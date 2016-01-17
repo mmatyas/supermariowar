@@ -1389,7 +1389,13 @@ void NetGameHost::sendStartGameMessage()
     netplay.client.setAsLastReceivedMessage(pkg.packageType);
 }
 
-void NetGameHost::sendCurrentGameState()
+void NetGameHost::sendCurrentGameStateIfNeeded()
+{
+    //if (current_server_tick % 3 == 0)
+        sendCurrentGameStateNow();
+}
+
+void NetGameHost::sendCurrentGameStateNow()
 {
     NetPkgs::GameState pkg;
 

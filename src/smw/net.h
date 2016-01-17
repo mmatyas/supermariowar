@@ -97,7 +97,7 @@ class NetGameHost : public NetworkEventHandler
         void sendStartRoomMessage();
 
         // P3. Game
-        void sendCurrentGameState();
+        void sendCurrentGameStateIfNeeded();
         void sendPowerupStart();
         void prepareMapCollisionEvent(CPlayer&);
         void sendMapCollisionEvent();
@@ -150,6 +150,7 @@ class NetGameHost : public NetworkEventHandler
         void setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* ports);
 
         // P3. Play
+        void sendCurrentGameStateNow();
         void handleRemoteInput(const NetPeer&, const uint8_t*, size_t);
         void handlePowerupRequest(const NetPeer&, const uint8_t*, size_t);
 
