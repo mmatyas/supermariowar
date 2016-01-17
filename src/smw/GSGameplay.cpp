@@ -235,9 +235,10 @@ void GameplayState::createPlayers()
     //netplay.latest_playerdata.copyFromLocal();
 
     if (netplay.active && !netplay.theHostIsMe) {
-        short teamid, subteamid;
-        LookupTeamID(netplay.remotePlayerNumber, &teamid, &subteamid);
-        netshadow_p0 = new PlayerNetworkShadow(netplay.remotePlayerNumber, netplay.remotePlayerNumber, teamid, subteamid);
+        //short teamid, subteamid;
+        //LookupTeamID(netplay.remotePlayerNumber, &teamid, &subteamid);
+        //netshadow_p0 = new PlayerNetworkShadow(netplay.remotePlayerNumber, netplay.remotePlayerNumber, teamid, subteamid);
+        netshadow_p0 = new PlayerNetworkShadow(list_players[netplay.remotePlayerNumber]);
     }
 }
 
@@ -1130,8 +1131,8 @@ void GameplayState::drawMiddleLayer()
     g_map->drawPlatforms(1);
 
     if (!game_values.swapplayers) {
-        /*if (netshadow_p0)
-            netshadow_p0->draw();*/
+        if (netshadow_p0)
+            netshadow_p0->draw();
 
         for (short i = 0; i < list_players_cnt; i++)
             list_players[i]->draw();
@@ -2195,13 +2196,13 @@ void GameplayState::read_network()
                 netplay.latest_playerdata.player_xvel[netplay.remotePlayerNumber],
                 netplay.latest_playerdata.player_yvel[netplay.remotePlayerNumber]);
 
-            if (!game_values.swapplayers && game_values.screenfade == 0)
-                netshadow_p0->apply_input();
+            /*if (!game_values.swapplayers && game_values.screenfade == 0)
+                netshadow_p0->apply_input();*/
 
-            list_players[netplay.remotePlayerNumber]->fx = netshadow_p0->inner_player->fx;
+            /*list_players[netplay.remotePlayerNumber]->fx = netshadow_p0->inner_player->fx;
             list_players[netplay.remotePlayerNumber]->fy = netshadow_p0->inner_player->fy;
             list_players[netplay.remotePlayerNumber]->velx = netshadow_p0->inner_player->velx;
-            list_players[netplay.remotePlayerNumber]->vely = netshadow_p0->inner_player->vely;
+            list_players[netplay.remotePlayerNumber]->vely = netshadow_p0->inner_player->vely;*/
         }
     }
 

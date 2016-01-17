@@ -26,6 +26,8 @@
 #include "player_components/PlayerWarpStatus.h"
 #include "player_components/PlayerWings.h"
 
+#include <list>
+
 namespace NetPkgs {
     struct MapCollision;
     struct P2PCollision;
@@ -532,35 +534,32 @@ private:
 		friend class PlayerNetworkShadow;
 };
 
-class DumbPlayer: public CPlayer
-{
-	DumbPlayer(short globalid, short localid, short teamid, short subteamid);
-	~DumbPlayer();
-
-private:
-	virtual bool FindSpawnPoint() { printf("DumbPlayer::FindSpawnPoint()\n"); return true; }
-
-	CScore fake_score;
-	short fake_respawn_counter;
-
-friend class PlayerNetworkShadow;
+struct PlayerShadowDiff {
+    float posx, posy;
+    float velx, vely;
 };
 
 class PlayerNetworkShadow
 {
 public:
-	PlayerNetworkShadow(short globalid, short localid, short teamid, short subteamid);
+	PlayerNetworkShadow(const CPlayer*);
 	~PlayerNetworkShadow();
-	void apply_input();
-	void draw();
+
+	void store_current_diff();
+	void replay_diffs();
+	void draw() const;
 
     void force_pos(float x, float y);
     void force_vel(float velx, float vely);
 
 private:
-	DumbPlayer* inner_player;
+	float posx, posy;
+	float velx, vely;
 
-friend class GameplayState;
+	const CPlayer* owner_player;
+	std::list<PlayerShadowDiff> diff_buffer;
+
+	void apply_diff(const PlayerShadowDiff&);
 };
 
 #endif // PLAYER_H

@@ -1398,7 +1398,7 @@ void NetGameHost::sendStartGameMessage()
 
 void NetGameHost::sendCurrentGameStateIfNeeded()
 {
-    //if (current_server_tick % 3 == 0)
+    if (current_server_tick % 4 == 0)
         sendCurrentGameStateNow();
 
     current_server_tick++;
