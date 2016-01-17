@@ -59,6 +59,9 @@ bool net_init()
     netplay.waitingForPowerupTrigger = false;
     netplay.allowMapCollisionEvent = false;
     netplay.gamestate_changed = false;
+    netplay.last_server_tick = 0;
+    netplay.previous_server_tick = 0;
+    netplay.local_tick = 0;
 
     if (!networkHandler.init())
         return false;
@@ -613,6 +616,7 @@ void NetClient::handleGameStartMessage()
 {
     printf("[net] Game start!\n");
     netplay.gameRunning = true;
+    netplay.local_tick = 0;
 }
 
 /****************************
@@ -642,6 +646,13 @@ void NetClient::sendLeaveGameMessage()
     //state change
     //...
     netplay.gameRunning = false;
+}
+
+void NetClient::storeLocalInput()
+{
+    assert(!netplay.theHostIsMe);
+    netplay.local_input_buffer.push_back(game_values.playerInput.outputControls[0]);
+    netplay.local_tick++;
 }
 
 void NetClient::sendLocalInput()
@@ -811,6 +822,9 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
 {
     NetPkgs::GameState pkg;
     memcpy(&pkg, data, sizeof(NetPkgs::GameState));
+
+    netplay.previous_server_tick = netplay.last_server_tick;
+    netplay.last_server_tick = pkg.server_tick;
 
     for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.getPlayerCoord(p, netplay.latest_playerdata.player_x[p], netplay.latest_playerdata.player_y[p]);
@@ -1130,6 +1144,7 @@ void Net_PlayerData::copyFromLocal()
 
 NetGameHost::NetGameHost()
     : active(false)
+    , current_server_tick(0)
     , foreign_lobbyserver(NULL)
     , expected_client_count(0)
     , next_free_client_slot(0)
@@ -1385,6 +1400,8 @@ void NetGameHost::sendCurrentGameStateIfNeeded()
 {
     //if (current_server_tick % 3 == 0)
         sendCurrentGameStateNow();
+
+    current_server_tick++;
 }
 
 void NetGameHost::sendCurrentGameStateNow()
@@ -1401,6 +1418,9 @@ void NetGameHost::sendCurrentGameStateNow()
         if (clients[c])
             clients[c]->send(&pkg, sizeof(NetPkgs::GameState));
     }
+
+    netplay.previous_server_tick = netplay.last_server_tick;
+    netplay.last_server_tick = current_server_tick;
 }
 
 void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, size_t dataLength) // only for room host

@@ -95,13 +95,23 @@ struct ClientInput : MessageHeader {
 };*/
 
 struct GameState : MessageHeader {
-    float           player_x[4];
-    float           player_y[4];
-    float           player_xvel[4];
-    float           player_yvel[4];
-    RawInput        input[4];
+    uint32_t server_tick; // current frame of the server
+    float player_x[4];
+    float player_y[4];
+    float player_xvel[4];
+    float player_yvel[4];
+    RawInput input[4];
 
-    GameState() : MessageHeader(NET_G2P_GAME_STATE) {}
+    GameState()
+        : MessageHeader(NET_G2P_GAME_STATE)
+        , server_tick(0)
+    {}
+
+
+    GameState(uint32_t tick)
+        : MessageHeader(NET_G2P_GAME_STATE)
+        , server_tick(tick)
+    {}
 
     // SEND
     void setPlayerCoord(uint8_t playerNum, float x, float y) {
