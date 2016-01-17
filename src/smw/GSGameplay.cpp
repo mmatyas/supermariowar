@@ -2141,9 +2141,6 @@ void GameplayState::handleInput()
         // net player inputs are not updated here,
         // it is handled in update()
     }
-
-    if (netplay.active && !netplay.theHostIsMe)
-        netplay.client.sendLocalInput();
 }
 
 bool shouldUpdate()
@@ -2187,6 +2184,22 @@ void GameplayState::read_network()
 
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
     //printf("%d -> %f\n", list_players[0]->leftX(), list_players[0]->fx);
+}
+
+void network_send_local_input()
+{
+    if (netplay.active && !netplay.theHostIsMe) {
+        netplay.client.sendLocalInput();
+    }
+}
+
+void network_broadcast_game_state()
+{
+    // The host sends the game state to clients
+    if (netplay.active && netplay.theHostIsMe) {
+        netplay.client.local_gamehost.sendCurrentGameStateIfNeeded();
+        netplay.client.local_gamehost.update();
+    }
 }
 
 void start_gameplay()
@@ -2341,6 +2354,7 @@ void GameplayState::update()
 #endif
 
     handleInput();
+    network_send_local_input();
 
     if (updateExitPauseDialog(iCountDownState)) {
         if (netplay.active)
@@ -2361,12 +2375,7 @@ void GameplayState::update()
             }
         }
         update_playerswap();
-
-        if (netplay.active && netplay.theHostIsMe) {
-            // The host sends the game state to clients
-            netplay.client.local_gamehost.sendCurrentGameState();
-            netplay.client.update();
-        }
+        network_broadcast_game_state();
 
         if (game_values.screenfade == 255) {
             if (game_values.gamestate == GS_START_GAME) {
