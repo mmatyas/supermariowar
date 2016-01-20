@@ -2977,19 +2977,32 @@ PlayerNetworkShadow::~PlayerNetworkShadow()
 
 void PlayerNetworkShadow::store_current_diff()
 {
-    diff_buffer.push_back(PlayerShadowDiff {
+    PlayerShadowDiff diff = {
         owner_player->fx - last_local.posx,
         owner_player->fy - last_local.posy,
         owner_player->velx - last_local.velx,
         owner_player->vely - last_local.vely
-    });
+    };
+
+    if (std::abs(diff.posx) > 75.0f
+        || std::abs(diff.posy) > 75.0f
+        || std::abs(diff.velx) > 10.0f
+        || std::abs(diff.vely) > 10.0f)
+    {
+        diff_buffer.clear();
+    }
+    else {
+        diff_buffer.push_back(diff);
+
+        printf("STORE {\n");
+        apply_diff(diff_buffer.back());
+        printf("}\n");
+    }
 
     last_local.posx = owner_player->fx;
     last_local.posy = owner_player->fy;
     last_local.velx = owner_player->velx;
     last_local.vely = owner_player->vely;
-
-    apply_diff(diff_buffer.back());
 
     //printf("- Player info: %f, %f, %f, %f\n", owner_player->fx, owner_player->fy, owner_player->velx, owner_player->vely);
     //printf("+ Stored diff: %f, %f, %f, %f\n", diff_buffer.back().posx, diff_buffer.back().posy, diff_buffer.back().velx, diff_buffer.back().vely);
@@ -3011,19 +3024,27 @@ void PlayerNetworkShadow::replay_diffs()
     assert(netplay.last_sent_input >= netplay.last_accepted_input);
     uint32_t tick_difference = netplay.last_sent_input - netplay.last_accepted_input;
     printf("now: %d, accepted until: %d, bufsize: %lu\n", netplay.last_sent_input, netplay.last_accepted_input, diff_buffer.size());
+    printf("dropped: ");
     while (tick_difference < diff_buffer.size()) {
+        printf(".");
         diff_buffer.pop_front();
     }
+    printf("\n");
 
     // replay unconfirmed input
-    printf("replay: ");
+    printf("replay: \n");
     auto iter = diff_buffer.begin();
     while (iter != diff_buffer.end()) {
         apply_diff(*iter);
         ++iter;
-        printf(".");
+        //printf(".");
     }
     printf("\n");
+    printf("After: %f, %f, %f, %f\n",
+        predicted_posx,
+        predicted_posy,
+        predicted_velx,
+        predicted_vely);
 }
 
 void PlayerNetworkShadow::apply_diff(const PlayerShadowDiff& diff)
@@ -3032,7 +3053,7 @@ void PlayerNetworkShadow::apply_diff(const PlayerShadowDiff& diff)
     predicted_posy += diff.posy;
     predicted_velx += diff.velx;
     predicted_vely += diff.vely;
-    //printf("- Applied diff: %f, %f, %f, %f\n", diff.posx, diff.posy, diff.velx, diff.vely);
+    printf("- Applied diff: %f, %f, %f, %f\n", diff.posx, diff.posy, diff.velx, diff.vely);
 }
 
 void PlayerNetworkShadow::set_last_confirmed(float posx, float posy, float velx, float vely)
@@ -3041,6 +3062,12 @@ void PlayerNetworkShadow::set_last_confirmed(float posx, float posy, float velx,
     predicted_posy = last_confirmed.posy = posy;
     predicted_velx = last_confirmed.velx = velx;
     predicted_vely = last_confirmed.vely = vely;
+
+    printf("Before: %f, %f, %f, %f\n",
+        predicted_posx,
+        predicted_posy,
+        predicted_velx,
+        predicted_vely);
 }
 
 void PlayerNetworkShadow::overwrite_owner_values()
