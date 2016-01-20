@@ -542,21 +542,24 @@ struct PlayerShadowDiff {
 class PlayerNetworkShadow
 {
 public:
-	PlayerNetworkShadow(const CPlayer*);
+	PlayerNetworkShadow(CPlayer*);
 	~PlayerNetworkShadow();
 
 	void store_current_diff();
 	void replay_diffs();
 	void draw() const;
 
-    void force_pos(float x, float y);
-    void force_vel(float velx, float vely);
+    void set_last_confirmed(float posx, float posy, float velx, float vely);
+    void overwrite_owner_values();
 
 private:
-	float posx, posy;
-	float velx, vely;
+	float predicted_posx, predicted_posy;
+	float predicted_velx, predicted_vely;
 
-	const CPlayer* owner_player;
+	PlayerShadowDiff last_confirmed;
+	PlayerShadowDiff last_local;
+
+	CPlayer* owner_player;
 	std::list<PlayerShadowDiff> diff_buffer;
 
 	void apply_diff(const PlayerShadowDiff&);

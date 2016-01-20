@@ -141,6 +141,7 @@ class NetGameHost : public NetworkEventHandler
         RawPlayerAddress expected_clients[3];
         uint8_t expected_client_count;
         uint8_t next_free_client_slot;
+        uint32_t last_processed_input[3];
 
         // Currently collision detection may change player data,
         // so it has to be saved before
@@ -318,9 +319,8 @@ struct Networking {
     Net_PlayerData latest_playerdata;
     std::list<COutputControl> local_input_buffer;
 
-    uint32_t last_server_tick;
-    uint32_t previous_server_tick;
-    uint32_t local_tick;
+    uint32_t last_sent_input;
+    uint32_t last_accepted_input;
 };
 
 extern Networking netplay;

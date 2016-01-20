@@ -2958,29 +2958,41 @@ void CPlayer::DecreaseProjectileLimit()
     }
 }
 
-PlayerNetworkShadow::PlayerNetworkShadow(const CPlayer* owner)
+PlayerNetworkShadow::PlayerNetworkShadow(CPlayer* owner)
     : owner_player(owner)
 {
     assert(owner);
-    posx = owner_player->fx;
-    posy = owner_player->fy;
-    velx = owner_player->velx;
-    vely = owner_player->vely;
+    last_local.posx = predicted_posx = owner_player->fx;
+    last_local.posy = predicted_posy = owner_player->fy;
+    last_local.velx = predicted_velx = owner_player->velx;
+    last_local.vely = predicted_vely = owner_player->vely;
+
+    //printf("INITIAL SHADOW: %f %f %f %f\n", posx, posy, velx, vely);
 }
 
 PlayerNetworkShadow::~PlayerNetworkShadow()
 {
-    owner_player = nullptr; // do NOT delete
+    owner_player = nullptr; // do NOT delete!
 }
 
 void PlayerNetworkShadow::store_current_diff()
 {
     diff_buffer.push_back(PlayerShadowDiff {
-        owner_player->fx - posx,
-        owner_player->fy - posy,
-        owner_player->velx - velx,
-        owner_player->vely - vely,
+        owner_player->fx - last_local.posx,
+        owner_player->fy - last_local.posy,
+        owner_player->velx - last_local.velx,
+        owner_player->vely - last_local.vely
     });
+
+    last_local.posx = owner_player->fx;
+    last_local.posy = owner_player->fy;
+    last_local.velx = owner_player->velx;
+    last_local.vely = owner_player->vely;
+
+    apply_diff(diff_buffer.back());
+
+    //printf("- Player info: %f, %f, %f, %f\n", owner_player->fx, owner_player->fy, owner_player->velx, owner_player->vely);
+    //printf("+ Stored diff: %f, %f, %f, %f\n", diff_buffer.back().posx, diff_buffer.back().posy, diff_buffer.back().velx, diff_buffer.back().vely);
 }
 
 void PlayerNetworkShadow::replay_diffs()
@@ -2995,6 +3007,14 @@ void PlayerNetworkShadow::replay_diffs()
         netplay.local_input_buffer.pop_front();
     }*/
 
+    // drop confirmed input
+    assert(netplay.last_sent_input >= netplay.last_accepted_input);
+    uint32_t tick_difference = netplay.last_sent_input - netplay.last_accepted_input;
+    printf("now: %d, accepted until: %d, bufsize: %lu\n", netplay.last_sent_input, netplay.last_accepted_input, diff_buffer.size());
+    while (tick_difference < diff_buffer.size()) {
+        diff_buffer.pop_front();
+    }
+
     // replay unconfirmed input
     printf("replay: ");
     auto iter = diff_buffer.begin();
@@ -3008,26 +3028,31 @@ void PlayerNetworkShadow::replay_diffs()
 
 void PlayerNetworkShadow::apply_diff(const PlayerShadowDiff& diff)
 {
-    posx += diff.posx;
-    posy += diff.posy;
-    velx += diff.velx;
-    vely += diff.vely;
+    predicted_posx += diff.posx;
+    predicted_posy += diff.posy;
+    predicted_velx += diff.velx;
+    predicted_vely += diff.vely;
+    //printf("- Applied diff: %f, %f, %f, %f\n", diff.posx, diff.posy, diff.velx, diff.vely);
 }
 
-void PlayerNetworkShadow::force_pos(float x, float y)
+void PlayerNetworkShadow::set_last_confirmed(float posx, float posy, float velx, float vely)
 {
-    posx = x;
-    posy = y;
+    predicted_posx = last_confirmed.posx = posx;
+    predicted_posy = last_confirmed.posy = posy;
+    predicted_velx = last_confirmed.velx = velx;
+    predicted_vely = last_confirmed.vely = vely;
 }
 
-void PlayerNetworkShadow::force_vel(float x, float y)
+void PlayerNetworkShadow::overwrite_owner_values()
 {
-    velx = x;
-    vely = y;
+    owner_player->fx = predicted_posx;
+    owner_player->fy = predicted_posy;
+    owner_player->velx = predicted_velx;
+    owner_player->vely = predicted_vely;
 }
 
 void PlayerNetworkShadow::draw() const
 {
     assert(owner_player);
-    rm->spr_shyguy[owner_player->colorID][owner_player->sprite_state]->draw(posx - PWOFFSET, posy - PHOFFSET, 0, 0, 32, 32);
+    rm->spr_shyguy[owner_player->colorID][owner_player->sprite_state]->draw(predicted_posx - PWOFFSET, predicted_posy - PHOFFSET, 0, 0, 32, 32);
 }

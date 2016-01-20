@@ -64,6 +64,7 @@ struct RawInput {
 };
 
 struct ClientInput : MessageHeader {
+    uint32_t    counter;
     RawInput    input;
 
     ClientInput(const COutputControl* playerControl)
@@ -95,7 +96,7 @@ struct ClientInput : MessageHeader {
 };*/
 
 struct GameState : MessageHeader {
-    uint32_t server_tick; // current frame of the server
+    uint32_t your_last_processed_input; // the last input id of the target player (who gets this pkg) that the server has processed
     float player_x[4];
     float player_y[4];
     float player_xvel[4];
@@ -104,13 +105,13 @@ struct GameState : MessageHeader {
 
     GameState()
         : MessageHeader(NET_G2P_GAME_STATE)
-        , server_tick(0)
+        , your_last_processed_input(0)
     {}
 
 
     GameState(uint32_t tick)
         : MessageHeader(NET_G2P_GAME_STATE)
-        , server_tick(tick)
+        , your_last_processed_input(tick)
     {}
 
     // SEND

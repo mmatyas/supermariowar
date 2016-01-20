@@ -62,7 +62,7 @@ short scorepowerupoffsets[3][3] = { {  37,  0,    0 },
 short GameplayState::scoreoffsets[3] = {2, 36, 70};
 short GameplayState::g_iPowerupToIcon[8] = {80, 176, 272, 304, 336, 368, 384, 400};
 
-PlayerNetworkShadow* netshadow_p0;
+PlayerNetworkShadow* netshadow_p0 = NULL;
 
 GameplayState::GameplayState()
 {
@@ -2189,12 +2189,13 @@ void GameplayState::read_network()
         // apply stored input to local player's network shadow
         // TODO: support multiple local players
         if (netshadow_p0) {
-            netshadow_p0->force_pos(
+            netshadow_p0->set_last_confirmed(
                 netplay.latest_playerdata.player_x[netplay.remotePlayerNumber],
-                netplay.latest_playerdata.player_y[netplay.remotePlayerNumber]);
-            netshadow_p0->force_vel(
+                netplay.latest_playerdata.player_y[netplay.remotePlayerNumber],
                 netplay.latest_playerdata.player_xvel[netplay.remotePlayerNumber],
                 netplay.latest_playerdata.player_yvel[netplay.remotePlayerNumber]);
+
+            netshadow_p0->replay_diffs();
 
             /*if (!game_values.swapplayers && game_values.screenfade == 0)
                 netshadow_p0->apply_input();*/
@@ -2203,6 +2204,8 @@ void GameplayState::read_network()
             list_players[netplay.remotePlayerNumber]->fy = netshadow_p0->inner_player->fy;
             list_players[netplay.remotePlayerNumber]->velx = netshadow_p0->inner_player->velx;
             list_players[netplay.remotePlayerNumber]->vely = netshadow_p0->inner_player->vely;*/
+
+            netshadow_p0->overwrite_owner_values();
         }
     }
 
@@ -2355,6 +2358,9 @@ void GameplayState::update_world()
     }
 
     g_map->update();
+
+    if (netshadow_p0)
+        netshadow_p0->store_current_diff();
 
     updateScreenShake();
 
