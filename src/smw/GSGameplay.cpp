@@ -2359,9 +2359,6 @@ void GameplayState::update_world()
 
     g_map->update();
 
-    if (netshadow_p0)
-        netshadow_p0->store_current_diff();
-
     updateScreenShake();
 
     updateScoreboardAnimation();
@@ -2409,6 +2406,9 @@ void GameplayState::update()
             } else {
                 update_world();
             }
+
+            if (netshadow_p0)
+                netshadow_p0->store_current_diff();
         }
         update_playerswap();
         network_broadcast_game_state();

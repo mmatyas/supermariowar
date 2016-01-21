@@ -535,8 +535,11 @@ private:
 };
 
 struct PlayerShadowDiff {
+	uint64_t input_id;
     float posx, posy;
     float velx, vely;
+
+    std::string print() const;
 };
 
 class PlayerNetworkShadow
