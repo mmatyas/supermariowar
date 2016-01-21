@@ -534,7 +534,7 @@ private:
 		friend class PlayerNetworkShadow;
 };
 
-struct PlayerShadowDiff {
+struct PlayerShadowData {
 	uint64_t input_id;
     float posx, posy;
     float velx, vely;
@@ -559,13 +559,13 @@ private:
 	float predicted_posx, predicted_posy;
 	float predicted_velx, predicted_vely;
 
-	PlayerShadowDiff last_confirmed;
-	PlayerShadowDiff last_local;
+	PlayerShadowData last_confirmed;
+	//PlayerShadowDiff last_local;
 
 	CPlayer* owner_player;
-	std::list<PlayerShadowDiff> diff_buffer;
+	std::list<PlayerShadowData> diff_buffer;
 
-	void apply_diff(const PlayerShadowDiff&);
+	//void apply_diff(const PlayerShadowDiff&);
 };
 
 #endif // PLAYER_H
