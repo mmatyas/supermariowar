@@ -96,22 +96,14 @@ struct ClientInput : MessageHeader {
 };*/
 
 struct GameState : MessageHeader {
-    uint32_t your_last_processed_input; // the last input id of the target player (who gets this pkg) that the server has processed
     float player_x[4];
     float player_y[4];
     float player_xvel[4];
     float player_yvel[4];
-    RawInput input[4];
+    RawInput input[4][NET_GAMESTATE_FRAMES_TO_SEND];
 
     GameState()
         : MessageHeader(NET_G2P_GAME_STATE)
-        , your_last_processed_input(0)
-    {}
-
-
-    GameState(uint32_t tick)
-        : MessageHeader(NET_G2P_GAME_STATE)
-        , your_last_processed_input(tick)
     {}
 
     // SEND
@@ -127,13 +119,13 @@ struct GameState : MessageHeader {
         player_yvel[playerNum] = yvel;
     }
 
-    void setPlayerKeys(uint8_t playerNum, const COutputControl* playerControl) {
+    void setPlayerKeys(uint8_t playerNum, const COutputControl& playerControl, uint8_t relative_frame) {
         assert(playerNum < 4);
-        assert(playerControl);
+        assert(relative_frame < NET_GAMESTATE_FRAMES_TO_SEND);
         for (uint8_t k = 0; k < 8; k++)
-            input[playerNum].setPlayerKey(k,
-                playerControl->keys[k].fDown,
-                playerControl->keys[k].fPressed);
+            input[playerNum][relative_frame].setPlayerKey(k,
+                playerControl.keys[k].fDown,
+                playerControl.keys[k].fPressed);
     }
 
     // RECEIVE
@@ -149,11 +141,12 @@ struct GameState : MessageHeader {
         yvel = player_yvel[playerNum];
     }
 
-    void getPlayerKeys(uint8_t playerNum, COutputControl* playerControl) {
+    void getPlayerKeys(uint8_t playerNum, COutputControl* playerControl, uint8_t relative_frame) {
         assert(playerNum < 4);
         assert(playerControl);
+        assert(relative_frame < NET_GAMESTATE_FRAMES_TO_SEND);
         for (uint8_t k = 0; k < 8; k++)
-            input[playerNum].getPlayerKey(k,
+            input[playerNum][relative_frame].getPlayerKey(k,
                 playerControl->keys[k].fDown,
                 playerControl->keys[k].fPressed);
     }

@@ -62,8 +62,6 @@ short scorepowerupoffsets[3][3] = { {  37,  0,    0 },
 short GameplayState::scoreoffsets[3] = {2, 36, 70};
 short GameplayState::g_iPowerupToIcon[8] = {80, 176, 272, 304, 336, 368, 384, 400};
 
-PlayerNetworkShadow* netshadow_p0 = NULL;
-
 GameplayState::GameplayState()
 {
     for (short p = 0; p < 4; p++) {
@@ -238,7 +236,7 @@ void GameplayState::createPlayers()
         //short teamid, subteamid;
         //LookupTeamID(netplay.remotePlayerNumber, &teamid, &subteamid);
         //netshadow_p0 = new PlayerNetworkShadow(netplay.remotePlayerNumber, netplay.remotePlayerNumber, teamid, subteamid);
-        netshadow_p0 = new PlayerNetworkShadow(list_players[netplay.remotePlayerNumber]);
+        //netshadow_p0 = new PlayerNetworkShadow(list_players[netplay.remotePlayerNumber]);
     }
 }
 
@@ -1131,8 +1129,8 @@ void GameplayState::drawMiddleLayer()
     g_map->drawPlatforms(1);
 
     if (!game_values.swapplayers) {
-        if (netshadow_p0)
-            netshadow_p0->draw();
+        /*if (netshadow_p0)
+            netshadow_p0->draw();*/
 
         for (short i = 0; i < list_players_cnt; i++)
             list_players[i]->draw();
@@ -2176,42 +2174,52 @@ void GameplayState::read_network()
     netplay.gamestate_changed = false;
     netplay.client.update();
 
-    if (!netplay.theHostIsMe && netplay.gamestate_changed) {
+    if (netplay.gamestate_changed) {
+        // At the start of the next interpolation interval,
+        // force every player to the confirmed position
         for (unsigned short p = 0; p < list_players_cnt; p++) {
-            if (p == netplay.remotePlayerNumber)
-                continue;
-
-            list_players[p]->fx = netplay.latest_playerdata.player_x[p];
-            list_players[p]->fy = netplay.latest_playerdata.player_y[p];
-            list_players[p]->velx = netplay.latest_playerdata.player_xvel[p];
-            list_players[p]->vely = netplay.latest_playerdata.player_yvel[p];
+            list_players[p]->fx = netplay.previous_playerdata.player_x[p];
+            list_players[p]->fy = netplay.previous_playerdata.player_y[p];
+            list_players[p]->velx = netplay.previous_playerdata.player_xvel[p];
+            list_players[p]->vely = netplay.previous_playerdata.player_yvel[p];
         }
+
         // apply stored input to local player's network shadow
         // TODO: support multiple local players
-        if (netshadow_p0) {
-            netshadow_p0->set_last_confirmed(
-                netplay.latest_playerdata.player_x[netplay.remotePlayerNumber],
-                netplay.latest_playerdata.player_y[netplay.remotePlayerNumber],
-                netplay.latest_playerdata.player_xvel[netplay.remotePlayerNumber],
-                netplay.latest_playerdata.player_yvel[netplay.remotePlayerNumber]);
-
-            netshadow_p0->replay_diffs();
-
-            /*if (!game_values.swapplayers && game_values.screenfade == 0)
-                netshadow_p0->apply_input();*/
-
-            /*list_players[netplay.remotePlayerNumber]->fx = netshadow_p0->inner_player->fx;
-            list_players[netplay.remotePlayerNumber]->fy = netshadow_p0->inner_player->fy;
-            list_players[netplay.remotePlayerNumber]->velx = netshadow_p0->inner_player->velx;
-            list_players[netplay.remotePlayerNumber]->vely = netshadow_p0->inner_player->vely;*/
-
-            netshadow_p0->overwrite_owner_values();
-        }
+//        if (netshadow_p0) {
+//            netshadow_p0->set_last_confirmed(
+//                netplay.latest_playerdata.player_x[netplay.remotePlayerNumber],
+//                netplay.latest_playerdata.player_y[netplay.remotePlayerNumber],
+//                netplay.latest_playerdata.player_xvel[netplay.remotePlayerNumber],
+//                netplay.latest_playerdata.player_yvel[netplay.remotePlayerNumber]);
+//
+//            netshadow_p0->replay_diffs();
+//
+//            /*if (!game_values.swapplayers && game_values.screenfade == 0)
+//                netshadow_p0->apply_input();*/
+//
+//            /*list_players[netplay.remotePlayerNumber]->fx = netshadow_p0->inner_player->fx;
+//            list_players[netplay.remotePlayerNumber]->fy = netshadow_p0->inner_player->fy;
+//            list_players[netplay.remotePlayerNumber]->velx = netshadow_p0->inner_player->velx;
+//            list_players[netplay.remotePlayerNumber]->vely = netshadow_p0->inner_player->vely;*/
+//
+//            netshadow_p0->overwrite_owner_values();
+//        }
     }
 
     if (previous_playerKeys != *current_playerKeys) {
         //netplay.client.sendLocalInput();
         previous_playerKeys = *current_playerKeys;
+    }
+
+    for (unsigned short p = 0; p < list_players_cnt; p++) {
+        assert(netplay.latest_playerdata.player_input[p].size() > 0);
+        netplay.netPlayerInput.outputControls[p] = netplay.latest_playerdata.player_input[p].front();
+
+        // Always leave one last input in the buffer,
+        // and repeat it until we get a new set
+        if (netplay.latest_playerdata.player_input[p].size() > 1)
+            netplay.latest_playerdata.player_input[p].pop_front();
     }
 
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
@@ -2220,10 +2228,13 @@ void GameplayState::read_network()
 
 void network_send_local_input()
 {
-    if (netplay.active && !netplay.theHostIsMe) {
-        netplay.client.storeLocalInput();
+    if (!netplay.active)
+        return;
+
+    netplay.client.storeLocalInput();
+
+    if (!netplay.theHostIsMe)
         netplay.client.sendLocalInput();
-    }
 }
 
 void network_broadcast_game_state()
@@ -2397,6 +2408,10 @@ void GameplayState::update()
     }
 
     if (shouldUpdate()) {
+        for (unsigned short i = 0; i < list_players_cnt; i++) {
+
+        }
+
         if (!game_values.swapplayers && game_values.screenfade == 0) {
             update_countdown_timer();
 
@@ -2407,9 +2422,11 @@ void GameplayState::update()
                 update_world();
             }
 
-            if (netshadow_p0)
-                netshadow_p0->store_current_diff();
+            /*if (netshadow_p0)
+                netshadow_p0->store_current_diff();*/
         }
+
+
         update_playerswap();
         network_broadcast_game_state();
 
