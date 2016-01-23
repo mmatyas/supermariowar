@@ -46,9 +46,9 @@ struct LeaveGame : MessageHeader {
 struct RawInput {
     uint16_t    flags;
 
-    RawInput() {
-        flags = 0;
-    }
+    RawInput()
+        : flags(0)
+    {}
 
     void setPlayerKey(uint8_t keyNum, bool down, bool pressed) {
         assert(keyNum < 8);
@@ -101,7 +101,13 @@ struct GameState : MessageHeader {
     float player_yvel[4];
     RawInput input[4][NET_GAMESTATE_FRAMES_TO_SEND];
 
-    GameState() : MessageHeader(NET_G2P_GAME_STATE) {}
+    GameState()
+        : MessageHeader(NET_G2P_GAME_STATE)
+        , player_x {0,0,0,0}
+        , player_y {0,0,0,0}
+        , player_xvel {0,0,0,0}
+        , player_yvel {0,0,0,0}
+    {}
 
     // SEND
     void setPlayerCoord(uint8_t playerNum, float x, float y) {
