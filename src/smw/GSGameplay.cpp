@@ -2189,6 +2189,7 @@ void GameplayState::read_network()
 void network_send_local_input()
 {
     if (netplay.active && !netplay.theHostIsMe) {
+        netplay.client.storeLocalInput();
         netplay.client.sendLocalInput();
     }
 }

@@ -652,6 +652,12 @@ void NetClient::sendLeaveGameMessage()
     netplay.gameRunning = false;
 }
 
+void NetClient::storeLocalInput()
+{
+    assert(!netplay.theHostIsMe);
+    netplay.local_input_buffer.push_back(game_values.playerInput.outputControls[0]);
+}
+
 void NetClient::sendLocalInput()
 {
     assert(!netplay.theHostIsMe);
@@ -1138,6 +1144,7 @@ void Net_PlayerData::copyFromLocal()
 
 NetGameHost::NetGameHost()
     : active(false)
+    , current_server_tick(0)
     , foreign_lobbyserver(NULL)
     , expected_client_count(0)
     , next_free_client_slot(0)
@@ -1393,6 +1400,8 @@ void NetGameHost::sendCurrentGameStateIfNeeded()
 {
     //if (current_server_tick % 3 == 0)
         sendCurrentGameStateNow();
+
+    current_server_tick++;
 }
 
 void NetGameHost::sendCurrentGameStateNow()

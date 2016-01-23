@@ -5,6 +5,7 @@
 #include "network/NetworkLayer.h"
 #include "ProtocolDefinitions.h"
 
+#include <list>
 #include <string>
 #include <vector>
 
@@ -110,6 +111,8 @@ class NetGameHost : public NetworkEventHandler
     private:
         bool active;
 
+        uint32_t current_server_tick;
+
         // connected players except local client
         // TODO: support more players?
         NetPeer* clients[3];
@@ -196,6 +199,7 @@ class NetClient : public NetworkEventHandler
 
         // P3. Play
         void sendLeaveGameMessage();
+        void storeLocalInput();
         void sendLocalInput();
         void sendPowerupRequest();
 
@@ -312,6 +316,7 @@ struct Networking {
 
     bool gamestate_changed;
     Net_PlayerData latest_playerdata;
+    std::list<COutputControl> local_input_buffer;
 };
 
 extern Networking netplay;

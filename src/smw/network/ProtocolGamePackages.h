@@ -95,11 +95,11 @@ struct ClientInput : MessageHeader {
 };*/
 
 struct GameState : MessageHeader {
-    float           player_x[4];
-    float           player_y[4];
-    float           player_xvel[4];
-    float           player_yvel[4];
-    RawInput        input[4];
+    float player_x[4];
+    float player_y[4];
+    float player_xvel[4];
+    float player_yvel[4];
+    RawInput input[4];
 
     GameState() : MessageHeader(NET_G2P_GAME_STATE) {}
 
