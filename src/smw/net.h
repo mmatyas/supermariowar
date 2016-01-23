@@ -5,6 +5,7 @@
 #include "network/NetworkLayer.h"
 #include "ProtocolDefinitions.h"
 
+#include <list>
 #include <string>
 #include <vector>
 
@@ -97,7 +98,7 @@ class NetGameHost : public NetworkEventHandler
         void sendStartRoomMessage();
 
         // P3. Game
-        void sendCurrentGameState();
+        void sendCurrentGameStateIfNeeded();
         void sendPowerupStart();
         void prepareMapCollisionEvent(CPlayer&);
         void sendMapCollisionEvent();
@@ -109,6 +110,8 @@ class NetGameHost : public NetworkEventHandler
 
     private:
         bool active;
+
+        uint32_t current_server_tick;
 
         // connected players except local client
         // TODO: support more players?
@@ -139,6 +142,8 @@ class NetGameHost : public NetworkEventHandler
         uint8_t expected_client_count;
         uint8_t next_free_client_slot;
 
+        std::list<COutputControl> remote_input_buffer[3];
+
         // Currently collision detection may change player data,
         // so it has to be saved before
         NetPkgs::MapCollision* preparedMapCollPkg;
@@ -150,6 +155,7 @@ class NetGameHost : public NetworkEventHandler
         void setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* ports);
 
         // P3. Play
+        void sendCurrentGameStateNow();
         void handleRemoteInput(const NetPeer&, const uint8_t*, size_t);
         void handlePowerupRequest(const NetPeer&, const uint8_t*, size_t);
 
@@ -195,6 +201,7 @@ class NetClient : public NetworkEventHandler
 
         // P3. Play
         void sendLeaveGameMessage();
+        void storeLocalInput();
         void sendLocalInput();
         void sendPowerupRequest();
 
@@ -263,9 +270,7 @@ struct Net_PlayerData {
     float          player_y[4];
     float          player_xvel[4];
     float          player_yvel[4];
-    COutputControl player_input[4];
-
-    void copyFromLocal();
+    std::list<COutputControl> player_input[4];
 };
 
 struct Networking {
@@ -310,7 +315,9 @@ struct Networking {
     bool allowMapCollisionEvent;
 
     bool gamestate_changed;
+    Net_PlayerData previous_playerdata;
     Net_PlayerData latest_playerdata;
+    std::list<COutputControl> local_input_buffer;
 };
 
 extern Networking netplay;

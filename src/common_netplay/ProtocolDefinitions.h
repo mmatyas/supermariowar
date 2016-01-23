@@ -10,6 +10,7 @@
 #define NET_MAX_ROOM_NAME_LENGTH            32
 #define NET_MAX_ROOM_PASSWORD_LENGTH        16
 #define NET_MAX_CHAT_MSG_LENGTH             100
+#define NET_GAMESTATE_FRAMES_TO_SEND        3 // send gamestate every Nth frame only
 
 #define NET_REQUEST_SERVERINFO              1
 #define NET_RESPONSE_BADPROTOCOL            2
