@@ -112,9 +112,14 @@ bool net_startSession()
     netplay.active = true;
     netplay.connectSuccessful = false;
 
-    // backup singleplayer settings
-    for (uint8_t p = 0; p < 4; p++)
+    COutputControl nullinput = (const struct COutputControl){0}; // set every field to false
+    for (uint8_t p = 0; p < 4; p++) {
+        // backup singleplayer settings
         backup_playercontrol[p] = game_values.playercontrol[p];
+
+        netplay.latest_playerdata.player_input[p].clear();
+        netplay.latest_playerdata.player_input[p].push_back(nullinput);
+    }
 
     return netplay.client.start();
 }
@@ -654,8 +659,8 @@ void NetClient::sendLeaveGameMessage()
 
 void NetClient::storeLocalInput()
 {
-    assert(!netplay.theHostIsMe);
-    netplay.local_input_buffer.push_back(game_values.playerInput.outputControls[0]);
+    if (netplay.theHostIsMe)
+        netplay.local_input_buffer.push_back(game_values.playerInput.outputControls[0]);
 }
 
 void NetClient::sendLocalInput()
@@ -826,10 +831,18 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
     NetPkgs::GameState pkg;
     memcpy(&pkg, data, sizeof(NetPkgs::GameState));
 
+    netplay.previous_playerdata = netplay.latest_playerdata;
+
     for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.getPlayerCoord(p, netplay.latest_playerdata.player_x[p], netplay.latest_playerdata.player_y[p]);
         pkg.getPlayerVel(p, netplay.latest_playerdata.player_xvel[p], netplay.latest_playerdata.player_yvel[p]);
-        pkg.getPlayerKeys(p, &netplay.latest_playerdata.player_input[p]);
+
+        netplay.latest_playerdata.player_input[p].clear();
+        for (short f = 0; f < NET_GAMESTATE_FRAMES_TO_SEND; f++) {
+            COutputControl keys;
+            pkg.getPlayerKeys(p, &keys, f);
+            netplay.latest_playerdata.player_input[p].push_back(keys);
+        }
     }
 
     netplay.gamestate_changed = true;
@@ -1127,20 +1140,6 @@ void NetClient::setAsLastReceivedMessage(uint8_t packageType)
 
 
 
-void Net_PlayerData::copyFromLocal()
-{
-    for (uint8_t p = 0; p < list_players_cnt; p++) {
-        player_x[p] = list_players[p]->fx;
-        player_y[p] = list_players[p]->fy;
-        player_xvel[p] = list_players[p]->velx;
-        player_yvel[p] = list_players[p]->vely;
-        player_input[p] = game_values.playerInput.outputControls[p];
-    }
-}
-
-
-
-
 
 NetGameHost::NetGameHost()
     : active(false)
@@ -1398,7 +1397,7 @@ void NetGameHost::sendStartGameMessage()
 
 void NetGameHost::sendCurrentGameStateIfNeeded()
 {
-    //if (current_server_tick % 3 == 0)
+    if (current_server_tick % NET_GAMESTATE_FRAMES_TO_SEND == 0)
         sendCurrentGameStateNow();
 
     current_server_tick++;
@@ -1411,13 +1410,29 @@ void NetGameHost::sendCurrentGameStateNow()
     for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
         pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
-        pkg.setPlayerKeys(p, list_players[p]->playerKeys);
+    }
+
+    for (short f = 0; f < NET_GAMESTATE_FRAMES_TO_SEND; f++) {
+        if (!netplay.local_input_buffer.empty()) {
+            pkg.setPlayerKeys(0, netplay.local_input_buffer.front(), f);
+            netplay.local_input_buffer.pop_front();
+        }
     }
 
     for (int c = 0; c < 3; c++) {
-        if (clients[c])
+        if (clients[c]) {
+            for (short f = 0; f < NET_GAMESTATE_FRAMES_TO_SEND; f++) {
+                if (!remote_input_buffer[c].empty()) {
+                    pkg.setPlayerKeys(c + 1, remote_input_buffer[c].front(), f);
+                    remote_input_buffer[c].pop_front();
+                }
+            }
             clients[c]->send(&pkg, sizeof(NetPkgs::GameState));
+        }
     }
+
+    netplay.client.handleRemoteGameState((uint8_t*)&pkg, sizeof(pkg));
+    netplay.client.setAsLastReceivedMessage(pkg.packageType);
 }
 
 void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, size_t dataLength) // only for room host
@@ -1431,7 +1446,14 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
             //printf("yey\n");
 
             // TODO: does this work if GH leaves?
-            pkg->readKeys(&netplay.netPlayerInput.outputControls[c + 1]);
+
+            // Do not accept inputs from the past
+            //if (last_processed_input[c] < pkg->counter) {
+            //    last_processed_input[c] = pkg->counter;
+                COutputControl keys;
+                pkg->readKeys(&keys);
+                remote_input_buffer[c].push_back(keys);
+            //}
 
 
             /*printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",

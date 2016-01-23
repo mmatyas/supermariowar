@@ -228,9 +228,6 @@ void GameplayState::createPlayers()
         game_values.bulletbilltimer[iPlayer] = 0;
         game_values.bulletbillspawntimer[iPlayer] = 0;
     }
-
-    //netplay.gamestate_changed = false;
-    //netplay.latest_playerdata.copyFromLocal();
 }
 
 void GameplayState::initScoreDisplayPosition()
@@ -2164,22 +2161,31 @@ void GameplayState::read_network()
     netplay.gamestate_changed = false;
     netplay.client.update();
 
-    if (netplay.theHostIsMe)
-        // The host sends the game state to clients
-        netplay.client.local_gamehost.sendCurrentGameStateIfNeeded();
-    else if (netplay.gamestate_changed) {
+    // Note: gamestate_changed becomes true on clients only
+    if (netplay.gamestate_changed) {
+        // At the start of the next interpolation interval,
+        // force every player to the confirmed position
         for (unsigned short p = 0; p < list_players_cnt; p++) {
             list_players[p]->fx = netplay.latest_playerdata.player_x[p];
             list_players[p]->fy = netplay.latest_playerdata.player_y[p];
             list_players[p]->velx = netplay.latest_playerdata.player_xvel[p];
             list_players[p]->vely = netplay.latest_playerdata.player_yvel[p];
-            netplay.netPlayerInput.outputControls[p].copyFrom(netplay.latest_playerdata.player_input[p]);
         }
     }
 
     if (previous_playerKeys != *current_playerKeys) {
-        //netplay.client.sendLocalInput();
         previous_playerKeys = *current_playerKeys;
+    }
+
+    // Consume the next input from the current interval's input buffer
+    for (unsigned short p = 0; p < list_players_cnt; p++) {
+        assert(netplay.latest_playerdata.player_input[p].size() > 0);
+        netplay.netPlayerInput.outputControls[p] = netplay.latest_playerdata.player_input[p].front();
+
+        // Always leave one last input in the buffer,
+        // and repeat it until we get a new set
+        if (netplay.latest_playerdata.player_input[p].size() > 1)
+            netplay.latest_playerdata.player_input[p].pop_front();
     }
 
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
@@ -2188,10 +2194,13 @@ void GameplayState::read_network()
 
 void network_send_local_input()
 {
-    if (netplay.active && !netplay.theHostIsMe) {
-        netplay.client.storeLocalInput();
+    if (!netplay.active)
+        return;
+
+    netplay.client.storeLocalInput();
+
+    if (!netplay.theHostIsMe)
         netplay.client.sendLocalInput();
-    }
 }
 
 void network_broadcast_game_state()

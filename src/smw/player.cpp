@@ -119,13 +119,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
         pPlayerAI->SetPlayer(this);
 
     if (netplay.active) {
-        if (iGlobalID == netplay.remotePlayerNumber) {
-            playerKeys = &game_values.playerInput.outputControls[0];
-            printf("[net] Player %d reads local input.\n", iGlobalID);
-        } else {
-            playerKeys = &netplay.netPlayerInput.outputControls[iGlobalID];
-            printf("[net] Player %d reads network input.\n", iGlobalID);
-        }
+        playerKeys = &netplay.netPlayerInput.outputControls[iGlobalID];
     }
     else {
         playerKeys = &game_values.playerInput.outputControls[globalID];
@@ -186,7 +180,7 @@ void CPlayer::accelerate(float direction)
     if (onice)
         velx += VELMOVINGADDICE * direction;
     else
-        velx += VELMOVINGADD * direction;       //move right
+        velx += VELMOVINGADD * direction;
 
     float maxVel = 0.0f;
     if (!frozen) {
@@ -199,7 +193,7 @@ void CPlayer::accelerate(float direction)
     }
     assert(maxVel >= 0.0);
 
-    if (abs(velx) > maxVel)
+    if (std::abs(velx) > maxVel)
         velx = maxVel * direction;
 
     if (!inair) {
