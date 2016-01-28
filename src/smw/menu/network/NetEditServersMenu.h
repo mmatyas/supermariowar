@@ -32,6 +32,9 @@ private:
     MI_Image * miLeftHeaderBar;
     MI_Image * miRightHeaderBar;
     MI_Text * miHeaderText;
+
+    MI_Text * miInstructionsText1;
+    MI_Text * miInstructionsText2;
 };
 
 #endif // MENU_NET_EDIT_SERVER_LIST_H

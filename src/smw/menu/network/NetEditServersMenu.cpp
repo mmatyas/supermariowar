@@ -19,6 +19,9 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     miRemoveButton = new MI_Button(&rm->spr_selectfield, 40, 120, "Remove", 200, 1);
     miRemoveButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE);
 
+    miInstructionsText1 = new MI_Text("", 40, 195, 0, 2, 0);
+    miInstructionsText2 = new MI_Text("", 40, 215, 0, 2, 0);
+
     miLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
     miHeaderText = new MI_Text("Add/Remove Servers Menu", 320, 5, 0, 2, 1);
@@ -37,6 +40,8 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     AddNonControl(miLeftHeaderBar);
     AddNonControl(miRightHeaderBar);
     AddNonControl(miHeaderText);
+    AddNonControl(miInstructionsText1);
+    AddNonControl(miInstructionsText2);
 
     AddControl(miServerScroll, NULL, NULL, NULL, NULL);
 
@@ -52,6 +57,9 @@ void UI_NetEditServersMenu::Restore() {
         RestoreCurrent();
 
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
+
+    miInstructionsText1->SetText("");
+    miInstructionsText2->SetText("");
 
     miServerScroll->ClearItems();
     for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
@@ -69,6 +77,9 @@ void UI_NetEditServersMenu::onPressEdit() {
     SetHeadControl(miServerScroll);
     SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
     miServerScroll->Activate();
+
+    miInstructionsText1->SetText("Select an entry");
+    miInstructionsText2->SetText("to edit");
 }
 
 void UI_NetEditServersMenu::onPressDelete() {
@@ -77,4 +88,7 @@ void UI_NetEditServersMenu::onPressDelete() {
     SetHeadControl(miServerScroll);
     SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
     miServerScroll->Activate();
+
+    miInstructionsText1->SetText("Select an entry");
+    miInstructionsText2->SetText("to delete");
 }
