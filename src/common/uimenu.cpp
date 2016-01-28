@@ -13,6 +13,7 @@ UI_Menu::UI_Menu()
 	fModifyingItem = false;
 	headControl = NULL;
 	current = NULL;
+	savedCurrent = NULL;
 
 	iControllingTeam = -1;
 }
