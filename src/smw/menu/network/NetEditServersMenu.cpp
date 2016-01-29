@@ -155,6 +155,11 @@ void UI_NetEditServersMenu::onEntrySelect() {
 
     switch (currentState) {
     case EDIT:
+        strncpy(dialogTextData, netplay.savedServers[miServerScroll->CurrentIndex()].hostname.c_str(), 127);
+        miDialogTextField->Refresh();
+        ShowDialog();
+        SetHeadControl(miDialogTextField);
+        SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
         break;
 
     case DELETE:
@@ -179,6 +184,8 @@ void UI_NetEditServersMenu::onDialogOk() {
         break;
 
     case EDIT:
+        assert(netplay.savedServers.size() > miServerScroll->CurrentIndex());
+        netplay.savedServers[miServerScroll->CurrentIndex()] = new_address;
         break;
 
     default:
