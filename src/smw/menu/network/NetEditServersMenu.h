@@ -21,9 +21,12 @@ public:
     void onPressEdit();
     void onPressDelete();
     void onEntrySelect();
+    void onDialogOk();
 
 private:
     void ReloadScroll();
+    void ShowDialog();
+    void HideDialog();
 
     enum MenuState {
         DEFAULT,
@@ -40,12 +43,19 @@ private:
 
     MI_StringScroll* miServerScroll;
 
+    MI_Text * miInstructionsText1;
+    MI_Text * miInstructionsText2;
+
+    MI_Text * miDialogTitle;
+    MI_TextField * miDialogTextField;
+    MI_Button * miDialogOK;
+    MI_Button * miDialogCancel;
+
+    char dialogTextData[128];
+
     MI_Image * miLeftHeaderBar;
     MI_Image * miRightHeaderBar;
     MI_Text * miHeaderText;
-
-    MI_Text * miInstructionsText1;
-    MI_Text * miInstructionsText2;
 };
 
 #endif // MENU_NET_EDIT_SERVER_LIST_H

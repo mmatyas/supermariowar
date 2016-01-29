@@ -10,6 +10,7 @@ extern CResourceManager* rm;
 UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
 {
     currentState = DEFAULT;
+    std::fill(dialogTextData, dialogTextData + 128, 0);
 
     miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
@@ -30,11 +31,24 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     miRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
     miHeaderText = new MI_Text("Add/Remove Servers Menu", 320, 5, 0, 2, 1);
 
-    miServerScroll = new MI_StringScroll(&rm->menu_plain_field, 260, 32, 350, 11);
+    miServerScroll = new MI_StringScroll(&rm->menu_plain_field, 260, 32, 350, 9);
     miServerScroll->SetAutoModify(true);
     miServerScroll->SetAcceptCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_SELECT);
     miServerScroll->SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
     miServerScroll->Deactivate();
+
+    miDialogTitle = new MI_Text("Enter a new server address below:", 40, 370, 0, 2, 0);
+    miDialogTextField = new MI_TextField(&rm->menu_plain_field, 40, 395, "URL or IP", 640 - 2 * 40, 150);
+    miDialogTextField->SetData(dialogTextData, 127);
+    miDialogOK = new MI_Button(&rm->spr_selectfield, 40, 432, "OK", 100, 1);
+    miDialogOK->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DIALOG_OK);
+    miDialogCancel = new MI_Button(&rm->spr_selectfield, 150, 432, "Cancel", 100, 1);
+    miDialogCancel->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
+
+    miDialogTitle->Show(false);
+    miDialogTextField->Show(false);
+    miDialogOK->Show(false);
+    miDialogCancel->Show(false);
 
     AddControl(miAddButton, miBackButton, miEditButton, NULL, NULL);
     AddControl(miEditButton, miAddButton, miRemoveButton, NULL, NULL);
@@ -48,6 +62,11 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     AddNonControl(miInstructionsText2);
 
     AddControl(miServerScroll, NULL, NULL, NULL, NULL);
+
+    AddNonControl(miDialogTitle);
+    AddControl(miDialogTextField, miDialogOK, miDialogOK, NULL, NULL);
+    AddControl(miDialogOK, miDialogTextField, miDialogTextField, miDialogCancel, miDialogCancel);
+    AddControl(miDialogCancel, miDialogTextField, miDialogTextField, miDialogOK, miDialogOK);
 
     SetHeadControl(miAddButton);
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
@@ -64,6 +83,20 @@ void UI_NetEditServersMenu::ReloadScroll() {
     }
 }
 
+void UI_NetEditServersMenu::ShowDialog() {
+    miDialogTitle->Show(true);
+    miDialogTextField->Show(true);
+    miDialogOK->Show(true);
+    miDialogCancel->Show(true);
+}
+
+void UI_NetEditServersMenu::HideDialog() {
+    miDialogTitle->Show(false);
+    miDialogTextField->Show(false);
+    miDialogOK->Show(false);
+    miDialogCancel->Show(false);
+}
+
 void UI_NetEditServersMenu::Restore() {
     if (savedCurrent)
         RestoreCurrent();
@@ -74,12 +107,17 @@ void UI_NetEditServersMenu::Restore() {
     miInstructionsText1->SetText("");
     miInstructionsText2->SetText("");
 
+    HideDialog();
     ReloadScroll();
 }
 
 void UI_NetEditServersMenu::onPressAdd() {
     RememberCurrent();
     currentState = ADD;
+
+    ShowDialog();
+    SetHeadControl(miDialogTextField);
+    SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 }
 
 void UI_NetEditServersMenu::onPressEdit() {
@@ -126,7 +164,29 @@ void UI_NetEditServersMenu::onEntrySelect() {
         break;
 
     default:
-        // You shouldn't reach this branch
+        // You should not reach this branch
         assert(false);
     }
+}
+
+void UI_NetEditServersMenu::onDialogOk() {
+    ServerAddress new_address;
+    new_address.hostname = dialogTextData;
+
+    switch (currentState) {
+    case ADD:
+        netplay.savedServers.push_back(new_address);
+        break;
+
+    case EDIT:
+        break;
+
+    default:
+        // You should not reach this branch
+        assert(false);
+    }
+
+    std::fill(dialogTextData, dialogTextData + 128, 0);
+    miDialogTextField->Refresh();
+    Restore();
 }
