@@ -29,7 +29,6 @@ matrix:
     before_script:
     - brew update
     - brew install sdl2 sdl2_image sdl2_mixer
-    - sed -i.bak 's/check_type_size.*/set(SIZEOF_VOID_P "8")/' dependencies/lz4/cmake_unofficial/CMakeLists.txt
 
   # Android builds
   - env: BUILD=android ABILIST='armeabi armeabi-v7a arm64-v8a'
