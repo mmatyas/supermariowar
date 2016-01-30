@@ -3,10 +3,14 @@
 #include "net.h"
 #include "ResourceManager.h"
 
+#include <cassert>
+
 extern CResourceManager* rm;
 
 UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
 {
+    currentState = DEFAULT;
+
     miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
@@ -52,15 +56,7 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
 UI_NetEditServersMenu::~UI_NetEditServersMenu() {
 }
 
-void UI_NetEditServersMenu::Restore() {
-    if (savedCurrent)
-        RestoreCurrent();
-
-    SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
-
-    miInstructionsText1->SetText("");
-    miInstructionsText2->SetText("");
-
+void UI_NetEditServersMenu::ReloadScroll() {
     miServerScroll->ClearItems();
     for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
         ServerAddress* host = &netplay.savedServers[iServer];
@@ -68,11 +64,30 @@ void UI_NetEditServersMenu::Restore() {
     }
 }
 
+void UI_NetEditServersMenu::Restore() {
+    if (savedCurrent)
+        RestoreCurrent();
+
+    SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
+    currentState = DEFAULT;
+
+    miInstructionsText1->SetText("");
+    miInstructionsText2->SetText("");
+
+    ReloadScroll();
+}
+
 void UI_NetEditServersMenu::onPressAdd() {
+    RememberCurrent();
+    currentState = ADD;
 }
 
 void UI_NetEditServersMenu::onPressEdit() {
+    if (netplay.savedServers.size() == 0)
+        return;
+
     RememberCurrent();
+    currentState = EDIT;
 
     SetHeadControl(miServerScroll);
     SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
@@ -83,7 +98,11 @@ void UI_NetEditServersMenu::onPressEdit() {
 }
 
 void UI_NetEditServersMenu::onPressDelete() {
+    if (netplay.savedServers.size() == 0)
+        return;
+
     RememberCurrent();
+    currentState = DELETE;
 
     SetHeadControl(miServerScroll);
     SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
@@ -91,4 +110,23 @@ void UI_NetEditServersMenu::onPressDelete() {
 
     miInstructionsText1->SetText("Select an entry");
     miInstructionsText2->SetText("to delete");
+}
+
+void UI_NetEditServersMenu::onEntrySelect() {
+    assert(netplay.savedServers.size() > miServerScroll->CurrentIndex());
+
+    switch (currentState) {
+    case EDIT:
+        break;
+
+    case DELETE:
+        netplay.savedServers.erase(netplay.savedServers.begin() + miServerScroll->CurrentIndex());
+        ReloadScroll();
+        miServerScroll->Activate();
+        break;
+
+    default:
+        // You shouldn't reach this branch
+        assert(false);
+    }
 }

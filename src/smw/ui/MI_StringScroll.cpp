@@ -72,6 +72,10 @@ void MI_StringScroll::Deactivate() {
     iSelectedLine = -1;
 }
 
+unsigned short MI_StringScroll::CurrentIndex() const {
+    return iIndex;
+}
+
 MenuCodeEnum MI_StringScroll::Modify(bool modify)
 {
     fModifying = modify;

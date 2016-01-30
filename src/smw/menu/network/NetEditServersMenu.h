@@ -20,8 +20,19 @@ public:
     void onPressAdd();
     void onPressEdit();
     void onPressDelete();
+    void onEntrySelect();
 
 private:
+    void ReloadScroll();
+
+    enum MenuState {
+        DEFAULT,
+        ADD,
+        EDIT,
+        DELETE
+    };
+    MenuState currentState;
+
     MI_Button * miAddButton;
     MI_Button * miEditButton;
     MI_Button * miRemoveButton;

@@ -40,6 +40,8 @@ class MI_StringScroll : public UI_Control
 		void Activate();
 		void Deactivate();
 
+		unsigned short CurrentIndex() const;
+
 	private:
 		std::vector<StringScrollElement> items;
 		std::vector<StringScrollElement>::iterator current;
