@@ -121,6 +121,9 @@ endif()
 #
 #-----------------------------------------------------------------------------
 
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIR})
+
 # emscripten uses its own SDL, no need to include or link
 if (NOT TARGET_EMSCRIPTEN)
 	if (USE_SDL2_LIBS)
