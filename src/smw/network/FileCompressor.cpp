@@ -1,6 +1,6 @@
 #include "network/FileCompressor.h"
 
-#include "lz4.h"
+#include "zlib.h"
 
 #include <cassert>
 #include <cstdio>
@@ -64,24 +64,24 @@ bool FileCompressor::compress(const std::string& input_path, uint8_t*& output_bu
 
         // Compress
 
-        int max_output_size = LZ4_compressBound(input_size);
-        if (max_output_size <= 0) {
+        compressed_size = compressBound(input_size);
+        if (compressed_size > COMPRESSION_SIZE_LIMIT) {
             printf("[error] File %s is too big\n", input_path.c_str());
             throw std::exception();
         }
 
         // package headers + uncompressed size (2B) + compressed size (2B) + data
-        output_buffer = (uint8_t*) malloc(output_header_offset + 4 + max_output_size);
+        output_buffer = (uint8_t*) malloc(output_header_offset + 4 + compressed_size);
         if (!output_buffer) {
             printf("[error] Out of memory\n");
             throw std::exception();
         }
 
-        int return_value = LZ4_compress_default((const char*)input_buffer, (char*)(output_buffer + output_header_offset + 4), input_size, max_output_size);
-        if (return_value <= 0)
+        int return_value = ::compress((uint8_t*)(output_buffer + output_header_offset + 4), &compressed_size, input_buffer, input_size);
+        if (return_value != Z_OK) {
+            printf("[error] Out of memory, could not compress\n");
             throw std::exception();
-
-        compressed_size = return_value;
+        }
 
         uint16_t stored_full_size = input_size;
         uint16_t stored_compressed_size = compressed_size;
@@ -131,7 +131,8 @@ bool FileCompressor::decompress(const uint8_t* input_buffer, const std::string& 
             throw std::exception();
         }
 
-        output_buffer = (uint8_t*) malloc(stored_full_size);
+        size_t output_size = stored_full_size;
+        output_buffer = (uint8_t*) malloc(output_size);
         if (!output_buffer) {
             printf("[error] Out of memory\n");
             throw std::exception();
@@ -139,9 +140,15 @@ bool FileCompressor::decompress(const uint8_t* input_buffer, const std::string& 
 
         // Decompress
 
-        int return_value = LZ4_decompress_safe((const char*) input_buffer + 4, (char *)output_buffer, stored_compressed_size, stored_full_size);
-        if (return_value <= 0)
+        int return_value = ::uncompress(output_buffer, &output_size, (const uint8_t*) input_buffer + 4, stored_compressed_size);
+        if (return_value != Z_OK) {
+            printf("[error] Out of memory, could not decompress\n");
             throw std::exception();
+        }
+
+        // Zlib note: after uncrompress(), output_size may decrease
+        // But if we have set the header values correctly, that shouldn't happen to us
+        assert(stored_full_size == output_size);
 
         // Save
 
@@ -149,7 +156,7 @@ bool FileCompressor::decompress(const uint8_t* input_buffer, const std::string& 
         // FIXME   Do some security checking here!
         // FIXME
 
-        if (stored_full_size != fwrite(output_buffer, 1, stored_full_size, output_file)) {
+        if (stored_full_size != fwrite(output_buffer, 1, output_size, output_file)) {
             printf("[error] File writing error (%s)\n", output_path.c_str());
             throw std::exception();
         }
