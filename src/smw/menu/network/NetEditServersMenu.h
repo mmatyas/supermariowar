@@ -16,6 +16,11 @@ public:
     UI_NetEditServersMenu();
     ~UI_NetEditServersMenu();
 
+    void Restore();
+    void onPressAdd();
+    void onPressEdit();
+    void onPressDelete();
+
 private:
     MI_Button * miAddButton;
     MI_Button * miEditButton;

@@ -1149,6 +1149,13 @@ void MenuState::update()
             } else if (MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU == code) {
                 mCurrentMenu = mNetEditServersMenu;
                 mCurrentMenu->ResetMenu();
+                mNetEditServersMenu->Restore();
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_ADD == code) {
+                mNetEditServersMenu->onPressAdd();
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_EDIT == code) {
+                mNetEditServersMenu->onPressEdit();
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE == code) {
+                mNetEditServersMenu->onPressDelete();
             } else if (MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
                 if (MENU_CODE_NET_SERVERLIST_EXIT == code)
                     netplay.currentMenuChanged = true;
