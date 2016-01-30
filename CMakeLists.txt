@@ -121,6 +121,9 @@ endif()
 #
 #-----------------------------------------------------------------------------
 
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIR})
+
 # emscripten uses its own SDL, no need to include or link
 if (NOT TARGET_EMSCRIPTEN)
 	if (USE_SDL2_LIBS)
@@ -166,15 +169,9 @@ if (BUILD_STATIC_LIBS)
 	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
 	set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
 	add_subdirectory(dependencies/yaml-cpp-noboost)
-
-	# Use LZ4 for compression
-	include_directories(dependencies/lz4/lib)
-	set(BUILD_TOOLS OFF CACHE BOOL "LZ4: Build the command line tools" FORCE)
-	add_subdirectory(dependencies/lz4/cmake_unofficial)
 else()
 	find_package(ENet REQUIRED)
 	find_package(yaml-cpp REQUIRED)
-	find_package(liblz4 REQUIRED)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -356,7 +353,7 @@ if (NOT BUILD_STATIC_LIBS)
 	if(NOT NO_NETWORK)
 		set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libenet2a")
 	endif()
-	set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libyaml-cpp0.5, liblz4 (>= 0.0~r129-2ubuntu1)")
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libyaml-cpp0.5")
 endif()
 
 #
@@ -374,7 +371,7 @@ if (NOT BUILD_STATIC_LIBS)
 	if(NOT NO_NETWORK)
 		set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, enet")
 	endif()
-	set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, yaml-cpp, lz4 (>= r129)")
+	set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, yaml-cpp")
 endif()
 
 #

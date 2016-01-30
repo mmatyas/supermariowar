@@ -1,6 +1,6 @@
 #include "network/FileCompressor.h"
 
-#include "lz4.h"
+#include "zlib.h"
 
 #include <cassert>
 #include <cstdio>
@@ -16,12 +16,11 @@
     The size of the buffer will be <output_header_offset> + 4 + the compressed size.
 */
 
-bool FileCompressor::compress(const std::string& input_path, unsigned char*& output_buffer,
+bool FileCompressor::compress(const std::string& input_path, uint8_t*& output_buffer,
                               size_t& compressed_size, const size_t output_header_offset)
 {
     assert(output_buffer == NULL);
     assert(input_path.length() >= 5);
-    assert(sizeof(unsigned short) == 2);
 
     if (input_path.length() < 5)
         return false;
@@ -32,13 +31,17 @@ bool FileCompressor::compress(const std::string& input_path, unsigned char*& out
         return false;
     }
 
-    char* input_buffer = NULL;
+    uint8_t* input_buffer = NULL;
 
     try {
         // Get uncompressed file size
 
         fseek(input_file, 0, SEEK_END);
         long input_size = ftell(input_file);
+        if (input_size < 0) {
+            perror("[error] File read error");
+            throw std::exception();
+        }
         fseek(input_file, 0, SEEK_SET);
 
         if (input_size > COMPRESSION_SIZE_LIMIT || input_size < 10) { // max map size
@@ -48,14 +51,14 @@ bool FileCompressor::compress(const std::string& input_path, unsigned char*& out
 
         // Read uncompressed data to buffer
 
-        input_buffer = (char*) malloc(input_size);
+        input_buffer = (uint8_t*) malloc(input_size);
         if (!input_buffer) {
             printf("[error] Out of memory\n");
             throw std::exception();
         }
 
         size_t frret = fread(input_buffer, 1, input_size, input_file);
-        if (input_size != frret) {
+        if (input_size != (long)frret) {
             printf("[error] File reading error (%s) %ld != %lu\n", input_path.c_str(), input_size, frret);
             throw std::exception();
         }
@@ -65,27 +68,29 @@ bool FileCompressor::compress(const std::string& input_path, unsigned char*& out
 
         // Compress
 
-        int max_output_size = LZ4_compressBound(input_size);
-        if (max_output_size <= 0) {
+        // Zlib requires ulong, but the size of that depends on the platform
+        unsigned long compressed_size_ulong = compressBound(input_size);
+        if (compressed_size_ulong > COMPRESSION_SIZE_LIMIT) {
             printf("[error] File %s is too big\n", input_path.c_str());
             throw std::exception();
         }
 
         // package headers + uncompressed size (2B) + compressed size (2B) + data
-        output_buffer = (unsigned char*) malloc(output_header_offset + 4 + max_output_size);
+        output_buffer = (uint8_t*) malloc(output_header_offset + 4 + compressed_size);
         if (!output_buffer) {
             printf("[error] Out of memory\n");
             throw std::exception();
         }
 
-        int return_value = LZ4_compress_default(input_buffer, (char*)(output_buffer + output_header_offset + 4), input_size, max_output_size);
-        if (return_value <= 0)
+        int return_value = ::compress((uint8_t*)(output_buffer + output_header_offset + 4), &compressed_size_ulong, input_buffer, input_size);
+        if (return_value != Z_OK) {
+            printf("[error] Out of memory, could not compress\n");
             throw std::exception();
+        }
 
-        compressed_size = return_value;
-
-        unsigned short stored_full_size = input_size;
-        unsigned short stored_compressed_size = compressed_size;
+        compressed_size = compressed_size_ulong;
+        uint16_t stored_full_size = input_size;
+        uint16_t stored_compressed_size = compressed_size;
         memcpy(output_buffer + output_header_offset, &stored_full_size, 2);
         memcpy(output_buffer + output_header_offset + 2, &stored_compressed_size, 2);
     }
@@ -106,11 +111,10 @@ bool FileCompressor::compress(const std::string& input_path, unsigned char*& out
     and writes the result into a file called <output_path>.
 */
 
-bool FileCompressor::decompress(const unsigned char* input_buffer, const std::string& output_path)
+bool FileCompressor::decompress(const uint8_t* input_buffer, const std::string& output_path)
 {
     assert(input_buffer != NULL);
     assert(output_path.length() >= 5);
-    assert(sizeof(unsigned short) == 2);
 
     FILE* output_file = fopen(output_path.c_str(), "wb");
     if (!output_file) {
@@ -118,13 +122,13 @@ bool FileCompressor::decompress(const unsigned char* input_buffer, const std::st
         return false;
     }
 
-    char* output_buffer = NULL;
+    uint8_t* output_buffer = NULL;
 
     try {
         // Read file sizes stored in first 4 bytes
 
-        unsigned short stored_full_size = 0;
-        unsigned short stored_compressed_size = 0;
+        uint16_t stored_full_size = 0;
+        uint16_t stored_compressed_size = 0;
         memcpy(&stored_full_size, input_buffer, 2);
         memcpy(&stored_compressed_size, input_buffer + 2, 2);
 
@@ -133,7 +137,9 @@ bool FileCompressor::decompress(const unsigned char* input_buffer, const std::st
             throw std::exception();
         }
 
-        output_buffer = (char*) malloc(stored_full_size);
+        // Zlib requires ulong, but the size of that depends on the platform
+        unsigned long output_size_ulong = stored_full_size;
+        output_buffer = (uint8_t*) malloc(stored_full_size);
         if (!output_buffer) {
             printf("[error] Out of memory\n");
             throw std::exception();
@@ -141,9 +147,15 @@ bool FileCompressor::decompress(const unsigned char* input_buffer, const std::st
 
         // Decompress
 
-        int return_value = LZ4_decompress_safe((const char*) input_buffer + 4, output_buffer, stored_compressed_size, stored_full_size);
-        if (return_value <= 0)
+        int return_value = ::uncompress(output_buffer, &output_size_ulong, (const uint8_t*) input_buffer + 4, stored_compressed_size);
+        if (return_value != Z_OK) {
+            printf("[error] Out of memory, could not decompress\n");
             throw std::exception();
+        }
+
+        // Zlib note: after uncrompress(), output_size may decrease
+        // But if we have set the header values correctly, that shouldn't happen to us
+        assert(stored_full_size == output_size_ulong);
 
         // Save
 
@@ -151,7 +163,7 @@ bool FileCompressor::decompress(const unsigned char* input_buffer, const std::st
         // FIXME   Do some security checking here!
         // FIXME
 
-        if (stored_full_size != fwrite(output_buffer, 1, stored_full_size, output_file)) {
+        if (stored_full_size != fwrite(output_buffer, 1, output_size_ulong, output_file)) {
             printf("[error] File writing error (%s)\n", output_path.c_str());
             throw std::exception();
         }

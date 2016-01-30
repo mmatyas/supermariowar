@@ -57,7 +57,6 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
     - SDL_image
     - SDL_mixer
 - yaml-cpp (included)
-- lz4 (>= r129, included)
 - ENet (optional, included)
 
 On Debian-based systems, the following command installs the required tools:

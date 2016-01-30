@@ -9,8 +9,9 @@ platform:
 install:
   - git submodule update --init --recursive
   - echo Installing dependencies
-  - choco install -y wget 7zip
+  - choco install -y 7zip
   - set PATH="C:\Program Files\7-Zip";C:\MinGW\bin;%PATH%
+  # Set up SDL libs
   - appveyor DownloadFile https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
@@ -22,6 +23,10 @@ install:
   - xcopy /S/Y SDL_mixer-1.2.12 SDL-1.2.15
   - set SDLDIR=%CD%\SDL-1.2.15
   - echo SDLDIR set to %SDLDIR%
+  # Set up Zlib
+  - appveyor DownloadFile http://sourceforge.net/projects/mingw/files/MinGW/Base/zlib/zlib-1.2.8/zlib-1.2.8-1-mingw32-dev.tar.lzma
+  - 7z x zlib-1.2.8-1-mingw32-dev.tar.lzma
+  - 7z x -ozlib zlib-1.2.8-1-mingw32-dev.tar
 
 build_script:
   - C:\MinGW\msys\1.0\bin\sh --login -c "
@@ -29,7 +34,7 @@ build_script:
       mkdir build;
       cd build;
       cmake --version;
-      CFLAGS=-D_hypot=hypot CXXFLAGS=-D_hypot=hypot cmake .. -G 'MSYS Makefiles';
+      CFLAGS=-D_hypot=hypot CXXFLAGS=-D_hypot=hypot cmake .. -G 'MSYS Makefiles' -DZLIB_ROOT=/c/projects/supermariowar/zlib;
       cmake --build ."
 
 artifacts:
