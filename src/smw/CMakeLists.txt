@@ -125,7 +125,7 @@ endif()
 if(NOT TARGET_EMSCRIPTEN)
 	target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
 	target_link_libraries(smw ${ZLIB_LIBRARY})
-	target_link_libraries(smw yaml-cpp liblz4)
+	target_link_libraries(smw yaml-cpp)
 
 	if(USE_SDL2_LIBS)
 		target_link_libraries(smw ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
