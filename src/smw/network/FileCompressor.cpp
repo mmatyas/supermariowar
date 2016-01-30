@@ -16,12 +16,11 @@
     The size of the buffer will be <output_header_offset> + 4 + the compressed size.
 */
 
-bool FileCompressor::compress(const std::string& input_path, unsigned char*& output_buffer,
+bool FileCompressor::compress(const std::string& input_path, uint8_t*& output_buffer,
                               size_t& compressed_size, const size_t output_header_offset)
 {
     assert(output_buffer == NULL);
     assert(input_path.length() >= 5);
-    assert(sizeof(unsigned short) == 2);
 
     if (input_path.length() < 5)
         return false;
@@ -32,7 +31,7 @@ bool FileCompressor::compress(const std::string& input_path, unsigned char*& out
         return false;
     }
 
-    char* input_buffer = NULL;
+    uint8_t* input_buffer = NULL;
 
     try {
         // Get uncompressed file size
@@ -48,7 +47,7 @@ bool FileCompressor::compress(const std::string& input_path, unsigned char*& out
 
         // Read uncompressed data to buffer
 
-        input_buffer = (char*) malloc(input_size);
+        input_buffer = (uint8_t*) malloc(input_size);
         if (!input_buffer) {
             printf("[error] Out of memory\n");
             throw std::exception();
@@ -72,20 +71,20 @@ bool FileCompressor::compress(const std::string& input_path, unsigned char*& out
         }
 
         // package headers + uncompressed size (2B) + compressed size (2B) + data
-        output_buffer = (unsigned char*) malloc(output_header_offset + 4 + max_output_size);
+        output_buffer = (uint8_t*) malloc(output_header_offset + 4 + max_output_size);
         if (!output_buffer) {
             printf("[error] Out of memory\n");
             throw std::exception();
         }
 
-        int return_value = LZ4_compress_default(input_buffer, (char*)(output_buffer + output_header_offset + 4), input_size, max_output_size);
+        int return_value = LZ4_compress_default((const char*)input_buffer, (char*)(output_buffer + output_header_offset + 4), input_size, max_output_size);
         if (return_value <= 0)
             throw std::exception();
 
         compressed_size = return_value;
 
-        unsigned short stored_full_size = input_size;
-        unsigned short stored_compressed_size = compressed_size;
+        uint16_t stored_full_size = input_size;
+        uint16_t stored_compressed_size = compressed_size;
         memcpy(output_buffer + output_header_offset, &stored_full_size, 2);
         memcpy(output_buffer + output_header_offset + 2, &stored_compressed_size, 2);
     }
@@ -106,11 +105,10 @@ bool FileCompressor::compress(const std::string& input_path, unsigned char*& out
     and writes the result into a file called <output_path>.
 */
 
-bool FileCompressor::decompress(const unsigned char* input_buffer, const std::string& output_path)
+bool FileCompressor::decompress(const uint8_t* input_buffer, const std::string& output_path)
 {
     assert(input_buffer != NULL);
     assert(output_path.length() >= 5);
-    assert(sizeof(unsigned short) == 2);
 
     FILE* output_file = fopen(output_path.c_str(), "wb");
     if (!output_file) {
@@ -118,13 +116,13 @@ bool FileCompressor::decompress(const unsigned char* input_buffer, const std::st
         return false;
     }
 
-    char* output_buffer = NULL;
+    uint8_t* output_buffer = NULL;
 
     try {
         // Read file sizes stored in first 4 bytes
 
-        unsigned short stored_full_size = 0;
-        unsigned short stored_compressed_size = 0;
+        uint16_t stored_full_size = 0;
+        uint16_t stored_compressed_size = 0;
         memcpy(&stored_full_size, input_buffer, 2);
         memcpy(&stored_compressed_size, input_buffer + 2, 2);
 
@@ -133,7 +131,7 @@ bool FileCompressor::decompress(const unsigned char* input_buffer, const std::st
             throw std::exception();
         }
 
-        output_buffer = (char*) malloc(stored_full_size);
+        output_buffer = (uint8_t*) malloc(stored_full_size);
         if (!output_buffer) {
             printf("[error] Out of memory\n");
             throw std::exception();
@@ -141,7 +139,7 @@ bool FileCompressor::decompress(const unsigned char* input_buffer, const std::st
 
         // Decompress
 
-        int return_value = LZ4_decompress_safe((const char*) input_buffer + 4, output_buffer, stored_compressed_size, stored_full_size);
+        int return_value = LZ4_decompress_safe((const char*) input_buffer + 4, (char *)output_buffer, stored_compressed_size, stored_full_size);
         if (return_value <= 0)
             throw std::exception();
 
