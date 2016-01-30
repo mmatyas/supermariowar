@@ -1150,15 +1150,15 @@ void MenuState::update()
                 mCurrentMenu = mNetEditServersMenu;
                 mCurrentMenu->ResetMenu();
                 mNetEditServersMenu->Restore();
-            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_ADD == code) {
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_ADD_BTN == code) {
                 mNetEditServersMenu->onPressAdd();
-            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_EDIT == code) {
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_EDIT_BTN == code) {
                 mNetEditServersMenu->onPressEdit();
-            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE == code) {
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE_BTN == code) {
                 mNetEditServersMenu->onPressDelete();
             } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_SELECT == code) {
                 mNetEditServersMenu->onEntrySelect();
-            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_DIALOG_OK == code) {
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_DIALOG_OK_BTN == code) {
                 mNetEditServersMenu->onDialogOk();
             } else if (MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
                 if (MENU_CODE_NET_SERVERLIST_EXIT == code)

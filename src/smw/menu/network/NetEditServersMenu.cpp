@@ -16,13 +16,13 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     miBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
     miAddButton = new MI_Button(&rm->spr_selectfield, 40, 40, "Add", 200, 1);
-    miAddButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_ADD);
+    miAddButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_ADD_BTN);
 
     miEditButton = new MI_Button(&rm->spr_selectfield, 40, 80, "Edit", 200, 1);
-    miEditButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_EDIT);
+    miEditButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_EDIT_BTN);
 
     miRemoveButton = new MI_Button(&rm->spr_selectfield, 40, 120, "Remove", 200, 1);
-    miRemoveButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE);
+    miRemoveButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE_BTN);
 
     miInstructionsText1 = new MI_Text("", 40, 195, 0, 2, 0);
     miInstructionsText2 = new MI_Text("", 40, 215, 0, 2, 0);
@@ -41,7 +41,7 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     miDialogTextField = new MI_TextField(&rm->menu_plain_field, 40, 395, "URL or IP", 640 - 2 * 40, 150);
     miDialogTextField->SetData(dialogTextData, 127);
     miDialogOK = new MI_Button(&rm->spr_selectfield, 40, 432, "OK", 100, 1);
-    miDialogOK->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DIALOG_OK);
+    miDialogOK->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DIALOG_OK_BTN);
     miDialogCancel = new MI_Button(&rm->spr_selectfield, 150, 432, "Cancel", 100, 1);
     miDialogCancel->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
