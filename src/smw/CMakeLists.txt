@@ -55,6 +55,7 @@ LIST(APPEND SMW_SRCS
 
 LIST(APPEND SMW_SRCS
 	ui/NetworkListScroll.cpp
+	ui/MI_StringScroll.cpp
 	ui/MI_PowerupSlider.cpp
 	ui/MI_FrenzyModeOptions.cpp
 	ui/MI_InputControlContainer.cpp
@@ -88,6 +89,7 @@ LIST(APPEND SMW_SRCS
 	menu/options/SoundOptionsMenu.cpp
 	menu/options/TeamOptionsMenu.cpp
 
+	menu/network/NetEditServersMenu.cpp
 	menu/network/NetLobbyMenu.cpp
 	menu/network/NetNewLevelMenu.cpp
 	menu/network/NetNewRoomMenu.cpp

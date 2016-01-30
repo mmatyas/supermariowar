@@ -32,7 +32,7 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
     if (netplay.savedServers.size() > 0)
         miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), 640 - 90, 205, 0, 2, 2);
     else
-        miNetServersSelectedHostText = new MI_Text("(disabled)", 640 - 90, 205, 0, 2, 2);
+        miNetServersSelectedHostText = new MI_Text("(none)", 640 - 90, 205, 0, 2, 2);
 
     miNetServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Connect", 640 - 2 * 70, 1);
     miNetServersConnectButton->SetCode(MENU_CODE_NET_CONNECT_IN_PROGRESS);
@@ -78,7 +78,7 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
 
     SetHeadControl(miNetServersSelectButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-    
+
 };
 
 UI_NetServersMenu::~UI_NetServersMenu() {
@@ -90,6 +90,19 @@ void UI_NetServersMenu::Refresh()
         const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
         miNetServersSelectedHostText->SetText(nethostname);
     }
+}
+
+void UI_NetServersMenu::RefreshScroll() {
+    miNetServersScroll->Clear();
+    for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
+        ServerAddress * host = &netplay.savedServers[iServer];
+        miNetServersScroll->Add(host->hostname, "");
+    }
+
+    if (netplay.savedServers.size() > 0)
+        miNetServersSelectedHostText->SetText(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str());
+    else
+        miNetServersSelectedHostText->SetText("(none)");
 }
 
 void UI_NetServersMenu::ConnectInProgress()

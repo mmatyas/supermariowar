@@ -29,6 +29,7 @@ class UI_ProjectileOptionsMenu;
 class UI_SoundOptionsMenu;
 class UI_TeamOptionsMenu;
 
+class UI_NetEditServersMenu;
 class UI_NetLobbyMenu;
 class UI_NetNewLevelMenu;
 class UI_NetNewRoomMenu;
@@ -148,6 +149,7 @@ class MenuState : public GameState
 
 		// Multiplayer menu
 		UI_NetServersMenu* mNetServersMenu;
+		UI_NetEditServersMenu* mNetEditServersMenu;
 		UI_NetLobbyMenu* mNetLobbyMenu;
 		UI_NetNewLevelMenu* mNetNewLevelMenu;
 		UI_NetNewRoomMenu* mNetNewRoomMenu;

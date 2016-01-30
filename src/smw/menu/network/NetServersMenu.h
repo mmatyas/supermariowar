@@ -19,6 +19,7 @@ public:
     void OpenServerList();
     void ConnectInProgress();
     void Restore();
+    void RefreshScroll();
 
 private:
     MI_Button * miNetServersSelectButton;

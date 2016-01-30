@@ -35,6 +35,7 @@
 #include "menu/options/SoundOptionsMenu.h"
 #include "menu/options/TeamOptionsMenu.h"
 
+#include "menu/network/NetEditServersMenu.h"
 #include "menu/network/NetLobbyMenu.h"
 #include "menu/network/NetNewLevelMenu.h"
 #include "menu/network/NetNewRoomMenu.h"
@@ -169,6 +170,7 @@ void MenuState::CreateMenu()
     mBonusWheelMenu = new UI_BonusWheelMenu();
 
     mNetServersMenu = new UI_NetServersMenu();
+    mNetEditServersMenu = new UI_NetEditServersMenu();
     mNetLobbyMenu = new UI_NetLobbyMenu();
     mNetNewLevelMenu = new UI_NetNewLevelMenu(mGameSettingsMenu);
     mNetNewRoomMenu = new UI_NetNewRoomMenu();
@@ -1144,6 +1146,22 @@ void MenuState::update()
 
             if (MENU_CODE_TO_NET_SERVERLIST == code) {
                 mNetServersMenu->OpenServerList();
+            } else if (MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU == code) {
+                mCurrentMenu = mNetEditServersMenu;
+                mCurrentMenu->ResetMenu();
+                mNetEditServersMenu->Restore();
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_ADD_BTN == code) {
+                mNetEditServersMenu->onPressAdd();
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_EDIT_BTN == code) {
+                mNetEditServersMenu->onPressEdit();
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE_BTN == code) {
+                mNetEditServersMenu->onPressDelete();
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_SELECT == code) {
+                mNetEditServersMenu->onEntrySelect();
+                mNetServersMenu->RefreshScroll();
+            } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_DIALOG_OK_BTN == code) {
+                mNetEditServersMenu->onDialogOk();
+                mNetServersMenu->RefreshScroll();
             } else if (MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
                 if (MENU_CODE_NET_SERVERLIST_EXIT == code)
                     netplay.currentMenuChanged = true;
