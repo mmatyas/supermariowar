@@ -4,6 +4,8 @@
 #include "uimenu.h"
 #include "uicontrol.h"
 
+#include "ui/MI_StringScroll.h"
+
 /*
     TODO: Description.
 */
@@ -15,7 +17,12 @@ public:
     ~UI_NetEditServersMenu();
 
 private:
+    MI_Button * miAddButton;
+    MI_Button * miEditButton;
+    MI_Button * miRemoveButton;
     MI_Button * miBackButton;
+
+    MI_StringScroll* miServerScroll;
 
     MI_Image * miLeftHeaderBar;
     MI_Image * miRightHeaderBar;
