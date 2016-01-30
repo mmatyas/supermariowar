@@ -166,6 +166,10 @@ void UI_NetEditServersMenu::onEntrySelect() {
         netplay.savedServers.erase(netplay.savedServers.begin() + miServerScroll->CurrentIndex());
         ReloadScroll();
         miServerScroll->Activate();
+
+        if (netplay.savedServers.size() == 0)
+            Restore();
+
         break;
 
     default:

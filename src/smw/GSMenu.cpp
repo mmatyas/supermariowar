@@ -1158,8 +1158,10 @@ void MenuState::update()
                 mNetEditServersMenu->onPressDelete();
             } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_SELECT == code) {
                 mNetEditServersMenu->onEntrySelect();
+                mNetServersMenu->RefreshScroll();
             } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_DIALOG_OK_BTN == code) {
                 mNetEditServersMenu->onDialogOk();
+                mNetServersMenu->RefreshScroll();
             } else if (MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
                 if (MENU_CODE_NET_SERVERLIST_EXIT == code)
                     netplay.currentMenuChanged = true;
