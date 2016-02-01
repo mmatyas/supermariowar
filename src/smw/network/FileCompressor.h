@@ -4,10 +4,19 @@
 #include <string>
 #include <stdint.h>
 
+struct CompressedData {
+	uint8_t* data;
+	size_t size;
+
+	CompressedData(uint8_t*, size_t);
+	~CompressedData();
+
+	bool is_valid();
+};
+
 class FileCompressor {
 public:
-    static bool compress(const std::string& input_path, uint8_t*& output_buffer,
-                         size_t& compressed_size, const size_t output_header_offset = 0);
+    static CompressedData compress(const std::string& input_path, const size_t output_header_offset = 0);
     static bool decompress(const uint8_t* input_buffer, const std::string& output_path);
 };
 

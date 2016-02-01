@@ -9,6 +9,24 @@
 
 #define COMPRESSION_SIZE_LIMIT 20000
 
+CompressedData::CompressedData(uint8_t* data, size_t size)
+    : data(data)
+    , size(size)
+{}
+
+CompressedData::~CompressedData() {
+    if (data)
+        free(data);
+
+    size = 0;
+}
+
+bool CompressedData::is_valid() {
+    if (!data || !size)
+        return false;
+    return true;
+}
+
 /*
     This compresses the file <input_path>
     to a self-allocated space pointed by <output_buffer>,
@@ -16,24 +34,25 @@
     The size of the buffer will be <output_header_offset> + 4 + the compressed size.
 */
 
-bool FileCompressor::compress(const std::string& input_path, uint8_t*& output_buffer,
-                              size_t& compressed_size, const size_t output_header_offset)
+CompressedData FileCompressor::compress(const std::string& input_path, const size_t output_header_offset)
 {
-    assert(output_buffer == NULL);
-    assert(input_path.length() >= 5);
-
-    if (input_path.length() < 5)
-        return false;
-
-    FILE* input_file = fopen(input_path.c_str(), "rb");
-    if (!input_file) {
-        printf("[error] File %s not found", input_path.c_str());
-        return false;
-    }
-
+    FILE* input_file = NULL;
     uint8_t* input_buffer = NULL;
+    uint8_t* compressed_buffer = NULL;
 
     try {
+        // Open the file
+
+        assert(input_path.length() >= 5);
+        if (input_path.length() < 5)
+            throw std::exception();
+
+        input_file = fopen(input_path.c_str(), "rb");
+        if (!input_file) {
+            printf("[error] Could not open %s\n", input_path.c_str());
+            throw std::exception();
+        }
+
         // Get uncompressed file size
 
         fseek(input_file, 0, SEEK_END);
@@ -51,9 +70,9 @@ bool FileCompressor::compress(const std::string& input_path, uint8_t*& output_bu
 
         // Read uncompressed data to buffer
 
-        input_buffer = (uint8_t*) malloc(input_size);
+        input_buffer = (uint8_t*) calloc(input_size, 1);
         if (!input_buffer) {
-            printf("[error] Out of memory\n");
+            printf("[error] Not enough memory for reading file %s\n", input_path.c_str());
             throw std::exception();
         }
 
@@ -71,39 +90,40 @@ bool FileCompressor::compress(const std::string& input_path, uint8_t*& output_bu
         // Zlib requires ulong, but the size of that depends on the platform
         unsigned long compressed_size_ulong = compressBound(input_size);
         if (compressed_size_ulong > COMPRESSION_SIZE_LIMIT) {
-            printf("[error] File %s is too big\n", input_path.c_str());
+            printf("[error] File is too big: %s\n", input_path.c_str());
             throw std::exception();
         }
 
         // package headers + uncompressed size (2B) + compressed size (2B) + data
-        output_buffer = (uint8_t*) malloc(output_header_offset + 4 + compressed_size);
-        if (!output_buffer) {
-            printf("[error] Out of memory\n");
+        compressed_buffer = (uint8_t*) calloc(output_header_offset + 4 + compressed_size_ulong, 1);
+        if (!compressed_buffer) {
+            printf("[error] Not enough memory to compress %s\n", input_path.c_str());
             throw std::exception();
         }
 
-        int return_value = ::compress((uint8_t*)(output_buffer + output_header_offset + 4), &compressed_size_ulong, input_buffer, input_size);
+        int return_value = ::compress((uint8_t*)(compressed_buffer + output_header_offset + 4), &compressed_size_ulong, input_buffer, input_size);
         if (return_value != Z_OK) {
-            printf("[error] Out of memory, could not compress\n");
+            printf("[error] Out of memory, could not compress %s\n", input_path.c_str());
             throw std::exception();
         }
 
-        compressed_size = compressed_size_ulong;
+        free(input_buffer);
+
         uint16_t stored_full_size = input_size;
-        uint16_t stored_compressed_size = compressed_size;
-        memcpy(output_buffer + output_header_offset, &stored_full_size, 2);
-        memcpy(output_buffer + output_header_offset + 2, &stored_compressed_size, 2);
+        uint16_t stored_compressed_size = compressed_size_ulong;
+        memcpy(compressed_buffer + output_header_offset, &stored_full_size, 2);
+        memcpy(compressed_buffer + output_header_offset + 2, &stored_compressed_size, 2);
+
+        return CompressedData(compressed_buffer, compressed_size_ulong + output_header_offset + 4);
     }
     catch (std::exception&) {
-        if (input_buffer) free(input_buffer);
-        if (input_file) fclose(input_file);
         printf("[error] Compression failed\n");
-        return false;
     }
 
-    if (input_buffer) free(input_buffer);
     if (input_file) fclose(input_file);
-    return true;
+    if (input_buffer) free(input_buffer);
+    if (compressed_buffer) free(compressed_buffer);
+    return CompressedData(NULL, 0);
 }
 
 /*
