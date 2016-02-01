@@ -6,6 +6,8 @@
 #include "objecthazard.h"
 #include "ResourceManager.h"
 
+#include <cstring>
+
 extern CGameValues game_values;
 extern CResourceManager* rm;
 

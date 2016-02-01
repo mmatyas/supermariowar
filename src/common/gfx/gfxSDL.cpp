@@ -3,6 +3,9 @@
 #include "SDL.h"
 #include "SDL_image.h"
 
+#include <cstdio>
+#include <cstdlib>
+
 extern SDL_Surface* screen;
 
 #define GFX_BPP 16

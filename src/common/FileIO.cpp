@@ -3,6 +3,7 @@
 #include "SDL_endian.h"
 
 #include <cassert>
+#include <cstring>
 #include <stdexcept>
 
 BinaryFile::BinaryFile(const char* filename, const char* options)

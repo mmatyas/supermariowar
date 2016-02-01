@@ -6,6 +6,7 @@
 #include "sdl12wrapper.h"
 
 #include <cassert>
+#include <cstdio>
 #include <iostream>
 
 using namespace std;

@@ -8,7 +8,9 @@
 #include "FileList.h"
 #include "MapList.h"
 
+#include <cstdio>
 #include <cstdlib> // atoi()
+#include <cstring>
 
 #include <map>
 #include <queue>

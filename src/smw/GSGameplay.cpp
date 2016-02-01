@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <cstring>
 
 #define COUNTDOWN_START_INDEX 4
 

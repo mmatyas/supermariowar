@@ -6,6 +6,7 @@
 #include "TilesetManager.h"
 
 #include <cassert>
+#include <cstring>
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;

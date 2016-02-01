@@ -4,6 +4,7 @@
 #include "ResourceManager.h"
 
 #include <cassert>
+#include <cstring>
 
 extern CResourceManager* rm;
 

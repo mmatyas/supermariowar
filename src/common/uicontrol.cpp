@@ -4,6 +4,7 @@
 #include "ResourceManager.h"
 
 #include <cmath>
+#include <cstring>
 
 extern CGameValues game_values;
 extern CResourceManager* rm;

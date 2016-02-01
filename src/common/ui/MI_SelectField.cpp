@@ -3,6 +3,8 @@
 #include "ResourceManager.h"
 extern CResourceManager* rm;
 
+#include <cstring>
+
 /**************************************
  * MI_SelectField Class
  **************************************/

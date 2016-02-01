@@ -2,6 +2,7 @@
 
 #include "SDL.h"
 
+#include <cstdio>
 #include <iostream>
 #include <string>
 

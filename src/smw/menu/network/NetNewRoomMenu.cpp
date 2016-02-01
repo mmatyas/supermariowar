@@ -6,6 +6,8 @@
 #include "net.h"
 #include "ResourceManager.h"
 
+#include <cstring>
+
 extern CResourceManager* rm;
 
 UI_NetNewRoomMenu::UI_NetNewRoomMenu() : UI_Menu()

@@ -3,6 +3,7 @@
 #include "SDL_image.h"
 
 #include <cassert>
+#include <cstdio>
 
 gfxPalette::gfxPalette()
     : numcolors(0)
