@@ -6,36 +6,68 @@ platform:
   - x86
   - x64
 
+environment:
+  matrix:
+    - USE_SDL2: true
+    - USE_SDL2: false
+
 install:
   - git submodule update --init --recursive
   - echo Installing dependencies
   - choco install -y 7zip
   - set PATH="C:\Program Files\7-Zip";C:\MinGW\bin;%PATH%
-  # Set up SDL libs
-  - appveyor DownloadFile https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
-  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
-  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
-  - 7z x SDL-devel-1.2.15-mingw32.tar.gz
-  - 7z x -xr!._\* -xr!man -xr!docs SDL-devel-1.2.15-mingw32.tar
-  - 7z x SDL_image-devel-1.2.12-VC.zip
-  - 7z x SDL_mixer-devel-1.2.12-VC.zip
-  - xcopy /S/Y SDL_image-1.2.12 SDL-1.2.15
-  - xcopy /S/Y SDL_mixer-1.2.12 SDL-1.2.15
-  - set SDLDIR=%CD%\SDL-1.2.15
-  - echo SDLDIR set to %SDLDIR%
   # Set up Zlib
   - appveyor DownloadFile http://sourceforge.net/projects/mingw/files/MinGW/Base/zlib/zlib-1.2.8/zlib-1.2.8-1-mingw32-dev.tar.lzma
   - 7z x zlib-1.2.8-1-mingw32-dev.tar.lzma
   - 7z x -ozlib zlib-1.2.8-1-mingw32-dev.tar
+  # Set up SDL 1.2 libs
+  - if [%USE_SDL2%]==[false] ( echo Setting up SDL 1.2.x )
+  - if [%USE_SDL2%]==[false] ( appveyor DownloadFile https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz )
+  - if [%USE_SDL2%]==[false] ( appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip )
+  - if [%USE_SDL2%]==[false] ( appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip )
+  - if [%USE_SDL2%]==[false] ( 7z x SDL-devel-1.2.15-mingw32.tar.gz )
+  - if [%USE_SDL2%]==[false] ( 7z x -xr!._\* -xr!man -xr!docs SDL-devel-1.2.15-mingw32.tar )
+  - if [%USE_SDL2%]==[false] ( 7z x SDL_image-devel-1.2.12-VC.zip )
+  - if [%USE_SDL2%]==[false] ( 7z x SDL_mixer-devel-1.2.12-VC.zip )
+  - if [%USE_SDL2%]==[false] ( xcopy /S/Y SDL_image-1.2.12 SDL-1.2.15 )
+  - if [%USE_SDL2%]==[false] ( xcopy /S/Y SDL_mixer-1.2.12 SDL-1.2.15 )
+  - if [%USE_SDL2%]==[false] ( set SDLDIR=%CD%\SDL-1.2.15 )
+  - if [%USE_SDL2%]==[false] ( echo SDLDIR set to %SDLDIR% )
+  # Set up SDL2 libs
+  - if [%USE_SDL2%]==[true] ( echo Setting up SDL2 )
+  - if [%USE_SDL2%]==[true] ( appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.4-mingw.tar.gz )
+  - if [%USE_SDL2%]==[true] ( appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-mingw.tar.gz )
+  - if [%USE_SDL2%]==[true] ( appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-mingw.tar.gz )
+  - if [%USE_SDL2%]==[true] ( 7z x SDL2-devel-2.0.4-mingw.tar.gz )
+  - if [%USE_SDL2%]==[true] ( 7z x -xr!._\* -xr!man -xr!docs SDL2-devel-2.0.4-mingw.tar )
+  - if [%USE_SDL2%]==[true] ( 7z x SDL2_image-devel-2.0.1-mingw.tar.gz )
+  - if [%USE_SDL2%]==[true] ( 7z x -xr!._\* -xr!man -xr!docs SDL2_image-devel-2.0.1-mingw.tar )
+  - if [%USE_SDL2%]==[true] ( 7z x SDL2_mixer-devel-2.0.1-mingw.tar.gz )
+  - if [%USE_SDL2%]==[true] ( 7z x -xr!._\* -xr!man -xr!docs SDL2_mixer-devel-2.0.1-mingw.tar )
+  - if [%USE_SDL2%]==[true] ( xcopy /S/Y SDL2_image-2.0.1 SDL2-2.0.4 )
+  - if [%USE_SDL2%]==[true] ( xcopy /S/Y SDL2_mixer-2.0.1 SDL2-2.0.4 )
+  - if [%USE_SDL2%]==[true] (
+      if [%PLATFORM%]==[x86] ( set SDL2DIR=%CD%\SDL2-2.0.4\i686-w64-mingw32 )
+      else ( set SDL2DIR=%CD%\SDL2-2.0.4\x86_64-w64-mingw32 ) )
+  - if [%USE_SDL2%]==[true] ( echo SDL2DIR set to %SDL2DIR% )
 
 build_script:
-  - C:\MinGW\msys\1.0\bin\sh --login -c "
+  - if [%USE_SDL2%]==[false] (
+    C:\MinGW\msys\1.0\bin\sh --login -c "
       cd /c/projects/supermariowar;
       mkdir build;
       cd build;
       cmake --version;
       CFLAGS=-D_hypot=hypot CXXFLAGS=-D_hypot=hypot cmake .. -G 'MSYS Makefiles' -DZLIB_ROOT=/c/projects/supermariowar/zlib;
-      cmake --build ."
+      cmake --build ." )
+  - if [%USE_SDL2%]==[true] (
+    C:\MinGW\msys\1.0\bin\sh --login -c "
+      cd /c/projects/supermariowar;
+      mkdir build;
+      cd build;
+      cmake --version;
+      CFLAGS=-D_hypot=hypot CXXFLAGS=-D_hypot=hypot cmake .. -G 'MSYS Makefiles' -DZLIB_ROOT=/c/projects/supermariowar/zlib -DUSE_SDL2_LIBS=1;
+      make smw" )
 
 artifacts:
   - path: build\Binaries\Release\*.exe
