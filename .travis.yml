@@ -44,6 +44,7 @@ before_script:
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
 
   # Android SDK + NDK
+  - if [[ "$BUILD" == "android" ]]; then cd ..; fi
   - if [[ "$BUILD" == "android" ]]; then curl -L https://raw.github.com/embarkmobile/android-sdk-installer/version-2/android-sdk-installer | bash /dev/stdin --install=build-tools-23.0.1,android-15; fi
   - if [[ "$BUILD" == "android" ]]; then source ~/.android-sdk-installer/env; fi
   - if [[ "$BUILD" == "android" ]]; then wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin; fi
@@ -58,6 +59,7 @@ script:
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then make smw; fi
   - if [[ "$BUILD" == "android" ]]; then git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git; fi
+  - if [[ "$BUILD" == "android" ]]; then mv supermariowar supermariowar-android/; fi
   - if [[ "$BUILD" == "android" ]]; then cd supermariowar-android; fi
   - if [[ "$BUILD" == "android" ]]; then ./build.sh --abi=$ABILIST; fi
 
