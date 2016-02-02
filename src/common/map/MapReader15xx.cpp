@@ -4,6 +4,8 @@
 #include "FileIO.h"
 #include "TilesetManager.h"
 
+#include <cstring>
+
 extern CTilesetManager* g_tilesetmanager;
 extern short g_iMusicCategoryConversion[26];
 extern short g_iTileTypeConversion[NUMTILETYPES];

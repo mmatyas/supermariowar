@@ -3,6 +3,8 @@
 #include "MapList.h"
 #include "ResourceManager.h"
 
+#include <cstring>
+
 extern MapList *maplist;
 extern CResourceManager* rm;
 extern CObjectContainer objectcontainer[3];

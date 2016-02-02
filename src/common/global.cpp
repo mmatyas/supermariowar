@@ -8,6 +8,8 @@
 #include "ResourceManager.h"
 #include "TilesetManager.h"
 
+#include <cstdio>
+
 //1.8.0.0 == Release to staff
 //1.8.0.1 == Second release to staff
 //1.8.0.2 == beta1

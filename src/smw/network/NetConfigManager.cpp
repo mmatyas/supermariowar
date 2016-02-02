@@ -4,6 +4,7 @@
 #include "path.h"
 
 #include <cassert>
+#include <cstring>
 #include <fstream>
 #include <stdexcept>
 #include <string>
@@ -98,7 +99,8 @@ void NetConfigManager::read_playername(YAML::Node& config)
             throw std::runtime_error(err);
         }
 
-        strcpy(netplay.myPlayerName, net_player_name.c_str());
+        strncpy(netplay.myPlayerName, net_player_name.c_str(), NET_MAX_PLAYER_NAME_LENGTH);
+        netplay.myPlayerName[NET_MAX_PLAYER_NAME_LENGTH] = '\0';
     }
     catch (std::runtime_error& error) {
         printf("[net][warning] servers.yml: %s\n", error.what());

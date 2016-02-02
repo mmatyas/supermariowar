@@ -3,6 +3,7 @@
 #include "SDL_image.h"
 #include "sdl12wrapper.h"
 
+#include <cstdio>
 #include <cassert>
 #include <iostream>
 

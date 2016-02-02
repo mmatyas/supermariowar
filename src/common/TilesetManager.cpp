@@ -3,6 +3,9 @@
 #include "FileIO.h"
 #include "map.h"
 
+#include <cstdio>
+#include <cstring>
+
 #if defined(__MACOSX__)
 #include <sys/stat.h>
 #endif

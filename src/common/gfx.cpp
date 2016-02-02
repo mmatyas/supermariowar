@@ -5,6 +5,7 @@
 #include "SDL_image.h"
 #include "sdl12wrapper.h"
 
+#include <cstdio>
 #include <iostream>
 #include <string>
 

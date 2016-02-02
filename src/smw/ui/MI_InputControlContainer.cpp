@@ -5,6 +5,9 @@
 #include "ui/MI_SelectField.h"
 #include "ResourceManager.h"
 
+#include <cstdlib>
+#include <cstring>
+
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
