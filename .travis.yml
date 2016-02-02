@@ -22,6 +22,14 @@ matrix:
   - compiler: clang
     env: BUILD=native SMW_USE_SDL2=true
 
+  # OSX SDL1.2 build
+  - os: osx
+    env: BUILD=native SMW_USE_SDL2=false
+    compiler: clang
+    before_script:
+    - brew update
+    - brew install sdl sdl_image sdl_mixer
+
   # OSX SDL2 build
   - os: osx
     env: BUILD=native SMW_USE_SDL2=true
