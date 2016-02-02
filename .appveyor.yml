@@ -11,6 +11,10 @@ environment:
     - USE_SDL2: true
     - USE_SDL2: false
 
+matrix:
+  allow_failures:
+    - platform: x64
+
 install:
   - git submodule update --init --recursive
   - echo Installing dependencies
