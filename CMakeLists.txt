@@ -187,19 +187,19 @@ endif()
 
 # Debugging CFLAGS. Turn optimizations off; turn debugging symbols on.
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
-  add_definitions(-DDEBUG -D_DEBUG -DPNG_DEBUG=1)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
+	add_definitions(-DDEBUG -D_DEBUG -DPNG_DEBUG=1)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
 else()
-  add_definitions(-DNDEBUG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3")
+	add_definitions(-DNDEBUG)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3")
 
-  # Strip binaries when using GCC
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s")
-      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s")
-  endif()
+	# Strip binaries
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s")
+	endif()
 endif()
 
 # Use C++11
