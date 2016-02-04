@@ -88,7 +88,7 @@ void NetConfigManager::read_playername(YAML::Node& config)
             throw std::runtime_error("player name too short");
 
         if (net_player_name.length() >= NET_MAX_PLAYER_NAME_LENGTH) {
-#if (defined(_WIN32) && defined(__MINGW32__)) || defined(ANDROID)
+#if (defined(_WIN32) && defined(__MINGW32__)) || defined(__ANDROID__)
             // There is a bug in MinGW and Android NDK's GCC <= 4.8.x
             std::string err("player name must be less than 16 letters");
 #else

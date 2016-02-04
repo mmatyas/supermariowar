@@ -102,11 +102,6 @@ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
 	include(PlatformArm64)
 endif()
 
-if (ANDROID)
-	message("Building for Android")
-	add_definitions(-DANDROID)
-endif()
-
 # For installing Linux desktop items
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	if (NOT XDG_APPS_INSTALL_DIR)
