@@ -303,10 +303,6 @@ add_subdirectory(src/leveleditor)
 add_subdirectory(src/worldeditor)
 add_subdirectory(src/server)
 
-if(USE_PNG_SAVE)
-	LIST(APPEND COMMON_SRCS src/savepng.cpp)
-endif()
-
 #-----------------------------------------------------------------------------
 #
 # Installation and packaging
