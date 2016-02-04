@@ -16,10 +16,10 @@ set(SMW_VERSION_PATCH "0")
 # Options for customizing builds
 #
 
-option(USE_PNG_SAVE "Enable PNG save feature" OFF) # currently working only with 1.2 ?
+option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" OFF)
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
 option(NO_NETWORK "Disable all network communication" OFF)
-option(BUILD_STATIC_LIBS "Build and link certain dependencies statically (enet, yaml-cpp, lz4)" ON)
+option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet, yaml-cpp)" ON)
 
 if (USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
@@ -32,9 +32,6 @@ endif()
 if (USE_PNG_SAVE)
 	add_definitions(-DPNG_SAVE_FORMAT)
 endif()
-
-# option(UNITTESTS "Build unittests" OFF)
-# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMakeTests)
 
 # Additional CMake search path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
@@ -72,18 +69,12 @@ if (MSVC)
 endif()
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x64|x86_64|amd64)")
-	set(SMW_CPU_X64 1)
 	include(PlatformX64)
 elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(i[3-6]86|x86)")
-	set(SMW_CPU_X86 1)
 	include(PlatformX86)
 elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
-	set(SMW_CPU_ARM 1)
-	set(SMW_CPU_ARM32 1)
 	include(PlatformArm)
 elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
-	set(SMW_CPU_ARM 1)
-	set(SMW_CPU_ARM64 1)
 	include(PlatformArm64)
 endif()
 
@@ -183,7 +174,7 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
-# Link statically on Windows to not need additional DLLs
+# Link libc statically on Windows to not need additional DLLs
 if (WIN32)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
 	# TODO: check if compiler supports this flag, may fail with GCC < 4.8
@@ -228,9 +219,6 @@ if (APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-narrowing")
 endif()
 
-##TODO: test this please, coming from smw Makefile
-add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
-
 ## MAIN CONFIG
 
 check_and_add_flag(VISIBILITY_INLINES_HIDDEN -fvisibility-inlines-hidden)
@@ -238,14 +226,6 @@ check_and_add_flag(VISIBILITY_INLINES_HIDDEN -fvisibility-inlines-hidden)
 if(UNIX AND NOT APPLE)
 	check_and_add_flag(VISIBILITY_HIDDEN -fvisibility=hidden)
 endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL Release AND UNIX AND NOT APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fomit-frame-pointer")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fomit-frame-pointer")
-endif()
-
-##TODO: test this
-add_definitions(-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE)
 
 #-----------------------------------------------------------------------------
 #
