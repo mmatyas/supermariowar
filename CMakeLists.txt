@@ -55,21 +55,6 @@ else()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries/Release)
 endif()
 
-#
-# Install locations
-#
-
-if (WIN32)
-	# CMAKE_INSTALL_PREFIX defaults to `C:/Program Files/smw`
-	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}      CACHE PATH "Installation location of the game binaries")
-	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/data CACHE PATH "Installation location of the game data")
-else()
-	# CMAKE_INSTALL_PREFIX defaults to `/usr/local`
-	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}/games           CACHE PATH "Installation location of the game binaries")
-	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/share/games/smw CACHE PATH "Installation location of the game data")
-endif()
-# set(SMW_USERDIR ".smw" CACHE STRING "User directory") # User settings directory
-
 add_definitions(-DSMW_DATADIR="${SMW_DATADIR}")
 
 #-----------------------------------------------------------------------------
@@ -100,13 +85,6 @@ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
 	set(SMW_CPU_ARM 1)
 	set(SMW_CPU_ARM64 1)
 	include(PlatformArm64)
-endif()
-
-# For installing Linux desktop items
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	if (NOT XDG_APPS_INSTALL_DIR)
-		set(XDG_APPS_INSTALL_DIR "/usr/share/applications/")
-	endif()
 endif()
 
 # Detect Emscripten
@@ -271,6 +249,44 @@ add_definitions(-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE)
 
 #-----------------------------------------------------------------------------
 #
+# Installation locations
+#
+#-----------------------------------------------------------------------------
+
+# Common install locations, also passed to the game components
+
+if (WIN32)
+	# CMAKE_INSTALL_PREFIX defaults to `C:/Program Files/smw`
+	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}      CACHE PATH "Installation location of the game binaries")
+	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/data CACHE PATH "Installation location of the game data")
+else()
+	# CMAKE_INSTALL_PREFIX defaults to `/usr/local`
+	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}/games           CACHE PATH "Installation location of the game binaries")
+	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/share/games/smw CACHE PATH "Installation location of the game data")
+endif()
+# set(SMW_USERDIR ".smw" CACHE STRING "User directory") # User settings directory
+
+# For installing Linux desktop items
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	if (NOT XDG_APPS_INSTALL_DIR)
+		set(XDG_APPS_INSTALL_DIR "/usr/share/applications/")
+	endif()
+endif()
+
+#
+# Data directory install location
+#
+
+if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+	install(DIRECTORY data/ DESTINATION ${SMW_DATADIR})
+endif()
+
+if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
+#	install(FILES Data/license.txt DESTINATION ${datadir})
+endif()
+
+#-----------------------------------------------------------------------------
+#
 # Ready to build!
 #
 #-----------------------------------------------------------------------------
@@ -300,24 +316,12 @@ add_subdirectory(src/server)
 
 #-----------------------------------------------------------------------------
 #
-# Installation and packaging
+# Packaging
 #
 #-----------------------------------------------------------------------------
 
 #
-# Data directory install location
-#
-
-if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-	install(DIRECTORY data/ DESTINATION ${SMW_DATADIR})
-endif()
-
-if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
-#	install(FILES Data/license.txt DESTINATION ${datadir})
-endif()
-
-#
-# Package settings
+# Common settings
 #
 
 set(CPACK_PACKAGE_NAME "smw")
