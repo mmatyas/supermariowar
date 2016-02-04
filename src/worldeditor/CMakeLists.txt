@@ -23,14 +23,16 @@ add_executable (smw-worldedit
 )
 target_link_libraries (smw-worldedit CommonFiles)
 
-# add .bc extension when building with emscripten
-if (TARGET_EMSCRIPTEN)
-	set_target_properties(smw-worldedit PROPERTIES SUFFIX ".bc")
-endif()
 
-if (NOT TARGET_EMSCRIPTEN)
-	target_link_libraries(smw-worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
-endif()
+#
+# Dependencies
+#
+
+target_link_libraries(smw-worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
+
+#
+# Installation
+#
 
 install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw-worldedit" DESTINATION ${SMW_BINDIR})
 

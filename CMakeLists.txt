@@ -17,7 +17,6 @@ set(SMW_VERSION_PATCH "0")
 #
 
 option(USE_PNG_SAVE "Enable PNG save feature" OFF) # currently working only with 1.2 ?
-option(TARGET_EMSCRIPTEN "Output asm.js code using emscripten" OFF) # TODO: change this to a build type maybe?
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
 option(NO_NETWORK "Disable all network communication" OFF)
 option(BUILD_STATIC_LIBS "Build and link certain dependencies statically (enet, yaml-cpp, lz4)" ON)
@@ -115,6 +114,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	endif()
 endif()
 
+# Detect Emscripten
+if(CMAKE_C_COMPILER MATCHES "/emcc(-[a-zA-Z0-9.])?(\\.bat)?$")
+	set(CMAKE_C_COMPILER_ID "Emscripten")
+	set(CMAKE_CXX_COMPILER_ID "Emscripten")
+	# include(PlatformEmscripten)
+endif()
+
 #-----------------------------------------------------------------------------
 #
 # Dependencies
@@ -124,37 +130,36 @@ endif()
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIR})
 
+# TODO: fix emscripten build
 # emscripten uses its own SDL, no need to include or link
-if (NOT TARGET_EMSCRIPTEN)
-	if (USE_SDL2_LIBS)
-		# add all SDL2 dependencies
-		find_package(SDL2 REQUIRED)
-		find_package(SDL2_mixer REQUIRED)
-		find_package(SDL2_image REQUIRED)
+# if (NOT TARGET_EMSCRIPTEN)
 
-		# location of SDL headers
-		include_directories(${SDL2_INCLUDE_DIR})
-		include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
-		include_directories(${SDL2_MIXER_INCLUDE_DIRS})
-	else()
-		# add all SDL dependencies
-		find_package(SDL REQUIRED)
-		find_package(SDL_mixer REQUIRED)
-		find_package(SDL_image REQUIRED)
+if (USE_SDL2_LIBS)
+	# add all SDL2 dependencies
+	find_package(SDL2 REQUIRED)
+	find_package(SDL2_mixer REQUIRED)
+	find_package(SDL2_image REQUIRED)
 
-		# location of SDL headers
-		include_directories(${SDL_INCLUDE_DIR})
-		include_directories(${SDL_IMAGE_INCLUDE_DIRS})
-		include_directories(${SDL_MIXER_INCLUDE_DIRS})
+	# location of SDL headers
+	include_directories(${SDL2_INCLUDE_DIR})
+	include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+	include_directories(${SDL2_MIXER_INCLUDE_DIRS})
+else()
+	# add all SDL dependencies
+	find_package(SDL REQUIRED)
+	find_package(SDL_mixer REQUIRED)
+	find_package(SDL_image REQUIRED)
+
+	# location of SDL headers
+	include_directories(${SDL_INCLUDE_DIR})
+	include_directories(${SDL_IMAGE_INCLUDE_DIRS})
+	include_directories(${SDL_MIXER_INCLUDE_DIRS})
+
+	# the optional libpng package
+	if(USE_PNG_SAVE)
+		find_package(PNG REQUIRED)
+		include_directories(${PNG_INCLUDE_DIR})
 	endif()
-endif()
-
-# the optional libpng package
-if(USE_PNG_SAVE)
-	find_package(PNG REQUIRED)
-
-	include_directories(${PNG_INCLUDE_DIR})
-	target_link_libraries(smw ${PNG_LIBRARY})
 endif()
 
 if (BUILD_STATIC_LIBS)

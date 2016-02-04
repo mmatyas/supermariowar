@@ -98,10 +98,7 @@ LIST(APPEND SMW_SRCS
 )
 
 if(NOT NO_NETWORK)
-	# disable networking in emscripten build for now...
-	if(NOT TARGET_EMSCRIPTEN)
-		LIST(APPEND SMW_SRCS platform/network/enet/NetworkLayerENet.cpp)
-	endif()
+	LIST(APPEND SMW_SRCS platform/network/enet/NetworkLayerENet.cpp)
 endif()
 
 # Add EXE icon on Windows
@@ -116,31 +113,35 @@ if(NOT NO_NETWORK)
 	target_link_libraries(smw NetplayFiles)
 endif()
 
-# add .bc extension when building with emscripten
-if(TARGET_EMSCRIPTEN)
-	set_target_properties(smw PROPERTIES SUFFIX ".bc")
-endif()
+#
+# Dependencies
+#
 
+# TODO: fix emscripten build
 # emscripten uses its own SDL
-if(NOT TARGET_EMSCRIPTEN)
-	target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
-	target_link_libraries(smw ${ZLIB_LIBRARY})
-	target_link_libraries(smw yaml-cpp)
+# if(NOT TARGET_EMSCRIPTEN)
 
-	if(USE_SDL2_LIBS)
-		target_link_libraries(smw ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
-	else()
-		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
-	endif()
+target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(smw ${ZLIB_LIBRARY})
+target_link_libraries(smw yaml-cpp)
 
-	if(NOT NO_NETWORK)
-		target_link_libraries(smw enet)
-		if (WIN32)
-			# WinSock2 libs, required by ENet on Windows
-			target_link_libraries(smw ws2_32 winmm)
-		endif()
+if(USE_SDL2_LIBS)
+	target_link_libraries(smw ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
+else()
+	target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
+endif()
+
+if(NOT NO_NETWORK)
+	target_link_libraries(smw enet)
+	if (WIN32)
+		# WinSock2 libs, required by ENet on Windows
+		target_link_libraries(smw ws2_32 winmm)
 	endif()
 endif()
+
+#
+# Installation
+#
 
 install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw" DESTINATION ${SMW_BINDIR})
 
