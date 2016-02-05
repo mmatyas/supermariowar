@@ -56,16 +56,15 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 - SDL (1.2 or 2.0), with
     - SDL_image
     - SDL_mixer
+- zlib
 - yaml-cpp (included)
 - ENet (optional, included)
 
-On Debian-based systems, the following command installs the required tools:
+You can use package managers for getting these dependencies:
 
-    apt-get install cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev
-
-On systems using RPM: `yum install cmake SDL-devel SDL_image-devel SDL_mixer-devel`
-
-On Arch and derivatives: `pacman -S cmake sdl sdl_image sdl_mixer`
+- Debian-based: `apt-get install cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev zlib1g-dev`
+- Fedora/RPM: `yum install cmake SDL-devel SDL_image-devel SDL_mixer-devel zlib-devel`
+- Arch: `pacman -S cmake sdl sdl_image sdl_mixer zlib`
 
 For other systems, you can download the development files manually from:
 
@@ -73,6 +72,7 @@ For other systems, you can download the development files manually from:
 - http://www.libsdl.org/download-1.2.php
 - http://www.libsdl.org/projects/SDL_image/release-1.2.html
 - http://www.libsdl.org/projects/SDL_mixer/release-1.2.html
+- http://zlib.net
 
 ### Get the code
 
