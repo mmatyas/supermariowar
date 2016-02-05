@@ -68,12 +68,6 @@ bool net_init()
 
     net_loadServerList();
 
-    if (!netplay.savedServers.size()) {
-        ServerAddress none;
-        none.hostname = "(none)";
-        netplay.savedServers.push_back(none);
-    }
-
     printf("[net] Network system initialized.\n");
     return true;
 }
