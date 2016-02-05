@@ -92,7 +92,7 @@ If you'd rather use the system libraries, please see the [Build configuration](#
 
 ### Linux
 
-Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. The binaries will be generated in `./Build/Binaries/Release` by default. In short:
+Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. The binaries will be generated in `./build/Binaries/Release` by default. In short:
 
 ```sh
 unzip data.zip
@@ -119,7 +119,7 @@ You'll probably need Xcode and its command line tools; you can install SDL and C
 
 ### Windows
 
-If you're using MinGW Shell/MSYS or Cygwin, you can follow the Linux guide. You can also generate a project file with CMake for various IDEs, such as CodeBlocks, Eclipse or Viual Studio.
+If you're using MinGW Shell/MSYS or Cygwin, you can follow the Linux guide. You can also generate a project file with CMake for various IDEs, such as CodeBlocks, Eclipse or Visual Studio.
 
 Visual Studio: *TODO: check this section*
 
