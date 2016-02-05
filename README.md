@@ -121,50 +121,13 @@ You'll probably need Xcode and its command line tools; you can install SDL and C
 
 If you're using MinGW Shell/MSYS or Cygwin, you can follow the Linux guide. You can also generate a project file with CMake for various IDEs, such as CodeBlocks, Eclipse or Visual Studio.
 
-Visual Studio: *TODO: check this section*
-
-- make sure you have CMake in your PATH
-- go to Build directory and issue `cmake ..`
-- open the generated solution smw.sln, right-click on the smw project and go to Configuration Properties -> C/C++ - Command line and remove everything there
-- on the same group, go to Linker and add your lib directory there
-- change also system to WINDOWS (not console)
-- now it will compile and smw.exe can be found in build\Binaries\Debug\smw.exe. make sure you copy the necessary SDL dlls along with smw.exe, otherwise it won't work
+For more details, see the wiki: [Building on Windows](https://github.com/mmatyas/supermariowar/wiki/Building-on-Windows).
 
 ### ARM devices
 
-You can build SMW on various ARM devices, like the Raspberry Pi, following the Linux instructions. Some boards may require different compiler flags hovewer, in this case you might want to manually edit `cmake/PlatformArm.cmake`.
+You can build SMW on ARM devices, like the Raspberry Pi, following the Linux instructions. If you know how to do it, you can also cross-compile the usual way, either by setting up a cross toolchain or emulating your device. For more details, see the wiki: [Cross compiling to ARM](https://github.com/mmatyas/supermariowar/wiki/Cross-compiling-to-ARM).
 
-If you know how to do it, you can also cross-compile the usual way, by setting up a toolchain or emulating your device. In this case, see the [Other devices](#other-devices) section. If your processor is not detected correctly (eg. in a rootfs), you can override it by adding the ARM_OVERRIDE_ARCH flag to CMake, eg. `-DARM_OVERRIDE_ARCH=armv6`.
-
-For example, here is how to set up a simple build environment for the Raspbery Pi on Ubuntu 14.04:
-
-```sh
-sudo apt-get install qemu-user-static debootstrap
-
-# Set up a Raspbian rootfs in the 'raspberry' directory
-sudo qemu-debootstrap --arch armhf wheezy raspberry http://archive.raspbian.org/raspbian
-
-# Mount some file systems in the rootfs
-sudo mount -o bind /dev  raspberry/dev
-sudo mount -o bind /proc raspberry/proc
-sudo mount -o bind /sys  raspberry/sys
-sudo cp /etc/resolv.conf raspberry/etc/resolv.conf
-
-# Enter
-sudo chroot raspberry /bin/bash
-```
-
-Then:
-
-```sh
-echo "deb http://archive.raspbian.org/raspbian jessie main" >> /etc/apt/sources.list
-wget http://archive.raspbian.org/raspbian.public.key -O - | apt-key add -
-apt-get update
-apt-get install build-essential g++ git \
-    cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev
-```
-
-Now you can continue with cloning the repository (eg. in `/root`) and following the Linux instructions. If you want to build for the first-gen Raspberry, you might have to call CMake as `cmake .. -DARM_OVERRIDE_ARCH=armv6l` to avoid linking errors. For other devices, you might need to edit the compiler flags as described above.
+The build configuration contains some default compiler flags already, but since there are many possible combinations (hard float, Thumb, NEON, ...), you might want to use custom parameters. In this case, define the CFLAGS and CXXFLAGS vars, and run CMake with the `DISABLE_DEFAULT_CFLAGS` option (see [Build configuration](#build-configuration)).
 
 ### Other devices
 
@@ -219,7 +182,6 @@ $ emcc Binaries/Release/smw-worldedit.bc -o worldedit.html $BUILDPARAMS
 You can change the build configuration by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the `Build` directory. You can read a short description of an element by hovering the mouse on its name too.
 
 Alternatively, you can pass these options directly to CMake as `-DFLAGNAME=VALUE` (eg. `cmake .. -DUSE_SDL2_LIBS=1`).
-
 
 
 ## How to play
