@@ -58,29 +58,31 @@ endif()
 #
 #-----------------------------------------------------------------------------
 
-#if (APPLE)
-#	include(PlatformApple)
-#endif()
-
-if (MSVC)
-	include(PlatformMSVC)
-endif()
-
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x64|x86_64|amd64)")
-	include(PlatformX64)
-elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(i[3-6]86|x86)")
-	include(PlatformX86)
-elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
-	include(PlatformArm)
-elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
-	include(PlatformArm64)
-endif()
-
 # Detect Emscripten
 if(CMAKE_C_COMPILER MATCHES "/emcc(-[a-zA-Z0-9.])?(\\.bat)?$")
 	set(CMAKE_C_COMPILER_ID "Emscripten")
 	set(CMAKE_CXX_COMPILER_ID "Emscripten")
 	# include(PlatformEmscripten)
+endif()
+
+if (NOT DISABLE_DEFAULT_CFLAGS)
+	if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x64|x86_64|amd64)")
+		include(PlatformX64)
+	elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "(i[3-6]86|x86)")
+		include(PlatformX86)
+	elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
+		include(PlatformArm)
+	elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+		include(PlatformArm64)
+	endif()
+
+	#if (APPLE)
+	#	include(PlatformApple)
+	#endif()
+
+	if (MSVC)
+		include(PlatformMSVC)
+	endif()
 endif()
 
 #-----------------------------------------------------------------------------
