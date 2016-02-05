@@ -1,4 +1,4 @@
-add_library ( CommonFiles
+set(COMMON_SRCS
     dirlist.cpp
     eyecandy.cpp
     FileIO.cpp
@@ -34,3 +34,9 @@ add_library ( CommonFiles
     ui/MI_ImageSelectField.cpp
     ui/MI_SliderField.cpp
 )
+
+if (USE_PNG_SAVE)
+    list(APPEND COMMON_SRCS src/savepng.cpp)
+endif()
+
+add_library(CommonFiles ${COMMON_SRCS})
