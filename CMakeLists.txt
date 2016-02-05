@@ -52,8 +52,6 @@ else()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries/Release)
 endif()
 
-add_definitions(-DSMW_DATADIR="${SMW_DATADIR}")
-
 #-----------------------------------------------------------------------------
 #
 # Platform-specific settings
@@ -245,6 +243,7 @@ else()
 	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/share/games/smw CACHE PATH "Installation location of the game data")
 endif()
 # set(SMW_USERDIR ".smw" CACHE STRING "User directory") # User settings directory
+add_definitions(-DSMW_DATADIR="${SMW_DATADIR}")
 
 # For installing Linux desktop items
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
