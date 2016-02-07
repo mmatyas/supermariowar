@@ -298,13 +298,12 @@ void CGameValues::resetSecretCounters()
 
 // Read saved settings from disk
 void CGameValues::ReadBinaryConfig() {
-    std::string options_path(GetHomeDirectory() + "options.bin");
-    BinaryFile options(options_path.c_str(), "rb");
-    if (!options.is_open())
-        return;
+    try {
+        std::string options_path(GetHomeDirectory() + "options.bin");
+        BinaryFile options(options_path.c_str(), "rb");
+        if (!options.is_open())
+            throw std::runtime_error("Could not open " + options_path);
 
-    try
-    {
         int32_t version[4];
         options.read_i32_array(version, 4);
 
@@ -389,25 +388,6 @@ void CGameValues::ReadBinaryConfig() {
         poweruppreset = options.read_i16();
         options.read_i16_array((int16_t *)g_iCurrentPowerupPresets, NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
-        //TODO: Need to test what happens when you unplug some controllers from the xbox
-        //and then start up (device index will probably point to a gamepad that isn't in the list)
-        //and this will cause a crash
-        options.read_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
-
-        //setup player input controls for game
-        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            short iDevice = options.read_i16();
-
-#ifdef _XBOX
-            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices on xbox
-#else
-            if (iDevice >= joystickcount)
-                iDevice = DEVICE_KEYBOARD;
-
-            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
-#endif
-        }
-
 #ifndef _XBOX
         fullscreen = options.read_bool();
 #endif
@@ -444,21 +424,56 @@ void CGameValues::ReadBinaryConfig() {
     catch (std::exception const& error)
     {
         perror(error.what());
+        return;
+    }
+
+    try {
+#ifdef USE_SDL2
+        std::string controls_path(GetHomeDirectory() + "controls.sdl2.bin");
+#else
+        std::string controls_path(GetHomeDirectory() + "controls.sdl.bin");
+#endif
+        BinaryFile controls(controls_path.c_str(), "rb");
+        if (!controls.is_open())
+            throw std::runtime_error("Could not open " + controls_path);
+
+        //TODO: Need to test what happens when you unplug some controllers from the xbox
+        //and then start up (device index will probably point to a gamepad that isn't in the list)
+        //and this will cause a crash
+        controls.read_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
+
+        //setup player input controls for game
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+            short iDevice = controls.read_i16();
+
+#ifdef _XBOX
+            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices on xbox
+#else
+            if (iDevice >= joystickcount)
+                iDevice = DEVICE_KEYBOARD;
+
+            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
+#endif
+        }
+    }
+    catch (std::exception const& error)
+    {
+        perror(error.what());
+        return;
     }
 }
 
 void CGameValues::WriteConfig()
 {
-    std::string options_path(GetHomeDirectory() + "options.bin");
-    BinaryFile options(options_path.c_str(), "wb");
-    if (!options.is_open())
-        return;
-
     try {
+        std::string options_path(GetHomeDirectory() + "options.bin");
+        BinaryFile options(options_path.c_str(), "wb");
+        if (!options.is_open())
+            throw std::runtime_error("Could not open " + options_path);
+
         options.write_raw(g_iVersion, sizeof(int) * 4);
 
 #ifdef _XBOX
-
         options.write_i16(flickerfilter);
         options.write_i16(hardwarefilter);
         options.write_i16(softfilter);
@@ -531,12 +546,6 @@ void CGameValues::WriteConfig()
         options.write_i16(poweruppreset);
         options.write_raw(&g_iCurrentPowerupPresets, sizeof(short) * NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
-        options.write_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
-
-        for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
-            options.write_i16(playerInput.inputControls[iPlayer]->iDevice);
-        }
-
 #ifndef _XBOX
         options.write_bool(fullscreen);
 #endif
@@ -565,6 +574,29 @@ void CGameValues::WriteConfig()
     catch (std::exception const& error)
     {
         perror(error.what());
+        return;
+    }
+
+    try {
+#ifdef USE_SDL2
+        std::string controls_path(GetHomeDirectory() + "controls.sdl2.bin");
+#else
+        std::string controls_path(GetHomeDirectory() + "controls.sdl.bin");
+#endif
+        BinaryFile controls(controls_path.c_str(), "wb");
+        if (!controls.is_open())
+            throw std::runtime_error("Could not open " + controls_path);
+
+
+        controls.write_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
+
+        for (int iPlayer = 0; iPlayer < 4; iPlayer++)
+            controls.write_i16(playerInput.inputControls[iPlayer]->iDevice);
+    }
+    catch (std::exception const& error)
+    {
+        perror(error.what());
+        return;
     }
 
     maplist->WriteFilters();
