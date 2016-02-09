@@ -3,7 +3,7 @@
 
 #include "uimenu.h"
 #include "uicontrol.h"
-#include "uicustomcontrol.h"
+#include "ui/MI_TeamSelect.h"
 
 /*
     Description.

@@ -59,6 +59,7 @@ LIST(APPEND SMW_SRCS
 	ui/MI_PowerupSlider.cpp
 	ui/MI_FrenzyModeOptions.cpp
 	ui/MI_InputControlContainer.cpp
+	ui/MI_TeamSelect.cpp
 )
 
 #
