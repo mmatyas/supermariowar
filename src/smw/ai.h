@@ -9,7 +9,7 @@ extern CGame *smw;
 
 class CObject;
 class CPlayer;
-class COutputControl;
+struct COutputControl;
 
 class NearestObjects
 {
