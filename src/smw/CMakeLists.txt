@@ -60,6 +60,7 @@ LIST(APPEND SMW_SRCS
 	ui/MI_FrenzyModeOptions.cpp
 	ui/MI_InputControlContainer.cpp
 	ui/MI_TeamSelect.cpp
+	ui/MI_NetRoomTeamSelect.cpp
 )
 
 #

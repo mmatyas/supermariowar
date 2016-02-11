@@ -19,13 +19,10 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
 
     for (short p = 0; p < 4; p++) {
         miNetRoomPlayerName[p] = new MI_Text("" /* Px name here */, 60, 80 + p * 60, 0, 2, 0);
-        miNetRoomPlayerSkin[p] = new MI_Image(rm->spr_player[p][PGFX_STANDING_R],
-            16, 72 + p * 60,
-            0, 0, 32, 32,
-            1, 1, 0);
-
-        AddNonControl(miNetRoomPlayerSkin[p]);
         AddNonControl(miNetRoomPlayerName[p]);
+
+        miSkinSelector[p] = new MI_NetRoomTeamSelect(16, 72 + p * 60, p);
+        AddNonControl(miSkinSelector[p]);
     }
 
     miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, 300, 310, "(waiting)", 331, 1);
