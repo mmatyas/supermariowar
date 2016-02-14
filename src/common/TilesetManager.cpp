@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <cstring>
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
 #include <sys/stat.h>
 #endif
 
@@ -130,7 +130,7 @@ void CTileset::SaveTileset()
 		tsf.write_i32(tiletypes[i]);
 	}
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
 	chmod(szTilesetPath, S_IRWXU | S_IRWXG | S_IROTH);
 #endif
 }
