@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
 #include <sys/stat.h>
 #endif
 
@@ -479,7 +479,7 @@ void MapList::WriteFilters()
 
             fclose(fp);
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
             chmod(filterslist->GetIndex(iFilter), S_IRWXU | S_IRWXG | S_IROTH);
 #endif
         }
@@ -620,7 +620,7 @@ void MapList::WriteMapSummaryCache()
 
     fclose(fp);
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
     chmod(convertPath("maps/cache/mapsummary.txt").c_str(), S_IRWXU | S_IRWXG | S_IROTH);
 #endif
 }

@@ -15,7 +15,7 @@
 #include <map>
 #include <queue>
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
 #include <sys/stat.h>
 #endif
 
@@ -1006,7 +1006,7 @@ bool WorldMap::Save(const char * szPath)
 
     fclose(file);
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
     chmod(szPath, S_IRWXU | S_IRWXG | S_IROTH);
 #endif
 

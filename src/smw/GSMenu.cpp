@@ -62,7 +62,7 @@
 #endif
 #endif
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
 #include <sys/stat.h>
 #endif
 
@@ -1948,7 +1948,7 @@ void MenuState::SaveScript(const char * szScriptFile)
 
         fclose(fp);
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
         chmod(szScriptFile, S_IRWXU | S_IRWXG | S_IROTH);
 #endif
     }

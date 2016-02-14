@@ -27,7 +27,7 @@ const std::string GetHomeDirectory()
     // NOTE: _WIN32 is also defined on _XBOX
     return std::string("D:\\.smw\\");
 
-#elif __MACOSX__
+#elif __APPLE__
     std::string result("/Library/Preferences/.smw/");
     char* folder = getenv("HOME");
     if (folder)
@@ -67,7 +67,7 @@ bool File_Exists (const std::string fileName)
 /*********************************************************************
   Mac OS X Application Bundles                              *********/
 
-#ifdef __MACOSX__
+#ifdef __APPLE__
 #include <iostream>
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -132,7 +132,7 @@ const string convertPath(const string& source)
 			SMW_Root_Data_Dir = RootDataDirectory;
 //		#endif
 
-		#ifdef __MACOSX__
+		#ifdef __APPLE__
 			Initialize_Paths();
 		#endif
 

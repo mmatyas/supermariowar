@@ -19,7 +19,7 @@
 using std::cout;
 using std::endl;
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
 #include <sys/stat.h>
 #endif
 
@@ -1337,7 +1337,7 @@ void CMap::saveMap(const std::string& file)
         mapfile.write_i32(flagbaselocations[j].y);
     }
 
-#if defined(__MACOSX__)
+#if defined(__APPLE__)
     chmod(file.c_str(), S_IRWXU | S_IRWXG | S_IROTH);
 #endif
 

@@ -23,7 +23,7 @@ const std::string getFileFromPath(const std::string &path);
 
 const std::string GetHomeDirectory();
 
-#ifdef __MACOSX__
+#ifdef __APPLE__
     void Initialize_Paths();
 #else
 #  define Initialize_Paths();
