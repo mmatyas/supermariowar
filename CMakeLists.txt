@@ -91,38 +91,36 @@ endif()
 #
 #-----------------------------------------------------------------------------
 
-find_package(ZLIB REQUIRED)
-include_directories(${ZLIB_INCLUDE_DIR})
+if (NOT DISABLE_SYSLIB_CHECKS)
+	find_package(ZLIB REQUIRED)
+	include_directories(${ZLIB_INCLUDE_DIR})
 
-# TODO: fix emscripten build
-# emscripten uses its own SDL, no need to include or link
-# if (NOT TARGET_EMSCRIPTEN)
+	if (USE_SDL2_LIBS)
+		# add all SDL2 dependencies
+		find_package(SDL2 REQUIRED)
+		find_package(SDL2_mixer REQUIRED)
+		find_package(SDL2_image REQUIRED)
 
-if (USE_SDL2_LIBS)
-	# add all SDL2 dependencies
-	find_package(SDL2 REQUIRED)
-	find_package(SDL2_mixer REQUIRED)
-	find_package(SDL2_image REQUIRED)
+		# location of SDL headers
+		include_directories(${SDL2_INCLUDE_DIR})
+		include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+		include_directories(${SDL2_MIXER_INCLUDE_DIRS})
+	else()
+		# add all SDL dependencies
+		find_package(SDL REQUIRED)
+		find_package(SDL_mixer REQUIRED)
+		find_package(SDL_image REQUIRED)
 
-	# location of SDL headers
-	include_directories(${SDL2_INCLUDE_DIR})
-	include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
-	include_directories(${SDL2_MIXER_INCLUDE_DIRS})
-else()
-	# add all SDL dependencies
-	find_package(SDL REQUIRED)
-	find_package(SDL_mixer REQUIRED)
-	find_package(SDL_image REQUIRED)
+		# location of SDL headers
+		include_directories(${SDL_INCLUDE_DIR})
+		include_directories(${SDL_IMAGE_INCLUDE_DIRS})
+		include_directories(${SDL_MIXER_INCLUDE_DIRS})
 
-	# location of SDL headers
-	include_directories(${SDL_INCLUDE_DIR})
-	include_directories(${SDL_IMAGE_INCLUDE_DIRS})
-	include_directories(${SDL_MIXER_INCLUDE_DIRS})
-
-	# the optional libpng package
-	if(USE_PNG_SAVE)
-		find_package(PNG REQUIRED)
-		include_directories(${PNG_INCLUDE_DIR})
+		# the optional libpng package
+		if(USE_PNG_SAVE)
+			find_package(PNG REQUIRED)
+			include_directories(${PNG_INCLUDE_DIR})
+		endif()
 	endif()
 endif()
 
