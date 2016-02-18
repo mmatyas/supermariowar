@@ -27,9 +27,7 @@ private:
     void create_game_window(bool fullscreen);
 
     void print_sdl_version();
-#ifndef __EMSCRIPTEN__
     void print_sdl_img_version();
-#endif
 
 #ifdef USE_SDL2
     void create_renderer();

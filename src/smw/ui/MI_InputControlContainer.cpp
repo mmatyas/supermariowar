@@ -384,7 +384,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
 
 #else
     for (short iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
-    #if defined(USE_SDL2) && !defined(__EMSCRIPTEN__)
+    #ifdef USE_SDL2
         miDeviceSelectField->Add(SDL_JoystickNameForIndex(iJoystick), iJoystick, "", false, false);
     #else
         miDeviceSelectField->Add(SDL_JoystickName(iJoystick), iJoystick, "", false, false);

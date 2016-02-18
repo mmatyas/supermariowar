@@ -400,7 +400,7 @@ bool CResourceManager::LoadGameSounds()
 {
     game_values.soundcapable = false;
 
-#if !defined(_XBOX) && !defined(__EMSCRIPTEN__)  //xbox and emscripten has sound capabilities
+#if !defined(_XBOX)  //xbox has sound capabilities
     int frequency, channels;
     Uint16 format;
 

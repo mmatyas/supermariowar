@@ -70,11 +70,8 @@ void GraphicsSDL::init_sdl_img()
         throw E_INIT_SDL_IMG;
     }
 
-    // TODO: Remove guards when IMG gets properly supported by Emscripten
-#ifndef __EMSCRIPTEN__
     atexit(IMG_Quit);
     print_sdl_img_version();
-#endif
 }
 
 void GraphicsSDL::print_sdl_version()
@@ -92,7 +89,6 @@ void GraphicsSDL::print_sdl_version()
         ver_current.major, ver_current.minor, ver_current.patch);
 }
 
-#ifndef __EMSCRIPTEN__
 void GraphicsSDL::print_sdl_img_version()
 {
     // show SDL_image version
@@ -102,7 +98,6 @@ void GraphicsSDL::print_sdl_img_version()
     printf("[gfx] SDL_image %d.%d.%d loaded.\n",
         ver_img_current->major, ver_img_current->minor, ver_img_current->patch);
 }
-#endif
 
 #ifdef USE_SDL2
 // -----------------------

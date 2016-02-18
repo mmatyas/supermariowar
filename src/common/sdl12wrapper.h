@@ -104,11 +104,7 @@
     inline int SDL_SCALEBLIT(SDL_Surface* src, SDL_Rect* srcrect,
         SDL_Surface* dst, SDL_Rect* dstrect)
     {
-        #ifndef __EMSCRIPTEN__
         return SDL_SoftStretch(src, srcrect, dst, dstrect);
-        #else
-        return SDL_BlitSurface(src, srcrect, dst, dstrect);
-        #endif
     }
 
     /*#ifdef __EMSCRIPTEN__
