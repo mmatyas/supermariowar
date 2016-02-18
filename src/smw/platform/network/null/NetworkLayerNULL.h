@@ -19,6 +19,7 @@ class NetworkLayerNULL : public NetworkLayer
 
         bool connectToLobbyServer(const char*, uint16_t) { return false; }
         bool connectToForeignGameHost(const char*, uint16_t) { return false; }
+        bool natPunch(uint32_t host, uint16_t port) { return false; };
 };
 
 #endif // NETWORK_LAYER_NULL_H
