@@ -275,8 +275,12 @@ message("    SYSTEM:      ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}")
 message("    BUILD:       ${CMAKE_BUILD_TYPE}")
 message("    CC:          ${CMAKE_C_COMPILER}")
 message("    CXX:         ${CMAKE_CXX_COMPILER}")
-message("    C_FLAGS:     ${CMAKE_C_FLAGS}")
-message("    CXX_FLAGS:   ${CMAKE_CXX_FLAGS}")
+message("    C FLAGS:     ${CMAKE_C_FLAGS}")
+message("    CXX FLAGS:   ${CMAKE_CXX_FLAGS}")
+message("    LD FLAGS:    ${CMAKE_EXE_LINKER_FLAGS}")
+
+get_directory_property(MSG_DEFINITIONS DEFINITIONS)
+message("    DEFINITIONS: ${MSG_DEFINITIONS}")
 
 #
 # Go through every sub-project
