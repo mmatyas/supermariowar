@@ -160,7 +160,7 @@ void UI_NetEditServersMenu::onEntrySelect() {
         miDialogTextField->Refresh();
         ShowDialog();
         SetHeadControl(miDialogTextField);
-        SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
+        SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
         break;
 
     case DELETE:
