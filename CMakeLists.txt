@@ -279,7 +279,7 @@ message("    C FLAGS:     ${CMAKE_C_FLAGS}")
 message("    CXX FLAGS:   ${CMAKE_CXX_FLAGS}")
 message("    LD FLAGS:    ${CMAKE_EXE_LINKER_FLAGS}")
 
-get_directory_property(MSG_DEFINITIONS DEFINITIONS)
+get_directory_property(MSG_DEFINITIONS COMPILE_DEFINITIONS)
 message("    DEFINITIONS: ${MSG_DEFINITIONS}")
 
 #
