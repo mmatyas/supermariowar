@@ -12,7 +12,7 @@
 	- [ARM / Raspberry Pi](#arm-devices)
 	- [Other devices](#other-devices)
 	- [Android](#android)
-	- [Asm.js](#asmjs)
+	- [Emscripten](#emscripten)
 	- [Build configuration](#build-configuration)
 - [How to play](#how-to-play)
 
@@ -149,30 +149,15 @@ You should be able to port SMW to any device where SDL (either 1.2 or 2.0) works
 
 The Android port uses a different build system, you can find more details [here](https://github.com/mmatyas/supermariowar-android).
 
-### ASM.JS
+### Emscripten
 
-*TODO: Update this part, it's broken with the latest emscripten*
+SMW can be build to run in your browser using [Emscripten](https://kripken.github.io/emscripten-site/). You will also need to apply a [patch](https://github.com/mmatyas/supermariowar/wiki/Building-the-Emscripten-port) for SMW to make it work. After that, the build steps are similar to Linux:
 
-SMW can be build to run in your browser. For this, you need
-Emscripten with the special LLVM backend, and Clang.
-See [here](https://kripken.github.io/emscripten-site/docs/building_from_source/LLVM-Backend.html) for more information.
-
-You can prepare a build directory with the following commands:
-
-```sh
-$ mkdir build-js && cd build-js
-$ ln -s ../data data
-$ emconfigure cmake .. -DTARGET_EMSCRIPTEN=1 -DNO_NETWORK=1
 ```
-
-Then build with:
-
-```sh
-$ emmake make
-$ BUILDPARAMS="-O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1"
-$ emcc Binaries/Release/smw.bc -o smw.html $BUILDPARAMS
-$ emcc Binaries/Release/smw-leveledit.bc -o leveledit.html $BUILDPARAMS
-$ emcc Binaries/Release/smw-worldedit.bc -o worldedit.html $BUILDPARAMS
+unzip data.zip
+mkdir build_js && cd build_js
+emconfigure cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
+emmake make smw
 ```
 
 ### Build configuration
