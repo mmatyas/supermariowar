@@ -41,11 +41,7 @@ bool gfx_loadpalette(const std::string& palette_path) {
 
 bool ValidSkinSurface(SDL_Surface * skin)
 {
-#ifdef __EMSCRIPTEN__
-    if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 32)
-#else
     if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 24)
-#endif
         return true;
 
     return false;
@@ -84,11 +80,7 @@ SDL_Surface * gfx_createskinsurface(
     if (SDL_MUSTLOCK(skin))
         SDL_LockSurface(skin);
 
-#ifdef __EMSCRIPTEN__
-    Uint8 byteperframe = 128;
-#else
     Uint8 byteperframe = 96;
-#endif
 
     int skincounter = spriteindex * byteperframe;
     int tempcounter = 0;
