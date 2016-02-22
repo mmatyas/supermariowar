@@ -41,11 +41,7 @@ bool gfx_loadpalette(const std::string& palette_path) {
 
 bool ValidSkinSurface(SDL_Surface * skin)
 {
-#ifdef __EMSCRIPTEN__
-    if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 32)
-#else
     if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 24)
-#endif
         return true;
 
     return false;
@@ -84,11 +80,7 @@ SDL_Surface * gfx_createskinsurface(
     if (SDL_MUSTLOCK(skin))
         SDL_LockSurface(skin);
 
-#ifdef __EMSCRIPTEN__
-    Uint8 byteperframe = 128;
-#else
     Uint8 byteperframe = 96;
-#endif
 
     int skincounter = spriteindex * byteperframe;
     int tempcounter = 0;
@@ -153,11 +145,7 @@ SDL_Surface * gfx_createskinsurface(
         return NULL;
     }
 
-#ifdef __EMSCRIPTEN__
-    SDL_Surface * final = SDL_DisplayFormatAlpha(temp);
-#else
     SDL_Surface * final = SDL_DisplayFormat(temp);
-#endif
     if (!final) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
@@ -371,11 +359,7 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
         }
     }
 
-#ifdef __EMSCRIPTEN__
-    SDL_Surface * sFinalImage = SDL_DisplayFormatAlpha(sTempImage);
-#else
     SDL_Surface * sFinalImage = SDL_DisplayFormat(sTempImage);
-#endif
     if (!sFinalImage) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;

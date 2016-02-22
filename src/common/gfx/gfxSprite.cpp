@@ -75,12 +75,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, boo
         return false;
     }
 
-#ifdef __EMSCRIPTEN__
-    SDL_Surface * temp = SDL_DisplayFormatAlpha(m_picture);
-#else
     SDL_Surface * temp = SDL_DisplayFormat(m_picture);
-#endif
-
     if (!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()
@@ -173,12 +168,7 @@ bool gfxSprite::init(const std::string& filename)
         return false;
     }
 
-#ifdef __EMSCRIPTEN__
-    SDL_Surface * temp = SDL_DisplayFormatAlpha(m_picture);
-#else
     SDL_Surface * temp = SDL_DisplayFormat(m_picture);
-#endif
-
     if (!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()

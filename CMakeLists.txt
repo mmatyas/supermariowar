@@ -58,13 +58,6 @@ endif()
 #
 #-----------------------------------------------------------------------------
 
-# Detect Emscripten
-if(CMAKE_C_COMPILER MATCHES "/emcc(-[a-zA-Z0-9.])?(\\.bat)?$")
-	set(CMAKE_C_COMPILER_ID "Emscripten")
-	set(CMAKE_CXX_COMPILER_ID "Emscripten")
-	# include(PlatformEmscripten)
-endif()
-
 if (NOT DISABLE_DEFAULT_CFLAGS)
 	if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x64|x86_64|amd64)")
 		include(PlatformX64)
@@ -74,6 +67,10 @@ if (NOT DISABLE_DEFAULT_CFLAGS)
 		include(PlatformArm)
 	elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
 		include(PlatformArm64)
+	endif()
+
+	if (EMSCRIPTEN)
+		include(PlatformEmscripten)
 	endif()
 
 	#if (APPLE)
@@ -177,6 +174,16 @@ if (WIN32)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
 	# TODO: check if compiler supports this flag, may fail with GCC < 4.8
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
+endif()
+
+if (EMSCRIPTEN)
+	if (CMAKE_BUILD_TYPE STREQUAL Debug)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g4")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g4")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O0 -g4")
+	else()
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O3")
+	endif()
 endif()
 
 include(CheckCXXCompilerFlag)

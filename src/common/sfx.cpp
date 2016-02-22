@@ -28,11 +28,15 @@ bool sfx_init()
 	for (short iChannel = 0; iChannel < NUM_SOUND_CHANNELS; iChannel++)
 		g_PlayingSoundChannels[iChannel] = NULL;
 
-//TODO: remove guard when emscripten gets fixed
 #ifndef __EMSCRIPTEN__
     const SDL_version *link_version = Mix_Linked_Version();
     printf("[sfx] SDL_Mixer %d.%d.%d initialized.\n",
         link_version->major, link_version->minor, link_version->patch);
+#else
+    SDL_version ver_compiled;
+    SDL_MIXER_VERSION(&ver_compiled);
+    printf("[sfx] SDL_Mixer %d.%d.%d initialized.\n",
+        ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
 #endif
 
     return true;
