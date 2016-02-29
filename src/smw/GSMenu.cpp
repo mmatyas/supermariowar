@@ -1679,6 +1679,9 @@ void MenuState::DisplayControllingTeamMessage(short iControlTeam)
 
 void MenuState::Exit()
 {
+#ifdef __EMSCRIPTEN__
+    return;
+#endif
     game_values.gamestate = GS_QUIT;
     game_values.WriteConfig();
 }

@@ -27,8 +27,12 @@ UI_MainMenu::UI_MainMenu() : UI_Menu()
     miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Controls", 200, 0);
     miControlsButton->SetCode(MENU_CODE_TO_CONTROLS_MENU);
 
+#ifdef __EMSCRIPTEN__
+    miExitButton = NULL;
+#else
     miExitButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Exit", 640 * 0.625f, 0);
     miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
+#endif
 
     AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
     AddControl(miQuickGameButton, miExitButton, miPlayerSelect, miMainStartButton, NULL);
@@ -36,10 +40,12 @@ UI_MainMenu::UI_MainMenu() : UI_Menu()
     AddControl(miMultiplayerButton, miPlayerSelect, miOptionsButton, NULL, NULL);
     AddControl(miOptionsButton, miMultiplayerButton, miExitButton, miControlsButton, miControlsButton);
     AddControl(miControlsButton, miMultiplayerButton, miExitButton, miOptionsButton, miOptionsButton);
+#ifndef __EMSCRIPTEN__
     AddControl(miExitButton, miOptionsButton, miMainStartButton, NULL, NULL);
+#endif
 
     SetHeadControl(miMainStartButton);
-#ifndef _XBOX
+#if !defined(_XBOX) && !defined(__EMSCRIPTEN__)
     SetCancelCode(MENU_CODE_EXIT_APPLICATION);
 #endif
 
