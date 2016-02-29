@@ -65,6 +65,7 @@ You can use package managers for getting these dependencies:
 - Debian-based: `apt-get install cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev zlib1g-dev`
 - Fedora/RPM: `yum install cmake SDL-devel SDL_image-devel SDL_mixer-devel zlib-devel`
 - Arch: `pacman -S cmake sdl sdl_image sdl_mixer zlib`
+- MSYS2: `pacman -S mingw-w64-x86_64-SDL mingw-w64-x86_64-SDL_image mingw-w64-x86_64-SDL_mixer mingw-w64-x86_64-zlib`
 
 For other systems, you can download the development files manually from:
 
