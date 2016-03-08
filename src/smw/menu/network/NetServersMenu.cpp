@@ -107,6 +107,9 @@ void UI_NetServersMenu::RefreshScroll() {
 
 void UI_NetServersMenu::ConnectInProgress()
 {
+    if (!netplay.savedServers.size())
+        return;
+
     netplay.client.sendConnectRequestToSelectedServer();
     netplay.operationInProgress = true;
 
