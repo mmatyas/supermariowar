@@ -491,7 +491,7 @@ void NetClient::sendSkinChange()
 
     NetPkgs::MessageHeader header(NET_NOTICE_SKIN_CHANGE);
     memcpy(compressed.data, &header, sizeof(NetPkgs::MessageHeader));
-    compressed.data[sizeof(NetPkgs::MessageHeader) + 1] = 0xFF; // the player's id in a room (0-3), or 0xFF
+    compressed.data[sizeof(NetPkgs::MessageHeader)] = 0xFF; // the player's id in a room (0-3), or 0xFF
 
     sendMessageToLobbyServer(compressed.data, compressed.size);
 }
