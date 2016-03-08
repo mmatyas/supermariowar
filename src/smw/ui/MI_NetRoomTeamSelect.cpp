@@ -27,9 +27,16 @@ MI_NetRoomTeamSelect::MI_NetRoomTeamSelect(short x, short y, short player_id)
 
         fReady[iTeam] = false;
     }*/
+
+    miHoverImage = new MI_Image(&rm->menu_player_select, x - 6, y - 6, 32 + 18, 128 + 18, 44, 44, 1, 1, 1);
+    miHoverImage->Show(false);
+    miModifyImage = new MI_Image(&rm->menu_player_select, x - 24, y - 24, 32, 128, 78, 78, 4, 1, 8);
+    miModifyImage->Show(false);
 }
 
-MI_NetRoomTeamSelect::~MI_NetRoomTeamSelect() {}
+MI_NetRoomTeamSelect::~MI_NetRoomTeamSelect() {
+    delete miModifyImage;
+}
 
 void MI_NetRoomTeamSelect::Update() {
     if (++iAnimationTimer > 7) {
@@ -43,20 +50,48 @@ void MI_NetRoomTeamSelect::Update() {
         if (iRandomAnimationFrame >= 128)
             iRandomAnimationFrame = 0;
     }
+
+    if (fSelected) {
+        miHoverImage->Show(true);
+        miModifyImage->Show(false);
+
+        if (fModifying) {
+            miHoverImage->Show(false);
+            miModifyImage->Show(true);
+            miModifyImage->Update();
+        }
+    }
+    else {
+        miHoverImage->Show(false);
+        miModifyImage->Show(false);
+    }
 }
 
 void MI_NetRoomTeamSelect::Draw() {
     if (!fShow)
         return;
 
-    rm->spr_player[owner_player][player_ready ? 0 : iAnimationFrame]->draw(x, y, 0, 0, 32, 32);
+    miHoverImage->Draw();
+    miModifyImage->Draw();
+
+    // if changing or selected, animate
+    if (!player_ready || fSelected)
+        rm->spr_player[owner_player][iAnimationFrame]->draw(x, y, 0, 0, 32, 32);
+    else
+        rm->spr_player[owner_player][0]->draw(x, y, 0, 0, 32, 32);
 }
 
 MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {
+    if (playerInput->outputControls[0].menu_select.fPressed || playerInput->outputControls[0].menu_cancel.fPressed) {
+        fModifying = false;
+        return MENU_CODE_UNSELECT_ITEM;
+    }
 
+    return MENU_CODE_NONE;
 }
 
 MenuCodeEnum MI_NetRoomTeamSelect::Modify(bool modify) {
+    printf("modify\n");
     fModifying = modify;
     return MENU_CODE_MODIFY_ACCEPTED;
 }

@@ -26,6 +26,9 @@ private:
     short iAnimationTimer;
     short iAnimationFrame;
     short iRandomAnimationFrame;
+
+    MI_Image* miModifyImage;
+    MI_Image* miHoverImage;
 };
 
 #endif // UI_NET_ROOM_TEAM_SELECT_H
