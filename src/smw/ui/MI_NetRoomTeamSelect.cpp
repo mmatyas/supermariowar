@@ -18,6 +18,8 @@ MI_NetRoomTeamSelect::MI_NetRoomTeamSelect(short x, short y, short player_id)
     , iAnimationTimer(0)
     , iAnimationFrame(0)
     , iRandomAnimationFrame(0)
+    , iFastScroll(0)
+    , iFastScrollTimer(0)
 {
     /*for (short iTeam = 0; iTeam < 4; iTeam++) {
         iTeamCounts[iTeam] = game_values.teamcounts[iTeam];
@@ -85,6 +87,74 @@ MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {
     if (playerInput->outputControls[0].menu_select.fPressed || playerInput->outputControls[0].menu_cancel.fPressed) {
         fModifying = false;
         return MENU_CODE_UNSELECT_ITEM;
+    }
+
+    // FIXME: The following code was copy-pasted from MI_TeamSelect
+
+    COutputControl* playerKeys = &game_values.playerInput.outputControls[0];
+
+    //Scroll up/down through player skins
+    if (!game_values.randomskin[0]) {
+        if (playerKeys->menu_up.fPressed) {
+            do {
+                if (playerKeys->menu_down.fDown) {
+                    game_values.skinids[0] = RANDOM_INT(skinlist->GetCount());
+                } else {
+                    if (--game_values.skinids[0] < 0)
+                        game_values.skinids[0] = (short)skinlist->GetCount() - 1;
+                }
+            } while (!rm->LoadMenuSkin(0, game_values.skinids[0], game_values.colorids[0], false));
+        } else if (playerKeys->menu_up.fDown) {
+            if (iFastScroll == 0) {
+                if (++iFastScrollTimer > 40) {
+                    iFastScroll = 1;
+                }
+            } else {
+                if (++iFastScrollTimer > 5) {
+                    do {
+                        if (--game_values.skinids[0] < 0)
+                            game_values.skinids[0] = (short)skinlist->GetCount() - 1;
+                    } while (!rm->LoadMenuSkin(0, game_values.skinids[0], game_values.colorids[0], false));
+
+                    iFastScrollTimer = 0;
+                }
+            }
+        }
+
+        if (playerKeys->menu_down.fPressed) {
+            do {
+                if (playerKeys->menu_up.fDown) {
+                    game_values.skinids[0] = RANDOM_INT( skinlist->GetCount());
+                } else {
+                    if (++game_values.skinids[0] >= skinlist->GetCount())
+                        game_values.skinids[0] = 0;
+                }
+            } while (!rm->LoadMenuSkin(0, game_values.skinids[0], game_values.colorids[0], false));
+        } else if (playerKeys->menu_down.fDown) {
+            if (iFastScroll == 0) {
+                if (++iFastScrollTimer > 40) {
+                    iFastScroll = 1;
+                }
+            } else {
+                if (++iFastScrollTimer > 5) {
+                    do {
+                        if (++game_values.skinids[0] >= skinlist->GetCount())
+                            game_values.skinids[0] = 0;
+                    } while (!rm->LoadMenuSkin(0, game_values.skinids[0], game_values.colorids[0], false));
+
+                    iFastScrollTimer = 0;
+                }
+            }
+        }
+
+        if ((!playerKeys->menu_up.fDown && !playerKeys->menu_down.fDown) ||
+                (playerKeys->menu_up.fDown && playerKeys->menu_down.fDown)) {
+            iFastScroll = 0;
+            iFastScrollTimer = 0;
+        }
+    } else {
+        iFastScroll = 0;
+        iFastScrollTimer = 0;
     }
 
     return MENU_CODE_NONE;

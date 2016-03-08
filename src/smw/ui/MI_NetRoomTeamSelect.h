@@ -27,6 +27,9 @@ private:
     short iAnimationFrame;
     short iRandomAnimationFrame;
 
+    short iFastScroll;
+    short iFastScrollTimer;
+
     MI_Image* miModifyImage;
     MI_Image* miHoverImage;
 };
