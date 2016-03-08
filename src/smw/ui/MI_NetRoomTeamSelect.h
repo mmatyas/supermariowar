@@ -4,9 +4,11 @@
 #include "uimenu.h"
 #include "uicontrol.h"
 
+#include <functional>
+
 class MI_NetRoomTeamSelect : public UI_Control {
 public:
-    MI_NetRoomTeamSelect(short x, short y, short player_id);
+    MI_NetRoomTeamSelect(short x, short y, short player_id, std::function<void()>&& on_change_accepted = [](){});
     virtual ~MI_NetRoomTeamSelect();
 
     void Update();
@@ -32,6 +34,8 @@ private:
 
     MI_Image* miModifyImage;
     MI_Image* miHoverImage;
+
+    std::function<void()> onChangeAccepted;
 };
 
 #endif // UI_NET_ROOM_TEAM_SELECT_H

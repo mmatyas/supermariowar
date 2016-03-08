@@ -9,7 +9,7 @@ extern CResourceManager* rm;
 
 extern SkinList *skinlist;
 
-MI_NetRoomTeamSelect::MI_NetRoomTeamSelect(short x, short y, short player_id)
+MI_NetRoomTeamSelect::MI_NetRoomTeamSelect(short x, short y, short player_id, std::function<void()>&& on_change_accepted)
     : UI_Control(x, y)
     , x(x)
     , y(y)
@@ -20,6 +20,7 @@ MI_NetRoomTeamSelect::MI_NetRoomTeamSelect(short x, short y, short player_id)
     , iRandomAnimationFrame(0)
     , iFastScroll(0)
     , iFastScrollTimer(0)
+    , onChangeAccepted(on_change_accepted)
 {
     /*for (short iTeam = 0; iTeam < 4; iTeam++) {
         iTeamCounts[iTeam] = game_values.teamcounts[iTeam];
@@ -84,7 +85,9 @@ void MI_NetRoomTeamSelect::Draw() {
 }
 
 MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {
-    if (playerInput->outputControls[0].menu_select.fPressed || playerInput->outputControls[0].menu_cancel.fPressed) {
+    if (playerInput->outputControls[0].menu_select.fPressed
+        || playerInput->outputControls[0].menu_cancel.fPressed) {
+        onChangeAccepted();
         fModifying = false;
         return MENU_CODE_UNSELECT_ITEM;
     }

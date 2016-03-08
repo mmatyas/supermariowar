@@ -36,7 +36,9 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
         miNetRoomPlayerName[p] = new MI_Text("" /* Px name here */, 60, 80 + p * 60, 0, 2, 0);
         AddNonControl(miNetRoomPlayerName[p]);
 
-        miSkinSelector[p] = new MI_NetRoomTeamSelect(16, 72 + p * 60, p);
+        miSkinSelector[p] = new MI_NetRoomTeamSelect(16, 72 + p * 60, p, [](){
+            netplay.client.sendSkinChange();
+        });
         AddControl(miSkinSelector[p], miNetRoomMessageField, miNetRoomStartButton, NULL, NULL);
     }
 
