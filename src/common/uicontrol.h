@@ -6,6 +6,7 @@
 #include "RandomNumberGenerator.h"
 #include "uimenu.h"
 
+#include <cassert>
 #include <functional>
 
 class UI_Menu;
@@ -52,6 +53,7 @@ public:
     }
 
     void SetNeighbor(short iNeighbor, UI_Control * uiControl) {
+        assert(iNeighbor < 4);
         neighborControls[iNeighbor] = uiControl;
     }
     UI_Control * GetNeighbor(short iNeighbor) {
