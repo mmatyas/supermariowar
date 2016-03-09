@@ -1553,7 +1553,7 @@ void MenuState::StartGame()
             if (netplay.active) {
                 if (k == netplay.remotePlayerNumber) { // local player uses local skin
                     printf("  player %d -> local\n", k);
-                    rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[0], game_values.colorids[k]);
+                    rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
                 }
                 else {
                     std::ostringstream path;

@@ -19,11 +19,6 @@ public:
 private:
     short x, y;
     short owner_player;
-    bool player_ready;
-    // The list of players for each team
-    // (there can be 4 teams, and a team can contain 3 players at most)
-    /*short iTeamIDs[4][3];
-    short iTeamCounts[4];*/
 
     short iAnimationTimer;
     short iAnimationFrame;

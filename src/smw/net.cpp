@@ -478,8 +478,8 @@ void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
 
 void NetClient::sendSkinChange()
 {
-    assert(strlen(skinlist->GetIndex(game_values.skinids[0])) > 4);
-    std::string skinpath(skinlist->GetIndex(game_values.skinids[0]));
+    assert(strlen(skinlist->GetIndex(game_values.skinids[netplay.remotePlayerNumber])) > 4);
+    std::string skinpath(skinlist->GetIndex(game_values.skinids[netplay.remotePlayerNumber]));
     printf("[net] Sending skin: %s\n", skinpath.c_str());
 
     // NOTE: see sendMapChangeMessage() for similar code
@@ -534,7 +534,6 @@ void NetClient::handleSkinChangeMessage(const uint8_t* data, size_t dataLength)
         printf("[warning] Could not load netplay skin of player %d, using default\n", playerID);
         rm->LoadMenuSkin(playerID, game_values.skinids[playerID], playerID, false);
     }
-
 }
 
 /****************************
