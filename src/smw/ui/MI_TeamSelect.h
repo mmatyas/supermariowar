@@ -7,7 +7,6 @@
 class MI_TeamSelect : public UI_Control
 {
 	public:
-
 		MI_TeamSelect(gfxSprite * spr_background, short x, short y);
 		virtual ~MI_TeamSelect();
 

@@ -17,17 +17,6 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
     miNetRoomName = new MI_Text("" /* Room name here */, 40, 50, 0, 2, 0);
     //AddNonControl(miNetRoomName);
 
-    for (short p = 0; p < 4; p++) {
-        miNetRoomPlayerName[p] = new MI_Text("" /* Px name here */, 60, 80 + p * 60, 0, 2, 0);
-        miNetRoomPlayerSkin[p] = new MI_Image(rm->spr_player[p][PGFX_STANDING_R],
-            16, 72 + p * 60,
-            0, 0, 32, 32,
-            1, 1, 0);
-
-        AddNonControl(miNetRoomPlayerSkin[p]);
-        AddNonControl(miNetRoomPlayerName[p]);
-    }
-
     miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, 300, 310, "(waiting)", 331, 1);
     miNetRoomStartButton->SetCode(MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS);
 
@@ -42,6 +31,16 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
 
     miNetRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Leave", 80, 1);
     miNetRoomBackButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
+
+    for (short p = 0; p < 4; p++) {
+        miNetRoomPlayerName[p] = new MI_Text("" /* Px name here */, 60, 80 + p * 60, 0, 2, 0);
+        AddNonControl(miNetRoomPlayerName[p]);
+
+        miSkinSelector[p] = new MI_NetRoomTeamSelect(16, 72 + p * 60, p, [](){
+            netplay.client.sendSkinChange();
+        });
+        AddControl(miSkinSelector[p], miNetRoomMessageField, miNetRoomStartButton, NULL, NULL);
+    }
 
     AddNonControl(miNetRoomMessages);
     AddNonControl(miNetRoomMapPreview);
@@ -81,6 +80,9 @@ UI_NetRoomMenu::~UI_NetRoomMenu() {
 void UI_NetRoomMenu::Refresh()
 {
     miNetRoomHeaderText->SetText(netplay.currentRoom.name.c_str());
+
+    miNetRoomStartButton->SetNeighbor(MENU_ITEM_NEIGHBOR_UP, miSkinSelector[netplay.remotePlayerNumber]);
+    miNetRoomMessageField->SetNeighbor(MENU_ITEM_NEIGHBOR_DOWN, miSkinSelector[netplay.remotePlayerNumber]);
 
     for (short p = 0; p < 4; p++) {
         miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p].c_str());

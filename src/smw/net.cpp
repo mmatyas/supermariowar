@@ -7,6 +7,7 @@
 #include "path.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
 #include "ui/NetworkListScroll.h"
 
 #include "network/FileCompressor.h"
@@ -33,7 +34,10 @@ Networking netplay;
 extern CGameValues game_values;
 extern CPlayer* list_players[4];
 extern short list_players_cnt;
+
+// used for setting netplay player skins
 extern SkinList *skinlist;
+extern CResourceManager* rm;
 
 extern short currentgamemode;
 extern CGameMode * gamemodes[GAMEMODE_LAST];
@@ -474,8 +478,8 @@ void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
 
 void NetClient::sendSkinChange()
 {
-    assert(strlen(skinlist->GetIndex(game_values.skinids[0])) > 4);
-    std::string skinpath(skinlist->GetIndex(game_values.skinids[0]));
+    assert(strlen(skinlist->GetIndex(game_values.skinids[netplay.remotePlayerNumber])) > 4);
+    std::string skinpath(skinlist->GetIndex(game_values.skinids[netplay.remotePlayerNumber]));
     printf("[net] Sending skin: %s\n", skinpath.c_str());
 
     // NOTE: see sendMapChangeMessage() for similar code
@@ -525,6 +529,11 @@ void NetClient::handleSkinChangeMessage(const uint8_t* data, size_t dataLength)
     path << GetHomeDirectory() << "net_skin" << playerID << ".bmp";
     if (!FileCompressor::decompress(data + sizeof(NetPkgs::MessageHeader) + 1, path.str()))
         return;
+
+    if (!rm->LoadMenuSkin(playerID, path.str(), playerID, false)) {
+        printf("[warning] Could not load netplay skin of player %d, using default\n", playerID);
+        rm->LoadMenuSkin(playerID, game_values.skinids[playerID], playerID, false);
+    }
 }
 
 /****************************

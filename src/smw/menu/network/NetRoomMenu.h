@@ -4,6 +4,7 @@
 #include "uimenu.h"
 #include "uicontrol.h"
 #include "uicustomcontrol.h"
+#include "ui/MI_NetRoomTeamSelect.h"
 
 /*
     Description.
@@ -24,10 +25,13 @@ public:
 private:
     MI_Text * miNetRoomName;
     MI_Text * miNetRoomPlayerName[4];
-    MI_Image * miNetRoomPlayerSkin[4];
+    MI_NetRoomTeamSelect* miSkinSelector[4];
+
     MI_ChatMessageBox * miNetRoomMessages;
-    MI_MapPreview * miNetRoomMapPreview;
     MI_TextField * miNetRoomMessageField;
+
+    MI_MapPreview * miNetRoomMapPreview;
+
     MI_Button * miNetRoomStartButton;
     MI_Button * miNetRoomSendButton;
     MI_Button * miNetRoomBackButton;
