@@ -39,22 +39,51 @@ matrix:
     - brew install sdl2 sdl2_image sdl2_mixer
 
   # Android builds
-  - env: BUILD=android ABILIST='armeabi armeabi-v7a arm64-v8a'
-  - env: BUILD=android ABILIST='x86 x86_64'
-  - env: BUILD=android ABILIST='mips mips64'
+  - language: android
+    env: BUILD=android ABILIST='armeabi armeabi-v7a arm64-v8a'
+
+  - language: android
+    env: BUILD=android ABILIST='x86 x86_64'
+
+  - language: android
+    env: BUILD=android ABILIST='mips mips64'
 
 
 before_script:
   # Native (Linux, OSX)
+  - if [[ "$BUILD" == "native" && "$TRAVIS_OS_NAME" == "linux" ]]; then
+      sudo apt-get -qq update &&
+      sudo apt-get install -y
+        cmake
+        clang
+        gcc-4.8
+        g++-4.8
+        libsdl1.2-dev
+        libsdl-image1.2-dev
+        libsdl-mixer1.2-dev
+        libsdl2-dev
+        libsdl2-image-dev
+        libsdl2-mixer-dev
+    ; fi
   - if [[ "$BUILD" == "native" ]]; then $CXX --version; fi
   - if [[ "$BUILD" == "native" ]]; then cmake --version; fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
 
   # Android SDK + NDK
+  - if [[ "$BUILD" == "android" ]]; then
+      sudo apt-get -qq update &&
+      sudo apt-get install -y
+        ant
+        expect
+        lib32bz2-1.0
+        lib32gcc1
+        lib32ncurses5
+        lib32stdc++6
+        lib32z1
+        openjdk-7-jdk
+    ; fi
   - if [[ "$BUILD" == "android" ]]; then cd ..; fi
-  - if [[ "$BUILD" == "android" ]]; then curl -L https://raw.github.com/embarkmobile/android-sdk-installer/version-2/android-sdk-installer | bash /dev/stdin --install=build-tools-23.0.1,android-15; fi
-  - if [[ "$BUILD" == "android" ]]; then source ~/.android-sdk-installer/env; fi
   - if [[ "$BUILD" == "android" ]]; then wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin; fi
   - if [[ "$BUILD" == "android" ]]; then chmod +x ./android-ndk-r10e-linux-x86_64.bin; fi
   - if [[ "$BUILD" == "android" ]]; then ./android-ndk-r10e-linux-x86_64.bin > /dev/null; fi
@@ -71,28 +100,7 @@ script:
   - if [[ "$BUILD" == "android" ]]; then cd supermariowar-android; fi
   - if [[ "$BUILD" == "android" ]]; then ./build.sh --abi=$ABILIST; fi
 
-
-addons:
-  apt:
-    packages:
-    # Packages for native Linux build
-    - cmake
-    - clang
-    - gcc-4.8
-    - g++-4.8
-    - libsdl1.2-dev
-    - libsdl-image1.2-dev
-    - libsdl-mixer1.2-dev
-    - libsdl2-dev
-    - libsdl2-image-dev
-    - libsdl2-mixer-dev
-
-    # Packages for Android build
-    - ant
-    - expect
-    - lib32bz2-1.0
-    - lib32gcc1
-    - lib32ncurses5
-    - lib32stdc++6
-    - lib32z1
-    - openjdk-7-jdk
+android:
+  components:
+    - build-tools-23.0.1
+    - android-15
