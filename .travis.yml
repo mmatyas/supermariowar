@@ -38,6 +38,9 @@ matrix:
     - brew update
     - brew install sdl2 sdl2_image sdl2_mixer
 
+  # Emscripten
+  - env: BUILD=emscripten
+
   # Android builds
   - language: android
     env: BUILD=android ABILIST='armeabi armeabi-v7a arm64-v8a'
@@ -69,6 +72,17 @@ before_script:
   - if [[ "$BUILD" == "native" ]]; then cmake --version; fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
+
+  # Emscripten
+  - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then
+      wget https://github.com/mmatyas/mmatyas.github.io/releases/download/arm-libs/emscripten_1350.tgz;
+      tar xzf emscripten_1350.tgz;
+      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/clang/fastcomp/build_master_64/bin;
+      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/node/4.1.1_64bit/bin;
+      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/emscripten/master;
+      export PATH=$EM_PATH:$PATH;
+    fi
+  - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then emcc -v; fi
 
   # Android SDK + NDK
   - if [[ "$BUILD" == "android" ]]; then
@@ -108,6 +122,18 @@ script:
       mv supermariowar supermariowar-android/;
       cd supermariowar-android;
       ./build.sh --abi=$ABILIST;
+    fi
+
+  # Emscripten
+  - if [[ "$BUILD" == "emscripten" ]]; then
+      cd dependencies;
+      hg clone https://hg.libsdl.org/SDL_mixer SDL2_mixer;
+      cd ..;
+      sed -i 's|if (BUILD_STATIC_LIBS)|if (BUILD_STATIC_LIBS)\ninclude_directories(dependencies/SDL2_mixer)|' CMakeLists.txt;
+      unzip data.zip > /dev/null;
+      mkdir build_js && cd build_js;
+      emconfigure cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1;
+      emmake make smw;
     fi
 
 android:
