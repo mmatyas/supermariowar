@@ -83,22 +83,32 @@ before_script:
         lib32z1
         openjdk-7-jdk
     ; fi
-  - if [[ "$BUILD" == "android" ]]; then cd ..; fi
-  - if [[ "$BUILD" == "android" ]]; then wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin; fi
-  - if [[ "$BUILD" == "android" ]]; then chmod +x ./android-ndk-r10e-linux-x86_64.bin; fi
-  - if [[ "$BUILD" == "android" ]]; then ./android-ndk-r10e-linux-x86_64.bin > /dev/null; fi
-  - if [[ "$BUILD" == "android" ]]; then export PATH=$PATH:$(pwd)/android-ndk-r10e; fi
+  - if [[ "$BUILD" == "android" ]]; then
+      cd ..;
+      wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin;
+      chmod +x ./android-ndk-r10e-linux-x86_64.bin;
+      ./android-ndk-r10e-linux-x86_64.bin > /dev/null;
+      export PATH=$PATH:$(pwd)/android-ndk-r10e;
+    fi
 
 script:
   - if [[ "$BUILD" == "native" ]]; then mkdir build && cd build; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then cmake ..; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then make; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then make smw; fi
-  - if [[ "$BUILD" == "android" ]]; then git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git; fi
-  - if [[ "$BUILD" == "android" ]]; then mv supermariowar supermariowar-android/; fi
-  - if [[ "$BUILD" == "android" ]]; then cd supermariowar-android; fi
-  - if [[ "$BUILD" == "android" ]]; then ./build.sh --abi=$ABILIST; fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then
+      cmake ..;
+      make;
+    fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then
+      cmake -D USE_SDL2_LIBS:BOOL=ON ..;
+      make smw;
+    fi
+
+  # Android
+  - if [[ "$BUILD" == "android" ]]; then
+      git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git;
+      mv supermariowar supermariowar-android/;
+      cd supermariowar-android;
+      ./build.sh --abi=$ABILIST;
+    fi
 
 android:
   components:
