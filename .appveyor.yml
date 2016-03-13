@@ -31,8 +31,9 @@ install:
   # Get MinGW 4.9
   - echo Installing MinGW 4.9.2
   - ps: |
-      $filename=x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
-      if (!(Test-Path $filename)) {appveyor DownloadFile http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.9.2/threads-win32/seh/$filename/download -OutFile $filename}
+      $gccversion="4.9.2"
+      $filename="x86_64-$gccversion-release-win32-seh-rt_v4-rev4.7z"
+      if (!(Test-Path $filename)) {appveyor DownloadFile http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/$gccversion/threads-win32/seh/$filename/download -OutFile $filename}
       7z x $filename > $null
       Get-Command sh.exe -All | Remove-Item
 
