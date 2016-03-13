@@ -1,7 +1,8 @@
 #ifndef NET_CONFIG_MANAGER_H
 #define NET_CONFIG_MANAGER_H
 
-#include "yaml-cpp/yaml.h"
+#include <string>
+#include <list>
 
 /*
 
@@ -18,9 +19,8 @@ public:
     void save();
 
 private:
-    bool load_file(YAML::Node&);
-    void read_playername(YAML::Node&);
-    void read_servers(YAML::Node&);
+    void handle_playername(const std::string&);
+    void handle_servers(const std::list<std::string>&);
 };
 
 #endif // NET_CONFIG_MANAGER_H

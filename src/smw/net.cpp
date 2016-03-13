@@ -26,6 +26,7 @@
 #include <cassert>
 #include <cstring>
 #include <ctime>
+#include <sstream>
 #include <string>
 
 NetworkHandler networkHandler;

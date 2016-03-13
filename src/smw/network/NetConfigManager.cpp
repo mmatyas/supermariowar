@@ -3,6 +3,8 @@
 #include "net.h"
 #include "path.h"
 
+#include "cpptoml/cpptoml.h"
+
 #include <cassert>
 #include <cstring>
 #include <fstream>
@@ -13,77 +15,56 @@ void NetConfigManager::save()
 {
     assert(netplay.myPlayerName);
 
-    std::ofstream config(GetHomeDirectory() + "servers.yml");
-    if (!config.is_open()) {
+    FILE* config = fopen((GetHomeDirectory() + "netplay.toml").c_str(), "wt");
+    if (!config) {
         printf("[net][error] Could not save network settings\n");
         return;
     }
 
-    YAML::Emitter content;
-    content << YAML::BeginMap;
-    content << YAML::Key << "player_name";
-    content << YAML::Value << netplay.myPlayerName;
+    fprintf(config, "player_name = \"%s\"\n", netplay.myPlayerName);
+    fprintf(config, "servers = [\n");
+    for (auto server: netplay.savedServers)
+        fprintf(config, "    \"%s\",\n", server.hostname.c_str());
+    fprintf(config, "]\n");
 
-    assert(content.good());
-
-    content << YAML::Key << "servers";
-    content << YAML::Value << YAML::BeginSeq;
-
-    // Remove `(none)`
-    if (netplay.savedServers.size() == 1) {
-        if (netplay.savedServers[0].hostname.compare("(none)") == 0)
-            netplay.savedServers.clear();
-    }
-
-    for (unsigned i = 0; i < netplay.savedServers.size(); i++)
-        content << netplay.savedServers[i].hostname;
-
-    content << YAML::EndSeq;
-    content << YAML::EndMap;
-
-    assert(content.good());
-
-    config << content.c_str();
-    config.close();
+    fprintf(config, "\n");
+    fclose(config);
 }
 
 void NetConfigManager::load()
 {
-    YAML::Node config;
-    if (!load_file(config))
-        return;
-
-    read_playername(config);
-    read_servers(config);
-}
-
-bool NetConfigManager::load_file(YAML::Node& config) {
+    std::shared_ptr<cpptoml::table> config;
     try {
-        config = YAML::LoadFile(GetHomeDirectory() + "servers.yml");
-        return true;
+        config = cpptoml::parse_file(GetHomeDirectory() + "netplay.toml");
     }
-    catch (YAML::BadFile& error) {
-        printf("[net][warning] Could not open servers.yml, using default values.\n");
-    }
-    catch (std::runtime_error& error) {
-        printf("[net][warning] servers.yml: %s", error.what());
+    catch (const cpptoml::parse_exception& e) {
+        printf("[net][warning] netplay.toml: %s\n", e.what());
+        return;
     }
 
-    return false;
+    // read player name
+    auto player_name = config->get_as<std::string>("player_name");
+    if (player_name)
+        handle_playername(*player_name);
+
+    // read server list
+    auto raw_array = config->get_array("server");
+    if (raw_array) {
+        auto str_array = raw_array->array_of<std::string>();
+
+        std::list<std::string> servers;
+        for (auto str_entry: str_array) {
+            if (str_entry)
+                servers.push_back(str_entry->get());
+        }
+
+        handle_servers(servers);
+    }
 }
 
-void NetConfigManager::read_playername(YAML::Node& config)
+void NetConfigManager::handle_playername(const std::string& net_player_name)
 {
     try {
-        YAML::Node config_playername = config["player_name"];
-        if (config_playername.IsNull())
-            return;
-
-        if (!config_playername.IsScalar())
-            throw std::runtime_error("player name must be a simple string");
-
-        std::string net_player_name = config_playername.as<std::string>();
-
         if (net_player_name.length() < 3)
             throw std::runtime_error("player name too short");
 
@@ -103,34 +84,23 @@ void NetConfigManager::read_playername(YAML::Node& config)
         netplay.myPlayerName[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
     }
     catch (std::runtime_error& error) {
-        printf("[net][warning] servers.yml: %s\n", error.what());
+        printf("[net][warning] netplay.toml: %s\n", error.what());
     }
 }
 
-void NetConfigManager::read_servers(YAML::Node& config)
+void NetConfigManager::handle_servers(const std::list<std::string>& net_servers)
 {
-    try {
-        YAML::Node config_servers = config["servers"];
-        if (config_servers.IsNull())
-            return;
-
-        if (!config_servers.IsSequence())
-            throw std::runtime_error("`servers` is in wrong format");
-
-        for (unsigned i = 0; i < config_servers.size(); i++) {
-            std::string address_str = config_servers[i].as<std::string>();
-
-            if (address_str.length() < 8 || address_str.length() > 250) {
-                printf("[net][warning] servers.yml: server #%u is invalid\n", i + 1);
-                continue;
-            }
-
-            ServerAddress host;
-            host.hostname = address_str;
-            netplay.savedServers.push_back(host);
+    unsigned i = 1;
+    for (auto server_address: net_servers) {
+        if (server_address.length() < 8 || server_address.length() > 250) {
+            printf("[net][warning] netplay.toml: server #%u is invalid\n", i);
+            continue;
         }
-    }
-    catch (std::runtime_error& error) {
-        printf("[net][warning] servers.yml: %s\n", error.what());
+
+        ServerAddress host;
+        host.hostname = server_address;
+        netplay.savedServers.push_back(host);
+
+        i++;
     }
 }
