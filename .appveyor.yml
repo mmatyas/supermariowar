@@ -61,7 +61,8 @@ install:
       echo SDLDIR set to %SDLDIR%
     )
   # Set up SDL2 libs
-  - if [%USE_SDL2%]==[true] (
+  - |
+    if [%USE_SDL2%]==[true] (
       echo Setting up SDL2
       if not exists SDL2-devel-2.0.4-mingw.tar.gz (appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.4-mingw.tar.gz)
       if not exists SDL2_image-devel-2.0.1-mingw.tar.gz (appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-mingw.tar.gz)
