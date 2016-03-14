@@ -45,37 +45,39 @@ install:
   - 7z x -ozlib zlib-1.2.8-1-mingw32-dev.tar
   # Set up SDL 1.2 libs
   - cmd: |
-    if [%USE_SDL2%]==[false] (
-      echo Setting up SDL 1.2.x
-      if not exist SDL-devel-1.2.15-mingw32.tar.gz appveyor DownloadFile https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
-      if not exist SDL_image-devel-1.2.12-VC.zip appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
-      if not exist SDL_mixer-devel-1.2.12-VC.zip appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
-      7z x SDL-devel-1.2.15-mingw32.tar.gz
-      7z x -xr!._\* -xr!man -xr!docs SDL-devel-1.2.15-mingw32.tar
-      7z x SDL_image-devel-1.2.12-VC.zip
-      7z x SDL_mixer-devel-1.2.12-VC.zip
-      xcopy /S/Y SDL_image-1.2.12 SDL-1.2.15
-      xcopy /S/Y SDL_mixer-1.2.12 SDL-1.2.15
-      set SDLDIR=%CD%\SDL-1.2.15
-      echo SDLDIR set to %SDLDIR% )
+      if [%USE_SDL2%]==[false] (
+        echo Setting up SDL 1.2.x
+        if not exist SDL-devel-1.2.15-mingw32.tar.gz appveyor DownloadFile https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
+        if not exist SDL_image-devel-1.2.12-VC.zip appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
+        if not exist SDL_mixer-devel-1.2.12-VC.zip appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
+        7z x SDL-devel-1.2.15-mingw32.tar.gz
+        7z x -xr!._\* -xr!man -xr!docs SDL-devel-1.2.15-mingw32.tar
+        7z x SDL_image-devel-1.2.12-VC.zip
+        7z x SDL_mixer-devel-1.2.12-VC.zip
+        xcopy /S/Y SDL_image-1.2.12 SDL-1.2.15
+        xcopy /S/Y SDL_mixer-1.2.12 SDL-1.2.15
+        set SDLDIR=%CD%\SDL-1.2.15
+        echo SDLDIR set to %SDLDIR%
+      )
   # Set up SDL2 libs
   - cmd: |
-    if [%USE_SDL2%]==[true] (
-      echo Setting up SDL2
-      if not exist SDL2-devel-2.0.4-mingw.tar.gz appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.4-mingw.tar.gz
-      if not exist SDL2_image-devel-2.0.1-mingw.tar.gz appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-mingw.tar.gz
-      if not exist SDL2_mixer-devel-2.0.1-mingw.tar.gz appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-mingw.tar.gz
-      7z x SDL2-devel-2.0.4-mingw.tar.gz
-      7z x -xr!._\* -xr!man -xr!docs SDL2-devel-2.0.4-mingw.tar
-      7z x SDL2_image-devel-2.0.1-mingw.tar.gz
-      7z x -xr!._\* -xr!man -xr!docs SDL2_image-devel-2.0.1-mingw.tar
-      7z x SDL2_mixer-devel-2.0.1-mingw.tar.gz
-      7z x -xr!._\* -xr!man -xr!docs SDL2_mixer-devel-2.0.1-mingw.tar
-      xcopy /S/Y SDL2_image-2.0.1 SDL2-2.0.4
-      xcopy /S/Y SDL2_mixer-2.0.1 SDL2-2.0.4
-      if [%PLATFORM%]==[x86] ( set SDL2DIR=%CD%\SDL2-2.0.4\i686-w64-mingw32 )
-      else ( set SDL2DIR=%CD%\SDL2-2.0.4\x86_64-w64-mingw32 )
-      echo SDL2DIR set to %SDL2DIR% )
+      if [%USE_SDL2%]==[true] (
+        echo Setting up SDL2
+        if not exist SDL2-devel-2.0.4-mingw.tar.gz appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.4-mingw.tar.gz
+        if not exist SDL2_image-devel-2.0.1-mingw.tar.gz appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-mingw.tar.gz
+        if not exist SDL2_mixer-devel-2.0.1-mingw.tar.gz appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-mingw.tar.gz
+        7z x SDL2-devel-2.0.4-mingw.tar.gz
+        7z x -xr!._\* -xr!man -xr!docs SDL2-devel-2.0.4-mingw.tar
+        7z x SDL2_image-devel-2.0.1-mingw.tar.gz
+        7z x -xr!._\* -xr!man -xr!docs SDL2_image-devel-2.0.1-mingw.tar
+        7z x SDL2_mixer-devel-2.0.1-mingw.tar.gz
+        7z x -xr!._\* -xr!man -xr!docs SDL2_mixer-devel-2.0.1-mingw.tar
+        xcopy /S/Y SDL2_image-2.0.1 SDL2-2.0.4
+        xcopy /S/Y SDL2_mixer-2.0.1 SDL2-2.0.4
+        if [%PLATFORM%]==[x86] ( set SDL2DIR=%CD%\SDL2-2.0.4\i686-w64-mingw32 )
+        else ( set SDL2DIR=%CD%\SDL2-2.0.4\x86_64-w64-mingw32 )
+        echo SDL2DIR set to %SDL2DIR%
+      )
 
 before_build:
   - set Path=%CD%\mingw64\bin;%Path%
