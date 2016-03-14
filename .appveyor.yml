@@ -44,7 +44,7 @@ install:
   - 7z x zlib-1.2.8-1-mingw32-dev.tar.lzma
   - 7z x -ozlib zlib-1.2.8-1-mingw32-dev.tar
   # Set up SDL 1.2 libs
-  - |
+  - cmd: |
     if [%USE_SDL2%]==[false] (
       echo Setting up SDL 1.2.x
       if not exist SDL-devel-1.2.15-mingw32.tar.gz appveyor DownloadFile https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
