@@ -31,12 +31,12 @@ install:
   - git submodule update --init --recursive
 
   # Get MinGW 4.9
-  - echo Installing MinGW 4.9.2
+  # - echo Installing MinGW 4.9.2
   #- set MINGW_ARCHIVE=x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
   #- set MINGW_URL=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.9.2/threads-win32/seh/x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z/download
-  - if not exist "%MINGW_ARCHIVE%" appveyor DownloadFile "%MINGW_URL%" -FileName "%MINGW_ARCHIVE%"
-  - 7z x "%MINGW_ARCHIVE%" > nul
-  - ps: Get-Command sh.exe -All | Remove-Item
+  # - if not exist "%MINGW_ARCHIVE%" appveyor DownloadFile "%MINGW_URL%" -FileName "%MINGW_ARCHIVE%"
+  # - 7z x "%MINGW_ARCHIVE%" > nul
+  # - ps: Get-Command sh.exe -All | Remove-Item
 
   - echo Installing dependencies
   # Set up Zlib
@@ -74,11 +74,10 @@ install:
       xcopy /S/Y SDL2_mixer-2.0.1 SDL2-2.0.4
       if [%PLATFORM%]==[x86] ( set SDL2DIR=%CD%\SDL2-2.0.4\i686-w64-mingw32 )
       else ( set SDL2DIR=%CD%\SDL2-2.0.4\x86_64-w64-mingw32 )
-      echo SDL2DIR set to %SDL2DIR%
     )
 
 before_build:
-  - set Path=%CD%\mingw64\bin;%Path%
+  - set Path=C:\mingw64\bin;%Path%
   - g++ --version
   - mingw32-make --version
   - cmake --version
