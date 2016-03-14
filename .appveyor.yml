@@ -57,8 +57,7 @@ install:
       xcopy /S/Y SDL_image-1.2.12 SDL-1.2.15
       xcopy /S/Y SDL_mixer-1.2.12 SDL-1.2.15
       set SDLDIR=%CD%\SDL-1.2.15
-      echo SDLDIR set to %SDLDIR%
-    )
+      echo SDLDIR set to %SDLDIR% )
   # Set up SDL2 libs
   - cmd: |
     if [%USE_SDL2%]==[true] (
@@ -75,9 +74,8 @@ install:
       xcopy /S/Y SDL2_image-2.0.1 SDL2-2.0.4
       xcopy /S/Y SDL2_mixer-2.0.1 SDL2-2.0.4
       if [%PLATFORM%]==[x86] ( set SDL2DIR=%CD%\SDL2-2.0.4\i686-w64-mingw32 )
-      else                   ( set SDL2DIR=%CD%\SDL2-2.0.4\x86_64-w64-mingw32 )
-      echo SDL2DIR set to %SDL2DIR%
-    )
+      else ( set SDL2DIR=%CD%\SDL2-2.0.4\x86_64-w64-mingw32 )
+      echo SDL2DIR set to %SDL2DIR% )
 
 before_build:
   - set Path=%CD%\mingw64\bin;%Path%
