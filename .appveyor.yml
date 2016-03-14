@@ -85,7 +85,7 @@ build_script:
   - if [%USE_SDL2%]==[false] cmake --build build
   - if [%USE_SDL2%]==[true] cmake -H. -Bbuild -G "MinGW Makefiles" -DZLIB_ROOT="%CD%\zlib" -DUSE_SDL2_LIBS=1
   - if [%USE_SDL2%]==[true] cd build
-  - if [%USE_SDL2%]==[true] make smw
+  - if [%USE_SDL2%]==[true] mingw32-make smw
 
 artifacts:
   - path: build\Binaries\Release\*.exe
