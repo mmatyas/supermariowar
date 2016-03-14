@@ -49,9 +49,9 @@ install:
   - if [%USE_SDL2%]==[false] appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
   - if [%USE_SDL2%]==[false] appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
   - if [%USE_SDL2%]==[false] 7z x SDL-devel-1.2.15-mingw32.tar.gz
-  - if [%USE_SDL2%]==[false] 7z x -xr!._\* -xr!man -xr!docs -xr!test SDL-devel-1.2.15-mingw32.tar
-  - if [%USE_SDL2%]==[false] 7z x SDL_image-devel-1.2.12-VC.zip
-  - if [%USE_SDL2%]==[false] 7z x SDL_mixer-devel-1.2.12-VC.zip
+  - if [%USE_SDL2%]==[false] 7z x -xr!._\* -xr!man -xr!docs -xr!test SDL-devel-1.2.15-mingw32.tar > nul
+  - if [%USE_SDL2%]==[false] 7z x SDL_image-devel-1.2.12-VC.zip > nul
+  - if [%USE_SDL2%]==[false] 7z x SDL_mixer-devel-1.2.12-VC.zip > nul
   - if [%USE_SDL2%]==[false] xcopy /S/Y SDL_image-1.2.12 SDL-1.2.15
   - if [%USE_SDL2%]==[false] xcopy /S/Y SDL_mixer-1.2.12 SDL-1.2.15
   - if [%USE_SDL2%]==[false] set SDLDIR=%CD%\SDL-1.2.15
@@ -62,11 +62,11 @@ install:
   - if [%USE_SDL2%]==[true] appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-mingw.tar.gz
   - if [%USE_SDL2%]==[true] appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-mingw.tar.gz
   - if [%USE_SDL2%]==[true] 7z x SDL2-devel-2.0.4-mingw.tar.gz
-  - if [%USE_SDL2%]==[true] 7z x -xr!._\* -xr!man -xr!docs -xr!test SDL2-devel-2.0.4-mingw.tar
+  - if [%USE_SDL2%]==[true] 7z x -xr!._\* -xr!man -xr!docs -xr!test SDL2-devel-2.0.4-mingw.tar > nul
   - if [%USE_SDL2%]==[true] 7z x SDL2_image-devel-2.0.1-mingw.tar.gz
-  - if [%USE_SDL2%]==[true] 7z x -xr!._\* -xr!man -xr!docs SDL2_image-devel-2.0.1-mingw.tar
+  - if [%USE_SDL2%]==[true] 7z x -xr!._\* -xr!man -xr!docs SDL2_image-devel-2.0.1-mingw.tar > nul
   - if [%USE_SDL2%]==[true] 7z x SDL2_mixer-devel-2.0.1-mingw.tar.gz
-  - if [%USE_SDL2%]==[true] 7z x -xr!._\* -xr!man -xr!docs SDL2_mixer-devel-2.0.1-mingw.tar
+  - if [%USE_SDL2%]==[true] 7z x -xr!._\* -xr!man -xr!docs SDL2_mixer-devel-2.0.1-mingw.tar > nul
   - if [%USE_SDL2%]==[true] xcopy /S/Y SDL2_image-2.0.1 SDL2-2.0.4
   - if [%USE_SDL2%]==[true] xcopy /S/Y SDL2_mixer-2.0.1 SDL2-2.0.4
   - if [%USE_SDL2%]==[true]
@@ -77,7 +77,7 @@ install:
 before_build:
   - set Path=%CD%\mingw64\bin;%Path%
   - g++ --version
-  - make --version
+  - mingw32-make --version
   - cmake --version
 
 build_script:
