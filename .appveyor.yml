@@ -4,18 +4,12 @@ branches:
 
 platform:
   - x86
-  # - x64
+  - x64
 
 environment:
-  MINGW_URL: http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.9.2/threads-win32/seh/x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z/download
-  MINGW_ARCHIVE: x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
   matrix:
     - USE_SDL2: true
-    # - USE_SDL2: false
-
-matrix:
-  allow_failures:
-    - platform: x64
+    - USE_SDL2: false
 
 cache:
   - x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
@@ -32,8 +26,8 @@ install:
 
   # Get MinGW 4.9
   - echo Installing MinGW 4.9.2
-  #- set MINGW_ARCHIVE=x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
-  #- set MINGW_URL=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.9.2/threads-win32/seh/x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z/download
+  - set MINGW_URL=http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.9.2/threads-win32/seh/x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z/download
+  - set MINGW_ARCHIVE=x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
   - if not exist "%MINGW_ARCHIVE%" appveyor DownloadFile "%MINGW_URL%" -FileName "%MINGW_ARCHIVE%"
   - 7z x "%MINGW_ARCHIVE%" > nul
   - ps: Get-Command sh.exe -All | Remove-Item
@@ -82,10 +76,9 @@ before_build:
 
 build_script:
   - if [%USE_SDL2%]==[false] cmake -H. -Bbuild -G "MinGW Makefiles" -DZLIB_ROOT="%CD%\zlib"
-  - if [%USE_SDL2%]==[false] cmake --build build
+  - if [%USE_SDL2%]==[false] cmake --build build -j%NUMBER_OF_PROCESSORS%
   - if [%USE_SDL2%]==[true] cmake -H. -Bbuild -G "MinGW Makefiles" -DZLIB_ROOT="%CD%\zlib" -DUSE_SDL2_LIBS=1
-  - if [%USE_SDL2%]==[true] cd build
-  - if [%USE_SDL2%]==[true] mingw32-make smw
+  - if [%USE_SDL2%]==[true] cmake --build build -- smw -j%NUMBER_OF_PROCESSORS%
 
 artifacts:
   - path: build\Binaries\Release\*.exe
