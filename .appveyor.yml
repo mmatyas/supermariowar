@@ -60,7 +60,7 @@ install:
       echo SDLDIR set to %SDLDIR%
     )
   # Set up SDL2 libs
-  - |
+  - cmd: |
     if [%USE_SDL2%]==[true] (
       echo Setting up SDL2
       if not exist SDL2-devel-2.0.4-mingw.tar.gz appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.4-mingw.tar.gz
