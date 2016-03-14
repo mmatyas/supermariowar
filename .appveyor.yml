@@ -76,9 +76,9 @@ before_build:
 
 build_script:
   - if [%USE_SDL2%]==[false] cmake -H. -Bbuild -G "MinGW Makefiles" -DZLIB_ROOT="%CD%\zlib"
-  - if [%USE_SDL2%]==[false] cmake --build build -j%NUMBER_OF_PROCESSORS%
+  - if [%USE_SDL2%]==[false] cmake --build build -- -j%NUMBER_OF_PROCESSORS%
   - if [%USE_SDL2%]==[true] cmake -H. -Bbuild -G "MinGW Makefiles" -DZLIB_ROOT="%CD%\zlib" -DUSE_SDL2_LIBS=1
-  - if [%USE_SDL2%]==[true] cmake --build build -- smw -j%NUM-j%NUMBER_OF_PROCESSORS%BER_OF_PROCESSORS%
+  - if [%USE_SDL2%]==[true] cmake --build build -- smw -j%NUMBER_OF_PROCESSORS%
 
 artifacts:
   - path: build\Binaries\Release\*.exe
