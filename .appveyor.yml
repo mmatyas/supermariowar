@@ -34,8 +34,8 @@ install:
   - echo Installing MinGW 4.9.2
   #- set MINGW_ARCHIVE=x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z
   #- set MINGW_URL=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.9.2/threads-win32/seh/x86_64-4.9.2-release-win32-seh-rt_v4-rev4.7z/download
-  - if not exist "%MINGW_ARCHIVE%" curl -fsSL -o "%MINGW_ARCHIVE%" "%MINGW_URL%"
-  - 7z x $filename > nul
+  - if not exist "%MINGW_ARCHIVE%" appveyor DownloadFile "%MINGW_URL%" -FileName "%MINGW_ARCHIVE%"
+  - 7z x "%MINGW_ARCHIVE%" > nul
   - ps: Get-Command sh.exe -All | Remove-Item
 
   - echo Installing dependencies
