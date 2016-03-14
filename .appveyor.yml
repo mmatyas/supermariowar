@@ -72,8 +72,6 @@ install:
       7z x -xr!._\* -xr!man -xr!docs SDL2_mixer-devel-2.0.1-mingw.tar
       xcopy /S/Y SDL2_image-2.0.1 SDL2-2.0.4
       xcopy /S/Y SDL2_mixer-2.0.1 SDL2-2.0.4
-      if [%PLATFORM%]==[x86] ( set SDL2DIR=%CD%\SDL2-2.0.4\i686-w64-mingw32 )
-      else ( set SDL2DIR=%CD%\SDL2-2.0.4\x86_64-w64-mingw32 )
     )
 
 before_build:
