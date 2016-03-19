@@ -38,6 +38,9 @@ matrix:
     - brew update
     - brew install sdl2 sdl2_image sdl2_mixer
 
+  # Emscripten
+  - env: BUILD=emscripten
+
   # Android builds
   - language: android
     env: BUILD=android ABILIST='armeabi armeabi-v7a arm64-v8a'
@@ -70,6 +73,17 @@ before_script:
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
 
+  # Emscripten
+  - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then
+      wget https://github.com/mmatyas/mmatyas.github.io/releases/download/arm-libs/emscripten_1350.tgz;
+      tar xzf emscripten_1350.tgz;
+      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/clang/fastcomp/build_master_64/bin;
+      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/node/4.1.1_64bit/bin;
+      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/emscripten/master;
+      export PATH=$EM_PATH:$PATH;
+    fi
+  - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then emcc -v; fi
+
   # Android SDK + NDK
   - if [[ "$BUILD" == "android" ]]; then
       sudo apt-get -qq update &&
@@ -83,22 +97,44 @@ before_script:
         lib32z1
         openjdk-7-jdk
     ; fi
-  - if [[ "$BUILD" == "android" ]]; then cd ..; fi
-  - if [[ "$BUILD" == "android" ]]; then wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin; fi
-  - if [[ "$BUILD" == "android" ]]; then chmod +x ./android-ndk-r10e-linux-x86_64.bin; fi
-  - if [[ "$BUILD" == "android" ]]; then ./android-ndk-r10e-linux-x86_64.bin > /dev/null; fi
-  - if [[ "$BUILD" == "android" ]]; then export PATH=$PATH:$(pwd)/android-ndk-r10e; fi
+  - if [[ "$BUILD" == "android" ]]; then
+      cd ..;
+      wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin;
+      chmod +x ./android-ndk-r10e-linux-x86_64.bin;
+      ./android-ndk-r10e-linux-x86_64.bin > /dev/null;
+      export PATH=$PATH:$(pwd)/android-ndk-r10e;
+    fi
 
 script:
   - if [[ "$BUILD" == "native" ]]; then mkdir build && cd build; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then cmake ..; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then make; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then make smw; fi
-  - if [[ "$BUILD" == "android" ]]; then git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git; fi
-  - if [[ "$BUILD" == "android" ]]; then mv supermariowar supermariowar-android/; fi
-  - if [[ "$BUILD" == "android" ]]; then cd supermariowar-android; fi
-  - if [[ "$BUILD" == "android" ]]; then ./build.sh --abi=$ABILIST; fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then
+      cmake ..;
+      make;
+    fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then
+      cmake -D USE_SDL2_LIBS:BOOL=ON ..;
+      make smw;
+    fi
+
+  # Android
+  - if [[ "$BUILD" == "android" ]]; then
+      git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git;
+      mv supermariowar supermariowar-android/;
+      cd supermariowar-android;
+      ./build.sh --abi=$ABILIST;
+    fi
+
+  # Emscripten
+  - if [[ "$BUILD" == "emscripten" ]]; then
+      cd dependencies;
+      hg clone https://hg.libsdl.org/SDL_mixer SDL2_mixer;
+      cd ..;
+      sed -i 's|if (BUILD_STATIC_LIBS)|if (BUILD_STATIC_LIBS)\ninclude_directories(dependencies/SDL2_mixer)|' CMakeLists.txt;
+      unzip data.zip > /dev/null;
+      mkdir build_js && cd build_js;
+      emconfigure cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1;
+      emmake make smw;
+    fi
 
 android:
   components:
