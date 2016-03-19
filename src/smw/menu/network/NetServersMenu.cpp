@@ -45,6 +45,7 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
 
     miNetServersConnectingDialogImage->Show(false);
     miNetServersConnectingDialogText->Show(false);
+    miNetServersConnectingDialogText->Disable(true);
 
     //miNetServersConnectionDetector = new MI_NetworkStatusDetector(&rm->spr_selectfield, 320, 240 - 10, "Connecting...", 80, 1);
     /*miNetServersConnectionDetector = new MI_NetworkStatusDetector(0, 0);
