@@ -4,16 +4,16 @@
 
 - [About](#about)
 - [Building](#building-instructions)
-	- [Get the code](#get-the-code)
-	- [Requirements](#requirements)
-	- [Linux](#linux)
-	- [Mac OSX](#mac-osx)
-	- [Windows](#windows)
-	- [ARM / Raspberry Pi](#arm-devices)
-	- [Other devices](#other-devices)
-	- [Android](#android)
-	- [Emscripten](#emscripten)
-	- [Build configuration](#build-configuration)
+  - [Get the code](#get-the-code)
+  - [Requirements](#requirements)
+  - [Linux](#linux)
+  - [Mac OSX](#mac-osx)
+  - [Windows](#windows)
+  - [ARM / Raspberry Pi](#arm-devices)
+  - [Android](#android)
+  - [Emscripten](#emscripten)
+  - [Other devices](#other-devices)
+  - [Build configuration](#build-configuration)
 - [How to play](#how-to-play)
 
 
@@ -130,6 +130,14 @@ You can build SMW on ARM devices, like the Raspberry Pi, following the Linux ins
 
 The build configuration contains some default compiler flags already, but since there are many possible combinations (hard float, Thumb, NEON, ...), you might want to use custom parameters. In this case, define the CFLAGS and CXXFLAGS vars, and run CMake with the `DISABLE_DEFAULT_CFLAGS` option (see [Build configuration](#build-configuration)).
 
+### Android
+
+The Android port uses a different build system, you can find more details [here](https://github.com/mmatyas/supermariowar-android).
+
+### Emscripten
+
+SMW can be build to run in your browser using [Emscripten](https://kripken.github.io/emscripten-site/). You can find the build instructions in the [wiki](https://github.com/mmatyas/supermariowar/wiki/Building-the-Emscripten-port).
+
 ### Other devices
 
 You should be able to port SMW to any device where SDL (either 1.2 or 2.0) works. Generally, this involves the following steps:
@@ -145,14 +153,6 @@ You should be able to port SMW to any device where SDL (either 1.2 or 2.0) works
     - requires libvorbis
 - create a CMake toolchain file and define your compiler and paths
 - build using the toolchain file
-
-### Android
-
-The Android port uses a different build system, you can find more details [here](https://github.com/mmatyas/supermariowar-android).
-
-### Emscripten
-
-SMW can be build to run in your browser using [Emscripten](https://kripken.github.io/emscripten-site/). You can find the build instructions in the [wiki](https://github.com/mmatyas/supermariowar/wiki/Building-the-Emscripten-port).
 
 ### Build configuration
 
