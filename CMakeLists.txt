@@ -122,13 +122,23 @@ if (NOT DISABLE_SYSLIB_CHECKS)
 endif()
 
 if (BUILD_STATIC_LIBS)
+	macro(check_submodule_git dir)
+		if (NOT EXISTS "${CMAKE_SOURCE_DIR}/${dir}/.git")
+			message(SEND_ERROR
+			"It seems you've forgot to clone the dependencies; ${dir} is not a git repository."
+			"Please run `git submodule update --init` first.")
+		endif()
+	endmacro()
+
 	# Use ENet for networking
 	if(NOT NO_NETWORK)
+		check_submodule_git(dependencies/enet)
 		include_directories(dependencies/enet/include)
 		add_subdirectory(dependencies/enet)
 	endif()
 
 	# Use YAML for game config files
+	check_submodule_git(dependencies/yaml-cpp-noboost)
 	include_directories(dependencies/yaml-cpp-noboost/include)
 	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
 	set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
