@@ -152,14 +152,7 @@ The Android port uses a different build system, you can find more details [here]
 
 ### Emscripten
 
-SMW can be build to run in your browser using [Emscripten](https://kripken.github.io/emscripten-site/). You will also need to apply a [patch](https://github.com/mmatyas/supermariowar/wiki/Building-the-Emscripten-port) for SMW to make it work. After that, the build steps are similar to Linux:
-
-```
-unzip data.zip
-mkdir build_js && cd build_js
-emconfigure cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
-emmake make smw
-```
+SMW can be build to run in your browser using [Emscripten](https://kripken.github.io/emscripten-site/). You can find the build instructions in the [wiki](https://github.com/mmatyas/supermariowar/wiki/Building-the-Emscripten-port).
 
 ### Build configuration
 
