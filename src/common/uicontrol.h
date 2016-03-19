@@ -36,6 +36,9 @@ public:
     }
 
     virtual MenuCodeEnum Modify(bool modify) {
+        if (fDisable)
+            return MENU_CODE_UNSELECT_ITEM;
+
         fModifying = modify;
         return MENU_CODE_MODIFY_ACCEPTED;
     }
