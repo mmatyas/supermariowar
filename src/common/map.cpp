@@ -1389,6 +1389,9 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
         return NULL;
     }
 
+#ifdef USE_SDL2
+    SDL_Surface * sBackground = temp;
+#else
     SDL_Surface * sBackground = SDL_DisplayFormat(temp);
     if (!sBackground) {
         printf("ERROR: Couldn't convert thumbnail background to diplay pixel format: %s\n", SDL_GetError());
@@ -1396,6 +1399,7 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
     }
 
     SDL_FreeSurface(temp);
+#endif
 
 	SDL_Rect srcRectBackground = {0, 0, smw->ScreenWidth, smw->ScreenHeight};
     SDL_Rect dstRectBackground = {0, 0, 160, 120};
@@ -1917,10 +1921,11 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
     int i, j;
 
     //draw left to right full vertical
-    short iTilesetIndex = 1;
+    // 0: full, 1: preview, 2: thumbnail
+    short iTilesetSize = 1;
 
     if (fThumbnail)
-        iTilesetIndex = 2;
+        iTilesetSize = 2;
 
     for (i = 0; i < MAPWIDTH; i++) {
         for (j = 0; j < MAPHEIGHT; j++) {
@@ -1930,12 +1935,12 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
 
             //Handle drawing preview for animated tiles
             if (tile->iID >= 0) {
-                g_tilesetmanager->Draw(targetSurface, tile->iID, iTilesetIndex, tile->iCol, tile->iRow, i, j);
-                //SDL_BlitSurface(rm->spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][tile->iCol][tile->iRow], targetSurface, &rectDst);
+                g_tilesetmanager->Draw(targetSurface, tile->iID, iTilesetSize, tile->iCol, tile->iRow, i, j);
+                // SDL_BlitSurface(rm->spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetSize][tile->iCol][tile->iRow], targetSurface, &rectDst);
             } else if (tile->iID == TILESETANIMATED) {
-                SDL_BlitSurface(rm->spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], targetSurface, &g_tilesetmanager->rRects[iTilesetIndex][i][j]);
+                SDL_BlitSurface(rm->spr_tileanimation[iTilesetSize].getSurface(), &g_tilesetmanager->rRects[iTilesetSize][tile->iCol << 2][tile->iRow], targetSurface, &g_tilesetmanager->rRects[iTilesetSize][i][j]);
             } else if (tile->iID == TILESETUNKNOWN) {
-                SDL_BlitSurface(rm->spr_unknowntile[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][0][0], targetSurface, &g_tilesetmanager->rRects[iTilesetIndex][i][j]);
+                SDL_BlitSurface(rm->spr_unknowntile[iTilesetSize].getSurface(), &g_tilesetmanager->rRects[iTilesetSize][0][0], targetSurface, &g_tilesetmanager->rRects[iTilesetSize][i][j]);
             }
         }
     }

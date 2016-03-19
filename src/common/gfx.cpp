@@ -145,6 +145,9 @@ SDL_Surface * gfx_createskinsurface(
         return NULL;
     }
 
+#ifdef USE_SDL2
+    return temp;
+#else
     SDL_Surface * final = SDL_DisplayFormat(temp);
     if (!final) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
@@ -154,6 +157,7 @@ SDL_Surface * gfx_createskinsurface(
     SDL_FreeSurface(temp);
 
     return final;
+#endif
 }
 
 
@@ -359,6 +363,9 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
         }
     }
 
+#ifdef USE_SDL2
+    return sTempImage;
+#else
     SDL_Surface * sFinalImage = SDL_DisplayFormat(sTempImage);
     if (!sFinalImage) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
@@ -367,6 +374,7 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     SDL_FreeSurface(sTempImage);
 
     return sFinalImage;
+#endif
 }
 
 bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fWrap)
