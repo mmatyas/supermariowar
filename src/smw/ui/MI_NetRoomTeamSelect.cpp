@@ -28,6 +28,7 @@ MI_NetRoomTeamSelect::MI_NetRoomTeamSelect(short x, short y, short player_id, st
 }
 
 MI_NetRoomTeamSelect::~MI_NetRoomTeamSelect() {
+    delete miHoverImage;
     delete miModifyImage;
 }
 
