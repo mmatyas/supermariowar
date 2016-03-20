@@ -139,7 +139,7 @@ void gameloop()
     GameStateManager::instance().currentState = &SplashScreenState::instance();
 
 #ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(gameloop_frame, 60, 1);
+    emscripten_set_main_loop(gameloop_frame, 0, 1);
 }
 
 void gameloop_frame()
