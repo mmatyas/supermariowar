@@ -19,7 +19,7 @@ set(SMW_VERSION_PATCH "0")
 option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" OFF)
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
 option(NO_NETWORK "Disable all network communication" OFF)
-option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet, yaml-cpp)" ON)
+option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet)" ON)
 
 if (USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
@@ -137,15 +137,10 @@ if (BUILD_STATIC_LIBS)
 		add_subdirectory(dependencies/enet)
 	endif()
 
-	# Use YAML for game config files
-	check_submodule_git(dependencies/yaml-cpp-noboost)
-	include_directories(dependencies/yaml-cpp-noboost/include)
-	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
-	set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
-	add_subdirectory(dependencies/yaml-cpp-noboost)
+	# Use cpptoml for game config files
+	include_directories(dependencies/cpptoml/include)
 else()
 	find_package(ENet REQUIRED)
-	find_package(yaml-cpp REQUIRED)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -353,7 +348,6 @@ if (NOT BUILD_STATIC_LIBS)
 	if(NOT NO_NETWORK)
 		set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libenet2a")
 	endif()
-	set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libyaml-cpp0.5")
 endif()
 
 #
@@ -371,7 +365,6 @@ if (NOT BUILD_STATIC_LIBS)
 	if(NOT NO_NETWORK)
 		set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, enet")
 	endif()
-	set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, yaml-cpp")
 endif()
 
 #
