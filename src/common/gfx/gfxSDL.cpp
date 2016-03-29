@@ -107,6 +107,7 @@ void GraphicsSDL::create_game_window(bool fullscreen)
 {
     RecreateWindow(fullscreen);
     create_renderer();
+    print_renderer_info();
     create_screen_surface();
     create_screen_tex();
 }
@@ -143,6 +144,15 @@ void GraphicsSDL::create_game_window(bool fullscreen)
             fprintf(stderr, "[gfx] Couldn't create video texture: %s\n", SDL_GetError());
             throw E_CREATE_SCREEN_TEX;
         }
+    }
+
+    void GraphicsSDL::print_renderer_info()
+    {
+        SDL_RendererInfo renderer_info;
+        SDL_GetRendererInfo(sdl2_renderer, &renderer_info);
+        printf("[gfx] Renderer: %s, %s\n",
+            renderer_info.name,
+            renderer_info.flags & SDL_RENDERER_ACCELERATED ? "accelerated" : "software");
     }
 
 void GraphicsSDL::setTitle(const char* title)

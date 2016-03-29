@@ -33,6 +33,7 @@ private:
     void create_renderer();
     void create_screen_surface();
     void create_screen_tex();
+    void print_renderer_info();
 
     // screen -> texture -> renderer -> window
     SDL_Window*     sdl2_window;
