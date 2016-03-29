@@ -34,6 +34,9 @@ private:
     void create_screen_surface();
     void create_screen_tex();
     void print_renderer_info();
+#ifdef SDL2_FORCE_GLES
+    int find_gles_driver_index();
+#endif
 
     // screen -> texture -> renderer -> window
     SDL_Window*     sdl2_window;

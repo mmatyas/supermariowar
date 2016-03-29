@@ -112,9 +112,33 @@ void GraphicsSDL::create_game_window(bool fullscreen)
     create_screen_tex();
 }
 
+#ifdef SDL2_FORCE_GLES
+    int GraphicsSDL::find_gles_driver_index() {
+        int render_driver_count = SDL_GetNumRenderDrivers();
+        if (render_driver_count < 1) {
+            printf("[gfx][warning] Couldn't access renderers, fallback to default: %s\n", SDL_GetError());
+            return -1;
+        }
+
+        for (int i = 0; i < render_driver_count; i++) {
+            SDL_RendererInfo renderer_info;
+            SDL_GetRenderDriverInfo(i, &renderer_info);
+            if (strncmp(renderer_info.name, "opengles", strlen("opengles")) == 0)
+                return i;
+        }
+
+        printf("[gfx][warning] No GLES renderer found, fallback to default");
+        return -1;
+    }
+#endif
+
     void GraphicsSDL::create_renderer()
     {
+#ifdef SDL2_FORCE_GLES
+        sdl2_renderer = SDL_CreateRenderer(sdl2_window, find_gles_driver_index(),
+#else
         sdl2_renderer = SDL_CreateRenderer(sdl2_window, -1,
+#endif
             SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
         if (!sdl2_renderer) {
             fprintf(stderr, "[gfx] Couldn't create renderer: %s\n", SDL_GetError());
