@@ -12,6 +12,7 @@
 using namespace std;
 
 extern SDL_Surface * blitdest;
+extern SDL_Surface * screen;
 extern short x_shake;
 extern short y_shake;
 
@@ -75,7 +76,10 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, boo
         return false;
     }
 
-#ifndef USE_SDL2
+#ifdef USE_SDL2
+    // FIXME: this causes missing map tiles
+    // SDL_Surface* temp = SDL_ConvertSurface(m_picture, screen->format, 0);
+#else
     SDL_Surface* temp = SDL_DisplayFormat(m_picture);
     if (!temp) {
         cout << endl << " ERROR: Couldn't convert "
@@ -127,8 +131,11 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
         return false;
     }
 
-#ifndef USE_SDL2
+#ifdef USE_SDL2
+    SDL_Surface* temp = SDL_ConvertSurface(m_picture, screen->format, 0);
+#else
     SDL_Surface* temp = SDL_DisplayFormatAlpha(m_picture);
+#endif
     if (!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()
@@ -137,7 +144,6 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
     }
     SDL_FreeSurface(m_picture);
     m_picture = temp;
-#endif
 
     m_bltrect.w = (Uint16)m_picture->w;
     m_bltrect.h = (Uint16)m_picture->h;
@@ -167,8 +173,11 @@ bool gfxSprite::init(const std::string& filename)
         return false;
     }
 
-#ifndef USE_SDL2
+#ifdef USE_SDL2
+    SDL_Surface * temp = SDL_ConvertSurface(m_picture, screen->format, 0);
+#else
     SDL_Surface * temp = SDL_DisplayFormat(m_picture);
+#endif
     if (!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()
@@ -178,7 +187,6 @@ bool gfxSprite::init(const std::string& filename)
 
     SDL_FreeSurface(m_picture);
     m_picture = temp;
-#endif
 
     m_bltrect.w = (Uint16)m_picture->w;
     m_bltrect.h = (Uint16)m_picture->h;

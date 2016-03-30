@@ -67,8 +67,8 @@
 
 
 //------ system stuff ------
-SDL_Surface		*screen;		//for gfx (maybe the gfx system should be improved -> resource manager)
-SDL_Surface		*blitdest;		//the destination surface for all drawing (can be swapped from screen to another surface)
+SDL_Surface		*screen = NULL;		//for gfx (maybe the gfx system should be improved -> resource manager)
+SDL_Surface		*blitdest = NULL;	//the destination surface for all drawing (can be swapped from screen to another surface)
 
 short			x_shake = 0;
 short			y_shake = 0;

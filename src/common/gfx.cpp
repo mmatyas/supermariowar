@@ -12,6 +12,7 @@
 using namespace std;
 
 extern SDL_Surface * blitdest;
+extern SDL_Surface * screen;
 
 extern short x_shake;
 extern short y_shake;
@@ -146,9 +147,10 @@ SDL_Surface * gfx_createskinsurface(
     }
 
 #ifdef USE_SDL2
-    return temp;
+    SDL_Surface * final = SDL_ConvertSurface(temp, screen->format, 0);
 #else
     SDL_Surface * final = SDL_DisplayFormat(temp);
+#endif
     if (!final) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
@@ -157,7 +159,6 @@ SDL_Surface * gfx_createskinsurface(
     SDL_FreeSurface(temp);
 
     return final;
-#endif
 }
 
 
@@ -364,9 +365,10 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     }
 
 #ifdef USE_SDL2
-    return sTempImage;
+    SDL_Surface * sFinalImage = SDL_ConvertSurface(sTempImage, screen->format, 0);
 #else
     SDL_Surface * sFinalImage = SDL_DisplayFormat(sTempImage);
+#endif
     if (!sFinalImage) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
@@ -374,7 +376,6 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     SDL_FreeSurface(sTempImage);
 
     return sFinalImage;
-#endif
 }
 
 bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fWrap)
