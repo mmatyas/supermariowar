@@ -17,12 +17,17 @@ set(SMW_VERSION_PATCH "0")
 #
 
 option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" OFF)
-option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
 option(NO_NETWORK "Disable all network communication" OFF)
 option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet, yaml-cpp)" ON)
+option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
+option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
 
 if (USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
+
+	if (SDL2_FORCE_GLES)
+		add_definitions(-DSDL2_FORCE_GLES)
+	endif()
 endif()
 
 if (NO_NETWORK)
