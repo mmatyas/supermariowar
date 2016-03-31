@@ -163,7 +163,7 @@ void MI_MapPreview::SetSpecialMap(const char * mapName, const char * szMapPath)
     LoadMap(szMapPath);
 }
 
-std::string MI_MapPreview::GetMapFilePath()
+const std::string MI_MapPreview::GetMapFilePath()
 {
     return maplist->currentFilename();
 }

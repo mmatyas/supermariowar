@@ -109,6 +109,8 @@ void UI_NetRoomMenu::Refresh()
         miNetRoomStartButton->SetName("Start");
     else
         miNetRoomStartButton->SetName("(waiting)");
+
+    SetPreviewMapPath(netplay.mapfilepath);
 }
 
 void UI_NetRoomMenu::StartInProgress()
