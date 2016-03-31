@@ -2,6 +2,7 @@
 
 #include "GlobalConstants.h"
 #include "GameMode.h"
+#include "GameModeSettings.h"
 #include "GameValues.h"
 #include "FileList.h"
 #include "path.h"
@@ -43,6 +44,89 @@ extern short currentgamemode;
 extern CGameMode * gamemodes[GAMEMODE_LAST];
 
 short backup_playercontrol[4];
+
+
+union GameModeSettingsUnion {
+    ClassicGameModeSettings classic;
+    FragGameModeSettings frag;
+    TimeGameModeSettings time;
+    JailGameModeSettings jail;
+    CoinGameModeSettings coins;
+    StompGameModeSettings stomp;
+    EggGameModeSettings egg;
+    FlagGameModeSettings flag;
+    ChickenGameModeSettings chicken;
+    TagGameModeSettings tag;
+    StarGameModeSettings star;
+    DominationGameModeSettings domination;
+    KingOfTheHillModeSettings kingofthehill;
+    RaceGameModeSettings race;
+    FrenzyGameModeSettings frenzy;
+    SurvivalGameModeSettings survival;
+    GreedGameModeSettings greed;
+    HealthGameModeSettings health;
+    CollectionGameModeSettings collection;
+    ChaseGameModeSettings chase;
+    ShyGuyTagGameModeSettings shyguytag;
+
+    GameModeSettingsUnion() { memset(this, 0, sizeof(GameModeSettingsUnion)); }
+
+    void set_global(GameModeType mode) {
+        switch (mode) {
+        case game_mode_classic:     game_values.gamemodesettings.classic = classic; break;
+        case game_mode_frag:        game_values.gamemodesettings.frag = frag; break;
+        case game_mode_timelimit:   game_values.gamemodesettings.time = time; break;
+        case game_mode_jail:        game_values.gamemodesettings.jail = jail; break;
+        case game_mode_coins:       game_values.gamemodesettings.coins = coins; break;
+        case game_mode_stomp:       game_values.gamemodesettings.stomp = stomp; break;
+        case game_mode_eggs:        game_values.gamemodesettings.egg = egg; break;
+        case game_mode_ctf:         game_values.gamemodesettings.flag = flag; break;
+        case game_mode_chicken:     game_values.gamemodesettings.chicken = chicken; break;
+        case game_mode_tag:         game_values.gamemodesettings.tag = tag; break;
+        case game_mode_star:        game_values.gamemodesettings.star = star; break;
+        case game_mode_domination:  game_values.gamemodesettings.domination = domination; break;
+        case game_mode_koth:        game_values.gamemodesettings.kingofthehill = kingofthehill; break;
+        case game_mode_race:        game_values.gamemodesettings.race = race; break;
+        case game_mode_frenzy:      game_values.gamemodesettings.frenzy = frenzy; break;
+        case game_mode_survival:    game_values.gamemodesettings.survival = survival; break;
+        case game_mode_greed:       game_values.gamemodesettings.greed = greed; break;
+        case game_mode_health:      game_values.gamemodesettings.health = health; break;
+        case game_mode_collection:  game_values.gamemodesettings.collection = collection; break;
+        case game_mode_chase:       game_values.gamemodesettings.chase = chase; break;
+        case game_mode_shyguytag:   game_values.gamemodesettings.shyguytag = shyguytag; break;
+        default:
+            assert(false);
+        }
+    }
+
+    void read_global(GameModeType mode) {
+        switch (mode) {
+        case game_mode_classic:     classic = game_values.gamemodesettings.classic; break;
+        case game_mode_frag:        frag = game_values.gamemodesettings.frag; break;
+        case game_mode_timelimit:   time = game_values.gamemodesettings.time; break;
+        case game_mode_jail:        jail = game_values.gamemodesettings.jail; break;
+        case game_mode_coins:       coins = game_values.gamemodesettings.coins; break;
+        case game_mode_stomp:       stomp = game_values.gamemodesettings.stomp; break;
+        case game_mode_eggs:        egg = game_values.gamemodesettings.egg; break;
+        case game_mode_ctf:         flag = game_values.gamemodesettings.flag; break;
+        case game_mode_chicken:     chicken = game_values.gamemodesettings.chicken; break;
+        case game_mode_tag:         tag = game_values.gamemodesettings.tag; break;
+        case game_mode_star:        star = game_values.gamemodesettings.star; break;
+        case game_mode_domination:  domination = game_values.gamemodesettings.domination; break;
+        case game_mode_koth:        kingofthehill = game_values.gamemodesettings.kingofthehill; break;
+        case game_mode_race:        race = game_values.gamemodesettings.race; break;
+        case game_mode_frenzy:      frenzy = game_values.gamemodesettings.frenzy; break;
+        case game_mode_survival:    survival = game_values.gamemodesettings.survival; break;
+        case game_mode_greed:       greed = game_values.gamemodesettings.greed; break;
+        case game_mode_health:      health = game_values.gamemodesettings.health; break;
+        case game_mode_collection:  collection = game_values.gamemodesettings.collection; break;
+        case game_mode_chase:       chase = game_values.gamemodesettings.chase; break;
+        case game_mode_shyguytag:   shyguytag = game_values.gamemodesettings.shyguytag; break;
+        default:
+            assert(false);
+        }
+    }
+};
 
 bool net_init()
 {
@@ -325,6 +409,7 @@ void NetClient::handleRoomCreatedMessage(const uint8_t* data, size_t dataLength)
     game_values.playercontrol[3] = 0;
 
     sendMapChangeMessage();
+    sendGameModeSettingsChangeMessage();
 
     local_gamehost.start(foreign_lobbyserver);
 }
@@ -391,6 +476,7 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     currentgamemode = pkg.gamemodeID;
     game_values.gamemode = gamemodes[currentgamemode];
     game_values.gamemode->goal = pkg.gamemodeGoal;
+
     printf("  Game mode #%d: %s with %s: %d\n",
         currentgamemode, gamemodes[currentgamemode]->GetModeName(),
         gamemodes[currentgamemode]->GetGoalName(), game_values.gamemode->goal);
@@ -464,6 +550,41 @@ void NetClient::handleMapChangeMessage(const uint8_t* data, size_t dataLength)
     netplay.mapfilepath = GetHomeDirectory() + "net_last.map";
     if (!FileCompressor::decompress(data + sizeof(NetPkgs::MessageHeader), netplay.mapfilepath))
         return;
+}
+
+void NetClient::sendGameModeSettingsChangeMessage()
+{
+    size_t data_size = sizeof(NetPkgs::MessageHeader) + sizeof(GameModeSettingsUnion);
+    CompressedData blob((uint8_t*) calloc(data_size, 1), data_size);
+
+    NetPkgs::MessageHeader header(NET_NOTICE_GAMEMODESETTINGS);
+    memcpy(blob.data, &header, sizeof(NetPkgs::MessageHeader));
+
+    GameModeSettingsUnion modesettings;
+    modesettings.read_global((GameModeType) currentgamemode);
+    memcpy(blob.data + sizeof(NetPkgs::MessageHeader), &modesettings, sizeof(GameModeSettingsUnion));
+
+    sendMessageToLobbyServer(blob.data, blob.size);
+}
+
+void NetClient::handleGameModeSettingsChangeMessage(const uint8_t* data, size_t dataLength)
+{
+    if (dataLength <= sizeof(NetPkgs::MessageHeader) + sizeof(GameModeSettingsUnion)
+        || dataLength > 20000
+        || !data) {
+        printf("[error] Corrupt map arrived\n");
+        return;
+    }
+
+    // read
+    NetPkgs::MessageHeader pkg(0);
+    memcpy(&pkg, data, sizeof(NetPkgs::MessageHeader));
+
+    GameModeSettingsUnion modesettings;
+    memcpy(&modesettings, data + sizeof(NetPkgs::MessageHeader), sizeof(GameModeSettingsUnion));
+    modesettings.set_global((GameModeType) currentgamemode);
+
+    printf("[net] Game mode settings changed\n");
 }
 
 void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
@@ -985,6 +1106,10 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
         case NET_NOTICE_SKIN_CHANGE:
             handleSkinChangeMessage(data, dataLength);
+            break;
+
+        case NET_NOTICE_GAMEMODESETTINGS:
+            handleGameModeSettingsChangeMessage(data, dataLength);
             break;
 
         case NET_NOTICE_ROOM_CHAT_MSG:

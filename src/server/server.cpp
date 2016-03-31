@@ -189,6 +189,10 @@ void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             hostChangesMap(playerID, data, dataLength);
             break;
 
+        case NET_NOTICE_GAMEMODESETTINGS:
+            hostChangesGameModeSettings(playerID, data, dataLength);
+            break;
+
         case NET_NOTICE_SKIN_CHANGE:
             playerChangesSkin(playerID, data, dataLength);
             break;
@@ -442,6 +446,23 @@ void SMWServer::hostChangesMap(uint64_t playerID, const void* data, size_t dataL
 
     rooms[roomID].changeAndSendMap(data, dataLength);
     printf("room open!\n");
+}
+
+void SMWServer::hostChangesGameModeSettings(uint64_t playerID, const void* data, size_t dataLength)
+{
+    printf("hostChangesGameModeSettings\n");
+    if (!players.count(playerID))
+        return;
+
+    Player* player = &players[playerID];
+    uint32_t roomID = player->currentRoomID;
+    if (!roomID || player->isPlaying)
+        return;
+
+    if (!rooms.count(roomID))
+        return;
+
+    rooms[roomID].changeAndSendGameModeSettings(data, dataLength);
 }
 
 void SMWServer::playerChangesSkin(uint64_t playerID, const void* data, size_t dataLength)

@@ -195,6 +195,7 @@ class NetClient : public NetworkEventHandler
         void sendJoinRoomMessage();
         void sendLeaveRoomMessage();
         void sendMapChangeMessage();
+        void sendGameModeSettingsChangeMessage();
         void sendChatMessage(const char*);
 
         void sendSkinChange();
@@ -235,6 +236,7 @@ class NetClient : public NetworkEventHandler
         void handleRoomCreatedMessage(const uint8_t*, size_t);
         void handleRoomChangedMessage(const uint8_t*, size_t);
         void handleMapChangeMessage(const uint8_t*, size_t);
+        void handleGameModeSettingsChangeMessage(const uint8_t*, size_t);
         void handleSkinChangeMessage(const uint8_t*, size_t);
         void handleRoomChatMessage(const uint8_t*, size_t);
 

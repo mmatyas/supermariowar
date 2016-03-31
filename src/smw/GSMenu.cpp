@@ -1131,7 +1131,7 @@ void MenuState::update()
                         && lastSent.timestamp < lastRecv.timestamp) // ensure that the incoming message arrived after the request
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 
-                else if (lastSent.packageType == NET_NOTICE_MAP_CHANGE
+                else if (lastSent.packageType == NET_NOTICE_GAMEMODESETTINGS
                         && lastRecv.packageType == NET_RESPONSE_CREATE_OK)
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 

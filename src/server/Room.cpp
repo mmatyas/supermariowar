@@ -65,7 +65,8 @@ void Room::tryAddingPlayer(Player* player)
             assert(playerCount <= 4);
 
             sendRoomUpdate(); // do this first to set correct remote player IDs
-            sendMapTo(p);
+            sendBlobTo(p, mapPackage);
+            sendBlobTo(p, gamemodeSettingsBlob);
 
             // send new player's skin to others
             shareSkinOf(player);
@@ -196,18 +197,39 @@ void Room::changeAndSendMap(const void* data, size_t data_length)
     memcpy(mapPackage.data, data, data_length);
     mapPackage.size = data_length;
 
-    sendMap();
+    sendBlob(mapPackage);
 }
 
-void Room::sendMap()
+void Room::changeAndSendGameModeSettings(const void* data, size_t data_length)
+{
+    printf("chageandsendgms\n");
+    assert(hostPlayerNumber < 4);
+    assert(players[hostPlayerNumber]);
+
+    // Some basic package validation
+    if (data_length <= sizeof(NetPkgs::MessageHeader)
+        || data_length > MAPPKG_SIZE_LIMIT) {
+        printf("[error] Corrupt map arrived from host in room %u\n", roomID);
+        return;
+    }
+
+    delete gamemodeSettingsBlob.data;
+    gamemodeSettingsBlob.data = new uint8_t[data_length];
+    memcpy(gamemodeSettingsBlob.data, data, data_length);
+    gamemodeSettingsBlob.size = data_length;
+
+    sendBlob(gamemodeSettingsBlob);
+}
+
+void Room::sendBlob(const Blob& blob)
 {
     for (uint8_t p = 0; p < 4; p++)
-        sendMapTo(p);
+        sendBlobTo(p, blob);
 }
 
-void Room::sendMapTo(uint8_t index)
+void Room::sendBlobTo(uint8_t index, const Blob& blob)
 {
-    printf("  sendMapTo %d\n", index);
+    printf("  sendBlobTo %d\n", index);
     assert(hostPlayerNumber < 4);
     assert(index < 4);
     if (index == hostPlayerNumber)
@@ -215,10 +237,10 @@ void Room::sendMapTo(uint8_t index)
     if (!players[index])
         return;
 
-    assert(mapPackage.data);
-    assert(mapPackage.size);
+    assert(blob.data);
+    assert(blob.size);
 
-    players[index]->sendData(mapPackage.data, mapPackage.size);
+    players[index]->sendData(blob.data, blob.size);
 }
 
 void Room::shareSkinOf(Player* sender)

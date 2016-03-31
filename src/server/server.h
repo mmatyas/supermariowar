@@ -41,6 +41,7 @@ private:
     void playerJoinsRoom(uint64_t playerID, const void* data, size_t dataLength);
     void playerLeavesRoom(uint64_t playerID);
     void hostChangesMap(uint64_t playerID, const void* data, size_t dataLength);
+    void hostChangesGameModeSettings(uint64_t playerID, const void* data, size_t dataLength);
     void playerChangesSkin(uint64_t playerID, const void* data, size_t dataLength);
     void playerSendsChatMsg(uint64_t playerID, const void* data, size_t dataLength);
 

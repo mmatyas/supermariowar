@@ -7,11 +7,11 @@
 
 #include <stdint.h>
 
-struct Map {
+struct Blob {
     uint8_t* data;
     size_t size;
 
-    Map() : data(0), size(0) {}
+    Blob() : data(0), size(0) {}
 };
 
 struct Room {
@@ -24,10 +24,11 @@ struct Room {
     uint8_t         hostPlayerNumber; // 0-3 index in players[]
     uint8_t         playerCount;
 
-    Map             mapPackage;
+    Blob            mapPackage;
 
     uint8_t         gamemodeID;
     uint16_t        gamemodeGoal;
+    Blob            gamemodeSettingsBlob;
 
     TimePoint       createTime;
     TimePoint       lastActivityTime;
@@ -45,8 +46,9 @@ struct Room {
     void sendRoomUpdate();
     void shareSkinOf(Player*);
     void changeAndSendMap(const void*, size_t);
-    void sendMap();
-    void sendMapTo(uint8_t);
+    void changeAndSendGameModeSettings(const void*, size_t);
+    void sendBlob(const Blob&);
+    void sendBlobTo(uint8_t, const Blob&);
     void sendStartSignal(); // sends start sync
     void startGameIfEverybodyReady();
 };

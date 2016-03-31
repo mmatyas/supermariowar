@@ -2,7 +2,7 @@
 #define NETWORK_PROTOCOL_DEFINITIONS_H
 
 #define NET_PROTOCOL_VERSION_MAJOR          0
-#define NET_PROTOCOL_VERSION_MINOR          3
+#define NET_PROTOCOL_VERSION_MINOR          4
 #define NET_MAX_MESSAGE_SIZE                128
 #define NET_LOBBYSERVER_PORT                12521
 #define NET_GAMEHOST_PORT                   12522
@@ -35,8 +35,9 @@
 #define NET_RESPONSE_ROOM_FULL              33
 #define NET_NOTICE_ROOM_CHANGE              34
 #define NET_NOTICE_MAP_CHANGE               35 // (after everyone connected) Game Host -> Players: "Here's the map file"
-#define NET_NOTICE_SKIN_CHANGE              36
-#define NET_NOTICE_ROOM_CHAT_MSG            37
+#define NET_NOTICE_GAMEMODESETTINGS         36
+#define NET_NOTICE_SKIN_CHANGE              37
+#define NET_NOTICE_ROOM_CHAT_MSG            38
 
 #define NET_REQUEST_CREATE_ROOM             40
 #define NET_RESPONSE_CREATE_OK              41
