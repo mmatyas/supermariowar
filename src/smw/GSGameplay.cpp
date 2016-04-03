@@ -1234,19 +1234,11 @@ void drawExitPauseDialog()
 
 bool IsPauseAllowed()
 {
-#ifdef TEST_AUTO_INPUT
-    return false;
-#endif
-
     return !game_values.noexit;
 }
 
 bool IsExitAllowed()
 {
-#ifdef TEST_AUTO_INPUT
-    return false;
-#endif
-
     if (!game_values.noexit || list_players_cnt == 0)
         return true;
 
@@ -2003,8 +1995,18 @@ void GameplayState::handleInput()
         case 1: sdlevent.key.keysym.sym = SDLK_DOWN; break;
         case 2: sdlevent.key.keysym.sym = SDLK_LEFT; break;
         case 3: sdlevent.key.keysym.sym = SDLK_RIGHT; break;
-        case 4: sdlevent.key.keysym.sym = SDLK_RETURN; break;
-        case 5: sdlevent.key.keysym.sym = SDLK_ESCAPE; break;
+        case 4:
+            if (game_values.showscoreboard)
+                sdlevent.key.keysym.sym = SDLK_RETURN;
+            else
+                sdlevent.key.keysym.sym = SDLK_SPACE;
+            break;
+        case 5:
+            if (game_values.showscoreboard)
+                sdlevent.key.keysym.sym = SDLK_ESCAPE;
+            else
+                sdlevent.key.keysym.sym = SDLK_SPACE;
+            break;
         case 6: sdlevent.key.keysym.sym = SDLK_RCTRL; break;
         case 7: sdlevent.key.keysym.sym = SDLK_RSHIFT; break;
         case 8: sdlevent.key.keysym.sym = SDLK_SPACE; break;
