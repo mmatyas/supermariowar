@@ -420,6 +420,32 @@ void MenuState::update()
     //Reset the keys that were down the last frame
     game_values.playerInput.ClearPressedKeys(1);
 
+#ifdef TEST_AUTO_INPUT
+    unsigned input_cnt = RANDOM_INT(5);
+    for (unsigned i = 0; i < input_cnt; i++) {
+        bool keyup = RANDOM_BOOL();
+
+        SDL_Event sdlevent;
+        sdlevent.type = keyup ? SDL_KEYUP : SDL_KEYDOWN;
+
+        switch (RANDOM_INT(11)) {
+        case 0: sdlevent.key.keysym.sym = SDLK_UP; break;
+        case 1: sdlevent.key.keysym.sym = SDLK_DOWN; break;
+        case 2: sdlevent.key.keysym.sym = SDLK_LEFT; break;
+        case 3: sdlevent.key.keysym.sym = SDLK_RIGHT; break;
+        case 4: sdlevent.key.keysym.sym = SDLK_RETURN; break;
+        case 5: sdlevent.key.keysym.sym = SDLK_ESCAPE; break;
+        case 6: sdlevent.key.keysym.sym = SDLK_RCTRL; break;
+        case 7: sdlevent.key.keysym.sym = SDLK_RSHIFT; break;
+        case 8: sdlevent.key.keysym.sym = SDLK_SPACE; break;
+        case 9: sdlevent.key.keysym.sym = (SDLKey)('a' + RANDOM_INT('z' - 'a')); break;
+        case 10: sdlevent.key.keysym.sym = (SDLKey)('0' + RANDOM_INT(9)); break;
+        }
+
+        SDL_PushEvent(&sdlevent);
+    }
+#endif
+
     //handle messages
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -587,7 +613,9 @@ void MenuState::update()
         }
 
         if (MENU_CODE_EXIT_APPLICATION == code) {
+#ifndef TEST_AUTO_INPUT
             Exit();
+#endif
             return;
         } else if (MENU_CODE_TO_MAIN_MENU == code) {
             iDisplayError = DISPLAY_ERROR_NONE;

@@ -53,6 +53,10 @@ void FPSLimiter::beforeFlip()
 
 void FPSLimiter::afterFlip()
 {
+#ifdef TEST_AUTO_INPUT
+    return;
+#endif
+
     flipfps = 1000.0f / (float)ticks;
 
     //Sleep for time just under what we need

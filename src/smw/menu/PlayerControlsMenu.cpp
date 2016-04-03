@@ -9,8 +9,10 @@ UI_PlayerControlsMenu::UI_PlayerControlsMenu() : UI_Menu()
     miInputContainer = new MI_InputControlContainer(&rm->menu_plain_field, 94, 10, 0);
     miInputContainer->SetAutoModify(true);
 
+#ifndef TEST_AUTO_INPUT
     AddControl(miInputContainer, NULL, NULL, NULL, NULL);
     SetHeadControl(miInputContainer);
+#endif
     SetCancelCode(MENU_CODE_BACK_TO_CONTROLS_MENU);
 };
 
