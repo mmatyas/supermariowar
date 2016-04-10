@@ -2,6 +2,8 @@
 
 [![Travis][travis-img]][travis-link] [![AppVeyor][appveyor-img]][appveyor-link] [![Freenode channel][freenode-img]][freenode-link]
 
+Super Mario War is a fan-made multiplayer Super Mario Bros. style deathmatch game in which players try to beat one another in a variety of gameplay modes. You can play on teams, design your own levels, design your own worlds, and much more!
+
 - [About](#about)
 - [Building](#building-instructions)
   - [Get the code](#get-the-code)
