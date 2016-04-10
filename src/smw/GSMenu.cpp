@@ -879,7 +879,10 @@ void MenuState::update()
             if (fNeedTeamAnnouncement)
                 mWorldMenu->miWorld->DisplayTeamControlAnnouncement();
         } else if (MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS == code) {
-            mCurrentMenu = mGameSettingsMenu;
+            if (netplay.active)
+                mCurrentMenu = mNetNewRoomSettingsMenu;
+            else
+                mCurrentMenu = mGameSettingsMenu;
         } else if (MENU_CODE_MODE_CHANGED == code) {
             game_values.gamemode = gamemodes[mGameSettingsMenu->GetCurrentGameModeID()];
             mGameSettingsMenu->RefreshGameModeButtons();
@@ -984,11 +987,17 @@ void MenuState::update()
             mCurrentMenu = mProjectileLimitsMenu;
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code) {
-            for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-                if (mGameSettingsMenu->miGoalField[iGameMode]->IsVisible()) {
-                    mCurrentMenu = mModeOptionsMenu->GetOptionsMenu(iGameMode);
-                    mCurrentMenu->ResetMenu();
-                    break;
+            if (netplay.active) {
+                mCurrentMenu = mModeOptionsMenu->GetOptionsMenu(mNetNewRoomSettingsMenu->getSelectedGameModeID());
+                mCurrentMenu->ResetMenu();
+            }
+            else {
+                for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+                    if (mGameSettingsMenu->miGoalField[iGameMode]->IsVisible()) {
+                        mCurrentMenu = mModeOptionsMenu->GetOptionsMenu(iGameMode);
+                        mCurrentMenu->ResetMenu();
+                        break;
+                    }
                 }
             }
         } else if (MENU_CODE_MENU_GRAPHICS_PACK_CHANGED == code) {

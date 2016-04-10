@@ -21,6 +21,8 @@ public:
     std::string getCurrentMapPath();
     void RefreshGameModeButtons();
 
+    short getSelectedGameModeID();
+
 private:
     MI_ImageSelectField * miModeField;
     MI_SelectField * miGoalField[22];
