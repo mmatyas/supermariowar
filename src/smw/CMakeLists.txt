@@ -93,8 +93,8 @@ LIST(APPEND SMW_SRCS
 
 	menu/network/NetEditServersMenu.cpp
 	menu/network/NetLobbyMenu.cpp
-	menu/network/NetNewLevelMenu.cpp
 	menu/network/NetNewRoomMenu.cpp
+	menu/network/NetNewRoomSettingsMenu.cpp
 	menu/network/NetRoomMenu.cpp
 	menu/network/NetServersMenu.cpp
 )

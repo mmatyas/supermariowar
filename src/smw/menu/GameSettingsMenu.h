@@ -52,7 +52,7 @@ private:
     MI_Button * miGameSettingsExitDialogYesButton;
     MI_Button * miGameSettingsExitDialogNoButton;
 
-friend class UI_NetNewLevelMenu;
+friend class UI_NetNewRoomSettingsMenu;
 };
 
 #endif // MENU_GAMESETTINGS_H

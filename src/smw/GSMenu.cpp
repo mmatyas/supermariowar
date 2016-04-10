@@ -37,8 +37,8 @@
 
 #include "menu/network/NetEditServersMenu.h"
 #include "menu/network/NetLobbyMenu.h"
-#include "menu/network/NetNewLevelMenu.h"
 #include "menu/network/NetNewRoomMenu.h"
+#include "menu/network/NetNewRoomSettingsMenu.h"
 #include "menu/network/NetRoomMenu.h"
 #include "menu/network/NetServersMenu.h"
 
@@ -172,8 +172,8 @@ void MenuState::CreateMenu()
     mNetServersMenu = new UI_NetServersMenu();
     mNetEditServersMenu = new UI_NetEditServersMenu();
     mNetLobbyMenu = new UI_NetLobbyMenu();
-    mNetNewLevelMenu = new UI_NetNewLevelMenu(mGameSettingsMenu);
     mNetNewRoomMenu = new UI_NetNewRoomMenu();
+    mNetNewRoomSettingsMenu = new UI_NetNewRoomSettingsMenu(mGameSettingsMenu);
     mNetRoomMenu = new UI_NetRoomMenu();
 
 #ifdef _XBOX
@@ -883,7 +883,7 @@ void MenuState::update()
         } else if (MENU_CODE_MODE_CHANGED == code) {
             game_values.gamemode = gamemodes[mGameSettingsMenu->GetCurrentGameModeID()];
             mGameSettingsMenu->RefreshGameModeButtons();
-            mNetNewLevelMenu->RefreshGameModeButtons();
+            mNetNewRoomSettingsMenu->RefreshGameModeButtons();
         } else if (MENU_CODE_BACK_TEAM_SELECT_MENU == code) {
             if (game_values.matchtype == MATCH_TYPE_WORLD) {
                 mWorldMenu->OpenExitDialog();
@@ -1050,9 +1050,9 @@ void MenuState::update()
             for (short iPlayer = 0; iPlayer < 4; iPlayer++)
                 game_values.storedpowerups[iPlayer] = -1;
         } else if (MENU_CODE_MAP_CHANGED == code) {
-            if (mCurrentMenu == mNetNewLevelMenu) {
+            if (mCurrentMenu == mNetNewRoomSettingsMenu) {
                 assert(netplay.active);
-                netplay.mapfilepath = mNetNewLevelMenu->getCurrentMapPath();
+                netplay.mapfilepath = mNetNewRoomSettingsMenu->getCurrentMapPath();
                 printf("[net] Selected map: %s\n", netplay.mapfilepath.c_str());
                 mNetRoomMenu->SetPreviewMapPath(netplay.mapfilepath);
             }
@@ -1192,7 +1192,7 @@ void MenuState::update()
                 mCurrentMenu = mNetLobbyMenu;
                 mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU == code) {
-                mCurrentMenu = mNetNewLevelMenu;
+                mCurrentMenu = mNetNewRoomSettingsMenu;
                 mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU == code) {
                 mCurrentMenu = mNetNewRoomMenu;

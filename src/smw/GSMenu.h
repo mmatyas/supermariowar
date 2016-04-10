@@ -31,8 +31,8 @@ class UI_TeamOptionsMenu;
 
 class UI_NetEditServersMenu;
 class UI_NetLobbyMenu;
-class UI_NetNewLevelMenu;
 class UI_NetNewRoomMenu;
+class UI_NetNewRoomSettingsMenu;
 class UI_NetRoomMenu;
 class UI_NetServersMenu;
 
@@ -151,8 +151,8 @@ class MenuState : public GameState
 		UI_NetServersMenu* mNetServersMenu;
 		UI_NetEditServersMenu* mNetEditServersMenu;
 		UI_NetLobbyMenu* mNetLobbyMenu;
-		UI_NetNewLevelMenu* mNetNewLevelMenu;
 		UI_NetNewRoomMenu* mNetNewRoomMenu;
+		UI_NetNewRoomSettingsMenu* mNetNewRoomSettingsMenu;
 		UI_NetRoomMenu* mNetRoomMenu;
 
 		DisplayError iDisplayError;
