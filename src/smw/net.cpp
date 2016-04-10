@@ -569,8 +569,7 @@ void NetClient::sendGameModeSettingsChangeMessage()
 
 void NetClient::handleGameModeSettingsChangeMessage(const uint8_t* data, size_t dataLength)
 {
-    if (dataLength <= sizeof(NetPkgs::MessageHeader) + sizeof(GameModeSettingsUnion)
-        || dataLength > 20000
+    if (dataLength != sizeof(NetPkgs::MessageHeader) + sizeof(GameModeSettingsUnion)
         || !data) {
         printf("[error] Corrupt game mode settings arrived\n");
         return;
