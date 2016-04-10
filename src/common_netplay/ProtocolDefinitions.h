@@ -2,7 +2,7 @@
 #define NETWORK_PROTOCOL_DEFINITIONS_H
 
 #define NET_PROTOCOL_VERSION_MAJOR          0
-#define NET_PROTOCOL_VERSION_MINOR          4
+#define NET_PROTOCOL_VERSION_MINOR          5
 #define NET_MAX_MESSAGE_SIZE                128
 #define NET_LOBBYSERVER_PORT                12521
 #define NET_GAMEHOST_PORT                   12522
@@ -57,11 +57,12 @@
 
 #define NET_P2G_LEAVE_GAME                  70 // Normal players -> Game host
 #define NET_P2G_LOCAL_KEYS                  71 // Normal players -> Game host
-#define NET_G2P_GAME_STATE                  72 // GH -> Players
-#define NET_P2G_REQ_POWERUP                 73 // Player wants to use powerup
-#define NET_G2P_START_POWERUP               74 // Another player wants to use powerup
-#define NET_G2P_TRIGGER_POWERUP             75 // Trigger powerup effect
-#define NET_G2P_TRIGGER_MAPCOLL             76 // Trigger map collision for clients
-#define NET_G2P_TRIGGER_P2PCOLL             77 // Trigger player-to-player collision for clients
+#define NET_G2P_REMOTE_KEYS                 72 // Game host -> Normal players
+#define NET_G2P_GAME_STATE                  73 // GH -> Players
+#define NET_P2G_REQ_POWERUP                 74 // Player wants to use powerup
+#define NET_G2P_START_POWERUP               75 // Another player wants to use powerup
+#define NET_G2P_TRIGGER_POWERUP             76 // Trigger powerup effect
+#define NET_G2P_TRIGGER_MAPCOLL             77 // Trigger map collision for clients
+#define NET_G2P_TRIGGER_P2PCOLL             78 // Trigger player-to-player collision for clients
 
 #endif // NETWORK_PROTOCOL_DEFINITIONS_H

@@ -119,7 +119,13 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
         pPlayerAI->SetPlayer(this);
 
     if (netplay.active) {
-        playerKeys = &netplay.netPlayerInput.outputControls[iGlobalID];
+        if (iGlobalID == netplay.remotePlayerNumber) {
+            playerKeys = &game_values.playerInput.outputControls[0];
+            printf("[net] Player %d reads local input.\n", iGlobalID);
+        } else {
+            playerKeys = &netplay.netPlayerInput.outputControls[iGlobalID];
+            printf("[net] Player %d reads network input.\n", iGlobalID);
+        }
     }
     else {
         playerKeys = &game_values.playerInput.outputControls[globalID];

@@ -81,25 +81,40 @@ struct ClientInput : MessageHeader {
     }
 };
 
-/*struct RemoteInput : MessageHeader {
-    uint8_t         playerNumber;
+struct RemoteInput : MessageHeader {
+    uint8_t     playerNumber;
     RawInput    input;
 
-    // Response package
+    RemoteInput(uint8_t player, RawInput& input)
+        : MessageHeader(NET_G2P_REMOTE_KEYS)
+        , playerNumber(player)
+        , input(input)
+    {}
+
+    RemoteInput(uint8_t player)
+        : MessageHeader(NET_G2P_REMOTE_KEYS)
+        , playerNumber(player)
+    {}
 
     void readKeys(COutputControl* playerControl) {
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
             input.getPlayerKey(k, playerControl->keys[k].fDown, playerControl->keys[k].fPressed);
     }
-};*/
+
+    void writeKeys(const COutputControl& playerControl) {
+        for (uint8_t k = 0; k < 8; k++)
+            input.setPlayerKey(k,
+                playerControl.keys[k].fDown,
+                playerControl.keys[k].fPressed);
+    }
+};
 
 struct GameState : MessageHeader {
     float player_x[4];
     float player_y[4];
     float player_xvel[4];
     float player_yvel[4];
-    RawInput input[4][NET_GAMESTATE_FRAMES_TO_SEND];
 
     GameState()
         : MessageHeader(NET_G2P_GAME_STATE)
@@ -122,15 +137,6 @@ struct GameState : MessageHeader {
         player_yvel[playerNum] = yvel;
     }
 
-    void setPlayerKeys(uint8_t playerNum, const COutputControl& playerControl, uint8_t relative_frame) {
-        assert(playerNum < 4);
-        assert(relative_frame < NET_GAMESTATE_FRAMES_TO_SEND);
-        for (uint8_t k = 0; k < 8; k++)
-            input[playerNum][relative_frame].setPlayerKey(k,
-                playerControl.keys[k].fDown,
-                playerControl.keys[k].fPressed);
-    }
-
     // RECEIVE
     void getPlayerCoord(uint8_t playerNum, float& x, float& y) {
         assert(playerNum < 4);
@@ -142,16 +148,6 @@ struct GameState : MessageHeader {
         assert(playerNum < 4);
         xvel = player_xvel[playerNum];
         yvel = player_yvel[playerNum];
-    }
-
-    void getPlayerKeys(uint8_t playerNum, COutputControl* playerControl, uint8_t relative_frame) {
-        assert(playerNum < 4);
-        assert(playerControl);
-        assert(relative_frame < NET_GAMESTATE_FRAMES_TO_SEND);
-        for (uint8_t k = 0; k < 8; k++)
-            input[playerNum][relative_frame].getPlayerKey(k,
-                playerControl->keys[k].fDown,
-                playerControl->keys[k].fPressed);
     }
 };
 

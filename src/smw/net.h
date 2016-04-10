@@ -142,8 +142,6 @@ class NetGameHost : public NetworkEventHandler
         uint8_t expected_client_count;
         uint8_t next_free_client_slot;
 
-        std::list<COutputControl> remote_input_buffer[3];
-
         // Currently collision detection may change player data,
         // so it has to be saved before
         NetPkgs::MapCollision* preparedMapCollPkg;
@@ -155,6 +153,7 @@ class NetGameHost : public NetworkEventHandler
         void setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* ports);
 
         // P3. Play
+        void sendLocalInput();
         void sendCurrentGameStateNow();
         void handleRemoteInput(const NetPeer&, const uint8_t*, size_t);
         void handlePowerupRequest(const NetPeer&, const uint8_t*, size_t);
@@ -247,6 +246,7 @@ class NetClient : public NetworkEventHandler
         void handleGameStartMessage();
 
         // P3. Game
+        void handleRemoteInput(const uint8_t*, size_t);
         void handleRemoteGameState(const uint8_t*, size_t);
         void handlePowerupStart(const uint8_t*, size_t);
         void handlePowerupTrigger(const uint8_t*, size_t);
@@ -320,6 +320,7 @@ struct Networking {
     Net_PlayerData previous_playerdata;
     Net_PlayerData latest_playerdata;
     std::list<COutputControl> local_input_buffer;
+    std::list<COutputControl> remote_input_buffer[3];
 };
 
 extern Networking netplay;

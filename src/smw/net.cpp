@@ -784,12 +784,13 @@ void NetClient::storeLocalInput()
 
 void NetClient::sendLocalInput()
 {
-    assert(!netplay.theHostIsMe);
-    /*if (netplay.theHostIsMe)
-        return;*/
-
-    NetPkgs::ClientInput pkg(&game_values.playerInput.outputControls[0]);
-    sendMessageToGameHost(&pkg, sizeof(NetPkgs::ClientInput));
+    if (netplay.theHostIsMe) {
+        local_gamehost.sendLocalInput();
+    }
+    else {
+        NetPkgs::ClientInput pkg(&game_values.playerInput.outputControls[0]);
+        sendMessageToGameHost(&pkg, sizeof(NetPkgs::ClientInput));
+    }
 
     //game_values.playerInput.outputControls[iGlobalID];
     /*printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
@@ -945,6 +946,14 @@ void NetClient::handleP2PCollision(const uint8_t * data, size_t dataLength)
     printf("P%d collided with P%d!\n", pkg.player_id[0], pkg.player_id[1]);
 }
 
+void NetClient::handleRemoteInput(const uint8_t* data, size_t dataLength)
+{
+    NetPkgs::RemoteInput* pkg = (NetPkgs::RemoteInput*) data;
+    COutputControl keys;
+    pkg->readKeys(&keys);
+    netplay.remote_input_buffer[pkg->playerNumber].push_back(keys);
+}
+
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
 {
     NetPkgs::GameState pkg;
@@ -955,13 +964,6 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
     for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.getPlayerCoord(p, netplay.latest_playerdata.player_x[p], netplay.latest_playerdata.player_y[p]);
         pkg.getPlayerVel(p, netplay.latest_playerdata.player_xvel[p], netplay.latest_playerdata.player_yvel[p]);
-
-        netplay.latest_playerdata.player_input[p].clear();
-        for (short f = 0; f < NET_GAMESTATE_FRAMES_TO_SEND; f++) {
-            COutputControl keys;
-            pkg.getPlayerKeys(p, &keys, f);
-            netplay.latest_playerdata.player_input[p].push_back(keys);
-        }
     }
 
     netplay.gamestate_changed = true;
@@ -1148,6 +1150,10 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
         //
         // Game
         //
+
+        case NET_G2P_REMOTE_KEYS:
+            handleRemoteInput(data, dataLength);
+            break;
 
         case NET_G2P_GAME_STATE:
             handleRemoteGameState(data, dataLength);
@@ -1518,6 +1524,25 @@ void NetGameHost::sendStartGameMessage()
     netplay.client.setAsLastReceivedMessage(pkg.packageType);
 }
 
+void NetGameHost::sendLocalInput()
+{
+    if (netplay.local_input_buffer.empty())
+        return;
+
+    NetPkgs::RemoteInput pkg(0);
+    pkg.writeKeys(netplay.local_input_buffer.front());
+    netplay.local_input_buffer.pop_front();
+
+    for (int c = 0; c < 3; c++) {
+        if (clients[c]) {
+            clients[c]->send(&pkg, sizeof(NetPkgs::RemoteInput));
+        }
+    }
+
+    netplay.client.handleRemoteInput((uint8_t*)&pkg, sizeof(pkg));
+    netplay.client.setAsLastReceivedMessage(pkg.packageType);
+}
+
 void NetGameHost::sendCurrentGameStateIfNeeded()
 {
     if (current_server_tick % NET_GAMESTATE_FRAMES_TO_SEND == 0)
@@ -1535,21 +1560,8 @@ void NetGameHost::sendCurrentGameStateNow()
         pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
     }
 
-    for (short f = 0; f < NET_GAMESTATE_FRAMES_TO_SEND; f++) {
-        if (!netplay.local_input_buffer.empty()) {
-            pkg.setPlayerKeys(0, netplay.local_input_buffer.front(), f);
-            netplay.local_input_buffer.pop_front();
-        }
-    }
-
-    for (int c = 0; c < 3; c++) {
+    for (unsigned short c = 0; c < expected_client_count; c++) {
         if (clients[c]) {
-            for (short f = 0; f < NET_GAMESTATE_FRAMES_TO_SEND; f++) {
-                if (!remote_input_buffer[c].empty()) {
-                    pkg.setPlayerKeys(c + 1, remote_input_buffer[c].front(), f);
-                    remote_input_buffer[c].pop_front();
-                }
-            }
             clients[c]->send(&pkg, sizeof(NetPkgs::GameState));
         }
     }
@@ -1565,6 +1577,9 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
     NetPkgs::ClientInput* pkg = (NetPkgs::ClientInput*) data; // TODO: check size!
 
     for (unsigned short c = 0; c < expected_client_count; c++) {
+        assert(clients[c]);
+
+        // compare by content
         if (player == *clients[c]) {
             //printf("yey\n");
 
@@ -1575,9 +1590,15 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
             //    last_processed_input[c] = pkg->counter;
                 COutputControl keys;
                 pkg->readKeys(&keys);
-                remote_input_buffer[c].push_back(keys);
+                netplay.remote_input_buffer[c + 1].push_back(keys);
             //}
 
+            NetPkgs::RemoteInput pkg_out(c + 1, pkg->input);
+            for (unsigned short c_out = 0; c_out < expected_client_count; c_out++) {
+                if (clients[c_out] && c != c_out) {
+                    clients[c_out]->send(&pkg_out, sizeof(NetPkgs::RemoteInput));
+                }
+            }
 
             /*printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
                 netplay.netPlayerInput.outputControls[c + 1].keys[0].fDown,
