@@ -572,7 +572,7 @@ void NetClient::handleGameModeSettingsChangeMessage(const uint8_t* data, size_t 
     if (dataLength <= sizeof(NetPkgs::MessageHeader) + sizeof(GameModeSettingsUnion)
         || dataLength > 20000
         || !data) {
-        printf("[error] Corrupt map arrived\n");
+        printf("[error] Corrupt game mode settings arrived\n");
         return;
     }
 
