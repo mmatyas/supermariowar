@@ -448,17 +448,27 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
 
 CMap::CMap()
-{
-    platforms = NULL;
-    iNumPlatforms = 0;
-    iNumMapItems = 0;
-    iNumMapHazards = 0;
-
-    animatedTilesSurface = NULL;
-
-    for (short iSwitch = 0; iSwitch < 4; iSwitch++)
-        iSwitches[iSwitch] = 0;
-}
+    : iNumMapItems(0)
+    , iNumMapHazards(0)
+    , platforms(nullptr)
+    , iNumPlatforms(0)
+    , warpexits()
+    , maxConnection(0)
+    , tilebltrect()
+    , bltrect()
+    , drawareas()
+    , numdrawareas(0)
+    , iSwitches()
+    , racegoallocations()
+    , flagbaselocations()
+    , iTileAnimationTimer(0)
+    , iTileAnimationFrame(0)
+    , iAnimatedBackgroundLayers(0)
+    , animatedFrontmapSurface(nullptr)
+    , animatedBackmapSurface(nullptr)
+    , animatedTilesSurface(nullptr)
+    , iAnimatedTileCount(0)
+{}
 
 CMap::~CMap()
 {}
@@ -593,8 +603,6 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     eyecandy[2] = 0;
     iNumMapItems = 0;
     iNumMapHazards = 0;
-
-    short i, j, k;
 
     /*
     cout << "loading map " << file;
