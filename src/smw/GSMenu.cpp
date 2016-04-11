@@ -307,7 +307,7 @@ void MenuState::onEnterState()
 
             case 4: { //Tournament Behind Teams
                 short iNumInPlace = 0;
-                short iInPlace[4];
+                short iInPlace[4] = {0,0,0,0};
                 short iLeastWins = 20; //Most possible wins are 10
 
                 for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
