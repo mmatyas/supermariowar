@@ -1980,7 +1980,7 @@ void GameplayState::onEnterState()
 void GameplayState::handleInput()
 {
     game_values.playerInput.ClearPressedKeys(game_values.exitinggame ? 1 : 0);
-    netplay.netPlayerInput.ClearGameActionKeys();
+    // netplay.netPlayerInput.ClearGameActionKeys();
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -2166,6 +2166,7 @@ void GameplayState::read_network()
     if (netplay.gamestate_changed) {
         // At the start of the next interpolation interval,
         // force every player to the confirmed position
+        // TODO: interpolation
         for (unsigned short p = 0; p < list_players_cnt; p++) {
             list_players[p]->fx = netplay.latest_playerdata.player_x[p];
             list_players[p]->fy = netplay.latest_playerdata.player_y[p];
@@ -2178,15 +2179,13 @@ void GameplayState::read_network()
         previous_playerKeys = *current_playerKeys;
     }
 
-    // Consume the next input from the current interval's input buffer
+    // Consume the next input from the remote input buffer
+    netplay.netPlayerInput.ClearGameActionKeys();
     for (unsigned short p = 0; p < list_players_cnt; p++) {
-        assert(netplay.latest_playerdata.player_input[p].size() > 0);
-        netplay.netPlayerInput.outputControls[p] = netplay.latest_playerdata.player_input[p].front();
-
-        // Always leave one last input in the buffer,
-        // and repeat it until we get a new set
-        if (netplay.latest_playerdata.player_input[p].size() > 1)
-            netplay.latest_playerdata.player_input[p].pop_front();
+        if (netplay.remote_input_buffer[p].size() > 0) {
+            netplay.netPlayerInput.outputControls[p] = netplay.remote_input_buffer[p].front();
+            netplay.remote_input_buffer[p].pop_front();
+        }
     }
 
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
@@ -2199,9 +2198,7 @@ void network_send_local_input()
         return;
 
     netplay.client.storeLocalInput();
-
-    if (!netplay.theHostIsMe)
-        netplay.client.sendLocalInput();
+    netplay.client.sendLocalInput();
 }
 
 void network_broadcast_game_state()
