@@ -320,7 +320,8 @@ struct Networking {
     Net_PlayerData previous_playerdata;
     Net_PlayerData latest_playerdata;
     std::list<COutputControl> local_input_buffer;
-    std::list<COutputControl> remote_input_buffer[3];
+    std::list<COutputControl> remote_input_buffer[4];
+    bool player_disconnected[4];
 };
 
 extern Networking netplay;

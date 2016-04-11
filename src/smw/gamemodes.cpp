@@ -3,6 +3,7 @@
 #include "eyecandy.h"
 #include "GameValues.h"
 #include "gfx/gfxFont.h"
+#include "net.h"
 #include "object.h"
 #include "ObjectContainer.h"
 #include "objectgame.h"
@@ -297,6 +298,13 @@ void CGameMode::init()  //called once when the game is started
 
 void CGameMode::think()
 {
+    if (netplay.active) {
+        for (short k = 0; k < list_players_cnt; k++) {
+            if (netplay.player_disconnected[k])
+                list_players[k]->spawnText("Disconnected!");
+        }
+    }
+
     if (gameover)
         displayplayertext();
 }

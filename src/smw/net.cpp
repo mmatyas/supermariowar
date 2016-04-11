@@ -146,7 +146,6 @@ bool net_init()
     netplay.mychatmessage[0] = '\0';
     netplay.waitingForPowerupTrigger = false;
     netplay.allowMapCollisionEvent = false;
-    netplay.gamestate_changed = false;
 
     if (!networkHandler.init())
         return false;
@@ -193,6 +192,8 @@ bool net_startSession()
     printf("[net] Session start.\n");
     netplay.active = true;
     netplay.connectSuccessful = false;
+    netplay.gamestate_changed = false;
+    std::fill(netplay.player_disconnected, netplay.player_disconnected + 4, false);
 
     COutputControl nullinput = (const struct COutputControl){0}; // set every field to false
     for (uint8_t p = 0; p < 4; p++) {
@@ -201,6 +202,9 @@ bool net_startSession()
 
         netplay.latest_playerdata.player_input[p].clear();
         netplay.latest_playerdata.player_input[p].push_back(nullinput);
+
+        netplay.local_input_buffer.clear();
+        netplay.remote_input_buffer[p].clear();
     }
 
     return netplay.client.start();
@@ -1002,6 +1006,7 @@ void NetClient::onDisconnect(NetPeer& client)
     if (foreign_gamehost) {
         if (client == *foreign_gamehost) {
             printf("[net] Disconnected from game host.\n");
+            netplay.player_disconnected[netplay.remotePlayerNumber] = true;
             return;
         }
     }
@@ -1407,6 +1412,12 @@ void NetGameHost::onConnect(NetPeer* new_player)
 void NetGameHost::onDisconnect(NetPeer& player)
 {
     printf("[net] Client %s disconnected\n", player.addressAsString().c_str());
+    for (short c = 0; c < expected_client_count; c++) {
+        if (clients[c] && *clients[c] == player) {
+            netplay.player_disconnected[c + 1] = true;
+            return;
+        }
+    }
 }
 
 void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLength)
