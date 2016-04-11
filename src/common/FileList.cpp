@@ -140,6 +140,10 @@ void UpdateMusicWithOverrides()
 }
 
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+SimpleFileList::SimpleFileList()
+    : currentIndex(-1)
+{}
+
 SimpleFileList::SimpleFileList(const std::string &path, const std::string &extension, bool fAlphabetize)
 {
     DirectoryListing d(path, extension);
@@ -800,31 +804,16 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
     fError = false;
     fUsesWorldOverrides = false;
 
-    int i, k;
+    size_t separator_pos = musicdirectory.rfind(getDirectorySeperator());
+    if (separator_pos != std::string::npos)
+        name = musicdirectory.substr(separator_pos + 1);
+    else
+        name = musicdirectory;
 
-    char * szDir = (char*)(musicdirectory.c_str());
-
-    char musiclistname[FILEBUFSIZE];
-
-    char cDirSeperator = getDirectorySeperator().c_str()[0];
-    char * p = strrchr(szDir, cDirSeperator);
-    if (!p) p=szDir;
-    else p++;
-    strcpy(musiclistname, p);
-
-    for (i = (int)strlen(musiclistname); i >= 0; i--) {
-        if (musiclistname[i] == '.') {
-            musiclistname[i] = '\0';
-            break;
-        }
-    }
-
-    name = musiclistname;
+    name = name.substr(0, name.rfind("."));
 
     std::string musicfile = musicdirectory + getDirectorySeperator() + std::string("Music.txt");
-
     FILE * in = fopen(musicfile.c_str(), "r");
-
     if (!in) {
         printf("Error: Could not open: %s\n", musicfile.c_str());
         fError = true;
@@ -840,7 +829,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 
         //Chop off line ending
         int stringLength = strlen(szBuffer);
-        for (k = 0; k < stringLength; k++) {
+        for (int k = 0; k < stringLength; k++) {
             if (szBuffer[k] == '\r' || szBuffer[k] == '\n') {
                 szBuffer[k] = '\0';
                 break;

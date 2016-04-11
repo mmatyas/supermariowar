@@ -16,7 +16,7 @@
 class SimpleFileList
 {
 public:
-    SimpleFileList() {};
+    SimpleFileList();
     SimpleFileList(const std::string &path, const std::string &extension, bool fAlphabetize = false);
     virtual ~SimpleFileList();
     const char * GetIndex(unsigned int index);
