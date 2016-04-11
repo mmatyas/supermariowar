@@ -433,32 +433,19 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
     int i, k;
 
-    char * szDir = (char*)(musicdirectory.c_str());
-
     for (k = 0; k < MAXMUSICCATEGORY; k++)
         numsongsforcategory[k] = 0;
 
-    char musiclistname[FILEBUFSIZE];
+    size_t separator_pos = musicdirectory.rfind(getDirectorySeperator());
+    if (separator_pos != std::string::npos)
+        name = musicdirectory.substr(separator_pos + 1);
+    else
+        name = musicdirectory;
 
-    char cDirSeperator = getDirectorySeperator().c_str()[0];
-    char * p = strrchr(szDir, cDirSeperator);
-    if (!p) p=szDir;
-    else p++;
-    strcpy(musiclistname, p);
-
-    for (i = (int)strlen(musiclistname); i >= 0; i--) {
-        if (musiclistname[i] == '.') {
-            musiclistname[i] = '\0';
-            break;
-        }
-    }
-
-    name = musiclistname;
+    name = name.substr(0, name.rfind("."));
 
     std::string musicfile = musicdirectory + getDirectorySeperator() + std::string("Music.txt");
-
     FILE * in = fopen(musicfile.c_str(), "r");
-
     if (!in) {
         printf("Error: Could not open: %s\n", musicfile.c_str());
         fError = true;
