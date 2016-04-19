@@ -736,6 +736,8 @@ void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
     printf("reseed: %d\n", pkg.commonRandomSeed);
     RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
 
+    std::fill(netplay.player_disconnected, netplay.player_disconnected + 4, false);
+
     // respond
     if (netplay.theHostIsMe)
         setAsLastSentMessage(NET_P2G_SYNC_OK);
