@@ -738,6 +738,8 @@ void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
     RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
 
     std::fill(netplay.player_disconnected, netplay.player_disconnected + 4, false);
+    netplay.last_confirmed_input = 0;
+    netplay.current_input_counter = 0;
 
     // respond
     if (netplay.theHostIsMe)
@@ -796,6 +798,7 @@ void NetClient::sendLocalInput()
     }
     else {
         NetPkgs::ClientInput pkg(&game_values.playerInput.outputControls[0]);
+        pkg.input_id = netplay.current_input_counter;
         sendMessageToGameHost(&pkg, sizeof(NetPkgs::ClientInput));
     }
 
@@ -975,6 +978,7 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
 
     netplay.gamestate_changed = true;
     netplay.frames_since_last_gamestate = 0;
+    netplay.last_confirmed_input = pkg.last_confirmed_local_input_id;
 }
 
 /****************
@@ -1289,6 +1293,7 @@ NetGameHost::NetGameHost()
     //printf("NetGameHost::ctor\n");
     for (short p = 0; p < 3; p++) {
         clients[p] = NULL;
+        last_processed_input_id[p] = 0;
     }
 
     preparedMapCollPkg = new NetPkgs::MapCollision();
@@ -1352,6 +1357,7 @@ void NetGameHost::stop()
             clients[p] = NULL;
         }
         expected_clients[p].reset();
+        last_processed_input_id[p] = 0;
     }
 
     networkHandler.gamehost_shutdown();
@@ -1577,6 +1583,7 @@ void NetGameHost::sendCurrentGameStateNow()
 
     for (unsigned short c = 0; c < expected_client_count; c++) {
         if (clients[c]) {
+            pkg.last_confirmed_local_input_id = last_processed_input_id[c];
             clients[c]->send(&pkg, sizeof(NetPkgs::GameState));
         }
     }
@@ -1600,7 +1607,9 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
 
             // TODO: does this work if GH leaves?
 
-            // Do not accept inputs from the past
+            // TODO: Do not accept inputs from the past
+            last_processed_input_id[c] = std::max(last_processed_input_id[c], pkg->input_id);
+
             //if (last_processed_input[c] < pkg->counter) {
             //    last_processed_input[c] = pkg->counter;
                 COutputControl keys;

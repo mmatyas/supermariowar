@@ -64,10 +64,12 @@ struct RawInput {
 };
 
 struct ClientInput : MessageHeader {
+    uint8_t     input_id;
     RawInput    input;
 
     ClientInput(const COutputControl* playerControl)
         : MessageHeader(NET_P2G_LOCAL_KEYS)
+        , input_id(0)
     {
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
@@ -115,6 +117,7 @@ struct GameState : MessageHeader {
     float player_y[4];
     float player_xvel[4];
     float player_yvel[4];
+    uint8_t last_confirmed_local_input_id;
 
     GameState()
         : MessageHeader(NET_G2P_GAME_STATE)
@@ -122,6 +125,7 @@ struct GameState : MessageHeader {
         , player_y {0,0,0,0}
         , player_xvel {0,0,0,0}
         , player_yvel {0,0,0,0}
+        , last_confirmed_local_input_id(0)
     {}
 
     // SEND
