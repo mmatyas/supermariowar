@@ -388,6 +388,8 @@ private:
 
 		Spotlight * sSpotlight;
 
+		bool net_waitingForPowerupTrigger;
+
 		void TransferTag(CPlayer * o2);
 		void TransferShyGuy(CPlayer * o2);
 		void BounceAssistPlayer(CPlayer * o2);

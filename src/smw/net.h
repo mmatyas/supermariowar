@@ -99,7 +99,7 @@ class NetGameHost : public NetworkEventHandler
 
         // P3. Game
         void sendCurrentGameStateIfNeeded();
-        void sendPowerupStart();
+        void sendPowerupStartByGH();
         void prepareMapCollisionEvent(CPlayer&);
         void sendMapCollisionEvent();
         void sendP2PCollisionEvent(CPlayer&, CPlayer&);
@@ -311,6 +311,7 @@ struct Networking {
     // In-game
     bool theHostIsMe;
     uint8_t remotePlayerNumber;
+    uint8_t hostPlayerNumber;
     CPlayerInput netPlayerInput;
 
     bool waitingForPowerupTrigger;

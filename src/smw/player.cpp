@@ -113,6 +113,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     , spawntext(20)  // set it to 20 so there is an immediate text spawned upon winning
     , iSuicideCreditPlayerID(-1)
     , iSuicideCreditTimer(0)
+    , net_waitingForPowerupTrigger(false)
 {
     //AI stuff
     if (pPlayerAI)
@@ -838,7 +839,7 @@ void CPlayer::update_usePowerup()
     powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
     powerupangle += 0.05f;
 
-    if (netplay.active && netplay.waitingForPowerupTrigger)
+    if (netplay.active && net_waitingForPowerupTrigger)
         return;
 
     if (powerupradius < 0.0f)
@@ -1017,12 +1018,20 @@ void CPlayer::tryReleasingPowerup()
 
     ifSoundOnPlay(rm->sfx_storedpowerupsound);
 
-    netplay.waitingForPowerupTrigger = true;
-    if (netplay.active) {
-        if (netplay.theHostIsMe)
-            netplay.client.local_gamehost.sendPowerupStart();
-        else
+    // only the locally controlled player should be able to send requests
+    if (netplay.active && globalID == netplay.remotePlayerNumber) {
+        if (netplay.theHostIsMe) {
+            // this happens when the game host player triggers a powerup
+            netplay.client.local_gamehost.sendPowerupStartByGH();
+
+            // otherwise, when a remote client presses the trigger button,
+            // it sends a powerup trigger request, so we don't have to handle
+            // this on the host side here
+        }
+        else {
+            net_waitingForPowerupTrigger = true;
             netplay.client.sendPowerupRequest();
+        }
     }
 }
 
