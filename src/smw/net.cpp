@@ -144,7 +144,6 @@ bool net_init()
     netplay.newroom_name[0] = '\0';
     netplay.newroom_password[0] = '\0';
     netplay.mychatmessage[0] = '\0';
-    netplay.waitingForPowerupTrigger = false;
     netplay.allowMapCollisionEvent = false;
 
     if (!networkHandler.init())
@@ -488,6 +487,7 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     netplay.theHostIsMe = false;
     netplay.currentRoom.hostPlayerNumber = pkg.hostPlayerNumber;
     netplay.remotePlayerNumber = pkg.remotePlayerNumber;
+    netplay.hostPlayerNumber = pkg.hostPlayerNumber;
     if (netplay.remotePlayerNumber == pkg.hostPlayerNumber) {
         netplay.theHostIsMe = true;
         local_gamehost.start(foreign_lobbyserver);
@@ -836,25 +836,25 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
     if (pkg.player_id > 3)
         return;
 
-    // if the source of this event was me
-    if (pkg.player_id == netplay.remotePlayerNumber)
-        return;
-
     assert(list_players[pkg.player_id]);
     if (!list_players[pkg.player_id])
         return;
 
-    list_players[pkg.player_id]->powerupused = pkg.powerup_id;
-    unsigned missed_frames = (pkg.delay + foreign_gamehost->averageRTT() / 2) / WAITTIME;
+    unsigned missed_frames = pkg.delay;
+    if (!netplay.theHostIsMe)
+        missed_frames += foreign_gamehost->averageRTT() / 2;
+    missed_frames /= WAITTIME; // ms to frames
+
     // TODO: make this nicer
     // TODO: this might be overriden by a late packet, in tryReleasingPowerup()
+    list_players[pkg.player_id]->powerupused = pkg.powerup_id;
     list_players[pkg.player_id]->powerupradius = 100.0f;
     for (; missed_frames > 0; missed_frames--) {
         list_players[pkg.player_id]->powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
     }
 
     // TODO: replace this eventually with the powerup trigger package
-    netplay.waitingForPowerupTrigger = false;
+    list_players[pkg.player_id]->net_waitingForPowerupTrigger = false;
     printf("[net] P%d used powerup %d\n", pkg.player_id, pkg.powerup_id);
 }
 
@@ -1637,7 +1637,7 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
 }
 
 // The boss wants to use powerup, so notifies the clients
-void NetGameHost::sendPowerupStart()
+void NetGameHost::sendPowerupStartByGH()
 {
     assert(netplay.theHostIsMe);
     assert(list_players[netplay.remotePlayerNumber]->powerupused >= 0);
@@ -1646,7 +1646,7 @@ void NetGameHost::sendPowerupStart()
         list_players[netplay.remotePlayerNumber]->powerupused, 0);
     sendMessageToMyPeers(&pkg, sizeof(NetPkgs::StartPowerup));
 
-    netplay.waitingForPowerupTrigger = false;
+    list_players[netplay.remotePlayerNumber]->net_waitingForPowerupTrigger = false;
     printf("[net] P%d (host) used powerup %d\n", pkg.player_id, pkg.powerup_id);
 }
 
@@ -1672,24 +1672,23 @@ void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* dat
         return;
     if (!list_players[playerID])
         return;
-    if (list_players[playerID]->powerupused < 0)
-        return;
 
-    NetPkgs::StartPowerup pkg(playerID, list_players[playerID]->powerupused, player.averageRTT() / 2);
+    // TODO: this was copied from player.cpp
+    int powerupused = game_values.gamepowerups[playerID];
+    assert(powerupused > 0);
+    if (powerupused <= 0)
+        return; // invalid request or de-sync
+
+    game_values.gamepowerups[playerID] = -1;
+
+    NetPkgs::StartPowerup pkg(playerID, powerupused, player.averageRTT() / 2);
     for (unsigned short c = 0; c < expected_client_count; c++) {
-        if (clients[c] && player != *clients[c]) {
+        if (clients[c]) {
             clients[c]->sendReliable(&pkg, sizeof(NetPkgs::StartPowerup));
         }
     }
-
-    // FIXME: this is almost the same as in the regular client code
-    unsigned missed_frames = pkg.delay / WAITTIME;
-    list_players[pkg.player_id]->powerupradius = 100.0f;
-    for (; missed_frames > 0; missed_frames--) {
-        list_players[pkg.player_id]->powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
-    }
-
-    printf("[net] P%d used powerup %d\n", pkg.player_id, pkg.powerup_id);
+    netplay.client.handlePowerupStart((uint8_t*)&pkg, sizeof(pkg));
+    netplay.client.setAsLastReceivedMessage(pkg.packageType);
 }
 
 /*void NetGameHost::sendPowerupTriggerIfReady()
