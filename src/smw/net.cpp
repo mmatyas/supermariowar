@@ -192,6 +192,7 @@ bool net_startSession()
     netplay.active = true;
     netplay.connectSuccessful = false;
     netplay.gamestate_changed = false;
+    netplay.frames_since_last_gamestate = 0;
     std::fill(netplay.player_disconnected, netplay.player_disconnected + 4, false);
 
     COutputControl nullinput = (const struct COutputControl){0}; // set every field to false
@@ -973,6 +974,7 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
     }
 
     netplay.gamestate_changed = true;
+    netplay.frames_since_last_gamestate = 0;
 }
 
 /****************

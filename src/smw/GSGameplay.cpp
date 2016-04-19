@@ -17,6 +17,7 @@
 #include "Score.h"
 #include "sfx.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cassert>
 #include <cstring>
@@ -2162,17 +2163,31 @@ void GameplayState::read_network()
     netplay.gamestate_changed = false;
     netplay.client.update();
 
-    // Note: gamestate_changed becomes true on clients only
-    if (netplay.gamestate_changed) {
-        // At the start of the next interpolation interval,
-        // force every player to the confirmed position
-        // TODO: interpolation
+    float percent_new = std::min(1.0f, (float)netplay.frames_since_last_gamestate / NET_GAMESTATE_FRAMES_TO_SEND);
+    float percent_old = 1.0f - percent_new;
+    assert(0 <= percent_new && percent_new <= 1.0f);
+    assert(0 <= percent_old && percent_old <= 1.0f);
+    assert(0.99 < percent_old + percent_new && percent_old + percent_new <= 1.01);
+
+    if (!netplay.theHostIsMe) {
         for (unsigned short p = 0; p < list_players_cnt; p++) {
-            list_players[p]->fx = netplay.latest_playerdata.player_x[p];
-            list_players[p]->fy = netplay.latest_playerdata.player_y[p];
-            list_players[p]->velx = netplay.latest_playerdata.player_xvel[p];
-            list_players[p]->vely = netplay.latest_playerdata.player_yvel[p];
+            if (p == netplay.remotePlayerNumber) {
+                if (netplay.gamestate_changed) {
+                    list_players[p]->fx = netplay.latest_playerdata.player_x[p];
+                    list_players[p]->fy = netplay.latest_playerdata.player_y[p];
+                    list_players[p]->velx = netplay.latest_playerdata.player_xvel[p];
+                    list_players[p]->vely = netplay.latest_playerdata.player_yvel[p];
+                }
+                continue;
+            }
+
+            list_players[p]->fx   = percent_old * netplay.previous_playerdata.player_x[p]    + percent_new * netplay.latest_playerdata.player_x[p];
+            list_players[p]->fy   = percent_old * netplay.previous_playerdata.player_y[p]    + percent_new * netplay.latest_playerdata.player_y[p];
+            list_players[p]->velx = percent_old * netplay.previous_playerdata.player_xvel[p] + percent_new * netplay.latest_playerdata.player_xvel[p];
+            list_players[p]->vely = percent_old * netplay.previous_playerdata.player_yvel[p] + percent_new * netplay.latest_playerdata.player_yvel[p];
         }
+
+        netplay.frames_since_last_gamestate++;
     }
 
     if (previous_playerKeys != *current_playerKeys) {

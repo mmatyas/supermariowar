@@ -318,6 +318,7 @@ struct Networking {
     bool allowMapCollisionEvent;
 
     bool gamestate_changed;
+    unsigned frames_since_last_gamestate;
     Net_PlayerData previous_playerdata;
     Net_PlayerData latest_playerdata;
     std::list<COutputControl> local_input_buffer;
