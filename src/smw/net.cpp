@@ -972,8 +972,8 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
     netplay.previous_playerdata = netplay.latest_playerdata;
 
     for (uint8_t p = 0; p < list_players_cnt; p++) {
-        pkg.getPlayerCoord(p, netplay.latest_playerdata.player_x[p], netplay.latest_playerdata.player_y[p]);
-        pkg.getPlayerVel(p, netplay.latest_playerdata.player_xvel[p], netplay.latest_playerdata.player_yvel[p]);
+        pkg.getPlayerCoord(p, netplay.latest_playerdata.player[p].x, netplay.latest_playerdata.player[p].y);
+        pkg.getPlayerVel(p, netplay.latest_playerdata.player[p].xvel, netplay.latest_playerdata.player[p].yvel);
     }
 
     netplay.gamestate_changed = true;

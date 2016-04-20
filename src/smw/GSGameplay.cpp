@@ -2200,10 +2200,10 @@ void GameplayState::read_network()
                 // if there is a confirmed position available
                 if (netplay.gamestate_changed) {
                     // set confirmed data
-                    list_players[p]->fx = netplay.latest_playerdata.player_x[p];
-                    list_players[p]->fy = netplay.latest_playerdata.player_y[p];
-                    list_players[p]->velx = netplay.latest_playerdata.player_xvel[p];
-                    list_players[p]->vely = netplay.latest_playerdata.player_yvel[p];
+                    list_players[p]->fx = netplay.latest_playerdata.player[p].x;
+                    list_players[p]->fy = netplay.latest_playerdata.player[p].y;
+                    list_players[p]->velx = netplay.latest_playerdata.player[p].xvel;
+                    list_players[p]->vely = netplay.latest_playerdata.player[p].yvel;
 
                     // if the player isn't in its normal state, we must not interpolate
                     assert(!list_players[p]->isready() && netplay.local_delta_buffer.empty()
@@ -2224,10 +2224,10 @@ void GameplayState::read_network()
                 }
             }
             else {
-                list_players[p]->fx   = percent_old * netplay.previous_playerdata.player_x[p]    + percent_new * netplay.latest_playerdata.player_x[p];
-                list_players[p]->fy   = percent_old * netplay.previous_playerdata.player_y[p]    + percent_new * netplay.latest_playerdata.player_y[p];
-                list_players[p]->velx = percent_old * netplay.previous_playerdata.player_xvel[p] + percent_new * netplay.latest_playerdata.player_xvel[p];
-                list_players[p]->vely = percent_old * netplay.previous_playerdata.player_yvel[p] + percent_new * netplay.latest_playerdata.player_yvel[p];
+                list_players[p]->fx   = percent_old * netplay.previous_playerdata.player[p].x    + percent_new * netplay.latest_playerdata.player[p].x;
+                list_players[p]->fy   = percent_old * netplay.previous_playerdata.player[p].y    + percent_new * netplay.latest_playerdata.player[p].y;
+                list_players[p]->velx = percent_old * netplay.previous_playerdata.player[p].xvel + percent_new * netplay.latest_playerdata.player[p].xvel;
+                list_players[p]->vely = percent_old * netplay.previous_playerdata.player[p].yvel + percent_new * netplay.latest_playerdata.player[p].yvel;
             }
         }
 
