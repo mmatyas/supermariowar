@@ -141,6 +141,7 @@ class NetGameHost : public NetworkEventHandler
         RawPlayerAddress expected_clients[3];
         uint8_t expected_client_count;
         uint8_t next_free_client_slot;
+        uint8_t last_processed_input_id[3];
 
         // Currently collision detection may change player data,
         // so it has to be saved before
@@ -268,11 +269,26 @@ enum NetworkState {
 };
 
 struct Net_PlayerData {
-    float          player_x[4];
-    float          player_y[4];
-    float          player_xvel[4];
-    float          player_yvel[4];
+    float x;
+    float y;
+    float xvel;
+    float yvel;
+};
+
+struct Net_AllPlayerData {
+    Net_PlayerData player[4];
     std::list<COutputControl> player_input[4];
+};
+
+struct Net_LocalDelta {
+    uint8_t input_id;
+    short d_x;
+    short d_y;
+    short d_xvel;
+    short d_yvel;
+
+    Net_LocalDelta(uint8_t id)
+        : input_id(id), d_x(0), d_y(0), d_xvel(0), d_yvel(0) {}
 };
 
 struct Networking {
@@ -319,9 +335,13 @@ struct Networking {
 
     bool gamestate_changed;
     unsigned frames_since_last_gamestate;
-    Net_PlayerData previous_playerdata;
-    Net_PlayerData latest_playerdata;
+    Net_AllPlayerData previous_playerdata;
+    Net_AllPlayerData latest_playerdata;
+    Net_PlayerData previous_local_playerdata;
     std::list<COutputControl> local_input_buffer;
+    std::list<Net_LocalDelta> local_delta_buffer;
+    unsigned short last_confirmed_input;
+    uint8_t current_input_counter;
     std::list<COutputControl> remote_input_buffer[4];
     bool player_disconnected[4];
 };
