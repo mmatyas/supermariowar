@@ -287,7 +287,8 @@ struct Net_LocalDelta {
     float d_xvel;
     float d_yvel;
 
-    Net_LocalDelta(uint8_t id);
+    Net_LocalDelta(uint8_t id = 0);
+    void print();
 };
 
 struct Networking {
@@ -338,7 +339,10 @@ struct Networking {
     Net_AllPlayerData latest_playerdata;
     Net_PlayerData previous_local_playerdata;
     std::list<COutputControl> local_input_buffer;
+
+    unsigned current_deltabuf_idx;
     std::list<Net_LocalDelta> local_delta_buffer;
+
     unsigned short last_confirmed_input;
     uint8_t current_input_counter;
     std::list<COutputControl> remote_input_buffer[4];

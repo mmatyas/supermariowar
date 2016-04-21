@@ -49,6 +49,10 @@ Net_LocalDelta::Net_LocalDelta(uint8_t id)
     : input_id(id), d_x(0), d_y(0), d_xvel(0), d_yvel(0)
 {}
 
+void Net_LocalDelta::print() {
+    printf(" [%d, %3.2f-%3.2f ]", input_id, d_x, d_y);
+}
+
 union GameModeSettingsUnion {
     ClassicGameModeSettings classic;
     FragGameModeSettings frag;
@@ -743,6 +747,7 @@ void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
     std::fill(netplay.player_disconnected, netplay.player_disconnected + 4, false);
     netplay.last_confirmed_input = 0;
     netplay.current_input_counter = 0;
+    netplay.current_deltabuf_idx = 0;
 
     // respond
     if (netplay.theHostIsMe)
