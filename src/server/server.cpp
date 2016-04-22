@@ -46,6 +46,8 @@ void SMWServer::readConfig()
     configFile.open("serverconfig", std::ifstream::in);
     if (!configFile.is_open()) {
         log("[warning] Configuration file not found, using default values.");
+        printf("  server name: %s\n", serverInfo.name);
+        printf("  max players: %d\n", serverInfo.maxPlayerCount);
         return;
     }
 
