@@ -10,8 +10,7 @@
 #include <unistd.h>
 #endif
 
-
-SMWServer server;
+bool running = true;
 
 void cleanup()
 {
@@ -21,14 +20,14 @@ void cleanup()
 void interrupt(int code)
 {
     printf("  Goodbye!\n");
-    cleanup();
-    exit(0);
+    running = false;
 }
 
 int main(int argc, char* argv[])
 {
     printf("SMW Server alpha\n");
 
+    SMWServer server;
     if (!server.init()) {
         cleanup();
         return 1;
@@ -52,7 +51,6 @@ int main(int argc, char* argv[])
     //
     clock_t frameStart = clock();
     clock_t frameEnd;
-    bool running = true;
     while (running)
     {
         server.update(running);
