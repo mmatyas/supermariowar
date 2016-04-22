@@ -287,8 +287,7 @@ struct Net_LocalDelta {
     short d_xvel;
     short d_yvel;
 
-    Net_LocalDelta(uint8_t id)
-        : input_id(id), d_x(0), d_y(0), d_xvel(0), d_yvel(0) {}
+    Net_LocalDelta(uint8_t id);
 };
 
 struct Networking {

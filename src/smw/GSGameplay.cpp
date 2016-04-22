@@ -2173,56 +2173,13 @@ void GameplayState::read_network()
         for (unsigned short p = 0; p < list_players_cnt; p++) {
             // if local player
             if (p == netplay.remotePlayerNumber) {
-                // save the delta at the end of the *previous* frame,
-                // if the player is in its regular state
-                if (list_players[p]->isready()) {
-                    Net_LocalDelta new_delta(netplay.current_input_counter);
-                    new_delta.d_x = list_players[p]->fx - netplay.previous_local_playerdata.x;
-                    new_delta.d_y = list_players[p]->fy - netplay.previous_local_playerdata.y;
-                    new_delta.d_xvel = list_players[p]->velx - netplay.previous_local_playerdata.xvel;
-                    new_delta.d_yvel = list_players[p]->vely - netplay.previous_local_playerdata.yvel;
-                    netplay.local_delta_buffer.push_back(new_delta);
-                }
-                // interpolation is invalid during warp, dead, etc.
-                else {
-                    netplay.local_delta_buffer.clear();
-                }
-
-                // save player data at the end of the *previous* frame
-                netplay.previous_local_playerdata.x = list_players[p]->fx;
-                netplay.previous_local_playerdata.y = list_players[p]->fy;
-                netplay.previous_local_playerdata.xvel = list_players[p]->velx;
-                netplay.previous_local_playerdata.yvel = list_players[p]->vely;
-
-                // Now we can start handling the current frame
-                netplay.current_input_counter++;
-
-                // if there is a confirmed position available
-                if (netplay.gamestate_changed) {
-                    // set confirmed data
-                    list_players[p]->fx = netplay.latest_playerdata.player[p].x;
-                    list_players[p]->fy = netplay.latest_playerdata.player[p].y;
-                    list_players[p]->velx = netplay.latest_playerdata.player[p].xvel;
-                    list_players[p]->vely = netplay.latest_playerdata.player[p].yvel;
-
-                    // if the player isn't in its normal state, we must not interpolate
-                    assert(!list_players[p]->isready() && netplay.local_delta_buffer.empty()
-                        || list_players[p]->isready());
-
-                    // remove already confirmed inputs
-                    netplay.local_delta_buffer.remove_if([](const Net_LocalDelta& entry){
-                        return entry.input_id <= netplay.last_confirmed_input;
-                    });
-
-                    // replay unconfirmed inputs
-                    for (const auto& delta: netplay.local_delta_buffer) {
-                        list_players[p]->fx += delta.d_x;
-                        list_players[p]->fy += delta.d_y;
-                        list_players[p]->velx += delta.d_xvel;
-                        list_players[p]->vely += delta.d_yvel;
-                    }
-                }
+                // set confirmed data
+                list_players[p]->fx = netplay.latest_playerdata.player[p].x;
+                list_players[p]->fy = netplay.latest_playerdata.player[p].y;
+                list_players[p]->velx = netplay.latest_playerdata.player[p].xvel;
+                list_players[p]->vely = netplay.latest_playerdata.player[p].yvel;
             }
+            // for remote players, interpolate
             else {
                 list_players[p]->fx   = percent_old * netplay.previous_playerdata.player[p].x    + percent_new * netplay.latest_playerdata.player[p].x;
                 list_players[p]->fy   = percent_old * netplay.previous_playerdata.player[p].y    + percent_new * netplay.latest_playerdata.player[p].y;

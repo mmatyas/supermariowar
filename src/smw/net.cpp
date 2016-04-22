@@ -45,6 +45,9 @@ extern CGameMode * gamemodes[GAMEMODE_LAST];
 
 short backup_playercontrol[4];
 
+Net_LocalDelta::Net_LocalDelta(uint8_t id)
+    : input_id(id), d_x(0), d_y(0), d_xvel(0), d_yvel(0)
+{}
 
 union GameModeSettingsUnion {
     ClassicGameModeSettings classic;
@@ -800,6 +803,7 @@ void NetClient::sendLocalInput()
         NetPkgs::ClientInput pkg(&game_values.playerInput.outputControls[0]);
         pkg.input_id = netplay.current_input_counter;
         sendMessageToGameHost(&pkg, sizeof(NetPkgs::ClientInput));
+        netplay.current_input_counter++;
     }
 
     //game_values.playerInput.outputControls[iGlobalID];
