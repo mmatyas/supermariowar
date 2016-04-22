@@ -1612,7 +1612,10 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
             // TODO: does this work if GH leaves?
 
             // TODO: Do not accept inputs from the past
+            // Careful, 255 < 0 !
             last_processed_input_id[c] = std::max(last_processed_input_id[c], pkg->input_id);
+            if (last_processed_input_id[c] > 200 && pkg->input_id < 50)
+                last_processed_input_id[c] = pkg->input_id;
 
             //if (last_processed_input[c] < pkg->counter) {
             //    last_processed_input[c] = pkg->counter;

@@ -282,10 +282,10 @@ struct Net_AllPlayerData {
 
 struct Net_LocalDelta {
     uint8_t input_id;
-    short d_x;
-    short d_y;
-    short d_xvel;
-    short d_yvel;
+    float d_x;
+    float d_y;
+    float d_xvel;
+    float d_yvel;
 
     Net_LocalDelta(uint8_t id);
 };
