@@ -748,6 +748,7 @@ void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
     netplay.last_confirmed_input = 0;
     netplay.current_input_counter = 0;
     netplay.current_deltabuf_idx = 0;
+    netplay.input_confirm_received = false;
 
     // respond
     if (netplay.theHostIsMe)
@@ -987,6 +988,10 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
 
     netplay.gamestate_changed = true;
     netplay.frames_since_last_gamestate = 0;
+    if ( !(netplay.last_confirmed_input == pkg.last_confirmed_local_input_id
+        && pkg.last_confirmed_local_input_id == 0) )
+        netplay.input_confirm_received = true;
+
     netplay.last_confirmed_input = pkg.last_confirmed_local_input_id;
 }
 

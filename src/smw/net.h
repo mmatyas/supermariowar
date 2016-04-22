@@ -347,6 +347,7 @@ struct Networking {
     uint8_t current_input_counter;
     std::list<COutputControl> remote_input_buffer[4];
     bool player_disconnected[4];
+    bool input_confirm_received;
 };
 
 extern Networking netplay;
