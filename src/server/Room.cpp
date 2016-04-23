@@ -1,6 +1,7 @@
 #include "Room.h"
 
 #include "ProtocolPackages.h"
+#include "Util.h"
 
 #include <algorithm>
 #include <cassert>
@@ -12,33 +13,28 @@
 Room::Room()
     : roomID(0)
     , visible(true)
+    , players{}
     , hostPlayerNumber(0)
     , playerCount(0)
     , gamemodeID(0) // Classic
     , gamemodeGoal(10) // 10 lives
 {
-    for (uint8_t p = 0; p < 4; p++)
-        players[p] = NULL;
 }
 
 Room::Room(uint32_t roomID, const char* name, const char* password, Player* host)
     : roomID(roomID)
     , visible(true) // TODO
+    , players{}
     , hostPlayerNumber(0)
     , playerCount(1)
     , gamemodeID(0) // Classic
     , gamemodeGoal(10) // 10 lives
 {
-    strncpy(this->name, name, NET_MAX_ROOM_NAME_LENGTH);
-    this->name[NET_MAX_ROOM_NAME_LENGTH - 1] = '\0';
-    strncpy(this->password, password, NET_MAX_ROOM_PASSWORD_LENGTH);
-    this->password[NET_MAX_ROOM_PASSWORD_LENGTH - 1] = '\0';
+    strncpy_sec(this->name, name, NET_MAX_ROOM_NAME_LENGTH);
+    strncpy_sec(this->password, password, NET_MAX_ROOM_PASSWORD_LENGTH);
 
     players[0] = host;
     host->skinPackage.setPlayerID(0);
-
-    for (uint8_t p = 1; p < 4; p++)
-        players[p] = NULL;
 
     createTime = TIME_NOW();
     lastActivityTime = createTime;
@@ -51,8 +47,7 @@ Room::~Room()
         players[p] = NULL;
     }
 
-    delete mapPackage.data;
-    mapPackage.data = NULL;
+    mapPackage.free();
 }
 
 void Room::tryAddingPlayer(Player* player)
@@ -73,12 +68,12 @@ void Room::tryAddingPlayer(Player* player)
             // send skins of others to new player
             for (uint8_t p = 0; p < 4; p++) {
                 if (players[p] && players[p] != player) {
-                    player->sendData(players[p]->skinPackage.data, players[p]->skinPackage.size);
+                    sendBlobTo(p, players[p]->skinPackage);
                 }
             }
         }
         else
-            printf("  R-%u: slot %d foglalt: %p\n", roomID, p, players[p]);
+            printf("  R-%u: slot %d taken by %p\n", roomID, p, players[p]);
     }
 }
 
@@ -121,16 +116,13 @@ void Room::sendRoomUpdate()
     NetPkgs::CurrentRoom package;
         package.roomID = roomID;
         package.hostPlayerNumber = hostPlayerNumber;
-        strncpy(package.name, name, NET_MAX_ROOM_NAME_LENGTH);
-        package.name[NET_MAX_ROOM_NAME_LENGTH - 1] = '\0';
+        strncpy_sec(package.name, name, NET_MAX_ROOM_NAME_LENGTH);
 
     for (uint8_t p = 0; p < 4; p++) {
         if (players[p])
-            strncpy(package.playerName[p], players[p]->name.c_str(), NET_MAX_PLAYER_NAME_LENGTH);
+            strncpy_sec(package.playerName[p], players[p]->name.c_str(), NET_MAX_PLAYER_NAME_LENGTH);
         else
-            strncpy(package.playerName[p], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
-
-        package.playerName[p][NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
+            strncpy_sec(package.playerName[p], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
     }
 
     package.gamemodeID = gamemodeID;
@@ -152,7 +144,7 @@ void Room::sendRoomUpdate()
     }
 }
 
-void Room::sendChatMessage(Player* sender, const char* message)
+void Room::sendChatMessage(const Player* sender, const char* message)
 {
     if (!message)
         return;
@@ -161,20 +153,21 @@ void Room::sendChatMessage(Player* sender, const char* message)
         return;
 
     // TODO: verify
-    uint8_t senderNum = 255;
-    for (uint8_t p = 0; p < 4 && senderNum == 255; p++) {
+    uint8_t senderNum = 0xFF;
+    for (uint8_t p = 0; p < 4; p++) {
         if (players[p] == sender) {
             senderNum = p;
+            break;
         }
     }
-    assert(senderNum != 255);
+    assert(senderNum != 0xFF);
 
     NetPkgs::RoomChatMsg package(senderNum, message);
 
     // Send every player information about the other players.
     for (uint8_t p = 0; p < 4; p++) {
         if (players[p]) {
-            players[p]->sendData(&package, sizeof(NetPkgs::RoomChatMsg));
+            players[p]->sendData(&package, sizeof(package));
         }
     }
 }
@@ -192,12 +185,8 @@ void Room::changeAndSendMap(const void* data, size_t data_length)
         return;
     }
 
-    delete mapPackage.data;
-    mapPackage.data = new uint8_t[data_length];
-    memcpy(mapPackage.data, data, data_length);
-    mapPackage.size = data_length;
-
-    sendBlob(mapPackage);
+    mapPackage.replace_with(data, data_length);
+    shareBlobExceptHost(mapPackage);
 }
 
 void Room::changeAndSendGameModeSettings(const void* data, size_t data_length)
@@ -213,18 +202,24 @@ void Room::changeAndSendGameModeSettings(const void* data, size_t data_length)
         return;
     }
 
-    delete gamemodeSettingsBlob.data;
-    gamemodeSettingsBlob.data = new uint8_t[data_length];
-    memcpy(gamemodeSettingsBlob.data, data, data_length);
-    gamemodeSettingsBlob.size = data_length;
-
-    sendBlob(gamemodeSettingsBlob);
+    gamemodeSettingsBlob.replace_with(data, data_length);
+    shareBlobExceptHost(gamemodeSettingsBlob);
 }
 
-void Room::sendBlob(const Blob& blob)
+void Room::shareBlob(const Blob& blob)
 {
     for (uint8_t p = 0; p < 4; p++)
         sendBlobTo(p, blob);
+}
+
+void Room::shareBlobExceptHost(const Blob& blob)
+{
+    for (uint8_t p = 0; p < 4; p++) {
+        if (p == hostPlayerNumber)
+            continue;
+
+        sendBlobTo(p, blob);
+    }
 }
 
 void Room::sendBlobTo(uint8_t index, const Blob& blob)
@@ -232,25 +227,18 @@ void Room::sendBlobTo(uint8_t index, const Blob& blob)
     printf("  sendBlobTo %d\n", index);
     assert(hostPlayerNumber < 4);
     assert(index < 4);
-    if (index == hostPlayerNumber)
-        return;
     if (!players[index])
         return;
 
-    assert(blob.data);
-    assert(blob.size);
-
-    players[index]->sendData(blob.data, blob.size);
+    assert(!blob.empty());
+    players[index]->sendData(blob.get_data(), blob.get_size());
 }
 
 void Room::shareSkinOf(Player* sender)
 {
     assert(sender);
 
-    if (!sender->skinPackage.data)
-        return;
-
-    if (!sender->skinPackage.size)
+    if (sender->skinPackage.empty())
         return;
 
     // TODO: verify
@@ -266,7 +254,7 @@ void Room::shareSkinOf(Player* sender)
     // send the fixed package to others
     for (uint8_t p = 0; p < 4; p++) {
         if (players[p] && players[p] != sender) {
-            players[p]->sendData(sender->skinPackage.data, sender->skinPackage.size);
+            sendBlobTo(p, sender->skinPackage);
         }
     }
 }

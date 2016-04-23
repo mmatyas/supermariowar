@@ -1,18 +1,12 @@
 #ifndef ROOM_H
 #define ROOM_H
 
+#include "Blob.h"
 #include "Clock.h"
 #include "ProtocolDefinitions.h"
 #include "Player.h"
 
 #include <stdint.h>
-
-struct Blob {
-    uint8_t* data;
-    size_t size;
-
-    Blob() : data(0), size(0) {}
-};
 
 struct Room {
     uint32_t        roomID;
@@ -34,7 +28,7 @@ struct Room {
     TimePoint       lastActivityTime;
 
     Room();
-    Room(uint32_t roomID, const char * name, const char * password, Player * host);
+    Room(uint32_t roomID, const char* name, const char* password, Player* host);
     ~Room();
 
     void tryAddingPlayer(Player* player);
@@ -42,12 +36,13 @@ struct Room {
 
     void setGamemode(uint8_t id, uint16_t goal);
 
-    void sendChatMessage(Player*, const char*);
+    void sendChatMessage(const Player*, const char*);
     void sendRoomUpdate();
     void shareSkinOf(Player*);
     void changeAndSendMap(const void*, size_t);
     void changeAndSendGameModeSettings(const void*, size_t);
-    void sendBlob(const Blob&);
+    void shareBlob(const Blob&);
+    void shareBlobExceptHost(const Blob&);
     void sendBlobTo(uint8_t, const Blob&);
     void sendStartSignal(); // sends start sync
     void startGameIfEverybodyReady();

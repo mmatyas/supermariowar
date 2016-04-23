@@ -3,14 +3,12 @@
 
 #include <string>
 
-#include "NetworkLayer.h"
+#include "Blob.h"
 #include "Clock.h"
+#include "NetworkLayer.h"
 
-struct PlayerSkin {
-    uint8_t* data;
-    size_t size;
-
-    PlayerSkin() : data(0), size(0) {}
+struct PlayerSkin: public Blob {
+    PlayerSkin() : Blob() {}
     void setPlayerID(uint8_t id);
 };
 
@@ -32,7 +30,7 @@ struct Player {
     ~Player();
 
     void setClient(NetPeer* client);
-    void setName(std::string& name);
+    void setName(const std::string& name);
     void setSkin(const void*, size_t);
 
     bool sendData(const void*, size_t);

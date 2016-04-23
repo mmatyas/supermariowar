@@ -12,7 +12,8 @@ NetworkLayerENet netLayer;
 
 
 SMWServer::SMWServer()
-    : serverInfo("SMW Server", 0, 20 /* maxPlayerCount */)
+    : serverName("SMW Server")
+    , serverInfo("SMW Server", 0, 20 /* maxPlayerCount */)
     , currentPlayerCount(0)
     , maxPlayerCount(20)
     , roomCreateID(1)
@@ -232,19 +233,19 @@ void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
 void SMWServer::sendServerInfo(NetPeer& client)
 {
-    client.sendReliable(&serverInfo, sizeof(NetPkgs::ServerInfo));
+    client.sendReliable(&serverInfo, sizeof(serverInfo));
 }
 
 void SMWServer::sendCode(NetPeer& client, uint8_t code)
 {
     NetPkgs::MessageHeader msg(code);
-    client.sendReliable(&msg, sizeof(NetPkgs::MessageHeader));
+    client.sendReliable(&msg, sizeof(msg));
 }
 
 void SMWServer::sendCode(NetPeer* client, uint8_t code)
 {
     NetPkgs::MessageHeader msg(code);
-    client->sendReliable(&msg, sizeof(NetPkgs::MessageHeader));
+    client->sendReliable(&msg, sizeof(msg));
 }
 
 void SMWServer::sendCode(uint64_t playerID, uint8_t code)
@@ -300,7 +301,7 @@ void SMWServer::sendVisibleRoomEntries(NetPeer& client)
     while (it != rooms.end()) {
         Room* room = &it->second;
         // only visible if public and has valid map
-        if (room->visible && room->mapPackage.data)
+        if (room->visible && !room->mapPackage.empty())
         {
             NetPkgs::RoomInfo roomInfo;
             {
@@ -314,9 +315,10 @@ void SMWServer::sendVisibleRoomEntries(NetPeer& client)
                     roomInfo.passwordRequired = true;
 
                 roomInfo.currentPlayerCount = 0;
-                for (long unsigned p = 0; p < 4; p++)
+                for (long unsigned p = 0; p < 4; p++) {
                     if (room->players[p])
                         roomInfo.currentPlayerCount++;
+                }
 
                 roomInfo.gamemodeID = room->gamemodeID;
 
@@ -324,7 +326,7 @@ void SMWServer::sendVisibleRoomEntries(NetPeer& client)
                     roomInfo.roomID, roomInfo.name, roomInfo.passwordRequired, roomInfo.currentPlayerCount);
             }
 
-            client.sendReliable(&roomInfo, sizeof(NetPkgs::RoomInfo));
+            client.sendReliable(&roomInfo, sizeof(roomInfo));
         }
 
         ++it;
@@ -359,7 +361,7 @@ void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data, size_t da
 
     // output
     NetPkgs::NewRoomCreated package(roomCreateID);
-    player->sendData(&package, sizeof(NetPkgs::NewRoomCreated));
+    player->sendData(&package, sizeof(package));
 
     log("New room by %s : {id: %d; name: %s; pw: %s}",
         player->toString().c_str(), room.roomID, room.name, room.password);

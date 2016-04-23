@@ -45,7 +45,7 @@ void Player::setClient(NetPeer* client)
     lastActivityTime = TIME_NOW();
 }
 
-void Player::setName(std::string& name)
+void Player::setName(const std::string& name)
 {
     this->name = name;
 
@@ -61,10 +61,8 @@ void Player::setSkin(const void* data, size_t data_length)
         return;
     }
 
-    delete skinPackage.data;
-    skinPackage.data = new uint8_t[data_length];
-    memcpy(skinPackage.data, data, data_length);
-    skinPackage.size = data_length;
+    skinPackage.replace_with(data, data_length);
+    lastActivityTime = TIME_NOW();
 }
 
 // Printing stuff
