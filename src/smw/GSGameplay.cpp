@@ -2173,6 +2173,9 @@ void GameplayState::read_network()
         for (unsigned short p = 0; p < list_players_cnt; p++) {
             // if local player
             if (p == netplay.remotePlayerNumber) {
+
+                printf("  end   x: %.2f\n", list_players[p]->fx);
+
                 // save the delta at the end of the *previous* frame,
                 // if the player is in its regular state
                 // interpolation is invalid during warp, dead, etc.
@@ -2185,6 +2188,7 @@ void GameplayState::read_network()
                     //printf("add x: %.2f, xvel: %.5f\n", new_delta.d_x, new_delta.d_xvel);
                 }
                 netplay.local_delta_buffer.push_back(new_delta);
+                printf("  delta x: [%3d, %.2f]\n", new_delta.input_id, new_delta.d_x);
 
                 // save player data at the end of the *previous* frame
                 netplay.previous_local_playerdata.x = list_players[p]->fx;
@@ -2192,7 +2196,10 @@ void GameplayState::read_network()
                 netplay.previous_local_playerdata.xvel = list_players[p]->velx;
                 netplay.previous_local_playerdata.yvel = list_players[p]->vely;
 
+
                 // Now we can start handling the current frame
+                printf("-- frame start\n");
+
 
                 // if there is a confirmed position available
                 if (netplay.gamestate_changed) {
@@ -2202,53 +2209,55 @@ void GameplayState::read_network()
                     list_players[p]->velx = netplay.latest_playerdata.player[p].xvel;
                     list_players[p]->vely = netplay.latest_playerdata.player[p].yvel;
 
-                    // netplay.previous_local_playerdata.x += list_players[p]->fx - netplay.previous_local_playerdata.x;
-                    // netplay.previous_local_playerdata.y += list_players[p]->fy - netplay.previous_local_playerdata.y;
-                    // netplay.previous_local_playerdata.xvel += list_players[p]->velx - netplay.previous_local_playerdata.xvel;
-                    // netplay.previous_local_playerdata.yvel += list_players[p]->vely - netplay.previous_local_playerdata.yvel;
+                    printf("  arrived: x= %.2f, c= %d\n", list_players[p]->fx, netplay.last_confirmed_input);
 
                     // if the player isn't in its normal state, we must not interpolate
-                    /*assert(!list_players[p]->isready() && netplay.local_delta_buffer.empty()
-                        || list_players[p]->isready());*/
-                    printf("----- confirmed: %d, current: %d, buffer size: %zu\n"
+                    printf("  confirmed: %d, current: %d, buffer size: %zu (%d-%d)\n"
                         , netplay.last_confirmed_input
                         , netplay.current_input_counter
                         , netplay.local_delta_buffer.size()
+                        , netplay.local_delta_buffer.front().input_id
+                        , netplay.local_delta_buffer.back().input_id
                     );
 
                     // remove already confirmed inputs
                     uint8_t tmp_idx = netplay.local_delta_buffer.front().input_id;
                     while (tmp_idx != netplay.last_confirmed_input
-                        && !netplay.local_delta_buffer.empty())
+                        && !netplay.local_delta_buffer.empty()
+                        && netplay.input_confirm_received)
                     {
-                        printf("  delete entry: %3d\n", tmp_idx);
+                        printf("  delete entry: [%3d, %.2f]\n", tmp_idx, netplay.local_delta_buffer.front().d_x);
                         netplay.local_delta_buffer.pop_front();
                         tmp_idx++;
                     }
                     // handle (tmp_idx == netplay.last_confirmed_input)
                     // but only after the first input confirm has arrived
                     if (!netplay.local_delta_buffer.empty() && netplay.input_confirm_received) {
-                        printf("  delete entry: %3d\n", netplay.local_delta_buffer.front().input_id);
+                        printf("  delete eq: [%3d, %.2f]\n", netplay.local_delta_buffer.front().input_id, netplay.local_delta_buffer.front().d_x);
                         netplay.local_delta_buffer.pop_front();
                     }
 
                     // replay unconfirmed inputs
                     // unsigned index = netplay.last_confirmed_input + 1;
+                    float sum = 0;
                     for (const auto& delta: netplay.local_delta_buffer) {
-                        list_players[p]->fy += delta.d_y;
+                        //list_players[p]->fy += delta.d_y;
                         list_players[p]->velx += delta.d_xvel;
-                        list_players[p]->vely += delta.d_yvel;
+                        //list_players[p]->vely += delta.d_yvel;
 
                         printf("  apply %3d: %.2f + %.2f = ", delta.input_id, list_players[p]->fx, delta.d_x);
                         list_players[p]->fx += delta.d_x;
                         printf("%.2f\n", list_players[p]->fx);
+                        sum += delta.d_x;
                     }
 
-                    netplay.previous_local_playerdata.x = list_players[p]->fx;
-                    netplay.previous_local_playerdata.y = list_players[p]->fy;
-                    netplay.previous_local_playerdata.xvel = list_players[p]->velx;
-                    netplay.previous_local_playerdata.yvel = list_players[p]->vely;
+                    /*if (std::abs(netplay.previous_local_playerdata.x - list_players[p]->fx) > 0.10f) {
+                        printf("  ^^^^^  delta szum: %.2f, diff: %f\n", sum, list_players[p]->fx - netplay.previous_local_playerdata.x);
+                        assert(false);
+                    }*/
                 }
+
+                printf("  begin x: %.2f\n", list_players[p]->fx);
             }
             // for remote players, interpolate
             else {
@@ -2262,15 +2271,20 @@ void GameplayState::read_network()
         netplay.frames_since_last_gamestate++;
     }
 
+
     if (previous_playerKeys != *current_playerKeys) {
         previous_playerKeys = *current_playerKeys;
     }
 
     // Consume the next input from the remote input buffer
     netplay.netPlayerInput.ClearGameActionKeys();
+
+    if (netplay.theHostIsMe)
+        netplay.client.local_gamehost.confirmCurrentInputs();
+
     for (unsigned short p = 0; p < list_players_cnt; p++) {
         if (netplay.remote_input_buffer[p].size() > 0) {
-            netplay.netPlayerInput.outputControls[p] = netplay.remote_input_buffer[p].front();
+            netplay.netPlayerInput.outputControls[p] = netplay.remote_input_buffer[p].front().second;
             netplay.remote_input_buffer[p].pop_front();
         }
     }

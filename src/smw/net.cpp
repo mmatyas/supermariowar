@@ -970,7 +970,7 @@ void NetClient::handleRemoteInput(const uint8_t* data, size_t dataLength)
     NetPkgs::RemoteInput* pkg = (NetPkgs::RemoteInput*) data;
     COutputControl keys;
     pkg->readKeys(&keys);
-    netplay.remote_input_buffer[pkg->playerNumber].push_back(keys);
+    netplay.remote_input_buffer[pkg->playerNumber].push_back(std::make_pair(0, keys));
 }
 
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
@@ -987,8 +987,7 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
 
     netplay.gamestate_changed = true;
     netplay.frames_since_last_gamestate = 0;
-    if ( !(netplay.last_confirmed_input == pkg.last_confirmed_local_input_id
-        && pkg.last_confirmed_local_input_id == 0) )
+    if (pkg.last_confirmed_local_input_id != 0xFF) // TODO: this has to be checked only once per match
         netplay.input_confirm_received = true;
 
     netplay.last_confirmed_input = pkg.last_confirmed_local_input_id;
@@ -1306,7 +1305,7 @@ NetGameHost::NetGameHost()
     //printf("NetGameHost::ctor\n");
     for (short p = 0; p < 3; p++) {
         clients[p] = NULL;
-        last_processed_input_id[p] = 0;
+        last_processed_input_id[p] = 0xFF;
     }
 
     preparedMapCollPkg = new NetPkgs::MapCollision();
@@ -1370,7 +1369,7 @@ void NetGameHost::stop()
             clients[p] = NULL;
         }
         expected_clients[p].reset();
-        last_processed_input_id[p] = 0;
+        last_processed_input_id[p] = 0xFF;
     }
 
     networkHandler.gamehost_shutdown();
@@ -1605,6 +1604,21 @@ void NetGameHost::sendCurrentGameStateNow()
     netplay.client.setAsLastReceivedMessage(pkg.packageType);
 }
 
+void NetGameHost::confirmCurrentInputs()
+{
+    for (unsigned short c = 0; c < expected_client_count; c++) {
+        assert(clients[c]);
+        if (netplay.remote_input_buffer[c + 1].empty())
+            continue;
+
+        // Careful, 255 < 0 !
+        uint8_t input_id = netplay.remote_input_buffer[c + 1].front().first;
+        last_processed_input_id[c] = std::max(last_processed_input_id[c], input_id);
+        if (last_processed_input_id[c] > 200 && input_id < 50)
+            last_processed_input_id[c] = input_id;
+    }
+}
+
 void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, size_t dataLength) // only for room host
 {
     assert(player == *clients[0] || player == *clients[1] || player == *clients[2]);
@@ -1621,16 +1635,11 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
             // TODO: does this work if GH leaves?
 
             // TODO: Do not accept inputs from the past
-            // Careful, 255 < 0 !
-            last_processed_input_id[c] = std::max(last_processed_input_id[c], pkg->input_id);
-            if (last_processed_input_id[c] > 200 && pkg->input_id < 50)
-                last_processed_input_id[c] = pkg->input_id;
-
             //if (last_processed_input[c] < pkg->counter) {
             //    last_processed_input[c] = pkg->counter;
                 COutputControl keys;
                 pkg->readKeys(&keys);
-                netplay.remote_input_buffer[c + 1].push_back(keys);
+                netplay.remote_input_buffer[c + 1].push_back(std::make_pair(pkg->input_id, keys));
             //}
 
             NetPkgs::RemoteInput pkg_out(c + 1, pkg->input);

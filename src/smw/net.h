@@ -103,6 +103,7 @@ class NetGameHost : public NetworkEventHandler
         void prepareMapCollisionEvent(CPlayer&);
         void sendMapCollisionEvent();
         void sendP2PCollisionEvent(CPlayer&, CPlayer&);
+        void confirmCurrentInputs();
 
 
         LastMessage lastSentMessage;
@@ -142,6 +143,7 @@ class NetGameHost : public NetworkEventHandler
         uint8_t expected_client_count;
         uint8_t next_free_client_slot;
         uint8_t last_processed_input_id[3];
+
 
         // Currently collision detection may change player data,
         // so it has to be saved before
@@ -344,7 +346,7 @@ struct Networking {
 
     unsigned short last_confirmed_input;
     uint8_t current_input_counter;
-    std::list<COutputControl> remote_input_buffer[4];
+    std::list<std::pair<uint8_t, COutputControl>> remote_input_buffer[4];
     bool player_disconnected[4];
     bool input_confirm_received;
 };
