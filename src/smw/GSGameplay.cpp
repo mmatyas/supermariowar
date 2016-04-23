@@ -2175,17 +2175,14 @@ void GameplayState::read_network()
             if (p == netplay.remotePlayerNumber) {
                 // save the delta at the end of the *previous* frame,
                 // if the player is in its regular state
-                Net_LocalDelta new_delta(netplay.current_input_counter);
-                if (list_players[p]->isready() && netplay.frames_since_last_gamestate > 0) {
+                // interpolation is invalid during warp, dead, etc.
+                Net_LocalDelta new_delta(netplay.current_input_counter - 1);
+                if (list_players[p]->isready()) {
                     new_delta.d_x = list_players[p]->fx - netplay.previous_local_playerdata.x;
                     new_delta.d_y = list_players[p]->fy - netplay.previous_local_playerdata.y;
                     new_delta.d_xvel = list_players[p]->velx - netplay.previous_local_playerdata.xvel;
                     new_delta.d_yvel = list_players[p]->vely - netplay.previous_local_playerdata.yvel;
                     //printf("add x: %.2f, xvel: %.5f\n", new_delta.d_x, new_delta.d_xvel);
-                }
-                // interpolation is invalid during warp, dead, etc.
-                else {
-                //    netplay.local_delta_buffer.clear();
                 }
                 netplay.local_delta_buffer.push_back(new_delta);
 
@@ -2213,10 +2210,10 @@ void GameplayState::read_network()
                     // if the player isn't in its normal state, we must not interpolate
                     /*assert(!list_players[p]->isready() && netplay.local_delta_buffer.empty()
                         || list_players[p]->isready());*/
-                    printf("----- confirmed: %d, current: %d, buffer size: %zu\n",
-                        netplay.last_confirmed_input,
-                        netplay.current_input_counter,
-                        netplay.local_delta_buffer.size()
+                    printf("----- confirmed: %d, current: %d, buffer size: %zu\n"
+                        , netplay.last_confirmed_input
+                        , netplay.current_input_counter
+                        , netplay.local_delta_buffer.size()
                     );
 
                     // remove already confirmed inputs

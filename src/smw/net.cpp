@@ -745,9 +745,8 @@ void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
     RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
 
     std::fill(netplay.player_disconnected, netplay.player_disconnected + 4, false);
-    netplay.last_confirmed_input = 0;
+    netplay.last_confirmed_input = 0xFF;
     netplay.current_input_counter = 0;
-    netplay.current_deltabuf_idx = 0;
     netplay.input_confirm_received = false;
 
     // respond
