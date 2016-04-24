@@ -120,6 +120,9 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_select.fPressed) {
+            if (items.empty())
+                return MENU_CODE_NONE;
+
             printf("Selected index: %d\n", *iRemoteIndex);
             return iAcceptCode;
         }
