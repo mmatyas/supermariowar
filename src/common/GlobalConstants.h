@@ -47,7 +47,7 @@
 #define VELJUMP             9.0f    //velocity for jumping
 #define VELSLOWJUMP         7.0f    //velocity for jumping when slow down powerup is in effect
 #define VELTURBOJUMP        10.2f   //velocity for turbo jumping
-#define VELSUPERJUMP        13.0f;  //super jump (jumping off of orange note blocks) // TODO: check semicolon!
+#define VELSUPERJUMP        13.0f  //super jump (jumping off of orange note blocks)
 #define VELPUSHBACK         5.0f
 #define VELMAXBREAKBLOCK    3.0f
 #define VELNOTEBLOCKBOUNCE  3.0f
