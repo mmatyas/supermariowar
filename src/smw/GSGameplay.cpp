@@ -2173,11 +2173,60 @@ void GameplayState::read_network()
         for (unsigned short p = 0; p < list_players_cnt; p++) {
             // if local player
             if (p == netplay.remotePlayerNumber) {
-                // set confirmed data
-                list_players[p]->fx = netplay.latest_playerdata.player[p].x;
-                list_players[p]->fy = netplay.latest_playerdata.player[p].y;
-                list_players[p]->velx = netplay.latest_playerdata.player[p].xvel;
-                list_players[p]->vely = netplay.latest_playerdata.player[p].yvel;
+                // save the player data that was cause by the input of the previous frame
+                Net_IndexedPlayerData pdata(netplay.current_input_counter);
+                pdata.x = list_players[p]->fx;
+                pdata.y = list_players[p]->fy;
+                pdata.xvel = list_players[p]->velx;
+                pdata.yvel = list_players[p]->vely;
+                netplay.local_playerdata_buffer.push_back(pdata);
+                netplay.local_playerdata_store_time[netplay.current_input_counter] = std::chrono::system_clock::now();
+                netplay.current_input_counter++;
+
+                if (netplay.gamestate_changed) {
+                    // remove old, saved player data
+                    uint8_t confirmed_index = netplay.last_confirmed_input + 1;
+                    nettimepoint confirmed_until = netplay.local_playerdata_store_time[confirmed_index];
+                    uint8_t iid;
+                    while (!netplay.local_playerdata_buffer.empty()) {
+                        iid = netplay.local_playerdata_buffer.front().input_id;
+                        if (confirmed_until <= netplay.local_playerdata_store_time[iid])
+                            break;
+
+                        netplay.local_playerdata_buffer.pop_front();
+                    }
+
+                    // check if we can use the local player data,
+                    // or the difference is so big we have to fall back
+                    // to the remote, confirmed positions
+                    bool use_remote_pdata = false;
+                    if (netplay.local_playerdata_buffer.empty()) {
+                        use_remote_pdata = true;
+                    }
+                    else {
+                        Net_IndexedPlayerData pd_local = netplay.local_playerdata_buffer.front();
+                        Net_PlayerData pd_remote = netplay.latest_playerdata.player[p];
+
+                        if (std::abs(pd_local.x - pd_remote.x) > 0.05f ||
+                            std::abs(pd_local.y - pd_remote.y) > 0.05f ||
+                            std::abs(pd_local.xvel - pd_remote.xvel) > 0.05f ||
+                            std::abs(pd_local.yvel - pd_remote.yvel) > 0.05f)
+                        {
+                            use_remote_pdata = true;
+                        }
+                    }
+
+                    if (use_remote_pdata) {
+                        // the buffered data is now invalid
+                        netplay.local_playerdata_buffer.clear();
+
+                        // set confirmed data
+                        list_players[p]->fx = netplay.latest_playerdata.player[p].x;
+                        list_players[p]->fy = netplay.latest_playerdata.player[p].y;
+                        list_players[p]->velx = netplay.latest_playerdata.player[p].xvel;
+                        list_players[p]->vely = netplay.latest_playerdata.player[p].yvel;
+                    }
+                }
             }
             // for remote players, interpolate
             else {
@@ -2191,15 +2240,18 @@ void GameplayState::read_network()
         netplay.frames_since_last_gamestate++;
     }
 
+
     if (previous_playerKeys != *current_playerKeys) {
         previous_playerKeys = *current_playerKeys;
     }
 
     // Consume the next input from the remote input buffer
     netplay.netPlayerInput.ClearGameActionKeys();
+    if (netplay.theHostIsMe)
+        netplay.client.local_gamehost.confirmCurrentInputs();
     for (unsigned short p = 0; p < list_players_cnt; p++) {
         if (netplay.remote_input_buffer[p].size() > 0) {
-            netplay.netPlayerInput.outputControls[p] = netplay.remote_input_buffer[p].front();
+            netplay.netPlayerInput.outputControls[p] = netplay.remote_input_buffer[p].front().second;
             netplay.remote_input_buffer[p].pop_front();
         }
     }

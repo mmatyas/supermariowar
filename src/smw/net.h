@@ -5,10 +5,12 @@
 #include "network/NetworkLayer.h"
 #include "ProtocolDefinitions.h"
 
+#include <chrono>
 #include <list>
 #include <string>
 #include <vector>
 
+typedef std::chrono::system_clock::time_point nettimepoint;
 
 //Write network handler class here
 //Do similar to how gfx/sfx works with init and clean up functions
@@ -103,6 +105,7 @@ class NetGameHost : public NetworkEventHandler
         void prepareMapCollisionEvent(CPlayer&);
         void sendMapCollisionEvent();
         void sendP2PCollisionEvent(CPlayer&, CPlayer&);
+        void confirmCurrentInputs();
 
 
         LastMessage lastSentMessage;
@@ -273,6 +276,8 @@ struct Net_PlayerData {
     float y;
     float xvel;
     float yvel;
+
+    Net_PlayerData();
 };
 
 struct Net_AllPlayerData {
@@ -280,14 +285,10 @@ struct Net_AllPlayerData {
     std::list<COutputControl> player_input[4];
 };
 
-struct Net_LocalDelta {
+struct Net_IndexedPlayerData: public Net_PlayerData {
     uint8_t input_id;
-    float d_x;
-    float d_y;
-    float d_xvel;
-    float d_yvel;
 
-    Net_LocalDelta(uint8_t id);
+    Net_IndexedPlayerData(uint8_t id);
 };
 
 struct Networking {
@@ -336,13 +337,14 @@ struct Networking {
     unsigned frames_since_last_gamestate;
     Net_AllPlayerData previous_playerdata;
     Net_AllPlayerData latest_playerdata;
-    Net_PlayerData previous_local_playerdata;
-    std::list<COutputControl> local_input_buffer;
-    std::list<Net_LocalDelta> local_delta_buffer;
     unsigned short last_confirmed_input;
     uint8_t current_input_counter;
-    std::list<COutputControl> remote_input_buffer[4];
+    std::list<std::pair<uint8_t, COutputControl>> remote_input_buffer[4];
     bool player_disconnected[4];
+
+    std::list<COutputControl> local_input_buffer;
+    std::list<Net_IndexedPlayerData> local_playerdata_buffer;
+    nettimepoint local_playerdata_store_time[256];
 };
 
 extern Networking netplay;
