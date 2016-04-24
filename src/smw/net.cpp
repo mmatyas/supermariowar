@@ -45,8 +45,12 @@ extern CGameMode * gamemodes[GAMEMODE_LAST];
 
 short backup_playercontrol[4];
 
-Net_LocalDelta::Net_LocalDelta(uint8_t id)
-    : input_id(id), d_x(0), d_y(0), d_xvel(0), d_yvel(0)
+Net_PlayerData::Net_PlayerData()
+    : x(0), y(0), xvel(0), yvel(0)
+{}
+
+Net_IndexedPlayerData::Net_IndexedPlayerData(uint8_t id)
+    : input_id(id)
 {}
 
 union GameModeSettingsUnion {
@@ -196,7 +200,7 @@ bool net_startSession()
     netplay.connectSuccessful = false;
     netplay.gamestate_changed = false;
     netplay.frames_since_last_gamestate = 0;
-    std::fill(netplay.player_disconnected, netplay.player_disconnected + 4, false);
+    std::fill_n(netplay.player_disconnected, 4, false);
 
     COutputControl nullinput = (const struct COutputControl){0}; // set every field to false
     for (uint8_t p = 0; p < 4; p++) {
@@ -740,9 +744,10 @@ void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
     printf("reseed: %d\n", pkg.commonRandomSeed);
     RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
 
-    std::fill(netplay.player_disconnected, netplay.player_disconnected + 4, false);
-    netplay.last_confirmed_input = 0;
+    std::fill_n(netplay.player_disconnected, 4, false);
+    netplay.last_confirmed_input = 0xFF;
     netplay.current_input_counter = 0;
+    std::fill_n(netplay.local_playerdata_store_time, 256, std::chrono::system_clock::now());
 
     // respond
     if (netplay.theHostIsMe)
@@ -803,7 +808,6 @@ void NetClient::sendLocalInput()
         NetPkgs::ClientInput pkg(&game_values.playerInput.outputControls[0]);
         pkg.input_id = netplay.current_input_counter;
         sendMessageToGameHost(&pkg, sizeof(NetPkgs::ClientInput));
-        netplay.current_input_counter++;
     }
 
     //game_values.playerInput.outputControls[iGlobalID];
@@ -965,7 +969,7 @@ void NetClient::handleRemoteInput(const uint8_t* data, size_t dataLength)
     NetPkgs::RemoteInput* pkg = (NetPkgs::RemoteInput*) data;
     COutputControl keys;
     pkg->readKeys(&keys);
-    netplay.remote_input_buffer[pkg->playerNumber].push_back(keys);
+    netplay.remote_input_buffer[pkg->playerNumber].push_back(std::make_pair(0, keys));
 }
 
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
@@ -1297,7 +1301,7 @@ NetGameHost::NetGameHost()
     //printf("NetGameHost::ctor\n");
     for (short p = 0; p < 3; p++) {
         clients[p] = NULL;
-        last_processed_input_id[p] = 0;
+        last_processed_input_id[p] = 0xFF;
     }
 
     preparedMapCollPkg = new NetPkgs::MapCollision();
@@ -1361,7 +1365,7 @@ void NetGameHost::stop()
             clients[p] = NULL;
         }
         expected_clients[p].reset();
-        last_processed_input_id[p] = 0;
+        last_processed_input_id[p] = 0xFF;
     }
 
     networkHandler.gamehost_shutdown();
@@ -1596,6 +1600,21 @@ void NetGameHost::sendCurrentGameStateNow()
     netplay.client.setAsLastReceivedMessage(pkg.packageType);
 }
 
+void NetGameHost::confirmCurrentInputs()
+{
+    for (unsigned short c = 0; c < expected_client_count; c++) {
+        assert(clients[c]);
+        if (netplay.remote_input_buffer[c + 1].empty())
+            continue;
+
+        // Careful, 255 < 0 !
+        uint8_t input_id = netplay.remote_input_buffer[c + 1].front().first;
+        last_processed_input_id[c] = std::max(last_processed_input_id[c], input_id);
+        if (last_processed_input_id[c] > 200 && input_id < 50)
+            last_processed_input_id[c] = input_id;
+    }
+}
+
 void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, size_t dataLength) // only for room host
 {
     assert(player == *clients[0] || player == *clients[1] || player == *clients[2]);
@@ -1612,16 +1631,11 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
             // TODO: does this work if GH leaves?
 
             // TODO: Do not accept inputs from the past
-            // Careful, 255 < 0 !
-            last_processed_input_id[c] = std::max(last_processed_input_id[c], pkg->input_id);
-            if (last_processed_input_id[c] > 200 && pkg->input_id < 50)
-                last_processed_input_id[c] = pkg->input_id;
-
             //if (last_processed_input[c] < pkg->counter) {
             //    last_processed_input[c] = pkg->counter;
                 COutputControl keys;
                 pkg->readKeys(&keys);
-                netplay.remote_input_buffer[c + 1].push_back(keys);
+                netplay.remote_input_buffer[c + 1].push_back(std::make_pair(pkg->input_id, keys));
             //}
 
             NetPkgs::RemoteInput pkg_out(c + 1, pkg->input);
