@@ -2188,11 +2188,13 @@ void GameplayState::read_network()
                     uint8_t confirmed_index = netplay.last_confirmed_input + 1;
                     nettimepoint confirmed_until = netplay.local_playerdata_store_time[confirmed_index];
                     uint8_t iid;
+                    Net_IndexedPlayerData last_popped_local(0xFF);
                     while (!netplay.local_playerdata_buffer.empty()) {
                         iid = netplay.local_playerdata_buffer.front().input_id;
                         if (confirmed_until <= netplay.local_playerdata_store_time[iid])
                             break;
 
+                        last_popped_local = netplay.local_playerdata_buffer.front();
                         netplay.local_playerdata_buffer.pop_front();
                     }
 
@@ -2204,13 +2206,10 @@ void GameplayState::read_network()
                         use_remote_pdata = true;
                     }
                     else {
-                        Net_IndexedPlayerData pd_local = netplay.local_playerdata_buffer.front();
                         Net_PlayerData pd_remote = netplay.latest_playerdata.player[p];
 
-                        if (std::abs(pd_local.x - pd_remote.x) > 0.05f ||
-                            std::abs(pd_local.y - pd_remote.y) > 0.05f ||
-                            std::abs(pd_local.xvel - pd_remote.xvel) > 0.05f ||
-                            std::abs(pd_local.yvel - pd_remote.yvel) > 0.05f)
+                        if (std::abs(last_popped_local.x - pd_remote.x) > 0.45f ||
+                            std::abs(last_popped_local.y - pd_remote.y) > 0.45f)
                         {
                             use_remote_pdata = true;
                         }
