@@ -54,10 +54,10 @@ void BinaryFile::write_u8(uint8_t value)
 void BinaryFile::write_i16(int16_t value)
 {
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    int32_t tmp = value;
+    int16_t tmp = value;
 
-    ((char*)&out)[0] = ((char*)&tmp)[1];
-    ((char*)&out)[1] = ((char*)&tmp)[0];
+    ((char*)&value)[0] = ((char*)&tmp)[1];
+    ((char*)&value)[1] = ((char*)&tmp)[0];
 #endif
 
     fwrite_or_exception(&value, sizeof(int16_t), 1);
@@ -68,10 +68,10 @@ void BinaryFile::write_i32(int32_t value)
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
     int32_t tmp = value;
 
-    ((char*)&out)[0] = ((char*)&tmp)[3];
-    ((char*)&out)[1] = ((char*)&tmp)[2];
-    ((char*)&out)[2] = ((char*)&tmp)[1];
-    ((char*)&out)[3] = ((char*)&tmp)[0];
+    ((char*)&value)[0] = ((char*)&tmp)[3];
+    ((char*)&value)[1] = ((char*)&tmp)[2];
+    ((char*)&value)[2] = ((char*)&tmp)[1];
+    ((char*)&value)[3] = ((char*)&tmp)[0];
 #endif
 
     fwrite_or_exception(&value, sizeof(int32_t), 1);
@@ -85,12 +85,12 @@ void BinaryFile::write_bool(bool value)
 void BinaryFile::write_float(float value)
 {
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    float tmp = out;
+    float tmp = value;
 
-    ((char*)&out)[0] = ((char*)&tmp)[3];
-    ((char*)&out)[1] = ((char*)&tmp)[2];
-    ((char*)&out)[2] = ((char*)&tmp)[1];
-    ((char*)&out)[3] = ((char*)&tmp)[0];
+    ((char*)&value)[0] = ((char*)&tmp)[3];
+    ((char*)&value)[1] = ((char*)&tmp)[2];
+    ((char*)&value)[2] = ((char*)&tmp)[1];
+    ((char*)&value)[3] = ((char*)&tmp)[0];
 #endif
 
     fwrite_or_exception(&value, sizeof(float), 1);
@@ -154,7 +154,7 @@ int16_t BinaryFile::read_i16()
     fread_or_exception(&in, sizeof(int16_t), 1);
 
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    int32_t tmp = in;
+    int16_t tmp = in;
 
     ((char*)&in)[0] = ((char*)&tmp)[1];
     ((char*)&in)[1] = ((char*)&tmp)[0];
@@ -172,7 +172,7 @@ void BinaryFile::read_i16_array(int16_t* target, size_t size)
     for (unsigned int i = 0; i < size; i++) {
         fread_or_exception(&target[i], sizeof(int16_t), 1);
 
-        int tmp = target[i];
+        int16_t tmp = target[i];
 
         ((char*)&target[i])[0] = ((char*)&tmp)[1];
         ((char*)&target[i])[1] = ((char*)&tmp)[0];
@@ -208,7 +208,7 @@ void BinaryFile::read_i32_array(int32_t* target, size_t size)
     for (unsigned int i = 0; i < size; i++) {
         fread_or_exception(&target[i], sizeof(int32_t), 1);
 
-        int tmp = target[i];
+        int32_t tmp = target[i];
 
         ((char*)&target[i])[0] = ((char*)&tmp)[3];
         ((char*)&target[i])[1] = ((char*)&tmp)[2];
