@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <cstring>
 
-#define MAPPKG_SIZE_LIMIT 20000 /* bytes in worst case */
+#define REMOTE_PKG_SIZE_LIMIT 20000 /* bytes in worst case */
 
 Room::Room()
     : roomID(0)
@@ -180,8 +180,8 @@ void Room::changeAndSendMap(const void* data, size_t data_length)
 
     // Some basic package validation
     if (data_length <= sizeof(NetPkgs::MessageHeader) + 4 /* un-/compressed size 2*2B */
-        || data_length > MAPPKG_SIZE_LIMIT) {
-        printf("[error] Corrupt map arrived from host in room %u\n", roomID);
+        || data_length > REMOTE_PKG_SIZE_LIMIT) {
+        printf("[warning] Corrupt map arrived from host in room %u\n", roomID);
         return;
     }
 
@@ -197,8 +197,8 @@ void Room::changeAndSendGameModeSettings(const void* data, size_t data_length)
 
     // Some basic package validation
     if (data_length <= sizeof(NetPkgs::MessageHeader)
-        || data_length > MAPPKG_SIZE_LIMIT) {
-        printf("[error] Corrupt map arrived from host in room %u\n", roomID);
+        || data_length > REMOTE_PKG_SIZE_LIMIT) {
+        printf("[warning] Corrupt settings arrived from host in room %u\n", roomID);
         return;
     }
 
