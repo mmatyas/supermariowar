@@ -123,7 +123,7 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
             if (items.empty())
                 return MENU_CODE_NONE;
 
-            printf("Selected index: %d\n", *iRemoteIndex);
+            // printf("Selected index: %d\n", *iRemoteIndex);
             return iAcceptCode;
         }
 

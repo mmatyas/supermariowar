@@ -155,7 +155,7 @@ CPlayer::~CPlayer()
 
 void CPlayer::Init()
 {
-    printf("CPlayer::init()\n");
+    // printf("CPlayer::init()\n");
     if (pPlayerAI)
         pPlayerAI->Init();
 }

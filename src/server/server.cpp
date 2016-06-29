@@ -100,7 +100,7 @@ void SMWServer::update(bool& running)
 
 void SMWServer::onConnect(NetPeer* new_client)
 {
-    printf("Connect event [%lu].\n", new_client->getPlayerID());
+    // printf("Connect event [%lu].\n", new_client->getPlayerID());
 
     // Is there a player already with this address+port?
     if (players.count(new_client->getPlayerID()))
@@ -121,7 +121,7 @@ void SMWServer::onConnect(NetPeer* new_client)
 
 void SMWServer::onDisconnect(NetPeer& client)
 {
-    printf("Disconnect event [%lu].\n", client.getPlayerID());
+    // printf("Disconnect event [%lu].\n", client.getPlayerID());
     uint64_t playerID = client.getPlayerID();
     if (players.count(playerID)) {
         playerLeavesRoom(playerID);
@@ -130,8 +130,8 @@ void SMWServer::onDisconnect(NetPeer& client)
             players[playerID].network_client->addressAsString().c_str());
         players.erase(playerID);
     }
-    else
-        printf("No such player!\n");
+    // else
+    //     printf("No such player!\n");
 }
 
 void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLength)
@@ -217,10 +217,10 @@ void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             break;*/
 
         default:
-            printf("Unknown: %d", messageType);
+            // printf("Unknown: %d", messageType);
             /*for (int a = 0; a < netLayer.lastIncomingDataLength(); a++)
                 printf(" %3d", netLayer.lastIncomingData()[a]);*/
-            printf("\n");
+            // printf("\n");
             break;
     } // end of switch
 }
@@ -296,7 +296,7 @@ void SMWServer::sendVisibleRoomEntries(NetPeer& client)
         return;
     }
 
-    printf("Sending %lu rooms:\n", rooms.size());
+    // printf("Sending %lu rooms:\n", rooms.size());
     auto it = rooms.begin();
     while (it != rooms.end()) {
         Room* room = &it->second;
@@ -386,7 +386,7 @@ void SMWServer::playerJoinsRoom(uint64_t playerID, const void* data, size_t data
     NetPkgs::JoinRoom pkg;
     memcpy(&pkg, data, dataLength);
 
-    printf("%s wants to join room %u\n", player->name.c_str(), pkg.roomID);
+    // printf("%s wants to join room %u\n", player->name.c_str(), pkg.roomID);
 
     if (!rooms.count(pkg.roomID)) {
         printf("No such room! (%u)\n", pkg.roomID);
@@ -436,7 +436,7 @@ void SMWServer::playerLeavesRoom(uint64_t playerID)
 
 void SMWServer::hostChangesMap(uint64_t playerID, const void* data, size_t dataLength)
 {
-    printf("hostChangesMap\n");
+    // printf("hostChangesMap\n");
     if (!players.count(playerID))
         return;
 
@@ -449,12 +449,12 @@ void SMWServer::hostChangesMap(uint64_t playerID, const void* data, size_t dataL
         return;
 
     rooms[roomID].changeAndSendMap(data, dataLength);
-    printf("room open!\n");
+    // printf("room open!\n");
 }
 
 void SMWServer::hostChangesGameModeSettings(uint64_t playerID, const void* data, size_t dataLength)
 {
-    printf("hostChangesGameModeSettings\n");
+    // printf("hostChangesGameModeSettings\n");
     if (!players.count(playerID))
         return;
 
@@ -479,7 +479,7 @@ void SMWServer::playerChangesSkin(uint64_t playerID, const void* data, size_t da
         return;
 
     player->setSkin(data, dataLength);
-    printf("Player %s changed skin\n", player->name.c_str());
+    // printf("Player %s changed skin\n", player->name.c_str());
 
     uint32_t roomID = player->currentRoomID;
     if (!roomID)

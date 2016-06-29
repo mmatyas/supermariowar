@@ -2,7 +2,7 @@
 #define NETWORK_PROTOCOL_DEFINITIONS_H
 
 #define NET_PROTOCOL_VERSION_MAJOR          0
-#define NET_PROTOCOL_VERSION_MINOR          5
+#define NET_PROTOCOL_VERSION_MINOR          6
 #define NET_MAX_MESSAGE_SIZE                128
 #define NET_LOBBYSERVER_PORT                12521
 #define NET_GAMEHOST_PORT                   12522

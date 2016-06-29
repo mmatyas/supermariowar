@@ -394,7 +394,7 @@ void NetClient::sendCreateRoomMessage()
 
 void NetClient::handleRoomCreatedMessage(const uint8_t* data, size_t dataLength)
 {
-    printf("room created!\n");
+    //printf("room created!\n");
     NetPkgs::NewRoomCreated pkg;
     memcpy(&pkg, data, sizeof(NetPkgs::NewRoomCreated));
 
@@ -429,12 +429,12 @@ void NetClient::sendJoinRoomMessage()
 {
     assert(netplay.selectedRoomIndex < netplay.currentRooms.size());
 
-    printf("currentRooms[%d] = {id=%d, name='%s', cnt=%d}, össz: %lu\n",
+    /*printf("currentRooms[%d] = {id=%d, name='%s', cnt=%d}, össz: %lu\n",
         netplay.selectedRoomIndex,
         netplay.currentRooms.at(netplay.selectedRoomIndex).roomID,
         netplay.currentRooms.at(netplay.selectedRoomIndex).name.c_str(),
         netplay.currentRooms.at(netplay.selectedRoomIndex).playerCount,
-        netplay.currentRooms.size());
+        netplay.currentRooms.size());*/
 
     // TODO: implement password
     NetPkgs::JoinRoom msg(netplay.currentRooms.at(netplay.selectedRoomIndex).roomID, "");
@@ -488,9 +488,9 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     game_values.gamemode = gamemodes[currentgamemode];
     game_values.gamemode->goal = pkg.gamemodeGoal;
 
-    printf("  Game mode #%d: %s with %s: %d\n",
+    /*printf("  Game mode #%d: %s with %s: %d\n",
         currentgamemode, gamemodes[currentgamemode]->GetModeName(),
-        gamemodes[currentgamemode]->GetGoalName(), game_values.gamemode->goal);
+        gamemodes[currentgamemode]->GetGoalName(), game_values.gamemode->goal);*/
 
     netplay.theHostIsMe = false;
     netplay.currentRoom.hostPlayerNumber = pkg.hostPlayerNumber;
@@ -741,7 +741,7 @@ void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
     memcpy(&pkg, data, sizeof(NetPkgs::StartSync));
 
     // apply
-    printf("reseed: %d\n", pkg.commonRandomSeed);
+    //printf("reseed: %d\n", pkg.commonRandomSeed);
     RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
 
     std::fill_n(netplay.player_disconnected, 4, false);
@@ -867,7 +867,7 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
 
     // TODO: replace this eventually with the powerup trigger package
     list_players[pkg.player_id]->net_waitingForPowerupTrigger = false;
-    printf("[net] P%d used powerup %d\n", pkg.player_id, pkg.powerup_id);
+    //printf("[net] P%d used powerup %d\n", pkg.player_id, pkg.powerup_id);
 }
 
 /*void NetClient::handlePowerupTrigger(const uint8_t* data, size_t dataLength)
@@ -924,7 +924,7 @@ void NetClient::handleMapCollision(const uint8_t* data, size_t dataLength)
     list_players[pkg.player_id]->velx = temp_velx;
     list_players[pkg.player_id]->vely = temp_vely;
 
-    printf("[net] Map block collision!\n");
+    //printf("[net] Map block collision!\n");
 }
 
 void NetClient::handleP2PCollision(const uint8_t * data, size_t dataLength)
@@ -961,7 +961,7 @@ void NetClient::handleP2PCollision(const uint8_t * data, size_t dataLength)
 
     // TODO: restore position?
 
-    printf("P%d collided with P%d!\n", pkg.player_id[0], pkg.player_id[1]);
+    //printf("P%d collided with P%d!\n", pkg.player_id[0], pkg.player_id[1]);
 }
 
 void NetClient::handleRemoteInput(const uint8_t* data, size_t dataLength)
@@ -1034,7 +1034,7 @@ void NetClient::onDisconnect(NetPeer& client)
         }
     }
 
-    printf("[net] Client %s disconnected\n", client.addressAsString().c_str());
+    //printf("[net] Client %s disconnected\n", client.addressAsString().c_str());
 }
 
 void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLength)
@@ -1201,16 +1201,16 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
         //
 
         default:
-            printf("Unknown: ");
+            /*printf("Unknown: ");
             for (unsigned a = 0; a < dataLength; a++)
                 printf("%3d ", data[a]);
-            printf("\n");
+            printf("\n");*/
             return; // do not set as last message
     }
 
     setAsLastReceivedMessage(packageType);
-    if (packageType == NET_RESPONSE_CREATE_OK)
-        printf("last: %d, %d\n", lastSentMessage.packageType, lastReceivedMessage.packageType);
+    /*if (packageType == NET_RESPONSE_CREATE_OK)
+        printf("last: %d, %d\n", lastSentMessage.packageType, lastReceivedMessage.packageType);*/
 }
 
 /****************************
@@ -1467,10 +1467,10 @@ void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLen
             break;
 
         default:
-            printf("GH Unknown: ");
+            /*printf("GH Unknown: ");
             for (unsigned a = 0; a < dataLength; a++)
                 printf("%3d ", data[a]);
-            printf("\n");
+            printf("\n");*/
             return; // do not set as last message
     }
 }
@@ -1679,7 +1679,7 @@ void NetGameHost::sendPowerupStartByGH()
     sendMessageToMyPeers(&pkg, sizeof(NetPkgs::StartPowerup));
 
     list_players[netplay.remotePlayerNumber]->net_waitingForPowerupTrigger = false;
-    printf("[net] P%d (host) used powerup %d\n", pkg.player_id, pkg.powerup_id);
+    //printf("[net] P%d (host) used powerup %d\n", pkg.player_id, pkg.powerup_id);
 }
 
 // A player wants to use a stored powerup
@@ -1743,7 +1743,7 @@ void NetGameHost::sendMapCollisionEvent()
 
     sendMessageToMyPeers(preparedMapCollPkg, sizeof(NetPkgs::MapCollision));
 
-    printf("[net] P%d collided with a map block\n", preparedMapCollPkg->player_id);
+    //printf("[net] P%d collided with a map block\n", preparedMapCollPkg->player_id);
 }
 
 void NetGameHost::sendP2PCollisionEvent(CPlayer& p1, CPlayer& p2)
@@ -1755,7 +1755,7 @@ void NetGameHost::sendP2PCollisionEvent(CPlayer& p1, CPlayer& p2)
     NetPkgs::P2PCollision pkg(p1, p2);
     sendMessageToMyPeers(&pkg, sizeof(NetPkgs::P2PCollision));
 
-    printf("[net] P%d collided with P%d\n", p1.getGlobalID(), p2.getGlobalID());
+    //printf("[net] P%d collided with P%d\n", p1.getGlobalID(), p2.getGlobalID());
 }
 
 bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)

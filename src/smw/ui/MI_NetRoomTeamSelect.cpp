@@ -155,7 +155,7 @@ MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {
 }
 
 MenuCodeEnum MI_NetRoomTeamSelect::Modify(bool modify) {
-    printf("modify\n");
+    // printf("modify\n");
     fModifying = modify;
     return MENU_CODE_MODIFY_ACCEPTED;
 }

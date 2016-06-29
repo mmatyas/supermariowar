@@ -72,8 +72,8 @@ void Room::tryAddingPlayer(Player* player)
                 }
             }
         }
-        else
-            printf("  R-%u: slot %d taken by %p\n", roomID, p, players[p]);
+        // else
+        //     printf("  R-%u: slot %d taken by %p\n", roomID, p, players[p]);
     }
 }
 
@@ -131,13 +131,13 @@ void Room::sendRoomUpdate()
     // Send every player information about the other players.
     for (uint8_t p = 0; p < 4; p++) {
         if (players[p]) {
-            printf("Sending ROOM_CHANGED:\n");
-            printf("  id: %u\n", package.roomID);
-            printf("  name: %s\n", package.name);
-            printf("  p1: %s\n", package.playerName[0]);
-            printf("  p2: %s\n", package.playerName[1]);
-            printf("  p3: %s\n", package.playerName[2]);
-            printf("  p4: %s\n", package.playerName[3]);
+            // printf("Sending ROOM_CHANGED:\n");
+            // printf("  id: %u\n", package.roomID);
+            // printf("  name: %s\n", package.name);
+            // printf("  p1: %s\n", package.playerName[0]);
+            // printf("  p2: %s\n", package.playerName[1]);
+            // printf("  p3: %s\n", package.playerName[2]);
+            // printf("  p4: %s\n", package.playerName[3]);
             package.remotePlayerNumber = p;
             players[p]->sendData(&package, sizeof(NetPkgs::CurrentRoom));
         }
@@ -174,7 +174,7 @@ void Room::sendChatMessage(const Player* sender, const char* message)
 
 void Room::changeAndSendMap(const void* data, size_t data_length)
 {
-    printf("chageandsendmap\n");
+    // printf("chageandsendmap\n");
     assert(hostPlayerNumber < 4);
     assert(players[hostPlayerNumber]);
 
@@ -191,7 +191,7 @@ void Room::changeAndSendMap(const void* data, size_t data_length)
 
 void Room::changeAndSendGameModeSettings(const void* data, size_t data_length)
 {
-    printf("chageandsendgms\n");
+    // printf("chageandsendgms\n");
     assert(hostPlayerNumber < 4);
     assert(players[hostPlayerNumber]);
 
@@ -224,7 +224,7 @@ void Room::shareBlobExceptHost(const Blob& blob)
 
 void Room::sendBlobTo(uint8_t index, const Blob& blob)
 {
-    printf("  sendBlobTo %d\n", index);
+    // printf("  sendBlobTo %d\n", index);
     assert(hostPlayerNumber < 4);
     assert(index < 4);
     if (!players[index])
@@ -267,7 +267,7 @@ void Room::sendStartSignal()
     assert(gamehost);
 
 
-    printf("sendStartSignal\n");
+    // printf("sendStartSignal\n");
     /*printf("  p0: %p\n", players[0]);
     printf("  p1: %p\n", players[1]);
     printf("  p2: %p\n", players[2]);
@@ -278,7 +278,7 @@ void Room::sendStartSignal()
     NetPeer* gh_netclient = gamehost->network_client;
     NetPkgs::GameHostInfo pkg_to_players(gh_netclient->addressHost());
 
-    printf("  pkg->players: [%u:%u]\n", pkg_to_players.host, NET_GAMEHOST_PORT);
+    // printf("  pkg->players: [%u:%u]\n", pkg_to_players.host, NET_GAMEHOST_PORT);
 
 
     NetPkgs::PlayerInfo pkg_to_gh;

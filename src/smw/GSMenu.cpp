@@ -605,7 +605,7 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
             iUnlockMinigameOptionIndex = 0;
         } else if (MENU_CODE_MATCH_SELECTION_START == code || MENU_CODE_QUICK_GAME_START == code) {
-            printf("itt vagyok\n");
+            //printf("itt vagyok\n");
 
             if (MENU_CODE_QUICK_GAME_START == code)
                 game_values.matchtype = MATCH_TYPE_QUICK_GAME;
@@ -615,7 +615,7 @@ void MenuState::update()
             mTeamSelectMenu->ResetTeamSelect();
             mCurrentMenu = mTeamSelectMenu;
             mCurrentMenu->ResetMenu();
-            printf("Hello\n");
+            //printf("Hello\n");
 
             if (game_values.matchtype != MATCH_TYPE_TOURNAMENT) {
                 game_values.tournamentcontrolteam = -1;
@@ -682,7 +682,7 @@ void MenuState::update()
         }
 #endif
         else if (MENU_CODE_TO_GAME_SETUP_MENU == code) {
-            printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
+            //printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
             //Moves teams to the first arrays in the list and counts the number of teams
             score_cnt = mTeamSelectMenu->GetTeamCount();
             iDisplayError = DISPLAY_ERROR_NONE;
@@ -690,7 +690,7 @@ void MenuState::update()
             bool fErrorReadingTourFile = false;
 
             if (MATCH_TYPE_MINIGAME == game_values.matchtype) {
-                printf(" Match type: Minigame\n");
+                //printf(" Match type: Minigame\n");
                 short iMiniGameType = mMatchSelectionMenu->GetMinigameID();
 
                 if (iMiniGameType == 0) { //Pipe minigame
@@ -710,7 +710,7 @@ void MenuState::update()
 
                 StartGame();
             } else if (MATCH_TYPE_QUICK_GAME == game_values.matchtype) {
-                printf(" Match type: Quick game\n");
+                //printf(" Match type: Quick game\n");
                 short iRandomMode = RANDOM_INT( GAMEMODE_LAST);
                 game_values.gamemode = gamemodes[iRandomMode];
 
@@ -727,7 +727,7 @@ void MenuState::update()
 
                 //Load the tour here if one was selected
                 if (game_values.matchtype == MATCH_TYPE_TOUR) {
-                    printf("  Match type: Tour\n");
+                    //printf("  Match type: Tour\n");
                     if (!ReadTourFile()) {
                         iDisplayError = DISPLAY_ERROR_READ_TOUR_FILE;
                         iDisplayErrorTimer = 120;
@@ -736,7 +736,7 @@ void MenuState::update()
                         mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &rm->spr_tour_markers);
                     }
                 } else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
-                    printf("  Match type: Tournament\n");
+                    //printf("  Match type: Tournament\n");
                     //Set who is controlling the tournament menu
                     if (game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
                         game_values.tournamentcontrolteam = RANDOM_INT( score_cnt);
@@ -749,7 +749,7 @@ void MenuState::update()
 
                     mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &rm->menu_mode_large);
                 } else if (game_values.matchtype == MATCH_TYPE_WORLD) {
-                    printf("  Match type: World\n");
+                    //printf("  Match type: World\n");
                     if (!g_worldmap.Load(TILESIZE)) {
                         iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
                         iDisplayErrorTimer = 120;
@@ -776,7 +776,7 @@ void MenuState::update()
                 }
 
                 if (!fErrorReadingTourFile) {
-                    printf("  !fErrorReadingTourFile\n");
+                    //printf("  !fErrorReadingTourFile\n");
                     mTournamentScoreboardMenu->ClearEyeCandy();
 
                     //Initialize tournament values
@@ -789,8 +789,8 @@ void MenuState::update()
                     }
 
                     if (MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype || MATCH_TYPE_NET_GAME == game_values.matchtype) {
-                        printf("  MATCH_TYPE_SINGLE_GAME || MATCH_TYPE_TOURNAMENT\n");
-                        printf("current map: %s\n", szCurrentMapName);
+                        //printf("  MATCH_TYPE_SINGLE_GAME || MATCH_TYPE_TOURNAMENT\n");
+                        //printf("current map: %s\n", szCurrentMapName);
                         maplist->findexact(szCurrentMapName, false);
                         mGameSettingsMenu->miMapField->LoadCurrentMap();
 
@@ -1373,7 +1373,7 @@ void MenuState::update()
                     g_map->loadMap(szMapName, read_type_full);
                     sShortMapName = stripPathAndExtension(szMapName);
 
-                    printf("  State: GS_START_GAME, Match type: MATCH_TYPE_QUICK_GAME\n");
+                    //printf("  State: GS_START_GAME, Match type: MATCH_TYPE_QUICK_GAME\n");
                 } else if (netplay.active) {
                     // NOTE: for the host, netplay.mapfilepath will be ./data/something
                     // while for the other players, it's ~/.smw/net_last.map
@@ -1400,7 +1400,7 @@ void MenuState::update()
             }
 
             game_values.gamestate = GS_GAME;
-            printf("  GS_GAME\n");
+            //printf("  GS_GAME\n");
 
             g_map->predrawbackground(rm->spr_background, rm->spr_backmap[0]);
             g_map->predrawforeground(rm->spr_frontmap[0]);
@@ -1543,7 +1543,7 @@ bool MenuState::ReadTourFile()
 
 void MenuState::StartGame()
 {
-    printf("> StartGame\n");
+    //printf("> StartGame\n");
 #ifdef _DEBUG
     iScriptState = 2;
     fScriptRunPreGameOptions = false;
@@ -1556,18 +1556,18 @@ void MenuState::StartGame()
     game_values.WriteConfig();
 
     //Load skins for players
-    printf("Loading player skins...\n");
+    //printf("Loading player skins...\n");
     for (int k = 0; k < 4; k++) {
         if (game_values.playercontrol[k] > 0) {
             if (netplay.active) {
                 if (k == netplay.remotePlayerNumber) { // local player uses local skin
-                    printf("  player %d -> local\n", k);
+                    //printf("  player %d -> local\n", k);
                     rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
                 }
                 else {
                     std::ostringstream path;
                     path << GetHomeDirectory() << "net_skin" << k << ".bmp";
-                    printf("  player %d -> %s\n", k, path.str().c_str());
+                    //printf("  player %d -> %s\n", k, path.str().c_str());
 
                     if (!rm->LoadFullSkin(rm->spr_player[k], path.str(), k)) {
                         printf("[warning] Could not load netplay skin of player %d, using default\n", k);
@@ -1636,7 +1636,7 @@ void MenuState::StartGame()
 
     game_values.screenfade = 8;
     game_values.screenfadespeed = 8;
-    printf("< StartGame\n");
+    //printf("< StartGame\n");
 }
 
 void MenuState::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisplayMessage)
