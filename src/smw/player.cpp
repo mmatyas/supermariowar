@@ -224,7 +224,7 @@ void CPlayer::accelerate(float direction)
             game_values.playskidsound = true;
 
         //If rain candy is turned on
-        if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && abs(velx) > VELMOVINGADD && ++rainsteptimer > 7) {
+        if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && fabs(velx) > VELMOVINGADD && ++rainsteptimer > 7) {
             rainsteptimer = 0;
             eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
         }
@@ -2307,10 +2307,10 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
 
         fOldX = fx;
 
-        if (abs(velx) > 0.0f)
+        if (fabs(velx) > 0.0f)
             velx = 0.0f;
 
-        if (abs(oldvelx) > 0.0f)
+        if (fabs(oldvelx) > 0.0f)
             oldvelx = 0.0f;
 
         flipsidesifneeded();
