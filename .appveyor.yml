@@ -1,48 +1,56 @@
+os: Visual Studio 2015
+
+platform:
+  - x86
+
 branches:
   only:
     - master
 
-platform:
-  - x86
-  - x64
 
 environment:
-  matrix:
-    - USE_SDL2: true
-    - USE_SDL2: false
+  BASEDIR: c:\mylibs
+  ZLIB_IDIR: c:\mylibs\include
+  SDL1_IDIR: c:\mylibs\include\SDL
+  LIBDIR: c:\mylibs\lib
+
 
 install:
   - git submodule update --init --recursive
-  - set PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;%PATH
-  - set MINGW_ARCH=i686
-  - if [%PLATFORM%]==[x64] set MINGW_ARCH=x86_64
-  - set MINGW_SDL=SDL
-  - if [%USE_SDL2%]==[true] set MINGW_SDL=SDL2
-  - pacman --noconfirm --needed -Sy
-      pkg-config
-      mingw-w64-%MINGW_ARCH%-toolchain
-      mingw-w64-%MINGW_ARCH%-cmake
-      mingw-w64-%MINGW_ARCH%-zlib
-      mingw-w64-%MINGW_ARCH%-%MINGW_SDL%
-      mingw-w64-%MINGW_ARCH%-%MINGW_SDL%_image
-      mingw-w64-%MINGW_ARCH%-%MINGW_SDL%_mixer
+  - cmake --version
+  - mkdir %ZLIB_IDIR%
+  - mkdir %SDL1_IDIR%
+  - mkdir %LIBDIR%
+  - cd %TEMP%
+  # Download zlib
+  - appveyor DownloadFile http://zlib.net/zlib128-dll.zip
+  # Download SDL1
+  - appveyor DownloadFile https://www.libsdl.org/release/SDL-devel-1.2.15-VC.zip
+  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
+  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
+  # Extract files
+  - 7z x zlib128-dll.zip > nul
+  - 7z x SDL-devel-1.2.15-VC.zip > nul
+  - 7z x SDL_image-devel-1.2.12-VC.zip > nul
+  - 7z x SDL_mixer-devel-1.2.12-VC.zip > nul
+  # Set up includes
+  - copy include\* %ZLIB_IDIR% > nul
+  - copy SDL-1.2.15\include\* %SDL1_IDIR% > nul
+  - copy SDL_image-1.2.12\include\* %SDL1_IDIR% > nul
+  - copy SDL_mixer-1.2.12\include\* %SDL1_IDIR% > nul
+  # Set up libs
+  - copy lib\* %LIBDIR% > nul
+  - copy SDL-1.2.15\lib\x86\* %LIBDIR% > nul
+  - copy SDL_image-1.2.12\lib\x86\* %LIBDIR% > nul
+  - copy SDL_mixer-1.2.12\lib\x86\* %LIBDIR% > nul
 
 build_script:
-  - set MSYSTEM=MINGW32
-  - if [%PLATFORM%]==[x64] set MSYSTEM=MINGW64
-  - cmake --version
-  - make --version
-  - mkdir build
-  - if [%USE_SDL2%]==[false] (
-    bash -lc "
-      cd $APPVEYOR_BUILD_FOLDER/build;
-      cmake .. -G 'Unix Makefiles';
-      make" )
-  - if [%USE_SDL2%]==[true] (
-    bash -lc "
-      cd $APPVEYOR_BUILD_FOLDER/build;
-      cmake .. -G 'Unix Makefiles' -DUSE_SDL2_LIBS=1;
-      make smw" )
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - cmake
+      -DCMAKE_PREFIX_PATH=%BASEDIR%
+      -DCMAKE_BUILD_TYPE=Release
+      -G "Visual Studio 14 2015" .
+  - cmake --build . --config Release
 
 artifacts:
-  - path: build\Binaries\Release\*.exe
+  - path: Binaries\Release\Release\*.exe
