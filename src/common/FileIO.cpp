@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cstring>
 #include <stdexcept>
+#include <vector>
 
 BinaryFile::BinaryFile(const char* filename, const char* options)
     : fp(NULL)
@@ -242,20 +243,20 @@ void BinaryFile::read_string(char* target, size_t size)
     assert(target);
     assert(size > 0);
 
-    uint8_t len = read_u8();
+    const uint8_t len = read_u8();
     if (len <= 0) {
         target[0] = '\0';
         return;
     }
 
-    char string[len];
+    std::vector<char> string(len, '\0');
 
-    fread_or_exception(string, sizeof(char), len);
+    fread_or_exception(string.data(), sizeof(char), len);
     string[len - 1] = '\0';
 
     // if len < N, fills the rest with 0
     // if len > N, copies the first N characters
-    strncpy(target, string, size - 1);
+    strncpy(target, string.data(), size - 1);
     target[size - 1] = 0;
 }
 
@@ -266,20 +267,20 @@ void BinaryFile::read_string_long(char* target, size_t size)
     assert(target);
     assert(size > 0);
 
-    int len = read_i32();
+    const int len = read_i32();
     if (len <= 0) {
         target[0] = '\0';
         return;
     }
 
-    char string[len];
+    std::vector<char> string(len, '\0');
 
-    fread_or_exception(string, sizeof(char), len);
+    fread_or_exception(string.data(), sizeof(char), len);
     string[len - 1] = '\0';
 
     // if len < N, fills the rest with 0
     // if len > N, copies the first N characters
-    strncpy(target, string, size - 1);
+    strncpy(target, string.data(), size - 1);
     target[size - 1] = 0;
 }
 
