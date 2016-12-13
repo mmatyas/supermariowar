@@ -24,6 +24,7 @@
     #define NetworkHandler NetworkLayerENet
 #endif
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <ctime>
@@ -1609,7 +1610,7 @@ void NetGameHost::confirmCurrentInputs()
 
         // Careful, 255 < 0 !
         uint8_t input_id = netplay.remote_input_buffer[c + 1].front().first;
-        last_processed_input_id[c] = std::max(last_processed_input_id[c], input_id);
+        last_processed_input_id[c] = (std::max)(last_processed_input_id[c], input_id);
         if (last_processed_input_id[c] > 200 && input_id < 50)
             last_processed_input_id[c] = input_id;
     }
