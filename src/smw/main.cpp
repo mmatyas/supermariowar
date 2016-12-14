@@ -47,17 +47,6 @@
 #endif
 
 //now it's really time for an "engine" (aka resource manager)
-// TODO: check SDL2 Windows libs
-#ifdef _WIN32
-    #ifndef _XBOX
-        #define WIN32_LEAN_AND_MEAN
-        #include <windows.h>
-
-        #ifdef _MSC_VER
-        #include <crtdbg.h>
-        #endif
-    #endif
-#endif
 
 
 //------ system stuff ------
@@ -274,23 +263,11 @@ void init_spawnlocations()
 //*************************************
 
 
-#ifdef	WIN32
-int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow)
-{
-#ifdef _MSC_VER
-    // this will print important debugging information to debug console
-    _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
-#endif
-
-    if (strlen(lpCmdLine) > 0)
-        RootDataDirectory = lpCmdLine;
-#else
 // ------ MAIN ------
 int main(int argc, char *argv[])
 {
     if (argc >= 2)
         RootDataDirectory = argv[1];
-#endif
 
 
     create_globals();
