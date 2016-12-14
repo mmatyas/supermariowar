@@ -48,15 +48,6 @@
 
 #ifdef _WIN32
 	#include <windows.h>
-
-	#ifndef _XBOX
-		#pragma comment(linker, "/NODEFAULTLIB:libc.lib")
-
-		#ifdef PNG_SAVE_FORMAT
-			#pragma comment(lib, "libpng.lib")
-			#pragma comment(lib, "zlib.lib")
-		#endif
-    #endif
 #endif
 
 // TODO: Fix JS related problems.

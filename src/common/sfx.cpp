@@ -8,11 +8,6 @@
 
 using namespace std;
 
-#ifdef _WIN32
-	#ifndef _XBOX
-		#pragma comment(lib, "SDL_mixer.lib")
-	#endif
-#endif
 
 bool fResumeMusic = true;
 extern void DECLSPEC soundfinished(int channel);

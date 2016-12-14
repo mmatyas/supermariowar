@@ -37,17 +37,6 @@ using std::endl;
     inline void smallDelay() {}
 #endif
 
-#ifdef _WIN32
-    #ifndef _XBOX
-        #pragma comment(linker, "/NODEFAULTLIB:libc.lib")
-
-        #ifdef PNG_SAVE_FORMAT
-            #pragma comment(lib, "libpng.lib")
-            #pragma comment(lib, "zlib.lib")
-        #endif
-    #endif
-#endif
-
 
 extern gfxSprite spr_frontmap[2];
 extern short g_iTileConversion[];

@@ -49,13 +49,7 @@
 //now it's really time for an "engine" (aka resource manager)
 // TODO: check SDL2 Windows libs
 #ifdef _WIN32
-    #pragma comment(lib, "SDL_image.lib")
-
     #ifndef _XBOX
-        #pragma comment(lib, "SDL.lib")
-        #pragma comment(lib, "SDLmain.lib")
-        #pragma comment(lib, "SDL_mixer.lib")
-
         #define WIN32_LEAN_AND_MEAN
         #include <windows.h>
 
