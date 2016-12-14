@@ -11,7 +11,7 @@ set(COMMON_SRCS
     gfx/gfxPalette.cpp
     gfx/gfxSDL.cpp
     gfx/gfxSprite.cpp
-    gfx/SFont.c
+    gfx/SFont.cpp
     global.cpp
     input.cpp
     linfunc.cpp
