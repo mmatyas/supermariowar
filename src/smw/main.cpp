@@ -17,7 +17,6 @@
 #define TITLESTRING "Super Mario War"
 #define VERSIONNUMBER "2.0"
 
-
 #include "FileList.h"
 #include "GameMode.h"
 #include "gamemodes.h"
@@ -45,6 +44,15 @@
 #ifdef _XBOX
 #include <xtl.h>
 #endif
+
+#ifdef _MSC_VER
+#if _MSC_VER >= 1400
+    #include <stdio.h>
+    FILE _iob[] = {*stdin, *stdout, *stderr};
+    extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
+#endif
+#endif
+
 
 //now it's really time for an "engine" (aka resource manager)
 
