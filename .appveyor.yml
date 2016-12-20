@@ -12,7 +12,11 @@ environment:
   BASEDIR: c:\mylibs
   ZLIB_IDIR: c:\mylibs\include
   SDL1_IDIR: c:\mylibs\include\SDL
+  SDL2_IDIR: c:\mylibs\include\SDL2
   LIBDIR: c:\mylibs\lib
+  matrix:
+    - SDL_VER: 1
+    - SDL_VER: 2
 
 
 install:
@@ -20,37 +24,64 @@ install:
   - cmake --version
   - mkdir %ZLIB_IDIR%
   - mkdir %SDL1_IDIR%
+  - mkdir %SDL2_IDIR%
   - mkdir %LIBDIR%
   - cd %TEMP%
   # Download zlib
   - appveyor DownloadFile http://zlib.net/zlib128-dll.zip
+  - 7z x zlib128-dll.zip > nul
+  - copy include\* %ZLIB_IDIR% > nul
+  - copy lib\* %LIBDIR% > nul
   # Download SDL1
   - appveyor DownloadFile https://www.libsdl.org/release/SDL-devel-1.2.15-VC.zip
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
   # Extract files
-  - 7z x zlib128-dll.zip > nul
   - 7z x SDL-devel-1.2.15-VC.zip > nul
   - 7z x SDL_image-devel-1.2.12-VC.zip > nul
   - 7z x SDL_mixer-devel-1.2.12-VC.zip > nul
   # Set up includes
-  - copy include\* %ZLIB_IDIR% > nul
   - copy SDL-1.2.15\include\* %SDL1_IDIR% > nul
   - copy SDL_image-1.2.12\include\* %SDL1_IDIR% > nul
   - copy SDL_mixer-1.2.12\include\* %SDL1_IDIR% > nul
   # Set up libs
-  - copy lib\* %LIBDIR% > nul
   - copy SDL-1.2.15\lib\x86\* %LIBDIR% > nul
   - copy SDL_image-1.2.12\lib\x86\* %LIBDIR% > nul
   - copy SDL_mixer-1.2.12\lib\x86\* %LIBDIR% > nul
+  # Download SDL2
+  - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.5-VC.zip
+  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-VC.zip
+  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-VC.zip
+  # Extract files
+  - 7z x SDL2-devel-2.0.5-VC.zip > nul
+  - 7z x SDL2_image-devel-2.0.1-VC.zip > nul
+  - 7z x SDL2_mixer-devel-2.0.1-VC.zip > nul
+  # Set up includes
+  - copy SDL2-2.0.5\include\* %SDL2_IDIR% > nul
+  - copy SDL2_image-2.0.1\include\* %SDL2_IDIR% > nul
+  - copy SDL2_mixer-2.0.1\include\* %SDL2_IDIR% > nul
+  # Set up libs
+  - copy SDL2-2.0.5\lib\x86\* %LIBDIR% > nul
+  - copy SDL2_image-2.0.1\lib\x86\* %LIBDIR% > nul
+  - copy SDL2_mixer-2.0.1\lib\x86\* %LIBDIR% > nul
 
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - cmake
-      -DCMAKE_PREFIX_PATH=%BASEDIR%
-      -DCMAKE_BUILD_TYPE=Release
-      -G "Visual Studio 14 2015" .
-  - cmake --build . --config Release
+  - if [%SDL_VER%]==[1] (
+      cmake
+        -DCMAKE_PREFIX_PATH=%BASEDIR%
+        -DCMAKE_BUILD_TYPE=Release
+        -G "Visual Studio 14 2015" .
+    )
+  - if [%SDL_VER%]==[2] (
+      cmake
+        -DCMAKE_PREFIX_PATH=%BASEDIR%
+        -DCMAKE_BUILD_TYPE=Release
+        -DUSE_SDL2_LIBS=ON
+        -G "Visual Studio 14 2015" .
+    )
+  - if [%SDL_VER%]==[1] ( cmake --build . --config Release )
+  - if [%SDL_VER%]==[2] ( cmake --build . --config Release --target smw )
 
 artifacts:
   - path: Binaries\Release\Release\*.exe
