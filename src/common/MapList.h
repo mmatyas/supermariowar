@@ -1,6 +1,8 @@
 #ifndef MAPLIST_H
 #define MAPLIST_H
 
+#include "path.h"
+
 #include <map>
 #include <string>
 
@@ -43,7 +45,7 @@ class MapList
         return (*outercurrent).second->filename.c_str();
     }
     const char* currentShortmapname() {
-        return (*outercurrent).first.c_str();
+        return stripCreatorAndDotMap(outercurrent->first).c_str();
     }
     int currentShortMapNameLen() {
         return (*outercurrent).second->iShortNameLength;
@@ -114,19 +116,30 @@ class MapList
 		const char * GetUnknownMapName();
 
     private:
+        struct CompareShortName {
+            bool operator()(const std::string& a, const std::string& b) const {
+                const std::string a_short = stripCreatorAndDotMap(a);
+                const std::string b_short = stripCreatorAndDotMap(b);
+                if (a_short != b_short)
+                    return a_short < b_short;
 
-        std::map<std::string, MapListNode*> maps;
-		std::map<std::string, MapListNode*> worldmaps;
+                return a < b;
+            }
+        };
 
-        std::map<std::string, MapListNode*>::iterator current;
-		std::map<std::string, MapListNode*>::iterator savedcurrent;
 
-		std::map<std::string, MapListNode*>::iterator outercurrent;
+        std::map<std::string, MapListNode*, CompareShortName> maps;
+		std::map<std::string, MapListNode*, CompareShortName> worldmaps;
+
+        std::map<std::string, MapListNode*, CompareShortName>::iterator current;
+		std::map<std::string, MapListNode*, CompareShortName>::iterator savedcurrent;
+
+		std::map<std::string, MapListNode*, CompareShortName>::iterator outercurrent;
 
 		short iFilteredMapCount;
 
-		std::map<std::string, MapListNode*>::iterator * mlnFilteredMaps;
-		std::map<std::string, MapListNode*>::iterator * mlnMaps;
+		std::map<std::string, MapListNode*, CompareShortName>::iterator * mlnFilteredMaps;
+		std::map<std::string, MapListNode*, CompareShortName>::iterator * mlnMaps;
 
 		char szUnknownMapString[2];
 };

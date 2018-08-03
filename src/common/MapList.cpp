@@ -70,20 +70,20 @@ MapList::MapList(bool fWorldEditor)
 
     while (d(curname)) {
         MapListNode * node = new MapListNode(d.fullName(curname));
-        maps[stripCreatorAndDotMap(curname)] = node;
+        maps[curname] = node;
     }
 
 #ifdef _DEBUG
     DirectoryListing debugMapDir(convertPath("maps/test/"), ".map");
     while (debugMapDir(curname)) {
         MapListNode * node = new MapListNode(debugMapDir.fullName(curname));
-        maps[stripCreatorAndDotMap(curname)] = node;
+        maps[curname] = node;
     }
 
     DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
     while (specialDebugMapDir(curname)) {
         MapListNode * node = new MapListNode(specialDebugMapDir.fullName(curname));
-        maps[stripCreatorAndDotMap(curname)] = node;
+        maps[curname] = node;
     }
 #endif
 
@@ -94,7 +94,7 @@ MapList::MapList(bool fWorldEditor)
 
         while (tourMapDir(curname)) {
             MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
-            maps[stripCreatorAndDotMap(curname)] = node;
+            maps[curname] = node;
         }
 
         SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
@@ -107,7 +107,7 @@ MapList::MapList(bool fWorldEditor)
 
             while (worldMapDir(curname)) {
                 MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
-                maps[stripCreatorAndDotMap(curname)] = node;
+                maps[curname] = node;
             }
 
             worldeditormapdirs.next();
@@ -117,7 +117,7 @@ MapList::MapList(bool fWorldEditor)
         DirectoryListing specialEditorMapDir(convertPath("maps/special/"), ".map");
         while (specialEditorMapDir(curname)) {
             MapListNode * node = new MapListNode(specialEditorMapDir.fullName(curname));
-            maps[stripCreatorAndDotMap(curname)] = node;
+            maps[curname] = node;
         }
 #endif
 
@@ -151,7 +151,7 @@ MapList::MapList(bool fWorldEditor)
 
     while (tourMapDir(curname)) {
         MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
-        worldmaps[stripCreatorAndDotMap(curname)] = node;
+        worldmaps[curname] = node;
     }
 
     //Read all world map directories and load them into the world/tour only list
@@ -165,7 +165,7 @@ MapList::MapList(bool fWorldEditor)
 
         while (worldMapDir(curname)) {
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
-            worldmaps[stripCreatorAndDotMap(curname)] = node;
+            worldmaps[curname] = node;
         }
 
         worldmapdirs.next();
@@ -174,7 +174,7 @@ MapList::MapList(bool fWorldEditor)
     DirectoryListing specialMapDir(convertPath("maps/special/"), ".map");
     while (specialMapDir(curname)) {
         MapListNode * node = new MapListNode(specialMapDir.fullName(curname));
-        worldmaps[stripCreatorAndDotMap(curname)] = node;
+        worldmaps[curname] = node;
     }
 }
 
@@ -221,7 +221,7 @@ void MapList::addWorldMaps()
         std::string curname;
         while (worldMapDir(curname)) {
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
-            maps[stripCreatorAndDotMap(curname)] = node;
+            maps[curname] = node;
         }
 
         worldmapdirs.next();
@@ -239,7 +239,7 @@ void MapList::add(const char * name)
 
     //not found - insert new map
     MapListNode * node = new MapListNode(fullName);
-    maps[stripCreatorAndDotMap(name)] = node;
+    maps[name] = node;
 }
 
 bool MapList::find(const char * name)
@@ -271,8 +271,9 @@ bool MapList::findexact(const char * name, bool fWorld)
         std::map<std::string, MapListNode*>::iterator iterateAll = worldmaps.begin(), lim = worldmaps.end();
 
         while (iterateAll != lim && !fFound) {
-            char * szCurrentName = new char[iterateAll->first.length() + 1];
-            strcpy(szCurrentName, iterateAll->first.c_str());
+            const std::string shortName = stripCreatorAndDotMap(iterateAll->first);
+            char * szCurrentName = new char[shortName.length() + 1];
+            strcpy(szCurrentName, shortName.c_str());
             inPlaceLowerCase(szCurrentName);
 
             if (!strcmp(szCurrentName, szLookForName)) {
@@ -297,8 +298,9 @@ bool MapList::findexact(const char * name, bool fWorld)
     do {
         next(false);	//sets us to the beginning if we hit the end -> loop through the maps
 
-        char * szCurrentName = new char[current->first.length() + 1];
-        strcpy(szCurrentName, current->first.c_str());
+        const std::string shortName = stripCreatorAndDotMap(current->first);
+        char * szCurrentName = new char[shortName.length() + 1];
+        strcpy(szCurrentName, shortName.c_str());
         inPlaceLowerCase(szCurrentName);
 
         if (!strcmp(szCurrentName, szLookForName))
@@ -500,13 +502,25 @@ void MapList::ReadFilters()
         while (fgets(buffer, 256, mfp)) {
             char * pszMapName = strtok(buffer, ",\n");
 
-            if (maps.find(pszMapName) != maps.end()) {
+            // First look for an `author_mapname` entry
+            std::map<std::string, MapListNode*>::iterator itr = maps.find(pszMapName);
+            if (itr == maps.end()) {
+                // Otherwise look for the first entry that ends with `mapname`
+                for (itr = maps.begin(); itr != maps.end(); itr++) {
+                    const std::string shortName = stripCreatorAndDotMap(itr->first);
+                    if (shortName.compare(pszMapName) == 0)
+                        break;
+                }
+            }
+
+            if (itr != maps.end()) {
+                const std::string key = itr->first;
                 bool fErrorReading = false;
                 for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
                     char * psz = strtok(NULL, ",\n");
 
                     if (psz) {
-                        maps[pszMapName]->pfFilters[iFilter] = strcmp(psz, "0") != 0;
+                        maps[key]->pfFilters[iFilter] = strcmp(psz, "0") != 0;
                     } else {
                         fErrorReading = true;
                         break;
@@ -514,7 +528,7 @@ void MapList::ReadFilters()
                 }
 
                 if (!fErrorReading)
-                    maps[pszMapName]->fReadFromCache = true;
+                    maps[key]->fReadFromCache = true;
             }
         }
 
