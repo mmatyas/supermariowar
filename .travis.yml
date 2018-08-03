@@ -67,6 +67,8 @@ before_script:
         libsdl2-dev
         libsdl2-image-dev
         libsdl2-mixer-dev
+        libegl1-mesa-dev
+        libgles2-mesa-dev
     ; fi
   - if [[ "$BUILD" == "native" ]]; then $CXX --version; fi
   - if [[ "$BUILD" == "native" ]]; then cmake --version; fi
