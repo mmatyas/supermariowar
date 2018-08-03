@@ -3,10 +3,6 @@ language: cpp
 sudo: required
 dist: trusty
 
-branches:
-  only:
-    - master
-
 matrix:
   include:
   # Linux desktop builds
@@ -112,6 +108,10 @@ script:
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then
       cmake ..;
       make;
+      curl --upload-file ./Binaries/Release/smw https://transfer.sh/smw;
+      curl --upload-file ./Binaries/Release/smw-leveledit https://transfer.sh/smw-leveledit;
+      curl --upload-file ./Binaries/Release/smw-worldedit https://transfer.sh/smw-worldedit;
+      curl --upload-file ./Binaries/Release/smw-server https://transfer.sh/smw-server;
     fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then
       cmake -D USE_SDL2_LIBS:BOOL=ON ..;
