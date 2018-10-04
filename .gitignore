@@ -1,2 +1,6 @@
 data/
 build/
+
+# CMake in-source builds
+CMakeCache.txt
+CMakeFiles/
