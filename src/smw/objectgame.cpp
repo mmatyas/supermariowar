@@ -274,6 +274,7 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
 
 void CheckSecret(short id)
 {
+    /*
     if (id == 0 && !game_values.unlocksecretunlocked[0]) {
         short iCountTeams = 0;
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
@@ -322,6 +323,7 @@ void CheckSecret(short id)
         if (object)
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
     }
+    */
 }
 
 
