@@ -2879,10 +2879,12 @@ void CPlayer::SetPowerup(short iPowerup)
         }
 
         if (powerup != iPowerup) {
-            if (iPowerup == 3)
+            if (iPowerup == 3) {
                 ifSoundOnPlay(rm->sfx_collectfeather);
-            else
+            }
+            else {
                 ifSoundOnPlay(rm->sfx_collectpowerup);
+            }
         }
 
         ClearPowerupStates();
