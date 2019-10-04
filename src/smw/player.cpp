@@ -1874,12 +1874,14 @@ short CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killstyle style,
             killer->SetPowerup(0);
         }
 
-        if (deathstyle == death_style_jump)
-            ifSoundOnPlay(rm->sfx_deathsound);
-        else if (deathstyle == death_style_squish)
-            ifSoundOnPlay(rm->sfx_mip);
-        else if (deathstyle == death_style_shatter)
-            ifSoundOnPlay(rm->sfx_breakblock);
+		switch (deathstyle) {
+		case death_style_jump:
+			ifSoundOnPlay(rm->sfx_deathsound);
+		case death_style_squish:
+			ifSoundOnPlay(rm->sfx_mip);
+		case death_style_shatter:
+			ifSoundOnPlay(rm->sfx_breakblock);
+		}
     }
 
     if (player_kill_normal == iKillType || (fForce && player_kill_nonkill == iKillType))
