@@ -1877,10 +1877,13 @@ short CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killstyle style,
         switch (deathstyle) {
         case death_style_jump:
             ifSoundOnPlay(rm->sfx_deathsound);
+            break;
         case death_style_squish:
             ifSoundOnPlay(rm->sfx_mip);
+            break;
         case death_style_shatter:
             ifSoundOnPlay(rm->sfx_breakblock);
+            break;
         }
     }
 
