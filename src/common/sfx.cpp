@@ -203,7 +203,7 @@ bool sfxMusic::load(const string& filename)
 		return false;
 	}
 
-	Mix_HookMusicFinished(&musicfinished);
+	//Mix_HookMusicFinished(&musicfinished);
 
 	ready = true;
 
