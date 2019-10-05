@@ -80,6 +80,13 @@ SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_
 };
 #endif
 
+extern CGameValues game_values;
+void ifSoundOnPlay(sfxSound& sfx)
+{
+    if (game_values.sound)
+        sfx.play();
+}
+
 void CGameValues::init()
 {
     //set standard game values

@@ -6,7 +6,9 @@
 
 #include <vector>
 
-#define ifSoundOnPlay(x) if (game_values.sound) x.play()
+class sfxSound;
+
+void ifSoundOnPlay(sfxSound&);
 #define ifsoundonandreadyplay(x) (x.isready() && game_values.sound ? x.play() : -1)
 #define ifSoundOnPlayLoop(x,y) (game_values.sound ? x.playloop(y) : -1)
 #define ifsoundonstop(x) (game_values.sound ? x.stop() : void(NULL))
