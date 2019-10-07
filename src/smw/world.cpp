@@ -1242,7 +1242,7 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
     if (iLayer != 1) {
         if (tile->iCompleted >= 0) {
             SDL_Rect rSrc = {(tile->iCompleted + 10) << iTileSizeShift, 5 << iTileSizeShift, iTileSize, iTileSize};
-            SDL_BlitSurface(rm->spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+            SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
         } else {
             if (iForegroundSprite >= 0 && iForegroundSprite < WORLD_FOREGROUND_STAGE_OFFSET) {
                 short iPathStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
@@ -1266,18 +1266,18 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
             } else if (iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399) {
                 short iTileColor = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) / 100;
                 SDL_Rect rSrc = {(10 << iTileSizeShift) + iAnimationFrame, iTileColor << iTileSizeShift, iTileSize, iTileSize};
-                SDL_BlitSurface(rm->spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
 
                 short iTileNumber = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) % 100;
                 rSrc.x = (iTileNumber % 10) << iTileSizeShift;
                 rSrc.y = (iTileNumber / 10) << iTileSizeShift;
-                SDL_BlitSurface(rm->spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
             } else if (iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) {
                 SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 10) << iTileSizeShift, 7 << iTileSizeShift, iTileSize, iTileSize};
-                SDL_BlitSurface(rm->spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
             } else if (iForegroundSprite >= WORLD_START_SPRITE_OFFSET && iForegroundSprite <= WORLD_START_SPRITE_OFFSET + 1) {
                 SDL_Rect rSrc = {(iForegroundSprite - WORLD_START_SPRITE_OFFSET + 10) << iTileSizeShift, 4 << iTileSizeShift, iTileSize, iTileSize};
-                SDL_BlitSurface(rm->spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
             } else if (iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 179) {
                 short iSprite = iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET;
                 SDL_Rect rSrc = {(iSprite % 12) << iTileSizeShift, (iSprite / 12) << iTileSizeShift, iTileSize, iTileSize};
@@ -1293,7 +1293,7 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
         short iType = tile->iType;
         if (iType >= 2 && iType <= 5) {
             SDL_Rect rSrc = {(iType + 8) << iTileSizeShift, 6 << iTileSizeShift, iTileSize, iTileSize};
-            SDL_BlitSurface(rm->spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+            SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
         }
     }
 }
