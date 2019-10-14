@@ -533,6 +533,7 @@ void MenuState::update()
     }
 
     //Watch for the konami code to unlock the minigames match type
+    /*
     if (!game_values.minigameunlocked && mCurrentMenu == mMatchSelectionMenu) {
         if (!mCurrentMenu->GetCurrentControl()->IsModifying()) {
             int keymask =
@@ -563,6 +564,7 @@ void MenuState::update()
             }
         }
     }
+    */
 
 #ifdef _DEBUG
     if (g_fAutoTest)
