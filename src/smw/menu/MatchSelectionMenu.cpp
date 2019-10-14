@@ -21,7 +21,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu() : UI_Menu()
     miMatchSelectionField->Add("Tournament", MATCH_TYPE_TOURNAMENT, "", false, false);
     miMatchSelectionField->Add("Tour", MATCH_TYPE_TOUR, "", false, false);
     miMatchSelectionField->Add("World", MATCH_TYPE_WORLD, "", false, false);
-    miMatchSelectionField->Add("Minigame", MATCH_TYPE_MINIGAME, "", false, !game_values.minigameunlocked);
+    miMatchSelectionField->Add("Minigame", MATCH_TYPE_MINIGAME, "", false, false);
     miMatchSelectionField->SetData(&game_values.matchtype, NULL, NULL);
     miMatchSelectionField->SetKey(game_values.matchtype);
     miMatchSelectionField->SetItemChangedCode(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED);
