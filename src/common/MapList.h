@@ -1,8 +1,6 @@
 #ifndef MAPLIST_H
 #define MAPLIST_H
 
-#include "path.h"
-
 #include <map>
 #include <string>
 
@@ -45,7 +43,7 @@ class MapList
         return (*outercurrent).second->filename.c_str();
     }
     const char* currentShortmapname() {
-        return stripCreatorAndDotMap(outercurrent->first).c_str();
+        return (*outercurrent).first.c_str();
     }
     int currentShortMapNameLen() {
         return (*outercurrent).second->iShortNameLength;
@@ -77,10 +75,10 @@ class MapList
         return maps.size();
     }
 
-    std::map<std::string, MapListNode*>::iterator GetCurrent() {
+    std::multimap<std::string, MapListNode*>::iterator GetCurrent() {
         return current;
     }
-    void SetCurrent(std::map<std::string, MapListNode*>::iterator itr) {
+    void SetCurrent(std::multimap<std::string, MapListNode*>::iterator itr) {
         outercurrent = current = itr;
     }
 
@@ -101,7 +99,7 @@ class MapList
 		void ApplyFilters(bool * pfFilters);
 		bool MapInFilteredSet();
 
-		std::map<std::string, MapListNode*>::iterator GetIteratorAt(unsigned short iIndex, bool fUseFilters);
+		std::multimap<std::string, MapListNode*>::iterator GetIteratorAt(unsigned short iIndex, bool fUseFilters);
 
     void SaveCurrent() {
         savedcurrent = current;
@@ -116,30 +114,19 @@ class MapList
 		const char * GetUnknownMapName();
 
     private:
-        struct CompareShortName {
-            bool operator()(const std::string& a, const std::string& b) const {
-                const std::string a_short = stripCreatorAndDotMap(a);
-                const std::string b_short = stripCreatorAndDotMap(b);
-                if (a_short != b_short)
-                    return a_short < b_short;
 
-                return a < b;
-            }
-        };
+        std::multimap<std::string, MapListNode*> maps;
+		std::multimap<std::string, MapListNode*> worldmaps;
 
+        std::multimap<std::string, MapListNode*>::iterator current;
+		std::multimap<std::string, MapListNode*>::iterator savedcurrent;
 
-        std::map<std::string, MapListNode*, CompareShortName> maps;
-		std::map<std::string, MapListNode*, CompareShortName> worldmaps;
-
-        std::map<std::string, MapListNode*, CompareShortName>::iterator current;
-		std::map<std::string, MapListNode*, CompareShortName>::iterator savedcurrent;
-
-		std::map<std::string, MapListNode*, CompareShortName>::iterator outercurrent;
+		std::multimap<std::string, MapListNode*>::iterator outercurrent;
 
 		short iFilteredMapCount;
 
-		std::map<std::string, MapListNode*, CompareShortName>::iterator * mlnFilteredMaps;
-		std::map<std::string, MapListNode*, CompareShortName>::iterator * mlnMaps;
+		std::multimap<std::string, MapListNode*>::iterator * mlnFilteredMaps;
+		std::multimap<std::string, MapListNode*>::iterator * mlnMaps;
 
 		char szUnknownMapString[2];
 };
