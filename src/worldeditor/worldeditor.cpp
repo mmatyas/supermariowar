@@ -605,6 +605,17 @@ int main(int argc, char *argv[])
 	spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), 255, 0, 255);
 	spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), 255, 0, 255);
 
+	//Resource manager hack
+	rm->spr_worldbackground[0] = spr_worldbackground[0];
+	rm->spr_worldbackground[1] = spr_worldbackground[1];
+	rm->spr_worldforeground[0] = spr_worldforeground[0];
+	rm->spr_worldforeground[1] = spr_worldforeground[1];
+	rm->spr_worldforegroundspecial[0] = spr_worldforegroundspecial[0];
+	rm->spr_worldforegroundspecial[1] = spr_worldforegroundspecial[1];
+	rm->spr_worldpaths[0] = spr_worldpaths[0];
+	rm->spr_worldpaths[1] = spr_worldpaths[1];
+	rm->spr_worldvehicle[0] = spr_worldvehicle[0];
+	rm->spr_worldvehicle[1] = spr_worldvehicle[1];
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
