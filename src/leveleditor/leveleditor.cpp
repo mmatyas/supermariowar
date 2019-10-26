@@ -201,7 +201,11 @@ class MapPlatform
     void UpdatePreview() {
         if (!preview) {
 				preview = SDL_CreateRGBSurface(screen->flags, 160, 120, screen->format->BitsPerPixel, 0, 0, 0, 0);
+#ifdef USE_SDL2
+				SDL_SetColorKey(preview, SDL_TRUE, SDL_MapRGB(preview->format, 255, 0, 255));
+#else
 				SDL_SetColorKey(preview, SDL_SRCCOLORKEY, SDL_MapRGB(preview->format, 255, 0, 255));
+#endif
 			}
 
 			SDL_FillRect(preview, NULL, SDL_MapRGB(preview->format, 255, 0, 255));
@@ -397,8 +401,7 @@ int main(int argc, char *argv[])
 
 	//Add all of the maps that are world only so we can edit them
 	maplist->addWorldMaps();
-
-	SDL_WM_SetCaption(MAPTITLESTRING, "leveleditor.ico");
+	gfx_settitle(MAPTITLESTRING);
 
 	printf("\n---------------- loading graphics ----------------\n");
 
@@ -482,7 +485,19 @@ int main(int argc, char *argv[])
 		rm->spr_hazard_flame[i].SetWrap(true, 640 >> i);
 		rm->spr_hazard_pirhanaplant[i].SetWrap(true, 640 >> i);
 	}
+#ifdef USE_SDL2
+    if ( SDL_SetColorKey(s_platform, SDL_TRUE, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
+		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
+	}
 
+    if ( SDL_SetColorKey(s_platformpathbuttons, SDL_TRUE, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0) {
+		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
+	}
+
+    if ( SDL_SetColorKey(s_maphazardbuttons, SDL_TRUE, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0) {
+		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
+	}
+#else
     if ( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
 		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
 	}
@@ -494,6 +509,7 @@ int main(int argc, char *argv[])
     if ( SDL_SetColorKey(s_maphazardbuttons, SDL_SRCCOLORKEY, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0) {
 		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
 	}
+#endif
 
 	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
@@ -802,7 +818,11 @@ int editor_edit()
 
                 switch (event.type) {
                     case SDL_KEYDOWN: {
+#ifdef USE_SDL2
+                        SDL_Keycode key = event.key.keysym.sym;
+#else
                         SDLKey key = event.key.keysym.sym;
+#endif
 
                         if (key == SDLK_LEFT) {
                             fSelectedYes = true;
@@ -836,7 +856,11 @@ int editor_edit()
 					return EDITOR_QUIT;
 
                 case SDL_KEYDOWN: {
-						SDLKey key = event.key.keysym.sym;
+#ifdef USE_SDL2
+                    SDL_Keycode key = event.key.keysym.sym;
+#else
+                    SDLKey key = event.key.keysym.sym;
+#endif
 
                     if (key == SDLK_ESCAPE) {
 							if (g_musiccategorydisplaytimer > 0)
@@ -4303,7 +4327,11 @@ void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
 
 		SDL_Surface * temp = IMG_Load(szFileName);
 
+#ifdef USE_SDL2
+		SDL_Surface * sBackground = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_ARGB8888, 0);
+#else
 		SDL_Surface * sBackground = SDL_DisplayFormat(temp);
+#endif
         if (!sBackground) {
 			printf("ERROR: Couldn't convert thumbnail background to diplay pixel format: %s\n", SDL_GetError());
 			return;
@@ -4487,7 +4515,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
 	rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
-	SDL_Flip(screen);
+	gfx_flipscreen();
 
     while (true) {
 		int framestart = SDL_GetTicks();
@@ -4516,7 +4544,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
 							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
-							SDL_Flip(screen);
+							gfx_flipscreen();
 
 							currentChar--;
 						}
@@ -4572,7 +4600,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
 							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
-							SDL_Flip(screen);
+							gfx_flipscreen();
 						}
 					}
 				break;
