@@ -1,5 +1,10 @@
 set (WORLDEDIT_SRCS worldeditor.cpp)
 
+# Add EXE icon on Windows
+if (WIN32)
+	LIST(APPEND WORLDEDIT_SRCS "${PROJECT_SOURCE_DIR}/resources/windows/smw-worldedit.rc")
+endif()
+
 add_executable (smw-worldedit
 	../common/movingplatform.cpp
 	../smw/world.cpp
@@ -19,16 +24,15 @@ add_executable (smw-worldedit
 
 target_link_libraries (smw-worldedit CommonFiles)
 
-# Add EXE icon on Windows
-if (WIN32)
-	LIST(APPEND WORLDEDIT_SRCS "${PROJECT_SOURCE_DIR}/resources/windows/smw-worldedit.rc")
-endif()
-
 #
 # Dependencies
 #
 
-target_link_libraries(smw-worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
+if(USE_SDL2_LIBS)
+	target_link_libraries(smw-worldedit ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
+else()
+	target_link_libraries(smw-worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
+endif()
 
 #
 # Installation

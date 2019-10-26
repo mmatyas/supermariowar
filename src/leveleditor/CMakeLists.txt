@@ -12,7 +12,11 @@ target_link_libraries(smw-leveledit CommonFiles)
 # Dependencies
 #
 
-target_link_libraries(smw-leveledit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
+if(USE_SDL2_LIBS)
+	target_link_libraries(smw-leveledit ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
+else()
+	target_link_libraries(smw-leveledit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
+endif()
 
 #
 # Installation
