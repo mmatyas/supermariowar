@@ -1,7 +1,7 @@
 language: cpp
 
 sudo: required
-dist: trusty
+dist: xenial
 
 branches:
   only:
@@ -59,8 +59,7 @@ before_script:
       sudo apt-get install -y
         cmake
         clang
-        gcc-4.8
-        g++-4.8
+        g++
         libsdl1.2-dev
         libsdl-image1.2-dev
         libsdl-mixer1.2-dev
