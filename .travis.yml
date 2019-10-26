@@ -59,6 +59,7 @@ before_script:
       sudo apt-get install -y
         cmake
         clang
+        default-jre
         g++
         libsdl1.2-dev
         libsdl-image1.2-dev
@@ -76,12 +77,12 @@ before_script:
 
   # Emscripten
   - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then
-      wget https://github.com/mmatyas/mmatyas.github.io/releases/download/arm-libs/emscripten_1350.tgz;
-      tar xzf emscripten_1350.tgz;
-      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/clang/fastcomp/build_master_64/bin;
-      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/node/4.1.1_64bit/bin;
-      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/emscripten/master;
-      export PATH=$EM_PATH:$PATH;
+      git clone https://github.com/emscripten-core/emsdk.git --depth=1;
+      cd emsdk;
+      ./emsdk install latest;
+      ./emsdk activate latest;
+      source ./emsdk_env.sh;
+      cd ..;
     fi
   - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then emcc -v; fi
 
