@@ -41,6 +41,7 @@
 #endif
 
 #include "SDL_image.h"
+#include "sdl12wrapper.h"
 
 #include <cstdlib>
 #include <string.h>
@@ -496,7 +497,7 @@ int main(int argc, char *argv[])
 	blitdest = screen;
 	g_tilesetmanager->Init(convertPath("gfx/Classic/tilesets").c_str());
 
-	SDL_WM_SetCaption(MAPTITLESTRING, "worldeditor.ico");
+	gfx_settitle(MAPTITLESTRING);
 
 	game_values.toplayer = true;
 
@@ -937,8 +938,9 @@ int main(int argc, char *argv[])
 	mVehicleMenu.SetHeadControl(miVehicleSpriteField);
 	mVehicleMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);
 
-
+#ifndef USE_SDL2
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+#endif
 
 	printf("\n---------------- ready, steady, go! ----------------\n");
 
@@ -1090,7 +1092,11 @@ int editor_edit()
 
                 switch (event.type) {
                 case SDL_KEYDOWN: {
+#ifdef USE_SDL2
+						SDL_Keycode key = event.key.keysym.sym;
+#else
 						SDLKey key = event.key.keysym.sym;
+#endif
 
                     if (key == SDLK_LEFT) {
 							fSelectedYes = true;
@@ -1897,7 +1903,7 @@ int editor_edit()
 			DrawMessage();
 		}
 
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2572,7 +2578,7 @@ int editor_warp()
         menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2700,7 +2706,7 @@ int editor_start_items()
         menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2772,7 +2778,7 @@ int editor_boundary()
         menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2852,7 +2858,7 @@ int editor_type()
         menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2916,7 +2922,7 @@ int editor_water()
 			spr_worldbackground[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2947,7 +2953,11 @@ int editor_background()
 				}
 
             case SDL_KEYDOWN: {
+#ifdef USE_SDL2
+					SDL_Keycode key = event.key.keysym.sym;
+#else
 					SDLKey key = event.key.keysym.sym;
+#endif
                 if (key >= SDLK_1 && key <= SDLK_2) {
 						iPage = key - SDLK_1;
                 } else {
@@ -3005,7 +3015,7 @@ int editor_background()
 		spr_worldbackground[0].draw(0, 0, iPage * 640, 32, 640, 480);
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3036,7 +3046,11 @@ int editor_stageforeground()
 				}
 
             case SDL_KEYDOWN: {
+#ifdef USE_SDL2
+					SDL_Keycode key = event.key.keysym.sym;
+#else
 					SDLKey key = event.key.keysym.sym;
+#endif
 
                 if (key >= SDLK_1 && key <= SDLK_4) {
 						iForegroundScreen = key - SDLK_1;
@@ -3083,7 +3097,7 @@ int editor_stageforeground()
 		spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3148,7 +3162,7 @@ int editor_bridges()
 		spr_worldforegroundspecial[0].draw(0, 0, 320, 224, 128, 32);
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3220,7 +3234,7 @@ int editor_structureforeground()
 		spr_worldforeground[0].draw(416, 0, 512, 0, 32, 480);
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3284,7 +3298,7 @@ int editor_pathsprite()
 		}
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3404,7 +3418,7 @@ int editor_vehicles()
         menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3470,7 +3484,7 @@ int editor_path()
 		spr_path.draw(0, 0, 0, 0, 480, 32);
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -4352,7 +4366,7 @@ int editor_stage()
         menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
-		SDL_Flip(screen);
+		gfx_flipscreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -4470,7 +4484,7 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[space] - Toggle Stage Previews");
 
-	SDL_Flip(screen);
+	gfx_flipscreen();
 
     while (true) {
 		int framestart = SDL_GetTicks();
@@ -4529,7 +4543,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 	menu_font_large.drawCentered(320, 200, title);
 	menu_font_small.draw(240, 235, instructions);
     menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
-	SDL_Flip(screen);
+	gfx_flipscreen();
 
     while (true) {
 		int framestart = SDL_GetTicks();
@@ -4558,7 +4572,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							menu_font_small.draw(240, 235, instructions);
 							menu_font_small.draw(240, 255, input);
                         menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
-							SDL_Flip(screen);
+							gfx_flipscreen();
 
 							currentChar--;
 						}
@@ -4614,7 +4628,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							menu_font_small.draw(240, 235, instructions);
 							menu_font_small.draw(240, 255, input);
                         menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
-							SDL_Flip(screen);
+							gfx_flipscreen();
 						}
 					}
 				break;
