@@ -253,6 +253,15 @@ TileType * animatedtiletypes;
 bool ReadAnimatedTileTypeFile(const char * szFile);
 bool WriteAnimatedTileTypeFile(const char * szFile);
 
+#if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+bool CheckKey(const Uint8 * keystate, SDL_Keycode key) {
+	return keystate[SDL_GetScancodeFromKey(key)];
+}
+#else
+bool CheckKey(Uint8 * keystate, SDLKey key) {
+	return keystate[key];
+}
+#endif
 
 SDL_Surface * s_platform;
 SDL_Surface * s_platformpathbuttons;
@@ -956,7 +965,7 @@ int editor_edit()
                         rm->spr_background.init(convertPath(backgroundlist->current_name()));
                         strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->current_name()).c_str());
 
-                        if (!keystate[SDLK_LSHIFT] && !keystate[SDLK_RSHIFT]) {
+                        if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
 								//Set music to background default
                             for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
                                 if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile, strlen(g_szMusicCategoryNames[iCategory]))) {
@@ -975,20 +984,20 @@ int editor_edit()
 						}
 
                     if (key == SDLK_s ) {
-							if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT])
+							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT))
 								return SAVE_AS;
 
 							return SAVE;
 						}
 
                     if (key == SDLK_f ) {
-							if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT] || findstring[0] == '\0')
+							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT) || findstring[0] == '\0')
 								return FIND;
 
 							findcurrentstring();
 						}
 
-                    if (key == SDLK_DELETE && (keystate[SDLK_LCTRL] || keystate[SDLK_RCTRL])) {
+                    if (key == SDLK_DELETE && (CheckKey(keystate, SDLK_LCTRL) || CheckKey(keystate, SDLK_RCTRL))) {
 							return CLEAR_MAP;
 						}
 
@@ -1225,7 +1234,7 @@ int editor_edit()
 											clearselectedmaptiles();
 										}
                                 } else {
-										if (!keystate[SDLK_LSHIFT] && !keystate[SDLK_RSHIFT] && !keystate[SDLK_LCTRL])
+										if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT) && !CheckKey(keystate, SDLK_LCTRL))
 											resetselectedtiles();
 
                                     if (move_nodrag) {
@@ -2053,7 +2062,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
                     #else
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
-                    if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
+                    if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
                         for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++) {
 								if (event.key.keysym.sym == SDLK_d)
 									iValue = g_iDefaultPowerupPresets[0][iSetting];
@@ -2510,10 +2519,10 @@ int editor_platforms()
                     #else
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 2 && (keystate[SDLK_z] || keystate[SDLK_x] || keystate[SDLK_c])) {
-								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT], keystate[SDLK_z] != 0, keystate[SDLK_c] != 0);
+                        if (g_Platforms[iEditPlatform].iPathType == 2 && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
+								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT), CheckKey(keystate, SDLK_z) != 0, CheckKey(keystate, SDLK_c) != 0);
                         } else {
-								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]);
+								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
 							}
 						}
 
@@ -2534,9 +2543,9 @@ int editor_platforms()
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
                         if (g_Platforms[iEditPlatform].iPathType == 0) {
-								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]);
+								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
                         } else if (g_Platforms[iEditPlatform].iPathType == 1 || g_Platforms[iEditPlatform].iPathType == 2) {
-								UpdatePlatformPathAngle(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]);
+								UpdatePlatformPathAngle(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
 							}
 						}
 					}
@@ -2578,10 +2587,10 @@ int editor_platforms()
                     #else
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 2 && (keystate[SDLK_z] || keystate[SDLK_x] || keystate[SDLK_c])) {
-								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT], keystate[SDLK_z] != 0, keystate[SDLK_c] != 0);
+                        if (g_Platforms[iEditPlatform].iPathType == 2 && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
+								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT), CheckKey(keystate, SDLK_z) != 0, CheckKey(keystate, SDLK_c) != 0);
                         } else {
-								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]);
+								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
 							}
                     } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
                     #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
@@ -2590,9 +2599,9 @@ int editor_platforms()
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
                         if (g_Platforms[iEditPlatform].iPathType == 0) {
-								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]);
+								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
                         } else if (g_Platforms[iEditPlatform].iPathType == 1 || g_Platforms[iEditPlatform].iPathType == 2) {
-								UpdatePlatformPathAngle(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]);
+								UpdatePlatformPathAngle(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
 							}
 						}
 					}
@@ -3361,7 +3370,7 @@ void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
     #else
         Uint8 * keystate = SDL_GetKeyState(NULL);
     #endif
-    if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
+    if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
 		float dSector = TWO_PI / 16;
 		angle += TWO_PI / 32;
 
@@ -3388,7 +3397,7 @@ void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
 		hazard->dparam[1] = angle;
 
         if (radius > 32.0f) {
-            if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
+            if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
 				//Snap radius to every 16 pixels
 				hazard->dparam[2] = (float)(((int)(radius - 16.0f) >> 4) << 4);
             } else {
@@ -3893,7 +3902,7 @@ int editor_modeitems()
                         #else
                             Uint8 * keystate = SDL_GetKeyState(NULL);
                         #endif
-						bool fShiftDown = keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT];
+						bool fShiftDown = CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT);
 
                     if (modeitemmode == 0) {
 							g_map->racegoallocations[dragmodeitem].x = event.motion.x - dragoffsetx;
@@ -4503,10 +4512,6 @@ int save_as()
 
 bool dialog(const char * title, const char * instructions, char * input, int inputsize)
 {
-// FIXME
-#ifdef __EMSCRIPTEN__
-    return false;
-#endif
 	unsigned int currentChar = 0;
 
 	drawmap(false, TILESIZE);
@@ -4562,7 +4567,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
                         #else
                             Uint8 * keystate = SDL_GetKeyState(NULL);
                         #endif
-                        if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
+                        if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
 								if (event.key.keysym.sym == 45)
 									key = 95;
 								else if (event.key.keysym.sym >= 95 && event.key.keysym.sym <= 122)
