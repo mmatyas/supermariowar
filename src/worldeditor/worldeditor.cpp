@@ -336,6 +336,16 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 void updateworldsurface();
 void takescreenshot();
 
+#if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+bool CheckKey(const Uint8 * keystate, SDL_Keycode key) {
+	return keystate[SDL_GetScancodeFromKey(key)];
+}
+#else
+bool CheckKey(Uint8 * keystate, SDLKey key) {
+	return keystate[key];
+}
+#endif
+
 bool ignoreclick = false;
 
 char findstring[FILEBUFSIZE] = "";
@@ -1260,20 +1270,20 @@ int editor_edit()
 						}
 
                     if (event.key.keysym.sym == SDLK_s) {
-							if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT])
+							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT))
 								return SAVE_AS;
 
 							return SAVE;
 						}
 
                     if (event.key.keysym.sym == SDLK_f) {
-							if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT] || findstring[0] == '\0')
+							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT) || findstring[0] == '\0')
 								return FIND;
 
 							findcurrentstring();
 						}
 
-                    if (event.key.keysym.sym == SDLK_DELETE && (keystate[SDLK_LCTRL] || keystate[SDLK_RCTRL])) {
+                    if (event.key.keysym.sym == SDLK_DELETE && (CheckKey(keystate, SDLK_LCTRL) || CheckKey(keystate, SDLK_RCTRL))) {
 							return CLEAR_WORLD;
 						}
 
@@ -4601,7 +4611,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
                         #else
                             Uint8 * keystate = SDL_GetKeyState(NULL);
                         #endif
-                        if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
+                        if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
 								if (event.key.keysym.sym == 45)
 									key = 95;
 								else if (event.key.keysym.sym >= 95 && event.key.keysym.sym <= 122)
