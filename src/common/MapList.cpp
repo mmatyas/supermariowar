@@ -102,8 +102,10 @@ MapList::MapList(bool fWorldEditor)
         short iEditorDirCount = worldeditormapdirs.GetCount();
         for (short iDir = 0; iDir < iEditorDirCount; iDir++) {
             const char * szName = worldeditormapdirs.current_name();
+            std::string directory = convertPath(std::string(szName) + std::string("/"));
+            directory.erase(0,5); //Erase "data/" from the start because convertPath adds it twice
 
-            DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+            DirectoryListing worldMapDir(directory, ".map");
 
             while (worldMapDir(curname)) {
                 MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
@@ -160,10 +162,13 @@ MapList::MapList(bool fWorldEditor)
     short iDirCount = worldmapdirs.GetCount();
     for (short iDir = 0; iDir < iDirCount; iDir++) {
         const char * szName = worldmapdirs.current_name();
+        std::string directory = convertPath(std::string(szName) + std::string("/"));
+        directory.erase(0,5); //Erase "data/" from the start because convertPath adds it twice
 
-        DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+        DirectoryListing worldMapDir(directory, ".map");
 
         while (worldMapDir(curname)) {
+			cout << curname << endl;
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
             worldmaps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
         }
@@ -213,8 +218,10 @@ void MapList::addWorldMaps()
     short iDirCount = worldmapdirs.GetCount();
     for (short iDir = 0; iDir < iDirCount; iDir++) {
         const char * szName = worldmapdirs.current_name();
+        std::string directory = convertPath(std::string(szName) + std::string("/"));
+        directory.erase(0,5); //Erase "data/" from the start because convertPath adds it twice
 
-        DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+        DirectoryListing worldMapDir(directory, ".map");
 
         DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
 
