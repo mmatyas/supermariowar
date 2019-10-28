@@ -4512,6 +4512,10 @@ int save_as()
 
 bool dialog(const char * title, const char * instructions, char * input, int inputsize)
 {
+// FIXME
+#ifdef __EMSCRIPTEN__
+    return false;
+#endif
 	unsigned int currentChar = 0;
 
 	drawmap(false, TILESIZE);
