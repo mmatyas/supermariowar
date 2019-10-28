@@ -168,7 +168,6 @@ MapList::MapList(bool fWorldEditor)
         DirectoryListing worldMapDir(directory, ".map");
 
         while (worldMapDir(curname)) {
-			cout << curname << endl;
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
             worldmaps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
         }
