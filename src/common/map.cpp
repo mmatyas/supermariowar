@@ -40,7 +40,7 @@ using std::endl;
 
 extern gfxSprite spr_frontmap[2];
 extern short g_iTileConversion[];
-extern int32_t g_iVersion[];
+// extern int32_t g_iVersion[];
 
 extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 extern bool VersionIsEqualOrBefore(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
@@ -746,10 +746,16 @@ void CMap::saveMap(const std::string& file)
 
     //First write the map compatibility version number
     //(this will allow the map loader to identify if the map needs conversion)
-    mapfile.write_i32(g_iVersion[0]); //Major
-    mapfile.write_i32(g_iVersion[1]); //Minor
-    mapfile.write_i32(g_iVersion[2]); //Micro
-    mapfile.write_i32(g_iVersion[3]); //Build
+    // For compatibility, let's use the final 1.8 version until
+    // there's no actual change in the map format.
+    mapfile.write_i32(1); //Major
+    mapfile.write_i32(8); //Minor
+    mapfile.write_i32(0); //Micro
+    mapfile.write_i32(4); //Build
+    // mapfile.write_i32(g_iVersion[0]); //Major
+    // mapfile.write_i32(g_iVersion[1]); //Minor
+    // mapfile.write_i32(g_iVersion[2]); //Micro
+    // mapfile.write_i32(g_iVersion[3]); //Build
 
     //Calculate warp zones
     bool usedtile[MAPWIDTH][MAPHEIGHT];
