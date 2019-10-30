@@ -4,23 +4,23 @@
 
 Super Mario War는 Super Mario Bros의 팬이 만든 멀티플레이어 버전이다. 다양한 모드에서 플레이어가 서로를 이기는 것이 목적인 데스메치 형식의 게임이다. 당신은 이 게임을 팀으로도 플레이 할 수도 있고, 당신만의 레벨이나 세계를 구현할 수도 있으며, 그 이상도 가능하다!!!
 
-- [역사](#역사)
-- [게임에 대해서](#게임에 대해서)
-- [빌드방법](#빌드방법)
-  - [코드받기](#코드받기)
-  - [요구사항들](#요구사항들)
+- [History](#history)
+- [About](#about)
+- [Building](#building-instructions)
+  - [Get the code](#get-the-code)
+  - [Requirements](#requirements)
   - [Linux](#linux)
   - [Mac OSX](#mac-osx)
   - [Windows](#windows)
   - [ARM / Raspberry Pi](#arm-devices)
   - [Android](#android)
   - [Emscripten](#emscripten)
-  - [다른기기들](#다른기기들)
-  - [빌드 구성법](#빌드 구성법)
-- [플레이 방법](#플레이 방법)
+  - [Other devices](#other-devices)
+  - [Build configuration](#build-configuration)
+- [How to play](#how-to-play)
 
 
-## 역사 
+## History
 
 시초가 되는 *Mario War*는 2002년 *Samuele Poletto* 가 만들었는데, 4명의 슈퍼마리오 캐릭터가 여러 레벨에서 서로의 머리에 점프를 함으로써 대결을 할 수 있었다. 이 게임은 파스칼/어셈블리어 (Pascal/Assembly)로 제작이 되었고, DOS용으로 배포 되었다. 이후 버전들에는 맵 에디터도 포함되었다.
 
@@ -37,13 +37,13 @@ Super Mario War는 Super Mario Bros의 팬이 만든 멀티플레이어 버전�
 2016년은 나에게 이 프로젝트에 시간을 더 이상 투자하지 않은 시점이었다. 장기적으로 보면 전체를 새로 쓰는 것은 원래 게임을 패치하는 것보다 더 빠르고 효과적일 수 있었다. 어느 쪽이든, 나는 프로젝트를 이전보다 더 나은 상태로 두고 미래 개발자에게 유용하기를 바란다. 재밌게 즐기길!
 
 
-## 게임에 대해서
+## About
 
 Super Mario War는 Super Mario의 멀티플레이 버전 게임이다. 게임의 목표는 마리오가 가능한 많이 승리하는 것이다. 게임에는 서로 다른 여러개의 게임 모드가 있는데, 깃발잡기, 일인자, 데스매치, 팀 데스매치, 토너먼트 모드, 코인 모으기, 경주 그외에 여러가지가 있다. 이 게임에는 레벨 에디터가 포함되어 있어 맵을 처음부터 새롭게 만들거나 좋아하는 마리오 게임에서 구역을 재창조 할 수 있습니다. 당신의 상상력이 한계를 결정합니다! 최근 버전에는 토너먼트와 통합된 슈퍼마리오 브라더스 3 와 같은 플레이를 만들기 위해서 지정된 조건으로 여러 레벨을 묶을 수 있는 월드 에디터도 포함되어 있다. 이 게임은 Nintendo와 Samuele Poletto가 만든 원조 팬메이드 게임 Mario War에 대한 찬사다.
 
 이 게임은 Nintendo의 아트워크와 사운드를 사용한다. 우리는 이 비상업적 팬 게임이 공정한 사용으로 자격을 얻기를 바란다. 단지 우리는 Nintendo의 캐릭터와 게임을 우리가 얼마나 좋아하는지 보여주기 위해 이 게임을 만들고 싶었다.
 
-### 특징
+### Features
 
 - 최대 4명의 플레이어가 즐길 수 있는 데스매치
 - 다양한 게임 모드 (featuring GetTheChicken, Domination, CTF, ...)
@@ -56,7 +56,7 @@ Super Mario War는 Super Mario의 멀티플레이 버전 게임이다. 게임의
 - CPU 플레이어와 함께 할 수 있다
 - 당신을 즐겁게 할 것이다!!!
 
-### 지원하는 플랫폼들
+### Supported platforms
 
 - Linux
 - Windows
@@ -67,9 +67,9 @@ Super Mario War는 Super Mario의 멀티플레이 버전 게임이다. 게임의
 - asm.js (실험중)
 
 
-## 빌드방법
+## Building instructions
 
-### 요구사항들
+### Requirements
 
 - C++11를 지원하는 컴파일러 (예 gcc-4.8)
 - CMake (>= 2.6)
@@ -95,7 +95,7 @@ Super Mario War는 Super Mario의 멀티플레이 버전 게임이다. 게임의
 - http://www.libsdl.org/projects/SDL_mixer/release-1.2.html
 - http://zlib.net
 
-### 코드 받기
+### Get the code
 
 이 저장소에는 당신의 운영체제와 맞지 않거나 당신이 시스템에 설치하는 것을 원하지 않는 경우들에 사용할 수 있는 일부 하위 모듈들을 포함하고 있다. 포함되어 있는 라이브러리들을 이용하면 재귀적인 복사를 할 수 있을 것이다:
 
@@ -158,7 +158,7 @@ Android 포트는 다른 빌드 시스템을 사용하므로 아래 주소에서
 
 SMW 당신의 브라우저에서 [Emscripten](https://kripken.github.io/emscripten-site/)이것을 사용해서 빌드할 수 있다. 당신은 빌드 방법을 여기서 찾을 수 있다[wiki](https://github.com/mmatyas/supermariowar/wiki/Building-the-Emscripten-port).
 
-### 다른기기들
+### Other devices
 
 SDL(1.2 또는 2.0 )이 작동하는 모든 장치에 SMW을 이식할 수 있을 것이다. 일반적으로, 다음 단계들을 포함한다:
 
@@ -174,7 +174,7 @@ SDL(1.2 또는 2.0 )이 작동하는 모든 장치에 SMW을 이식할 수 있�
 - CMake 툴체인 파일 생성 및 컴파일러와 경로 정의 
 - 툴체인 파일을 이용하여 빌드 
 
-### 빌드 구성법
+### Build configuration
 
 *TODO: expand this section*
 
@@ -183,7 +183,7 @@ SDL(1.2 또는 2.0 )이 작동하는 모든 장치에 SMW을 이식할 수 있�
 대신에, 이런 옵션들을 아래처럼 CMake에 직접 전달할 수 있다 `-DFLAGNAME=VALUE` (예 `cmake .. -DUSE_SDL2_LIBS=1`).
 
 
-## 플레이 방법
+## How to play
 
 docs/ 폴더 안의 문서를 참고해 주세요.
 
