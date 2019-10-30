@@ -103,7 +103,7 @@ MapList::MapList(bool fWorldEditor)
         for (short iDir = 0; iDir < iEditorDirCount; iDir++) {
             const char * szName = worldeditormapdirs.current_name();
 
-            DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+            DirectoryListing worldMapDir(std::string(szName) + std::string("/"), ".map");
 
             while (worldMapDir(curname)) {
                 MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
@@ -161,7 +161,7 @@ MapList::MapList(bool fWorldEditor)
     for (short iDir = 0; iDir < iDirCount; iDir++) {
         const char * szName = worldmapdirs.current_name();
 
-        DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+        DirectoryListing worldMapDir(std::string(szName) + std::string("/"), ".map");
 
         while (worldMapDir(curname)) {
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
@@ -214,7 +214,7 @@ void MapList::addWorldMaps()
     for (short iDir = 0; iDir < iDirCount; iDir++) {
         const char * szName = worldmapdirs.current_name();
 
-        DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+        DirectoryListing worldMapDir(std::string(szName) + std::string("/"), ".map");
 
         DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
 
