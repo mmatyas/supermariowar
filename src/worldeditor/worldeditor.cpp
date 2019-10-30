@@ -494,7 +494,7 @@ int main(int argc, char *argv[])
 
     int saved_col = 0, saved_row = 0;
     {
-        std::string options_path(GetHomeDirectory() + "worldeditor.bin");
+        const std::string options_path(GetHomeDirectory() + "worldeditor.bin");
         BinaryFile editor_settings(options_path.c_str(), "rb");
         if (editor_settings.is_open()) {
             saved_col = editor_settings.read_i32();
@@ -1073,7 +1073,7 @@ int main(int argc, char *argv[])
 	g_worldmap.Save(convertPath("worlds/ZZworldeditor.txt").c_str());
 
     {
-        std::string options_path(GetHomeDirectory() + "worldeditor.bin");
+        const std::string options_path(GetHomeDirectory() + "worldeditor.bin");
         BinaryFile editor_settings(options_path.c_str(), "wb");
         if (editor_settings.is_open()) {
             editor_settings.write_i32(draw_offset_col);
