@@ -4,6 +4,8 @@
 
 Super Mario War is a fan-made multiplayer Super Mario Bros. style deathmatch game in which players try to beat one another in a variety of gameplay modes. You can play on teams, design your own levels, design your own worlds, and much more!
 
+*Read this page in other languages: [한국어](README.ko.md)*
+
 - [History](#history)
 - [About](#about)
 - [Building](#building-instructions)
