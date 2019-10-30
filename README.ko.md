@@ -73,7 +73,7 @@ Super Mario War는 Super Mario의 멀티플레이 버전 게임이다. 게임의
 
 - C++11를 지원하는 컴파일러 (예 gcc-4.8)
 - CMake (>= 2.6)
-- SDL (1.2 or 2.0) 그리고,
+- SDL (1.2 또는 2.0) 그리고,
     - SDL_image
     - SDL_mixer
 - zlib
