@@ -562,7 +562,7 @@ int main(int argc, char *argv[])
 
 	resetselectedtiles();
 
-	game_values.init(); //Needed for FPSLimiter
+	game_values.init(); // Needed for FPSLimiter
 
 	printf("entering level editor loop...\n");
 #ifdef __EMSCRIPTEN__
