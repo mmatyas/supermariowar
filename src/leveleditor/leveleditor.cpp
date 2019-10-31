@@ -30,6 +30,7 @@
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"
+#include "GameValues.h"
 
 // Included only for movingplatform
 // TODO: Remove and fix linker errors
@@ -90,6 +91,8 @@ extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 extern CResourceManager* rm;
 extern std::string RootDataDirectory;
+
+extern CGameValues game_values;
 
 enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS, EDITOR_MAPHAZARDS};
 
@@ -558,6 +561,8 @@ int main(int argc, char *argv[])
 	printf("\n---------------- ready, steady, go! ----------------\n");
 
 	resetselectedtiles();
+
+	game_values.init(); // Needed for FPSLimiter
 
 	printf("entering level editor loop...\n");
 #ifdef __EMSCRIPTEN__
