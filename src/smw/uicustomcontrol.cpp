@@ -1213,6 +1213,7 @@ void MI_TourStop::Refresh(short iTourStop)
             gamemode = pipegamemode;
             tourstopicon = 25;
         } else if (tourstop->iMode == game_mode_boss_minigame) {
+            bossgamemode->SetBossType(tourstop->gmsSettings.boss.bosstype);
             gamemode = bossgamemode;
             tourstopicon = 26;
         } else if (tourstop->iMode == game_mode_boxes_minigame) {
