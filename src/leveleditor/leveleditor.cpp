@@ -969,7 +969,7 @@ int editor_edit()
                     if (key == SDLK_g) {
                         backgroundlist->next();
 
-                        rm->spr_background.init(convertPath(backgroundlist->current_name()));
+                        rm->spr_background.init(backgroundlist->current_name());
                         strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->current_name()).c_str());
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
@@ -4102,7 +4102,7 @@ int editor_backgrounds()
                             {
                                 backgroundlist->SetCurrent(iPage * 16 + iBackground);
 
-                                rm->spr_background.init(convertPath(backgroundlist->current_name()));
+                                rm->spr_background.init(backgroundlist->current_name());
                                 strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->current_name()).c_str());
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
