@@ -81,43 +81,12 @@ short			iWorldWidth, iWorldHeight;
 
 SDL_Event		event;
 
-gfxFont			menu_font_small;
-gfxFont			menu_font_large;
-
-gfxSprite		spr_tilesetworld;
-gfxSprite		spr_selectedtile;
 gfxSprite		spr_dialog;
 gfxSprite		menu_shade;
 gfxSprite		spr_largedialog;
 
 gfxSprite		spr_warps[3];
 gfxSprite		spr_path;
-
-gfxSprite		spr_worldbackground[3];
-gfxSprite		spr_worldforeground[3];
-gfxSprite		spr_worldforegroundspecial[3];
-gfxSprite		spr_worldpaths[3];
-gfxSprite		spr_worldvehicle[3];
-
-gfxSprite		spr_storedpowerupsmall;
-gfxSprite		spr_worlditems;
-gfxSprite		spr_worldpopup;
-
-gfxSprite		spr_worlditemssmall;
-gfxSprite		spr_worlditemsplace;
-
-//Mode Options Menu Gfx
-gfxSprite		menu_egg;
-gfxSprite		menu_plain_field;
-gfxSprite		menu_slider_bar;
-gfxSprite		menu_stomp;
-gfxSprite		menu_survival;
-gfxSprite		spr_phanto;
-gfxSprite		spr_selectfield;
-gfxSprite		menu_verticalarrows;
-gfxSprite		spr_storedpoweruplarge;
-gfxSprite		menu_mode_small;
-gfxSprite		menu_mode_large;
 
 gfxSprite		spr_vehicleicons;
 
@@ -142,12 +111,6 @@ WorldVehicle g_wvVehicleStamp;
 gfxSprite		spr_platformstarttile;
 gfxSprite		spr_platformendtile;
 gfxSprite		spr_platformpath;
-
-gfxSprite		spr_thumbnail_warps[2];
-gfxSprite		spr_thumbnail_mapitems[2];
-gfxSprite		spr_tileanimation[3];
-gfxSprite		spr_blocks[3];
-gfxSprite		spr_unknowntile[3];
 
 //// Global stuff that the map editor doesn't need, but has references to
 gfxSprite		spr_warplock;
@@ -218,7 +181,6 @@ gfxSprite		spr_awardsouls, spr_fireballexplosion;
 gfxSprite		spr_backmap[2];
 gfxSprite		spr_background;
 gfxSprite		spr_explosion;
-gfxSprite		spr_hazard_bulletbilldead;
 
 sfxSound		sfx_boomerang;
 sfxSound		sfx_bobombsound;
@@ -244,11 +206,6 @@ extern CResourceManager* rm;
 extern CGame* smw;
 extern std::string RootDataDirectory;
 
-gfxSprite		spr_hazard_fireball[3];
-gfxSprite		spr_hazard_rotodisc[3];
-gfxSprite		spr_hazard_bulletbill[3];
-gfxSprite		spr_hazard_flame[3];
-gfxSprite		spr_hazard_pirhanaplant[3];
 gfxSprite		spr_overlay, spr_overlayhole;
 
 void DECLSPEC soundfinished(int channel){}
@@ -417,8 +374,6 @@ MI_Text * miTitleText;
 
 UI_ModeOptionsMenu* mModeOptionsMenu;
 
-gfxSprite menu_dialog;
-
 SDL_Surface * sMapThumbnail = NULL;
 short iOldStageId = -1;
 
@@ -520,16 +475,14 @@ int main(int argc, char *argv[])
 
 	spr_path.init(convertPath("gfx/leveleditor/leveleditor_world_path.png"), 255, 0, 255);
 
-	spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 128, true);
+	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 128, true);
 
 	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), 255, 0, 255, 255, true);
 	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), 255, 0, 255, 128, true);
 	spr_largedialog.init(convertPath("gfx/leveleditor/leveleditor_platform.png"), 255, 0, 255, 255, true);
 
-	menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
-	menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
-    rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
-    rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
+	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
+	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
 
 	spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 255, 0, 255, 128, true);
 
@@ -541,92 +494,80 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- load world ----------------\n");
 
-	spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), 255, 0, 255, false);
-	spr_worldbackground[1].init(convertPath("gfx/packs/Classic/world/preview/world_background.png"), 255, 0, 255);
-	spr_worldbackground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_background.png"), 255, 0, 255);
+	rm->spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), 255, 0, 255, false);
+	rm->spr_worldbackground[1].init(convertPath("gfx/packs/Classic/world/preview/world_background.png"), 255, 0, 255);
+	rm->spr_worldbackground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_background.png"), 255, 0, 255);
 
-	spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), 255, 0, 255, false);
-	spr_worldforeground[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground.png"), 255, 0, 255);
-	spr_worldforeground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground.png"), 255, 0, 255);
+	rm->spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), 255, 0, 255, false);
+	rm->spr_worldforeground[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground.png"), 255, 0, 255);
+	rm->spr_worldforeground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground.png"), 255, 0, 255);
 
-	spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), 255, 0, 255, false);
-	spr_worldforegroundspecial[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground_special.png"), 255, 0, 255);
-	spr_worldforegroundspecial[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground_special.png"), 255, 0, 255);
+	rm->spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), 255, 0, 255, false);
+	rm->spr_worldforegroundspecial[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground_special.png"), 255, 0, 255);
+	rm->spr_worldforegroundspecial[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground_special.png"), 255, 0, 255);
 
-	spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), 255, 0, 255, false);
-	spr_worldpaths[1].init(convertPath("gfx/packs/Classic/world/preview/world_paths.png"), 255, 0, 255);
-	spr_worldpaths[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_paths.png"), 255, 0, 255);
+	rm->spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), 255, 0, 255, false);
+	rm->spr_worldpaths[1].init(convertPath("gfx/packs/Classic/world/preview/world_paths.png"), 255, 0, 255);
+	rm->spr_worldpaths[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_paths.png"), 255, 0, 255);
 
-	spr_worldvehicle[0].init(convertPath("gfx/packs/Classic/world/world_vehicles.png"), 255, 0, 255);
-	spr_worldvehicle[1].init(convertPath("gfx/packs/Classic/world/preview/world_vehicles.png"), 255, 0, 255);
-	spr_worldvehicle[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_vehicles.png"), 255, 0, 255);
+	rm->spr_worldvehicle[0].init(convertPath("gfx/packs/Classic/world/world_vehicles.png"), 255, 0, 255);
+	rm->spr_worldvehicle[1].init(convertPath("gfx/packs/Classic/world/preview/world_vehicles.png"), 255, 0, 255);
+	rm->spr_worldvehicle[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_vehicles.png"), 255, 0, 255);
 
-	spr_worlditems.init(convertPath("gfx/packs/Classic/world/world_powerups.png"), 255, 0, 255);
-	spr_worldpopup.init(convertPath("gfx/packs/Classic/world/world_item_popup.png"), 255, 0, 255);
+	rm->spr_worlditems.init(convertPath("gfx/packs/Classic/world/world_powerups.png"), 255, 0, 255);
+	rm->spr_worlditempopup.init(convertPath("gfx/packs/Classic/world/world_item_popup.png"), 255, 0, 255);
 
-	spr_storedpowerupsmall.init(convertPath("gfx/packs/Classic/powerups/small.png"), 255, 0, 255);
-	spr_worlditemssmall.init(convertPath("gfx/packs/Classic/world/world_powerupssmall.png"), 255, 0, 255);
-	spr_worlditemsplace.init(convertPath("gfx/packs/Classic/world/world_bonusplace.png"), 255, 0, 255);
+	rm->spr_storedpowerupsmall.init(convertPath("gfx/packs/Classic/powerups/small.png"), 255, 0, 255);
+	rm->spr_worlditemssmall.init(convertPath("gfx/packs/Classic/world/world_powerupssmall.png"), 255, 0, 255);
+	rm->spr_worlditemsplace.init(convertPath("gfx/packs/Classic/world/world_bonusplace.png"), 255, 0, 255);
 
-	menu_dialog.init(convertPath("gfx/packs/Classic/menu/menu_dialog.png"), 255, 0, 255);
+	rm->menu_dialog.init(convertPath("gfx/packs/Classic/menu/menu_dialog.png"), 255, 0, 255);
 
 	//Mode Options Menu Gfx
-	menu_egg.init(convertPath("gfx/packs/Classic/modeobjects/menu_egg.png"), 255, 0, 255);
-	menu_stomp.init(convertPath("gfx/packs/Classic/modeobjects/menu_stomp.png"), 255, 0, 255);
-	menu_survival.init(convertPath("gfx/packs/Classic/modeobjects/menu_survival.png"), 255, 0, 255);
-	spr_phanto.init(convertPath("gfx/packs/Classic/modeobjects/phanto.png"), 255, 0, 255);
-	menu_plain_field.init(convertPath("gfx/leveleditor/menu_plain_field.png"), 255, 0, 255);
-	menu_slider_bar.init(convertPath("gfx/packs/Classic/menu/menu_slider_bar.png"), 255, 0, 255);
-	spr_selectfield.init(convertPath("gfx/leveleditor/menu_selectfield.png"), 255, 0, 255);
-	menu_verticalarrows.init(convertPath("gfx/packs/Classic/menu/menu_vertical_arrows.png"), 255, 0, 255);
-	spr_storedpoweruplarge.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
+	rm->menu_egg.init(convertPath("gfx/packs/Classic/modeobjects/menu_egg.png"), 255, 0, 255);
+	rm->menu_stomp.init(convertPath("gfx/packs/Classic/modeobjects/menu_stomp.png"), 255, 0, 255);
+	rm->menu_survival.init(convertPath("gfx/packs/Classic/modeobjects/menu_survival.png"), 255, 0, 255);
+	rm->spr_phanto.init(convertPath("gfx/packs/Classic/modeobjects/phanto.png"), 255, 0, 255);
+	rm->menu_plain_field.init(convertPath("gfx/leveleditor/menu_plain_field.png"), 255, 0, 255);
+	rm->menu_slider_bar.init(convertPath("gfx/packs/Classic/menu/menu_slider_bar.png"), 255, 0, 255);
+	rm->spr_selectfield.init(convertPath("gfx/leveleditor/menu_selectfield.png"), 255, 0, 255);
+	rm->menu_verticalarrows.init(convertPath("gfx/packs/Classic/menu/menu_vertical_arrows.png"), 255, 0, 255);
+	rm->spr_storedpoweruplarge.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
 
-	menu_mode_small.init(convertPath("gfx/packs/Classic/menu/menu_mode_small.png"), 255, 0, 255);
-	menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_large.png"), 255, 0, 255);
+	rm->menu_mode_small.init(convertPath("gfx/packs/Classic/menu/menu_mode_small.png"), 255, 0, 255);
+	rm->menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_large.png"), 255, 0, 255);
 
 	spr_vehicleicons.init(convertPath("gfx/leveleditor/vehicle_icons.png"), 255, 0, 255);
 
-	spr_thumbnail_warps[0].init(convertPath("gfx/packs/Classic/menu/menu_warp_preview.png"), 255, 0, 255);
-	spr_thumbnail_warps[1].init(convertPath("gfx/packs/Classic/menu/menu_warp_thumbnail.png"), 255, 0, 255);
+	rm->spr_thumbnail_warps[0].init(convertPath("gfx/packs/Classic/menu/menu_warp_preview.png"), 255, 0, 255);
+	rm->spr_thumbnail_warps[1].init(convertPath("gfx/packs/Classic/menu/menu_warp_thumbnail.png"), 255, 0, 255);
 
-	spr_thumbnail_mapitems[0].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_preview.png"), 255, 0, 255);
-	spr_thumbnail_mapitems[1].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_thumbnail.png"), 255, 0, 255);
+	rm->spr_thumbnail_mapitems[0].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_preview.png"), 255, 0, 255);
+	rm->spr_thumbnail_mapitems[1].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_thumbnail.png"), 255, 0, 255);
 
-	spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), 255, 0, 255);
-	spr_tileanimation[2].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), 255, 0, 255);
+	rm->spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), 255, 0, 255);
+	rm->spr_tileanimation[2].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), 255, 0, 255);
 
-	spr_blocks[1].init(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), 255, 0, 255);
-	spr_blocks[2].init(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), 255, 0, 255);
+	rm->spr_blocks[1].init(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), 255, 0, 255);
+	rm->spr_blocks[2].init(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), 255, 0, 255);
 
-	spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), 255, 0, 255);
-	spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), 255, 0, 255);
+	rm->spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), 255, 0, 255);
+	rm->spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), 255, 0, 255);
 
-	spr_hazard_fireball[1].init(convertPath("gfx/packs/Classic/hazards/fireball_preview.png"), 255, 0, 255);
-	spr_hazard_fireball[2].init(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png"), 255, 0, 255);
+	rm->spr_hazard_fireball[1].init(convertPath("gfx/packs/Classic/hazards/fireball_preview.png"), 255, 0, 255);
+	rm->spr_hazard_fireball[2].init(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png"), 255, 0, 255);
 
-	spr_hazard_rotodisc[1].init(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png"), 255, 0, 255);
-	spr_hazard_rotodisc[2].init(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png"), 255, 0, 255);
+	rm->spr_hazard_rotodisc[1].init(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png"), 255, 0, 255);
+	rm->spr_hazard_rotodisc[2].init(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png"), 255, 0, 255);
 
-	spr_hazard_bulletbill[1].init(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png"), 255, 0, 255);
-	spr_hazard_bulletbill[2].init(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png"), 255, 0, 255);
+	rm->spr_hazard_bulletbill[1].init(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png"), 255, 0, 255);
+	rm->spr_hazard_bulletbill[2].init(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png"), 255, 0, 255);
 
-	spr_hazard_flame[1].init(convertPath("gfx/packs/Classic/hazards/flame_preview.png"), 255, 0, 255);
-	spr_hazard_flame[2].init(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png"), 255, 0, 255);
+	rm->spr_hazard_flame[1].init(convertPath("gfx/packs/Classic/hazards/flame_preview.png"), 255, 0, 255);
+	rm->spr_hazard_flame[2].init(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png"), 255, 0, 255);
 
-	spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), 255, 0, 255);
-	spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), 255, 0, 255);
-
-	//Resource manager hack
-	rm->spr_worldbackground[0] = spr_worldbackground[0];
-	rm->spr_worldbackground[1] = spr_worldbackground[1];
-	rm->spr_worldforeground[0] = spr_worldforeground[0];
-	rm->spr_worldforeground[1] = spr_worldforeground[1];
-	rm->spr_worldforegroundspecial[0] = spr_worldforegroundspecial[0];
-	rm->spr_worldforegroundspecial[1] = spr_worldforegroundspecial[1];
-	rm->spr_worldpaths[0] = spr_worldpaths[0];
-	rm->spr_worldpaths[1] = spr_worldpaths[1];
-	rm->spr_worldvehicle[0] = spr_worldvehicle[0];
-	rm->spr_worldvehicle[1] = spr_worldvehicle[1];
+	rm->spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), 255, 0, 255);
+	rm->spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), 255, 0, 255);
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
@@ -677,10 +618,10 @@ int main(int argc, char *argv[])
 	mCurrentMenu = &mStageSettingsMenu;
 
 	//Name
-	miNameField = new MI_TextField(&spr_selectfield, 70, 20, "Name", 500, 120);
+	miNameField = new MI_TextField(&rm->spr_selectfield, 70, 20, "Name", 500, 120);
 	miNameField->SetDisallowedChars(",");
 
-	miModeField = new MI_ImageSelectField(&spr_selectfield, &menu_mode_small, 70, 60, "Mode", 500, 120, 16, 16);
+	miModeField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 60, "Mode", 500, 120, 16, 16);
 	//miModeField->SetData(game_values.tourstops[0]->iMode, NULL, NULL);
 	//miModeField->SetKey(0);
 	miModeField->SetItemChangedCode(MENU_CODE_MODE_CHANGED);
@@ -688,7 +629,7 @@ int main(int argc, char *argv[])
     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
 		miModeField->Add(stagemodes[iGameMode].szName, iGameMode, "", false, false);
 
-		miGoalField[iGameMode] = new MI_SelectField(&spr_selectfield, 70, 100, stagemodes[iGameMode].szGoal, 352, 120);
+		miGoalField[iGameMode] = new MI_SelectField(&rm->spr_selectfield, 70, 100, stagemodes[iGameMode].szGoal, 352, 120);
 		miGoalField[iGameMode]->Show(iGameMode == 0);
 
         for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
@@ -706,7 +647,7 @@ int main(int argc, char *argv[])
 	miModeField->Add("Boxes Minigame", 27, "", false, false);
 
 	//Create goal field for pipe game
-	miSpecialGoalField[0] = new MI_SelectField(&spr_selectfield, 70, 100, "Points", 352, 120);
+	miSpecialGoalField[0] = new MI_SelectField(&rm->spr_selectfield, 70, 100, "Points", 352, 120);
 	miSpecialGoalField[0]->Show(false);
 
     for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
@@ -717,7 +658,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Create goal field for boss game
-	miSpecialGoalField[1] = new MI_SelectField(&spr_selectfield, 70, 100, "Lives", 352, 120);
+	miSpecialGoalField[1] = new MI_SelectField(&rm->spr_selectfield, 70, 100, "Lives", 352, 120);
 	miSpecialGoalField[1]->Show(false);
 
     for (short iGameLives = 1; iGameLives <= 30; iGameLives++) {
@@ -727,7 +668,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Create goal field for boxes game
-	miSpecialGoalField[2] = new MI_SelectField(&spr_selectfield, 70, 100, "Lives", 352, 120);
+	miSpecialGoalField[2] = new MI_SelectField(&rm->spr_selectfield, 70, 100, "Lives", 352, 120);
 	miSpecialGoalField[2]->Show(false);
 
     for (short iGameLives = 1; iGameLives <= 30; iGameLives++) {
@@ -737,11 +678,11 @@ int main(int argc, char *argv[])
 	}
 
 	//Mode Settings Button
-	miModeSettingsButton = new MI_Button(&spr_selectfield, 430, 100, "Settings", 140, 0);
+	miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 100, "Settings", 140, 0);
 	miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
 
 	//Points Field
-	miPointsField = new MI_SelectField(&spr_selectfield, 70, 140, "Points", 245, 120);
+	miPointsField = new MI_SelectField(&rm->spr_selectfield, 70, 140, "Points", 245, 120);
     for (short iPoints = 0; iPoints <= 20; iPoints++) {
 		char szPoints[8];
 		sprintf(szPoints, "%d", iPoints);
@@ -749,30 +690,30 @@ int main(int argc, char *argv[])
 	}
 
 	//Final Stage Field
-	miFinalStageField = new MI_SelectField(&spr_selectfield, 325, 140, "End Stage", 245, 120);
+	miFinalStageField = new MI_SelectField(&rm->spr_selectfield, 325, 140, "End Stage", 245, 120);
 	miFinalStageField->Add("No", 0, "", false, false);
 	miFinalStageField->Add("Yes", 1, "", true, false);
 	miFinalStageField->SetAutoAdvance(true);
 
 	//Map Select Field
-	miMapField = new MI_MapField(&spr_selectfield, 70, 180, "Map", 500, 120, true);
+	miMapField = new MI_MapField(&rm->spr_selectfield, 70, 180, "Map", 500, 120, true);
 
 	//Bonus Item Picker Menu Button
-	miBonusItemsButton= new MI_Button(&spr_selectfield, 430, 220, "Bonuses", 140, 0);
+	miBonusItemsButton= new MI_Button(&rm->spr_selectfield, 430, 220, "Bonuses", 140, 0);
 	miBonusItemsButton->SetCode(MENU_CODE_TO_BONUS_PICKER_MENU);
 
 	//Bonus Type
-	miBonusType = new MI_SelectField(&spr_selectfield, 70, 100, "Type", 500, 120);
+	miBonusType = new MI_SelectField(&rm->spr_selectfield, 70, 100, "Type", 500, 120);
 	miBonusType->Add("Fixed", 0, "", false, false);
 	miBonusType->Add("Random", 1, "", true, false);
 	miBonusType->SetAutoAdvance(true);
 
 	//Bonus House Text * 5
-	miBonusTextField[0] = new MI_TextField(&spr_selectfield, 70, 140, "Text", 500, 120);
-	miBonusTextField[1] = new MI_TextField(&spr_selectfield, 70, 180, "Text", 500, 120);
-	miBonusTextField[2] = new MI_TextField(&spr_selectfield, 70, 220, "Text", 500, 120);
-	miBonusTextField[3] = new MI_TextField(&spr_selectfield, 70, 260, "Text", 500, 120);
-	miBonusTextField[4] = new MI_TextField(&spr_selectfield, 70, 300, "Text", 500, 120);
+	miBonusTextField[0] = new MI_TextField(&rm->spr_selectfield, 70, 140, "Text", 500, 120);
+	miBonusTextField[1] = new MI_TextField(&rm->spr_selectfield, 70, 180, "Text", 500, 120);
+	miBonusTextField[2] = new MI_TextField(&rm->spr_selectfield, 70, 220, "Text", 500, 120);
+	miBonusTextField[3] = new MI_TextField(&rm->spr_selectfield, 70, 260, "Text", 500, 120);
+	miBonusTextField[4] = new MI_TextField(&rm->spr_selectfield, 70, 300, "Text", 500, 120);
 
 	miBonusTextField[0]->SetDisallowedChars(",|");
 	miBonusTextField[1]->SetDisallowedChars(",|");
@@ -781,15 +722,15 @@ int main(int argc, char *argv[])
 	miBonusTextField[4]->SetDisallowedChars(",|");
 
 	//Delete Stage Button
-	miDeleteStageButton = new MI_Button(&spr_selectfield, 430, 440, "Delete", 140, 0);
+	miDeleteStageButton = new MI_Button(&rm->spr_selectfield, 430, 440, "Delete", 140, 0);
 	miDeleteStageButton->SetCode(MENU_CODE_DELETE_STAGE_BUTTON);
 
 	//Are You Sure Dialog for Delete Stage
 	miDeleteStageDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
 	miDeleteStageDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
 	miDeleteStageDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
-	miDeleteStageDialogYesButton = new MI_Button(&spr_selectfield, 235, 250, "Yes", 80, 1);
-	miDeleteStageDialogNoButton = new MI_Button(&spr_selectfield, 325, 250, "No", 80, 1);
+	miDeleteStageDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
+	miDeleteStageDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
 
 	miDeleteStageDialogYesButton->SetCode(MENU_CODE_DELETE_STAGE_YES);
 	miDeleteStageDialogNoButton->SetCode(MENU_CODE_DELETE_STAGE_NO);
@@ -870,7 +811,7 @@ int main(int argc, char *argv[])
 	g_wvVehicleStamp.iBoundary = 0;
 
 	//Create Vehicle Menu
-	miVehicleSpriteField = new MI_ImageSelectField(&spr_selectfield, &spr_vehicleicons, 70, 80, "Sprite", 500, 150, 16, 16);
+	miVehicleSpriteField = new MI_ImageSelectField(&rm->spr_selectfield, &spr_vehicleicons, 70, 80, "Sprite", 500, 150, 16, 16);
 	miVehicleSpriteField->Add("Hammer Brother", 0, "", false, false);
 	miVehicleSpriteField->Add("Boomerang Brother", 1, "", false, false);
 	miVehicleSpriteField->Add("Fire Brother", 2, "", false, false);
@@ -883,10 +824,10 @@ int main(int argc, char *argv[])
 	miVehicleSpriteField->SetData(&g_wvVehicleStamp.iDrawSprite, NULL, NULL);
 	miVehicleSpriteField->SetKey(g_wvVehicleStamp.iDrawSprite);
 
-	miVehicleStageField = new MI_ImageSelectField(&spr_selectfield, &menu_mode_small, 70, 120, "Stage", 500, 150, 16, 16);
+	miVehicleStageField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 120, "Stage", 500, 150, 16, 16);
 	miVehicleStageField->SetData(&g_wvVehicleStamp.iActionId, NULL, NULL);
 
-	miVehicleMinMovesField = new MI_SelectField(&spr_selectfield, 70, 160, "Min Moves", 500, 150);
+	miVehicleMinMovesField = new MI_SelectField(&rm->spr_selectfield, 70, 160, "Min Moves", 500, 150);
 
     for (short iMinMoves = 0; iMinMoves <= 100; iMinMoves++) {
 		char szMinMoves[8];
@@ -900,7 +841,7 @@ int main(int argc, char *argv[])
 	miVehicleMinMovesField->SetNoWrap(true);
 	miVehicleMinMovesField->AllowFastScroll(true);
 
-	miVehicleMaxMovesField = new MI_SelectField(&spr_selectfield, 70, 200, "Max Moves", 500, 150);
+	miVehicleMaxMovesField = new MI_SelectField(&rm->spr_selectfield, 70, 200, "Max Moves", 500, 150);
 
     for (short iMaxMoves = 0; iMaxMoves <= 100; iMaxMoves++) {
 		char szMaxMoves[8];
@@ -914,21 +855,21 @@ int main(int argc, char *argv[])
 	miVehicleMaxMovesField->SetNoWrap(true);
 	miVehicleMaxMovesField->AllowFastScroll(true);
 
-	miVehiclePacesField = new MI_SelectField(&spr_selectfield, 70, 240, "Paces", 500, 150);
+	miVehiclePacesField = new MI_SelectField(&rm->spr_selectfield, 70, 240, "Paces", 500, 150);
 	miVehiclePacesField->Add("No", 0, "", false, false);
 	miVehiclePacesField->Add("Yes", 1, "", true, false);
 	miVehiclePacesField->SetData(NULL, NULL, &g_wvVehicleStamp.fSpritePaces);
 	miVehiclePacesField->SetKey(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
 	miVehiclePacesField->SetAutoAdvance(true);
 
-	miVehicleDirectionField = new MI_SelectField(&spr_selectfield, 70, 280, "Direction", 500, 150);
+	miVehicleDirectionField = new MI_SelectField(&rm->spr_selectfield, 70, 280, "Direction", 500, 150);
 	miVehicleDirectionField->Add("Left", 0, "", false, false);
 	miVehicleDirectionField->Add("Right", 1, "", true, false);
 	miVehiclePacesField->SetData(&g_wvVehicleStamp.iDrawDirection, NULL, NULL);
 	miVehiclePacesField->SetKey(g_wvVehicleStamp.iDrawDirection);
 	miVehicleDirectionField->SetAutoAdvance(true);
 
-	miVehicleBoundaryField = new MI_SelectField(&spr_selectfield, 70, 320, "Boundary", 500, 150);
+	miVehicleBoundaryField = new MI_SelectField(&rm->spr_selectfield, 70, 320, "Boundary", 500, 150);
 	miVehicleBoundaryField->Add("No Boundary", 0, "", false, false);
 
     for (short iBoundary = 1; iBoundary <= 100; iBoundary++) {
@@ -941,7 +882,7 @@ int main(int argc, char *argv[])
 	miVehicleBoundaryField->SetKey(g_wvVehicleStamp.iBoundary);
 	miVehicleBoundaryField->AllowFastScroll(true);
 
-	miVehicleCreateButton = new MI_Button(&spr_selectfield, 430, 360, "OK", 140, 1);
+	miVehicleCreateButton = new MI_Button(&rm->spr_selectfield, 430, 360, "OK", 140, 1);
 	miVehicleCreateButton->SetCode(MENU_CODE_CREATE_VEHICLE);
 
 	miTitleText = new MI_Text("Clicking on the map will add the vehicle configured below", 320, 50, 640, 2, 1);
@@ -1786,10 +1727,10 @@ int editor_edit()
 		//Ask if you are sure you want to exit
         if (fExiting) {
 			spr_dialog.draw(224, 176, 0, 0, 192, 128);
-			menu_font_large.drawCentered(320, 195, "Exit");
-			menu_font_large.drawCentered(320, 220, "Are You Sure?");
-			menu_font_large.drawCentered(282, 254, "Yes");
-			menu_font_large.drawCentered(356, 254, "No");
+			rm->menu_font_large.drawCentered(320, 195, "Exit");
+			rm->menu_font_large.drawCentered(320, 220, "Are You Sure?");
+			rm->menu_font_large.drawCentered(282, 254, "Yes");
+			rm->menu_font_large.drawCentered(356, 254, "No");
 
 			spr_dialog.draw(fSelectedYes ? 250 : 326, 250, 192, 0, 64, 32);
         } else {
@@ -1838,7 +1779,7 @@ int editor_edit()
 							SDL_Rect r = {ix, iy, 32, 32};
 							SDL_FillRect(blitdest, &r, color);
 
-							spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
+							rm->spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
 						}
 					}
 				}
@@ -1854,7 +1795,7 @@ int editor_edit()
 							SDL_Rect r = {ix, iy, 32, 32};
 							SDL_FillRect(blitdest, &r, color);
 
-							spr_worldforegroundspecial[0].draw(ix, iy, (iType % 10) << 5, (iType / 10) << 5, 32, 32);
+							rm->spr_worldforegroundspecial[0].draw(ix, iy, (iType % 10) << 5, (iType / 10) << 5, 32, 32);
 						}
 					}
 				}
@@ -1879,18 +1820,18 @@ int editor_edit()
 					SDL_Rect r = {ix, iy, 32, 32};
 					SDL_FillRect(blitdest, &r, color);
 
-					spr_worldvehicle[0].draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
+					rm->spr_worldvehicle[0].draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
 
                     if (edit_mode == 5) {
-						spr_worldforegroundspecial[0].draw(ix, iy, (vehicle->iActionId % 10) << 5, (vehicle->iActionId / 10) << 5, 32, 32);
+						rm->spr_worldforegroundspecial[0].draw(ix, iy, (vehicle->iActionId % 10) << 5, (vehicle->iActionId / 10) << 5, 32, 32);
 					}
 
                     if (edit_mode == 8) {
 						short iBoundary = vehicle->iBoundary - 1;
 						if (iBoundary == -1)
-							spr_worldforegroundspecial[0].draw(ix, iy, 288, 288, 32, 32);
+							rm->spr_worldforegroundspecial[0].draw(ix, iy, 288, 288, 32, 32);
 						else
-							spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
+							rm->spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
 					}
 
 					itr++;
@@ -1906,21 +1847,21 @@ int editor_edit()
 				}
 			}
 
-			menu_font_small.draw(0, 0, szEditModes[edit_mode]);
+			rm->menu_font_small.draw(0, 0, szEditModes[edit_mode]);
 
 			if (fAutoPaint)
-				menu_font_small.draw(0, 16, "Auto Paint");
+				rm->menu_font_small.draw(0, 16, "Auto Paint");
 
-            menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+            rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 
             if (--g_musiccategorydisplaytimer > 0) {
 				spr_dialog.draw(224, 176, 0, 0, 192, 128);
-				menu_font_small.drawCentered(320, 195, "Music Category");
-				menu_font_large.drawCentered(320, 220, g_szWorldMusicCategoryNames[g_worldmap.iMusicCategory]);
+				rm->menu_font_small.drawCentered(320, 195, "Music Category");
+				rm->menu_font_large.drawCentered(320, 220, g_szWorldMusicCategoryNames[g_worldmap.iMusicCategory]);
 
-				menu_font_small.drawCentered(320, 255, "Press 'R' Again");
-				menu_font_small.drawCentered(320, 270, "To Change");
+				rm->menu_font_small.drawCentered(320, 255, "Press 'R' Again");
+				rm->menu_font_small.drawCentered(320, 270, "To Change");
 			}
 
 			DrawMessage();
@@ -1946,10 +1887,10 @@ void DrawMessage()
 		--g_messagedisplaytimer;
 
 		spr_dialog.draw(224, 176, 0, 0, 192, 128);
-		menu_font_large.drawCentered(320, 195, g_szMessageTitle.c_str());
-		menu_font_large.drawCentered(320, 220, g_szMessageLine[0].c_str());
-		menu_font_large.drawCentered(320, 240, g_szMessageLine[1].c_str());
-		menu_font_large.drawCentered(320, 260, g_szMessageLine[2].c_str());
+		rm->menu_font_large.drawCentered(320, 195, g_szMessageTitle.c_str());
+		rm->menu_font_large.drawCentered(320, 220, g_szMessageLine[0].c_str());
+		rm->menu_font_large.drawCentered(320, 240, g_szMessageLine[1].c_str());
+		rm->menu_font_large.drawCentered(320, 260, g_szMessageLine[2].c_str());
 	}
 }
 
@@ -2598,7 +2539,7 @@ int editor_warp()
 
 		spr_warps[0].draw(0, 0, 0, 0, 320, 32);
 
-        menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2706,27 +2647,27 @@ int editor_start_items()
 		menu_shade.draw(0, 0);
 
         for (short iItem = 0; iItem < NUM_POWERUPS; iItem++) {
-			spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
+			rm->spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
 		}
 
         for (short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++) {
-			spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
+			rm->spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
 		}
 
         for (short iPopup = 0; iPopup < 4; iPopup++) {
-			spr_worldpopup.draw(0, 416 - (iPopup << 6), 0, 0, 320, 64);
-			spr_worldpopup.draw(320, 416 - (iPopup << 6), 192, 0, 320, 64);
+			rm->spr_worlditempopup.draw(0, 416 - (iPopup << 6), 0, 0, 320, 64);
+			rm->spr_worlditempopup.draw(320, 416 - (iPopup << 6), 192, 0, 320, 64);
 		}
 
         for (short iPickedItem = 0; iPickedItem < g_worldmap.iNumInitialBonuses; iPickedItem++) {
 			short iPowerup = g_worldmap.iInitialBonuses[iPickedItem];
 			if (iPowerup >= NUM_POWERUPS)
-				spr_worlditems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
+				rm->spr_worlditems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
 			else
-				spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
+				rm->spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
 		}
 
-        menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2796,9 +2737,9 @@ int editor_boundary()
 		SDL_Rect r = {0, 0, 320, 320};
 		SDL_FillRect(blitdest, &r, color);
 
-		spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
+		rm->spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
 
-        menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2873,12 +2814,12 @@ int editor_type()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
-		spr_worldforegroundspecial[0].draw(0, 0, 320, 128, 64, 32);
-		spr_worldforegroundspecial[0].draw(64, 0, 320, 192, 128, 32);
+		rm->spr_worldforegroundspecial[0].draw(0, 0, 320, 128, 64, 32);
+		rm->spr_worldforegroundspecial[0].draw(64, 0, 320, 192, 128, 32);
 
-		spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
+		rm->spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
 
-        menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2942,7 +2883,7 @@ int editor_water()
 		SDL_FillRect(screen, NULL, 0x0);
 
 		for (short iWater = 0; iWater < 3; iWater++)
-			spr_worldbackground[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
+			rm->spr_worldbackground[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3035,7 +2976,7 @@ int editor_background()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		spr_worldbackground[0].draw(0, 0, iPage * 640, 32, 640, 480);
+		rm->spr_worldbackground[0].draw(0, 0, iPage * 640, 32, 640, 480);
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3113,11 +3054,11 @@ int editor_stageforeground()
 
         for (short iRow = 0; iRow < 10; iRow++) {
             for (short iCol = 0; iCol < 10; iCol++) {
-				spr_worldforegroundspecial[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
+				rm->spr_worldforegroundspecial[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
 			}
 		}
 
-		spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
+		rm->spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3182,7 +3123,7 @@ int editor_bridges()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		spr_worldforegroundspecial[0].draw(0, 0, 320, 224, 128, 32);
+		rm->spr_worldforegroundspecial[0].draw(0, 0, 320, 224, 128, 32);
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3253,8 +3194,8 @@ int editor_structureforeground()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		spr_worldforeground[0].draw(0, 0, 0, 0, 416, 480);
-		spr_worldforeground[0].draw(416, 0, 512, 0, 32, 480);
+		rm->spr_worldforeground[0].draw(0, 0, 0, 0, 416, 480);
+		rm->spr_worldforeground[0].draw(416, 0, 512, 0, 32, 480);
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3317,7 +3258,7 @@ int editor_pathsprite()
 		SDL_FillRect(screen, NULL, 0x0);
 
         for (short iPath = 0; iPath < 8; iPath++) {
-			spr_worldpaths[0].draw(iPath << 5, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);
+			rm->spr_worldpaths[0].draw(iPath << 5, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);
 		}
 
 		DrawMessage();
@@ -3438,7 +3379,7 @@ int editor_vehicles()
 		mCurrentMenu->Update();
 		mCurrentMenu->Draw();
 
-        menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3582,27 +3523,27 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 		spr_largedialog.draw(iMouseX + 116, iMouseY + 44, 140, 180, 116, 44);
 	}
 
-	menu_mode_large.draw(iMouseX + 16, iMouseY + 16, iMode << 5, 0, 32, 32);
+	rm->menu_mode_large.draw(iMouseX + 16, iMouseY + 16, iMode << 5, 0, 32, 32);
 
-	menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 16, 164, ts->szName);
+	rm->menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 16, 164, ts->szName);
 
 	char szPrint[128];
     if (iMode != 24) {
 		sprintf(szPrint, "Goal: %d", ts->iGoal);
-		menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
+		rm->menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
 
 		sprintf(szPrint, "Points: %d", ts->iPoints);
-		menu_font_small.drawChopRight(iMouseX + 16, iMouseY + 176, 100, szPrint);
+		rm->menu_font_small.drawChopRight(iMouseX + 16, iMouseY + 176, 100, szPrint);
 
 		sprintf(szPrint, "End: %s", ts->fEndStage ? "Yes" : "No");
-		menu_font_small.drawChopRight(iMouseX + 126, iMouseY + 176, 80, szPrint);
+		rm->menu_font_small.drawChopRight(iMouseX + 126, iMouseY + 176, 80, szPrint);
 
         for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
 			WorldStageBonus * wsb = &ts->wsbBonuses[iBonus];
-			spr_worlditemsplace.draw(iMouseX + iBonus * 20 + 16, iMouseY + 194, wsb->iWinnerPlace * 20, 0, 20, 20);
+			rm->spr_worlditemsplace.draw(iMouseX + iBonus * 20 + 16, iMouseY + 194, wsb->iWinnerPlace * 20, 0, 20, 20);
 
 			short iBonusIcon = wsb->iBonus;
-			gfxSprite * spr_icon = iBonusIcon < NUM_POWERUPS ? &spr_storedpowerupsmall : &spr_worlditemssmall;
+			gfxSprite * spr_icon = iBonusIcon < NUM_POWERUPS ? &rm->spr_storedpowerupsmall : &rm->spr_worlditemssmall;
 			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 196, (iBonusIcon < NUM_POWERUPS ? iBonusIcon : iBonusIcon - NUM_POWERUPS) << 4, 0, 16, 16);
 		}
 
@@ -3614,7 +3555,7 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 		}
     } else {
 		sprintf(szPrint, "Sort: %s", ts->iBonusType == 0 ? "Fixed" : "Random");
-		menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
+		rm->menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
 
         for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
 			short iBonusIcon = ts->wsbBonuses[iBonus].iBonus;
@@ -3622,19 +3563,19 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 			short iSrcX = 0, iSrcY = 0;
 
             if (iBonusIcon < NUM_POWERUPS) {
-				spr_icon = &spr_storedpowerupsmall;
+				spr_icon = &rm->spr_storedpowerupsmall;
 				iSrcX = iBonusIcon << 4;
 				iSrcY = 0;
             } else if (iBonusIcon < NUM_POWERUPS + NUM_WORLD_POWERUPS) {
-				spr_icon = &spr_worlditemssmall;
+				spr_icon = &rm->spr_worlditemssmall;
 				iSrcX = (iBonusIcon - NUM_POWERUPS) << 4;
 				iSrcY = 0;
             } else if (iBonusIcon < NUM_POWERUPS + NUM_WORLD_POWERUPS + 10) {
-				spr_icon = &spr_worlditemssmall;
+				spr_icon = &rm->spr_worlditemssmall;
 				iSrcX = (iBonusIcon - NUM_POWERUPS - NUM_WORLD_POWERUPS) << 4;
 				iSrcY = 16;
             } else {
-				spr_icon = &spr_worlditemssmall;
+				spr_icon = &rm->spr_worlditemssmall;
 				iSrcX = (iBonusIcon - NUM_POWERUPS - NUM_WORLD_POWERUPS - 10) << 4;
 				iSrcY = 32;
 			}
@@ -4300,7 +4241,7 @@ int editor_stage()
 				SDL_Rect r = {ix, iy, 32, 32};
 				SDL_FillRect(blitdest, &r, color);
 
-				spr_worldforegroundspecial[0].draw(ix, iy, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
+				rm->spr_worldforegroundspecial[0].draw(ix, iy, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
 			}
 
             if (iStageDisplay >= 0) {
@@ -4312,12 +4253,12 @@ int editor_stage()
 			}
 
 			//Display New button
-			spr_selectfield.draw(256, 420, 0, 0, 64, 32);
-			spr_selectfield.draw(320, 420, 448, 0, 64, 32);
+			rm->spr_selectfield.draw(256, 420, 0, 0, 64, 32);
+			rm->spr_selectfield.draw(320, 420, 448, 0, 64, 32);
 
-			menu_font_large.drawCentered(320, 425, "New Stage");
+			rm->menu_font_large.drawCentered(320, 425, "New Stage");
 
-			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[LMB] Select Stage, [RMB] Edit Stage, [n] New Stage");
+			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[LMB] Select Stage, [RMB] Edit Stage, [n] New Stage");
         } else {
 			mCurrentMenu->Update();
 			mCurrentMenu->Draw();
@@ -4329,7 +4270,7 @@ int editor_stage()
 				SDL_Rect r = {ix, iy, 32, 32};
 				SDL_FillRect(blitdest, &r, color);
 
-				spr_worldforegroundspecial[0].draw(ix, iy, (iEditStage % 10) << 5, (iEditStage / 10) << 5, 32, 32);
+				rm->spr_worldforegroundspecial[0].draw(ix, iy, (iEditStage % 10) << 5, (iEditStage / 10) << 5, 32, 32);
 			}
 		}
 
@@ -4338,24 +4279,24 @@ int editor_stage()
 
 			//Game powerups
             for (short iItem = 0; iItem < NUM_POWERUPS; iItem++) {
-				spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
+				rm->spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
 			}
 
 			//World Powerups
             for (short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++) {
-				spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
+				rm->spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
 			}
 
 			//Score Bonuses
             if (ts->iStageType == 1) {
                 for (short iScoreBonus = 0; iScoreBonus < NUM_WORLD_SCORE_BONUSES; iScoreBonus++) {
-					spr_worlditems.draw(rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].x, rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].y, iScoreBonus < 10 ? iScoreBonus << 5 : (iScoreBonus - 10) << 5, iScoreBonus < 10 ? 32 : 64, 32, 32);
+					rm->spr_worlditems.draw(rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].x, rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].y, iScoreBonus < 10 ? iScoreBonus << 5 : (iScoreBonus - 10) << 5, iScoreBonus < 10 ? 32 : 64, 32, 32);
 				}
 			}
 
 			//Draw background container
-			spr_worldpopup.draw(0, 344, 0, 0, 320, 64);
-			spr_worldpopup.draw(320, 344, 192, 0, 320, 64);
+			rm->spr_worlditempopup.draw(0, 344, 0, 0, 320, 64);
+			rm->spr_worlditempopup.draw(320, 344, 192, 0, 320, 64);
 
 			SDL_Rect * rects = rStageBonusDst;
 
@@ -4368,25 +4309,25 @@ int editor_stage()
 
 				//Draw place behind bonus
 				if (ts->iStageType == 0)
-					spr_worldpopup.draw(rects[iPickedItem].x - 8, rects[iPickedItem].y - 8, iPlace * 48, 256, 48, 48);
+					rm->spr_worlditempopup.draw(rects[iPickedItem].x - 8, rects[iPickedItem].y - 8, iPlace * 48, 256, 48, 48);
 
                 if (iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS) {
 					short iBonusIndex = iBonus - NUM_POWERUPS - NUM_WORLD_POWERUPS;
-					spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, iBonusIndex < 10 ? iBonusIndex << 5 : (iBonusIndex - 10) << 5, iBonusIndex < 10 ? 32 : 64, 32, 32);
+					rm->spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, iBonusIndex < 10 ? iBonusIndex << 5 : (iBonusIndex - 10) << 5, iBonusIndex < 10 ? 32 : 64, 32, 32);
                 } else if (iBonus >= NUM_POWERUPS) {
-					spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, (iBonus - NUM_POWERUPS) << 5, 0, 32, 32);
+					rm->spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, (iBonus - NUM_POWERUPS) << 5, 0, 32, 32);
                 } else {
-					spr_storedpoweruplarge.draw(rects[iPickedItem].x, rects[iPickedItem].y, iBonus << 5, 0, 32, 32);
+					rm->spr_storedpoweruplarge.draw(rects[iPickedItem].x, rects[iPickedItem].y, iBonus << 5, 0, 32, 32);
 				}
 			}
 
 			if (ts->iStageType == 0)
-				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[1-4] Select Items, [LMB] Remove Items");
+				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[1-4] Select Items, [LMB] Remove Items");
 			else
-				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[LMB] Select Items, [LMB] Remove Items");
+				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[LMB] Select Items, [LMB] Remove Items");
 		}
 
-        menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -4409,103 +4350,103 @@ int display_help()
 
 	drawmap(false, TILESIZE);
 	menu_shade.draw(0, 0);
-	menu_font_large.drawCentered(320, 15, "Help");
+	rm->menu_font_large.drawCentered(320, 15, "Help");
 
 	int offsety = 55;
 	int offsetx = 30;
-	menu_font_small.draw(offsetx, offsety, "Modes:");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[1] - Water Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[2] - Land Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[3] - Stage Objects Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[4] - Path Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[5] - Objects Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[6] - Bridges Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[p] - Connection Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[w] - Warp Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[v] - Vehicle");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "      [c] - Copy Vehicle");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[t] - Start and Doors");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[b] - Vehicle Boundaries");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[i] - Initial Powerups");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[e] - Edit Stages");
-	offsety += menu_font_small.getHeight() + 20;
+	rm->menu_font_small.draw(offsetx, offsety, "Modes:");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[1] - Water Mode");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[2] - Land Mode");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[3] - Stage Objects Mode");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[4] - Path Mode");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[5] - Objects Mode");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[6] - Bridges Mode");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[p] - Connection Mode");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[w] - Warp Mode");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[v] - Vehicle");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "      [c] - Copy Vehicle");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[t] - Start and Doors");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[b] - Vehicle Boundaries");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[i] - Initial Powerups");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[e] - Edit Stages");
+	offsety += rm->menu_font_small.getHeight() + 20;
 
-	menu_font_small.draw(offsetx, offsety, "File:");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[n] - New World");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[s] - Save World");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[shift] + [s] - Save As");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[f] - Find World");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[shift] + [f] - New Search");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[pageup] - Go To Previous World");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next World");
+	rm->menu_font_small.draw(offsetx, offsety, "File:");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[n] - New World");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[s] - Save World");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[shift] + [s] - Save As");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[f] - Find World");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[shift] + [f] - New Search");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[pageup] - Go To Previous World");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next World");
 
 	offsetx = 300;
 	offsety = 55;
 
-	menu_font_small.draw(offsetx, offsety, "Place Tiles:");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Place Item");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Remove Item");
-	offsety += menu_font_small.getHeight() + 20;
+	rm->menu_font_small.draw(offsetx, offsety, "Place Tiles:");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Place Item");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Remove Item");
+	offsety += rm->menu_font_small.getHeight() + 20;
 
 	/*
-	menu_font_small.draw(offsetx, offsety, "Move Mode:");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Select Area");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Unselect Area");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "Select And Drag - Move Selections");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "Hold [shift] - Multiple Selections");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "Hold [ctrl] - Freehand Selections");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[delete] - Delete Selection");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[c] - Copy Selection");
-	offsety += menu_font_small.getHeight() + 20;
+	rm->menu_font_small.draw(offsetx, offsety, "Move Mode:");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Select Area");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Unselect Area");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "Select And Drag - Move Selections");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "Hold [shift] - Multiple Selections");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "Hold [ctrl] - Freehand Selections");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[delete] - Delete Selection");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[c] - Copy Selection");
+	offsety += rm->menu_font_small.getHeight() + 20;
 	*/
 
-	menu_font_small.draw(offsetx, offsety, "Miscellaneous:");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[r] - Change Music Category");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[Arrow Keys] - Navigate World");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[a] - Automatic Path/Land");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[k] - Resize World");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[insert] - Screenshot");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[alt] + [enter] - Full Screen/Window");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[space] - Toggle Stage Previews");
+	rm->menu_font_small.draw(offsetx, offsety, "Miscellaneous:");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[r] - Change Music Category");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[Arrow Keys] - Navigate World");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[a] - Automatic Path/Land");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[k] - Resize World");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[insert] - Screenshot");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[alt] + [enter] - Full Screen/Window");
+	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[space] - Toggle Stage Previews");
 
 	gfx_flipscreen();
 
@@ -4563,9 +4504,9 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 	drawmap(false, TILESIZE);
 	menu_shade.draw(0, 0);
 	spr_dialog.draw(224, 176, 0, 0, 192, 128);
-	menu_font_large.drawCentered(320, 200, title);
-	menu_font_small.draw(240, 235, instructions);
-    menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+	rm->menu_font_large.drawCentered(320, 200, title);
+	rm->menu_font_small.draw(240, 235, instructions);
+    rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 	gfx_flipscreen();
 
     while (true) {
@@ -4591,10 +4532,10 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							drawmap(false, TILESIZE);
 							menu_shade.draw(0, 0);
 							spr_dialog.draw(224, 176, 0, 0, 192, 128);
-							menu_font_large.drawCentered(320, 200, title);
-							menu_font_small.draw(240, 235, instructions);
-							menu_font_small.draw(240, 255, input);
-                        menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+							rm->menu_font_large.drawCentered(320, 200, title);
+							rm->menu_font_small.draw(240, 235, instructions);
+							rm->menu_font_small.draw(240, 255, input);
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 							gfx_flipscreen();
 
 							currentChar--;
@@ -4647,10 +4588,10 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							drawmap(false, TILESIZE);
 							menu_shade.draw(0, 0);
 							spr_dialog.draw(224, 176, 0, 0, 192, 128);
-							menu_font_large.drawCentered(320, 200, title);
-							menu_font_small.draw(240, 235, instructions);
-							menu_font_small.draw(240, 255, input);
-                        menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+							rm->menu_font_large.drawCentered(320, 200, title);
+							rm->menu_font_small.draw(240, 235, instructions);
+							rm->menu_font_small.draw(240, 255, input);
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
 							gfx_flipscreen();
 						}
 					}
@@ -4887,7 +4828,7 @@ void takescreenshot()
 			short ix = vehicle->iCurrentTileX * iTileSize;
 			short iy = vehicle->iCurrentTileY * iTileSize;
 
-			spr_worldvehicle[iScreenshotSize].draw(ix, iy, vehicle->iDrawDirection * iTileSize, vehicle->iDrawSprite * iTileSize, iTileSize, iTileSize);
+			rm->spr_worldvehicle[iScreenshotSize].draw(ix, iy, vehicle->iDrawDirection * iTileSize, vehicle->iDrawSprite * iTileSize, iTileSize, iTileSize);
 
 			itr++;
 		}
