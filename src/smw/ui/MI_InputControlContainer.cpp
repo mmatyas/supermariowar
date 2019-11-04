@@ -424,7 +424,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
     miBackButton->SetCode(MENU_CODE_BACK_TO_CONTROLS_MENU);
 
     mInputMenu = new UI_Menu();
-    mInputMenu->SetCancelCode(MENU_CODE_CANCEL_INPUT);
+    mInputMenu->SetCancelCode(MENU_CODE_BACK_TO_CONTROLS_MENU);
     mInputMenu->AddNonControl(miImage[0]);
     mInputMenu->AddNonControl(miImage[1]);
     mInputMenu->AddNonControl(miText);
