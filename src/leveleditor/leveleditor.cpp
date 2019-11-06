@@ -2036,7 +2036,9 @@ void init_editor_properties(short iBlockCol, short iBlockRow)
 int editor_properties(short iBlockCol, short iBlockRow)
 {
     init_editor_properties(iBlockCol, iBlockRow);
-
+	while (true)
+	{
+		FPSLimiter::instance().frameStart();
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -2204,7 +2206,10 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
 
 		DrawMessage();
-		return EDITOR_PROPERTIES;
+		FPSLimiter::instance().beforeFlip();
+		gfx_flipscreen();
+		FPSLimiter::instance().afterFlip();
+	}
 }
 
 //SDL_Rect r;
