@@ -47,7 +47,7 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
     miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 125, "Settings", 140, 0);
     miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
 
-    miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 400, 120, true);
+    miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 500, 120, true);
 
     miMapFiltersButton = new MI_Button(&rm->spr_selectfield, 430, 205, "Filters", 140, 0);
     miMapFiltersButton->SetCode(MENU_CODE_TO_MAP_FILTERS);
