@@ -574,6 +574,7 @@ int main(int argc, char *argv[])
     worldlist->find(findstring);
     game_values.worldindex = worldlist->GetCurrentIndex();
 	loadcurrentworld();
+	findstring[0] = 0;  //clear out the find string so that pressing "f" will give you the find dialog
 
     if (saved_row >= 0 && saved_row <= iWorldHeight - 15 && saved_col >= 0 && saved_col <= iWorldWidth - 20) {
 		draw_offset_row = saved_row;
@@ -4642,6 +4643,7 @@ int clear_world()
 
 void loadcurrentworld()
 {
+	game_values.worldindex = worldlist->GetCurrentIndex();
 	g_worldmap.Load(TILESIZE);
 	ReadVehiclesIntoEditor();
 	ReadWarpsIntoEditor();
