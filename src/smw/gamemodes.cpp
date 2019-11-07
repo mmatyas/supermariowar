@@ -3199,6 +3199,7 @@ bool CGM_Boss_MiniGame::SetWinner(CPlayer * player)
     }
 
     SetupScoreBoard(false);
+    ShowScoreBoard();
 
     if (game_values.music) {
         ifsoundonstop(rm->sfx_invinciblemusic);
