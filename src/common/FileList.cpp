@@ -279,7 +279,7 @@ bool SimpleFileList::find(const char * name)
     do {
         next(); //sets us to the beginning if we hit the end -> loop through the maps
 
-        if (strCiCompare(filelist[currentIndex].c_str(), name))   //compare names after
+        if (strstr(filelist[currentIndex].c_str(), name))   //compare names after
             fFound = true;
     } while (currentIndex != oldCurrent && !fFound);
 
