@@ -1079,24 +1079,20 @@ void WorldMap::Resize(short w, short h)
         tiles[iCol] = new WorldMapTile[iHeight];
 
     for (short iCol = 0; iCol < w; iCol++) {
-        if (iCol < iOldWidth) {
-            for (short iRow = 0; iRow < h; iRow++) {
-                if (iRow < iOldHeight)
-                    tiles[iCol][iRow] = tempTiles[iCol][iRow];
-                else {
-                    tiles[iCol][iRow].iBackgroundSprite = 0;
-                    tiles[iCol][iRow].iBackgroundWater = 0;
-                    tiles[iCol][iRow].iForegroundSprite = 0;
-                    tiles[iCol][iRow].iConnectionType = 0;
-                    tiles[iCol][iRow].iType = 0;
-                    tiles[iCol][iRow].iID = iRow * iWidth + iCol;
-                    tiles[iCol][iRow].iVehicleBoundary = 0;
-                    tiles[iCol][iRow].iWarp = 0;
-                }
+        for (short iRow = 0; iRow < h; iRow++) {
+            if (iCol < iOldWidth && iRow < iOldHeight)
+                tiles[iCol][iRow] = tempTiles[iCol][iRow];
+            else {
+                tiles[iCol][iRow].iBackgroundSprite = 0;
+                tiles[iCol][iRow].iBackgroundWater = 0;
+                tiles[iCol][iRow].iForegroundSprite = 0;
+                tiles[iCol][iRow].iConnectionType = 0;
+                tiles[iCol][iRow].iType = 0;
+                tiles[iCol][iRow].iID = iRow * iWidth + iCol;
+                tiles[iCol][iRow].iVehicleBoundary = 0;
+                tiles[iCol][iRow].iWarp = 0;
             }
         }
-        else
-            tiles[iCol] = new WorldMapTile[h];
     }
 
 }
