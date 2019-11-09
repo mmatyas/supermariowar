@@ -1065,46 +1065,40 @@ void WorldMap::New(short w, short h)
 void WorldMap::Resize(short w, short h)
 {
     //Copy tiles from old map
-    WorldMapTile ** tempTiles = NULL;
+    WorldMapTile ** tempTiles = tiles;
     short iOldWidth = iWidth;
     short iOldHeight = iHeight;
 
-    if (tiles) {
-        tempTiles = new WorldMapTile*[w];
-
-        for (short iCol = 0; iCol < w && iCol < iOldWidth; iCol++) {
-            tempTiles[iCol] = new WorldMapTile[h];
-
-            for (short iRow = 0; iRow < h && iRow < iOldHeight; iRow++) {
-                tempTiles[iCol][iRow].iBackgroundSprite = tiles[iCol][iRow].iBackgroundSprite;
-                tempTiles[iCol][iRow].iBackgroundWater = tiles[iCol][iRow].iBackgroundWater;
-                tempTiles[iCol][iRow].iForegroundSprite = tiles[iCol][iRow].iForegroundSprite;
-                tempTiles[iCol][iRow].iConnectionType = tiles[iCol][iRow].iConnectionType;
-                tempTiles[iCol][iRow].iType = tiles[iCol][iRow].iType;
-            }
-        }
-    }
-
     //Create new map
-    New(w, h);
+    iWidth = w;
+    iHeight = h;
 
-    //Copy into new map
-    if (tempTiles) {
-        for (short iCol = 0; iCol < w && iCol < iOldWidth; iCol++) {
-            for (short iRow = 0; iRow < h && iRow < iOldHeight; iRow++) {
-                tiles[iCol][iRow].iBackgroundSprite = tempTiles[iCol][iRow].iBackgroundSprite;
-                tiles[iCol][iRow].iBackgroundWater = tempTiles[iCol][iRow].iBackgroundWater;
-                tiles[iCol][iRow].iForegroundSprite = tempTiles[iCol][iRow].iForegroundSprite;
-                tiles[iCol][iRow].iConnectionType = tempTiles[iCol][iRow].iConnectionType;
-                tiles[iCol][iRow].iType = tempTiles[iCol][iRow].iType;
+    tiles = new WorldMapTile*[iWidth];
+
+    for (short iCol = 0; iCol < iWidth; iCol++)
+        tiles[iCol] = new WorldMapTile[iHeight];
+
+    for (short iCol = 0; iCol < w; iCol++) {
+        if (iCol < iOldWidth) {
+            for (short iRow = 0; iRow < h; iRow++) {
+                if (iRow < iOldHeight)
+                    tiles[iCol][iRow] = tempTiles[iCol][iRow];
+                else {
+                    tiles[iCol][iRow].iBackgroundSprite = 0;
+                    tiles[iCol][iRow].iBackgroundWater = 0;
+                    tiles[iCol][iRow].iForegroundSprite = 0;
+                    tiles[iCol][iRow].iConnectionType = 0;
+                    tiles[iCol][iRow].iType = 0;
+                    tiles[iCol][iRow].iID = iRow * iWidth + iCol;
+                    tiles[iCol][iRow].iVehicleBoundary = 0;
+                    tiles[iCol][iRow].iWarp = 0;
+                }
             }
         }
-
-        for (short iCol = 0; iCol < w; iCol++)
-            delete [] tempTiles[iCol];
-
-        delete [] tempTiles;
+        else
+            tiles[iCol] = new WorldMapTile[h];
     }
+
 }
 
 void WorldMap::InitPlayer()
