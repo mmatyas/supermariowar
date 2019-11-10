@@ -4777,6 +4777,20 @@ int resize_world()
 		if (iHeight < 1)
 			iHeight = 1;
 
+		std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
+        while (itrVehicle != limVehicle) {
+			if ((*itrVehicle)->iCurrentTileX >= iWidth || (*itrVehicle)->iCurrentTileY >= iHeight) {
+				RemoveVehicleFromTile((*itrVehicle)->iCurrentTileX, (*itrVehicle)->iCurrentTileY);
+				//List was modified, restart.
+				itrVehicle = vehiclelist.begin();
+				limVehicle = vehiclelist.end();
+			}
+			else
+				itrVehicle++;
+		}
+
+		warplist.clear();
+
 		g_worldmap.Resize(iWidth, iHeight);
 
 		savecurrentworld();
