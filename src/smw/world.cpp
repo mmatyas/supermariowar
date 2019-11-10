@@ -1075,11 +1075,10 @@ void WorldMap::Resize(short w, short h)
 
     tiles = new WorldMapTile*[iWidth];
 
-    for (short iCol = 0; iCol < iWidth; iCol++)
+    //Copy tiles to new map
+    for (short iCol = 0; iCol < iWidth; iCol++) {
         tiles[iCol] = new WorldMapTile[iHeight];
-
-    for (short iCol = 0; iCol < w; iCol++) {
-        for (short iRow = 0; iRow < h; iRow++) {
+        for (short iRow = 0; iRow < iHeight; iRow++) {
             if (iCol < iOldWidth && iRow < iOldHeight)
                 tiles[iCol][iRow] = tempTiles[iCol][iRow];
             else {
