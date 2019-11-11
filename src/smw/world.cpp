@@ -1094,6 +1094,13 @@ void WorldMap::Resize(short w, short h)
         }
     }
 
+    //Delete old tiles
+    if (tempTiles) {
+        for (short iCol = 0; iCol < iOldWidth; iCol++)
+            delete [] tempTiles[iCol];
+
+        delete [] tempTiles;
+    }
 }
 
 void WorldMap::InitPlayer()
