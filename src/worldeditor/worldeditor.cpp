@@ -4789,6 +4789,11 @@ int resize_world()
 				itrVehicle++;
 		}
 
+		std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
+        while (itrWarp != limWarp) {
+			delete (*itrWarp);
+			itrWarp++;
+		}
 		warplist.clear();
 
 		g_worldmap.Resize(iWidth, iHeight);
