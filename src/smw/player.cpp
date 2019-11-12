@@ -200,7 +200,7 @@ void CPlayer::accelerate(float direction)
     }
     assert(maxVel >= 0.0);
 
-    if (std::abs(velx) > maxVel)
+    if ((direction == 1 && velx > maxVel) || (direction == -1 && velx < -maxVel))
         velx = maxVel * direction;
 
     if (!inair) {
