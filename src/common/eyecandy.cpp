@@ -382,6 +382,13 @@ EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
         tx2 = (ix + PWOFFSET + PW - smw->ScreenWidth) / TILESIZE;
     else
         tx2 = (ix + PWOFFSET + PW) / TILESIZE;
+
+    //Wrap around screen properly
+    short width = smw->ScreenWidth / TILESIZE;
+    if (tx < 0) tx += width;
+    else if (tx >= width) tx -= width;
+    if (tx2 < 0) tx2 += width;
+    else if (tx2 >= width) tx2 -= width;
 }
 
 void EC_Corpse::update()
@@ -409,19 +416,17 @@ void EC_Corpse::update()
                 }
             }
 
-            if (tx >= 0 && tx2 >= 0 && tx < smw->ScreenWidth / TILESIZE &&  tx2 < smw->ScreenWidth / TILESIZE) {
-                IO_Block * leftblock = g_map->block(tx, ty);
-                IO_Block * rightblock = g_map->block(tx2, ty);
+            IO_Block * leftblock = g_map->block(tx, ty);
+            IO_Block * rightblock = g_map->block(tx2, ty);
 
-                if ((g_map->map(tx, ty) & 0x13) > 0 || (g_map->map(tx2, ty) & 0x13) > 0 ||
-                        (leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) || (rightblock && !rightblock->isTransparent() && !rightblock->isHidden())) {
-                    //on ground
-                    dy = (float) ((ty << 5)  - TILESIZE);
-                    vely = 0.0f;
-                    iy = (short)dy;
+            if ((g_map->map(tx, ty) & 0x13) > 0 || (g_map->map(tx2, ty) & 0x13) > 0 ||
+                    (leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) || (rightblock && !rightblock->isTransparent() && !rightblock->isHidden())) {
+                //on ground
+                dy = (float) ((ty << 5)  - TILESIZE);
+                vely = 0.0f;
+                iy = (short)dy;
 
-                    return;
-                }
+                return;
             }
         }
 
