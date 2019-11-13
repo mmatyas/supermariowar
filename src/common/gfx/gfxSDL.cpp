@@ -250,7 +250,6 @@ void GraphicsSDL::create_game_window(bool fullscreen)
 void GraphicsSDL::setTitle(const char* title)
 {
     SDL_WM_SetCaption(title, "smw.ico");
-    SDL_ShowCursor(SDL_DISABLE);
 }
 
 void GraphicsSDL::FlipScreen()
