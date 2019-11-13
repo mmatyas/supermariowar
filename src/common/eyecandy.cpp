@@ -382,6 +382,13 @@ EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
         tx2 = (ix + PWOFFSET + PW - smw->ScreenWidth) / TILESIZE;
     else
         tx2 = (ix + PWOFFSET + PW) / TILESIZE;
+
+    //Wrap around screen properly
+    short width = smw->ScreenWidth / TILESIZE;
+    if (tx < 0) tx += width;
+    else if (tx >= width) tx -= width;
+    if (tx2 < 0) tx2 += width;
+    else if (tx2 >= width) tx2 -= width;
 }
 
 void EC_Corpse::update()
