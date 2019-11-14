@@ -11,7 +11,7 @@ extern CGameValues game_values;
 
 UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
 {
-	miRespawnField = new MI_SelectField(&rm->spr_selectfield, 70, 60, "Respawn Time", 500, 220);
+	miRespawnField = new MI_SelectField(&rm->spr_selectfield, 70, 40, "Respawn Time", 500, 220);
     miRespawnField->Add("Instant", 0, "", false, false);
     miRespawnField->Add("0.5 Seconds", 1, "", false, false);
     miRespawnField->Add("1.0 Seconds", 2, "", false, false);
@@ -36,7 +36,7 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miRespawnField->SetData(&game_values.respawn, NULL, NULL);
     miRespawnField->SetKey(game_values.respawn);
 
-    miShieldStyleField = new MI_SelectField(&rm->spr_selectfield, 70, 100, "Shield Style", 500, 220);
+    miShieldStyleField = new MI_SelectField(&rm->spr_selectfield, 70, 80, "Shield Style", 500, 220);
     miShieldStyleField->Add("No Shield", 0, "", false, false);
     miShieldStyleField->Add("Soft", 1, "", false, false);
     miShieldStyleField->Add("Soft with Stomp", 2, "", false, false);
@@ -44,7 +44,7 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miShieldStyleField->SetData(&game_values.shieldstyle, NULL, NULL);
     miShieldStyleField->SetKey(game_values.shieldstyle);
 
-    miShieldTimeField = new MI_SelectField(&rm->spr_selectfield, 70, 140, "Shield Time", 500, 220);
+    miShieldTimeField = new MI_SelectField(&rm->spr_selectfield, 70, 120, "Shield Time", 500, 220);
     miShieldTimeField->Add("0.5 Seconds", 31, "", false, false);
     miShieldTimeField->Add("1.0 Seconds", 62, "", false, false);
     miShieldTimeField->Add("1.5 Seconds", 93, "", false, false);
@@ -58,7 +58,7 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miShieldTimeField->SetData(&game_values.shieldtime, NULL, NULL);
     miShieldTimeField->SetKey(game_values.shieldtime);
 
-    miBoundsTimeField = new MI_SelectField(&rm->spr_selectfield, 70, 180, "Bounds Time", 500, 220);
+    miBoundsTimeField = new MI_SelectField(&rm->spr_selectfield, 70, 160, "Bounds Time", 500, 220);
     miBoundsTimeField->Add("Infinite", 0, "", false, false);
     miBoundsTimeField->Add("1 Second", 1, "", false, false);
     miBoundsTimeField->Add("2 Seconds", 2, "", false, false);
@@ -73,7 +73,7 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miBoundsTimeField->SetData(&game_values.outofboundstime, NULL, NULL);
     miBoundsTimeField->SetKey(game_values.outofboundstime);
 
-    miSuicideTimeField = new MI_SelectField(&rm->spr_selectfield, 70, 220, "Suicide Time", 500, 220);
+    miSuicideTimeField = new MI_SelectField(&rm->spr_selectfield, 70, 200, "Suicide Time", 500, 220);
     miSuicideTimeField->Add("Off", 0, "", false, false);
     miSuicideTimeField->Add("3 Seconds", 186, "", false, false);
     miSuicideTimeField->Add("5 Seconds", 310, "", false, false);
@@ -84,7 +84,7 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miSuicideTimeField->SetData(&game_values.suicidetime, NULL, NULL);
     miSuicideTimeField->SetKey(game_values.suicidetime);
 
-    miWarpLockStyleField = new MI_SelectField(&rm->spr_selectfield, 70, 260, "Warp Lock Style", 500, 220);
+    miWarpLockStyleField = new MI_SelectField(&rm->spr_selectfield, 70, 240, "Warp Lock Style", 500, 220);
     miWarpLockStyleField->Add("Entrance Only", 0, "", false, false);
     miWarpLockStyleField->Add("Exit Only", 1, "", false, false);
     miWarpLockStyleField->Add("Entrance and Exit", 2, "", false, false);
@@ -93,7 +93,7 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miWarpLockStyleField->SetData(&game_values.warplockstyle, NULL, NULL);
     miWarpLockStyleField->SetKey(game_values.warplockstyle);
 
-    miWarpLockTimeField = new MI_SelectField(&rm->spr_selectfield, 70, 300, "Warp Lock Time", 500, 220);
+    miWarpLockTimeField = new MI_SelectField(&rm->spr_selectfield, 70, 280, "Warp Lock Time", 500, 220);
     miWarpLockTimeField->Add("Off", 0, "", false, false);
     miWarpLockTimeField->Add("1 Second", 62, "", false, false);
     miWarpLockTimeField->Add("2 Seconds", 124, "", false, false);
@@ -108,7 +108,7 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miWarpLockTimeField->SetData(&game_values.warplocktime, NULL, NULL);
     miWarpLockTimeField->SetKey(game_values.warplocktime);
 
-    miBotsField = new MI_SelectField(&rm->spr_selectfield, 70, 340, "Bot Difficulty", 500, 220);
+    miBotsField = new MI_SelectField(&rm->spr_selectfield, 70, 320, "Bot Difficulty", 500, 220);
     miBotsField->Add("Very Easy", 0, "", false, false);
     miBotsField->Add("Easy", 1, "", false, false);
     miBotsField->Add("Moderate", 2, "", false, false);
@@ -117,7 +117,7 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miBotsField->SetData(&game_values.cpudifficulty, NULL, NULL);
     miBotsField->SetKey(game_values.cpudifficulty);
 
-    miPointSpeedField = new MI_SelectField(&rm->spr_selectfield, 70, 380, "Point Speed", 500, 220);
+    miPointSpeedField = new MI_SelectField(&rm->spr_selectfield, 70, 360, "Point Speed", 500, 220);
     miPointSpeedField->Add("Very Slow", 60, "", false, false);
     miPointSpeedField->Add("Slow", 40, "", false, false);
     miPointSpeedField->Add("Moderate", 20, "", false, false);
@@ -125,6 +125,12 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miPointSpeedField->Add("Very Fast", 5, "", false, false);
     miPointSpeedField->SetData(&game_values.pointspeed, NULL, NULL);
     miPointSpeedField->SetKey(game_values.pointspeed);
+
+    miSecretsField = new MI_SelectField(&rm->spr_selectfield, 70, 400, "Secrets", 500, 220);
+    miSecretsField->Add("Off", 0, "", false, false);
+    miSecretsField->Add("On", 1, "", true, false);
+    miSecretsField->SetData(NULL, NULL, &game_values.secretsenabled);
+    miSecretsField->SetKey(game_values.secretsenabled ? 1 : 0);
 
     miGameplayOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miGameplayOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -141,9 +147,10 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     AddControl(miWarpLockStyleField, miSuicideTimeField, miWarpLockTimeField, NULL, miGameplayOptionsMenuBackButton);
     AddControl(miWarpLockTimeField, miWarpLockStyleField, miBotsField, NULL, miGameplayOptionsMenuBackButton);
     AddControl(miBotsField, miWarpLockTimeField, miPointSpeedField, NULL, miGameplayOptionsMenuBackButton);
-    AddControl(miPointSpeedField, miBotsField, miGameplayOptionsMenuBackButton, NULL, miGameplayOptionsMenuBackButton);
+    AddControl(miPointSpeedField, miBotsField, miSecretsField, NULL, miGameplayOptionsMenuBackButton);
+    AddControl(miSecretsField, miPointSpeedField, miGameplayOptionsMenuBackButton, NULL, miGameplayOptionsMenuBackButton);
 
-    AddControl(miGameplayOptionsMenuBackButton, miPointSpeedField, miRespawnField, miPointSpeedField, NULL);
+    AddControl(miGameplayOptionsMenuBackButton, miSecretsField, miRespawnField, miSecretsField, NULL);
 
     AddNonControl(miGameplayOptionsMenuLeftHeaderBar);
     AddNonControl(miGameplayOptionsMenuRightHeaderBar);
