@@ -197,7 +197,7 @@ void CGameValues::init()
     singleplayermode  = -1;
     worldskipscoreboard = false;
     overridepowerupsettings = 0;
-    minigameunlocked  = false;
+    secretsenabled  = false;
     poweruppreset   = 0;
     tournamentcontrolstyle = 0;
 
@@ -356,7 +356,7 @@ void CGameValues::ReadBinaryConfig() {
         pointspeed = options.read_u8();
         swapstyle = options.read_u8();
         overridepowerupsettings = options.read_u8();
-        minigameunlocked = options.read_u8();
+        secretsenabled = options.read_u8();
         startgamecountdown = options.read_u8();
         deadteamnotice = options.read_u8();
         tournamentcontrolstyle = options.read_u8();
@@ -514,7 +514,7 @@ void CGameValues::WriteConfig()
         options.write_u8(pointspeed);
         options.write_u8(swapstyle);
         options.write_u8(overridepowerupsettings);
-        options.write_u8(minigameunlocked);
+        options.write_u8(secretsenabled);
         options.write_u8(startgamecountdown);
         options.write_u8(deadteamnotice);
         options.write_u8(tournamentcontrolstyle);
