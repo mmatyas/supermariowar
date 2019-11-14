@@ -126,7 +126,7 @@ public:
     bool		playnextmusic;  //automatically advance to the next music track after one finishes
     short		outofboundstime;
     short		overridepowerupsettings;
-    bool		minigameunlocked;
+    bool		secretsenabled;
     GameModeSettings gamemodemenusettings;
     bool		music;
     short		pointspeed;
