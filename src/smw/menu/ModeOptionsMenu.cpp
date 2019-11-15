@@ -760,6 +760,8 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miKingOfTheHillModeSizeField->Add("3 x 3", 3, "", false, false);
     miKingOfTheHillModeSizeField->Add("4 x 4", 4, "", false, false);
     miKingOfTheHillModeSizeField->Add("5 x 5", 5, "", false, false);
+    miKingOfTheHillModeSizeField->Add("6 x 6", 6, "", false, false);
+    miKingOfTheHillModeSizeField->Add("7 x 7", 7, "", false, false);
     miKingOfTheHillModeSizeField->SetData(&game_values.gamemodemenusettings.kingofthehill.areasize, NULL, NULL);
     miKingOfTheHillModeSizeField->SetKey(game_values.gamemodemenusettings.kingofthehill.areasize);
 
@@ -831,8 +833,8 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miRaceModeSpeedField->Add("Moderate", 4, "", false, false);
     miRaceModeSpeedField->Add("Fast", 6, "", false, false);
     miRaceModeSpeedField->Add("Very Fast", 8, "", false, false, false);
-    miRaceModeSpeedField->Add("Extremely Fast", 10, "", false, false, false);
-    miRaceModeSpeedField->Add("Insanely Fast", 15, "", false, false, false);
+    miRaceModeSpeedField->Add("Extremely Fast", 15, "", false, false, false);
+    miRaceModeSpeedField->Add("Insanely Fast", 30, "", false, false, false);
     miRaceModeSpeedField->SetData(&game_values.gamemodemenusettings.race.speed, NULL, NULL);
     miRaceModeSpeedField->SetKey(game_values.gamemodemenusettings.race.speed);
 
@@ -913,6 +915,8 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miSurvivalModeDensityField->Add("Medium", 20, "", false, false);
     miSurvivalModeDensityField->Add("High", 15, "", false, false);
     miSurvivalModeDensityField->Add("Very High", 10, "", false, false, false);
+    miSurvivalModeDensityField->Add("Extremely High", 6, "", false, false);
+    miSurvivalModeDensityField->Add("Insanely High", 2, "", false, false, false);
     miSurvivalModeDensityField->SetData(&game_values.gamemodemenusettings.survival.density, NULL, NULL);
     miSurvivalModeDensityField->SetKey(game_values.gamemodemenusettings.survival.density);
 
@@ -922,8 +926,8 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miSurvivalModeSpeedField->Add("Moderate", 4, "", false, false);
     miSurvivalModeSpeedField->Add("Fast", 6, "", false, false);
     miSurvivalModeSpeedField->Add("Very Fast", 8, "", false, false, false);
-    miSurvivalModeSpeedField->Add("Extremely Fast", 10, "", false, false, false);
-    miSurvivalModeSpeedField->Add("Insanely Fast", 15, "", false, false, false);
+    miSurvivalModeSpeedField->Add("Extremely Fast", 15, "", false, false, false);
+    miSurvivalModeSpeedField->Add("Insanely Fast", 30, "", false, false, false);
     miSurvivalModeSpeedField->SetData(&game_values.gamemodemenusettings.survival.speed, NULL, NULL);
     miSurvivalModeSpeedField->SetKey(game_values.gamemodemenusettings.survival.speed);
 
