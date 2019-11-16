@@ -10,12 +10,6 @@
 |  (C) 2003-2009 Florian Hufsky <florian.hufsky@gmail.com>	|
 +----------------------------------------------------------*/
 
-//TODO:
-//1) Continue testing by creating a fully functional new world
-//3) When saving new world, it didn't save the name correct (or at all)
-
-//Checkin
-
 #define SMW_EDITOR
 
 #include "FileIO.h"
@@ -3778,6 +3772,8 @@ void EditStage(short iEditStage)
 			miModeField->SetKey(24);
         } else if (iMode >= 1000 && iMode <= 1002) { //Pipe, Boss and Boxes Game
 			miModeField->SetKey(iMode - 975);
+			miSpecialGoalField[iMode-1000]->SetData(&game_values.tourstops[iEditStage]->iGoal, NULL, NULL);
+			miSpecialGoalField[iMode-1000]->SetKey(game_values.tourstops[iEditStage]->iGoal);
 			miPointsField->SetKey(game_values.tourstops[iEditStage]->iPoints);
 			miFinalStageField->SetKey(game_values.tourstops[iEditStage]->fEndStage ? 1 : 0);
 
@@ -4751,7 +4747,7 @@ int new_world()
 		warplist.clear();
 
 		g_worldmap.New(iWidth, iHeight);
-        worldlist->add(strcat(worldLocation, strcat(fileName, ".txt")));
+        worldlist->add(convertPath(strcat(worldLocation, strcat(fileName, ".txt"))).c_str());
         worldlist->find(fileName);
         game_values.worldindex = worldlist->GetCurrentIndex();
 		savecurrentworld();
