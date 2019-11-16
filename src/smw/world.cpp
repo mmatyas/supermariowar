@@ -838,7 +838,10 @@ bool WorldMap::Save(const char * szPath)
         return false;
 
     fprintf(file, "#Version\n");
-    fprintf(file, "%d.%d.%d.%d\n\n", g_iVersion[0], g_iVersion[1], g_iVersion[2], g_iVersion[3]);
+    // For compatibility, let's use the final 1.8 version until
+    // there's no actual change in the world format.
+    fprintf(file, "1.8.0.4\n\n");
+    //fprintf(file, "%d.%d.%d.%d\n\n", g_iVersion[0], g_iVersion[1], g_iVersion[2], g_iVersion[3]);
 
     fprintf(file, "#Music Category\n");
     fprintf(file, "%d\n\n", iMusicCategory);
