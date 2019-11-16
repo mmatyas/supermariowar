@@ -29,6 +29,7 @@ private:
     MI_SelectField * miWarpLockTimeField;
     MI_SelectField * miBotsField;
     MI_SelectField * miPointSpeedField;
+    MI_SelectField * miSecretsField;
     MI_Button * miGameplayOptionsMenuBackButton;
 
     MI_Image * miGameplayOptionsMenuLeftHeaderBar;
