@@ -274,55 +274,46 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
 
 void CheckSecret(short id)
 {
-    if (game_values.secretsenabled) {
-        if (id == 0 && !game_values.unlocksecretunlocked[0]) {
-            short iCountTeams = 0;
-            for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-                if (game_values.unlocksecret1part1[iPlayer])
-                    iCountTeams++;
-            }
-
-            if (iCountTeams >= 2 && game_values.unlocksecret1part2 >= 8) {
-                game_values.unlocksecretunlocked[0] = true;
-                ifSoundOnPlay(rm->sfx_transform);
-
-                IO_MovingObject * object = createpowerup(SECRET1_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
-
-                if (object)
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
-            }
-        } else if (id == 1 && !game_values.unlocksecretunlocked[1]) {
-            if (game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3) {
-                game_values.unlocksecretunlocked[1] = true;
-                ifSoundOnPlay(rm->sfx_transform);
-
-                IO_MovingObject * object = createpowerup(SECRET2_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
-
-                if (object)
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
-            }
-        } else if (id == 2 && !game_values.unlocksecretunlocked[2]) {
-            for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-                //number of songs on thriller + number of released albums (figure it out :))
-                if (game_values.unlocksecret3part1[iPlayer] >= 9 && game_values.unlocksecret3part2[iPlayer] >= 13) {
-                    game_values.unlocksecretunlocked[2] = true;
-                    ifSoundOnPlay(rm->sfx_transform);
-
-                    IO_MovingObject * object = createpowerup(SECRET3_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
-
-                    if (object)
-                        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
-                }
-            }
-        } else if (id == 3 && !game_values.unlocksecretunlocked[3]) {
-            game_values.unlocksecretunlocked[3] = true;
-            ifSoundOnPlay(rm->sfx_transform);
-
-            IO_MovingObject * object = createpowerup(SECRET4_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
-
-            if (object)
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+    if (!game_values.secretsenabled)
+        return;
+    if (id == 0 && !game_values.unlocksecretunlocked[0]) {
+        short iCountTeams = 0;
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+            if (game_values.unlocksecret1part1[iPlayer])
+                iCountTeams++;
         }
+        if (iCountTeams >= 2 && game_values.unlocksecret1part2 >= 8) {
+            game_values.unlocksecretunlocked[0] = true;
+            ifSoundOnPlay(rm->sfx_transform);
+            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
+            if (object)
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+        }
+    } else if (id == 1 && !game_values.unlocksecretunlocked[1]) {
+        if (game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3) {
+            game_values.unlocksecretunlocked[1] = true;
+            ifSoundOnPlay(rm->sfx_transform);
+            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
+            if (object)
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+        }
+    } else if (id == 2 && !game_values.unlocksecretunlocked[2]) {
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+            //number of songs on thriller + number of released albums (figure it out :))
+            if (game_values.unlocksecret3part1[iPlayer] >= 9 && game_values.unlocksecret3part2[iPlayer] >= 13) {
+                game_values.unlocksecretunlocked[2] = true;
+                ifSoundOnPlay(rm->sfx_transform);
+                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
+                if (object)
+                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+            }
+        }
+    } else if (id == 3 && !game_values.unlocksecretunlocked[3]) {
+        game_values.unlocksecretunlocked[3] = true;
+        ifSoundOnPlay(rm->sfx_transform);
+        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
+        if (object)
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
     }
 }
 
