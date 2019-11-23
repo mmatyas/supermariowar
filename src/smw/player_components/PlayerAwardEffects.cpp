@@ -67,7 +67,7 @@ void PlayerAwardEffects::addExploding(CPlayer& player)
 {
     if (player.killsinrow < MINAWARDSNEEDED)
         return;
-		printf("Exploding!\n");
+
     ifSoundOnPlay(rm->sfx_cannon);
 
     short numawards = (player.killsinrow > MAXAWARDS ? MAXAWARDS : player.killsinrow);
@@ -92,7 +92,7 @@ void PlayerAwardEffects::addSwirling(CPlayer& player)
 {
     if (player.killsinrow < MINAWARDSNEEDED)
         return;
-		printf("Swirling!\n");
+
     ifSoundOnPlay(rm->sfx_cannon);
 
     short numawards = (player.killsinrow > MAXAWARDS ? MAXAWARDS : player.killsinrow);
@@ -112,7 +112,7 @@ void PlayerAwardEffects::addRocket(CPlayer& player)
 {
     if (player.killsinrow < MINAWARDSNEEDED)
         return;
-		printf("Rocket!\n");
+
     ifSoundOnPlay(rm->sfx_cannon);
 
     short numawards = (player.killsinrow > MAXAWARDS ? MAXAWARDS : player.killsinrow);
