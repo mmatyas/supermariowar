@@ -17,11 +17,11 @@ extern void CheckSecret(short id);
 
 struct STextAward {
     const char *name;
-    bool font = false;
+    bool large = false;
 
-    STextAward(const char *nname, bool nfont) {
+    STextAward(const char *nname, bool nlarge) {
         name = nname;
-        font = nfont;
+        large = nlarge;
     }
 };
 
@@ -232,7 +232,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, killst
                 sprintf(text, "%d - %s", killer.killsinrow, awardtexts[awardIndex].name);
 
                 //now add the eyecandy
-                eyecandy[2].add(new EC_GravText(awardtexts[awardIndex].font ? &rm->game_font_large : &rm->game_font_small, killer.centerX(), killer.bottomY(), text, -VELJUMP));
+                eyecandy[2].add(new EC_GravText(awardtexts[awardIndex].large ? &rm->game_font_large : &rm->game_font_small, killer.centerX(), killer.bottomY(), text, -VELJUMP));
             }
 
             //if we stopped the other players run show another award
@@ -241,7 +241,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, killst
                 char text[128];
                 sprintf(text, "%s Stopped!",  awardtexts[a].name);
 
-                eyecandy[2].add(new EC_GravText(awardtexts[a].font ? &rm->game_font_large : &rm->game_font_small, killed->centerX(), killed->bottomY(), text, -VELJUMP*1.3f));
+                eyecandy[2].add(new EC_GravText(awardtexts[a].large ? &rm->game_font_large : &rm->game_font_small, killed->centerX(), killed->bottomY(), text, -VELJUMP*1.3f));
             }
         }
     }
