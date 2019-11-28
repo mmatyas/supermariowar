@@ -2327,14 +2327,26 @@ int editor_platforms()
 						}
                 } else if (event.key.keysym.sym == SDLK_t) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-							editor_tiles();
+							FPSLimiter::instance().frameStart();
+							while (editor_tiles() == EDITOR_TILES) {
+								FPSLimiter::instance().beforeFlip();
+								gfx_flipscreen();
+								FPSLimiter::instance().afterFlip();
+								FPSLimiter::instance().frameStart();
+							}
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
 							iPlatformEditState = PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE;
 						}
                 } else if (event.key.keysym.sym == SDLK_a) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-							editor_animation();
+							FPSLimiter::instance().frameStart();
+							while (editor_animation() == EDITOR_ANIMATION) {
+								FPSLimiter::instance().beforeFlip();
+								gfx_flipscreen();
+								FPSLimiter::instance().afterFlip();
+								FPSLimiter::instance().frameStart();
+							}
 							iPlatformEditState = PLATFORM_EDIT_STATE_ANIMATED;
 						}
                 } else if (event.key.keysym.sym == SDLK_l) {
@@ -2390,6 +2402,11 @@ int editor_platforms()
 							iPlatformPreview = -1;
 							g_Platforms[iEditPlatform].UpdatePreview();
 							iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
+							//Fix menu offset
+							r.x = 192;
+							r.y = 128;
+							r.w = 256;
+							r.h = 224;
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
 						}
