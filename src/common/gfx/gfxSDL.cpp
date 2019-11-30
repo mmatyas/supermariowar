@@ -110,6 +110,7 @@ void GraphicsSDL::create_game_window(bool fullscreen)
     print_renderer_info();
     create_screen_surface();
     create_screen_tex();
+    SDL_SetWindowResizable(sdl2_window, SDL_TRUE);
 }
 
 #ifdef SDL2_FORCE_GLES
