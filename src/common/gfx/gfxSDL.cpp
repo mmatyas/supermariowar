@@ -201,7 +201,7 @@ void GraphicsSDL::RecreateWindow(bool fullscreen)
     sdl2_window = SDL_CreateWindow("smw",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         GFX_SCREEN_W, GFX_SCREEN_H,
-        fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE: SDL_WINDOW_RESIZABLE);
+        fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE : SDL_WINDOW_RESIZABLE);
 
     if (!sdl2_window) {
         fprintf(stderr, "[gfx] Couldn't create window: %s\n", SDL_GetError());
