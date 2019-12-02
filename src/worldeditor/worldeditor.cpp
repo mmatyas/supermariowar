@@ -99,6 +99,8 @@ bool			selectedtiles[MAPWIDTH][MAPHEIGHT];
 bool			moveselectedtiles[MAPWIDTH][MAPHEIGHT];
 WorldMapTile	copiedtiles[MAPWIDTH][MAPHEIGHT];
 
+int				mouse_x, mouse_y;
+
 //Vehicle structure that holds the current vehicle "stamp"
 WorldVehicle g_wvVehicleStamp;
 
@@ -1153,11 +1155,8 @@ int editor_edit()
 						}
 
                     if (edit_mode == 5 && event.key.keysym.sym == SDLK_c) {
-							int iMouseX, iMouseY;
-							SDL_GetMouseState(&iMouseX, &iMouseY);
-
-							short iButtonX = iMouseX - draw_offset_x;
-							short iButtonY = iMouseY - draw_offset_y;
+							short iButtonX = mouse_x - draw_offset_x;
+							short iButtonY = mouse_y - draw_offset_y;
 							short iCol = iButtonX / TILESIZE + draw_offset_col;
 							short iRow = iButtonY / TILESIZE + draw_offset_row;
 
@@ -1490,6 +1489,8 @@ int editor_edit()
 					}
 					//Painting tiles with mouse movement
                 case SDL_MOUSEMOTION: {
+						mouse_x = event.button.x;
+						mouse_y = event.button.y;
 						short iButtonX = event.button.x - draw_offset_x;
 						short iButtonY = event.button.y - draw_offset_y;
 						short iCol = (iButtonX >> 5) + draw_offset_col;
@@ -1796,10 +1797,7 @@ int editor_edit()
 				}
 
                 if (iStageDisplay >= 0 && g_fShowStagePreviews) {
-					int iMouseX, iMouseY;
-					SDL_GetMouseState(&iMouseX, &iMouseY);
-
-					DisplayStageDetails(false, iStageDisplay, iMouseX, iMouseY);
+					DisplayStageDetails(false, iStageDisplay, mouse_x, mouse_y);
 				}
 			}
 
@@ -1834,10 +1832,7 @@ int editor_edit()
 
                 if (edit_mode == 5) {
                     if (iStageDisplay >= 0) {
-						int iMouseX, iMouseY;
-						SDL_GetMouseState(&iMouseX, &iMouseY);
-
-						DisplayStageDetails(false, iStageDisplay, iMouseX, iMouseY);
+						DisplayStageDetails(false, iStageDisplay, mouse_x, mouse_y);
 					}
 				}
 			}
@@ -3931,10 +3926,7 @@ int editor_stage()
                     if (ts->iStageType == 0) {
 							short iPlace = event.key.keysym.sym - SDLK_1 + 1;
 
-							int iMouseX, iMouseY;
-							SDL_GetMouseState(&iMouseX, &iMouseY);
-
-							TestAndSetBonusItem(ts, iPlace, iMouseX, iMouseY);
+							TestAndSetBonusItem(ts, iPlace, mouse_x, mouse_y);
 						}
                 } else if ((event.key.keysym.sym == SDLK_PAGEUP && iEditStage > 0) ||
                           (event.key.keysym.sym == SDLK_PAGEDOWN && iEditStage < g_worldmap.iNumStages - 1)) {
@@ -4027,6 +4019,8 @@ int editor_stage()
 				}
 
             case SDL_MOUSEMOTION: {
+					mouse_x = event.button.x;
+					mouse_y = event.button.y;
 					iStageDisplay = -1;
 
                 if (iEditStage == -1) {
@@ -4242,10 +4236,7 @@ int editor_stage()
 			}
 
             if (iStageDisplay >= 0) {
-				int iMouseX, iMouseY;
-				SDL_GetMouseState(&iMouseX, &iMouseY);
-
-				DisplayStageDetails(fForceStageDisplay, iStageDisplay, iMouseX, iMouseY);
+				DisplayStageDetails(fForceStageDisplay, iStageDisplay, mouse_x, mouse_y);
 				fForceStageDisplay = false;
 			}
 
