@@ -164,6 +164,13 @@ int				copiedlayer;
 short			x_shake = 0;
 short			y_shake = 0;
 
+int				mouse_x, mouse_y;
+
+void update_mouse_coords() {
+	mouse_x = std::min(640 - 1, std::max(event.button.x, 0));
+	mouse_y = std::min(480 - 1, std::max(event.button.y, 0));
+}
+
 CEyecandyContainer eyecandy[3];
 CGameMode		*gamemodes[GAMEMODE_LAST];
 CPlayer			*list_players[4];
@@ -950,9 +957,8 @@ int editor_edit()
 
                     if (key == SDLK_k) {
 							int iMouseX, iMouseY;
-							SDL_GetMouseState(&iMouseX, &iMouseY);
-							iMouseX >>= 5;
-							iMouseY >>= 5;
+							iMouseX = mouse_x / TILESIZE;
+							iMouseY = mouse_y / TILESIZE;
 
 							short iType = g_map->objectdata[iMouseX][iMouseY].iType;
                         if (iType == 1 || iType == 15 || iType == 4 || iType == 5 || iType == 17 || iType == 18 || iType == 3) {
@@ -1344,6 +1350,7 @@ int editor_edit()
 					}
 
                 case SDL_MOUSEMOTION: {
+						update_mouse_coords();
 						short iClickX = event.button.x / TILESIZE;
 						short iClickY = event.button.y / TILESIZE;
 
@@ -1478,15 +1485,11 @@ int editor_edit()
 			}
 
             if (move_mode == 1 || move_mode == 3) {
-				int mousex, mousey;
-				SDL_GetMouseState(&mousex, &mousey);
-				move_offset_x = (mousex / TILESIZE) - move_start_x;
-				move_offset_y = (mousey / TILESIZE) - move_start_y;
+				move_offset_x = (mouse_x / TILESIZE) - move_start_x;
+				move_offset_y = (mouse_y / TILESIZE) - move_start_y;
             } else if (move_mode == 2) {
-				int mousex, mousey;
-				SDL_GetMouseState(&mousex, &mousey);
-				move_drag_offset_x = (mousex / TILESIZE);
-				move_drag_offset_y = (mousey / TILESIZE);
+				move_drag_offset_x = (mouse_x / TILESIZE);
+				move_drag_offset_y = (mouse_y / TILESIZE);
 			}
 
 		}
@@ -1957,6 +1960,11 @@ int editor_eyecandy()
 					break;
 				}
 
+			case SDL_MOUSEMOTION: {
+				update_mouse_coords();
+				break;
+				}
+
 				default:
 					break;
 			}
@@ -1966,15 +1974,12 @@ int editor_eyecandy()
 		drawmap(false, TILESIZE);
 		rm->menu_shade.draw(0, 0);
 
-		int iMouseX, iMouseY;
-		SDL_GetMouseState(&iMouseX, &iMouseY);
-
 		short ix = 165;
         for (short iLayer = 0; iLayer < 3; iLayer++) {
             for (short k = 0; k < NUM_EYECANDY; k++) {
 				short iy = k * 65 + 20;
 
-				if (iMouseX >= ix && iMouseX < ix + 90 && iMouseY >= iy && iMouseY < iy + 52)
+				if (mouse_x >= ix && mouse_x < ix + 90 && mouse_y >= iy && mouse_y < iy + 52)
 					rm->spr_powerupselector.draw(ix, iy, 0, 0, 90, 52);
 				else
 					rm->spr_powerupselector.draw(ix, iy, 0, 52, 90, 52);
@@ -2050,11 +2055,8 @@ int editor_properties(short iBlockCol, short iBlockRow)
                     editor_properties_initialized = false;
 					return EDITOR_EDIT;
                 } else if ((iBlockType == 1 || iBlockType == 15) && ((event.key.keysym.sym >= SDLK_0 && event.key.keysym.sym <= SDLK_9) || event.key.keysym.sym == SDLK_BACKQUOTE || event.key.keysym.sym == SDLK_d)) {
-						int iMouseX, iMouseY;
-						SDL_GetMouseState(&iMouseX, &iMouseY);
-
 						short iSettingIndex = 0;
-						short * piSetting = GetBlockProperty(iMouseX, iMouseY, iBlockCol, iBlockRow, &iSettingIndex);
+						short * piSetting = GetBlockProperty(mouse_x, mouse_y, iBlockCol, iBlockRow, &iSettingIndex);
 
 						//If shift is held, set all powerups to this setting
 						short iValue = event.key.keysym.sym - SDLK_0;
@@ -2091,8 +2093,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 						short * piSetting = GetBlockProperty(event.button.x, event.button.y, iBlockCol, iBlockRow, &iSettingIndex);
 
                     if (piSetting) {
-							int iMouseX, iMouseY;
-							Uint8 iMouseState = SDL_GetMouseState(&iMouseX, &iMouseY);
+							Uint8 iMouseState = SDL_GetMouseState(NULL, NULL);
 
 							if ((event.button.button == SDL_BUTTON_RIGHT && (iMouseState & SDL_BUTTON_LMASK)) ||
                                 (event.button.button == SDL_BUTTON_LEFT && (iMouseState & SDL_BUTTON_RMASK))) {
@@ -2132,6 +2133,11 @@ int editor_properties(short iBlockCol, short iBlockRow)
 					break;
 				}
 
+			case SDL_MOUSEMOTION: {
+				update_mouse_coords();
+				break;
+				}
+
 				default:
 					break;
 			}
@@ -2140,9 +2146,6 @@ int editor_properties(short iBlockCol, short iBlockRow)
 
 		drawmap(false, TILESIZE);
 		rm->menu_shade.draw(0, 0);
-
-		int iMouseX, iMouseY;
-		SDL_GetMouseState(&iMouseX, &iMouseY);
 
 		short iHiddenCheckboxY = 0;
 
@@ -2153,7 +2156,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 				short ix = (iSetting % 6) * 100 + 35;
 				short iy = (iSetting / 6) * 62 + 65;
 
-				if (iMouseX >= ix - 10 && iMouseX < ix + 80 && iMouseY >= iy - 10 && iMouseY < iy + 42 && !fUseGame)
+				if (mouse_x >= ix - 10 && mouse_x < ix + 80 && mouse_y >= iy - 10 && mouse_y < iy + 42 && !fUseGame)
 					rm->spr_powerupselector.draw(ix - 10, iy - 10, 0, 0, 90, 52);
 				else
 					rm->spr_powerupselector.draw(ix - 10, iy - 10, 0, 52, 90, 52);
@@ -2179,7 +2182,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 			iHiddenCheckboxY = 214;
 		}
 
-		if (iMouseX >= 270 && iMouseX < 370 && iMouseY >= iHiddenCheckboxY && iMouseY < iHiddenCheckboxY + 52)
+		if (mouse_x >= 270 && mouse_x < 370 && mouse_y >= iHiddenCheckboxY && mouse_y < iHiddenCheckboxY + 52)
 			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, 90, 0, 100, 52);
 		else
 			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, 90, 52, 100, 52);
@@ -2191,7 +2194,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 
 		//Display "Use Game" option
         if (iBlockType == 1 || iBlockType == 15) {
-			if (iMouseX >= 390 && iMouseX < 490 && iMouseY >= iHiddenCheckboxY && iMouseY < iHiddenCheckboxY + 52)
+			if (mouse_x >= 390 && mouse_x < 490 && mouse_y >= iHiddenCheckboxY && mouse_y < iHiddenCheckboxY + 52)
 				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, 90, 0, 100, 52);
 			else
 				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, 90, 52, 100, 52);
@@ -2580,6 +2583,7 @@ int editor_platforms()
 					}
 				}
             case SDL_MOUSEMOTION: {
+					update_mouse_coords();
 					short ix = event.button.x / TILESIZE;
 					short iy = event.button.y / TILESIZE;
 
@@ -3225,6 +3229,7 @@ int editor_maphazards()
 					}
 				}
             case SDL_MOUSEMOTION: {
+					update_mouse_coords();
 					short iClickX = event.button.x;
 					short iClickY = event.button.y;
 
@@ -3583,6 +3588,7 @@ int editor_tiles()
 				}
 
             case SDL_MOUSEMOTION: {
+					update_mouse_coords();
 					short iCol = event.button.x / TILESIZE + view_tileset_x;
 					short iRow = event.button.y / TILESIZE + view_tileset_y;
 
@@ -3925,6 +3931,7 @@ int editor_modeitems()
 				}
 
             case SDL_MOUSEMOTION: {
+                update_mouse_coords();
                 if (dragmodeitem >= 0 && event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
                         #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                             const Uint8 * keystate = SDL_GetKeyboardState(NULL);
@@ -4147,6 +4154,10 @@ int editor_backgrounds()
 					}
 				break;
 
+				case SDL_MOUSEMOTION:
+					update_mouse_coords();
+				break;
+
 				default:
 					break;
 			}
@@ -4165,11 +4176,7 @@ int editor_backgrounds()
 		rm->menu_font_small.draw(0,480-rm->menu_font_small.getHeight() * 2, "[Page Up] next page, [Page Down] previous page");
 		rm->menu_font_small.draw(0,480-rm->menu_font_small.getHeight(), "[LMB] choose background with music category, [RMB] choose just background");
 
-		int x, y;
-
-		SDL_GetMouseState(&x, &y);
-
-		int iID = x / 160 + y / 120 * 4 + iPage * 16;
+		int iID = mouse_x / 160 + mouse_y / 120 * 4 + iPage * 16;
 
         if (iID < backgroundlist->GetCount())
             rm->menu_font_small.draw(0, 0, backgroundlist->GetIndex(iID));
@@ -4278,6 +4285,7 @@ int editor_animation()
 				}
 
             case SDL_MOUSEMOTION: {
+                update_mouse_coords();
                 if (fInValidTile) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
 							if (iCol < set_tile_start_x)
