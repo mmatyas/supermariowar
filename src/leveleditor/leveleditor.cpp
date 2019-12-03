@@ -61,6 +61,10 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 #include <cstring>
 #include <cstdlib>
 
+#ifndef USE_SDL2
+#include <algorithm>
+#endif
+
 #ifdef _WIN32
 	#include <windows.h>
     #ifdef _MSC_VER
@@ -167,8 +171,8 @@ short			y_shake = 0;
 int				mouse_x, mouse_y;
 
 void update_mouse_coords() {
-	mouse_x = std::min(640 - 1, std::max(event.button.x, 0));
-	mouse_y = std::min(480 - 1, std::max(event.button.y, 0));
+	mouse_x = std::min(640 - 1, std::max(event.motion.x, 0));
+	mouse_y = std::min(480 - 1, std::max(event.motion.y, 0));
 }
 
 CEyecandyContainer eyecandy[3];
