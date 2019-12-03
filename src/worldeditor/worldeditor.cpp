@@ -101,6 +101,11 @@ WorldMapTile	copiedtiles[MAPWIDTH][MAPHEIGHT];
 
 int				mouse_x, mouse_y;
 
+void update_mouse_coords() {
+	mouse_x = std::min(640 - 1, std::max(event.button.x, 0));
+	mouse_y = std::min(480 - 1, std::max(event.button.y, 0));
+}
+
 //Vehicle structure that holds the current vehicle "stamp"
 WorldVehicle g_wvVehicleStamp;
 
@@ -1489,8 +1494,7 @@ int editor_edit()
 					}
 					//Painting tiles with mouse movement
                 case SDL_MOUSEMOTION: {
-						mouse_x = event.button.x;
-						mouse_y = event.button.y;
+						update_mouse_coords();
 						short iButtonX = event.button.x - draw_offset_x;
 						short iButtonY = event.button.y - draw_offset_y;
 						short iCol = (iButtonX >> 5) + draw_offset_col;
@@ -4019,8 +4023,7 @@ int editor_stage()
 				}
 
             case SDL_MOUSEMOTION: {
-					mouse_x = event.button.x;
-					mouse_y = event.button.y;
+					update_mouse_coords();
 					iStageDisplay = -1;
 
                 if (iEditStage == -1) {
