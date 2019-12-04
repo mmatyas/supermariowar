@@ -64,6 +64,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 #ifdef _WIN32
 	#include <windows.h>
     #ifdef _MSC_VER
+    #define NOMINMAX
     #if _MSC_VER >= 1400
         #include <stdio.h>
         FILE _iob[] = {*stdin, *stdout, *stderr};
