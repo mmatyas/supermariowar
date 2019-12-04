@@ -41,10 +41,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifndef USE_SDL2
-#include <algorithm>
-#endif
-
 #ifdef _WIN32
 	#include <windows.h>
     #ifdef _MSC_VER
@@ -106,8 +102,13 @@ WorldMapTile	copiedtiles[MAPWIDTH][MAPHEIGHT];
 int				mouse_x, mouse_y;
 
 void update_mouse_coords() {
+#ifdef USE_SDL2
 	mouse_x = std::min(640 - 1, std::max(event.motion.x, 0));
 	mouse_y = std::min(480 - 1, std::max(event.motion.y, 0));
+#else
+	mouse_x = event.motion.x;
+	mouse_y = event.motion.y;
+#endif
 }
 
 //Vehicle structure that holds the current vehicle "stamp"
