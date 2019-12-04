@@ -110,7 +110,7 @@ before_script:
 script:
   - if [[ "$BUILD" == "native" ]]; then mkdir build && cd build; fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then
-      cmake ..;
+      cmake -D USE_SDL2_LIBS:BOOL=OFF ..;
       make;
     fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then
