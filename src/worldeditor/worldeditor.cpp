@@ -44,7 +44,6 @@
 #ifdef _WIN32
 	#include <windows.h>
     #ifdef _MSC_VER
-    #define NOMINMAX
     #if _MSC_VER >= 1400
         #include <stdio.h>
         FILE _iob[] = {*stdin, *stdout, *stderr};
@@ -104,8 +103,8 @@ int				mouse_x, mouse_y;
 
 void update_mouse_coords() {
 #ifdef USE_SDL2
-	mouse_x = std::min(640 - 1, std::max(event.motion.x, 0));
-	mouse_y = std::min(480 - 1, std::max(event.motion.y, 0));
+	mouse_x = (std::min)(640 - 1, (std::max)(event.motion.x, 0));
+	mouse_y = (std::min)(480 - 1, (std::max)(event.motion.y, 0));
 #else
 	mouse_x = event.motion.x;
 	mouse_y = event.motion.y;
