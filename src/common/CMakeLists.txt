@@ -36,7 +36,7 @@ set(COMMON_SRCS
 )
 
 if (USE_PNG_SAVE AND NOT USE_SDL2_LIBS)
-    list(APPEND COMMON_SRCS src/savepng.cpp)
+    list(APPEND COMMON_SRCS savepng.cpp)
 endif()
 
 add_library(CommonFiles ${COMMON_SRCS})
