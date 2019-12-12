@@ -216,7 +216,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
             } else {
                 if (DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0) {
                     fModifying = false;
-                    return MENU_CODE_UNSELECT_ITEM;
+                    return MENU_CODE_BACK_TO_MATCH_SELECTION_MENU;
                 }
             }
         }
