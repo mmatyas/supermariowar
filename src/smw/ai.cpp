@@ -480,10 +480,6 @@ void CPlayerAI::Think(COutputControl * playerKeys)
         }
     }
 
-    //Let go of the jump button so that we clear "lockjump" so we can jump again when we hit the ground if we want to
-    if (pPlayer->inair && pPlayer->vely > 0 && (pPlayer->powerup != 3 || (pPlayer->powerup == 3 && pPlayer->lockjump)))
-        playerKeys->game_jump.fDown = false;
-
     /***************************************************
     * 4. Deal with falling onto spikes (this needs to be improved)
     ***************************************************/
