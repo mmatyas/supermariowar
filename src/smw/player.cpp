@@ -1151,6 +1151,9 @@ void CPlayer::move()
                 if (playerKeys->game_jump.fDown || playerKeys->game_left.fDown || playerKeys->game_right.fDown)
                     suicidetimer.reset();
             }
+            //Let go of the jump button so that we clear "lockjump" so we can jump again when we hit the ground if we want to
+            if (inair && vely > 0 && (powerup != 3 || lockjump))
+                playerKeys->game_jump.fDown = false;
         }
     }
 
@@ -1272,7 +1275,7 @@ void CPlayer::move()
                 enableFreeFall();
 
             if (playerKeys->game_down.fDown) {
-                if (!lockfall && !inair && playerDevice == DEVICE_KEYBOARD) {
+                if (!lockfall && !inair && (playerDevice == DEVICE_KEYBOARD || pPlayerAI)) {
                     lockfall = true;
                     fallthrough = true;
                 }

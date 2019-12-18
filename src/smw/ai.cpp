@@ -269,6 +269,8 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             } else {
                 if (nearestObjects.playerdistance < 8100)	//else if player is near but higher, run away (left)
                     *moveAway = true;
+                else
+                    *moveToward = true;	//Don't just stand and do nothing
             }
 
 
@@ -281,8 +283,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                        player->ix - ix < 45 &&
                        player->ix - ix > -45 && RandomNumberGenerator::generator().getBoolean()) {
                 //or if player is high
-                playerKeys->game_jump.fDown = true;
-                playerKeys->game_down.fDown = true;
+                if (!pPlayer->inair) playerKeys->game_down.fDown = true;
 
                 if (!pPlayer->superstomp.isInSuperStompState()) {
                     //If the player is tanooki, then try to super stomp on them
@@ -294,11 +295,6 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                         playerKeys->game_jump.fPressed = true;
                     }
                 }
-            } else if (iy - player->iy > 70) { //If the player is significatly below us, then jump
-                playerKeys->game_jump.fDown = true;
-            } else {
-                if (!RandomNumberGenerator::generator().getBoolean(60))
-                    playerKeys->game_jump.fDown = true;
             }
         } else if (actionType == 1) { //Go for goal
             CObject * goal = nearestObjects.goal;
@@ -311,13 +307,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             if (goal->iy <= iy && goal->ix - ix < 45 && goal->ix - ix > -45) {
                 playerKeys->game_jump.fDown = true;
             } else if (goal->iy > iy && goal->ix - ix < 45 && goal->ix - ix > -45) {
-                playerKeys->game_jump.fDown = true;
-                playerKeys->game_down.fDown = true;
-            } else if (iy - goal->iy > 70) {
-                playerKeys->game_jump.fDown = true;
-            } else {
-                if (!RandomNumberGenerator::generator().getBoolean(60))
-                    playerKeys->game_jump.fDown = true;
+                if (!pPlayer->inair) playerKeys->game_down.fDown = true;
             }
 
             if (goal->getObjectType() == object_moving && ((IO_MovingObject*)goal)->getMovingObjectType() == movingobject_egg)
@@ -359,8 +349,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 playerKeys->game_left.fDown = true;
 
             if (threat->iy <= iy && threat->ix - ix < 60 && threat->ix - ix > -60) {
-                playerKeys->game_jump.fDown = true;
-                playerKeys->game_down.fDown = true;
+                if (!pPlayer->inair) playerKeys->game_down.fDown = true;
             } else if (threat->iy > iy && threat->ix - ix < 60 && threat->ix - ix > -60) {
                 playerKeys->game_jump.fDown = true;
             }
@@ -375,13 +364,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             if (teammate->iy <= iy && teammate->ix - ix < 45 && teammate->ix - ix > -45) {
                 playerKeys->game_jump.fDown = true;
             } else if (teammate->iy > iy && teammate->ix - ix < 45 && teammate->ix - ix > -45) {
-                playerKeys->game_jump.fDown = true;
-                playerKeys->game_down.fDown = true;
-            } else if (iy - teammate->iy > 70) {
-                playerKeys->game_jump.fDown = true;
-            } else {
-                if (!RandomNumberGenerator::generator().getBoolean(60))
-                    playerKeys->game_jump.fDown = true;
+                if (!pPlayer->inair) playerKeys->game_down.fDown = true;
             }
         } else if (actionType == 4) { //Stomp something (goomba, koopa, cheepcheep)
             CObject * stomp = nearestObjects.stomp;
@@ -411,8 +394,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             if (stomp->iy <= iy + PH && nearestObjects.stompdistance < 2025) {
                 playerKeys->game_jump.fDown = true;
             } else if (stomp->iy > iy + PH && nearestObjects.stompdistance < 2025) {
-                playerKeys->game_jump.fDown = true;
-                playerKeys->game_down.fDown = true;
+                if (!pPlayer->inair) playerKeys->game_down.fDown = true;
 
                 if (!pPlayer->superstomp.isInSuperStompState()) {
                     //If the player is tanooki, then try to super stomp on them
@@ -424,12 +406,13 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                         playerKeys->game_jump.fPressed = true;
                     }
                 }
-            } else {
-                if (!RandomNumberGenerator::generator().getBoolean(60))
-                    playerKeys->game_jump.fDown = true;
             }
         }
     }
+
+    //Jump if trying to move left/right and x velocity is zero
+    if ((playerKeys->game_left.fDown || playerKeys->game_right.fDown) && pPlayer->velx == 0.0f)
+        playerKeys->game_jump.fDown = true;
 
     //"Star Mode" specific stuff
     //Drop the star if we're not it
@@ -479,10 +462,6 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             playerKeys->game_turbo.fDown = false;
         }
     }
-
-    //Let go of the jump button so that we clear "lockjump" so we can jump again when we hit the ground if we want to
-    if (pPlayer->inair && pPlayer->vely > 0 && (pPlayer->powerup != 3 || (pPlayer->powerup == 3 && pPlayer->lockjump)))
-        playerKeys->game_jump.fDown = false;
 
     /***************************************************
     * 4. Deal with falling onto spikes (this needs to be improved)
