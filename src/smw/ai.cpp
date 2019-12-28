@@ -499,7 +499,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
             goto ExitDeathCheck;
         } else if ((ttLeftTile & tile_flag_solid) || (ttLeftTile & tile_flag_solid_on_top) || g_map->block(iDeathX1, iDeathY) ||
-                  ((ttRightTile & tile_flag_solid) && (ttRightTile & tile_flag_solid_on_top)) || g_map->block(iDeathX2, iDeathY)) {
+                  (ttRightTile & tile_flag_solid) || (ttRightTile & tile_flag_solid_on_top) || g_map->block(iDeathX2, iDeathY)) {
             iFallDanger = 0;
             goto ExitDeathCheck;
         }
@@ -520,7 +520,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
                 goto ExitDeathCheck;
             } else if ((lefttile & tile_flag_solid) || (lefttile & tile_flag_solid_on_top) ||
-                      ((righttile & tile_flag_solid) && (righttile & tile_flag_solid_on_top))) {
+                      (righttile & tile_flag_solid) || (righttile & tile_flag_solid_on_top)) {
                 iFallDanger = 0;
                 goto ExitDeathCheck;
             }
