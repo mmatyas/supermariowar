@@ -286,13 +286,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 if (!pPlayer->inair) playerKeys->game_down.fDown = true;
 
                 if (!pPlayer->superstomp.isInSuperStompState()) {
-                    //If the player is tanooki, then try to super stomp on them
-                    if (pPlayer->tanookisuit.isOn()) {
-                        playerKeys->game_turbo.fPressed = true;
-                        pPlayer->lockfire = false;
-                    } else if (pPlayer->kuriboshoe.is_on()) { //else if the player has the shoe then stomp
-                        playerKeys->game_down.fPressed = true;
+                    //If the player has the tanooki or shoe, then try to super stomp on them
+                    if (pPlayer->tanookisuit.isOn() || pPlayer->kuriboshoe.is_on()) {
+                        playerKeys->game_down.fDown = true;
                         playerKeys->game_jump.fPressed = true;
+                        if (pPlayer->tanookisuit.isOn()) pPlayer->lockfire = false;
                     }
                 }
             }
@@ -397,13 +395,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 if (!pPlayer->inair) playerKeys->game_down.fDown = true;
 
                 if (!pPlayer->superstomp.isInSuperStompState()) {
-                    //If the player is tanooki, then try to super stomp on them
-                    if (pPlayer->tanookisuit.isOn()) {
-                        playerKeys->game_turbo.fPressed = true;
-                        pPlayer->lockfire = false;
-                    } else if (pPlayer->kuriboshoe.is_on()) { //else if the player has the shoe then stomp
-                        playerKeys->game_down.fPressed = true;
+                    //If the player has the tanooki or shoe, then try to super stomp on them
+                    if (pPlayer->tanookisuit.isOn() || pPlayer->kuriboshoe.is_on()) {
+                        playerKeys->game_down.fDown = true;
                         playerKeys->game_jump.fPressed = true;
+                        if (pPlayer->tanookisuit.isOn()) pPlayer->lockfire = false;
                     }
                 }
             }
@@ -417,6 +413,10 @@ void CPlayerAI::Think(COutputControl * playerKeys)
     //Pick up throwable blocks from below
     if (playerKeys->game_turbo.fDown && !carriedItem && !pPlayer->inair)
         playerKeys->game_turbo.fPressed = true;
+
+    //Stay inside tanooki statue
+    if (pPlayer->tanookisuit.isOn() && pPlayer->tanookisuit.isStatue())
+        playerKeys->game_down.fDown = true;
 
     //"Star Mode" specific stuff
     //Drop the star if we're not it
