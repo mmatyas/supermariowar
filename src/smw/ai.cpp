@@ -290,7 +290,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                     if (pPlayer->tanookisuit.isOn() || pPlayer->kuriboshoe.is_on()) {
                         playerKeys->game_down.fDown = true;
                         playerKeys->game_jump.fPressed = true;
-                        if (pPlayer->tanookisuit.isOn()) pPlayer->lockfire = false;
+                        if (pPlayer->tanookisuit.isOn())
+                        {
+                            playerKeys->game_turbo.fPressed = true;
+                            pPlayer->lockfire = false;
+                        }
                     }
                 }
             }
@@ -399,7 +403,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                     if (pPlayer->tanookisuit.isOn() || pPlayer->kuriboshoe.is_on()) {
                         playerKeys->game_down.fDown = true;
                         playerKeys->game_jump.fPressed = true;
-                        if (pPlayer->tanookisuit.isOn()) pPlayer->lockfire = false;
+                        if (pPlayer->tanookisuit.isOn())
+                        {
+                            playerKeys->game_turbo.fPressed = true;
+                            pPlayer->lockfire = false;
+                        }
                     }
                 }
             }
