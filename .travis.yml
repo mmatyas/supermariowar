@@ -79,8 +79,8 @@ before_script:
   - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then
       git clone https://github.com/emscripten-core/emsdk.git --depth=1;
       cd emsdk;
-      ./emsdk install latest;
-      ./emsdk activate latest;
+      ./emsdk install 1.39.5;
+      ./emsdk activate 1.39.5;
       source ./emsdk_env.sh;
       cd ..;
     fi
