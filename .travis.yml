@@ -115,7 +115,7 @@ script:
     fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then
       cmake -D USE_SDL2_LIBS:BOOL=ON ..;
-      make smw;
+      make;
     fi
 
   # Android
