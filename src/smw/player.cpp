@@ -2832,6 +2832,8 @@ bool CPlayer::AcceptItem(MO_CarriedObject * item)
 
         carriedItem = item;
         item->owner = this;
+        carriedItem->velx = 0.0f;
+        carriedItem->vely = 0.0f;
 
         fAcceptingItem = false;
         return true;
