@@ -2358,7 +2358,13 @@ int editor_platforms()
 						}
                 } else if (event.key.keysym.sym == SDLK_l) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-							editor_tiletype();
+							FPSLimiter::instance().frameStart();
+							while (editor_tiletype() == EDITOR_TILETYPE) {
+								FPSLimiter::instance().beforeFlip();
+								gfx_flipscreen();
+								FPSLimiter::instance().afterFlip();
+								FPSLimiter::instance().frameStart();
+							}
 							iPlatformEditState = PLATFORM_EDIT_STATE_TILETYPE;
 						}
                 } else if (event.key.keysym.sym == SDLK_y) { //Change the draw layer
