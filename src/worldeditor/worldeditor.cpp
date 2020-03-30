@@ -434,7 +434,7 @@ int main(int argc, char *argv[])
 	g_map = new CMap();
 	g_tilesetmanager = new CTilesetManager();
 	filterslist = new FiltersList();
-	maplist = new MapList(false);
+	maplist = new MapList(true);
     menugraphicspacklist = new GraphicsList;
     gamegraphicspacklist = new GraphicsList;
     worldlist = new WorldList;
