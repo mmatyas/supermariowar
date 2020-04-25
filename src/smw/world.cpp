@@ -12,8 +12,10 @@
 #include <cstdlib> // atoi()
 #include <cstring>
 
+#include <fstream>
 #include <map>
 #include <queue>
+#include <string>
 
 #if defined(__APPLE__)
 #include <sys/stat.h>
@@ -408,13 +410,14 @@ bool WorldMap::Load(short tilesize)
     }
 
     const char * szPath = worldlist->GetIndex(game_values.worldindex);
-    FILE * file = fopen(szPath, "r");
     worldName = stripPathAndExtension(szPath);
 
+    std::ifstream file(szPath);
     if (!file)
         return false;
 
-    char buffer[1024];
+    std::string line;
+    char* buffer = NULL;
     short iReadType = 0;
     int32_t iVersion[4] = {0, 0, 0, 0};
     short iMapTileReadRow = 0;
@@ -422,8 +425,18 @@ bool WorldMap::Load(short tilesize)
     short iCurrentWarp = 0;
     short iCurrentVehicle = 0;
 
-    while (fgets(buffer, 1024, file)) {
-        if (buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
+    while (std::getline(file, line)) {
+        if (line.empty())
+            continue;
+
+        if (buffer)
+            delete[] buffer;
+
+        buffer = new char[line.size() + 1];
+        std::copy(line.begin(), line.end(), buffer);
+        buffer[line.size()] = '\0';
+
+        if (buffer[0] == '#' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
             continue;
 
         if (iReadType == 0) { //Read version number
@@ -465,7 +478,7 @@ bool WorldMap::Load(short tilesize)
                 iDrawSurfaceTiles = 456; //19 * 24 = 456 max tiles in world surface
 
             iTilesPerCycle = iDrawSurfaceTiles / 8;
-        } else if (iReadType == 4) { //background sprites
+        } else if (iReadType == 4) { //background water
             char * psz = strtok(buffer, ",\n");
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
@@ -765,8 +778,8 @@ bool WorldMap::Load(short tilesize)
     }
 
 RETURN:
-
-    fclose(file);
+    if (buffer)
+        delete[] buffer;
 
     return iReadType == 17;
 }
