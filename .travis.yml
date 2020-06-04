@@ -22,6 +22,10 @@ matrix:
   - compiler: clang
     env: BUILD=native SMW_USE_SDL2=true
 
+  # MinGW cross
+  - dist: bionic
+    env: BUILD=mingw SMW_USE_SDL2=true
+
   # OSX SDL1.2 build
   - os: osx
     env: BUILD=native SMW_USE_SDL2=false
@@ -75,6 +79,20 @@ before_script:
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
 
+  # MinGW cross
+  - if [[ "$BUILD" == "mingw" && "$TRAVIS_OS_NAME" == "linux" ]]; then
+      sudo apt-get -qq update &&
+      sudo apt-get install -y
+        cmake
+        g++-mingw-w64-i686
+    ; fi
+  - if [[ "$BUILD" == "mingw" && "$TRAVIS_OS_NAME" == "linux" ]]; then
+      export SDL2DIR=/ &&
+      curl -L https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/i686-w64-mingw32.tar.xz | tar xJf - -C /tmp/
+    ; fi
+  - if [[ "$BUILD" == "mingw" && "$TRAVIS_OS_NAME" == "linux" ]]; then $CXX --version; fi
+  - if [[ "$BUILD" == "mingw" && "$TRAVIS_OS_NAME" == "linux" ]]; then cmake --version; fi
+
   # Emscripten
   - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then
       git clone https://github.com/emscripten-core/emsdk.git --depth=1;
@@ -115,6 +133,13 @@ script:
     fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then
       cmake -D USE_SDL2_LIBS:BOOL=ON ..;
+      make;
+    fi
+
+  # MinGW
+  - if [[ "$BUILD" == "mingw" && "$SMW_USE_SDL2" == "true" ]]; then
+      mkdir build && cd build &&
+      cmake -DCMAKE_TOOLCHAIN_FILE=../.travis/mingw_toolchain.cmake -DUSE_SDL2_LIBS=ON .. &&
       make;
     fi
 
