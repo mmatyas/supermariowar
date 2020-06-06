@@ -87,7 +87,7 @@ void PlayerTanookiSuit::update(CPlayer& player)
     }
 
     // If not super stomping currently
-    if (!player.superstomp.isInSuperStompState()) {
+    if (!player.superstomp.isStomping()) {
         // Count down the statue timer, which leads to a forced detransformation
         if (statue_timer == 1) {
             // Untransform from statue
