@@ -128,19 +128,35 @@ before_script:
 script:
   - if [[ "$BUILD" == "native" ]]; then mkdir build && cd build; fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then
-      cmake -D USE_SDL2_LIBS:BOOL=OFF ..;
-      make;
+      cmake -D USE_SDL2_LIBS:BOOL=OFF .. &&
+      make &&
+      cd ..;
     fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then
-      cmake -D USE_SDL2_LIBS:BOOL=ON ..;
-      make;
+      cmake -D USE_SDL2_LIBS:BOOL=ON .. &&
+      make &&
+      cd ..;
+    fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" && "$TRAVIS_COMPILER" == "gcc" ]]; then
+      export deploydir="supermariowar_$(date +%F)_linux" &&
+      mkdir "$deploydir" &&
+      cp docs/readme-v1.8.html build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server} "${deploydir}/";
     fi
 
   # MinGW
   - if [[ "$BUILD" == "mingw" && "$SMW_USE_SDL2" == "true" ]]; then
       mkdir build && cd build &&
       cmake -DCMAKE_TOOLCHAIN_FILE=../.travis/mingw_toolchain.cmake -DUSE_SDL2_LIBS=ON .. &&
-      make;
+      make &&
+      cd ..;
+    fi
+  - if [[ "$BUILD" == "mingw" && "$SMW_USE_SDL2" == "true" ]]; then
+      export deploydir="supermariowar_$(date +%F)_windows" &&
+      mkdir "$deploydir" &&
+      cp docs/readme-v1.8.html "${deploydir}/" &&
+      cp /tmp/i686-w64-mingw32/bin/lib{modplug-1,mpg123-0,ogg-0,opus-0,opusfile-0,png16-16,vorbis-0,vorbisfile-3}.dll "${deploydir}/" &&
+      cp /tmp/i686-w64-mingw32/bin/{SDL2,SDL2_image,SDL2_mixer,zlib1}.dll "${deploydir}/" &&
+      cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server}.exe "${deploydir}/";
     fi
 
   # Android
@@ -161,6 +177,14 @@ script:
       mkdir build_js && cd build_js;
       emconfigure cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1;
       emmake make smw;
+    fi
+
+  # Deploy
+  - if [[ -n "$deploydir" ]]; then
+      unzip -q data.zip -d "${deploydir}/" &&
+      zip -r "${deploydir}.zip" "${deploydir}" &&
+      wget -c https://github.com/mmatyas/uploadtool/raw/master/upload.sh &&
+      bash ./upload.sh "${deploydir}.zip";
     fi
 
 android:
