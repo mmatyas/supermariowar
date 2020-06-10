@@ -10,24 +10,30 @@ branches:
 matrix:
   include:
   # Linux desktop builds
-  - compiler: gcc
+  - name: "Linux + GCC + SDL 1.2"
+    compiler: gcc
     env: BUILD=native SMW_USE_SDL2=false
 
-  - compiler: gcc
+  - name: "Linux + GCC + SDL 2"
+    compiler: gcc
     env: BUILD=native SMW_USE_SDL2=true
 
-  - compiler: clang
+  - name: "Linux + Clang + SDL 1.2"
+    compiler: clang
     env: BUILD=native SMW_USE_SDL2=false
 
-  - compiler: clang
+  - name: "Linux + Clang + SDL 2"
+    compiler: clang
     env: BUILD=native SMW_USE_SDL2=true
 
   # MinGW cross
-  - dist: bionic
+  - name: "MinGW"
+    dist: bionic
     env: BUILD=mingw SMW_USE_SDL2=true
 
   # OSX SDL1.2 build
-  - os: osx
+  - name: "macOS + SDL 1.2"
+    os: osx
     env: BUILD=native SMW_USE_SDL2=false
     compiler: clang
     before_script:
@@ -35,7 +41,8 @@ matrix:
     - brew install sdl sdl_image sdl_mixer
 
   # OSX SDL2 build
-  - os: osx
+  - name: "macOS + SDL 2"
+    os: osx
     env: BUILD=native SMW_USE_SDL2=true
     compiler: clang
     before_script:
@@ -43,16 +50,20 @@ matrix:
     - brew install sdl2 sdl2_image sdl2_mixer
 
   # Emscripten
-  - env: BUILD=emscripten
+  - name: "Emscripten"
+    env: BUILD=emscripten
 
   # Android builds
-  - language: android
+  - name: "Android ARM"
+    language: android
     env: BUILD=android ABILIST='armeabi armeabi-v7a arm64-v8a'
 
-  - language: android
+  - name: "Android Intel"
+    language: android
     env: BUILD=android ABILIST='x86 x86_64'
 
-  - language: android
+  - name: "Android MIPS"
+    language: android
     env: BUILD=android ABILIST='mips mips64'
 
 
