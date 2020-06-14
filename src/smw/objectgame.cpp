@@ -2375,7 +2375,10 @@ MO_CarriedObject::MO_CarriedObject(gfxSprite *nspr, short x, short y, short iNum
 }
 
 MO_CarriedObject::~MO_CarriedObject()
-{}
+{
+    if (owner)
+        owner->carriedItem = NULL;
+}
 
 void MO_CarriedObject::init()
 {
