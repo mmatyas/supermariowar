@@ -1494,12 +1494,13 @@ bool MenuState::ReadTourFile()
     ResetTourStops();
 
     FILE * fp = fopen(tourlist->GetIndex(game_values.tourindex), "r");
+    const char* const ignorable_leads = " #\n\r\t";
 
     char buffer[256];
     bool fReadVersion = false;
     int32_t iVersion[4] = {0, 0, 0, 0};
     while (fgets(buffer, 256, fp) && game_values.tourstoptotal < 10) {
-        if (buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')
+        if (strchr(ignorable_leads, buffer[0]))
             continue;
 
         if (!fReadVersion) {
