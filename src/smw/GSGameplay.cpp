@@ -1751,7 +1751,7 @@ void playMusic()
             ifsoundonstop(rm->sfx_slowdownmusic);
     }
 
-    if (game_values.playinvinciblesound) {
+    if (game_values.playinvinciblesound && game_values.musicvolume > 0) {
         if (!rm->sfx_invinciblemusic.isPlaying() && !rm->sfx_timewarning.isPlaying() && !rm->backgroundmusic[0].isplaying())
             ifSoundOnPlay(rm->sfx_invinciblemusic);
     } else {
