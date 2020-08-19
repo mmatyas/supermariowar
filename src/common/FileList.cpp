@@ -296,9 +296,15 @@ SkinListNode::SkinListNode(std::string skinName, std::string skinPath)
 
 SkinList::SkinList()
 {
-    DirectoryListing d(convertPath("gfx/skins/"), ".bmp");
+    DirectoryListing d(convertPath("gfx/skins/"));
     std::string curname;
     while (d(curname)) {
+        if (curname.length() < 5)
+            continue;
+        std::string file_ext = std::string(lowercaseDup(curname.substr(curname.length() - 4).c_str()));
+        if (file_ext != ".bmp" && file_ext != ".png") //Allow bmp and png skins
+            continue;
+        
         std::string sShortSkinName = stripCreatorAndDotMap(curname);
         SkinListNode * node = new SkinListNode(sShortSkinName, d.fullName(curname));
 
