@@ -1,5 +1,6 @@
+#include <algorithm>
+#include <string>
 #include <ctype.h>
-#include <cstring>
 
 //_DEBUG
 #if 0
@@ -45,7 +46,20 @@ char *inPlaceLowerCase(char *str)
     return str;
 }
 
-char *lowercaseDup(const char *name)
+void inPlaceLowerCase(std::string& str)
 {
-	return inPlaceLowerCase(strdup(name));
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+}
+
+bool cstr_ci_equals(const char* const a, const char* const b)
+{
+    if (a == b)
+        return true;
+
+    for (const char *pa = a, *pb = b; *pa; pa++, pb++) {
+        if (::tolower(*pa) != ::tolower(*pb))
+            return false;
+    }
+
+    return true;
 }

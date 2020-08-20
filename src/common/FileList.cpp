@@ -72,9 +72,9 @@ void UpdateMusicWithOverrides()
 
         //If we found a category header
         if (szBuffer[0] == '[') {
-            if (!strCiCompare(szBuffer, "[maps]"))
+            if (cstr_ci_equals(szBuffer, "[maps]"))
                 iAddToCategory = 1;
-            else if (!strCiCompare(szBuffer, "[worlds]"))
+            else if (cstr_ci_equals(szBuffer, "[worlds]"))
                 iAddToCategory = 2;
 
             continue;
@@ -301,10 +301,12 @@ SkinList::SkinList()
     while (d(curname)) {
         if (curname.length() < 5)
             continue;
-        std::string file_ext = std::string(lowercaseDup(curname.substr(curname.length() - 4).c_str()));
+
+        std::string file_ext = curname.substr(curname.length() - 4);
+        inPlaceLowerCase(file_ext);
         if (file_ext != ".bmp" && file_ext != ".png") //Allow bmp and png skins
             continue;
-        
+
         std::string sShortSkinName = stripCreatorAndDotMap(curname);
         SkinListNode * node = new SkinListNode(sShortSkinName, d.fullName(curname));
 
@@ -497,31 +499,31 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
         //If we found a category header
         if (szBuffer[0] == '[') {
-            if (!strCiCompare(szBuffer, "[land]"))
+            if (cstr_ci_equals(szBuffer, "[land]"))
                 iAddToCategory = 0;
-            else if (!strCiCompare(szBuffer, "[underground]"))
+            else if (cstr_ci_equals(szBuffer, "[underground]"))
                 iAddToCategory = 1;
-            else if (!strCiCompare(szBuffer, "[underwater]"))
+            else if (cstr_ci_equals(szBuffer, "[underwater]"))
                 iAddToCategory = 2;
-            else if (!strCiCompare(szBuffer, "[castle]"))
+            else if (cstr_ci_equals(szBuffer, "[castle]"))
                 iAddToCategory = 3;
-            else if (!strCiCompare(szBuffer, "[platforms]"))
+            else if (cstr_ci_equals(szBuffer, "[platforms]"))
                 iAddToCategory = 4;
-            else if (!strCiCompare(szBuffer, "[ghost]"))
+            else if (cstr_ci_equals(szBuffer, "[ghost]"))
                 iAddToCategory = 5;
-            else if (!strCiCompare(szBuffer, "[bonus]"))
+            else if (cstr_ci_equals(szBuffer, "[bonus]"))
                 iAddToCategory = 6;
-            else if (!strCiCompare(szBuffer, "[battle]"))
+            else if (cstr_ci_equals(szBuffer, "[battle]"))
                 iAddToCategory = 7;
-            else if (!strCiCompare(szBuffer, "[desert]"))
+            else if (cstr_ci_equals(szBuffer, "[desert]"))
                 iAddToCategory = 8;
-            else if (!strCiCompare(szBuffer, "[clouds]"))
+            else if (cstr_ci_equals(szBuffer, "[clouds]"))
                 iAddToCategory = 9;
-            else if (!strCiCompare(szBuffer, "[snow]"))
+            else if (cstr_ci_equals(szBuffer, "[snow]"))
                 iAddToCategory = 10;
-            else if (!strCiCompare(szBuffer, "[maps]"))
+            else if (cstr_ci_equals(szBuffer, "[maps]"))
                 iAddToCategory = MAXMUSICCATEGORY;
-            else if (!strCiCompare(szBuffer, "[backgrounds]"))
+            else if (cstr_ci_equals(szBuffer, "[backgrounds]"))
                 iAddToCategory = MAXMUSICCATEGORY + 1;
 
             continue;
@@ -844,29 +846,29 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 
         //If we found a category header
         if (szBuffer[0] == '[') {
-            if (!strCiCompare(szBuffer, "[grass]"))
+            if (cstr_ci_equals(szBuffer, "[grass]"))
                 iAddToCategory = 0;
-            else if (!strCiCompare(szBuffer, "[desert]"))
+            else if (cstr_ci_equals(szBuffer, "[desert]"))
                 iAddToCategory = 1;
-            else if (!strCiCompare(szBuffer, "[water]"))
+            else if (cstr_ci_equals(szBuffer, "[water]"))
                 iAddToCategory = 2;
-            else if (!strCiCompare(szBuffer, "[giant]"))
+            else if (cstr_ci_equals(szBuffer, "[giant]"))
                 iAddToCategory = 3;
-            else if (!strCiCompare(szBuffer, "[sky]"))
+            else if (cstr_ci_equals(szBuffer, "[sky]"))
                 iAddToCategory = 4;
-            else if (!strCiCompare(szBuffer, "[ice]"))
+            else if (cstr_ci_equals(szBuffer, "[ice]"))
                 iAddToCategory = 5;
-            else if (!strCiCompare(szBuffer, "[pipe]"))
+            else if (cstr_ci_equals(szBuffer, "[pipe]"))
                 iAddToCategory = 6;
-            else if (!strCiCompare(szBuffer, "[dark]"))
+            else if (cstr_ci_equals(szBuffer, "[dark]"))
                 iAddToCategory = 7;
-            else if (!strCiCompare(szBuffer, "[space]"))
+            else if (cstr_ci_equals(szBuffer, "[space]"))
                 iAddToCategory = 8;
-            else if (!strCiCompare(szBuffer, "[bonus]"))
+            else if (cstr_ci_equals(szBuffer, "[bonus]"))
                 iAddToCategory = WORLDMUSICBONUS;
-            else if (!strCiCompare(szBuffer, "[sleep]"))
+            else if (cstr_ci_equals(szBuffer, "[sleep]"))
                 iAddToCategory = WORLDMUSICSLEEP;
-            else if (!strCiCompare(szBuffer, "[worlds]"))
+            else if (cstr_ci_equals(szBuffer, "[worlds]"))
                 iAddToCategory = WORLDMUSICWORLDS;
 
             continue;
