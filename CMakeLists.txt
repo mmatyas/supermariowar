@@ -20,10 +20,15 @@ option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" OFF)
 option(NO_NETWORK "Disable all network communication" OFF)
 option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet, yaml-cpp)" ON)
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" ON)
+option(SDL2_USE_MIXERX "(SDL2) Use SDL Mixer X instead of SDL Mixer" OFF)
 option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
 
 if (USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
+
+	if (SDL2_USE_MIXERX)
+		add_definitions(-DSDL2_USE_MIXERX)
+	endif()
 
 	if (SDL2_FORCE_GLES)
 		add_definitions(-DSDL2_FORCE_GLES)
@@ -100,13 +105,24 @@ if (NOT DISABLE_SYSLIB_CHECKS)
 	if (USE_SDL2_LIBS)
 		# add all SDL2 dependencies
 		find_package(SDL2 REQUIRED)
-		find_package(SDL2_mixer REQUIRED)
 		find_package(SDL2_image REQUIRED)
+		if (SDL2_USE_MIXERX)
+			find_package(PkgConfig REQUIRED)
+			pkg_check_modules(SDL2MIXER REQUIRED SDL2_mixer_ext)
+			link_directories(${SDL2MIXER_LIBRARY_DIRS})
+		else()
+			find_package(SDL2_mixer REQUIRED)
+			set(SDL2MIXER_LIBRARIES "${SDL2MIXER_LIBRARY}")
+		endif()
+
+		message("${SDL2MIXER_LIBRARY}")
+		message("${SDL2_MIXER_LIBRARY}")
+		message("${SDL2MIXER_LIBRARIES}")
 
 		# location of SDL headers
 		include_directories(${SDL2_INCLUDE_DIR})
-		include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
 		include_directories(${SDL2_MIXER_INCLUDE_DIRS})
+		include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
 	else()
 		# add all SDL dependencies
 		find_package(SDL REQUIRED)

@@ -1,7 +1,11 @@
 #ifndef SFX_H
 #define SFX_H
 
-#include "SDL_mixer.h"
+#ifdef SDL2_USE_MIXERX
+  #include "SDL_mixer_ext.h"
+#else
+  #include "SDL_mixer.h"
+#endif
 #include <string>
 
 #define NUM_SOUND_CHANNELS 16

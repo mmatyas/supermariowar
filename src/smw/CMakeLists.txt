@@ -128,7 +128,7 @@ target_link_libraries(smw ${ZLIB_LIBRARY})
 target_link_libraries(smw yaml-cpp)
 
 if(USE_SDL2_LIBS)
-	target_link_libraries(smw ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
+	target_link_libraries(smw ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
 else()
 	target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
 endif()
