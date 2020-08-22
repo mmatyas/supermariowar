@@ -50,7 +50,7 @@ void B_ViewBlock::update()
 short B_ViewBlock::SelectPowerup()
 {
     if (fNoPowerupsSelected)
-        return -1;
+        return NO_POWERUP;
 
     return powerupindex;
 }
