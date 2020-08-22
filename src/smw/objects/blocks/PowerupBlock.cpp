@@ -323,7 +323,7 @@ void B_PowerupBlock::triggerBehavior()
 short B_PowerupBlock::SelectPowerup()
 {
     if (iCountWeight == 0)
-        return -1;
+        return NO_POWERUP;
 
     int iRandPowerup = RANDOM_INT(iCountWeight + 1);
     int iSelectedPowerup = 0;
