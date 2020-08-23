@@ -13,6 +13,11 @@ set (SERVER_SRCS
 
 add_definitions(-DIS_SERVER=1)
 
+# Add EXE icon on Windows
+if (WIN32)
+	LIST(APPEND SERVER_SRCS "${PROJECT_SOURCE_DIR}/resources/windows/smw-server.rc")
+endif()
+
 add_executable (smw-server ${SERVER_SRCS})
 target_link_libraries(smw-server NetplayFiles)
 
