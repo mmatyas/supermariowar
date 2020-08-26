@@ -29,7 +29,11 @@ matrix:
   # MinGW cross
   - name: "MinGW"
     dist: bionic
-    env: BUILD=mingw SMW_USE_SDL2=true
+    env: BUILD=mingw SMW_USE_SDL2=true SMW_USE_MIXERX=OFF
+
+  - name: "MinGW + SDL Mixer X"
+    dist: bionic
+    env: BUILD=mingw SMW_USE_SDL2=true SMW_USE_MIXERX=ON
 
   # OSX SDL1.2 build
   - name: "macOS + SDL 1.2"
@@ -98,8 +102,14 @@ before_script:
         g++-mingw-w64-i686
     ; fi
   - if [[ "$BUILD" == "mingw" && "$TRAVIS_OS_NAME" == "linux" ]]; then
-      export SDL2DIR=/ &&
-      curl -L https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/i686-w64-mingw32.tar.xz | tar xJf - -C /tmp/
+      if [[ "$SMW_USE_MIXERX" == "OFF" ]]; then
+        export SDL2DIR=/ &&
+        export toolpack=i686-w64-mingw32.tar.xz;
+      else
+        export SDL2DIR=/usr/ &&
+        export toolpack=i686-w64-mingw32_mixerx.tar.xz;
+      fi &&
+      curl -L https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/${toolpack} | tar xJf - -C /tmp/
     ; fi
   - if [[ "$BUILD" == "mingw" && "$TRAVIS_OS_NAME" == "linux" ]]; then $CXX --version; fi
   - if [[ "$BUILD" == "mingw" && "$TRAVIS_OS_NAME" == "linux" ]]; then cmake --version; fi
@@ -157,17 +167,22 @@ script:
   # MinGW
   - if [[ "$BUILD" == "mingw" && "$SMW_USE_SDL2" == "true" ]]; then
       mkdir build && cd build &&
-      cmake -DCMAKE_TOOLCHAIN_FILE=../.travis/mingw_toolchain.cmake -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON .. &&
+      cmake ..
+        -DCMAKE_TOOLCHAIN_FILE=../.travis/mingw_toolchain.cmake
+        -DUSE_PNG_SAVE=ON
+        -DUSE_SDL2_LIBS=ON
+        -DSDL2_USE_MIXERX=${SMW_USE_MIXERX} &&
       make &&
       cd ..;
     fi
-  - if [[ "$BUILD" == "mingw" && "$SMW_USE_SDL2" == "true" ]]; then
+  - if [[ "$BUILD" == "mingw" && "$SMW_USE_SDL2" == "true" && "$SMW_USE_MIXERX" == "ON" ]]; then
       export deploydir="supermariowar_$(date +%F)_windows" &&
       mkdir "$deploydir" &&
-      cp docs/readme-v1.8.html "${deploydir}/" &&
-      cp /tmp/i686-w64-mingw32/bin/lib{modplug-1,mpg123-0,ogg-0,opus-0,opusfile-0,png16-16,vorbis-0,vorbisfile-3}.dll "${deploydir}/" &&
-      cp /tmp/i686-w64-mingw32/bin/{SDL2,SDL2_image,SDL2_mixer,zlib1}.dll "${deploydir}/" &&
-      cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server}.exe "${deploydir}/";
+      cp /usr/lib/gcc/i686-w64-mingw32/7.3-win32/{libgcc_s_sjlj-1,libstdc++-6}.dll "${deploydir}/" &&
+      cp /tmp/i686-w64-mingw32/usr/bin/{SDL2,SDL2_image,SDL2_mixer_ext}.dll "${deploydir}/" &&
+      cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server}.exe "${deploydir}/" &&
+      i686-w64-mingw32-strip ${deploydir}/* &&
+      cp docs/readme-v1.8.html "${deploydir}/";
     fi
 
   # Android

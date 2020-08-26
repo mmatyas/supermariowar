@@ -115,10 +115,6 @@ if (NOT DISABLE_SYSLIB_CHECKS)
 			set(SDL2MIXER_LIBRARIES "${SDL2MIXER_LIBRARY}")
 		endif()
 
-		message("${SDL2MIXER_LIBRARY}")
-		message("${SDL2_MIXER_LIBRARY}")
-		message("${SDL2MIXER_LIBRARIES}")
-
 		# location of SDL headers
 		include_directories(${SDL2_INCLUDE_DIR})
 		include_directories(${SDL2_MIXER_INCLUDE_DIRS})
