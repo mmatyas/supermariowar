@@ -1007,6 +1007,10 @@ void CPlayer::tryReleasingPowerup()
     if (game_values.gamepowerups[globalID] <= 0 || shyguy)
         return;
 
+    // Don't allow releasing another powerup when you're in the middle of releasing one
+    if (powerupused != -1)
+        return;
+
     powerupused = game_values.gamepowerups[globalID];
     game_values.gamepowerups[globalID] = -1;
 
