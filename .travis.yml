@@ -144,7 +144,7 @@ script:
       cd ..;
     fi
   - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then
-      cmake -D USE_SDL2_LIBS:BOOL=ON .. &&
+      cmake -D USE_SDL2_LIBS:BOOL=ON -DUSE_PNG_SAVE=ON .. &&
       make &&
       cd ..;
     fi
@@ -157,7 +157,7 @@ script:
   # MinGW
   - if [[ "$BUILD" == "mingw" && "$SMW_USE_SDL2" == "true" ]]; then
       mkdir build && cd build &&
-      cmake -DCMAKE_TOOLCHAIN_FILE=../.travis/mingw_toolchain.cmake -DUSE_SDL2_LIBS=ON .. &&
+      cmake -DCMAKE_TOOLCHAIN_FILE=../.travis/mingw_toolchain.cmake -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON .. &&
       make &&
       cd ..;
     fi
