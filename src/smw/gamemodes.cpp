@@ -1205,7 +1205,7 @@ void CGM_ShyGuyTag::FreeShyGuys()
 
 short CGM_ShyGuyTag::CheckWinner(CPlayer * player)
 {
-    if (gameover)
+    if (gameover || goal == -1)
         return player_kill_normal;
 
     if (player->Score().score >= goal) {
