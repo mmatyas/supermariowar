@@ -4857,10 +4857,10 @@ void takescreenshot()
 
 #ifdef PNG_SAVE_FORMAT
 		strcat(szSaveFile, ".png");
-		IMG_SavePNG(sScreenshot, szSaveFile);
+		IMG_SavePNG(sScreenshot, convertPath(szSaveFile).c_str());
 #else
 		strcat(szSaveFile, ".bmp");
-		SDL_SaveBMP(sScreenshot, szSaveFile);
+		SDL_SaveBMP(sScreenshot, convertPath(szSaveFile).c_str());
 #endif
 
 		SDL_FreeSurface(sScreenshot);
