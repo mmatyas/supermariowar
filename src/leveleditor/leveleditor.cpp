@@ -5234,10 +5234,10 @@ void takescreenshot()
 
 #ifdef PNG_SAVE_FORMAT
 		strcat(szSaveFile, ".png");
-		IMG_SavePNG(screenshot, szSaveFile);
+		IMG_SavePNG(screenshot, convertPath(szSaveFile).c_str());
 #else
 		strcat(szSaveFile, ".bmp");
-		SDL_SaveBMP(screenshot, szSaveFile);
+		SDL_SaveBMP(screenshot, convertPath(szSaveFile).c_str());
 #endif
 
 		SDL_FreeSurface(screenshot);
