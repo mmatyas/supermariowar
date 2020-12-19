@@ -57,7 +57,7 @@
 #define SDL_Delay(n) ;
 #endif
 
-#define MAPTITLESTRING "SMW 2.0 World Editor"
+#define MAPTITLESTRING "Super Cat Wars World Editor"
 
 enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_STAGEFOREGROUND, EDITOR_STRUCTUREFOREGROUND, EDITOR_BRIDGES, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY, EDITOR_START_ITEMS, EDITOR_STAGE};
 
@@ -603,11 +603,11 @@ int main(int argc, char *argv[])
 	SetStageMode(3, "Jail", "Kills", 5, 20);
 	SetStageMode(4, "Coin Collection", "Coins", 5, 20);
 	SetStageMode(5, "Stomp", "Kills", 10, 10);
-	SetStageMode(6, "Yoshi's Eggs", "Eggs", 5, 20);
+	SetStageMode(6, "Bells & Kittens", "Bells", 5, 20);
 	SetStageMode(7, "Capture The Flag", "Points", 5, 20);
 	SetStageMode(8, "Chicken", "Points", 50, 200);
 	SetStageMode(9, "Tag", "Points", 50, 200);
-	SetStageMode(10, "Star", "Lives", 1, 5);
+	SetStageMode(10, "Magic Bells", "Lives", 1, 5);
 	SetStageMode(11, "Domination", "Points", 50, 200);
 	SetStageMode(12, "King of the Hill", "Points", 50, 200);
 	SetStageMode(13, "Race", "Laps", 2, 10);
@@ -617,8 +617,8 @@ int main(int argc, char *argv[])
 	SetStageMode(17, "Greed", "Coins", 10, 40);
 	SetStageMode(18, "Health", "Lives", 1, 5);
 	SetStageMode(19, "Card Collection", "Points", 10, 30);
-	SetStageMode(20, "Phanto Chase", "Points", 50, 200);
-	SetStageMode(21, "Shy Guy Tag", "Points", 50, 200);
+	SetStageMode(20, "Ghost Chase", "Points", 50, 200);
+	SetStageMode(21, "Robo Tag", "Points", 50, 200);
 
 	//Setup The Mode Menu
 	mCurrentMenu = &mStageSettingsMenu;
@@ -818,15 +818,15 @@ int main(int argc, char *argv[])
 
 	//Create Vehicle Menu
 	miVehicleSpriteField = new MI_ImageSelectField(&rm->spr_selectfield, &spr_vehicleicons, 70, 80, "Sprite", 500, 150, 16, 16);
-	miVehicleSpriteField->Add("Hammer Brother", 0, "", false, false);
-	miVehicleSpriteField->Add("Boomerang Brother", 1, "", false, false);
-	miVehicleSpriteField->Add("Fire Brother", 2, "", false, false);
-	miVehicleSpriteField->Add("Tank 1", 3, "", false, false);
-	miVehicleSpriteField->Add("Boat 1", 4, "", false, false);
-	miVehicleSpriteField->Add("Boat 2", 5, "", false, false);
-	miVehicleSpriteField->Add("Airship 1", 6, "", false, false);
-	miVehicleSpriteField->Add("Airship 2", 7, "", false, false);
-	miVehicleSpriteField->Add("Tank 2", 8, "", false, false);
+	miVehicleSpriteField->Add("Commander Kobolt", 0, "", false, false);
+	miVehicleSpriteField->Add("Kallio", 1, "", false, false);
+	miVehicleSpriteField->Add("Mustamon", 2, "", false, false);
+	miVehicleSpriteField->Add("Tank", 3, "", false, false);
+	miVehicleSpriteField->Add("Boat", 4, "", false, false);
+	miVehicleSpriteField->Add("Commander Gorudo", 5, "", false, false);
+	miVehicleSpriteField->Add("Lord Iridium", 6, "", false, false);
+	miVehicleSpriteField->Add("Airship", 7, "", false, false);
+	miVehicleSpriteField->Add("Commander Mizu", 8, "", false, false);
 	miVehicleSpriteField->SetData(&g_wvVehicleStamp.iDrawSprite, NULL, NULL);
 	miVehicleSpriteField->SetKey(g_wvVehicleStamp.iDrawSprite);
 
