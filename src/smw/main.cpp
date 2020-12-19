@@ -14,7 +14,7 @@
     along with SMW.  If not, see <http://www.gnu.org/licenses/>. */
 
 
-#define TITLESTRING "Super Mario War"
+#define TITLESTRING "Super Cat Wars"
 #define VERSIONNUMBER "2.0"
 
 #include "FileList.h"
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
     create_globals();
 
     printf("-------------------------------------------------------------------------------\n");
-    printf(" %s %s\n", TITLESTRING, VERSIONNUMBER);
+    printf(" %s\n", TITLESTRING);
     printf("-------------------------------------------------------------------------------\n");
     printf("\n---------------- startup ----------------\n");
 
@@ -309,8 +309,8 @@ int main(int argc, char *argv[])
     //currently this only sets the title, not the icon.
     //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
     char title[128];
-    sprintf(title, "%s %s", TITLESTRING, VERSIONNUMBER);
-    gfx_settitle(title);
+    //sprintf(title, "%s %s", TITLESTRING, VERSIONNUMBER);
+    gfx_settitle(TITLESTRING);
     SDL_ShowCursor(SDL_DISABLE);
 
     printf("\n---------------- loading ----------------\n");
