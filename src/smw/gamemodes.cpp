@@ -1057,7 +1057,7 @@ CGM_ShyGuyTag::CGM_ShyGuyTag() : CGameMode()
     goal = 200;
     gamemode = game_mode_shyguytag;
 
-    SetupModeStrings("Shyguy Tag", "Points", 50);
+    SetupModeStrings("Robo Tag", "Points", 50);
     scorecounter = 0;
 }
 
@@ -1181,7 +1181,7 @@ void CGM_ShyGuyTag::SetShyGuy(short iTeam)
         if (list_players[iPlayer]->getTeamID() == iTeam) {
             CPlayer * player = list_players[iPlayer];
             player->shyguy = true;
-            eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Shyguy!", -VELJUMP*1.5));
+            eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Robo Tag!", -VELJUMP*1.5));
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
 
             player->StripPowerups();
@@ -1316,7 +1316,7 @@ CGM_Eggs::CGM_Eggs() : CGameMode()
     goal = 20;
     gamemode = game_mode_eggs;
 
-    SetupModeStrings("Yoshi's Eggs", "Eggs", 5);
+    SetupModeStrings("Bells & Kittens", "Bells", 5);
 };
 
 void CGM_Eggs::init()
@@ -2171,7 +2171,7 @@ CGM_Star::CGM_Star() : CGM_TimeLimit()
 {
     goal = 5;
     gamemode = game_mode_star;
-    SetupModeStrings("Star", "Lives", 1);
+    SetupModeStrings("Magic Bells", "Lives", 1);
     iCurrentModeType = 0;
 };
 
@@ -2460,9 +2460,9 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
         starItem[id]->setPlayerColor(starPlayer[id]->getColorID());
 
     if (starItem[id]->getType() == 1)
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), iCurrentModeType == 2 ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), iCurrentModeType == 2 ? "Bell Get!" : "Shiny!", -VELJUMP*1.5));
     else
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Ztarred!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Corrupted!", -VELJUMP*1.5));
 
     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
     ifSoundOnPlay(rm->sfx_transform);
@@ -2958,7 +2958,7 @@ CGM_Chase::CGM_Chase() : CGameMode()
     goal = 200;
     gamemode = game_mode_chase;
 
-    SetupModeStrings("Phanto", "Points", 50);
+    SetupModeStrings("Ghost Chase", "Points", 50);
 }
 
 void CGM_Chase::init()
@@ -3121,11 +3121,11 @@ void CGM_Boss_MiniGame::draw_foreground()
             rm->game_font_large.drawCentered(smw->ScreenWidth/2, 96, "You Failed To Defeat");
 
             if (iBossType == 0)
-                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Sledge Brother");
+                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Boss");
             else if (iBossType == 1)
-                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Bomb Brother");
+                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Boss");
             else if (iBossType == 2)
-                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Flame Brother");
+                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Boss");
         }
     }
 }
