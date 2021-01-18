@@ -452,15 +452,7 @@ void CGameValues::ReadBinaryConfig() {
         //setup player input controls for game
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             short iDevice = controls.read_i16();
-
-#ifdef _XBOX
-            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices on xbox
-#else
-            if (iDevice >= joystickcount)
-                iDevice = DEVICE_KEYBOARD;
-
-            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
-#endif
+            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices
         }
     }
     catch (std::exception const& error)
