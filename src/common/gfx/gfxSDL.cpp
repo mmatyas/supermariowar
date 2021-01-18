@@ -139,7 +139,7 @@ void GraphicsSDL::create_game_window(bool fullscreen)
 #else
         sdl2_renderer = SDL_CreateRenderer(sdl2_window, -1,
 #endif
-            SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+             SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_PRESENTVSYNC);
         if (!sdl2_renderer) {
             fprintf(stderr, "[gfx] Couldn't create renderer: %s\n", SDL_GetError());
             throw E_CREATE_RENDERER;
@@ -147,7 +147,7 @@ void GraphicsSDL::create_game_window(bool fullscreen)
 
         SDL_SetRenderDrawColor(sdl2_renderer, 0, 0, 0, 255);
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-        SDL_RenderSetLogicalSize(sdl2_renderer, GFX_SCREEN_W, GFX_SCREEN_H);
+        SDL_RenderSetLogicalSize(sdl2_renderer, 1920, 1080); //Fullscreen
     }
 
     void GraphicsSDL::create_screen_surface()
@@ -200,8 +200,7 @@ void GraphicsSDL::RecreateWindow(bool fullscreen)
 
     sdl2_window = SDL_CreateWindow("smw",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        GFX_SCREEN_W, GFX_SCREEN_H,
-        fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE : SDL_WINDOW_RESIZABLE);
+        GFX_SCREEN_W, GFX_SCREEN_H, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_OPENGL);
 
     if (!sdl2_window) {
         fprintf(stderr, "[gfx] Couldn't create window: %s\n", SDL_GetError());
