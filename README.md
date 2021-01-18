@@ -5,11 +5,16 @@ Super Mario War is a fan-made multiplayer Super Mario Bros. style deathmatch gam
 ### Get the Code
 
 This repository contains some submodules which you can use if the dependencies are not available for your OS, are outdated or you simply don't want to install them on your system. To use the included libraries, do a recursive cloning:
+As long as you clone this repo into the examples subfolder of the steamlink-sdk it should compile with no problems.
 
 `git clone https://github.com/ValveSoftware/steamlink-sdk.git`
+
 `cd steamlink-sdk/examples`
+
 `git clone --recursive https://github.com/thecosmicslug/SuperMarioWar-SteamLink.git`
+
 `cd SuperMarioWar-SteamLink`
+
 `./build_smw.sh`
 
 binarys will be placed in 'build' directory.
