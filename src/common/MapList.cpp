@@ -13,20 +13,6 @@
 #include <iostream>
 #include <stdexcept>
 
-#ifdef _XBOX
-#include <xtl.h>
-#endif
-
-#ifdef _WIN32
-#ifndef _XBOX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#endif
-
-#if defined(__APPLE__)
-#include <sys/stat.h>
-#endif
 
 using std::cout;
 using std::endl;

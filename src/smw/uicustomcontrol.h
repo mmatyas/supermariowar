@@ -377,26 +377,6 @@ class MI_BonusWheel : public UI_Control
 		bool fCpuControlled;
 };
 
-#ifdef _XBOX
-class MI_ScreenResize : public UI_Control
-{
-	public:
-
-		MI_ScreenResize();
-		virtual ~MI_ScreenResize();
-
-		void Draw();
-
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		MenuCodeEnum Modify(bool modify);
-
-	private:
-
-		MI_Text * miText[7];
-		float dPreset;
-};
-#endif //_XBOX
-
 class MFS_ListItem
 {
 	public:

@@ -20,21 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef LIST_DIRECTORIES_HEADER
 #define LIST_DIRECTORIES_HEADER
 
-#ifdef _XBOX
-#  include <xtl.h>
-#else
-#  ifdef _WIN32
-#    define WIN32_LEAN_AND_MEAN
-#    include <windows.h>
-#include <cstdio>
-#  else
-#    include <sys/types.h>
-#    include <sys/stat.h>
-#    include <unistd.h>
-#    include <dirent.h>
-#  endif
-#endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
 #include <string>
 
 class DirectoryListing

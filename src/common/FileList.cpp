@@ -9,19 +9,7 @@
 #include <ctype.h>
 #include <iostream>
 #include <algorithm>
-
-#ifdef _XBOX
-#include <xtl.h>
-#endif
-
-#ifdef _WIN32
-    #ifndef _XBOX
-        #define WIN32_LEAN_AND_MEAN
-        #include <windows.h>
-    #endif
-#else
-    #include <dirent.h>
-#endif
+#include <dirent.h>
 
 using std::cout;
 using std::endl;

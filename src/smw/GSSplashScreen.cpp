@@ -12,16 +12,6 @@
 #include <string>
 #include <iostream>
 
-#ifdef _XBOX
-#include <xtl.h>
-#endif
-
-#ifdef _WIN32
-#ifndef _XBOX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#endif
 
 using std::cout;
 using std::endl;
@@ -167,32 +157,27 @@ void SplashScreenState::update()
     while (SDL_PollEvent(&loop_event)) {
         switch (loop_event.type) {
 
-#ifndef _XBOX
         case SDL_QUIT: {
             game_values.gamestate = GS_QUIT;
             return;
         }
         break;
-#endif
+
         case SDL_KEYDOWN: {
             switch (loop_event.key.keysym.sym) {
             case SDLK_RETURN:
                 if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
-#ifndef _XBOX
                     game_values.fullscreen = !game_values.fullscreen;
                     gfx_changefullscreen(game_values.fullscreen);
                     blitdest = screen;
-#endif
                 }
                 break;
 
-#ifndef _XBOX
             case SDLK_F4:
                 if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
                     game_values.gamestate = GS_QUIT;
                     return;
                 break;
-#endif
 
             default:
                 break;

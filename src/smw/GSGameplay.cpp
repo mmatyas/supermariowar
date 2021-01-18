@@ -1136,21 +1136,13 @@ void GameplayState::drawMiddleLayer()
 void GameplayState::drawFrontLayer()
 {
     g_map->drawPlatforms(2);
-
-#ifdef _XBOX
-    g_map->drawfrontlayer();
-#else
     if (game_values.toplayer)
         g_map->drawfrontlayer();
-#endif
     g_map->drawWarpLocks();
-
     g_map->drawPlatforms(3);
-
     objectcontainer[2].draw();
     eyecandy[2].draw();
     game_values.gamemode->draw_foreground();
-
     g_map->drawPlatforms(4);
 }
 
@@ -1989,16 +1981,16 @@ void GameplayState::handleInput()
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-#ifndef _XBOX
+
         case SDL_QUIT: {
             CleanUp();
             game_values.gamestate = GS_QUIT;
             return;
         }
         break;
-#endif
+
         case SDL_KEYDOWN: {
-#ifndef _XBOX
+
             if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                 if (event.key.keysym.sym == SDLK_F4) {
                     CleanUp();
@@ -2014,7 +2006,7 @@ void GameplayState::handleInput()
                     continue;
                 }
             }
-#endif
+
             if (event.key.keysym.sym == SDLK_F1) {
                 game_values.showfps = !game_values.showfps;
             } else if (event.key.keysym.sym == SDLK_ESCAPE) {
@@ -2122,16 +2114,6 @@ void GameplayState::handleInput()
 #endif
             break;
         }
-
-#ifdef _XBOX
-        case SDL_JOYBUTTONDOWN: {
-            if (event.jbutton.state == SDL_PRESSED && event.jbutton.button == 5) {
-                PlayNextMusicTrack();
-            }
-
-            break;
-        }
-#endif
 
         default:
             break;
@@ -2421,12 +2403,6 @@ void GameplayState::update()
         iScoreTextOffset[iTeam] = 34 * game_values.teamcounts[iTeam] + 1;
     }
 
-    /*
-    #ifdef _XBOX
-            if (joystickcount != SDL_NumJoysticks())
-                reconnectjoysticks();
-    #endif
-    */
 #ifdef _DEBUG
     debug_gameplay();
 #endif

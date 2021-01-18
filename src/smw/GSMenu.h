@@ -36,12 +36,6 @@ class UI_NetNewRoomSettingsMenu;
 class UI_NetRoomMenu;
 class UI_NetServersMenu;
 
-#ifdef _XBOX
-class UI_ScreenResizeMenu;
-class UI_ScreenSettingsMenu;
-#endif
-
-
 
 #ifdef _DEBUG
 class ScriptOperation
@@ -128,10 +122,7 @@ class MenuState : public GameState
 		UI_GraphicsOptionsMenu* mGraphicsOptionsMenu;
 		UI_EyeCandyOptionsMenu* mEyeCandyOptionsMenu;
 		UI_SoundOptionsMenu* mSoundOptionsMenu;
-#ifdef _XBOX
-		UI_ScreenSettingsMenu* mScreenSettingsMenu;
-		UI_ScreenResizeMenu* mScreenResizeMenu;
-#endif
+
 		// Controls menu
 		UI_PlayerControlsSelectMenu* mPlayerControlsSelectMenu;
 		UI_PlayerControlsMenu* mPlayerControlsMenu;

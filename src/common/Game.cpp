@@ -18,16 +18,6 @@ CGame::CGame(const char *rootDirectory)
 {
     // make sure that the .smw directory is created
     std::string smwHome = GetHomeDirectory();
-
-#if	_WIN32
-    if (CreateDirectory(smwHome .c_str(), NULL) ||
-            ERROR_ALREADY_EXISTS == GetLastError()) {
-    	//TODO: print that directory already exists
-
-    } else {
-    	//TODO: print that we created the directory
-    }
-#else
     struct stat st;
     if (stat(smwHome.c_str(), &st) != 0) { // inode does not exist
         if (mkdir(smwHome.c_str(), 0775) != 0)
@@ -35,16 +25,8 @@ CGame::CGame(const char *rootDirectory)
     }
     else if (!S_ISDIR(st.st_mode)) // inode exist, but not a directory
         perror("[error] Could not access settings directory");
-#endif
 
-#ifdef _XBOX
-    	//TODO: make this configurable!
-    	//TV's seem to need extra shade
-    	MenuTransparency = 96;
-#else
-    	MenuTransparency = 72;
-#endif
-
+    MenuTransparency = 72;
     ScreenWidth = 640;
     ScreenHeight = 480;
 }

@@ -21,8 +21,6 @@ CPlayerInput::CPlayerInput()
 
 void CPlayerInput::CheckIfMouseUsed()
 {
-#ifndef _XBOX
-
     for (short iGameState = 0; iGameState < 2; iGameState++) {
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
 			CInputControl * inputControl = &inputControls[iPlayer]->inputGameControls[iGameState];
@@ -40,8 +38,6 @@ void CPlayerInput::CheckIfMouseUsed()
 		}
 	}
 
-#endif
-
 	fUsingMouse = false;
 }
 
@@ -56,7 +52,6 @@ void CPlayerInput::ClearPressedKeys(short iGameState)
         for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
 			outputControl->keys[iKey].fPressed = false;
 
-#ifndef _XBOX
             if (fUsingMouse) {
 				SDL_KEYTYPE iInputKey = inputControl->keys[iKey];
 
@@ -71,7 +66,6 @@ void CPlayerInput::ClearPressedKeys(short iGameState)
 					outputControl->keys[iKey].fDown = false;
 				}
 			}
-#endif
 		}
 	}
 
@@ -365,8 +359,5 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 			}
 		}
 
-		//This line might be causing input from some players not to be read
-		//if (fFound)
-			//break;
 	}
 }
