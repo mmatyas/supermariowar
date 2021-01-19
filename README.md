@@ -1,8 +1,17 @@
-# Super Mario War
+### Super Mario War - Steam Link Port
 
-Super Mario War is a fan-made multiplayer Super Mario Bros. style deathmatch game in which players try to beat one another in a variety of gameplay modes. You can play on teams, design your own levels, design your own worlds, and much more!
+This port is for running Super Mario War on the Steam Link, because the Steam Link is an ARMv7 device we need to use the SDK provided by valve at `https://github.com/ValveSoftware/steamlink-sdk.git`
 
-### Get the Code
+I have not changed much, only setting it to default to 1920x1080 resolution and trying to get it to default to  gamepad only.
+
+A Keyboard may still be needed for the initial config, but eventually this will be gamepad-only.
+
+Windows/XBOX etc.. stuff will be cleared out eventually because they will never apply to this port.
+
+I'm assuming the level-editor will not work without more modifications, and have so far only tested the base-game.
+
+
+## Build Super Mario War
 
 This repository contains some submodules which you can use if the dependencies are not available for your OS, are outdated or you simply don't want to install them on your system. To use the included libraries, do a recursive cloning:
 As long as you clone this repo into the examples subfolder of the steamlink-sdk it should compile with no problems.
@@ -17,9 +26,27 @@ As long as you clone this repo into the examples subfolder of the steamlink-sdk 
 
 `./build_smw.sh`
 
-binarys will be placed in 'build' directory.
+binarys will be placed in `build` directory. To Install an application on the Steamlink is best described on the SDK, but basically you need a directory called 'supermariowar' or such, containing the binary, the data directory, an icon for example icon.png, and a text file called toc.txt in the following format:
+
+name=Super Mario War
+icon=icon.png 
+run=smw
+
+This file is simply for the steam link launcher, once you have all the files together in your 'supermariowar' directory then you need to compress the whole folder inside a tar.gz file to be placed on a FAT32 USB stick in the following location : `/steamlink/apps/`.
+SSH access can be enabled on the link at the same time, a textfile should be created  at `/steamlink/config/system/enable_ssh.txt`
+
+Power on the steamlink with the usb stick plugged in for the initial install along with enabling SSH until a factory reset is performed on the device.
+
+the user/pass is default to
+`user=root` and 
+`password=steamlink123`, although this can be changed later with the passwd command.
+ 
+Once installed it is much easier to update an application via SSH at the following location on the steamlink:
+`/home/apps/<directory-from-tar.gz>`
 
 ## History
+
+Super Mario War is a fan-made multiplayer Super Mario Bros. style deathmatch game in which players try to beat one another in a variety of gameplay modes. You can play on teams, design your own levels, design your own worlds, and much more!
 
 The original *Mario War* was created by *Samuele Poletto* in 2002, in which four Super Mario characters could fight on various levels by jumping on each other's head. It was written in Pascal/Assembly, and was released for DOS. Later versions also included a map editor.
 
