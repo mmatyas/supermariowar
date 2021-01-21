@@ -21,7 +21,7 @@ option(NO_NETWORK "Disable all network communication" OFF)
 option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet, yaml-cpp)" ON)
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" ON)
 option(SDL2_USE_MIXERX "(SDL2) Use SDL Mixer X instead of SDL Mixer" OFF)
-option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
+option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" ON)
 
 if (USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
@@ -178,8 +178,8 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
 else()
 	add_definitions(-DNDEBUG)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Ofast -ffast-math -ffinite-math-only -funsafe-loop-optimizations -fno-math-errno -falign-functions=1 -falign-loops=1 -falign-jumps=1 -fno-unwind-tables -fno-asynchronous-unwind-tables -ftree-loop-if-convert -fno-math-errno -falign-functions=1 -falign-loops=1 -falign-jumps=1 -fno-signed-zeros -fno-trapping-math -funroll-loops -fassociative-math -freciprocal-math")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Ofast -ffast-math -ffinite-math-only -funsafe-loop-optimizations -fno-math-errno -falign-functions=1 -falign-loops=1 -falign-jumps=1 -fno-unwind-tables -fno-asynchronous-unwind-tables -ftree-loop-if-convert -fno-math-errno -falign-functions=1 -falign-loops=1 -falign-jumps=1 -fno-signed-zeros -fno-trapping-math frename-registers -funroll-loops -fassociative-math -freciprocal-math")
 
 	# Strip binaries
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -188,30 +188,6 @@ else()
 	endif()
 endif()
 
-# Use C++11
-if (WIN32 AND MINGW)
-	# MinGW forces strict-ANSI mode with std=c++11
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
-
-# Link libc statically on Windows to not need additional DLLs
-if (WIN32)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
-	# TODO: check if compiler supports this flag, may fail with GCC < 4.8
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
-endif()
-
-if (EMSCRIPTEN)
-	if (CMAKE_BUILD_TYPE STREQUAL Debug)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g4")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g4")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O0 -g4")
-	else()
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O3")
-	endif()
-endif()
 
 include(CheckCXXCompilerFlag)
 macro(check_and_add_flag var flag)
@@ -223,15 +199,6 @@ endmacro()
 
 # Enabling all warnings in MSVC spams too much
 if(NOT MSVC)
-#	add_definitions(-Wall)
-
-	# TODO: would like these but they produce overwhelming amounts of warnings
-	#check_and_add_flag(EXTRA -Wextra)
-	#check_and_add_flag(MISSING_FIELD_INITIALIZERS -Wmissing-field-initializers)
-	#check_and_add_flag(SWITCH_DEFAULT -Wswitch-default)
-	#check_and_add_flag(FLOAT_EQUAL -Wfloat-equal)
-	#check_and_add_flag(CONVERSION -Wconversion)
-	#check_and_add_flag(ZERO_AS_NULL_POINTER_CONSTANT -Wzero-as-null-pointer-constant)
 	check_and_add_flag(TYPE_LIMITS -Wtype-limits)
 	check_and_add_flag(SIGN_COMPARE -Wsign-compare)
 	check_and_add_flag(IGNORED_QUALIFIERS -Wignored-qualifiers)
@@ -247,9 +214,6 @@ if(NOT MSVC)
 
 endif(NOT MSVC)
 
-if (APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-narrowing")
-endif()
 
 ## MAIN CONFIG
 
@@ -276,7 +240,7 @@ else()
 	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}/games           CACHE PATH "Installation location of the game binaries")
 	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/share/games/smw CACHE PATH "Installation location of the game data")
 endif()
-# set(SMW_USERDIR ".smw" CACHE STRING "User directory") # User settings directory
+
 add_definitions(-DSMW_DATADIR="${SMW_DATADIR}")
 
 # For installing Linux desktop items

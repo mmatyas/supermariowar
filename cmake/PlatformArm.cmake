@@ -12,7 +12,8 @@ endif()
 
 # Select the optimal FPU settings
 # If you get linking errors, try editing these flags
-set(ARM_FLAGS "${ARM_FLAGS} -mfpu=vfp -mfloat-abi=hard")
+set(ARM_FLAGS "${ARM_FLAGS} -mtune=cortex-a9 -mfpu=neon -mfloat-abi=hard")
+
 
 # Apply the flags
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ARM_FLAGS}")
