@@ -3,13 +3,10 @@
 This port is for running Super Mario War on the Steam Link, because the Steam Link is an ARMv7 device we need to use the SDK provided by valve at `https://github.com/ValveSoftware/steamlink-sdk.git`
 
 I have not changed much, only setting it to default to 1920x1080 resolution and trying to get it to default to  gamepad only.
-
-A Keyboard may still be needed for the initial config, but eventually this will be gamepad-only.
-
 Windows/XBOX etc.. stuff will be cleared out eventually because they will never apply to this port.
 
-I'm assuming the level-editor will not work without more modifications, and have so far only tested the base-game.
-
+I'm assuming the level-editor will not work without more modifications, and have so far only tested local play game.
+Disconnecting Gamepads during play will mean the app needs to be restarted, seriously needs looking at!
 
 ## Build Super Mario War
 
