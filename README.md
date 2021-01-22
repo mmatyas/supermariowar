@@ -5,8 +5,8 @@ This port is for running Super Mario War on the Steam Link, because the Steam Li
 I have not changed much, only setting it to default to 1920x1080 resolution and trying to get it to default to  gamepad only.
 Windows/XBOX etc.. stuff will be cleared out eventually because they will never apply to this port.
 
-I'm assuming the level-editor will not work without more modifications, and have so far only tested local play game.
-Disconnecting Gamepads during play will mean the app needs to be restarted, seriously needs looking at!
+I'm assuming the level-editor will not work without more modifications, and have so far only tested local gameplay.
+Disconnecting Gamepads during play will mean the app needs to be restarted, this seriously needs looking at!
 
 ## Build Super Mario War
 
