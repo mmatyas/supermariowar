@@ -1,0 +1,2 @@
+./smw > smw.log
+

@@ -1,0 +1,119 @@
+
+------------------------------------------------------------------------------
+ THANKS TO (NEEDS TO BE UPDATED)                                    21.07.2006
+------------------------------------------------------------------------------
+
+First of all we want to thank everyone who gave us feedback - this game 
+wouldn't be where it is today without you.  It really keeps you motivated when
+you know that there are some people who like your game and look forward to
+the next version.
+
+
+Samuele Poletto     for the original Mario War, which some of us still play
+
+Florian Hufsky      for creating Super Mario War, maintaining the website,
+                    setting up and hosting the new source repository, and
+                    being an all-around cool dude
+
+Two52		    for continuing development since v1.23 and devoting tons
+                    of spare time to the game and community (seriously, we
+                    can't fit enough recognition for him in this space)
+
+Jared		    for contributing tons of ideas, managing user suggestions,
+                    contributing miscellaneous custom graphics, and staying on
+                    top of the build with an eye for quality
+
+dolorous            for maintaining the build for Linux systems and periodic
+                    code review (catching lots of bugs)
+
+Steven Graff        for putting in lots of custom graphics work and offering
+                    loads of great suggestions for the game
+
+Link901             for being a terrific moderator on the 72dpiarmy forums and
+                    for his work on the New Super Mario War gfx pack
+
+npodges             for creating the official content site www.smwstuff.com
+                    and registering #supermariowar on freenode for us
+
+Some Mac Guy        for maintaining the Macintosh builds of the game
+
+
+other thanks in no particular order:
+redfalcon,
+no_human,
+dschingis,
+matsche,
+aeroflare,
+no_shorty           for tips, finding bugs and maps
+Tymoe               for playing smw and submitting some screenshots
+Nintendo            for creating some of the coolest games ever
+David Olofson       for the very interesting conversations and tips
+scoti               for the map scot
+affeOHNEwaffe       for the map affe and the bowser skin
+mademan             for his skin and map
+mario piuk          for the new gamemodes the ai and some bugfixes
+yvoo                for many ideas, mirrors, code snippets and skins
+DNightmare, funvill and all the other guys who mirror smw
+Armen               for his leveleditor save/load map code
+vvill               for the new tilset and map backgrounds
+zio tiok            for the game mode ideas
+emedia              for putting smw on the freeware special cd
+gpmania             for printing the smw review and interview
+Donny Viszneki      for the MAC/Big Endian/Directory reader code
+Stephan Peijnik     for the initial fmod/sdl_mixer wrapper,
+ventuz              for his map and bug hunting
+Stefan Schury       for his ideas that helped create goomba mode
+DrJonez             for his map spawning and AI ideas
+riahc3              for his many game ideas and feature requests
+jinkies.uk          for his skins and long list of game ideas
+devguy              for extracting the halo announcer sounds
+Quinn Storm         for setting up the original CVS server and helping out
+                    with the linux source
+Alex Brown          for his configurable controls code
+Wasabimario         for creating all the tours that were bundled with 1.7
+nes6502             for his help with the bilinear filters
+XPort               for his help with SDLx
+
+
+We would also like to thank everyone who participated in the feature polls
+which were held just before work on 1.7 started.  (You know who you are.)
+Those polls were the first source of inspiration for most of the major
+features which were added to 1.7.
+
+
+A special thanks to the active members of the SMW forum:
+Jared, NMcCoy, SleepyP, Xijar, 4matsy, DrJones, Flexserve, Link901, Techokami,
+dolorous, SMW Fan, Discrosh, VenomousNinja, YoshiMonarch7, Tiptup300,
+Sgraff87, Dude, Lee, Pikawil, Marioman64, Peardian, npodges, Viper Snake,
+neavea, Mr.Bob-omb, milua, bobmanperson, DrTek, somestrangeflea, Naphistim,
+Chaos, NiGHTS, Water Kirby.
+
+These guys are relentless in responding to content requests and providing
+feedback.  They have created tons of maps, sounds, music and skins for this
+release!  The quality of this release is directly a result of their help and
+great ideas.
+
+
+The Spiters Resource and it's many contributors:
+Alexis Morrissette, Bidbood, neonater, Tetra Vega, Rogultgot, Arima,
+Toadeeboy, Crapcom, Tonberry2k, Jum2004, Bacon, Young Link, Blordow,
+Gozinzolo, Ragey, SaturnEchidna, Kutter
+
+
+Thanks to the beta testers for their great comments and tons of suggestions 
+to make the game better.
+
+
+I'd also like to thank the xbox test crew: Brian Porter, Caesar Cypher,
+Brandon Stansbury, Brian Smith, Chris Schager, Alex Arnot, Jason Lumbert,
+Kevin King, and WasabiMario and his crew.  They have helped me find numerous 
+bugs and have suggested tons of features.
+
+
+THANKS AGAIN TO EVERYONE!
+
+
+Inevitably, we have forgotten to thank somebody for their contribution.  So
+many people contributed ideas it's hard to keep track of everybody! :)  If you
+think we've missed mentioning you or anyone else, please let us know and we'll
+add it in a hurry.
