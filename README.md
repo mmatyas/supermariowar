@@ -21,7 +21,7 @@ As long as you clone this repo into the examples subfolder of the steamlink-sdk 
 
 `cd SuperMarioWar-SteamLink`
 
-`./build_smw.sh`
+`./build_smw-steamlink.sh`
 
 binarys will be placed in `build` directory. To Install an application on the Steamlink is best described on the SDK, but basically you need a directory called 'supermariowar' or such, containing the binary, the data directory, an icon for example icon.png, and a text file called toc.txt in the following format:
 
