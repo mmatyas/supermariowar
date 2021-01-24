@@ -5,17 +5,16 @@ source "../../setenv.sh"
 mkdir build
 cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=../../toolchain/steamlink-toolchain.cmake -DUSE_SDL2_LIBS=1 ..
-make all
+make smw
 
 # Prepare package directory
 rm "./output/smw-steamlink/smw"
-rm "./output/smw-steamlink/smw-server"
+
 cp "./Binaries/Release/smw" "../output/smw-steamlink/smw"
-cp "./Binaries/Release/smw" "../output/smw-steamlink/smw"
-cp "./Binaries/Release/smw-server" "../output/smw"
-cp "./Binaries/Release/smw-server" "../output/smw-server"
+cp "./Binaries/Release/smw" "../output/smw"
 
 cd ..
+rm -r build
 echo "Packaging it for Steam-Link...."
 export DESTDIR="${PWD}/output/smw-steamlink"
 cd output

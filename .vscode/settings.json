@@ -1,0 +1,65 @@
+{
+    // Configure glob patterns for excluding files and folders. 
+    // For example, the files explorer decides which files and folders to show 
+    // or hide based on this setting. 
+    // Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
+    "files.exclude": {
+      "**/.appveyor.yml": true,
+      "**/.travis": true,
+      "**/CREDITS": true,
+      "**/README.md": true,
+      "**/CHANGELOG": true,
+      "**/.travis.yml": true,
+      "**/testmaps.zip": true,
+      "**/cmake/**": true,
+      "**/output/**": true,
+      "**/resources/**": true,
+      "**/build/**": true,
+      "**/dependencies/**": true,
+      "**/CMakeLists.txt": true,
+      "**/docs/**": true,
+
+    },
+    // Configure glob patterns for excluding files and folders in searches. 
+    // Inherits all glob patterns from the `files.exclude` setting.   
+    // Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
+    "search.exclude": {
+        "**/.appveyor.yml": true,
+        "**/.travis": true,
+        "**/CREDITS": true,
+        "**/README.md": true,
+        "**/CHANGELOG": true,
+        "**/build/**": true,
+        "**/cmake/**": true,
+        "**/.travis.yml": true,
+        "**/testmaps.zip": true,
+        "**/output/**": true,
+        "**/resources/**": true,
+        "**/dependencies/**": true,
+        "**/CMakeLists.txt": true,
+        "**/docs/**": true,
+    },
+    // Configure glob patterns of file paths to exclude from file watching. 
+    // Patterns must match on absolute paths 
+    // (i.e. prefix with ** or the full path to match properly). 
+    // Changing this setting requires a restart. 
+    // When you experience Code consuming lots of cpu time on startup, 
+    // you can exclude large folders to reduce the initial load.
+    "files.watcherExclude": {
+        "**/.appveyor.yml": true,
+        "**/.travis": true,
+        "**/CREDITS": true,
+        "**/README.md": true,
+        "**/build/**": true,
+        "**/cmake/**": true,
+        "**/CHANGELOG": true,
+        "**/.travis.yml": true,
+        "**/testmaps.zip": true,
+        "**/output/**": true,
+        "**/resources/**": true,
+        "**/dependencies/**": true,
+        "**/CMakeLists.txt": true,
+        "**/docs/**": true,
+    }
+  }
+  

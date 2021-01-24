@@ -83,9 +83,9 @@ void CGameValues::init()
     music       = true;
     gamestate     = GS_SPLASH;
 #ifdef _DEBUG
-    fullscreen      = false;
+    fullscreen      = true;
 #else
-    fullscreen      = false;
+    fullscreen      = true;
 #endif
 
     screenResizeX   = 20.0f;
@@ -353,7 +353,7 @@ void CGameValues::ReadBinaryConfig() {
 
         poweruppreset = options.read_i16();
         options.read_i16_array((int16_t *)g_iCurrentPowerupPresets, NUM_POWERUP_PRESETS * NUM_POWERUPS);
-        fullscreen = options.read_bool();
+        fullscreen = true //options.read_bool();
 
         for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
             gamemodes[iGameMode]->goal = options.read_i16();
