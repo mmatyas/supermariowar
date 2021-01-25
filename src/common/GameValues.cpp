@@ -353,7 +353,7 @@ void CGameValues::ReadBinaryConfig() {
 
         poweruppreset = options.read_i16();
         options.read_i16_array((int16_t *)g_iCurrentPowerupPresets, NUM_POWERUP_PRESETS * NUM_POWERUPS);
-        fullscreen = true //options.read_bool();
+        fullscreen = true; //options.read_bool();
 
         for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
             gamemodes[iGameMode]->goal = options.read_i16();
@@ -377,6 +377,7 @@ void CGameValues::ReadBinaryConfig() {
         musiclist->SetCurrent(options.read_u8());
         worldmusiclist->SetCurrent(options.read_u8());
         soundpacklist->SetCurrent(options.read_u8());
+
         menugraphicspacklist->SetCurrent(options.read_u8());
         worldgraphicspacklist->SetCurrent(options.read_u8());
         gamegraphicspacklist->SetCurrent(options.read_u8());

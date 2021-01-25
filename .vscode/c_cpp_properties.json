@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/../../rootfs/usr/include/**"
+            ],
+            "defines": [],
+            "compilerPath": "${workspaceFolder}/../../toolchain/bin/armv7a-cros-linux-gnueabi-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "version": 4
+}
