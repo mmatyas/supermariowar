@@ -50,6 +50,7 @@ jobs:
           cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server} deploy/
           strip deploy/*
           cp docs/readme-v1.8.html deploy/
+          rsync -aC data deploy/
       - name: Upload artifacts
         if: matrix.sdl == 2
         uses: actions/upload-artifact@v2
@@ -94,6 +95,7 @@ jobs:
           cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server}.exe deploy/
           i686-w64-mingw32-strip deploy/*
           cp docs/readme-v1.8.html deploy/
+          rsync -aC data deploy/
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
