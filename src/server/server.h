@@ -51,7 +51,7 @@ private:
     void sendHostStateToOtherPlayers(uint64_t playerID);
 
 
-    void readConfig();
+    void readConfig(const std::string&);
 
     void sendCode(NetPeer&, uint8_t code);
     void sendCode(NetPeer*, uint8_t code);
@@ -61,7 +61,7 @@ public:
     SMWServer();
     ~SMWServer();
 
-    bool init();
+    bool init(const std::string&);
     void cleanup();
 
     void update(bool& running);
