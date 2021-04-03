@@ -46,17 +46,18 @@ jobs:
       - name: Package
         if: matrix.sdl == 2
         run: |
-          mkdir deploy
-          cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server} deploy/
-          strip deploy/*
-          cp docs/readme-v1.8.html deploy/
-          rsync -aC data deploy/
+          mkdir supermariowar
+          cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server} supermariowar/
+          strip supermariowar/*
+          cp docs/readme-v1.8.html supermariowar/
+          rsync -aC --exclude .git data supermariowar/
+          zip -r supermariowar_linux.zip supermariowar
       - name: Upload artifacts
         if: matrix.sdl == 2
         uses: actions/upload-artifact@v2
         with:
           name: supermariowar_linux
-          path: deploy
+          path: supermariowar_linux.zip
   mingw-cross:
     runs-on: ubuntu-18.04
     env:
@@ -89,18 +90,19 @@ jobs:
         run: make
       - name: Package
         run: |
-          mkdir deploy
-          cp /usr/lib/gcc/i686-w64-mingw32/7.3-win32/{libgcc_s_sjlj-1,libstdc++-6}.dll deploy/
-          cp /tmp/i686-w64-mingw32/usr/bin/{SDL2,SDL2_image,SDL2_mixer_ext}.dll deploy/
-          cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server}.exe deploy/
-          i686-w64-mingw32-strip deploy/*
-          cp docs/readme-v1.8.html deploy/
-          rsync -aC data deploy/
+          mkdir supermariowar
+          cp /usr/lib/gcc/i686-w64-mingw32/7.3-win32/{libgcc_s_sjlj-1,libstdc++-6}.dll supermariowar/
+          cp /tmp/i686-w64-mingw32/usr/bin/{SDL2,SDL2_image,SDL2_mixer_ext}.dll supermariowar/
+          cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server}.exe supermariowar/
+          i686-w64-mingw32-strip supermariowar/*
+          cp docs/readme-v1.8.html supermariowar/
+          rsync -aC --exclude .git data supermariowar/
+          zip -r supermariowar_windows.zip supermariowar
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: supermariowar_windows
-          path: deploy
+          path: supermariowar_windows.zip
   android:
     if: false
     runs-on: ubuntu-18.04
