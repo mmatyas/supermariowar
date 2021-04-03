@@ -54,7 +54,7 @@ jobs:
         if: matrix.sdl == 2
         uses: actions/upload-artifact@v2
         with:
-          name: smw_linux
+          name: supermariowar_linux
           path: deploy
   mingw-cross:
     runs-on: ubuntu-18.04
@@ -97,7 +97,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: smw_windows
+          name: supermariowar_windows
           path: deploy
   android:
     if: false
