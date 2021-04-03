@@ -43,6 +43,19 @@ jobs:
       - name: Build
         working-directory: build
         run: make
+      - name: Package
+        if: matrix.sdl == 2
+        run: |
+          mkdir deploy
+          cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server} deploy/
+          strip deploy/*
+          cp docs/readme-v1.8.html deploy/
+      - name: Upload artifacts
+        if: matrix.sdl == 2
+        uses: actions/upload-artifact@v2
+        with:
+          name: smw_linux
+          path: deploy
   mingw-cross:
     runs-on: ubuntu-18.04
     env:
