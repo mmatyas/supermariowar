@@ -22,6 +22,7 @@ const std::string convertPartialPath(const std::string & source);
 const std::string getFileFromPath(const std::string &path);
 
 const std::string GetHomeDirectory();
+const std::string GetRootDirectory();
 
 #ifdef __APPLE__
     void Initialize_Paths();

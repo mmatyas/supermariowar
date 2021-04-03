@@ -1,5 +1,9 @@
 #include "path.h"
 
+#ifdef USE_SDL2
+#include "SDL.h"
+#endif
+
 #include <cstring>
 #include <string>
 #include <sys/stat.h>
@@ -54,6 +58,20 @@ const std::string GetHomeDirectory()
         result = std::string(folder) + "/" + result;
     return result;
 #endif
+}
+
+const std::string GetRootDirectory()
+{
+#ifdef USE_SDL2
+    char* const sdl_path = SDL_GetBasePath();
+    if (sdl_path) {
+        std::string result = sdl_path;
+        SDL_free(sdl_path);
+        return result;
+    }
+#endif
+
+    return "./";
 }
 
 bool File_Exists (const std::string fileName)

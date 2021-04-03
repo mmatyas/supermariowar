@@ -23,7 +23,7 @@ int32_t g_iVersion[] = {2, 0, 0, 0};
 #ifdef __ANDROID__
 std::string RootDataDirectory = GetHomeDirectory() + "data";
 #else
-std::string RootDataDirectory = "data";
+std::string RootDataDirectory = GetRootDirectory() + "data";
 #endif
 
 CGame *smw;
