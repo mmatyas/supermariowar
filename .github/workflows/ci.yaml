@@ -51,13 +51,13 @@ jobs:
           strip supermariowar/*
           cp docs/readme-v1.8.html supermariowar/
           rsync -aC --exclude .git data supermariowar/
-          zip -r supermariowar_linux.zip supermariowar
+          zip -r "supermariowar_$(date +%F)_linux.zip" supermariowar
       - name: Upload artifacts
         if: matrix.sdl == 2
         uses: actions/upload-artifact@v2
         with:
           name: supermariowar_linux
-          path: supermariowar_linux.zip
+          path: supermariowar_*_linux.zip
   mingw-cross:
     runs-on: ubuntu-18.04
     env:
@@ -97,12 +97,12 @@ jobs:
           i686-w64-mingw32-strip supermariowar/*
           cp docs/readme-v1.8.html supermariowar/
           rsync -aC --exclude .git data supermariowar/
-          zip -r supermariowar_windows.zip supermariowar
+          zip -r "supermariowar_$(date +%F)_windows.zip" supermariowar
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: supermariowar_windows
-          path: supermariowar_windows.zip
+          path: supermariowar_*_windows.zip
   android:
     if: false
     runs-on: ubuntu-18.04
