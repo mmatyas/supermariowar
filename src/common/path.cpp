@@ -62,7 +62,9 @@ const std::string GetHomeDirectory()
 
 const std::string GetRootDirectory()
 {
-#ifdef USE_SDL2
+#if !defined(_WIN32) && defined(USE_SDL2)
+    // TODO: SDL_GetBasePath returns an UTF-8 string, which needs
+    // some special treatment on Windows to work
     char* const sdl_path = SDL_GetBasePath();
     if (sdl_path) {
         std::string result = sdl_path;
