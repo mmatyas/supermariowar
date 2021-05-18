@@ -18,7 +18,7 @@ if (WIN32)
 	LIST(APPEND SERVER_SRCS "${PROJECT_SOURCE_DIR}/resources/windows/smw-server.rc")
 endif()
 
-add_executable (smw-server ${SERVER_SRCS})
+add_executable(smw-server ${SERVER_SRCS})
 target_link_libraries(smw-server NetplayFiles)
 
 target_link_libraries (smw-server enet)

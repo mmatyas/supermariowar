@@ -109,7 +109,7 @@ if (WIN32)
 endif()
 
 #add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
-add_executable(smw ../common/movingplatform.cpp ../common/uicontrol.cpp ../common/uimenu.cpp ${SMW_SRCS})
+add_executable(smw WIN32 ../common/movingplatform.cpp ../common/uicontrol.cpp ../common/uimenu.cpp ${SMW_SRCS})
 target_link_libraries(smw CommonFiles)
 if(NOT NO_NETWORK)
 	target_link_libraries(smw NetplayFiles)
