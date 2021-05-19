@@ -12,6 +12,7 @@
 
 #define SMW_EDITOR
 
+#include "CmdArgs.h"
 #include "FileIO.h"
 #include "FileList.h"
 #include "GameMode.h"
@@ -425,8 +426,19 @@ void SetStageMode(short iIndex, const char * szModeName, const char * szGoalName
 //main main main
 int main(int argc, char *argv[])
 {
-	if (argc >= 2)
-		RootDataDirectory = argv[1];
+    const cmd::Args cmd = cmd::parse_args(argc, argv);
+    if (!cmd.success) {
+        return 1;
+    }
+    if (cmd.show_help) {
+        cmd::print_help(MAPTITLESTRING, "");
+        return 0;
+    }
+    if (cmd.debug) {
+        cmd::show_windows_console();
+    }
+    if (!cmd.data_root.empty())
+        RootDataDirectory = cmd.data_root;
 
     smw = new CGame(RootDataDirectory.c_str());
     rm = new CResourceManager();
