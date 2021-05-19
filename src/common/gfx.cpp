@@ -35,6 +35,10 @@ void gfx_settitle(const char* title) {
     gfx.setTitle(title);
 }
 
+void gfx_show_error(const char* message) {
+    gfx.showErrorBox(message);
+}
+
 void gfx_close() {}
 bool gfx_loadpalette(const std::string& palette_path) {
     return gfx.getPalette().load(palette_path.c_str());

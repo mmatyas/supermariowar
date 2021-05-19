@@ -99,6 +99,13 @@ void GraphicsSDL::print_sdl_img_version()
         ver_img_current->major, ver_img_current->minor, ver_img_current->patch);
 }
 
+void GraphicsSDL::showErrorBox(const char* message) const
+{
+#ifdef USE_SDL2
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message, sdl2_window);
+#endif
+}
+
 #ifdef USE_SDL2
 // -----------------------
 //  SDL2 specific methods

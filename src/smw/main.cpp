@@ -271,8 +271,14 @@ void init_spawnlocations()
 //  PROGRAM ENTRY POINT
 //*************************************
 
+void main_game();
 
-// ------ MAIN ------
+void show_catched_error(const char* message)
+{
+    fprintf(stderr, "\n%s\n", message);
+    gfx_show_error(message);
+}
+
 int main(int argc, char *argv[])
 {
     const cmd::Args cmd = cmd::parse_args(argc, argv);
@@ -290,6 +296,32 @@ int main(int argc, char *argv[])
         RootDataDirectory = cmd.data_root;
 
 
+    try {
+        main_game();
+    }
+    catch (const char* what) {
+        show_catched_error(what);
+        return 1;
+    }
+    catch (const std::exception& ex) {
+        show_catched_error(ex.what());
+        return 1;
+    }
+    catch (...) {
+        const char* message = "It seems the game has unexpectedly crashed.\n"
+            "If you could tell us what happened exactly, we might be able\n"
+            "to fix this bug. Consider reporting it on the link below, thanks!\n\n"
+            "https://github.com/mmatyas/supermariowar/issues\n\n"
+            "Sincerely,\nThe Developers";
+        show_catched_error(message);
+        return 1;
+    }
+
+    return 0;
+}
+
+void main_game()
+{
     create_globals();
 
     printf("-------------------------------------------------------------------------------\n");
@@ -437,8 +469,6 @@ int main(int argc, char *argv[])
 	// release all resources
 	delete rm;
     delete smw;
-
-    return 0;
 }
 
 

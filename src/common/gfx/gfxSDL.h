@@ -15,6 +15,7 @@ public:
     void RecreateWindow(bool fullscreen);
     void ChangeFullScreen(bool fullcreen);
     void setTitle(const char*);
+    void showErrorBox(const char*) const;
 
     bool Init(bool fullscreen);
     void Close();
