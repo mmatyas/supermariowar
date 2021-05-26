@@ -49,21 +49,21 @@ install:
   - copy SDL_image-1.2.12\lib\x86\* %LIBDIR% > nul
   - copy SDL_mixer-1.2.12\lib\x86\* %LIBDIR% > nul
   # Download SDL2
-  - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.5-VC.zip
-  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-VC.zip
-  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-VC.zip
+  - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.14-VC.zip
+  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.5-VC.zip
+  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.4-VC.zip
   # Extract files
-  - 7z x SDL2-devel-2.0.5-VC.zip > nul
-  - 7z x SDL2_image-devel-2.0.1-VC.zip > nul
-  - 7z x SDL2_mixer-devel-2.0.1-VC.zip > nul
+  - 7z x SDL2-devel-2.0.14-VC.zip > nul
+  - 7z x SDL2_image-devel-2.0.5-VC.zip > nul
+  - 7z x SDL2_mixer-devel-2.0.4-VC.zip > nul
   # Set up includes
-  - copy SDL2-2.0.5\include\* %SDL2_IDIR% > nul
-  - copy SDL2_image-2.0.1\include\* %SDL2_IDIR% > nul
-  - copy SDL2_mixer-2.0.1\include\* %SDL2_IDIR% > nul
+  - copy SDL2-2.0.14\include\* %SDL2_IDIR% > nul
+  - copy SDL2_image-2.0.5\include\* %SDL2_IDIR% > nul
+  - copy SDL2_mixer-2.0.4\include\* %SDL2_IDIR% > nul
   # Set up libs
-  - copy SDL2-2.0.5\lib\x86\* %LIBDIR% > nul
-  - copy SDL2_image-2.0.1\lib\x86\* %LIBDIR% > nul
-  - copy SDL2_mixer-2.0.1\lib\x86\* %LIBDIR% > nul
+  - copy SDL2-2.0.14\lib\x86\* %LIBDIR% > nul
+  - copy SDL2_image-2.0.5\lib\x86\* %LIBDIR% > nul
+  - copy SDL2_mixer-2.0.4\lib\x86\* %LIBDIR% > nul
 
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
