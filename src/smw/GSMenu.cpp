@@ -457,10 +457,14 @@ void MenuState::update()
                     continue;
                 }
             }
+
+            if (event.key.keysym.sym == SDLK_INSERT) {
+                gfx_take_screenshot();
+            }
 #endif
 #ifdef _DEBUG
             //Pressing insert in debug mode turns on automated testing
-            if (event.key.keysym.sym == SDLK_INSERT) {
+            if (event.key.keysym.sym == SDLK_F8) {
                 g_fAutoTest = !g_fAutoTest;
 
                 if (g_fAutoTest) {

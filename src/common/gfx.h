@@ -32,6 +32,7 @@ void gfx_changefullscreen(bool fullscreen);
 void gfx_flipscreen();
 void gfx_settitle(const char*);
 void gfx_show_error(const char*);
+void gfx_take_screenshot();
 
 void gfx_close();
 bool gfx_loadpalette(const std::string& palette_path);

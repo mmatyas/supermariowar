@@ -237,6 +237,43 @@ void GraphicsSDL::ChangeFullScreen(bool fullscreen)
     //SDL_SetWindowSize(sdl2_window, GFX_SCREEN_W, GFX_SCREEN_H);
 }
 
+void GraphicsSDL::takeScreenshot() const
+{
+    constexpr Uint32 format = SDL_PIXELFORMAT_RGB24;
+    constexpr int depth = 24;
+
+    SDL_Rect viewport;
+    SDL_RenderGetViewport(sdl2_renderer, &viewport);
+
+    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, viewport.w, viewport.h, depth, format);
+    if (!surface) {
+        fprintf(stderr, "[gfx] Couldn't create screenshot buffer: %s\n", SDL_GetError());
+        return;
+    }
+
+    if (SDL_RenderReadPixels(sdl2_renderer, nullptr, format, surface->pixels, surface->pitch) != 0) {
+        fprintf(stderr, "[gfx] Couldn't read the pixels of the renderer: %s\n", SDL_GetError());
+        SDL_FreeSurface(surface);
+        return;
+    }
+
+#ifdef PNG_SAVE_FORMAT
+    constexpr const char* path = "screenshot.png";
+    const int save_result = IMG_SavePNG(surface, path);
+#else
+    constexpr const char* path = "screenshot.bmp";
+    const int save_result = SDL_SaveBMP(surface, path);
+#endif
+    if (save_result != 0) {
+        fprintf(stderr, "[gfx] Couldn't write the screenshot to file: %s\n", SDL_GetError());
+        SDL_FreeSurface(surface);
+        return;
+    }
+
+    printf("[gfx] Screenshot saved to file: %s\n", path);
+    SDL_FreeSurface(surface);
+}
+
 void GraphicsSDL::Close()
 {
     SDL_DestroyTexture(sdl2_screen_as_texture);
@@ -290,6 +327,11 @@ void GraphicsSDL::RecreateWindow(bool fullscreen)
 void GraphicsSDL::ChangeFullScreen(bool fullscreen)
 {
     RecreateWindow(fullscreen);
+}
+
+void GraphicsSDL::takeScreenshot() const
+{
+    fprintf(stderr, "[gfx] Taking screenshots is not implemented for the SDL 1.x backend, sorry!");
 }
 
 void GraphicsSDL::Close()

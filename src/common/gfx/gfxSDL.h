@@ -16,6 +16,7 @@ public:
     void ChangeFullScreen(bool fullcreen);
     void setTitle(const char*);
     void showErrorBox(const char*) const;
+    void takeScreenshot() const;
 
     bool Init(bool fullscreen);
     void Close();
