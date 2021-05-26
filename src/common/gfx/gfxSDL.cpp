@@ -3,6 +3,7 @@
 #include "SDL.h"
 #include "SDL_image.h"
 
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 
@@ -239,6 +240,20 @@ void GraphicsSDL::ChangeFullScreen(bool fullscreen)
 
 void GraphicsSDL::takeScreenshot() const
 {
+#ifdef PNG_SAVE_FORMAT
+    constexpr const char* path_format = "screenshots/%F_%T.png";
+#else
+    constexpr const char* path_format = "screenshots/%F_%T.bmp";
+#endif
+    using std::chrono::system_clock;
+    const std::time_t now = system_clock::to_time_t(system_clock::now());
+    char path[36]; // screenshots/YYYY-MM-DD_HH:MM:SS.ext + 0
+    const size_t path_bytes = std::strftime(path, sizeof(path), path_format, std::localtime(&now));
+    if (path_bytes == 0) {
+        fprintf(stderr, "[gfx] Couldn't query the current time for the screenshot file name\n");
+        return;
+    }
+
     constexpr Uint32 format = SDL_PIXELFORMAT_RGB24;
     constexpr int depth = 24;
 
@@ -258,14 +273,13 @@ void GraphicsSDL::takeScreenshot() const
     }
 
 #ifdef PNG_SAVE_FORMAT
-    constexpr const char* path = "screenshot.png";
     const int save_result = IMG_SavePNG(surface, path);
 #else
-    constexpr const char* path = "screenshot.bmp";
     const int save_result = SDL_SaveBMP(surface, path);
 #endif
     if (save_result != 0) {
         fprintf(stderr, "[gfx] Couldn't write the screenshot to file: %s\n", SDL_GetError());
+        fprintf(stderr, "[gfx] Hint: Maybe the `screenshots` directory is missing?\n");
         SDL_FreeSurface(surface);
         return;
     }
