@@ -244,12 +244,15 @@ void GraphicsSDL::ChangeFullScreen(bool fullscreen)
 
 void GraphicsSDL::takeScreenshot() const
 {
-#ifdef PNG_SAVE_FORMAT
-    constexpr const char* path_format = "screenshots/%F_%T.png";
-#else
-    constexpr const char* path_format = "screenshots/%F_%T.bmp";
-#endif
     using std::chrono::system_clock;
+
+    // NOTE: %F and %T don't work on Windows
+#ifdef PNG_SAVE_FORMAT
+    constexpr const char* path_format = "screenshots/%Y-%m-%d_%H%M%S.png";
+#else
+    constexpr const char* path_format = "screenshots/%Y-%m-%d_%H%M%S.bmp";
+#endif
+
     const std::time_t now = system_clock::to_time_t(system_clock::now());
     std::ostringstream path_ss;
     path_ss << std::put_time(std::localtime(&now), path_format);
