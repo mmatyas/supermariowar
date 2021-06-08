@@ -258,37 +258,17 @@ void GraphicsSDL::takeScreenshot() const
     path_ss << std::put_time(std::localtime(&now), path_format);
     const std::string path = convertPath(path_ss.str());
 
-    constexpr Uint32 format = SDL_PIXELFORMAT_RGB24;
-    constexpr int depth = 24;
-
-    SDL_Rect viewport;
-    SDL_RenderGetViewport(sdl2_renderer, &viewport);
-
-    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, viewport.w, viewport.h, depth, format);
-    if (!surface) {
-        fprintf(stderr, "[gfx] Couldn't create screenshot buffer: %s\n", SDL_GetError());
-        return;
-    }
-
-    if (SDL_RenderReadPixels(sdl2_renderer, nullptr, format, surface->pixels, surface->pitch) != 0) {
-        fprintf(stderr, "[gfx] Couldn't read the pixels of the renderer: %s\n", SDL_GetError());
-        SDL_FreeSurface(surface);
-        return;
-    }
-
 #ifdef PNG_SAVE_FORMAT
-    const int save_result = IMG_SavePNG(surface, path.c_str());
+    const int save_result = IMG_SavePNG(screen, path.c_str());
 #else
-    const int save_result = SDL_SaveBMP(surface, path.c_str());
+    const int save_result = SDL_SaveBMP(screen, path.c_str());
 #endif
     if (save_result != 0) {
         fprintf(stderr, "[gfx] Couldn't write the screenshot to file: %s\n", SDL_GetError());
-        SDL_FreeSurface(surface);
         return;
     }
 
     printf("[gfx] Screenshot saved to file: %s\n", path.c_str());
-    SDL_FreeSurface(surface);
 }
 
 void GraphicsSDL::Close()
