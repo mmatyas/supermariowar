@@ -78,7 +78,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 #endif
 
 
-#define MAPTITLESTRING "SMW 2.0 Level Editor"
+#define MAPTITLESTRING "Super Cat Wars Level Editor"
 
 
 extern CMap* g_map;
@@ -2975,7 +2975,7 @@ SDL_Rect rBackground[2];
 //SDL_Rect rTypeButton[8][4];
 SDL_Rect rIconRects[MAXMAPHAZARDS][2];
 
-const char * szHazardNames[8] = {"Fireballs", "Rotodisc", "Bullet Bill", "Flame Thrower", "Green Pirhana", "Red Pirhana", "Tall Pirhana", "Short Pirhana"};
+const char * szHazardNames[8] = {"Firebar", "Electorb", "Cannonball", "Flamethrower", "Monkey", "Vulcan Turnip", "Bamboo Blossom", "Mr. Prickles"};
 
 bool editor_maphazards_initialized = false;
 void init_editor_maphazards()
