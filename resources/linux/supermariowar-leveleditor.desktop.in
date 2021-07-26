@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=smw-leveledit @SMW_DATADIR@
+Exec=smw-leveledit --datadir @SMW_DATADIR@
 Terminal=false
 Name=Super Mario War Level Editor
 Comment=Launch SMW Level Editor
