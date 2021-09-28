@@ -407,7 +407,7 @@ void MenuState::update()
             if (event.key.keysym.sym == SDLK_F2) {
                 game_values.frameadvance = !game_values.frameadvance;
             }
-#endif
+
             if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                 //ALT + F4 = close window
                 if (event.key.keysym.sym == SDLK_F4) {
@@ -423,13 +423,11 @@ void MenuState::update()
                 }
             }
 
-<<<<<<< HEAD
-=======
             if (event.key.keysym.sym == SDLK_INSERT) {
                 gfx_take_screenshot();
             }
 #endif
->>>>>>> 9791d41e3d549ed9eece405b3995c643544e2dc4
+
 #ifdef _DEBUG
             //Pressing insert in debug mode turns on automated testing
             if (event.key.keysym.sym == SDLK_F8) {
