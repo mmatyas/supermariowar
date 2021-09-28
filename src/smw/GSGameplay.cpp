@@ -2013,6 +2013,8 @@ void GameplayState::handleInput()
                 game_values.playerInput.outputControls[0].game_cancel.fPressed = true;
             } else if (event.key.keysym.sym == SDLK_TAB) {
                 PlayNextMusicTrack();
+            } else if (event.key.keysym.sym == SDLK_INSERT) {
+                gfx_take_screenshot();
             }
 #ifdef _DEBUG
             else if (event.key.keysym.sym == SDLK_LEFTBRACKET) {
@@ -2108,7 +2110,7 @@ void GameplayState::handleInput()
                     objectcontainer[0].add(new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
                 else
                     objectcontainer[0].add(new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
-            } else if (event.key.keysym.sym == SDLK_INSERT) {
+            } else if (event.key.keysym.sym == SDLK_F8) {
                 g_fAutoTest = !g_fAutoTest;
             }
 #endif

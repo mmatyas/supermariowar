@@ -1,4 +1,5 @@
 set(COMMON_SRCS
+    CmdArgs.cpp
     dirlist.cpp
     eyecandy.cpp
     FileIO.cpp

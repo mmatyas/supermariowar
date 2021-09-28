@@ -178,6 +178,14 @@ void SplashScreenState::update()
                     game_values.gamestate = GS_QUIT;
                     return;
                 break;
+<<<<<<< HEAD
+=======
+
+            case SDLK_INSERT:
+                gfx_take_screenshot();
+                break;
+#endif
+>>>>>>> 9791d41e3d549ed9eece405b3995c643544e2dc4
 
             default:
                 break;

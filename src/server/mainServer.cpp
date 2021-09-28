@@ -27,8 +27,12 @@ int main(int argc, char* argv[])
 {
     printf("SMW Server alpha\n");
 
+    const std::string config_path = argc > 1
+        ? argv[1]
+        : "serverconfig";
+
     SMWServer server;
-    if (!server.init()) {
+    if (!server.init(config_path)) {
         cleanup();
         return 1;
     }

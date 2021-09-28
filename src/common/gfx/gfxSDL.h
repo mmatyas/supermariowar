@@ -15,6 +15,8 @@ public:
     void RecreateWindow(bool fullscreen);
     void ChangeFullScreen(bool fullcreen);
     void setTitle(const char*);
+    void showErrorBox(const char*) const;
+    void takeScreenshot() const;
 
     bool Init(bool fullscreen);
     void Close();
@@ -39,9 +41,9 @@ private:
 #endif
 
     // screen -> texture -> renderer -> window
-    SDL_Window*     sdl2_window;
-    SDL_Renderer*   sdl2_renderer;
-    SDL_Texture*    sdl2_screen_as_texture;
+    SDL_Window*     sdl2_window = nullptr;
+    SDL_Renderer*   sdl2_renderer = nullptr;
+    SDL_Texture*    sdl2_screen_as_texture = nullptr;
 #endif
 
     gfxPalette palette;

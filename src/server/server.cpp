@@ -27,13 +27,13 @@ SMWServer::~SMWServer()
     cleanup();
 }
 
-bool SMWServer::init()
+bool SMWServer::init(const std::string& config_path)
 {
     if (!log_init())
         return false;
     log_silently("-- Server started --");
 
-    readConfig();
+    readConfig(config_path);
 
     if(!netLayer.init(maxPlayerCount))
         return false;
@@ -41,12 +41,11 @@ bool SMWServer::init()
     return true;
 }
 
-void SMWServer::readConfig()
+void SMWServer::readConfig(const std::string& config_path)
 {
-    std::ifstream configFile;
-    configFile.open("serverconfig", std::ifstream::in);
+    std::ifstream configFile(config_path, std::ifstream::in);
     if (!configFile.is_open()) {
-        log("[warning] Configuration file not found, using default values.");
+        log("[warning] Configuration file `%s` not found, using default values.", config_path.c_str());
         printf("  server name: %s\n", serverInfo.name);
         printf("  max players: %d\n", serverInfo.maxPlayerCount);
         return;

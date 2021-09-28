@@ -1,8 +1,13 @@
 #include "gfxSDL.h"
 
+#include "path.h"
+
 #include "SDL.h"
 #include "SDL_image.h"
 
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 #include <cstdio>
 #include <cstdlib>
 
@@ -97,6 +102,13 @@ void GraphicsSDL::print_sdl_img_version()
     SDL_IMAGE_VERSION(&ver_compiled);
     printf("[gfx] SDL_image %d.%d.%d loaded.\n",
         ver_img_current->major, ver_img_current->minor, ver_img_current->patch);
+}
+
+void GraphicsSDL::showErrorBox(const char* message) const
+{
+#ifdef USE_SDL2
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message, sdl2_window);
+#endif
 }
 
 #ifdef USE_SDL2
@@ -229,6 +241,35 @@ void GraphicsSDL::ChangeFullScreen(bool fullscreen)
     //SDL_SetWindowSize(sdl2_window, GFX_SCREEN_W, GFX_SCREEN_H);
 }
 
+void GraphicsSDL::takeScreenshot() const
+{
+    using std::chrono::system_clock;
+
+    // NOTE: %F and %T don't work on Windows
+#ifdef PNG_SAVE_FORMAT
+    constexpr const char* path_format = "screenshots/%Y-%m-%d_%H%M%S.png";
+#else
+    constexpr const char* path_format = "screenshots/%Y-%m-%d_%H%M%S.bmp";
+#endif
+
+    const std::time_t now = system_clock::to_time_t(system_clock::now());
+    std::ostringstream path_ss;
+    path_ss << std::put_time(std::localtime(&now), path_format);
+    const std::string path = convertPath(path_ss.str());
+
+#ifdef PNG_SAVE_FORMAT
+    const int save_result = IMG_SavePNG(screen, path.c_str());
+#else
+    const int save_result = SDL_SaveBMP(screen, path.c_str());
+#endif
+    if (save_result != 0) {
+        fprintf(stderr, "[gfx] Couldn't write the screenshot to file: %s\n", SDL_GetError());
+        return;
+    }
+
+    printf("[gfx] Screenshot saved to file: %s\n", path.c_str());
+}
+
 void GraphicsSDL::Close()
 {
     SDL_DestroyTexture(sdl2_screen_as_texture);
@@ -273,6 +314,11 @@ void GraphicsSDL::RecreateWindow(bool fullscreen)
 void GraphicsSDL::ChangeFullScreen(bool fullscreen)
 {
     RecreateWindow(fullscreen);
+}
+
+void GraphicsSDL::takeScreenshot() const
+{
+    fprintf(stderr, "[gfx] Taking screenshots is not implemented for the SDL 1.x backend, sorry!");
 }
 
 void GraphicsSDL::Close()
