@@ -1,6 +1,6 @@
 # Super Mario War
 
-[![Travis][travis-img]][travis-link] [![AppVeyor][appveyor-img]][appveyor-link] [![Freenode channel][freenode-img]][freenode-link]
+![Linux status][build-linux-img] ![Windows status][build-mingw-img] [![AppVeyor][appveyor-img]][appveyor-link] [![Discord][discord-img]][discord-link]
 
 Super Mario War is a fan-made multiplayer Super Mario Bros. style deathmatch game in which players try to beat one another in a variety of gameplay modes. You can play on teams, design your own levels, design your own worlds, and much more!
 
@@ -190,9 +190,9 @@ Alternatively, you can pass these options directly to CMake as `-DFLAGNAME=VALUE
 Please see documentation in the docs/ directory.
 
 
-[travis-img]: https://travis-ci.org/mmatyas/supermariowar.svg?branch=master
-[travis-link]: https://travis-ci.org/mmatyas/supermariowar
+[build-linux-img]: https://github.com/mmatyas/supermariowar/actions/workflows/build_linux.yml/badge.svg
+[build-mingw-img]: https://github.com/mmatyas/supermariowar/actions/workflows/build_mingw.yml/badge.svg
 [appveyor-img]: https://ci.appveyor.com/api/projects/status/github/mmatyas/supermariowar?svg=true
 [appveyor-link]: https://ci.appveyor.com/project/mmatyas/supermariowar
-[freenode-img]: http://img.shields.io/freenode/%23supermariowar.png
-[freenode-link]: https://webchat.freenode.net/?channels=supermariowar
+[discord-img]: https://img.shields.io/badge/Discord-7389D8?logo=discord&logoColor=white
+[discord-link]: https://discord.gg/SC4uXQB

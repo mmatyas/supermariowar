@@ -1,6 +1,6 @@
 # Super Mario War
 
-[![Travis][travis-img]][travis-link] [![AppVeyor][appveyor-img]][appveyor-link] [![Freenode channel][freenode-img]][freenode-link]
+![Linux status][build-linux-img] ![Windows status][build-mingw-img] [![AppVeyor][appveyor-img]][appveyor-link] [![Discord][discord-img]][discord-link]
 
 Super Mario War는 Super Mario Bros의 팬이 만든 멀티플레이어 버전이다. 다양한 모드에서 플레이어가 서로를 이기는 것이 목적인 데스메치 형식의 게임이다. 당신은 이 게임을 팀으로도 플레이 할 수도 있고, 당신만의 레벨이나 세계를 구현할 수도 있으며, 그 이상도 가능하다!!!
 
@@ -160,7 +160,7 @@ SMW 당신의 브라우저에서 [Emscripten](https://kripken.github.io/emscript
 
 ### Other devices
 
-SDL(1.2 또는 2.0 )이 작동하는 모든 장치에 SMW을 이식할 수 있을 것이다. 일반적으로, 다음 단계들을 포함한다:
+SDL(1.2 또는 2.0) 이 작동하는 모든 장치에 SMW을 이식할 수 있을 것이다. 일반적으로, 다음 단계들을 포함한다:
 
 - 너의 기기에 맞는 크로스 컴파일러 툴체인을 받아라 
 - SDL 라이브러리들이 포함되어있지 않으면 크로스 컴파일해라
@@ -188,9 +188,9 @@ SDL(1.2 또는 2.0 )이 작동하는 모든 장치에 SMW을 이식할 수 있�
 docs/ 폴더 안의 문서를 참고해 주세요.
 
 
-[travis-img]: https://travis-ci.org/mmatyas/supermariowar.svg?branch=master
-[travis-link]: https://travis-ci.org/mmatyas/supermariowar
+[build-linux-img]: https://github.com/mmatyas/supermariowar/actions/workflows/build_linux.yml/badge.svg
+[build-mingw-img]: https://github.com/mmatyas/supermariowar/actions/workflows/build_mingw.yml/badge.svg
 [appveyor-img]: https://ci.appveyor.com/api/projects/status/github/mmatyas/supermariowar?svg=true
 [appveyor-link]: https://ci.appveyor.com/project/mmatyas/supermariowar
-[freenode-img]: http://img.shields.io/freenode/%23supermariowar.png
-[freenode-link]: https://webchat.freenode.net/?channels=supermariowar
+[discord-img]: https://img.shields.io/badge/Discord-7389D8?logo=discord&logoColor=white
+[discord-link]: https://discord.gg/SC4uXQB
