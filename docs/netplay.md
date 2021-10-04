@@ -28,7 +28,7 @@ Name | Description | Default
 `maxplayers` | The number of players allowed to be on the server at the same time | 20
 `password` | A password players have to enter to join the server | (nothing)
 
-You can change these values by creating a file called `serverconfig` (without extension), and placing it next to `smw-server`. Here is an example:
+You can change these values by creating a file called `serverconfig.txt`, and placing it next to `smw-server`. Here is an example:
 
 ```
 # SMW Server configuration

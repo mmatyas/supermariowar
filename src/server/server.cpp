@@ -43,13 +43,20 @@ bool SMWServer::init(const std::string& config_path)
 
 void SMWServer::readConfig(const std::string& config_path)
 {
-    std::ifstream configFile(config_path, std::ifstream::in);
+    std::string final_path = config_path;
+    std::ifstream configFile(final_path, std::ifstream::in);
     if (!configFile.is_open()) {
-        log("[warning] Configuration file `%s` not found, using default values.", config_path.c_str());
+        final_path += ".txt";
+        configFile.open(final_path);
+    }
+    if (!configFile.is_open()) {
+        log("[warning] Configuration file `%s` not found, using default values.", final_path.c_str());
         printf("  server name: %s\n", serverInfo.name);
         printf("  max players: %d\n", serverInfo.maxPlayerCount);
         return;
     }
+
+    log("[info] Found configuration file `%s`", final_path.c_str());
 
     std::string keyword;
     std::string value;
