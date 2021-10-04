@@ -38,6 +38,8 @@ Eventually I've managed to make the network multiplayer working, but it's far fr
 
 For me, this was the point where I've stopped putting more time on this project (2016). In the long term, a complete rewrite might be faster and more effective than patching the original game for years. Either way, I hope I've left the project in a better state than it was, and that it will be of use for future developers. Have fun!
 
+[Old releases for Mario War and SMW can be found here.](https://github.com/mmatyas/supermariowar/releases/tag/1.8)
+
 
 ## About
 
