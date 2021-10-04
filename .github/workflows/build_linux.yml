@@ -1,0 +1,66 @@
+name: Build - Linux
+
+on: [push, workflow_dispatch]
+
+jobs:
+  linux:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        sdl: [1, 2]
+    env:
+      CXX: g++
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Install dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y
+          cmake
+          g++
+          libsdl1.2-dev
+          libsdl-image1.2-dev
+          libsdl-mixer1.2-dev
+          libsdl2-dev
+          libsdl2-image-dev
+          libsdl2-mixer-dev
+          libegl1-mesa-dev
+          libgles2-mesa-dev
+      - run: |
+          $CXX --version
+          cmake --version
+          mkdir build
+
+      - name: Configure
+        if: matrix.sdl == 1
+        working-directory: build
+        run: |
+          sdl-config --version
+          cmake -D USE_SDL2_LIBS:BOOL=OFF ..
+      - name: Configure
+        if: matrix.sdl == 2
+        working-directory: build
+        run: |
+          sdl2-config --version
+          cmake -D USE_SDL2_LIBS:BOOL=ON -DUSE_PNG_SAVE=ON ..
+
+      - name: Build
+        working-directory: build
+        run: make
+
+      - name: Package
+        if: matrix.sdl == 2
+        run: |
+          mkdir supermariowar
+          cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server} supermariowar/
+          strip supermariowar/*
+          cp docs/readme-v1.8.html supermariowar/
+          rsync -aC --exclude .git data supermariowar/
+          zip -r "supermariowar_$(date +%F)_linux.zip" supermariowar
+
+      - name: Upload artifacts
+        if: matrix.sdl == 2
+        uses: actions/upload-artifact@v2
+        with:
+          name: supermariowar_linux
+          path: supermariowar_*_linux.zip

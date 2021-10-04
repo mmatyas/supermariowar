@@ -1,0 +1,35 @@
+name: Build - Android
+
+on: [push, workflow_dispatch]
+
+jobs:
+  android:
+    if: false
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: android-actions/setup-android@v2
+      - name: Install Android SDK
+        run: sdkmanager "build-tools;23.0.1" "platforms;android-15"
+      - name: Install Android NDK
+        working-directory: /tmp
+        run: |
+          wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin;
+          chmod +x ./android-ndk-r10e-linux-x86_64.bin;
+          ./android-ndk-r10e-linux-x86_64.bin > /dev/null;
+      - name: Install dependencies
+        run: sudo dpkg --add-architecture i386 && sudo apt-get update -qq && sudo apt-get install -y
+          ant
+          expect
+          lib32z1
+          libbz2-1.0:i386
+          libc6:i386
+          libncurses5:i386
+          libstdc++6:i386
+          openjdk-8-jdk
+      - name: Build
+        run: |
+          export PATH=$PATH:/tmp/android-ndk-r10e
+          git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git
+          cd supermariowar-android
+          git clone --depth=1 https://github.com/mmatyas/supermariowar.git
+          ./build.sh --abi="armeabi-v7a arm64-v8a"

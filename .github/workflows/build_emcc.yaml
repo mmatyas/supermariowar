@@ -1,0 +1,30 @@
+name: Build - Web
+
+on: [push, workflow_dispatch]
+
+jobs:
+  emscripten:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Install Emscripten
+        working-directory: /tmp
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git --depth=1
+          cd emsdk
+          ./emsdk install 1.39.5
+          ./emsdk activate 1.39.5
+      - name: Download SDL mixer
+        working-directory: dependencies
+        run: curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.4.tar.gz | tar xzf -
+
+      - name: Build
+        run: |
+          source /tmp/emsdk/emsdk_env.sh
+          emcc -v
+          sed -i 's|if (BUILD_STATIC_LIBS)|if (BUILD_STATIC_LIBS)\ninclude_directories(dependencies/SDL2_mixer-2.0.4)|' CMakeLists.txt
+          mkdir build_js && cd build_js
+          emconfigure cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
+          emmake make smw
