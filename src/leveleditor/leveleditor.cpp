@@ -4451,8 +4451,10 @@ int display_help()
 	offsety += rm->menu_font_small.getHeight() + 2;
 	rm->menu_font_small.draw(offsetx, offsety, "[a] - Animated Tile Mode");
 	offsety += rm->menu_font_small.getHeight() + 2;
+	rm->menu_font_small.draw(offsetx, offsety, "[j] - Race Goals Mode");
+	offsety += rm->menu_font_small.getHeight() + 2;
 	rm->menu_font_small.draw(offsetx, offsety, "[k] - Block Properties");
-	offsety += rm->menu_font_small.getHeight() + 20;
+	offsety += rm->menu_font_small.getHeight() + 12;
 
 	rm->menu_font_small.draw(offsetx, offsety, "Layers:");
 	offsety += rm->menu_font_small.getHeight() + 2;
@@ -4463,7 +4465,7 @@ int display_help()
 	rm->menu_font_small.draw(offsetx, offsety, "[u] - Hide Inactive Tile Layers");
 	offsety += rm->menu_font_small.getHeight() + 2;
 	rm->menu_font_small.draw(offsetx, offsety, "[end] - Optimize Layers");
-	offsety += rm->menu_font_small.getHeight() + 20;
+	offsety += rm->menu_font_small.getHeight() + 12;
 
 	rm->menu_font_small.draw(offsetx, offsety, "Miscellaneous:");
 	offsety += rm->menu_font_small.getHeight() + 2;
