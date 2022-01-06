@@ -17,6 +17,10 @@
 
 #define SMW_EDITOR
 
+#ifdef _MSC_VER
+#define NOMINMAX
+#endif
+
 #include "CmdArgs.h"
 #include "eyecandy.h"
 #include "FPSLimiter.h"
@@ -57,6 +61,8 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 	#endif
 #endif
 
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <ctype.h>
 #include <cstring>
@@ -97,8 +103,10 @@ extern CGameValues game_values;
 
 enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS, EDITOR_MAPHAZARDS};
 
-#define MAX_PLATFORMS 8
+#define MAX_PLATFORMS 32
 #define MAX_PLATFORM_VELOCITY 16
+constexpr int UI_PLATFORM_ROWS = 4;
+constexpr int UI_PLATFORM_COLS = 8;
 
 class EditorMapTile
 {
@@ -554,14 +562,16 @@ int main(int argc, char *argv[])
 	printf("\n---------------- load map ----------------\n");
 
 	//Setup Platforms
+	constexpr int UI_PLATFORM_START_X = (640 - UI_PLATFORM_COLS * 32 - (UI_PLATFORM_COLS - 1) * 10 /* spacing */) / 2;
+	constexpr int UI_PLATFORM_START_Y = (480 - UI_PLATFORM_ROWS * 32 - (UI_PLATFORM_ROWS - 1) * 10 /* spacing */) / 2;
     for (short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++) {
 		g_Platforms[iPlatform].rIcon[0].x = (iPlatform % 8) * 32;
 		g_Platforms[iPlatform].rIcon[0].y = (iPlatform / 8) * 32 + 224;
 		g_Platforms[iPlatform].rIcon[0].w = 32;
 		g_Platforms[iPlatform].rIcon[0].h = 32;
 
-		g_Platforms[iPlatform].rIcon[1].x = (iPlatform % 4) * 42 + 240;
-		g_Platforms[iPlatform].rIcon[1].y = (iPlatform / 4) * 42 + 180;
+		g_Platforms[iPlatform].rIcon[1].x = (iPlatform % 8) * 42 + UI_PLATFORM_START_X;
+		g_Platforms[iPlatform].rIcon[1].y = (iPlatform / 8) * 42 + UI_PLATFORM_START_Y;
 		g_Platforms[iPlatform].rIcon[1].w = 32;
 		g_Platforms[iPlatform].rIcon[1].h = 32;
 
@@ -2247,26 +2257,44 @@ short iPlatformTop, iPlatformLeft, iPlatformWidth, iPlatformHeight;
 
 short iPlatformPreview = -1;
 
+void editor_platforms_update_layout()
+{
+    constexpr int padding = 32;
+    constexpr int btn_size = 32;
+    constexpr int btn_spacing = 10;
+
+    constexpr int grid_area_w = UI_PLATFORM_COLS * btn_size + (UI_PLATFORM_COLS - 1) * btn_spacing;
+    constexpr int grid_area_max_h = UI_PLATFORM_ROWS * btn_size + (UI_PLATFORM_ROWS - 1) * btn_spacing;
+
+    const int rows = (std::min(g_iNumPlatforms + 1, MAX_PLATFORMS) + UI_PLATFORM_COLS - 1) / UI_PLATFORM_COLS;
+    const int grid_area_h = rows * btn_size + (rows - 1) * btn_spacing;
+    const int title_area_h = padding + rm->menu_font_small.getHeight();
+    const int newbtn_area_h = padding + (g_iNumPlatforms < MAX_PLATFORMS ? 24 + rNewButton[0].h : 0);
+
+    r.w = 2 * padding + grid_area_w;
+    r.h = title_area_h + grid_area_h + newbtn_area_h;
+    r.x = (640 - r.w) / 2;
+    r.y = (480 - grid_area_max_h) / 2 - title_area_h;
+
+    rNewButton[1].x = r.x + (r.w >> 1) - (rNewButton[0].w >> 1);
+    rNewButton[1].y = r.y + r.h - padding - rNewButton[0].h;
+}
+
 bool editor_platforms_initialized = false;
 void init_editor_platforms()
 {
     if (editor_platforms_initialized)
         return;
 
-    r.x = 192;
-    r.y = 128;
-    r.w = 256;
-    r.h = 224;
-
     rNewButton[0].x = 0;
     rNewButton[0].y = 352;
     rNewButton[0].w = 76;
     rNewButton[0].h = 32;
 
-    rNewButton[1].x = r.x + (r.w >> 1) - (rNewButton[0].w >> 1);
-    rNewButton[1].y = r.y + r.h - 64;
-    rNewButton[1].w = 76;
-    rNewButton[1].h = 32;
+    rNewButton[1].w = rNewButton[0].w;
+    rNewButton[1].h = rNewButton[0].h;
+
+    editor_platforms_update_layout();
 
     for (short iType = 0; iType < 3; iType++) {
         rTypeButton[iType][0].x = 0;
@@ -2291,6 +2319,60 @@ void init_editor_platforms()
     }
 
     editor_platforms_initialized = true;
+}
+
+void editor_platforms_draw_background_section(const SDL_Rect& src_area, const SDL_Rect& dst_area)
+{
+    int offset_y = 0;
+    while (offset_y < dst_area.h) {
+        const int h = std::min<int>(dst_area.h - offset_y, src_area.h);
+
+        int offset_x = 0;
+        while (offset_x < dst_area.w) {
+            const int w = std::min<int>(dst_area.w - offset_x, src_area.w);
+
+            SDL_Rect src { src_area.x, src_area.y, w, h };
+            SDL_Rect dst { dst_area.x + offset_x, dst_area.y + offset_y, w, h };
+            SDL_BlitSurface(s_platform, &src, screen, &dst);
+
+            offset_x += w;
+        }
+
+        offset_y += h;
+    }
+}
+
+void editor_platforms_draw_background()
+{
+    constexpr int corner = 24;
+
+    SDL_Rect src {0, 0, corner, corner};
+    SDL_Rect dst {r.x, r.y, corner, corner};
+
+    constexpr std::array<int, 3> src_w { corner, 256 - 2 * corner, corner };
+    constexpr std::array<int, 3> src_h { corner, 224 - 2 * corner, corner };
+
+    const std::array<int, 3> dst_w { corner, r.w - 2 * corner, corner };
+    const std::array<int, 3> dst_h { corner, r.h - 2 * corner, corner };
+
+    for (int row = 0; row < 3; row++) {
+        src.x = 0;
+        src.h = src_h[row];
+
+        dst.x = r.x;
+        dst.h = dst_h[row];
+
+        for (int col = 0; col < 3; col++) {
+            src.w = src_w[col];
+            dst.w = dst_w[col];
+            editor_platforms_draw_background_section(src, dst);
+            src.x += src_w[col];
+            dst.x += dst_w[col];
+        }
+
+        src.y += src.h;
+        dst.y += dst.h;
+    }
 }
 
 // TODO: Check this for problems.
@@ -2337,6 +2419,7 @@ int editor_platforms()
                     if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState && g_iNumPlatforms < MAX_PLATFORMS) {
 							iEditPlatform = g_iNumPlatforms;
 							g_iNumPlatforms++;
+							editor_platforms_update_layout();
 							iPlatformEditState = PLATFORM_EDIT_STATE_PATH_TYPE;
 						}
                 } else if (event.key.keysym.sym == SDLK_m) {
@@ -2429,10 +2512,7 @@ int editor_platforms()
 							g_Platforms[iEditPlatform].UpdatePreview();
 							iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 							//Fix menu offset
-							r.x = 192;
-							r.y = 128;
-							r.w = 256;
-							r.h = 224;
+							editor_platforms_update_layout();
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
 						}
@@ -2505,6 +2585,7 @@ int editor_platforms()
 
 								iEditPlatform = g_iNumPlatforms;
 								g_iNumPlatforms++;
+								editor_platforms_update_layout();
 								iPlatformEditState = PLATFORM_EDIT_STATE_PATH_TYPE;
 								ignoreclick = true;
 							}
@@ -2694,14 +2775,9 @@ int editor_platforms()
 		}
 
         if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState || PLATFORM_EDIT_STATE_MOVE == iPlatformEditState) {
-			SDL_Rect rp;
-			rp.x = 0;
-			rp.y = 0;
-			rp.w = 256;
-			rp.h = 224;
+            editor_platforms_draw_background();
 
-			SDL_BlitSurface(s_platform, &rp, screen, &r);
-			rm->menu_font_small.drawCentered(320, 146, "Platforms");
+            rm->menu_font_small.drawCentered(320, r.y + 18, "Platforms");
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Platform Mode: [esc] Exit  [c] Check Paths, [1-8] Select, [n] New");
 			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
