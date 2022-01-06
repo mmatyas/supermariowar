@@ -28,7 +28,7 @@ install:
   - mkdir %LIBDIR%
   - cd %TEMP%
   # Download zlib
-  - appveyor DownloadFile http://zlib.net/zlib128-dll.zip
+  - appveyor DownloadFile https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/zlib128-dll.zip
   - 7z x zlib128-dll.zip > nul
   - copy include\* %ZLIB_IDIR% > nul
   - copy lib\* %LIBDIR% > nul
