@@ -114,10 +114,6 @@ void update_mouse_coords() {
 //Vehicle structure that holds the current vehicle "stamp"
 WorldVehicle g_wvVehicleStamp;
 
-gfxSprite		spr_platformstarttile;
-gfxSprite		spr_platformendtile;
-gfxSprite		spr_platformpath;
-
 //// Global stuff that the map editor doesn't need, but has references to
 gfxSprite		spr_warplock;
 short			x_shake = 0;
@@ -501,13 +497,6 @@ int main(int argc, char *argv[])
 	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
 
-	spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 255, 0, 255, 128, true);
-
-	spr_platformstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 0, 0, 0, 64, true);
-	spr_platformendtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 64, true);
-	spr_platformstarttile.SetWrap(true);
-	spr_platformendtile.SetWrap(true);
-
 
 	printf("\n---------------- load world ----------------\n");
 
@@ -585,6 +574,8 @@ int main(int argc, char *argv[])
 
 	rm->spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), 255, 0, 255);
 	rm->spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), 255, 0, 255);
+
+	rm->LoadMenuGraphics();
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
