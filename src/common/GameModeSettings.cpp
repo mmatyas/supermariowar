@@ -135,7 +135,7 @@ GreedGameModeSettings::GreedGameModeSettings()
 HealthGameModeSettings::HealthGameModeSettings()
     : startlife(6)         	//Start with 3 whole hearts (each increment is a half heart)
     , maxlife(1)           	//Maximum of 5 hearts
-    , percentextralife(2) 	//20% chance of a heart spawning
+    , percentextralife(20) 	//20% chance of a heart spawning
 {}
 
 CollectionGameModeSettings::CollectionGameModeSettings()
