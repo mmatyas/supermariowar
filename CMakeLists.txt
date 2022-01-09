@@ -39,7 +39,7 @@ if (NO_NETWORK)
 	add_definitions(-DNETWORK_DISABLED)
 endif()
 
-if (USE_PNG_SAVE)
+if (USE_PNG_SAVE OR USE_SDL2_LIBS)
 	add_definitions(-DPNG_SAVE_FORMAT)
 endif()
 
