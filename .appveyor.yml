@@ -67,11 +67,13 @@ install:
 
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - if [%SDL_VER%]==[1] (set USE_SDL2_LIBS=OFF) else (set USE_SDL2_LIBS=ON)
+  - if [%SDL_VER%]==[1] (set WITH_SDL2=OFF) else (set WITH_SDL2=ON)
+  - if [%SDL_VER%]==[1] (set WITH_PNG=OFF) else (set WITH_PNG=ON)
   - cmake
       -DCMAKE_PREFIX_PATH=%BASEDIR%
       -DCMAKE_BUILD_TYPE=Release
-      -DUSE_SDL2_LIBS=%USE_SDL2_LIBS%
+      -DUSE_SDL2_LIBS=%WITH_SDL2%
+      -DUSE_PNG_SAVE=%WITH_PNG%
       -G "Visual Studio 14 2015" .
   - cmake --build . --config Release
 
