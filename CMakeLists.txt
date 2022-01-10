@@ -16,7 +16,7 @@ set(SMW_VERSION_PATCH "0")
 # Options for customizing builds
 #
 
-option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" OFF)
+option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" ON)
 option(NO_NETWORK "Disable all network communication" OFF)
 option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet, yaml-cpp)" ON)
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" ON)
@@ -39,7 +39,7 @@ if (NO_NETWORK)
 	add_definitions(-DNETWORK_DISABLED)
 endif()
 
-if (USE_PNG_SAVE OR USE_SDL2_LIBS)
+if (USE_PNG_SAVE)
 	add_definitions(-DPNG_SAVE_FORMAT)
 endif()
 
