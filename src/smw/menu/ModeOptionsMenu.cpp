@@ -431,6 +431,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     //***********************
 
     miFlagModeSpeedField = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 120, 120, "Speed", 400, 180, 380);
+    miFlagModeSpeedField->Add("-", -1, "", false, false);
     miFlagModeSpeedField->Add("0", 0, "", false, false);
     miFlagModeSpeedField->Add("1", 1, "", false, false);
     miFlagModeSpeedField->Add("2", 2, "", false, false);
