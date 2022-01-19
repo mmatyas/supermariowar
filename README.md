@@ -40,6 +40,15 @@ For me, this was the point where I've stopped putting more time on this project 
 
 [Old releases for Mario War and SMW can be found here.](https://github.com/mmatyas/supermariowar/releases/tag/1.8)
 
+### Main changes since 1.8
+
+- Experimental online mode, including an online lobby server
+- Lots and lots and lots of bugfixes (seriously, there's at least 200)
+- Added Web, ARM and (an experimental) Android ports, and improved support for Windows, Linux and OSX
+- Improved music and sound quality
+- Ported all parts of the game to SDL2, for hardware accelerated drawing and improved support for many platforms
+- Major cleanup of the source code and the build system
+
 
 ## About
 
