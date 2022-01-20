@@ -22,6 +22,7 @@ class CTileset
 		TileType GetTileType(short iTileCol, short iTileRow);
 		void SetTileType(short iTileCol, short iTileRow, TileType type);
 		TileType IncrementTileType(short iTileCol, short iTileRow);
+		TileType DecrementTileType(short iTileCol, short iTileRow);
 
 		void Draw(SDL_Surface * dstSurface, short iTileSize, SDL_Rect * srcRect, SDL_Rect * dstRect);
 

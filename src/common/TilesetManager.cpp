@@ -14,7 +14,8 @@
 /*********************************
 *  CTileset
 *********************************/
-extern TileType GetIncrementedTileType(TileType type);
+extern TileType NextTileType(TileType type);
+extern TileType PrevTileType(TileType type);
 
 CTileset::CTileset(const char * szpath)
 {
@@ -106,7 +107,15 @@ void CTileset::SetTileType(short iTileCol, short iTileRow, TileType type)
 TileType CTileset::IncrementTileType(short iTileCol, short iTileRow)
 {
 	short iTile = iTileCol + iTileRow * iWidth;
-	tiletypes[iTile] = GetIncrementedTileType(tiletypes[iTile]);
+	tiletypes[iTile] = NextTileType(tiletypes[iTile]);
+
+	return tiletypes[iTile];
+}
+
+TileType CTileset::DecrementTileType(short iTileCol, short iTileRow)
+{
+	short iTile = iTileCol + iTileRow * iWidth;
+	tiletypes[iTile] = PrevTileType(tiletypes[iTile]);
 
 	return tiletypes[iTile];
 }

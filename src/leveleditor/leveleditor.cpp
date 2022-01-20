@@ -270,7 +270,8 @@ class MapPlatform
 		SDL_Surface * preview;
 };
 
-extern TileType GetIncrementedTileType(TileType type);
+extern TileType NextTileType(TileType type);
+extern TileType PrevTileType(TileType type);
 
 TileType * animatedtiletypes;
 bool ReadAnimatedTileTypeFile(const char * szFile);
@@ -3660,11 +3661,13 @@ int editor_tiles()
 							set_tile_drag = true;
 						}
                 } else if (event.button.button == SDL_BUTTON_RIGHT) {
-						set_type = tileset->IncrementTileType(iCol, iRow);
-					}
-
-					break;
+					set_type = tileset->IncrementTileType(iCol, iRow);
+				} else if (event.button.button == SDL_BUTTON_MIDDLE) {
+					set_type = tileset->DecrementTileType(iCol, iRow);
 				}
+
+				break;
+			}
 
             case SDL_MOUSEBUTTONUP: {
 					short iCol = event.button.x / TILESIZE + view_tileset_x;
@@ -3704,13 +3707,13 @@ int editor_tiles()
 
 							if (iRow > set_tile_end_y)
 								set_tile_end_y = iRow;
-                    } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-							tileset->SetTileType(iCol, iRow, set_type);
-						}
+                    } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT) || event.motion.state == SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
+						tileset->SetTileType(iCol, iRow, set_type);
 					}
-
-					break;
 				}
+
+				break;
+			}
 
 
 				default:
@@ -4358,13 +4361,17 @@ int editor_animation()
 
 							set_tile_drag = true;
 						}
-                } else if (event.button.button == SDL_BUTTON_RIGHT) {
-						TileType * type = &animatedtiletypes[iCol + (iRow << 5)];
-						set_type = *type = GetIncrementedTileType(*type);
-					}
-
-					break;
+                }
+                else if (event.button.button == SDL_BUTTON_RIGHT) {
+					TileType * type = &animatedtiletypes[iCol + (iRow << 5)];
+					set_type = *type = NextTileType(*type);
 				}
+				else if (event.button.button == SDL_BUTTON_MIDDLE) {
+					TileType * type = &animatedtiletypes[iCol + (iRow << 5)];
+					set_type = *type = PrevTileType(*type);
+				}
+				break;
+			}
 
             case SDL_MOUSEBUTTONUP: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
@@ -4398,16 +4405,16 @@ int editor_animation()
 
 							if (iRow > set_tile_end_y)
 								set_tile_end_y = iRow;
-                    } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-							animatedtiletypes[iCol + (iRow << 5)] = set_type;
-						}
+                    } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT) || event.motion.state == SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
+						animatedtiletypes[iCol + (iRow << 5)] = set_type;
 					}
-
-					break;
 				}
 
-				default:
-					break;
+				break;
+			}
+
+			default:
+				break;
 			}
 		}
 

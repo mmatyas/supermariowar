@@ -9,6 +9,8 @@
 #include "TilesetManager.h"
 
 #include <cstdio>
+#include <algorithm>
+#include <array>
 
 //1.8.0.0 == Release to staff
 //1.8.0.1 == Second release to staff
@@ -308,48 +310,44 @@ short iCountDownRectSize[28] = {3, 2, 1, 0, 1, 2, 3, 3, 2, 1, 0, 1, 2, 3, 3, 2, 
 short iCountDownRectGroup[28] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3};
 short iCountDownAnnounce[28] = {-1, -1, -1, 12, -1, -1, -1, -1, -1, -1, 13, -1, -1, -1, -1, -1, -1, 14, -1, -1, -1, -1, -1, -1, 15, -1, -1, -1};
 
-TileType GetIncrementedTileType(TileType type)
-{
-    switch (type) {
-    case tile_nonsolid:
-        return tile_solid;
-    case tile_solid:
-        return tile_solid_on_top;
-    case tile_solid_on_top:
-        return tile_ice;
-    case tile_ice:
-        return tile_death;
-    case tile_death:
-        return tile_death_on_top;
-    case tile_death_on_top:
-        return tile_death_on_bottom;
-    case tile_death_on_bottom:
-        return tile_death_on_left;
-    case tile_death_on_left:
-        return tile_death_on_right;
-    case tile_death_on_right:
-        return tile_ice_on_top;
-    case tile_ice_on_top:
-        return tile_ice_death_on_bottom;
-    case tile_ice_death_on_bottom:
-        return tile_ice_death_on_left;
-    case tile_ice_death_on_left:
-        return tile_ice_death_on_right;
-    case tile_ice_death_on_right:
-        return tile_super_death;
-    case tile_super_death:
-        return tile_super_death_top;
-    case tile_super_death_top:
-        return tile_super_death_bottom;
-    case tile_super_death_bottom:
-        return tile_super_death_left;
-    case tile_super_death_left:
-        return tile_super_death_right;
-    case tile_super_death_right:
-        return tile_player_death;
-    case tile_player_death:
-        return tile_nonsolid;
-    }
 
-    return tile_nonsolid;
+const std::array<TileType, 19> ordered_tile_types {
+    tile_nonsolid,
+    tile_solid,
+    tile_solid_on_top,
+    tile_ice,
+    tile_death,
+    tile_death_on_top,
+    tile_death_on_bottom,
+    tile_death_on_left,
+    tile_death_on_right,
+    tile_ice_on_top,
+    tile_ice_death_on_bottom,
+    tile_ice_death_on_left,
+    tile_ice_death_on_right,
+    tile_super_death,
+    tile_super_death_top,
+    tile_super_death_bottom,
+    tile_super_death_left,
+    tile_super_death_right,
+    tile_player_death,
+};
+
+TileType NextTileType(TileType type)
+{
+    auto it = std::find(ordered_tile_types.cbegin(), ordered_tile_types.cend(), type);
+    if (it == ordered_tile_types.cend())
+        return tile_nonsolid;
+
+    ++it;
+    return it == ordered_tile_types.cend() ? ordered_tile_types.front() : *it;
+}
+
+TileType PrevTileType(TileType type)
+{
+    auto it = std::find(ordered_tile_types.cbegin(), ordered_tile_types.cend(), type);
+    if (it == ordered_tile_types.cend())
+        return tile_nonsolid;
+
+    return it == ordered_tile_types.cbegin() ? ordered_tile_types.back() : *(--it);
 }
