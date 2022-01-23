@@ -27,14 +27,14 @@ struct STextAward {
 
 #define PAWARD_LAST     9
 const STextAward awardtexts[PAWARD_LAST] = {
-    STextAward("Double Kill", false),
-    STextAward("Triple Kill", false),
-    STextAward("Killing Spree",  false),
-    STextAward("Killing Spree x 2", false),
-    STextAward("Killing Spree x 3", false),
-    STextAward("Dominating", true),
-    STextAward("Dominating x 2", true),
-    STextAward("Dominating x 3", true),
+    STextAward("Nice!", false),
+    STextAward("Cool!", false),
+    STextAward("Good!",  false),
+    STextAward("Great!", false),
+    STextAward("Amazing!", false),
+    STextAward("Awesome!", true),
+    STextAward("Excellent!", true),
+    STextAward("Dominating!", true),
     STextAward("Unstoppable!", true)
 };
 
@@ -238,10 +238,10 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, killst
             //if we stopped the other players run show another award
             if (killed && killed->killsinrow >= 2) {
                 short a = (killed->killsinrow - 2) >= PAWARD_LAST ? PAWARD_LAST -1 : (killed->killsinrow - 2);
-                char text[128];
-                sprintf(text, "%s Stopped!",  awardtexts[a].name);
+                //char text[128];
+                //sprintf(text, "%s Stopped!",  awardtexts[a].name);
 
-                eyecandy[2].add(new EC_GravText(awardtexts[a].large ? &rm->game_font_large : &rm->game_font_small, killed->centerX(), killed->bottomY(), text, -VELJUMP*1.3f));
+                eyecandy[2].add(new EC_GravText(awardtexts[a].large ? &rm->game_font_large : &rm->game_font_small, killed->centerX(), killed->bottomY(), "Combo Broken!", -VELJUMP*1.3f));
             }
         }
     }
