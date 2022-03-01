@@ -1,0 +1,33 @@
+name: Build - MacOS
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  macos:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Install dependencies
+        run: brew install SDL2 SDL2_image SDL2_mixer
+
+      - run: mkdir build
+      - run: cmake -D USE_SDL2_LIBS:BOOL=ON -DUSE_PNG_SAVE=ON ..
+        working-directory: build
+      - run: make
+        working-directory: build
+
+      - name: Package
+        run: |
+          mkdir supermariowar
+          cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server} supermariowar/
+          strip supermariowar/*
+          cp docs/readme-v1.8.html supermariowar/
+          rsync -aC --exclude .git data supermariowar/
+          zip -r "supermariowar_$(date +%F)_macos.zip" supermariowar
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: supermariowar_macos
+          path: supermariowar_*_macos.zip
