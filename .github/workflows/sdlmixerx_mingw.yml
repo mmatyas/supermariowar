@@ -1,0 +1,51 @@
+name: SDL Mixer X - Windows
+
+on: [workflow_dispatch]
+
+jobs:
+  mingw-cross:
+    runs-on: ubuntu-latest
+    env:
+      SDL2DIR: /usr/
+      CXX: i686-w64-mingw32-g++-posix
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y
+          cmake
+          g++-mingw-w64-i686
+      - name: Get SDL2
+        run: |
+          curl -L https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/i686-w64-mingw32_mixerx.tar.xz | tar xJf - -C /tmp/
+          echo '/tmp/i686-w64-mingw32/usr/bin' >> $GITHUB_PATH
+      - name: Get SDL Mixer X
+        run: git clone --depth=1 https://github.com/WohlSoft/SDL-Mixer-X.git
+      - run: |
+          $CXX --version
+          cmake --version
+          mkdir build
+
+      - name: Configure
+        working-directory: build
+        env:
+          PKG_CONFIG_LIBDIR: /tmp/i686-w64-mingw32/usr/lib/pkgconfig
+          LDFLAGS: -L/tmp/i686-w64-mingw32/usr/lib
+          CPPFLAGS: -I/tmp/i686-w64-mingw32/usr/include
+          CFLAGS: --sysroot=/tmp/i686-w64-mingw32
+        run: cmake ../SDL-Mixer-X
+          -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/mingw_toolchain.cmake
+          -DCMAKE_INSTALL_PREFIX=/usr
+          -DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON
+          -DUSE_SYSTEM_SDL2=ON
+      - name: Build
+        working-directory: build
+        run: |
+          make
+          make install DESTDIR=/tmp/sdlmixerx
+          zip -r "sdlmixerx_$(date +%F)_windows.zip" /tmp/sdlmixerx
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: sdlmixerx_windows
+          path: /tmp/sdlmixerx_*.zip
