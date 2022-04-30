@@ -30,8 +30,8 @@ jobs:
         env:
           PKG_CONFIG_LIBDIR: /tmp/i686-w64-mingw32/usr/lib/pkgconfig
           LDFLAGS: -L/tmp/i686-w64-mingw32/usr/lib
-          CPPFLAGS: -I/tmp/i686-w64-mingw32/usr/include
-          CFLAGS: --sysroot=/tmp/i686-w64-mingw32
+          CXXFLAGS: --sysroot=/tmp/i686-w64-mingw32 -I/tmp/i686-w64-mingw32/usr/include
+          CFLAGS: --sysroot=/tmp/i686-w64-mingw32 -I/tmp/i686-w64-mingw32/usr/include
         run: cmake ../SDL-Mixer-X
           -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/mingw_toolchain.cmake
           -DCMAKE_INSTALL_PREFIX=/usr
