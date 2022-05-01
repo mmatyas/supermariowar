@@ -17,6 +17,7 @@ jobs:
       - name: Get SDL2
         run: |
           curl -L https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/i686-w64-mingw32_mixerx.tar.xz | tar xJf - -C /tmp/
+          sed -i 's|set(prefix.*|set(prefix "/tmp/i686-w64-mingw32/usr")|' /tmp/i686-w64-mingw32/usr/lib/cmake/SDL2/sdl2-config.cmake
           echo '/tmp/i686-w64-mingw32/usr/bin' >> $GITHUB_PATH
       - name: Get SDL Mixer X
         run: git clone --depth=1 https://github.com/WohlSoft/SDL-Mixer-X.git
