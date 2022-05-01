@@ -23,18 +23,11 @@ jobs:
       - run: |
           $CXX --version
           cmake --version
-          mkdir build
 
       - name: Configure
-        working-directory: build
-        env:
-          PKG_CONFIG_LIBDIR: /tmp/i686-w64-mingw32/usr/lib/pkgconfig
-          LDFLAGS: -L/tmp/i686-w64-mingw32/usr/lib
-          CXXFLAGS: --sysroot=/tmp/i686-w64-mingw32 -I/tmp/i686-w64-mingw32/usr/include
-          CFLAGS: --sysroot=/tmp/i686-w64-mingw32 -I/tmp/i686-w64-mingw32/usr/include
-        run: cmake ../SDL-Mixer-X
+        run: cmake -B build
           -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/mingw_toolchain.cmake
-          -DCMAKE_INSTALL_PREFIX=/usr
+          -DCMAKE_INSTALL_PREFIX=/tmp/i686-w64-mingw32/usr
           -DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON
           -DUSE_SYSTEM_SDL2=ON
       - name: Build
