@@ -23,9 +23,11 @@ jobs:
       - run: |
           $CXX --version
           cmake --version
+          mkdir build
 
       - name: Configure
-        run: cmake -B build
+        working-directory: build
+        run: cmake ../SDL-Mixer-X
           -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/mingw_toolchain.cmake
           -DCMAKE_INSTALL_PREFIX=/tmp/i686-w64-mingw32/usr
           -DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON
