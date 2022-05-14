@@ -3,6 +3,8 @@
 #include "FileIO.h"
 #include "map.h"
 
+#include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <cstring>
 
@@ -150,27 +152,7 @@ void CTileset::SaveTileset()
 
 CTilesetManager::CTilesetManager() :
 	SimpleDirectoryList(convertPath("gfx/packs/Classic/tilesets/"))
-{
-	short y1 = 0, y2 = 0, y3 = 0;
-    for (short i = 0; i < 32; i++) {
-		short x1 = 0, x2 = 0, x3 = 0;
-        for (short j = 0; j < 32; j++) {
-			gfx_setrect(&rRects[0][j][i], x1, y1, TILESIZE, TILESIZE);
-			gfx_setrect(&rRects[1][j][i], x2, y2, PREVIEWTILESIZE, PREVIEWTILESIZE);
-			gfx_setrect(&rRects[2][j][i], x3, y3, THUMBTILESIZE, THUMBTILESIZE);
-
-			x1 += TILESIZE;
-			x2 += PREVIEWTILESIZE;
-			x3 += THUMBTILESIZE;
-		}
-
-		y1 += TILESIZE;
-		y2 += PREVIEWTILESIZE;
-		y3 += THUMBTILESIZE;
-	}
-
-	tClassicTileset = NULL;
-}
+{}
 
 CTilesetManager::~CTilesetManager()
 {}
@@ -234,6 +216,40 @@ void CTilesetManager::Init(const char * szGfxPack)
 			}
 		}
 	}
+
+	InitTilesetRects();
+}
+
+void CTilesetManager::InitTilesetRects()
+{
+	size_t max_tileset_rows = 0;
+	for (CTileset* tileset : tilesetlist) {
+		max_tileset_rows = std::max<size_t>(max_tileset_rows, tileset->GetHeight());
+		max_tileset_cols = std::max<size_t>(max_tileset_cols, tileset->GetWidth());
+	}
+
+	const size_t tile_count = max_tileset_rows * max_tileset_cols;
+	rects_ingame.reserve(tile_count);
+	rects_preview.reserve(tile_count);
+	rects_thumb.reserve(tile_count);
+
+	short y1 = 0, y2 = 0, y3 = 0;
+	for (size_t row = 0; row < max_tileset_rows; row++) {
+		short x1 = 0, x2 = 0, x3 = 0;
+		for (size_t col = 0; col < max_tileset_cols; col++) {
+			rects_ingame.emplace_back(SDL_Rect { x1, y1, TILESIZE, TILESIZE });
+			rects_preview.emplace_back(SDL_Rect { x2, y2, PREVIEWTILESIZE, PREVIEWTILESIZE });
+			rects_thumb.emplace_back(SDL_Rect { x3, y3, THUMBTILESIZE, THUMBTILESIZE });
+
+			x1 += TILESIZE;
+			x2 += PREVIEWTILESIZE;
+			x3 += THUMBTILESIZE;
+		}
+
+		y1 += TILESIZE;
+		y2 += PREVIEWTILESIZE;
+		y3 += THUMBTILESIZE;
+	}
 }
 
 short CTilesetManager::GetIndexFromName(const char * szName)
@@ -250,7 +266,17 @@ short CTilesetManager::GetIndexFromName(const char * szName)
 
 void CTilesetManager::Draw(SDL_Surface * dstSurface, short iTilesetID, short iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow)
 {
-	tilesetlist[iTilesetID]->Draw(dstSurface, iTileSize, &rRects[iTileSize][iSrcTileCol][iSrcTileRow], &rRects[iTileSize][iDstTileCol][iDstTileRow]);
+	assert(0 <= iTilesetID && static_cast<size_t>(iTilesetID) < tilesetlist.size());
+	assert(iSrcTileCol >= 0 && iSrcTileRow >= 0);
+	assert(iDstTileCol >= 0 && iDstTileRow >= 0);
+
+	const size_t src_rect_idx = iSrcTileRow * max_tileset_cols + iSrcTileCol;
+	const size_t dst_rect_idx = iDstTileRow * max_tileset_cols + iDstTileCol;
+
+	SDL_Rect* src_rect = GetRect(iTileSize, src_rect_idx);
+	SDL_Rect* dst_rect = GetRect(iTileSize, dst_rect_idx);
+
+	tilesetlist[iTilesetID]->Draw(dstSurface, iTileSize, src_rect, dst_rect);
 }
 
 CTileset * CTilesetManager::GetTileset(short iTilesetID)
@@ -259,6 +285,25 @@ CTileset * CTilesetManager::GetTileset(short iTilesetID)
 		return NULL;
 
 	return tilesetlist[iTilesetID];
+}
+
+SDL_Rect* CTilesetManager::GetRect(short size_id, short col, short row)
+{
+	const size_t rect_idx = row * max_tileset_cols + col;
+	return GetRect(size_id, rect_idx);
+}
+
+SDL_Rect* CTilesetManager::GetRect(short size_id, size_t idx)
+{
+	assert(0 <= size_id && size_id < 3);
+	assert(idx < rects_ingame.size());
+
+	switch (size_id) {
+		case 0: return &rects_ingame[idx];
+		case 1: return &rects_preview[idx];
+		case 2: return &rects_thumb[idx];
+		default: return nullptr;
+	}
 }
 
 void CTilesetManager::SaveTilesets()

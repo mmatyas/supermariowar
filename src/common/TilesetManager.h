@@ -78,12 +78,20 @@ class CTilesetManager : public SimpleDirectoryList
     }
 
 		CTileset * GetTileset(short iID);
-		SDL_Rect rRects[3][32][32];
+		SDL_Rect* GetRect(short size_id, short col, short row);
+		SDL_Rect* GetRect(short size_id, size_t idx);
 
     private:
         std::vector<CTileset*> tilesetlist;
-		CTileset * tClassicTileset;
+		CTileset* tClassicTileset = nullptr;
 		short iClassicTilesetIndex;
+
+		std::vector<SDL_Rect> rects_ingame;
+		std::vector<SDL_Rect> rects_preview;
+		std::vector<SDL_Rect> rects_thumb;
+		size_t max_tileset_cols = 0;
+
+		void InitTilesetRects();
 };
 
 #endif // TILESETMANAGER_H

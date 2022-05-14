@@ -239,12 +239,12 @@ class MapPlatform
 
 					SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
                 if (tile->iID >= 0) {
-						SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(2), &g_tilesetmanager->rRects[2][tile->iCol][tile->iRow], preview, &bltrect);
+						SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(2), g_tilesetmanager->GetRect(2, tile->iCol, tile->iRow), preview, &bltrect);
                 } else if (tile->iID == TILESETANIMATED) {
-						SDL_BlitSurface(rm->spr_tileanimation[2].getSurface(), &g_tilesetmanager->rRects[2][tile->iCol << 2][tile->iRow], preview, &bltrect);
+						SDL_BlitSurface(rm->spr_tileanimation[2].getSurface(), g_tilesetmanager->GetRect(2, tile->iCol * 4, tile->iRow), preview, &bltrect);
                 } else if (tile->iID == TILESETUNKNOWN) {
 						//Draw unknown tile
-						SDL_BlitSurface(rm->spr_unknowntile[2].getSurface(), &g_tilesetmanager->rRects[2][0][0], preview, &bltrect);
+						SDL_BlitSurface(rm->spr_unknowntile[2].getSurface(), g_tilesetmanager->GetRect(2, 0, 0), preview, &bltrect);
 					}
 				}
 			}
@@ -1708,7 +1708,7 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 
             if (tile->iID >= 0) {
 				g_tilesetmanager->Draw(screen, tile->iID, iTilesetIndex, tile->iCol, tile->iRow, i, j);
-				//SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iTilesetIndex), &g_tilesetmanager->rRects[iTilesetIndex][tile->iCol][tile->iRow], screen, &bltrect);
+				//SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iTilesetIndex), g_tilesetmanager->GetRect(iTilesetIndex, tile->iCol, tile->iRow), screen, &bltrect);
             } else if (tile->iID == TILESETANIMATED) {
 				short iSrcCol = tile->iCol << 2;
 				short iSrcRow = tile->iRow;
@@ -1718,9 +1718,9 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 					iSrcRow = 0;
 				}
 
-				SDL_BlitSurface(rm->spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][iSrcCol][iSrcRow], screen, &g_tilesetmanager->rRects[iTilesetIndex][i][j]);
+				SDL_BlitSurface(rm->spr_tileanimation[iTilesetIndex].getSurface(), g_tilesetmanager->GetRect(iTilesetIndex, iSrcCol, iSrcRow), screen, g_tilesetmanager->GetRect(iTilesetIndex, i, j));
             } else if (tile->iID == TILESETUNKNOWN) {
-				SDL_BlitSurface(rm->spr_unknowntile[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][0][0], screen, &g_tilesetmanager->rRects[iTilesetIndex][i][j]);
+				SDL_BlitSurface(rm->spr_unknowntile[iTilesetIndex].getSurface(), g_tilesetmanager->GetRect(iTilesetIndex, 0, 0), screen, g_tilesetmanager->GetRect(iTilesetIndex, i, j));
 			}
 		}
 	}
@@ -1808,7 +1808,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 						rSrc.y = iBlockSize << 1;
 					}
 
-					SDL_BlitSurface(rm->spr_blocks[iTilesizeIndex].getSurface(), &rSrc, screen, &g_tilesetmanager->rRects[iTilesizeIndex][i][j]);
+					SDL_BlitSurface(rm->spr_blocks[iTilesizeIndex].getSurface(), &rSrc, screen, g_tilesetmanager->GetRect(iTilesizeIndex, i, j));
 				}
 			}
 		}
@@ -3019,7 +3019,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 
             if (tile->iID >= 0) {
 				g_tilesetmanager->Draw(screen, tile->iID, 0, tile->iCol, tile->iRow, iCol, iRow);
-				//SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(0), &g_tilesetmanager->rRects[0][tile->iCol][tile->iRow], screen, &bltrect);
+				//SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(0), g_tilesetmanager->GetRect(0, tile->iCol, tile->iRow), screen, &bltrect);
             } else if (tile->iID == TILESETANIMATED) {
 				short iSrcCol = tile->iCol << 2;
 				short iSrcRow = tile->iRow;
@@ -3029,9 +3029,9 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 					iSrcRow = 0;
 				}
 
-				SDL_BlitSurface(rm->spr_tileanimation[0].getSurface(), &g_tilesetmanager->rRects[0][iSrcCol][iSrcRow], screen, &g_tilesetmanager->rRects[0][iCol][iRow]);
+				SDL_BlitSurface(rm->spr_tileanimation[0].getSurface(), g_tilesetmanager->GetRect(0, iSrcCol, iSrcRow), screen, g_tilesetmanager->GetRect(0, iCol, iRow));
             } else if (tile->iID == TILESETUNKNOWN) {
-				SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], screen, &g_tilesetmanager->rRects[0][iCol][iRow]);
+				SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->GetRect(0, 0, 0), screen, g_tilesetmanager->GetRect(0, iCol, iRow));
 			}
 
             if (fDrawTileTypes) {

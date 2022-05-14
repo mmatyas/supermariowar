@@ -280,12 +280,12 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
                 SDL_Rect bltrect = {iDstX, iDstY, iTileSize, iTileSize};
                 if (tile->iID >= 0) {
-                    SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
+                    SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), g_tilesetmanager->GetRect(iSize, tile->iCol, tile->iRow), blitdest, &bltrect);
                 } else if (tile->iID == TILESETANIMATED) {
-                    SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
+                    SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), g_tilesetmanager->GetRect(iSize, tile->iCol * 4, tile->iRow), blitdest, &bltrect);
                 } else if (tile->iID == TILESETUNKNOWN) {
                     //Draw unknown tile
-                    SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
+                    SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), g_tilesetmanager->GetRect(iSize, 0, 0), blitdest, &bltrect);
                 }
 
                 bool fNeedWrap = false;
@@ -304,11 +304,11 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                     bltrect.h = iTileSize;
 
                     if (tile->iID >= 0)
-                        SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
+                        SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), g_tilesetmanager->GetRect(iSize, tile->iCol, tile->iRow), blitdest, &bltrect);
                     else if (tile->iID == TILESETANIMATED)
-                        SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
+                        SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), g_tilesetmanager->GetRect(iSize, tile->iCol * 4, tile->iRow), blitdest, &bltrect);
                     else if (tile->iID == TILESETUNKNOWN)
-                        SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
+                        SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), g_tilesetmanager->GetRect(iSize, 0, 0), blitdest, &bltrect);
                 }
             }
         }
@@ -1708,7 +1708,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
                     animatedtiles.push_back(animatedtile);
                 }
             } else if (tile->iID == TILESETUNKNOWN) { //Draw red X where tile should be
-                SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], targetSurface, &bltrect);
+                SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->GetRect(0, 0, 0), targetSurface, &bltrect);
             }
         }
 
@@ -1942,9 +1942,9 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
                 g_tilesetmanager->Draw(targetSurface, tile->iID, iTilesetSize, tile->iCol, tile->iRow, i, j);
                 // SDL_BlitSurface(rm->spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetSize][tile->iCol][tile->iRow], targetSurface, &rectDst);
             } else if (tile->iID == TILESETANIMATED) {
-                SDL_BlitSurface(rm->spr_tileanimation[iTilesetSize].getSurface(), &g_tilesetmanager->rRects[iTilesetSize][tile->iCol << 2][tile->iRow], targetSurface, &g_tilesetmanager->rRects[iTilesetSize][i][j]);
+                SDL_BlitSurface(rm->spr_tileanimation[iTilesetSize].getSurface(), g_tilesetmanager->GetRect(iTilesetSize, tile->iCol * 4, tile->iRow), targetSurface, g_tilesetmanager->GetRect(iTilesetSize, i, j));
             } else if (tile->iID == TILESETUNKNOWN) {
-                SDL_BlitSurface(rm->spr_unknowntile[iTilesetSize].getSurface(), &g_tilesetmanager->rRects[iTilesetSize][0][0], targetSurface, &g_tilesetmanager->rRects[iTilesetSize][i][j]);
+                SDL_BlitSurface(rm->spr_unknowntile[iTilesetSize].getSurface(), g_tilesetmanager->GetRect(iTilesetSize, 0, 0), targetSurface, g_tilesetmanager->GetRect(iTilesetSize, i, j));
             }
         }
     }
@@ -2112,7 +2112,7 @@ void CMap::SetupAnimatedTiles()
                         } else if (tilesetTile->iID == TILESETANIMATED) {
                             SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
-                            SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], animatedTilesSurface, &rDst);
+                            SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->GetRect(0, 0, 0), animatedTilesSurface, &rDst);
                         }
                     }
 
@@ -2148,7 +2148,7 @@ void CMap::SetupAnimatedTiles()
                         } else if (tilesetTile->iID == TILESETANIMATED) {
                             SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
-                            SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], animatedTilesSurface, &rDst);
+                            SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->GetRect(0, 0, 0), animatedTilesSurface, &rDst);
                         }
                     }
 
