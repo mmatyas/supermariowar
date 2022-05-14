@@ -32,8 +32,10 @@ CTileset::CTileset(const char * szpath)
 
 	sSurfaces[0] = sSprites[0].getSurface(); //optimization for repeat surface use
 
-	iWidth = sSprites[0].getWidth() / TILESIZE;
-	iHeight = sSprites[0].getHeight() / TILESIZE;
+	// The map format supports tilesets with up to 128x128 tiles, ignore the rest
+	constexpr int MAX_TILES_PER_AXIS = 128;
+	iWidth = std::min(sSprites[0].getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
+	iHeight = std::min(sSprites[0].getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/medium.png");
