@@ -13,6 +13,10 @@
 #endif
 
 
+// The map format supports tilesets with up to 128x128 tiles
+constexpr int MAX_TILES_PER_AXIS = 128;
+
+
 /*********************************
 *  CTileset
 *********************************/
@@ -32,10 +36,9 @@ CTileset::CTileset(const char * szpath)
 
 	sSurfaces[0] = sSprites[0].getSurface(); //optimization for repeat surface use
 
-	// The map format supports tilesets with up to 128x128 tiles, ignore the rest
-	constexpr int MAX_TILES_PER_AXIS = 128;
 	iWidth = std::min(sSprites[0].getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
 	iHeight = std::min(sSprites[0].getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
+	tiletypes = std::vector<TileType>(iWidth * iHeight, tile_nonsolid);
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/medium.png");
@@ -58,59 +61,52 @@ CTileset::CTileset(const char * szpath)
 
 bool CTileset::ReadTileTypeFile(char * szFile)
 {
+	constexpr int MAX_TILES = MAX_TILES_PER_AXIS * MAX_TILES_PER_AXIS;
+
 	//Detect if the tiletype file already exists, if not create it
-    if (File_Exists(szFile)) {
-		BinaryFile tsf(szFile, "rb");
-        if (!tsf.is_open()) {
-			printf("ERROR: couldn't open tileset file: %s\n", szFile);
-			return false;
-		}
+	if (!File_Exists(szFile))
+		return true;
 
-		iTileTypeSize = tsf.read_i32();
-
-        if (iTileTypeSize <= 0 || iTileTypeSize > 1024) {
-			return false;
-		}
-
-		tiletypes = new TileType[iTileTypeSize];
-
-        for (short i = 0; i < iTileTypeSize; i++) {
-			tiletypes[i] = (TileType)tsf.read_i32();
-		}
-    } else {
-		iTileTypeSize = iWidth * iHeight;
-		tiletypes = new TileType[iTileTypeSize];
-
-        for (short i = 0; i < iTileTypeSize; i++) {
-			tiletypes[i] = tile_nonsolid;
-		}
+	BinaryFile tsf(szFile, "rb");
+	if (!tsf.is_open()) {
+		printf("ERROR: couldn't open tileset file: %s\n", szFile);
+		return false;
 	}
+
+	int tiletype_count = tsf.read_i32();
+	if (tiletype_count <= 0 || tiletype_count > MAX_TILES)
+		return false;
+
+	tiletype_count = std::min<int>(tiletype_count, tiletypes.size());
+	for (short i = 0; i < tiletype_count; i++)
+		tiletypes[i] = static_cast<TileType>(tsf.read_i32());
 
 	return true;
 }
 
 
 CTileset::~CTileset()
-{
-	if (tiletypes)
-		delete [] tiletypes;
-
-	tiletypes = NULL;
-}
+{}
 
 TileType CTileset::GetTileType(short iTileCol, short iTileRow)
 {
+	assert(iTileCol >= 0 && iTileRow >= 0);
+	assert(iTileCol + iTileRow * iWidth < tiletypes.size());
 	return tiletypes[iTileCol + iTileRow * iWidth];
 }
 
 void CTileset::SetTileType(short iTileCol, short iTileRow, TileType type)
 {
+	assert(iTileCol >= 0 && iTileRow >= 0);
+	assert(iTileCol + iTileRow * iWidth < tiletypes.size());
 	tiletypes[iTileCol + iTileRow * iWidth] = type;
 }
 
 TileType CTileset::IncrementTileType(short iTileCol, short iTileRow)
 {
+	assert(iTileCol >= 0 && iTileRow >= 0);
 	short iTile = iTileCol + iTileRow * iWidth;
+	assert(iTile < tiletypes.size());
 	tiletypes[iTile] = NextTileType(tiletypes[iTile]);
 
 	return tiletypes[iTile];
@@ -118,7 +114,9 @@ TileType CTileset::IncrementTileType(short iTileCol, short iTileRow)
 
 TileType CTileset::DecrementTileType(short iTileCol, short iTileRow)
 {
+	assert(iTileCol >= 0 && iTileRow >= 0);
 	short iTile = iTileCol + iTileRow * iWidth;
+	assert(iTile < tiletypes.size());
 	tiletypes[iTile] = PrevTileType(tiletypes[iTile]);
 
 	return tiletypes[iTile];
@@ -132,16 +130,15 @@ void CTileset::Draw(SDL_Surface * dstSurface, short iTileSize, SDL_Rect * srcRec
 void CTileset::SaveTileset()
 {
 	BinaryFile tsf(szTilesetPath, "wb");
-    if (!tsf.is_open()) {
+	if (!tsf.is_open()) {
 		printf("ERROR: couldn't open tileset file to save tile types: %s\n", szTilesetPath);
 		return;
 	}
 
-	tsf.write_i32(iTileTypeSize);
+	tsf.write_i32(tiletypes.size());
 
-    for (short i = 0; i < iTileTypeSize; i++) {
-		tsf.write_i32(tiletypes[i]);
-	}
+	for (TileType tiletype : tiletypes)
+		tsf.write_i32(tiletype);
 
 #if defined(__APPLE__)
 	chmod(szTilesetPath, S_IRWXU | S_IRWXG | S_IROTH);

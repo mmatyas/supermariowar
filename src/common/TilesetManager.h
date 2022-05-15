@@ -42,17 +42,14 @@ class CTileset
 
 	private:
 		char szName[256];
+		char szTilesetPath[1024];
+		char szGfxPack[256];
+
 		SDL_Surface * sSurfaces[3];
 		gfxSprite sSprites[3];
 
-		short iTileTypeSize;
-		char szTilesetPath[1024];
-
 		short iWidth, iHeight;
-
-		char szGfxPack[256];
-
-		TileType * tiletypes;
+		std::vector<TileType> tiletypes;
 };
 
 

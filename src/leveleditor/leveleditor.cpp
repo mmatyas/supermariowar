@@ -3543,7 +3543,7 @@ void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
 	}
 }
 
-CTileset * tileset;
+CTileset * tileset = nullptr;
 short view_tileset_repeat_direction = -1;
 short view_tileset_repeat_timer = 0;
 
