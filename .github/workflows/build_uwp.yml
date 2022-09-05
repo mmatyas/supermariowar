@@ -1,0 +1,39 @@
+name: Build - UWP
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  uwp:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup environment
+      uses: TheMrMilchmann/setup-msvc-dev@v2.0.0
+      with:
+        uwp: true
+        arch: x64
+
+    - name: Install vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg
+        cd vcpkg
+        bootstrap-vcpkg.bat -disableMetrics
+
+    - name: Install dependencies
+      working-directory: vcpkg
+      run: vcpkg install libpng yaml-cpp zlib sdl2 sdl2-image sdl2-mixer --triplet=x64-uwp
+
+    - name: Create build directory
+      run: mkdir build
+
+    - name: Configure
+      working-directory: build
+      run: |
+        # Enet does not currently build for UWP
+        cmake .. -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DNO_NETWORK=ON
+
+    - name: Build
+      working-directory: build
+      run: cmake --build
