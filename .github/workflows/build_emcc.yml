@@ -4,9 +4,9 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   emscripten:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Install Emscripten
@@ -26,5 +26,5 @@ jobs:
           emcc -v
           sed -i 's|if (BUILD_STATIC_LIBS)|if (BUILD_STATIC_LIBS)\ninclude_directories(dependencies/SDL2_mixer-2.0.4)|' CMakeLists.txt
           mkdir build_js && cd build_js
-          emconfigure cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
+          emconfigure cmake .. -DSMW_OLD_STYLE_DEPS=ON -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
           emmake make smw

@@ -4,19 +4,19 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   macos:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Install dependencies
         run: brew install SDL2 SDL2_image SDL2_mixer
 
-      - run: mkdir build
-      - run: cmake -D USE_SDL2_LIBS:BOOL=ON -DUSE_PNG_SAVE=ON ..
-        working-directory: build
-      - run: make
-        working-directory: build
+      - name: Configure
+        run: cmake -B build -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON
+
+      - name: Build
+        run: cmake --build build
 
       - name: Package
         run: |
@@ -26,8 +26,9 @@ jobs:
           cp docs/readme-v1.8.html supermariowar/
           rsync -aC --exclude .git data supermariowar/
           zip -r "supermariowar_$(date +%F)_macos.zip" supermariowar
+
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: supermariowar_macos
           path: supermariowar_*_macos.zip

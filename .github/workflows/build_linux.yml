@@ -4,14 +4,12 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         sdl: [1, 2]
-    env:
-      CXX: g++
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Install dependencies
@@ -26,27 +24,22 @@ jobs:
           libsdl2-mixer-dev
           libegl1-mesa-dev
           libgles2-mesa-dev
-      - run: |
-          $CXX --version
-          cmake --version
-          mkdir build
-
-      - name: Configure
-        if: matrix.sdl == 1
-        working-directory: build
+          ninja-build
+      - name: Version checks
         run: |
           sdl-config --version
-          cmake -D USE_SDL2_LIBS:BOOL=OFF -D USE_PNG_SAVE:BOOL=OFF ..
-      - name: Configure
-        if: matrix.sdl == 2
-        working-directory: build
-        run: |
           sdl2-config --version
-          cmake -D USE_SDL2_LIBS:BOOL=ON -DUSE_PNG_SAVE=ON ..
+          cmake --version
+
+      - name: Configure with SDL1
+        if: matrix.sdl == 1
+        run: cmake -B build -G Ninja -DSMW_OLD_STYLE_DEPS=ON -DUSE_SDL2_LIBS=OFF -DUSE_PNG_SAVE=OFF
+      - name: Configure with SDL2
+        if: matrix.sdl == 2
+        run: cmake -B build -G Ninja -DSMW_OLD_STYLE_DEPS=ON -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON
 
       - name: Build
-        working-directory: build
-        run: make
+        run: cmake --build build
 
       - name: Package
         if: matrix.sdl == 2
@@ -60,7 +53,7 @@ jobs:
 
       - name: Upload artifacts
         if: matrix.sdl == 2
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: supermariowar_linux
           path: supermariowar_*_linux.zip

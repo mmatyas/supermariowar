@@ -5,7 +5,7 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   android:
     if: false
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: android-actions/setup-android@v2
       - name: Install Android SDK
