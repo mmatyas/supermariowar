@@ -1,28 +1,20 @@
-set(LEVELEDIT_SRCS leveleditor.cpp)
-
-# Add EXE icon on Windows
+add_executable(smw-leveledit WIN32
+	../common/movingplatform.cpp
+	../smw/FPSLimiter.cpp
+	leveleditor.cpp
+)
 if (WIN32)
-	LIST(APPEND LEVELEDIT_SRCS "${PROJECT_SOURCE_DIR}/resources/windows/smw-leveledit.rc")
+	# Add EXE icon on Windows
+	target_sources(smw-leveledit PRIVATE "${PROJECT_SOURCE_DIR}/resources/windows/smw-leveledit.rc")
 endif()
 
-add_executable(smw-leveledit WIN32 ../common/movingplatform.cpp ../smw/FPSLimiter.cpp ${LEVELEDIT_SRCS})
 target_link_libraries(smw-leveledit CommonFiles)
-
-#
-# Dependencies
-#
-
-if(USE_SDL2_LIBS)
-	target_link_libraries(smw-leveledit ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
-else()
-	target_link_libraries(smw-leveledit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
-endif()
 
 #
 # Installation
 #
 
-install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw-leveledit" DESTINATION ${SMW_BINDIR})
+install(TARGETS smw-leveledit DESTINATION "${SMW_BINDIR}")
 
 # install Linux desktop item and icons
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

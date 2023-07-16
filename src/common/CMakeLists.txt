@@ -1,4 +1,4 @@
-set(COMMON_SRCS
+add_library(CommonFiles
     CmdArgs.cpp
     dirlist.cpp
     eyecandy.cpp
@@ -37,7 +37,40 @@ set(COMMON_SRCS
 )
 
 if (USE_PNG_SAVE AND NOT USE_SDL2_LIBS)
-    list(APPEND COMMON_SRCS savepng.cpp)
+    target_sources(CommonFiles PRIVATE savepng.cpp)
 endif()
 
-add_library(CommonFiles ${COMMON_SRCS})
+
+if (USE_SDL2_LIBS)
+    if(SMW_OLD_STYLE_DEPS)
+        target_link_libraries(CommonFiles
+            ${SDL2_LIBRARY}
+            ${SDL2MIXER_LIBRARY}
+            ${SDL2IMAGE_LIBRARY}
+            ${SDL2MAIN_LIBRARY}
+        )
+        target_include_directories(CommonFiles PUBLIC
+            ${SDL2_INCLUDE_DIR}
+            ${SDL2_MIXER_INCLUDE_DIRS}
+            ${SDL2_IMAGE_INCLUDE_DIRS}
+        )
+    else()
+        target_link_libraries(CommonFiles
+            SDL2::SDL2main
+            SDL2::SDL2
+            SDL2_image::SDL2_image
+        )
+        if (SDL2_USE_MIXERX)
+            target_link_libraries(CommonFiles SDL2_mixer_ext::SDL2_mixer_ext)
+        else()
+            target_link_libraries(CommonFiles SDL2_mixer::SDL2_mixer)
+        endif()
+    endif()
+else()
+    target_link_libraries(CommonFiles
+        ${SDL_LIBRARY}
+        ${SDLMIXER_LIBRARY}
+        ${SDLIMAGE_LIBRARY}
+        ${SDLMAIN_LIBRARY}
+    )
+endif()

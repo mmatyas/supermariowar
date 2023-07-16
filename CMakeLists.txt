@@ -4,7 +4,7 @@
 #
 #-----------------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.16)
 
 project(smw)
 
@@ -100,25 +100,16 @@ endif()
 
 if (NOT DISABLE_SYSLIB_CHECKS)
 	find_package(ZLIB REQUIRED)
-	include_directories(${ZLIB_INCLUDE_DIR})
 
 	if (USE_SDL2_LIBS)
 		# add all SDL2 dependencies
 		find_package(SDL2 REQUIRED)
 		find_package(SDL2_image REQUIRED)
 		if (SDL2_USE_MIXERX)
-			find_package(PkgConfig REQUIRED)
-			pkg_check_modules(SDL2MIXER REQUIRED SDL2_mixer_ext)
-			link_directories(${SDL2MIXER_LIBRARY_DIRS})
+			find_package(SDL2_mixer_ext REQUIRED)
 		else()
 			find_package(SDL2_mixer REQUIRED)
-			set(SDL2MIXER_LIBRARIES "${SDL2MIXER_LIBRARY}")
 		endif()
-
-		# location of SDL headers
-		include_directories(${SDL2_INCLUDE_DIR})
-		include_directories(${SDL2_MIXER_INCLUDE_DIRS})
-		include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
 	else()
 		# add all SDL dependencies
 		find_package(SDL REQUIRED)
@@ -276,8 +267,6 @@ else()
 	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}/games           CACHE PATH "Installation location of the game binaries")
 	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/share/games/smw CACHE PATH "Installation location of the game data")
 endif()
-# set(SMW_USERDIR ".smw" CACHE STRING "User directory") # User settings directory
-add_definitions(-DSMW_DATADIR="${SMW_DATADIR}")
 
 # For installing Linux desktop items
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -291,7 +280,10 @@ endif()
 #
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-	install(DIRECTORY data/ DESTINATION ${SMW_DATADIR})
+	install(DIRECTORY data/
+		DESTINATION "${SMW_DATADIR}"
+		PATTERN .git EXCLUDE
+		PATTERN ZZleveleditor.map EXCLUDE)
 endif()
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))

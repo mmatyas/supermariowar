@@ -1,16 +1,29 @@
-set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
-           player.cpp world.cpp uicustomcontrol.cpp
-           objectgame.cpp objecthazard.cpp
-           net.cpp FPSLimiter.cpp GSSplashScreen.cpp
-           GSGameplay.cpp ObjectContainer.cpp main.cpp
-           network/NetConfigManager.cpp
-           network/FileCompressor.cpp
+add_executable(smw WIN32
+	ai.cpp
+	FPSLimiter.cpp
+	gamemodes.cpp
+	GSGameplay.cpp
+	GSMenu.cpp
+	GSSplashScreen.cpp
+	main.cpp
+	net.cpp
+	network/FileCompressor.cpp
+	network/NetConfigManager.cpp
+	ObjectContainer.cpp
+	objectgame.cpp
+	objecthazard.cpp
+	player.cpp
+	uicustomcontrol.cpp
+	world.cpp
+	../common/movingplatform.cpp
+	../common/uicontrol.cpp
+	../common/uimenu.cpp
 )
 
 #
 # Game objects
 #
-LIST(APPEND SMW_SRCS
+target_sources(smw PRIVATE
 	objects/blocks/IO_Block.cpp
 	objects/blocks/BounceBlock.cpp
 	objects/blocks/BreakableBlock.cpp
@@ -32,7 +45,7 @@ LIST(APPEND SMW_SRCS
 #
 # Player components
 #
-LIST(APPEND SMW_SRCS
+target_sources(smw PRIVATE
 	player_components/PlayerAwardEffects.cpp
 	player_components/PlayerBurnupTimer.cpp
 	player_components/PlayerCollisions.cpp
@@ -53,20 +66,10 @@ LIST(APPEND SMW_SRCS
 	player_components/PlayerWings.cpp
 )
 
-LIST(APPEND SMW_SRCS
-	ui/NetworkListScroll.cpp
-	ui/MI_StringScroll.cpp
-	ui/MI_PowerupSlider.cpp
-	ui/MI_FrenzyModeOptions.cpp
-	ui/MI_InputControlContainer.cpp
-	ui/MI_TeamSelect.cpp
-	ui/MI_NetRoomTeamSelect.cpp
-)
-
 #
 # Menu screens
 #
-LIST(APPEND SMW_SRCS
+target_sources(smw PRIVATE
 	menu/MainMenu.cpp
 	menu/BonusWheelMenu.cpp
 	menu/GameSettingsMenu.cpp
@@ -97,55 +100,47 @@ LIST(APPEND SMW_SRCS
 	menu/network/NetNewRoomSettingsMenu.cpp
 	menu/network/NetRoomMenu.cpp
 	menu/network/NetServersMenu.cpp
+
+	ui/NetworkListScroll.cpp
+	ui/MI_StringScroll.cpp
+	ui/MI_PowerupSlider.cpp
+	ui/MI_FrenzyModeOptions.cpp
+	ui/MI_InputControlContainer.cpp
+	ui/MI_TeamSelect.cpp
+	ui/MI_NetRoomTeamSelect.cpp
 )
 
 if(NOT NO_NETWORK)
-	LIST(APPEND SMW_SRCS platform/network/enet/NetworkLayerENet.cpp)
+	target_sources(smw PRIVATE platform/network/enet/NetworkLayerENet.cpp)
 endif()
 
-# Add EXE icon on Windows
 if (WIN32)
-	LIST(APPEND SMW_SRCS "${PROJECT_SOURCE_DIR}/resources/windows/smw.rc")
-endif()
-
-#add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
-add_executable(smw WIN32 ../common/movingplatform.cpp ../common/uicontrol.cpp ../common/uimenu.cpp ${SMW_SRCS})
-target_link_libraries(smw CommonFiles)
-if(NOT NO_NETWORK)
-	target_link_libraries(smw NetplayFiles)
+	# Add EXE icon on Windows
+	target_sources(smw PRIVATE "${PROJECT_SOURCE_DIR}/resources/windows/smw.rc")
 endif()
 
 #
 # Dependencies
 #
 
-# TODO: fix emscripten build
-# emscripten uses its own SDL
-# if(NOT TARGET_EMSCRIPTEN)
-
-target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(smw ${ZLIB_LIBRARY})
-target_link_libraries(smw yaml-cpp)
-
-if(USE_SDL2_LIBS)
-	target_link_libraries(smw ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
-else()
-	target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
-endif()
-
+target_link_libraries(smw CommonFiles)
 if(NOT NO_NETWORK)
-	target_link_libraries(smw enet)
-	if (WIN32)
-		# WinSock2 libs, required by ENet on Windows
-		target_link_libraries(smw ws2_32 winmm)
-	endif()
+	target_link_libraries(smw NetplayFiles)
 endif()
+
+if(SMW_OLD_STYLE_DEPS)
+	target_link_libraries(smw ${ZLIB_LIBRARY})
+	target_include_directories(smw PRIVATE "${ZLIB_INCLUDE_DIR}")
+else()
+	target_link_libraries(smw ZLIB::ZLIB)
+endif()
+target_link_libraries(smw yaml-cpp)
 
 #
 # Installation
 #
 
-install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw" DESTINATION ${SMW_BINDIR})
+install(TARGETS smw DESTINATION "${SMW_BINDIR}")
 
 # install Linux desktop item and icons
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
