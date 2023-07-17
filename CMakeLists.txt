@@ -54,19 +54,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-		"Build type (Release/Debug/RelWithDebInfo/MinSizeRe)" FORCE)
+		"Build type (Release/Debug/RelWithDebInfo/MinSizeRel)" FORCE)
 endif()
-
-#
-# Game-related flags
-#
 
 # Set where the binary files will be built.
-if (CMAKE_BUILD_TYPE STREQUAL Debug)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries/Debug)
-else()
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries/Release)
-endif()
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 #-----------------------------------------------------------------------------
 #

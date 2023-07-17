@@ -78,4 +78,4 @@ build_script:
   - cmake --build . --config Release
 
 artifacts:
-  - path: Binaries\Release\Release\*.exe
+  - path: '*.exe'

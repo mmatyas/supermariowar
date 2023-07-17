@@ -113,14 +113,14 @@ git submodule update --init
 
 ### Linux
 
-빌드할 디렉토리를 작성하고 CMake를 실행하여 프로젝트를 구성한다. 그리고 빌드하려고 할 때마다 `make`를 호출해라. 바이너리는 기본적으로 `./build/Binaries/Release` 에 생성된다. 간단히 말하자면:
+빌드할 디렉토리를 작성하고 CMake를 실행하여 프로젝트를 구성한다. 그리고 빌드하려고 할 때마다 `make`를 호출해라. 간단히 말하자면:
 
 ```sh
 unzip data.zip
 mkdir build && cd build
 cmake ..
 make -j4 # -jN = build on N threads
-./Binaries/Release/smw ../data
+./smw ../data
 ```
 
 `make`의 주요 빌드 대상:
