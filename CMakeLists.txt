@@ -23,6 +23,12 @@ option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" ON)
 option(SDL2_USE_MIXERX "(SDL2) Use SDL Mixer X instead of SDL Mixer" OFF)
 option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
 
+set(SMW_INSTALL_PORTABLE_DEFAULT OFF)
+if(WIN32)
+	set(SMW_INSTALL_PORTABLE_DEFAULT ON)
+endif()
+option(SMW_INSTALL_PORTABLE "Install to a single directory" ${SMW_INSTALL_PORTABLE_DEFAULT})
+
 if (USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
 
@@ -251,7 +257,7 @@ endif()
 
 # Common install locations, also passed to the game components
 
-if (WIN32)
+if(WIN32 OR SMW_INSTALL_PORTABLE)
 	# CMAKE_INSTALL_PREFIX defaults to `C:/Program Files/smw`
 	set(SMW_BINDIR  .    CACHE PATH "Installation location of the game binaries")
 	set(SMW_DATADIR data CACHE PATH "Installation location of the game data")
