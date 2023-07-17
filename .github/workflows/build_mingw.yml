@@ -29,14 +29,11 @@ jobs:
 
       - name: Package
         run: |
-          mkdir supermariowar
+          cmake --install build --prefix supermariowar --strip
+          rm -rf supermariowar/include supermariowar/lib
           cp /usr/lib/gcc/i686-w64-mingw32/10-posix/{libgcc_s_dw2-1,libstdc++-6}.dll supermariowar/
           cp /usr/i686-w64-mingw32/lib/libwinpthread-1.dll supermariowar/
           cp /opt/smwlibs/bin/{SDL2,SDL2_image,SDL2_mixer_ext}.dll supermariowar/
-          cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server}.exe supermariowar/
-          i686-w64-mingw32-strip supermariowar/*
-          cp docs/readme-v1.8.html supermariowar/
-          rsync -aC --exclude .git data supermariowar/
           zip -r "supermariowar_$(date +%F)_windows.zip" supermariowar
 
       - name: Upload artifacts

@@ -33,10 +33,10 @@ jobs:
 
       - name: Configure with SDL1
         if: matrix.sdl == 1
-        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=OFF -DUSE_PNG_SAVE=OFF
+        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=OFF -DUSE_PNG_SAVE=OFF -DSMW_INSTALL_PORTABLE=ON
       - name: Configure with SDL2
         if: matrix.sdl == 2
-        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON
+        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON -DSMW_INSTALL_PORTABLE=ON
 
       - name: Build
         run: cmake --build build
@@ -44,11 +44,8 @@ jobs:
       - name: Package
         if: matrix.sdl == 2
         run: |
-          mkdir supermariowar
-          cp build/Binaries/Release/{smw,smw-leveledit,smw-worldedit,smw-server} supermariowar/
-          strip supermariowar/*
-          cp docs/readme-v1.8.html supermariowar/
-          rsync -aC --exclude .git data supermariowar/
+          cmake --install build --prefix supermariowar --strip
+          rm -rf supermariowar/include supermariowar/lib
           zip -r "supermariowar_$(date +%F)_linux.zip" supermariowar
 
       - name: Upload artifacts
