@@ -261,10 +261,12 @@ if(WIN32 OR SMW_INSTALL_PORTABLE)
 	# CMAKE_INSTALL_PREFIX defaults to `C:/Program Files/smw`
 	set(SMW_BINDIR  .    CACHE PATH "Installation location of the game binaries")
 	set(SMW_DATADIR data CACHE PATH "Installation location of the game data")
+	set(SMW_DOCDIR  .    CACHE PATH "Installation location of the game documentation")
 else()
 	# CMAKE_INSTALL_PREFIX defaults to `/usr/local`
 	set(SMW_BINDIR  games           CACHE PATH "Installation location of the game binaries")
 	set(SMW_DATADIR share/games/smw CACHE PATH "Installation location of the game data")
+	set(SMW_DOCDIR  share/doc/smw   CACHE PATH "Installation location of the game documentation")
 endif()
 
 # For installing Linux desktop items
@@ -289,6 +291,8 @@ if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
 #	install(FILES Data/license.txt DESTINATION ${datadir})
 endif()
 
+install(FILES docs/readme-v1.8.html DESTINATION "${SMW_DOCDIR}")
+
 #-----------------------------------------------------------------------------
 #
 # Ready to build!
@@ -306,6 +310,11 @@ message("    LD FLAGS:    ${CMAKE_EXE_LINKER_FLAGS}")
 
 get_directory_property(MSG_DEFINITIONS COMPILE_DEFINITIONS)
 message("    DEFINITIONS: ${MSG_DEFINITIONS}")
+
+message("  [install]")
+message("    Binary dir:  ${SMW_BINDIR}")
+message("    Data dir:    ${SMW_DATADIR}")
+message("    Docs dir:    ${SMW_DOCDIR}")
 
 #
 # Go through every sub-project
