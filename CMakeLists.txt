@@ -329,7 +329,10 @@ add_subdirectory(src/common_netplay)
 add_subdirectory(src/smw)
 add_subdirectory(src/leveleditor)
 add_subdirectory(src/worldeditor)
-add_subdirectory(src/server)
+
+if(NOT NO_NETWORK)
+	add_subdirectory(src/server)
+endif()
 
 #-----------------------------------------------------------------------------
 #
