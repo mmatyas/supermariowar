@@ -187,13 +187,6 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
-# Link libc statically on Windows to not need additional DLLs
-if (WIN32)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
-	# TODO: check if compiler supports this flag, may fail with GCC < 4.8
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
-endif()
-
 if (EMSCRIPTEN)
 	if (CMAKE_BUILD_TYPE STREQUAL Debug)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g4")
