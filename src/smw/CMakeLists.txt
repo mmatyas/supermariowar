@@ -128,7 +128,10 @@ if(NOT NO_NETWORK)
 	target_link_libraries(smw NetplayFiles)
 endif()
 
-target_link_libraries(smw ZLIB::ZLIB)
+if(NOT EMSCRIPTEN)
+	target_link_libraries(smw ZLIB::ZLIB)
+endif()
+
 target_link_libraries(smw yaml-cpp)
 
 #

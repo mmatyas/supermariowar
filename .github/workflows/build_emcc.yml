@@ -14,8 +14,8 @@ jobs:
         run: |
           git clone https://github.com/emscripten-core/emsdk.git --depth=1
           cd emsdk
-          ./emsdk install 1.39.5
-          ./emsdk activate 1.39.5
+          ./emsdk install 3.1.43
+          ./emsdk activate 3.1.43
       - name: Download SDL mixer
         working-directory: dependencies
         run: curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.4.tar.gz | tar xzf -
@@ -26,5 +26,5 @@ jobs:
           emcc -v
           sed -i 's|if (BUILD_STATIC_LIBS)|if (BUILD_STATIC_LIBS)\ninclude_directories(dependencies/SDL2_mixer-2.0.4)|' CMakeLists.txt
           mkdir build_js && cd build_js
-          emconfigure cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
+          emcmake cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
           emmake make smw

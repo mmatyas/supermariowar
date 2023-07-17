@@ -41,21 +41,23 @@ if (USE_PNG_SAVE AND NOT USE_SDL2_LIBS)
 endif()
 
 
-if (USE_SDL2_LIBS)
-    target_link_libraries(CommonFiles
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-    )
-    if (SDL2_USE_MIXERX)
-        target_link_libraries(CommonFiles SDL2_mixer_ext::SDL2_mixer_ext)
+if(NOT EMSCRIPTEN)
+    if (USE_SDL2_LIBS)
+        target_link_libraries(CommonFiles
+            SDL2::SDL2
+            SDL2_image::SDL2_image
+        )
+        if (SDL2_USE_MIXERX)
+            target_link_libraries(CommonFiles SDL2_mixer_ext::SDL2_mixer_ext)
+        else()
+            target_link_libraries(CommonFiles SDL2_mixer::SDL2_mixer)
+        endif()
     else()
-        target_link_libraries(CommonFiles SDL2_mixer::SDL2_mixer)
+        target_link_libraries(CommonFiles
+            ${SDL_LIBRARY}
+            ${SDLMIXER_LIBRARY}
+            ${SDLIMAGE_LIBRARY}
+            ${SDLMAIN_LIBRARY}
+        )
     endif()
-else()
-    target_link_libraries(CommonFiles
-        ${SDL_LIBRARY}
-        ${SDLMIXER_LIBRARY}
-        ${SDLIMAGE_LIBRARY}
-        ${SDLMAIN_LIBRARY}
-    )
 endif()
