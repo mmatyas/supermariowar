@@ -17,7 +17,7 @@ target_link_libraries(smw-leveledit CommonFiles)
 install(TARGETS smw-leveledit DESTINATION "${SMW_BINDIR}")
 
 # install Linux desktop item and icons
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT SMW_INSTALL_PORTABLE)
 	configure_file("${PROJECT_SOURCE_DIR}/resources/linux/supermariowar-leveleditor.desktop.in"
 		"${PROJECT_BINARY_DIR}/supermariowar-leveleditor.desktop" @ONLY)
 
