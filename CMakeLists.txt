@@ -280,17 +280,11 @@ endif()
 # Data directory install location
 #
 
-if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-	install(DIRECTORY data/
-		DESTINATION "${SMW_DATADIR}"
-		PATTERN .git EXCLUDE
-		PATTERN ZZleveleditor.map EXCLUDE)
-endif()
-
-if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
-#	install(FILES Data/license.txt DESTINATION ${datadir})
-endif()
-
+install(DIRECTORY data/
+	DESTINATION "${SMW_DATADIR}"
+	PATTERN .git EXCLUDE
+	PATTERN ZZleveleditor.map EXCLUDE
+)
 install(FILES docs/readme-v1.8.html DESTINATION "${SMW_DOCDIR}")
 
 #-----------------------------------------------------------------------------
