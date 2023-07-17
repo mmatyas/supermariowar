@@ -128,12 +128,7 @@ if(NOT NO_NETWORK)
 	target_link_libraries(smw NetplayFiles)
 endif()
 
-if(SMW_OLD_STYLE_DEPS)
-	target_link_libraries(smw ${ZLIB_LIBRARY})
-	target_include_directories(smw PRIVATE "${ZLIB_INCLUDE_DIR}")
-else()
-	target_link_libraries(smw ZLIB::ZLIB)
-endif()
+target_link_libraries(smw ZLIB::ZLIB)
 target_link_libraries(smw yaml-cpp)
 
 #

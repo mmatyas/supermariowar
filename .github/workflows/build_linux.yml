@@ -33,10 +33,10 @@ jobs:
 
       - name: Configure with SDL1
         if: matrix.sdl == 1
-        run: cmake -B build -G Ninja -DSMW_OLD_STYLE_DEPS=ON -DUSE_SDL2_LIBS=OFF -DUSE_PNG_SAVE=OFF
+        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=OFF -DUSE_PNG_SAVE=OFF
       - name: Configure with SDL2
         if: matrix.sdl == 2
-        run: cmake -B build -G Ninja -DSMW_OLD_STYLE_DEPS=ON -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON
+        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON
 
       - name: Build
         run: cmake --build build
