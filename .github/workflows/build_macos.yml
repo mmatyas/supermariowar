@@ -4,6 +4,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   macos:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v3
