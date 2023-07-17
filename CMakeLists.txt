@@ -260,7 +260,7 @@ endif()
 
 if (WIN32)
 	# CMAKE_INSTALL_PREFIX defaults to `C:/Program Files/smw`
-	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}      CACHE PATH "Installation location of the game binaries")
+	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}/.    CACHE PATH "Installation location of the game binaries")
 	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/data CACHE PATH "Installation location of the game data")
 else()
 	# CMAKE_INSTALL_PREFIX defaults to `/usr/local`
