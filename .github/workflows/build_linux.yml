@@ -9,6 +9,7 @@ jobs:
     strategy:
       matrix:
         sdl: [1, 2]
+    name: X11 SDL${{ matrix.sdl }}
     steps:
       - uses: actions/checkout@v3
         with:
