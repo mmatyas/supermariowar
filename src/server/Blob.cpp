@@ -9,7 +9,7 @@ Blob::~Blob() {
 }
 
 void Blob::free() {
-	delete data;
+	delete[] data;
 	data = nullptr;
 	size = 0;
 }
