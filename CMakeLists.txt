@@ -6,11 +6,12 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-project(smw)
-
-set(SMW_VERSION_MAJOR "2")
-set(SMW_VERSION_MINOR "0")
-set(SMW_VERSION_PATCH "0")
+project(smw
+	VERSION 2.0.0
+	DESCRIPTION "A fan-made multiplayer Super Mario Bros. style deathmatch game"
+	HOMEPAGE_URL "https://github.com/mmatyas/supermariowar"
+	LANGUAGES CXX
+)
 
 #
 # Options for customizing builds
