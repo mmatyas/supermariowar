@@ -110,7 +110,9 @@ target_sources(smw PRIVATE
 	ui/MI_NetRoomTeamSelect.cpp
 )
 
-if(NOT NO_NETWORK)
+if(NO_NETWORK)
+	target_compile_definitions(smw PRIVATE NETWORK_DISABLED)
+else()
 	target_sources(smw PRIVATE platform/network/enet/NetworkLayerENet.cpp)
 endif()
 

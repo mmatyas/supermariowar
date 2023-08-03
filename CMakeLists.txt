@@ -30,26 +30,6 @@ if(WIN32)
 endif()
 option(SMW_INSTALL_PORTABLE "Install to a single directory" ${SMW_INSTALL_PORTABLE_DEFAULT})
 
-if (USE_SDL2_LIBS)
-	add_definitions(-DUSE_SDL2)
-
-	if (SDL2_USE_MIXERX)
-		add_definitions(-DSDL2_USE_MIXERX)
-	endif()
-
-	if (SDL2_FORCE_GLES)
-		add_definitions(-DSDL2_FORCE_GLES)
-	endif()
-endif()
-
-if (NO_NETWORK)
-	add_definitions(-DNETWORK_DISABLED)
-endif()
-
-if (USE_PNG_SAVE)
-	add_definitions(-DPNG_SAVE_FORMAT)
-endif()
-
 # Additional CMake search path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 

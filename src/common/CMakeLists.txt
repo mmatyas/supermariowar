@@ -41,6 +41,21 @@ if (USE_PNG_SAVE AND NOT USE_SDL2_LIBS)
 endif()
 
 
+if (USE_SDL2_LIBS)
+    target_compile_definitions(CommonFiles PUBLIC USE_SDL2)
+
+    if (SDL2_FORCE_GLES)
+        target_compile_definitions(CommonFiles PUBLIC SDL2_FORCE_GLES)
+    endif()
+    if (SDL2_USE_MIXERX)
+        target_compile_definitions(CommonFiles PUBLIC SDL2_USE_MIXERX)
+    endif()
+endif()
+if (USE_PNG_SAVE)
+    target_compile_definitions(CommonFiles PUBLIC PNG_SAVE_FORMAT)
+endif()
+
+
 if(NOT EMSCRIPTEN)
     if (USE_SDL2_LIBS)
         target_link_libraries(CommonFiles
