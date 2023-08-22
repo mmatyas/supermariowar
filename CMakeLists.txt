@@ -125,11 +125,10 @@ if (BUILD_STATIC_LIBS)
 	endif()
 
 	# Use YAML for game config files
-	check_submodule_git(dependencies/yaml-cpp-noboost)
-	include_directories(dependencies/yaml-cpp-noboost/include)
+	check_submodule_git(dependencies/yaml-cpp)
 	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
 	set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
-	add_subdirectory(dependencies/yaml-cpp-noboost)
+	add_subdirectory(dependencies/yaml-cpp)
 else()
 	find_package(ENet REQUIRED)
 	find_package(yaml-cpp REQUIRED)
