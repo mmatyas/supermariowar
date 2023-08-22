@@ -22,10 +22,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT SMW_INSTALL_PORTABLE)
 		"${PROJECT_BINARY_DIR}/supermariowar-leveleditor.desktop" @ONLY)
 
 	install(FILES "${PROJECT_BINARY_DIR}/supermariowar-leveleditor.desktop"
-		DESTINATION ${XDG_APPS_INSTALL_DIR})
+		DESTINATION "${SMW_DESKTOPDIR}")
 
 	install(FILES
 		"${PROJECT_SOURCE_DIR}/resources/icons/smw-leveledit.png"
 		"${PROJECT_SOURCE_DIR}/resources/icons/smw-leveledit.xpm"
-		DESTINATION "/usr/share/pixmaps/")
+		DESTINATION "${SMW_ICONDIR}")
 endif()

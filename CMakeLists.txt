@@ -235,17 +235,13 @@ if(WIN32 OR SMW_INSTALL_PORTABLE)
 	set(SMW_DATADIR data CACHE PATH "Installation location of the game data")
 	set(SMW_DOCDIR  .    CACHE PATH "Installation location of the game documentation")
 else()
+	include(GNUInstallDirs)
 	# CMAKE_INSTALL_PREFIX defaults to `/usr/local`
-	set(SMW_BINDIR  games           CACHE PATH "Installation location of the game binaries")
-	set(SMW_DATADIR share/games/smw CACHE PATH "Installation location of the game data")
-	set(SMW_DOCDIR  share/doc/smw   CACHE PATH "Installation location of the game documentation")
-endif()
-
-# For installing Linux desktop items
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	if (NOT XDG_APPS_INSTALL_DIR)
-		set(XDG_APPS_INSTALL_DIR "/usr/share/applications/")
-	endif()
+	set(SMW_BINDIR "${CMAKE_INSTALL_PREFIX}/games" CACHE PATH "Installation location of the game binaries")
+	set(SMW_DATADIR "${CMAKE_INSTALL_FULL_DATADIR}/games/smw" CACHE PATH "Installation location of the game data")
+	set(SMW_DOCDIR "${CMAKE_INSTALL_FULL_DOCDIR}" CACHE PATH "Installation location of the game documentation")
+	set(SMW_DESKTOPDIR "${CMAKE_INSTALL_FULL_DATADIR}/applications" CACHE PATH "Installation location of the desktop launchers")
+	set(SMW_ICONDIR "${CMAKE_INSTALL_FULL_DATADIR}/pixmaps" CACHE PATH "Installation location of the desktop icons")
 endif()
 
 #

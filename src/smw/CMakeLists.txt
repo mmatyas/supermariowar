@@ -148,10 +148,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND NOT SMW_INSTALL_PORTABLE)
 		"${PROJECT_BINARY_DIR}/supermariowar.desktop" @ONLY)
 
 	install(FILES "${PROJECT_BINARY_DIR}/supermariowar.desktop"
-		DESTINATION ${XDG_APPS_INSTALL_DIR})
+		DESTINATION "${SMW_DESKTOPDIR}")
 
 	install(FILES
 		"${PROJECT_SOURCE_DIR}/resources/icons/smw.png"
 		"${PROJECT_SOURCE_DIR}/resources/icons/smw.xpm"
-		DESTINATION "/usr/share/pixmaps/")
+		DESTINATION "${SMW_ICONDIR}")
 endif()
