@@ -1,4 +1,4 @@
-add_library(CommonFiles
+add_library(CommonFiles STATIC
     CmdArgs.cpp
     dirlist.cpp
     eyecandy.cpp
