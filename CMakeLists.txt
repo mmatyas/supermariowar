@@ -241,7 +241,8 @@ else()
 	set(SMW_DATADIR "${CMAKE_INSTALL_FULL_DATADIR}/games/smw" CACHE PATH "Installation location of the game data")
 	set(SMW_DOCDIR "${CMAKE_INSTALL_FULL_DOCDIR}" CACHE PATH "Installation location of the game documentation")
 	set(SMW_DESKTOPDIR "${CMAKE_INSTALL_FULL_DATADIR}/applications" CACHE PATH "Installation location of the desktop launchers")
-	set(SMW_ICONDIR "${CMAKE_INSTALL_FULL_DATADIR}/pixmaps" CACHE PATH "Installation location of the desktop icons")
+	set(SMW_PIXMAPDIR "${CMAKE_INSTALL_FULL_DATADIR}/pixmaps" CACHE PATH "Installation location of the desktop pixmaps")
+	set(SMW_ICONDIR "${CMAKE_INSTALL_FULL_DATADIR}/icons/hicolor" CACHE PATH "Installation location of the desktop icons")
 endif()
 
 #
