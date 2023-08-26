@@ -41,7 +41,7 @@ jobs:
         run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON -DSMW_INSTALL_PORTABLE=ON
 
       - name: Build
-        run: cmake --build build
+        run: cmake --build build --verbose
 
       - name: Package
         if: matrix.sdl == 2
