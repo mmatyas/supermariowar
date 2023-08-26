@@ -852,7 +852,7 @@ MenuCodeEnum MI_AnnouncerField::SendInput(CPlayerInput * playerInput)
 
 void MI_AnnouncerField::UpdateName()
 {
-    GetNameFromFileName(szFieldName, list->current_name());
+    szFieldName = GetNameFromFileName(list->current_name());
 }
 
 void MI_AnnouncerField::Update()
@@ -2678,15 +2678,13 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 
         //See if we already have a thumbnail saved for this map
 
-        char szThumbnail[256];
-        strcpy(szThumbnail, "maps/cache/");
-        char * pszThumbnail = szThumbnail + strlen(szThumbnail);
-        GetNameFromFileName(pszThumbnail, (*itr).second->filename.c_str());
+        std::string szThumbnail("maps/cache/");
+        szThumbnail += GetNameFromFileName((*itr).second->filename.c_str());
 
 #ifdef PNG_SAVE_FORMAT
-        strcat(szThumbnail, ".png");
+        szThumbnail += ".png";
 #else
-        strcat(szThumbnail, ".bmp");
+        szThumbnail += ".bmp";
 #endif
 
         std::string sConvertedPath = convertPath(szThumbnail);

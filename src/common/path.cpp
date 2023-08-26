@@ -4,6 +4,7 @@
 #include "SDL.h"
 #endif
 
+#include <cassert>
 #include <cstring>
 #include <string>
 #include <sys/stat.h>
@@ -241,32 +242,34 @@ const string getFileFromPath(const string &path)
 	return path;
 }
 
-//Takes a path to a file and gives you back the file name (with or without author) as a char *
-void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuthor)
+// Takes a path to a file and gives you back the file name (with or without author) as a char *
+std::string GetNameFromFileName(const std::string& path, bool strip_author)
 {
 #ifdef _XBOX
-    const char * p = strrchr(szFileName, '\\');
+    constexpr char PATH_SEPARATOR = '\\';
 #else
-    const char * p = strrchr(szFileName, '/');
+    constexpr char PATH_SEPARATOR = '/';
 #endif
 
-    if (!p)
-        p = szFileName;
-    else
-        p++;
+    size_t left_pos = 0;
+    size_t right_pos = path.length();
 
-    strcpy(szName, p);
+    const size_t sep_pos = path.find_last_of(PATH_SEPARATOR);
+    if (sep_pos != std::string::npos)
+        left_pos = sep_pos + 1;
 
-    if (fStripAuthor) {
-        char * pUnderscore = strchr(szName, '_');
-        if (pUnderscore)
-            strcpy(szName, ++pUnderscore);
+    if (strip_author) {
+        const size_t underscore_pos = path.find_first_of('_', left_pos);
+        if (underscore_pos != std::string::npos)
+            left_pos = underscore_pos + 1;
     }
 
-    char * pLastPeriod = strrchr(szName, '.');
+    const size_t dot_pos = path.find_last_of('.', right_pos);
+    if (dot_pos != std::string::npos && left_pos < dot_pos)
+        right_pos = dot_pos;
 
-    if (pLastPeriod)
-        *pLastPeriod = 0;
+    assert(right_pos >= left_pos);
+    return path.substr(left_pos, right_pos - left_pos);
 }
 
 //Takes a file name and gives you back just the name of the file with no author or file extention

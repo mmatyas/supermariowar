@@ -1468,19 +1468,17 @@ void MenuState::update()
         maplist->ReloadMapAutoFilters();
 
         //Write out all the map thumbnails for the map browser and filter editor
-        char szThumbnail[256];
         std::map<std::string, MapListNode*>::iterator itr = maplist->GetIteratorAt(0, false);
 
         short iMapCount = maplist->GetCount();
         for (short iMap = 0; iMap < iMapCount; iMap++) {
-            strcpy(szThumbnail, "maps/cache/");
-            char * pszThumbnail = szThumbnail + strlen(szThumbnail);
-            GetNameFromFileName(pszThumbnail, (*itr).second->filename.c_str());
+            std::string szThumbnail("maps/cache/");
+            szThumbnail += GetNameFromFileName(itr->second->filename);
 
 #ifdef PNG_SAVE_FORMAT
-            strcat(szThumbnail, ".png");
+            szThumbnail += ".png";
 #else
-            strcat(szThumbnail, ".bmp");
+            szThumbnail += ".bmp";
 #endif
 
             g_map->loadMap((*itr).second->filename, read_type_preview);

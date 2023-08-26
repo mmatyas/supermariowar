@@ -1349,15 +1349,13 @@ void CMap::saveMap(const std::string& file)
 
     /*
     	//Save thumbnail
-    	char szSaveThumbnail[256];
-    	strcpy(szSaveThumbnail, "maps/cache/");
-    	char * pszSaveThumbnail = szSaveThumbnail + strlen(szSaveThumbnail);
-    	GetNameFromFileName(pszSaveThumbnail, file.c_str());
+    	std::string szSaveThumbnail("maps/cache/");
+    	szSaveThumbnail += GetNameFromFileName_STR(file);
 
     #ifdef PNG_SAVE_FORMAT
-    	strcat(szSaveThumbnail, ".png");
+    	szSaveThumbnail += ".png";
     #else
-    	strcat(szSaveThumbnail, ".bmp");
+    	szSaveThumbnail += ".bmp";
     #endif
 
     	saveThumbnail(convertPath(szSaveThumbnail), true);

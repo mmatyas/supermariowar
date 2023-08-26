@@ -351,22 +351,20 @@ void takescreenshot()
 		}
 
 		//Save the screenshot with the same name as the map file
-		char szSaveFile[256];
-		strcpy(szSaveFile, "screenshots/");
-		char * pszSaveFile = szSaveFile + strlen(szSaveFile);
-		GetNameFromFileName(pszSaveFile, szMapName);
+		std::string szSaveFile("screenshots/");
+		szSaveFile += GetNameFromFileName(pszSaveFile, szMapName);
 
 		if (iTileSize == PREVIEWTILESIZE)
-			strcat(szSaveFile, "_preview");
+			szSaveFile += "_preview";
 		else if (iTileSize == THUMBTILESIZE)
-			strcat(szSaveFile, "_thumb");
+			szSaveFile += "_thumb";
 
 #ifdef PNG_SAVE_FORMAT
-		strcat(szSaveFile, ".png");
-		IMG_SavePNG(screenshot, szSaveFile);
+		szSaveFile += ".png";
+		IMG_SavePNG(screenshot, szSaveFile.c_str());
 #else
-		strcat(szSaveFile, ".bmp");
-		SDL_SaveBMP(screenshot, szSaveFile);
+		szSaveFile += ".bmp";
+		SDL_SaveBMP(screenshot, szSaveFile.c_str());
 #endif
 
 		SDL_FreeSurface(screenshot);

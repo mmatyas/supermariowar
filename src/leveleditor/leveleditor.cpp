@@ -5320,27 +5320,25 @@ void takescreenshot()
 			DrawMapHazard(&g_map->maphazards[iHazard], iScreenshotSize, false);
 
 		//Save the screenshot with the same name as the map file
-		char szSaveFile[256];
-		strcpy(szSaveFile, "maps/screenshots/");
-		char * pszSaveFile = szSaveFile + strlen(szSaveFile);
-		GetNameFromFileName(pszSaveFile, maplist->currentFilename());
+		std::string szSaveFile("maps/screenshots/");
+		szSaveFile += GetNameFromFileName(maplist->currentFilename());
 
 		if (iTileSize == PREVIEWTILESIZE)
-			strcat(szSaveFile, "_preview");
+			szSaveFile += "_preview";
 		else if (iTileSize == THUMBTILESIZE)
-			strcat(szSaveFile, "_thumb");
+			szSaveFile += "_thumb";
 
 #ifdef PNG_SAVE_FORMAT
-		strcat(szSaveFile, ".png");
+		szSaveFile += ".png";
 		IMG_SavePNG(screenshot, convertPath(szSaveFile).c_str());
 #else
-		strcat(szSaveFile, ".bmp");
+		szSaveFile += ".bmp";
 		SDL_SaveBMP(screenshot, convertPath(szSaveFile).c_str());
 #endif
 
 		SDL_FreeSurface(screenshot);
 
-		printf("Screenshot taken: %s\n", szSaveFile);
+		printf("Screenshot taken: %s\n", szSaveFile.c_str());
 	}
 
 	screen = old_screen;
