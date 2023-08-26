@@ -490,8 +490,8 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     game_values.gamemode->goal = pkg.gamemodeGoal;
 
     printf("  Game mode #%d: %s with %s: %d\n",
-        currentgamemode, gamemodes[currentgamemode]->GetModeName(),
-        gamemodes[currentgamemode]->GetGoalName(), game_values.gamemode->goal);
+        currentgamemode, gamemodes[currentgamemode]->GetModeName().c_str(),
+        gamemodes[currentgamemode]->GetGoalName().c_str(), game_values.gamemode->goal);
 
     netplay.theHostIsMe = false;
     netplay.currentRoom.hostPlayerNumber = pkg.hostPlayerNumber;

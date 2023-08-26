@@ -5,6 +5,7 @@
 
 #include "PlayerKillStyles.h"
 #include "PlayerKillTypes.h"
+#include <string>
 
 class CPlayer;
 
@@ -40,7 +41,7 @@ enum GameModeType {
 };
 
 struct SModeOption {
-	char szName[64];
+	std::string szName;
 	short iValue;
 };
 
@@ -86,10 +87,10 @@ class CGameMode
     }
 		GameModeType gamemode;
 
-    char * GetModeName() {
+    const std::string& GetModeName() const {
         return szModeName;
     }
-    char * GetGoalName() {
+    const std::string& GetGoalName() const {
         return szGoalName;
     }
     SModeOption * GetOptions() {
@@ -109,8 +110,8 @@ class CGameMode
 #endif
 
 	protected:
-		char szModeName[64];
-		char szGoalName[64];
+		std::string szModeName;
+		std::string szGoalName;
 		SModeOption modeOptions[GAMEMODE_NUM_OPTIONS];
 
 		void SetupModeStrings(const char * szMode, const char * szGoal, short iGoalSpacing);

@@ -37,7 +37,7 @@ class MI_InputControlField : public UI_Control
 	private:
 
 		gfxSprite * spr;
-		char * szName;
+		std::string szName;
 
 		short iWidth, iIndent;
 

@@ -14,8 +14,7 @@ MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, const char * 
 {
     spr = nspr;
 
-    szName = new char[strlen(name) + 1];
-    strcpy(szName, name);
+    szName = name;
 
     iWidth = width;
     iIndent = indent;
@@ -47,8 +46,7 @@ MI_SelectField::MI_SelectField(const MI_SelectField& other)
     : UI_Control(other)
 {
     spr = other.spr;
-    szName = new char[strlen(other.szName) + 1];
-    strcpy(szName, other.szName);
+    szName = other.szName;
 
     SetData(other.iValue, other.sValue, other.fValue);
 
@@ -80,8 +78,6 @@ MI_SelectField::MI_SelectField(const MI_SelectField& other)
 
 MI_SelectField::~MI_SelectField()
 {
-    delete [] szName;
-
     delete miModifyImageLeft;
     delete miModifyImageRight;
 
@@ -97,11 +93,9 @@ MI_SelectField::~MI_SelectField()
     items.clear();
 }
 
-void MI_SelectField::SetTitle(char * name)
+void MI_SelectField::SetTitle(std::string name)
 {
-    delete [] szName;
-    szName = new char[strlen(name) + 1];
-    strcpy(szName, name);
+    szName = std::move(name);
 }
 
 //Sets current selected item based on the items int value
@@ -297,7 +291,7 @@ void MI_SelectField::Draw()
     }
 
     if (iIndent> 0)
-        rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+        rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName.c_str());
 
 	// RFC
     if (!items.empty()) {

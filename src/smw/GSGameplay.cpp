@@ -1011,9 +1011,9 @@ void GameplayState::drawScreenFade()
             if (game_values.startmodedisplay && game_values.singleplayermode == -1) {
                 char szMode[128];
                 if (game_values.gamemode->goal < 0)
-                    sprintf(szMode, "%s  %s: X", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName());
+                    sprintf(szMode, "%s  %s: X", game_values.gamemode->GetModeName().c_str(), game_values.gamemode->GetGoalName().c_str());
                 else
-                    sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
+                    sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName().c_str(), game_values.gamemode->GetGoalName().c_str(), game_values.gamemode->goal);
 
                 short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
@@ -1212,16 +1212,14 @@ void drawExitPauseDialog()
 
         rm->menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
 
-        char szGoal[256];
-        strcpy(szGoal, game_values.gamemode->GetGoalName());
-        strcat(szGoal, ": ");
+        std::string szGoal = game_values.gamemode->GetGoalName() + ": ";
 
         if (game_values.gamemode->goal == -1)
-            sprintf(szGoal + strlen(szGoal), "Unlimited");
+            szGoal += "Unlimited";
         else
-            sprintf(szGoal + strlen(szGoal), "%d", game_values.gamemode->goal);
+            szGoal += std::to_string(game_values.gamemode->goal);
 
-        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 264, szGoal);
+        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 264, szGoal.c_str());
     }
 
     if (game_values.exitinggame) {

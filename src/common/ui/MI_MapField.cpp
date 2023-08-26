@@ -19,8 +19,7 @@ MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, 
     , iSearchStringTimer(0)
     , fShowtags(showtags)
 {
-    szName = new char[strlen(name) + 1];
-    strcpy(szName, name);
+    szName = name;
 
     miModifyImageLeft = new MI_Image(nspr, ix + indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
     miModifyImageLeft->Show(false);
@@ -200,7 +199,7 @@ void MI_MapField::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
-    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName.c_str());
     rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szMapName);
 
     MI_MapPreview::Draw();

@@ -35,7 +35,7 @@ void MI_SliderField::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
 
-    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName.c_str());
 
     if (!items.empty()) {
         rm->menu_font_large.drawChopRight(ix + iIndent2 + 16, iy + 5, iWidth - iIndent2 - 24, (*current)->sName.c_str());

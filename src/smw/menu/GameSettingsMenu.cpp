@@ -31,7 +31,7 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
     miModeField->SetItemChangedCode(MENU_CODE_MODE_CHANGED);
 
     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-        miGoalField[iGameMode] = new MI_SelectField(&rm->spr_selectfield, 70, 125, gamemodes[iGameMode]->GetGoalName(), 352, 120);
+        miGoalField[iGameMode] = new MI_SelectField(&rm->spr_selectfield, 70, 125, gamemodes[iGameMode]->GetGoalName().c_str(), 352, 120);
         //miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
         miGoalField[iGameMode]->Show(iGameMode == 0);
 

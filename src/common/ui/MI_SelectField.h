@@ -61,7 +61,7 @@ public:
     MI_SelectField(const MI_SelectField&);
     virtual ~MI_SelectField();
 
-    void SetTitle(char * name);
+    void SetTitle(std::string name);
 
     //When this control is selected, advance the value one instead of modifying the control
     void SetAutoAdvance(bool advance) {
@@ -152,7 +152,7 @@ protected:
     bool MoveRandom();
 
     gfxSprite * spr;
-    char * szName;
+    std::string szName;
 
     short * iValue;
     std::string * sValue;

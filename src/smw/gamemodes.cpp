@@ -335,16 +335,16 @@ void CGameMode::playwarningsound()
 
 void CGameMode::SetupModeStrings(const char * szMode, const char * szGoal, short iGoalSpacing)
 {
-    strcpy(szModeName, szMode);
-    strcpy(szGoalName, szGoal);
+    szModeName = szMode;
+    szGoalName = szGoal;
 
     for (short iMode = 0; iMode < GAMEMODE_NUM_OPTIONS; iMode++) {
         if (iMode == GAMEMODE_NUM_OPTIONS - 1) {
             modeOptions[iMode].iValue = -1;
-            strcpy(modeOptions[iMode].szName, "Unlimited");
+            modeOptions[iMode].szName += "Unlimited";
         } else {
             modeOptions[iMode].iValue = (iMode + 1) * iGoalSpacing;
-            sprintf(modeOptions[iMode].szName, "%d", modeOptions[iMode].iValue);
+            modeOptions[iMode].szName += std::to_string(modeOptions[iMode].iValue);
         }
     }
 }
@@ -1404,7 +1404,7 @@ short CGM_Eggs::CheckWinner(CPlayer * player)
 CGM_Frenzy::CGM_Frenzy() : CGM_Frag()
 {
     gamemode = game_mode_frenzy;
-    strcpy(szModeName, "Frenzy");
+    szModeName = "Frenzy";
 }
 
 void CGM_Frenzy::init()
@@ -1475,12 +1475,12 @@ void CGM_Frenzy::think()
 
 //Survival Mode! - just like mario war classic, but you have
 // to dodge thwomps from the sky.  Idea from ziotok.
-CGM_Survival::CGM_Survival() : CGM_Classic()
+CGM_Survival::CGM_Survival()
+    : CGM_Classic()
 {
     goal = 20;
     gamemode = game_mode_survival;
-
-    strcpy(szModeName, "Survival");
+    szModeName = "Survival";
 }
 
 void CGM_Survival::init()
@@ -1741,8 +1741,7 @@ CGM_Jail::CGM_Jail() : CGM_Frag()
 {
     gamemode = game_mode_jail;
     goal = 20;
-
-    strcpy(szModeName, "Jail");
+    szModeName = "Jail";
 }
 
 short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)

@@ -16,6 +16,7 @@
 #include <cmath>
 #include <cstdlib> // abs()
 #include <cstring>
+#include <string>
 
 #ifndef __EMSCRIPTEN__
     inline void smallDelay() { SDL_Delay(10); }
@@ -871,7 +872,7 @@ void MI_AnnouncerField::Draw()
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
     rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
-    rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szFieldName);
+    rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szFieldName.c_str());
 
     miModifyImageLeft->Draw();
     miModifyImageRight->Draw();

@@ -25,8 +25,7 @@ MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, c
 {
     spr = nspr;
 
-    szName = new char[strlen(name) + 1];
-    strcpy(szName, name);
+    szName = name;
 
     iWidth = width;
     iIndent = indent;
@@ -40,9 +39,7 @@ MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, c
 }
 
 MI_InputControlField::~MI_InputControlField()
-{
-    delete [] szName;
-}
+{}
 
 #ifdef USE_SDL2
     #define Keynames(key) SDL_GetKeyName(key) // FIXME
@@ -338,7 +335,7 @@ void MI_InputControlField::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
-    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName.c_str());
 
     if (iKey == NULL)
         rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, "Unassigned");

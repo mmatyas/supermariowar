@@ -2,6 +2,7 @@
 #define UI_MAP_FIELD
 
 #include "MI_MapPreview.h"
+#include <string>
 
 class MI_MapField: public MI_MapPreview
 {
@@ -35,7 +36,7 @@ protected:
 
     bool Move(bool fNext, bool fScrollFast);
 
-    char * szName;
+    std::string szName;
 
     MI_Image * miModifyImageLeft;
     MI_Image * miModifyImageRight;

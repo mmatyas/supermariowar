@@ -174,7 +174,7 @@ class MI_AnnouncerField : public UI_Control
 		char * szName;
 		short iWidth, iIndent;
 
-		char szFieldName[256];
+		std::string szFieldName;
 
 		MI_Image * miModifyImageLeft;
 		MI_Image * miModifyImageRight;
