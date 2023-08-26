@@ -157,14 +157,6 @@ else()
 	endif()
 endif()
 
-# Use C++11
-if (WIN32 AND MINGW)
-	# MinGW forces strict-ANSI mode with std=c++11
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
-
 if (EMSCRIPTEN)
 	if (CMAKE_BUILD_TYPE STREQUAL Debug)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g4")

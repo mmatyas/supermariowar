@@ -40,6 +40,8 @@ if (USE_PNG_SAVE AND NOT USE_SDL2_LIBS)
     target_sources(CommonFiles PRIVATE savepng.cpp)
 endif()
 
+target_compile_features(CommonFiles PUBLIC cxx_std_11)
+
 
 if (USE_SDL2_LIBS)
     target_compile_definitions(CommonFiles PUBLIC USE_SDL2)
