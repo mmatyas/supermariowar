@@ -14,8 +14,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake g++-mingw-w64-i686-posix ninja-build
-          curl -L https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/smwlibs-mingw.tar.xz | tar xJf - -C /
-          rm /opt/smwlibs/lib/{libzlib.a,libzlib.dll.a}
+          curl -L https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/smwlibs-mingw.tar.xz | tar xJf - -C /tmp/
+          rm /tmp/smwlibs/lib/{libzlib.a,libzlib.dll.a}
           cmake --version
 
       - name: Configure
@@ -34,7 +34,7 @@ jobs:
           rm -rf supermariowar/include supermariowar/lib
           cp /usr/lib/gcc/i686-w64-mingw32/10-posix/{libgcc_s_dw2-1,libstdc++-6}.dll supermariowar/
           cp /usr/i686-w64-mingw32/lib/libwinpthread-1.dll supermariowar/
-          cp /opt/smwlibs/bin/{SDL2,SDL2_image,SDL2_mixer_ext}.dll supermariowar/
+          cp /tmp/smwlibs/bin/{SDL2,SDL2_image,SDL2_mixer_ext}.dll supermariowar/
           zip -r "supermariowar_$(date +%F)_windows.zip" supermariowar
 
       - name: Upload artifacts
