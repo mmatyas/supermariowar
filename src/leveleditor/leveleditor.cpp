@@ -184,6 +184,14 @@ void update_mouse_coords() {
 	if (mouse_y > 480 - 1) mouse_y = 480 - 1;
 }
 
+int bound_to_window_w(int x) {
+	return std::max(0, std::min(x, 640));
+}
+
+int bound_to_window_h(int y) {
+	return std::max(0, std::min(y, 480));
+}
+
 CEyecandyContainer eyecandy[3];
 CGameMode		*gamemodes[GAMEMODE_LAST];
 CPlayer			*list_players[4];
@@ -1379,8 +1387,8 @@ int editor_edit()
 
                 case SDL_MOUSEMOTION: {
 						update_mouse_coords();
-						short iClickX = event.button.x / TILESIZE;
-						short iClickY = event.button.y / TILESIZE;
+						short iClickX = bound_to_window_w(event.motion.x) / TILESIZE;
+						short iClickY = bound_to_window_h(event.motion.y) / TILESIZE;
 
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
                         if (edit_mode == 0) {
@@ -2689,8 +2697,8 @@ int editor_platforms()
 				}
             case SDL_MOUSEMOTION: {
 					update_mouse_coords();
-					short ix = event.button.x / TILESIZE;
-					short iy = event.button.y / TILESIZE;
+					short ix = bound_to_window_w(event.motion.x) / TILESIZE;
+					short iy = bound_to_window_h(event.motion.y) / TILESIZE;
 
                 if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
@@ -3330,8 +3338,8 @@ int editor_maphazards()
 				}
             case SDL_MOUSEMOTION: {
 					update_mouse_coords();
-					short iClickX = event.button.x;
-					short iClickY = event.button.y;
+					short iClickX = bound_to_window_w(event.motion.x);
+					short iClickY = bound_to_window_h(event.motion.y);
 
                 if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
                     if (MAPHAZARD_EDIT_STATE_LOCATION == iEditState && !ignoreclick) {
@@ -3691,8 +3699,8 @@ int editor_tiles()
 
             case SDL_MOUSEMOTION: {
 					update_mouse_coords();
-					short iCol = event.button.x / TILESIZE + view_tileset_x;
-					short iRow = event.button.y / TILESIZE + view_tileset_y;
+					short iCol = bound_to_window_w(event.motion.x) / TILESIZE + view_tileset_x;
+					short iRow = bound_to_window_h(event.motion.y) / TILESIZE + view_tileset_y;
 
                 if (iCol < tileset->GetWidth() && iRow < tileset->GetHeight()) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
