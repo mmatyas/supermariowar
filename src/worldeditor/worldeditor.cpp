@@ -12,6 +12,10 @@
 
 #define SMW_EDITOR
 
+#ifdef _MSC_VER
+#define NOMINMAX
+#endif
+
 #include "CmdArgs.h"
 #include "FileIO.h"
 #include "FileList.h"
@@ -38,6 +42,7 @@
 #include "SDL_image.h"
 #include "sdl12wrapper.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <string.h>
 #include <ctype.h>
@@ -109,6 +114,14 @@ void update_mouse_coords() {
 	if (mouse_y < 0) mouse_y = 0;
 	if (mouse_x > 640 - 1) mouse_x = 640 - 1;
 	if (mouse_y > 480 - 1) mouse_y = 480 - 1;
+}
+
+int bound_to_window_w(int x) {
+	return std::max(0, std::min(x, 640));
+}
+
+int bound_to_window_h(int y) {
+	return std::max(0, std::min(y, 480));
 }
 
 //Vehicle structure that holds the current vehicle "stamp"
@@ -1323,8 +1336,8 @@ int editor_edit()
 					}
 
                 case SDL_MOUSEBUTTONDOWN: {
-						short iButtonX = event.button.x - draw_offset_x;
-						short iButtonY = event.button.y - draw_offset_y;
+						short iButtonX = bound_to_window_w(event.button.x) - draw_offset_x;
+						short iButtonY = bound_to_window_h(event.button.y) - draw_offset_y;
 						short iCol = iButtonX / TILESIZE + draw_offset_col;
 						short iRow = iButtonY / TILESIZE + draw_offset_row;
 
@@ -1502,8 +1515,8 @@ int editor_edit()
 					//Painting tiles with mouse movement
                 case SDL_MOUSEMOTION: {
 						update_mouse_coords();
-						short iButtonX = event.button.x - draw_offset_x;
-						short iButtonY = event.button.y - draw_offset_y;
+						short iButtonX = bound_to_window_w(event.motion.x) - draw_offset_x;
+						short iButtonY = bound_to_window_h(event.motion.y) - draw_offset_y;
 						short iCol = (iButtonX >> 5) + draw_offset_col;
 						short iRow = (iButtonY >> 5) + draw_offset_row;
 
@@ -2510,8 +2523,8 @@ int editor_warp()
 				}
 
             case SDL_MOUSEBUTTONDOWN: {
-					short iButtonX = event.button.x / TILESIZE;
-					short iButtonY = event.button.y / TILESIZE;
+					short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+					short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (iButtonX >= 0 && iButtonX <= 9 && iButtonY == 0) {
@@ -2607,8 +2620,8 @@ int editor_start_items()
 				}
 
             case SDL_MOUSEBUTTONDOWN: {
-					short iButtonX = event.button.x;
-					short iButtonY = event.button.y;
+					short iButtonX = bound_to_window_w(event.button.x);
+					short iButtonY = bound_to_window_h(event.button.y);
 
                 if (event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT) {
                     if (g_worldmap.iNumInitialBonuses < 32) {
@@ -2706,8 +2719,8 @@ int editor_boundary()
 				}
 
             case SDL_MOUSEBUTTONDOWN: {
-					short iButtonX = event.button.x / TILESIZE;
-					short iButtonY = event.button.y / TILESIZE;
+					short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+					short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (iButtonX >= 0 && iButtonX <= 9 && iButtonY >= 0 && iButtonY <= 9) {
@@ -2787,8 +2800,8 @@ int editor_type()
 
             case SDL_MOUSEBUTTONDOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
-						short iButtonX = event.button.x / TILESIZE;
-						short iButtonY = event.button.y / TILESIZE;
+						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
 						//Start and doors
                     if (iButtonX >= 0 && iButtonX <= 5 && iButtonY == 0) {
@@ -2859,8 +2872,8 @@ int editor_water()
 
             case SDL_MOUSEBUTTONDOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
-						short iButtonX = event.button.x / TILESIZE;
-						short iButtonY = event.button.y / TILESIZE;
+						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
                     if (iButtonY == 0) {
                         if (iButtonX >= 0 && iButtonX <= 2) {
@@ -2935,8 +2948,8 @@ int editor_background()
 
             case SDL_MOUSEBUTTONDOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
-						short iButtonX = event.button.x / TILESIZE;
-						short iButtonY = event.button.y / TILESIZE;
+						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
 						short iTileStyleOffset = ((iButtonX / 4) + (iPage * 5)) * WORLD_BACKGROUND_SPRITE_SET_SIZE;
 
@@ -3029,8 +3042,8 @@ int editor_stageforeground()
 
             case SDL_MOUSEBUTTONDOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
-						short iButtonX = event.button.x / TILESIZE;
-						short iButtonY = event.button.y / TILESIZE;
+						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
                     if (iButtonX >= 0 && iButtonX < 10) {
                         if (iButtonY >= 0 && iButtonY < 10) {
@@ -3100,8 +3113,8 @@ int editor_bridges()
 
             case SDL_MOUSEBUTTONDOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
-						short iButtonX = event.button.x / TILESIZE;
-						short iButtonY = event.button.y / TILESIZE;
+						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
                     if (iButtonX >= 0 && iButtonX < 4) {
                         if (iButtonY >= 0 && iButtonY < 1) {
@@ -3165,8 +3178,8 @@ int editor_structureforeground()
 
             case SDL_MOUSEBUTTONDOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
-						short iButtonX = event.button.x / TILESIZE;
-						short iButtonY = event.button.y / TILESIZE;
+						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
                     if (iButtonY >= 0 && iButtonY < 15) {
                         if (iButtonX >= 0 && iButtonX < 12) {
@@ -3235,8 +3248,8 @@ int editor_pathsprite()
 
             case SDL_MOUSEBUTTONDOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
-						short iButtonX = event.button.x / TILESIZE;
-						short iButtonY = event.button.y / TILESIZE;
+						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
                     if (iButtonX >= 0 && iButtonX < 8) {
 							if (iButtonY >= 0 && iButtonY < 6)
@@ -3332,8 +3345,8 @@ int editor_vehicles()
 				}
 
             case SDL_MOUSEBUTTONDOWN: {
-					short iButtonX = event.button.x;
-					short iButtonY = event.button.y;
+					short iButtonX = bound_to_window_w(event.button.x);
+					short iButtonY = bound_to_window_h(event.button.y);
 
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						code = mCurrentMenu->MouseClick(iButtonX, iButtonY);
@@ -3425,8 +3438,8 @@ int editor_path()
 
             case SDL_MOUSEBUTTONDOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
-						short iButtonX = event.button.x / TILESIZE;
-						short iButtonY = event.button.y / TILESIZE;
+						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
+						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
                     if (iButtonX >= 0 && iButtonX <= 15 && iButtonY == 0) {
 							set_tile = iButtonX + 1;
@@ -3962,10 +3975,10 @@ int editor_stage()
 				}
 
             case SDL_MOUSEBUTTONDOWN: {
-					short iTileX = event.button.x / TILESIZE;
-					short iTileY = event.button.y / TILESIZE;
-					short iButtonX = event.button.x;
-					short iButtonY = event.button.y;
+					short iTileX = bound_to_window_w(event.button.x) / TILESIZE;
+					short iTileY = bound_to_window_h(event.button.y) / TILESIZE;
+					short iButtonX = bound_to_window_w(event.button.x);
+					short iButtonY = bound_to_window_h(event.button.y);
 
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						//Stages
@@ -4036,8 +4049,8 @@ int editor_stage()
                 if (iEditStage == -1) {
 //						if (event.button.x >= 0 && event.button.y >= 0)
 						{
-							short iMouseX = event.button.x / TILESIZE;
-							short iMouseY = event.button.y / TILESIZE;
+							short iMouseX = bound_to_window_w(event.button.x) / TILESIZE;
+							short iMouseY = bound_to_window_h(event.button.y) / TILESIZE;
 
                         if (iMouseX >= 0 && iMouseX < g_worldmap.iNumStages - (iMouseY * 20) && iMouseY >= 0 && iMouseY <= (g_worldmap.iNumStages - 1) / 20) {
 								iStageDisplay = iMouseX + (iMouseY * 20);
