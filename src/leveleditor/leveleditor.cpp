@@ -418,9 +418,9 @@ int main(int argc, char *argv[])
     if (cmd.debug) {
         cmd::show_windows_console();
     }
-    if (!cmd.data_root.empty())
+    if (!cmd.data_root.empty()) {
         RootDataDirectory = cmd.data_root;
-
+    }
 
 	smw = new CGame(RootDataDirectory.c_str());
 	rm = new CResourceManager();
@@ -869,12 +869,6 @@ int editor_edit()
         if (fExiting) {
 			//handle messages
             while (SDL_PollEvent(&event)) {
-            #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
-                const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-            #else
-                Uint8 * keystate = SDL_GetKeyState(NULL);
-            #endif
-
                 switch (event.type) {
                     case SDL_KEYDOWN: {
 #ifdef USE_SDL2

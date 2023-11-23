@@ -1070,12 +1070,6 @@ int editor_edit()
         if (fExiting) {
 			//handle messages
             while (SDL_PollEvent(&event)) {
-            #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
-                const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-            #else
-                Uint8 * keystate = SDL_GetKeyState(NULL);
-            #endif
-
                 switch (event.type) {
                 case SDL_KEYDOWN: {
 #ifdef USE_SDL2

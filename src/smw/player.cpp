@@ -1857,11 +1857,8 @@ short CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killstyle style,
     if (killed->state != player_ready)
         return player_kill_none;
 
-    bool fSoundPlayed = false;
-    if (game_values.gamemode->chicken == killer && style != kill_style_pow) {
+    if (game_values.gamemode->chicken == killer && style != kill_style_pow)
         ifSoundOnPlay(rm->sfx_chicken);
-        fSoundPlayed = true;
-    }
 
     if (killed->frozen)
         deathstyle = death_style_shatter;

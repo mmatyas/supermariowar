@@ -528,7 +528,6 @@ class MI_World : public UI_Control
 		void UseCloud(bool fUseCloud);
 
 		short iState;
-		bool  fItemPopup;
 		short iStateTransition[4];
 		short iItemPopupDrawY[4];
 		short iPopupOffsets[4];

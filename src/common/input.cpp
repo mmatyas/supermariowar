@@ -117,7 +117,6 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
     for (short iPlayer = -1; iPlayer < MAX_PLAYERS; iPlayer++) {
 		CInputControl * inputControl;
 		COutputControl * outputControl;
-		short iPlayerID = iPlayer;
 		short iDeviceID = DEVICE_KEYBOARD;
 
 		//Allow keyboard input from player 1 at all times (even when he is configured to use joystick)
@@ -125,7 +124,6 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
             if (iGameState == 1 && inputControls[0]->iDevice != DEVICE_KEYBOARD) {
 				inputControl = &game_values.inputConfiguration[0][0].inputGameControls[1];
 				outputControl = &outputControls[0];
-				iPlayerID = 0;
 				iDeviceID = game_values.inputConfiguration[0][0].iDevice;
             } else {
 				continue;

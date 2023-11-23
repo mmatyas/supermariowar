@@ -437,27 +437,13 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
 
 CMap::CMap()
-    : iNumMapItems(0)
-    , iNumMapHazards(0)
-    , platforms(nullptr)
-    , iNumPlatforms(0)
-    , warpexits()
-    , maxConnection(0)
+    : warpexits()
     , tilebltrect()
     , bltrect()
     , drawareas()
-    , numdrawareas(0)
     , iSwitches()
     , racegoallocations()
     , flagbaselocations()
-    , iTileAnimationTimer(0)
-    , iTileAnimationFrame(0)
-    , iAnimatedBackgroundLayers(0)
-    , animatedFrontmapSurface(nullptr)
-    , animatedBackmapSurface(nullptr)
-    , animatedTilesSurface(nullptr)
-    , iAnimatedTileCount(0)
-    , numwarpexits(0)
 {}
 
 CMap::~CMap()

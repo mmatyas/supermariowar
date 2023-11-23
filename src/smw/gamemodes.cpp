@@ -1113,7 +1113,6 @@ void CGM_ShyGuyTag::think()
     //Award points to non shyguys
     if (shyguycount > 0) {
         if (++scorecounter >= game_values.pointspeed) {
-            bool playwarning = false;
             scorecounter = 0;
 
             CPlayer * pCheckWinner = NULL;

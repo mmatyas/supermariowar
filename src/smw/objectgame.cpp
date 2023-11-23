@@ -1365,10 +1365,11 @@ void MO_SuperFireball::update()
     setXf(fx + velx);
     setYf(fy + vely);
 
-    if (ix < 0)
+    if (ix < 0) {
         setXi(ix + smw->ScreenWidth);
-    else if (ix > smw->ScreenWidth - 1)
+    } else if (ix > smw->ScreenWidth - 1) {
         setXi(ix - smw->ScreenWidth);
+    }
 
 	if (iy > smw->ScreenHeight|| iy < -ih || --ttl <= 0)
         removeifprojectile(this, false, true);
@@ -5998,18 +5999,9 @@ bool CO_ThrowBox::collide(CPlayer * player)
         return false;
     }
 
-    if (HasKillVelocity()) {
-        short flipx = 0;
+    if (HasKillVelocity() && player->globalID != iPlayerID)
+        return KillPlayer(player);
 
-        if (player->ix + PW < 320 && ix > 320)
-            flipx = smw->ScreenWidth;
-        else if (ix + iw < 320 && player->ix > 320)
-            flipx = -smw->ScreenWidth;
-
-        if (player->globalID != iPlayerID) {
-            return KillPlayer(player);
-        }
-    }
     /*
     //Kill player when another player is holding the box
     else

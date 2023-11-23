@@ -12,7 +12,6 @@ class MO_IceBlast : public IO_MovingObject
 		void draw();
 
 	private:
-		short colorOffset;
 		short ttl;
 		Spotlight * sSpotlight;
 };

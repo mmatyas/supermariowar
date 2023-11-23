@@ -297,11 +297,11 @@ class CMap
 		short eyecandy[3];
 		short musicCategoryID;
 
-		short iNumMapItems;
-		short iNumMapHazards;
+		short iNumMapItems = 0;
+		short iNumMapHazards = 0;
 
-		short iNumRaceGoals;
-		short iNumFlagBases;
+		short iNumRaceGoals = 0;
+		short iNumFlagBases = 0;
 
 
 	private:
@@ -317,8 +317,8 @@ class CMap
 
 		std::vector<AnimatedTile*> animatedtiles;
 
-		MovingPlatform ** platforms;
-		short		iNumPlatforms;
+		MovingPlatform ** platforms = nullptr;
+		short		iNumPlatforms = 0;
 
 		std::list<MovingPlatform*> tempPlatforms;
 
@@ -330,17 +330,17 @@ class CMap
 		short		totalspawnsize[NUMSPAWNAREATYPES];
 
 		Warp        warpdata[MAPWIDTH][MAPHEIGHT];
-		short		numwarpexits; //number of warp exits
+		short		numwarpexits = 0; //number of warp exits
 		WarpExit	warpexits[MAXWARPS];
 		short		warplocktimer[10];
 		bool		warplocked[10];
-		short		maxConnection;
+		short		maxConnection = 0;
 
 		SDL_Rect	tilebltrect;
 		SDL_Rect    bltrect;
 
 		SDL_Rect	drawareas[MAXDRAWAREAS];
-		short		numdrawareas;
+		short		numdrawareas = 0;
 
 		short		iSwitches[4];
 		std::list<IO_Block*> switchBlocks[8];
@@ -351,17 +351,16 @@ class CMap
 
 		Point       flagbaselocations[4];
 
-		short		iTileAnimationTimer;
-		short		iTileAnimationFrame;
+		short		iTileAnimationTimer = 0;
+		short		iTileAnimationFrame = 0;
 
-		short iAnimatedBackgroundLayers;
-		SDL_Surface * animatedFrontmapSurface;
-		SDL_Surface * animatedBackmapSurface;
+		short iAnimatedBackgroundLayers = 0;
+		SDL_Surface * animatedFrontmapSurface = nullptr;
+		SDL_Surface * animatedTilesSurface = nullptr;
 
-		SDL_Surface * animatedTilesSurface;
-
-		short iAnimatedTileCount;
+		short iAnimatedTileCount = 0;
 		short iAnimatedVectorIndices[NUM_FRAMES_BETWEEN_TILE_ANIMATION + 1];
+		SDL_Surface * animatedBackmapSurface = nullptr;
 
 		std::list<MovingPlatform*> platformdrawlayer[5];
 

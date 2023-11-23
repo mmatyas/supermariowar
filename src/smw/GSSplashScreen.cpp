@@ -188,9 +188,10 @@ void SplashScreenState::update()
 
 #ifndef _XBOX
             case SDLK_F4:
-                if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
+                if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                     game_values.gamestate = GS_QUIT;
                     return;
+                }
                 break;
 
             case SDLK_INSERT:

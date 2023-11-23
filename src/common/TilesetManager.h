@@ -43,7 +43,6 @@ class CTileset
 	private:
 		char szName[256];
 		char szTilesetPath[1024];
-		char szGfxPack[256];
 
 		SDL_Surface * sSurfaces[3];
 		gfxSprite sSprites[3];

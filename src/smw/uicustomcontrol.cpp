@@ -1866,10 +1866,8 @@ MI_BonusWheel::~MI_BonusWheel()
 {
     delete miContinueButton;
 
-    if (miBonusImages) {
-        for (int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
-            delete miBonusImages[iImage];
-    }
+    for (int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
+        delete miBonusImages[iImage];
 
     if (miPlayerImages) {
         for (int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)

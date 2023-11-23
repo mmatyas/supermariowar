@@ -17,7 +17,6 @@ class MO_SledgeHammer : public IO_MovingObject
 		short colorOffset;
 
 	private:
-		short ttl;
 		bool fSuper;
 };
 

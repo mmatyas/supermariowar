@@ -21,17 +21,12 @@ class MysteryMushroomTempPlayer
 		float fOldX, fOldY;
 		float velx, vely;
 
-		bool bobomb;
-		short powerup;
-
 		short burnupstarttimer, burnuptimer;
 
-		bool inair, onice, invincible;
-		short invincibletimer;
+		bool inair, onice;
 
 		MovingPlatform * platform;
 
-		short iCapeFrameX, iCapeFrameY, iCapeTimer, iCapeYOffset;
 		short gamepowerup;
 
 		short iOldPowerupX, iOldPowerupY;
