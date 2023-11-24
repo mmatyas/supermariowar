@@ -91,14 +91,14 @@ CTileset::~CTileset()
 TileType CTileset::GetTileType(short iTileCol, short iTileRow)
 {
 	assert(iTileCol >= 0 && iTileRow >= 0);
-	assert(iTileCol + iTileRow * iWidth < tiletypes.size());
+	assert(static_cast<size_t>(iTileCol + iTileRow * iWidth) < tiletypes.size());
 	return tiletypes[iTileCol + iTileRow * iWidth];
 }
 
 void CTileset::SetTileType(short iTileCol, short iTileRow, TileType type)
 {
 	assert(iTileCol >= 0 && iTileRow >= 0);
-	assert(iTileCol + iTileRow * iWidth < tiletypes.size());
+	assert(static_cast<size_t>(iTileCol + iTileRow * iWidth) < tiletypes.size());
 	tiletypes[iTileCol + iTileRow * iWidth] = type;
 }
 
@@ -106,7 +106,7 @@ TileType CTileset::IncrementTileType(short iTileCol, short iTileRow)
 {
 	assert(iTileCol >= 0 && iTileRow >= 0);
 	short iTile = iTileCol + iTileRow * iWidth;
-	assert(iTile < tiletypes.size());
+	assert(static_cast<size_t>(iTile) < tiletypes.size());
 	tiletypes[iTile] = NextTileType(tiletypes[iTile]);
 
 	return tiletypes[iTile];
@@ -116,7 +116,7 @@ TileType CTileset::DecrementTileType(short iTileCol, short iTileRow)
 {
 	assert(iTileCol >= 0 && iTileRow >= 0);
 	short iTile = iTileCol + iTileRow * iWidth;
-	assert(iTile < tiletypes.size());
+	assert(static_cast<size_t>(iTile) < tiletypes.size());
 	tiletypes[iTile] = PrevTileType(tiletypes[iTile]);
 
 	return tiletypes[iTile];

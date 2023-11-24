@@ -26,7 +26,6 @@ public:
 private:
     MI_TextField * miNetNewRoomNameField;
     MI_TextField * miNetNewRoomPasswordField;
-    MI_SelectField * miNetNewRoomPrivateToggle;
     MI_Button * miNetNewRoomCreateButton;
     MI_Button * miNetNewRoomBackButton;
 
