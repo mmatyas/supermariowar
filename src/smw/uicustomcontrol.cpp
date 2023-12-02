@@ -299,18 +299,18 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
         miPowerupSlider[iPowerup]->SetItemChangedCode(MENU_CODE_POWERUP_SETTING_CHANGED);
     }
 
-    miRestoreDefaultsButton = new MI_Button(&rm->spr_selectfield, 160, 432, "Defaults", 150, TextAlignment::CENTER);
+    miRestoreDefaultsButton = new MI_Button(&rm->spr_selectfield, 160, 432, "Defaults", 150, TextAlign::CENTER);
     miRestoreDefaultsButton->SetCode(MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS);
 
-    miClearButton = new MI_Button(&rm->spr_selectfield, 330, 432, "Clear", 150, TextAlignment::CENTER);
+    miClearButton = new MI_Button(&rm->spr_selectfield, 330, 432, "Clear", 150, TextAlign::CENTER);
     miClearButton->SetCode(MENU_CODE_CLEAR_POWERUP_WEIGHTS);
 
     //Are You Sure dialog box
     miDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miDialogAreYouText = new MI_HeaderText("Are You", 320, 195);
     miDialogSureText = new MI_HeaderText("Sure?", 320, 220);
-    miDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
-    miDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
+    miDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlign::CENTER);
+    miDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlign::CENTER);
 
     miDialogYesButton->SetCode(MENU_CODE_POWERUP_RESET_YES);
     miDialogNoButton->SetCode(MENU_CODE_POWERUP_RESET_NO);
@@ -1036,7 +1036,7 @@ void MI_PlaylistField::Draw()
  * MI_StoredPowerupResetButton Class
  **************************************/
 
-MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, const char * name, short width, TextAlignment align) :
+MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, const char * name, short width, TextAlign align) :
     MI_Button(nspr, x, y, name, width, align)
 {
     spr = nspr;
@@ -1858,7 +1858,7 @@ MI_BonusWheel::MI_BonusWheel(short x, short y) :
     //Fix the last sector to allow correct detection of sector for tick sound
     dSelectionSector[NUMBONUSITEMSONWHEEL] = TWO_PI;
 
-    miContinueButton = new MI_Button(&rm->menu_plain_field, ix + 76, iy + 390, "Continue", 200, TextAlignment::CENTER);
+    miContinueButton = new MI_Button(&rm->menu_plain_field, ix + 76, iy + 390, "Continue", 200, TextAlign::CENTER);
     miContinueButton->Show(false);
     miContinueButton->SetCode(MENU_CODE_BONUS_DONE);
 }

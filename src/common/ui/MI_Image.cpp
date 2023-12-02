@@ -1,5 +1,7 @@
 #include "MI_Image.h"
 
+#include "gfx.h"
+
 #include <cmath>
 
 
@@ -11,10 +13,10 @@ MI_Image::MI_Image(
         short numxframes, short numyframes, short speed)
     : UI_Control(x, y)
     , spr(nspr)
-    , isrcx(srcx)
-    , isrcy(srcy)
     , iNumXFrames(numxframes)
     , iNumYFrames(numyframes)
+    , isrcx(srcx)
+    , isrcy(srcy)
     , iw(w)
     , ih(h)
     , iSpeed(speed)

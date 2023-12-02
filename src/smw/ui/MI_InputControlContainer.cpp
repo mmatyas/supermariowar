@@ -2,6 +2,7 @@
 
 #include "GameValues.h"
 #include "gfx/gfxSprite.h"
+#include "uimenu.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_SelectField.h"
@@ -398,7 +399,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
         miDeviceSelectField->SetKey(iDevice);
     }
 
-    miInputTypeButton = new MI_Button(spr_button, x + 336, y + 84, "Game", 100, TextAlignment::CENTER);
+    miInputTypeButton = new MI_Button(spr_button, x + 336, y + 84, "Game", 100, TextAlign::CENTER);
     miInputTypeButton->SetCode(MENU_CODE_INPUT_TYPE_CHANGED);
 
 
@@ -420,7 +421,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
         miMenuInputControlFields[iKey]->SetKey(&game_values.playerInput.inputControls[iPlayerID]->inputGameControls[1].keys[iKey]);
     }
 
-    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miBackButton->SetCode(MENU_CODE_BACK_TO_CONTROLS_MENU);
 
     mInputMenu = new UI_Menu();

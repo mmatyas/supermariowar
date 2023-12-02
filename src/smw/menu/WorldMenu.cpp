@@ -20,8 +20,8 @@ UI_WorldMenu::UI_WorldMenu() : UI_Menu()
     miWorldExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miWorldExitDialogExitTourText = new MI_HeaderText("Exit World", 320, 205);
 
-    miWorldExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
-    miWorldExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
+    miWorldExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlign::CENTER);
+    miWorldExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlign::CENTER);
 
     miWorldExitDialogYesButton->SetCode(MENU_CODE_EXIT_WORLD_YES);
     miWorldExitDialogNoButton->SetCode(MENU_CODE_EXIT_WORLD_NO);

@@ -2,7 +2,6 @@
 #define MENU_NETLOBBY_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
 #include "uicustomcontrol.h"
 
 class MI_TextField;

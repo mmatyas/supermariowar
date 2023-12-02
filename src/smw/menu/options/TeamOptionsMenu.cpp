@@ -40,7 +40,7 @@ UI_TeamOptionsMenu::UI_TeamOptionsMenu() : UI_Menu()
     miTournamentControlField->SetData(&game_values.tournamentcontrolstyle, NULL, NULL);
     miTournamentControlField->SetKey(game_values.tournamentcontrolstyle);
 
-    miTeamOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miTeamOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miTeamOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miTeamOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

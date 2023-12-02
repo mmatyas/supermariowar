@@ -2,13 +2,16 @@
 
 #include "uicontrol.h"
 
+#include <functional>
 #include <memory>
 #include <string>
+
+class gfxSprite;
 
 
 class MI_Button : public UI_Control {
 public:
-    MI_Button(gfxSprite* nspr, short x, short y, std::string name, short width, TextAlignment align = TextAlignment::LEFT);
+    MI_Button(gfxSprite* nspr, short x, short y, std::string name, short width, TextAlign align = TextAlign::LEFT);
 
     void Draw() override;
     MenuCodeEnum Modify(bool fModify) override;
@@ -29,7 +32,7 @@ protected:
 
     short iWidth = 0;
     short iIndent = 0;
-    TextAlignment m_text_align = TextAlignment::LEFT;
+    TextAlign m_text_align = TextAlign::LEFT;
 
     MenuCodeEnum menuCode = MENU_CODE_NONE;
 

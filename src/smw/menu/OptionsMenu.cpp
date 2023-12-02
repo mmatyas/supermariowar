@@ -11,39 +11,39 @@ extern CGameValues game_values;
 
 UI_OptionsMenu::UI_OptionsMenu() : UI_Menu()
 {
-    miGameplayOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 40, "Gameplay", 400, TextAlignment::CENTER);
+    miGameplayOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 40, "Gameplay", 400, TextAlign::CENTER);
     miGameplayOptionsMenuButton->SetCode(MENU_CODE_TO_GAMEPLAY_OPTIONS_MENU);
 
-    miTeamOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 80, "Team", 400, TextAlignment::CENTER);
+    miTeamOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 80, "Team", 400, TextAlign::CENTER);
     miTeamOptionsMenuButton->SetCode(MENU_CODE_TO_TEAM_OPTIONS_MENU);
 
-    miPowerupOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 120, "Item Selection", 400, TextAlignment::CENTER);
+    miPowerupOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 120, "Item Selection", 400, TextAlign::CENTER);
     miPowerupOptionsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SELECTION_MENU);
 
-    miPowerupSettingsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 160, "Item Settings", 400, TextAlignment::CENTER);
+    miPowerupSettingsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 160, "Item Settings", 400, TextAlign::CENTER);
     miPowerupSettingsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SETTINGS_MENU);
 
-    miProjectilesOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 200, "Weapons & Projectiles", 400, TextAlignment::CENTER);
+    miProjectilesOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 200, "Weapons & Projectiles", 400, TextAlign::CENTER);
     miProjectilesOptionsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_OPTIONS_MENU);
 
-    miProjectilesLimitsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 240, "Weapon Use Limits", 400, TextAlignment::CENTER);
+    miProjectilesLimitsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 240, "Weapon Use Limits", 400, TextAlign::CENTER);
     miProjectilesLimitsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_LIMITS_MENU);
 
-    miGraphicsOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 280, "Graphics", 400, TextAlignment::CENTER);
+    miGraphicsOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 280, "Graphics", 400, TextAlign::CENTER);
     miGraphicsOptionsMenuButton->SetCode(MENU_CODE_TO_GRAPHICS_OPTIONS_MENU);
 
-    miEyeCandyOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 320, "Eye Candy", 400, TextAlignment::CENTER);
+    miEyeCandyOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 320, "Eye Candy", 400, TextAlign::CENTER);
     miEyeCandyOptionsMenuButton->SetCode(MENU_CODE_TO_EYECANDY_OPTIONS_MENU);
 
-    miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &rm->spr_selectfield : &rm->spr_selectfielddisabled), 120, 360, "Music & Sound", 400, TextAlignment::CENTER);
+    miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &rm->spr_selectfield : &rm->spr_selectfielddisabled), 120, 360, "Music & Sound", 400, TextAlign::CENTER);
 
     if (game_values.soundcapable)
         miSoundOptionsMenuButton->SetCode(MENU_CODE_TO_SOUND_OPTIONS_MENU);
 
-    miGenerateMapThumbsButton = new MI_Button(&rm->spr_selectfield, 120, 400, "Refresh Maps", 400, TextAlignment::CENTER);
+    miGenerateMapThumbsButton = new MI_Button(&rm->spr_selectfield, 120, 400, "Refresh Maps", 400, TextAlign::CENTER);
     miGenerateMapThumbsButton->SetCode(MENU_CODE_SAVE_ALL_MAP_THUMBNAILS);
 
-    miOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miOptionsMenuBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
     miOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -53,8 +53,8 @@ UI_OptionsMenu::UI_OptionsMenu() : UI_Menu()
     miGenerateThumbsDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miGenerateThumbsDialogAreYouText = new MI_HeaderText("Are You", 320, 195);
     miGenerateThumbsDialogSureText = new MI_HeaderText("Sure?", 320, 220);
-    miGenerateThumbsDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
-    miGenerateThumbsDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
+    miGenerateThumbsDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlign::CENTER);
+    miGenerateThumbsDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlign::CENTER);
 
     miGenerateThumbsDialogYesButton->SetCode(MENU_CODE_GENERATE_THUMBS_RESET_YES);
     miGenerateThumbsDialogNoButton->SetCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);

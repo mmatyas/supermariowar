@@ -30,7 +30,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miClassicModeScoringField->SetData(&game_values.gamemodemenusettings.classic.scoring, NULL, NULL);
     miClassicModeScoringField->SetKey(game_values.gamemodemenusettings.classic.scoring);
 
-    miClassicModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miClassicModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miClassicModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miClassicModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -65,7 +65,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miFragModeScoringField->SetData(&game_values.gamemodemenusettings.frag.scoring, NULL, NULL);
     miFragModeScoringField->SetKey(game_values.gamemodemenusettings.frag.scoring);
 
-    miFragModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miFragModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miFragModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miFragModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -126,7 +126,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miTimeLimitModePercentExtraTime->SetKey(game_values.gamemodemenusettings.time.percentextratime);
     miTimeLimitModePercentExtraTime->SetNoWrap(true);
 
-    miTimeLimitModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miTimeLimitModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miTimeLimitModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miTimeLimitModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -207,7 +207,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miJailModeJailKeyField->SetKey(game_values.gamemodemenusettings.jail.percentkey);
     miJailModeJailKeyField->SetNoWrap(true);
 
-    miJailModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miJailModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miJailModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miJailModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -279,7 +279,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miCoinModePercentExtraCoin->SetKey(game_values.gamemodemenusettings.coins.percentextracoin);
     miCoinModePercentExtraCoin->SetNoWrap(true);
 
-    miCoinModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miCoinModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miCoinModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miCoinModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -332,7 +332,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
         miStompModeEnemySlider[iEnemy]->SetKey(game_values.gamemodemenusettings.stomp.enemyweight[iEnemy]);
     }
 
-    miStompModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miStompModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miStompModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miStompModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -401,7 +401,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miEggModeExplosionTimeField->SetData(&game_values.gamemodemenusettings.egg.explode, NULL, NULL);
     miEggModeExplosionTimeField->SetKey(game_values.gamemodemenusettings.egg.explode);
 
-    miEggModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miEggModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miEggModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miEggModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -493,7 +493,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miFlagModeCenterFlagField->SetKey(game_values.gamemodemenusettings.flag.centerflag ? 1 : 0);
     miFlagModeCenterFlagField->SetAutoAdvance(true);
 
-    miFlagModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miFlagModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miFlagModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miFlagModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -535,7 +535,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miChickenModeGlideField->SetKey(game_values.gamemodemenusettings.chicken.glide ? 1 : 0);
     miChickenModeGlideField->SetAutoAdvance(true);
 
-    miChickenModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miChickenModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miChickenModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miChickenModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -566,7 +566,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miTagModeTagOnTouchField->SetKey(game_values.gamemodemenusettings.tag.tagontouch ? 1 : 0);
     miTagModeTagOnTouchField->SetAutoAdvance(true);
 
-    miTagModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miTagModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miTagModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miTagModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -639,7 +639,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miStarModePercentExtraTime->SetKey(game_values.gamemodemenusettings.star.percentextratime);
     miStarModePercentExtraTime->SetNoWrap(true);
 
-    miStarModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miStarModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miStarModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miStarModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -707,7 +707,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miDominationModeRelocateFrequencyField->SetData(&game_values.gamemodemenusettings.domination.relocationfrequency, NULL, NULL);
     miDominationModeRelocateFrequencyField->SetKey(game_values.gamemodemenusettings.domination.relocationfrequency);
 
-    miDominationModeDeathText = new MI_Text("On Death", 120, 210, 0, true, TextAlignment::LEFT);
+    miDominationModeDeathText = new MI_Text("On Death", 120, 210, 0, true, TextAlign::LEFT);
 
     miDominationModeLoseOnDeathField = new MI_SelectField(&rm->spr_selectfield, 120, 240, "Lose Bases", 400, 180);
     miDominationModeLoseOnDeathField->Add("Off", 0, "", false, false);
@@ -731,7 +731,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miDominationModeStealOnDeathField->SetAutoAdvance(true);
 
 
-    miDominationModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miDominationModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miDominationModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miDominationModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -794,7 +794,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miKingOfTheHillModeMultiplierField->SetData(&game_values.gamemodemenusettings.kingofthehill.maxmultiplier, NULL, NULL);
     miKingOfTheHillModeMultiplierField->SetKey(game_values.gamemodemenusettings.kingofthehill.maxmultiplier);
 
-    miKingOfTheHillModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miKingOfTheHillModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miKingOfTheHillModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miKingOfTheHillModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -849,7 +849,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miRaceModePenaltyField->SetData(&game_values.gamemodemenusettings.race.penalty, NULL, NULL);
     miRaceModePenaltyField->SetKey(game_values.gamemodemenusettings.race.penalty);
 
-    miRaceModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miRaceModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miRaceModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miRaceModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -942,7 +942,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miSurvivalModeShieldField->SetKey(game_values.gamemodemenusettings.survival.shield ? 1 : 0);
     miSurvivalModeShieldField->SetAutoAdvance(true);
 
-    miSurvivalModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miSurvivalModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miSurvivalModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miSurvivalModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -1031,7 +1031,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miGreedModePercentExtraCoin->SetKey(game_values.gamemodemenusettings.greed.percentextracoin);
     miGreedModePercentExtraCoin->SetNoWrap(true);
 
-    miGreedModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miGreedModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miGreedModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miGreedModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -1112,7 +1112,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miHealthModePercentExtraLife->SetKey(game_values.gamemodemenusettings.health.percentextralife);
     miHealthModePercentExtraLife->SetNoWrap(true);
 
-    miHealthModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miHealthModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miHealthModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miHealthModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -1199,7 +1199,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miCollectionModeCardLifeField->SetData(&game_values.gamemodemenusettings.collection.cardlife, NULL, NULL);
     miCollectionModeCardLifeField->SetKey(game_values.gamemodemenusettings.collection.cardlife);
 
-    miCollectionModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miCollectionModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miCollectionModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miCollectionModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -1247,7 +1247,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
         miChaseModeQuantitySlider[iPhanto]->SetKey(game_values.gamemodemenusettings.chase.phantoquantity[iPhanto]);
     }
 
-    miChaseModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miChaseModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miChaseModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miChaseModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -1303,7 +1303,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miShyGuyTagModeFreeTimeField->SetData(&game_values.gamemodemenusettings.shyguytag.freetime, NULL, NULL);
     miShyGuyTagModeFreeTimeField->SetKey(game_values.gamemodemenusettings.shyguytag.freetime);
 
-    miShyGuyTagModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miShyGuyTagModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miShyGuyTagModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miShyGuyTagModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -1367,7 +1367,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miBossModeHitPointsField->SetData(&game_values.gamemodemenusettings.boss.hitpoints, NULL, NULL);
     miBossModeHitPointsField->SetKey(game_values.gamemodemenusettings.boss.hitpoints);
 
-    miBossModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miBossModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miBossModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miBossModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

@@ -3,11 +3,13 @@
 #include "GameValues.h"
 #include "ResourceManager.h"
 
+#include <cassert>
 #include <cmath>
 #include <cstring>
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
+
 
 UI_Control::UI_Control(short x, short y)
     : ix(x)
@@ -38,4 +40,9 @@ UI_Control& UI_Control::operator= (const UI_Control& other)
 UI_Control::UI_Control(const UI_Control& other)
 {
     *this = other;
+}
+
+void UI_Control::SetNeighbor(unsigned short iNeighbor, UI_Control* uiControl) {
+    assert(iNeighbor < neighborControls.size());
+    neighborControls[iNeighbor] = uiControl;
 }

@@ -4,6 +4,10 @@
 #include "uicontrol.h"
 
 #include <string>
+#include <vector>
+
+class gfxSprite;
+
 
 class StringScrollElement {
 public:

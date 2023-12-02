@@ -9,19 +9,19 @@ extern CResourceManager* rm;
 
 UI_PlayerControlsSelectMenu::UI_PlayerControlsSelectMenu() : UI_Menu()
 {
-    miPlayer1ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 140, "Player 1", 400, TextAlignment::CENTER);
+    miPlayer1ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 140, "Player 1", 400, TextAlign::CENTER);
     miPlayer1ControlsButton->SetCode(MENU_CODE_TO_PLAYER_1_CONTROLS);
 
-    miPlayer2ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 180, "Player 2", 400, TextAlignment::CENTER);
+    miPlayer2ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 180, "Player 2", 400, TextAlign::CENTER);
     miPlayer2ControlsButton->SetCode(MENU_CODE_TO_PLAYER_2_CONTROLS);
 
-    miPlayer3ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 220, "Player 3", 400, TextAlignment::CENTER);
+    miPlayer3ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 220, "Player 3", 400, TextAlign::CENTER);
     miPlayer3ControlsButton->SetCode(MENU_CODE_TO_PLAYER_3_CONTROLS);
 
-    miPlayer4ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 260, "Player 4", 400, TextAlignment::CENTER);
+    miPlayer4ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 260, "Player 4", 400, TextAlign::CENTER);
     miPlayer4ControlsButton->SetCode(MENU_CODE_TO_PLAYER_4_CONTROLS);
 
-    miPlayerControlsBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miPlayerControlsBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miPlayerControlsBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
     miPlayerControlsLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

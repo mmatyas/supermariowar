@@ -1,6 +1,8 @@
 #include "MI_MapField.h"
 
+#include "input.h"
 #include "MapList.h"
+#include "ObjectContainer.h"
 #include "ResourceManager.h"
 #include "ui/MI_Image.h"
 

@@ -3,8 +3,11 @@
 
 #include "uicontrol.h"
 #include "gfx/gfxSprite.h"
+#include "RandomNumberGenerator.h"
 
 #include <string>
+#include <vector>
+
 
 class MI_Image;
 

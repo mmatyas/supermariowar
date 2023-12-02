@@ -2,6 +2,8 @@
 
 #include "uicontrol.h"
 
+class gfxSprite;
+
 
 class MI_Image : public UI_Control {
 public:

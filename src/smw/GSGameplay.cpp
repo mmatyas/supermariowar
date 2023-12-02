@@ -11,6 +11,7 @@
 #include "object.h"
 #include "objectgame.h"
 #include "objecthazard.h"
+#include "ObjectContainer.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"

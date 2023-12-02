@@ -1,19 +1,14 @@
-#ifndef UICONTROL_H
-#define UICONTROL_H
+#pragma once
 
-#include "input.h"
-#include "ObjectContainer.h"
-#include "RandomNumberGenerator.h"
-#include "uimenu.h"
+#include "ui/MenuCode.h"
 
 #include <array>
-#include <cassert>
-#include <functional>
 
+class CPlayerInput;
 class UI_Menu;
 
 
-enum class TextAlignment: unsigned char {
+enum class TextAlign: unsigned char {
     LEFT,
     CENTER,
     RIGHT,
@@ -25,13 +20,13 @@ class UI_Control
 public:
     UI_Control(short x, short y);
     UI_Control(const UI_Control&);
-    UI_Control & operator= (const UI_Control&);
-    virtual ~UI_Control() {}
+    UI_Control& operator=(const UI_Control&);
+    virtual ~UI_Control() = default;
 
     virtual void Update() {}
     virtual void Draw() {}
 
-    virtual MenuCodeEnum SendInput(CPlayerInput *) {
+    virtual MenuCodeEnum SendInput(CPlayerInput*) {
         return MENU_CODE_NONE;
     }
 
@@ -64,11 +59,9 @@ public:
         iy = y;
     }
 
-    void SetNeighbor(short iNeighbor, UI_Control * uiControl) {
-        assert(iNeighbor < 4);
-        neighborControls[iNeighbor] = uiControl;
-    }
-    UI_Control * GetNeighbor(short iNeighbor) {
+    void SetNeighbor(unsigned short iNeighbor, UI_Control* uiControl);
+
+    UI_Control* GetNeighbor(short iNeighbor) const {
         return neighborControls[iNeighbor];
     }
 
@@ -79,11 +72,11 @@ public:
         return fShow;
     }
 
-    void SetMenuParent(UI_Menu * menu) {
+    void SetMenuParent(UI_Menu* menu) {
         uiMenu = menu;
     }
 
-    bool IsModifying() {
+    bool IsModifying() const {
         return fModifying;
     }
 
@@ -102,7 +95,8 @@ public:
     }
 
 protected:
-    short ix, iy;
+    short ix = 0;
+    short iy = 0;
 
     bool fSelected = false;
     bool fModifying = false;
@@ -115,5 +109,3 @@ protected:
     UI_Menu* uiMenu = nullptr;
     short iControllingTeam = -1;
 };
-
-#endif // UICONTROL_H

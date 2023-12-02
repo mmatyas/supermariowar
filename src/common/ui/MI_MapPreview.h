@@ -1,13 +1,19 @@
 #ifndef UI_MAP_PREVIEW
 #define UI_MAP_PREVIEW
 
+#include "SDL.h"
 #include "uicontrol.h"
+
+#include <string>
+
+class gfxSprite;
+
 
 class MI_MapPreview : public UI_Control
 {
 public:
 
-    MI_MapPreview(gfxSprite * nspr, short x, short y, short width, short indent);
+    MI_MapPreview(gfxSprite* nspr, short x, short y, short width, short indent);
     virtual ~MI_MapPreview();
 
     //Updates animations or other events every frame

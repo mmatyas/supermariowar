@@ -69,7 +69,7 @@ UI_SoundOptionsMenu::UI_SoundOptionsMenu() : UI_Menu()
     worldmusiclist->SetCurrent(iCurrentMusic);
     miWorldMusicField->SetItemChangedCode(MENU_CODE_WORLD_MUSIC_CHANGED);
 
-    miSoundOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miSoundOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miSoundOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miSoundOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

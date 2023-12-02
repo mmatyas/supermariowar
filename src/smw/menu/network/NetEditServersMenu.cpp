@@ -18,20 +18,20 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     currentState = DEFAULT;
     std::fill(dialogTextData, dialogTextData + 128, 0);
 
-    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
-    miAddButton = new MI_Button(&rm->spr_selectfield, 40, 40, "Add", 200, TextAlignment::CENTER);
+    miAddButton = new MI_Button(&rm->spr_selectfield, 40, 40, "Add", 200, TextAlign::CENTER);
     miAddButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_ADD_BTN);
 
-    miEditButton = new MI_Button(&rm->spr_selectfield, 40, 80, "Edit", 200, TextAlignment::CENTER);
+    miEditButton = new MI_Button(&rm->spr_selectfield, 40, 80, "Edit", 200, TextAlign::CENTER);
     miEditButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_EDIT_BTN);
 
-    miRemoveButton = new MI_Button(&rm->spr_selectfield, 40, 120, "Remove", 200, TextAlignment::CENTER);
+    miRemoveButton = new MI_Button(&rm->spr_selectfield, 40, 120, "Remove", 200, TextAlign::CENTER);
     miRemoveButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE_BTN);
 
-    miInstructionsText1 = new MI_Text("", 40, 195, 0, true, TextAlignment::LEFT);
-    miInstructionsText2 = new MI_Text("", 40, 215, 0, true, TextAlignment::LEFT);
+    miInstructionsText1 = new MI_Text("", 40, 195, 0, true, TextAlign::LEFT);
+    miInstructionsText2 = new MI_Text("", 40, 215, 0, true, TextAlign::LEFT);
 
     miLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
@@ -43,12 +43,12 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     miServerScroll->SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
     miServerScroll->Deactivate();
 
-    miDialogTitle = new MI_Text("Enter a new server address below:", 40, 370, 0, true, TextAlignment::LEFT);
+    miDialogTitle = new MI_Text("Enter a new server address below:", 40, 370, 0, true, TextAlign::LEFT);
     miDialogTextField = new MI_TextField(&rm->menu_plain_field, 40, 395, "URL or IP", 640 - 2 * 40, 150);
     miDialogTextField->SetData(dialogTextData, 127);
-    miDialogOK = new MI_Button(&rm->spr_selectfield, 40, 432, "OK", 100, TextAlignment::CENTER);
+    miDialogOK = new MI_Button(&rm->spr_selectfield, 40, 432, "OK", 100, TextAlign::CENTER);
     miDialogOK->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DIALOG_OK_BTN);
-    miDialogCancel = new MI_Button(&rm->spr_selectfield, 150, 432, "Cancel", 100, TextAlignment::CENTER);
+    miDialogCancel = new MI_Button(&rm->spr_selectfield, 150, 432, "Cancel", 100, TextAlign::CENTER);
     miDialogCancel->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
     miDialogTitle->Show(false);

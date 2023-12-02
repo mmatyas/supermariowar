@@ -3,6 +3,7 @@
 #include "GameValues.h"
 #include "map.h"
 #include "MapList.h"
+#include "ObjectContainer.h"
 #include "objecthazard.h"
 #include "ResourceManager.h"
 

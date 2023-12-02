@@ -77,7 +77,7 @@ UI_PowerupSettingsMenu::UI_PowerupSettingsMenu() : UI_Menu()
     miStoredPowerupResetButton = new MI_StoredPowerupResetButton(&rm->spr_selectfield, 70, 340, "Reset Stored Items", 500);
     miStoredPowerupResetButton->SetCode(MENU_CODE_RESET_STORED_POWERUPS);
 
-    miPowerupSettingsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miPowerupSettingsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miPowerupSettingsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miPowerupSettingsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

@@ -84,7 +84,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
         miPowerupSlider[iPowerup]->SetKey(game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
     }
 
-    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     miUpArrow = new MI_Image(&rm->menu_verticalarrows, 310, 162, 20, 0, 20, 20, 1, 4, 8);

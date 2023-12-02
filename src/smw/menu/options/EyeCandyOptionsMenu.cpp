@@ -73,7 +73,7 @@ UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu() : UI_Menu()
     miDeadTeamNoticeField->SetKey(game_values.deadteamnotice ? 1 : 0);
     miDeadTeamNoticeField->SetAutoAdvance(true);
 
-    miEyeCandyOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miEyeCandyOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miEyeCandyOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miEyeCandyOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

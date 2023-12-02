@@ -1,4 +1,7 @@
+#include "input.h"
 #include "uicontrol.h"
+
+#include <string>
 
 class gfxSprite;
 class MI_Image;

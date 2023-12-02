@@ -24,6 +24,7 @@
 #include "map.h"
 #include "MapList.h"
 #include "menu/ModeOptionsMenu.h"
+#include "ObjectContainer.h"
 #include "objectgame.h"
 #include "ResourceManager.h"
 #include "sfx.h"
@@ -755,8 +756,8 @@ int main(int argc, char *argv[])
 	miDeleteStageDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miDeleteStageDialogAreYouText = new MI_HeaderText("Are You", 320, 195);
     miDeleteStageDialogSureText = new MI_HeaderText("Sure?", 320, 220);
-    miDeleteStageDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
-    miDeleteStageDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
+    miDeleteStageDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlign::CENTER);
+    miDeleteStageDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlign::CENTER);
 
 	miDeleteStageDialogYesButton->SetCode(MENU_CODE_DELETE_STAGE_YES);
 	miDeleteStageDialogNoButton->SetCode(MENU_CODE_DELETE_STAGE_NO);
@@ -908,10 +909,10 @@ int main(int argc, char *argv[])
 	miVehicleBoundaryField->SetKey(g_wvVehicleStamp.iBoundary);
 	miVehicleBoundaryField->AllowFastScroll(true);
 
-    miVehicleCreateButton = new MI_Button(&rm->spr_selectfield, 430, 360, "OK", 140, TextAlignment::CENTER);
+    miVehicleCreateButton = new MI_Button(&rm->spr_selectfield, 430, 360, "OK", 140, TextAlign::CENTER);
 	miVehicleCreateButton->SetCode(MENU_CODE_CREATE_VEHICLE);
 
-    miTitleText = new MI_Text("Clicking on the map will add the vehicle configured below", 320, 50, 640, true, TextAlignment::CENTER);
+    miTitleText = new MI_Text("Clicking on the map will add the vehicle configured below", 320, 50, 640, true, TextAlign::CENTER);
 
 	mVehicleMenu.AddNonControl(miTitleText);
 

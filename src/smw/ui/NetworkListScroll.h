@@ -1,5 +1,11 @@
 #include "uicontrol.h"
 
+#include <string>
+#include <vector>
+
+class gfxSprite;
+
+
 class NLS_ListItem {
 public:
     NLS_ListItem();

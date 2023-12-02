@@ -135,7 +135,7 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     miSecretsField->SetData(NULL, NULL, &game_values.secretsenabled);
     miSecretsField->SetKey(game_values.secretsenabled ? 1 : 0);
 
-    miGameplayOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miGameplayOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miGameplayOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miGameplayOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

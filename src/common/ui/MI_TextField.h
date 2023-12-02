@@ -5,12 +5,13 @@
 #include <memory>
 #include <string>
 
+class gfxSprite;
 class MI_Image;
 
 
 class MI_TextField : public UI_Control {
 public:
-    MI_TextField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+    MI_TextField(gfxSprite* nspr, short x, short y, const char * name, short width, short indent);
 
     void SetTitle(std::string name);
 
@@ -20,7 +21,7 @@ public:
     }
 
     //Called when user selects this control to change it's value
-    MenuCodeEnum Modify(bool modify);
+    MenuCodeEnum Modify(bool modify) override;
 
     void Clear() {
         szOutValue[0] = 0;
@@ -29,13 +30,13 @@ public:
     }
 
     //Updates animations or other events every frame
-    void Update();
+    void Update() override;
 
     //Draws every frame
-    virtual void Draw();
+    void Draw() override;
 
     //Sends player input to control on every frame
-    virtual MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    MenuCodeEnum SendInput(CPlayerInput * playerInput) override;
 
     //When the item is changed, this code will be returned from SendInput()
     void SetItemChangedCode(MenuCodeEnum code) {
@@ -48,9 +49,9 @@ public:
     //Set where the data of this control is written to (some member of game_values probably)
     void SetData(char* data, short maxchars);
 
-    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY) override;
 
-    void Refresh();
+    void Refresh() override;
 
     void SetDisallowedChars(const char * chars);
 

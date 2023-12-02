@@ -1,5 +1,6 @@
 #include "MI_TeamSelect.h"
 
+#include "Game.h"
 #include "GameValues.h"
 #include "ResourceManager.h"
 #include "FileList.h"
@@ -7,6 +8,7 @@
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
+extern CGame* smw;
 
 extern SkinList *skinlist;
 

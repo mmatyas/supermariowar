@@ -158,7 +158,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu() : UI_Menu()
     miWandLimitField ->SetData(&game_values.wandlimit, NULL, NULL);
     miWandLimitField ->SetKey(game_values.wandlimit);
 
-    miProjectilesLimitsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
+    miProjectilesLimitsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miProjectilesLimitsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miProjectilesLimitsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
