@@ -23,9 +23,9 @@ UI_MainMenu::UI_MainMenu() : UI_Menu()
 
 // disable Multiplayer button for web builds
 #ifdef __EMSCRIPTEN__
-    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer - Under Construction", 400, 0);
-    miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 400, 0);
-    miControlsButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Controls", 400, 0);
+    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer - Under Construction", 400);
+    miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 400);
+    miControlsButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Controls", 400);
 #else
     miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer", 400);
     miMultiplayerButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
