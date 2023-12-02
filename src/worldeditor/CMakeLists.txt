@@ -1,17 +1,30 @@
 add_executable(smw-worldedit WIN32
 	../common/movingplatform.cpp
+	../common/movingplatform.h
 	../smw/world.cpp
+	../smw/world.h
 	../smw/objects/moving/MovingObject.cpp
+	../smw/objects/moving/MovingObject.h
 	../smw/objects/overmap/OverMapObject.cpp
+	../smw/objects/overmap/OverMapObject.h
 	../smw/ObjectContainer.cpp
+	../smw/ObjectContainer.h
 	../smw/objecthazard.cpp
+	../smw/objecthazard.h
 	../smw/menu/ModeOptionsMenu.cpp
+	../smw/menu/ModeOptionsMenu.h
 	../common/uicontrol.cpp
+	../common/uicontrol.h
 	../common/ui/MI_MapPreview.cpp
+	../common/ui/MI_MapPreview.h
 	../common/ui/MI_MapField.cpp
+	../common/ui/MI_MapField.h
 	../smw/ui/MI_PowerupSlider.cpp
+	../smw/ui/MI_PowerupSlider.h
 	../smw/ui/MI_FrenzyModeOptions.cpp
+	../smw/ui/MI_FrenzyModeOptions.h
 	../common/uimenu.cpp
+	../common/uimenu.h
 	worldeditor.cpp
 )
 if (WIN32)

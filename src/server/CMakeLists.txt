@@ -1,11 +1,18 @@
 add_executable(smw-server
-    Blob.cpp
-    Log.cpp
-    NetworkLayerENet.cpp
-    Player.cpp
-    Room.cpp
-    server.cpp
     mainServer.cpp
+    Blob.cpp
+    Blob.h
+    Clock.h
+    Log.cpp
+    Log.h
+    NetworkLayerENet.cpp
+    NetworkLayerENet.h
+    Player.cpp
+    Player.h
+    Room.cpp
+    Room.h
+    server.cpp
+    server.h
 )
 if(WIN32)
     # Add EXE icon on Windows
