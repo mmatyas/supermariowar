@@ -5,6 +5,8 @@
 #include "uicontrol.h"
 #include "uicustomcontrol.h"
 
+class MI_TextField;
+
 /*
     Description.
 */

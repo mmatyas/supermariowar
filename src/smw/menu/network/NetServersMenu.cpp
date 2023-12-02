@@ -2,6 +2,7 @@
 
 #include "net.h"
 #include "ResourceManager.h"
+#include "ui/MI_TextField.h"
 
 extern CResourceManager* rm;
 

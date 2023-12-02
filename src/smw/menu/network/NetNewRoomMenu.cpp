@@ -2,6 +2,7 @@
 
 #include "uicontrol.h"
 #include "ui/MI_SelectField.h"
+#include "ui/MI_TextField.h"
 
 #include "net.h"
 #include "ResourceManager.h"

@@ -2,6 +2,7 @@
 
 #include "net.h"
 #include "ResourceManager.h"
+#include "ui/MI_TextField.h"
 
 #include <cassert>
 #include <cstring>

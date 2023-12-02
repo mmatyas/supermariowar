@@ -30,6 +30,7 @@
 #include "TilesetManager.h"
 #include "ui/MI_MapField.h"
 #include "ui/MI_ImageSelectField.h"
+#include "ui/MI_TextField.h"
 #include "world.h"
 
 #ifdef PNG_SAVE_FORMAT

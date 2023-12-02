@@ -4,6 +4,7 @@
 #include "net.h"
 #include "path.h"
 #include "ResourceManager.h"
+#include "ui/MI_TextField.h"
 
 #include <sstream>
 
