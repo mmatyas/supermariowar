@@ -8,7 +8,7 @@ extern CResourceManager* rm;
 
 UI_NetNewRoomSettingsMenu::UI_NetNewRoomSettingsMenu(const UI_GameSettingsMenu* gsm) : UI_Menu()
 {
-    miContinueButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Continue", 500, 0);
+    miContinueButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Continue", 500);
     miContinueButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU);
 
     miModeField = new MI_ImageSelectField(*(gsm->miModeField));
@@ -29,7 +29,7 @@ UI_NetNewRoomSettingsMenu::UI_NetNewRoomSettingsMenu(const UI_GameSettingsMenu* 
     AddControl(miGoalField[GAMEMODE_LAST - 1], miGoalField[GAMEMODE_LAST - 2], miMapField, miGoalField[GAMEMODE_LAST - 2], NULL);
 */
 
-    miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 125, "Settings", 140, 0);
+    miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 125, "Settings", 140);
     miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
 
 

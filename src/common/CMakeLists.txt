@@ -66,6 +66,8 @@ add_library(CommonFiles STATIC
     ui/MI_SliderField.h
     ui/MI_TextField.h
     ui/MI_TextField.cpp
+    ui/MI_Button.h
+    ui/MI_Button.cpp
 )
 
 if (USE_PNG_SAVE AND NOT USE_SDL2_LIBS)

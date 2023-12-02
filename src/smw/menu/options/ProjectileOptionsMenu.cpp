@@ -1,6 +1,7 @@
 #include "ProjectileOptionsMenu.h"
 
 #include "uicontrol.h"
+#include "ui/MI_Button.h"
 #include "ui/MI_SelectField.h"
 
 #include "GameValues.h"
@@ -185,7 +186,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu() : UI_Menu()
     miRedBlockLifeField->SetData(&game_values.redblockttl, NULL, NULL);
     miRedBlockLifeField->SetKey(game_values.redblockttl);
 
-    miProjectileOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miProjectileOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
     miProjectileOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miProjectileOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

@@ -8,7 +8,7 @@ extern CResourceManager* rm;
 
 UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
 {
-    miNetServersBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miNetServersBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
     miNetServersBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
     miNetServersLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -28,17 +28,17 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
         miNetServersScroll->Add(host->hostname, "");
     }
 
-    miNetServersSelectButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Selected Server", 640 - 2 * 70, 0);
+    miNetServersSelectButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Selected Server", 640 - 2 * 70);
     miNetServersSelectButton->SetCode(MENU_CODE_TO_NET_SERVERLIST);
     if (netplay.savedServers.size() > 0)
         miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), 640 - 90, 205, 0, 2, 2);
     else
         miNetServersSelectedHostText = new MI_Text("(none)", 640 - 90, 205, 0, 2, 2);
 
-    miNetServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Connect", 640 - 2 * 70, 1);
+    miNetServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Connect", 640 - 2 * 70, TextAlignment::CENTER);
     miNetServersConnectButton->SetCode(MENU_CODE_NET_CONNECT_IN_PROGRESS);
 
-    miNetServersAddRemoveButton = new MI_Button(&rm->spr_selectfield, 70, 280, "Add / Remove Server", 640 - 2 * 70, 1);
+    miNetServersAddRemoveButton = new MI_Button(&rm->spr_selectfield, 70, 280, "Add / Remove Server", 640 - 2 * 70, TextAlignment::CENTER);
     miNetServersAddRemoveButton->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
     miNetServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);

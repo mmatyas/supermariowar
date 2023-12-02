@@ -5,6 +5,7 @@
 #include "GameValues.h"
 #include "path.h"
 #include "ResourceManager.h"
+#include "ui/MI_Button.h"
 
 extern CGameMode * gamemodes[GAMEMODE_LAST];
 extern short currentgamemode;
@@ -18,7 +19,7 @@ extern short g_iAutoFilterIcons[NUM_AUTO_FILTERS];
 
 UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
 {
-    miSettingsStartButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Start", 500, 0);
+    miSettingsStartButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Start", 500);
     miSettingsStartButton->SetCode(MENU_CODE_START_GAME);
 
     miModeField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
@@ -44,18 +45,18 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
         miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
     }
 
-    miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 125, "Settings", 140, 0);
+    miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 125, "Settings", 140);
     miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
 
     miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 500, 120, true);
 
-    miMapFiltersButton = new MI_Button(&rm->spr_selectfield, 430, 205, "Filters", 140, 0);
+    miMapFiltersButton = new MI_Button(&rm->spr_selectfield, 430, 205, "Filters", 140);
     miMapFiltersButton->SetCode(MENU_CODE_TO_MAP_FILTERS);
 
     miMapFiltersOnImage = new MI_Image(&rm->menu_map_filter, 530, 213, 0, 48, 16, 16, 1, 1, 0);
     miMapFiltersOnImage->Show(false);
 
-    miMapThumbnailsButton = new MI_Button(&rm->spr_selectfield, 430, 245, "Thumbs", 140, 0);
+    miMapThumbnailsButton = new MI_Button(&rm->spr_selectfield, 430, 245, "Thumbs", 140);
     miMapThumbnailsButton->SetCode(MENU_CODE_TO_MAP_BROWSER_THUMBNAILS);
 
     miMapFilterScroll = new MI_MapFilterScroll(&rm->menu_plain_field, 120, 72, 400, 9);
@@ -83,8 +84,8 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
     miGameSettingsExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miGameSettingsExitDialogExitText = new MI_Text("Exit", 320, 195, 0, 2, 1);
     miGameSettingsExitDialogTournamentText = new MI_Text("Tournament", 320, 220, 0, 2, 1);
-    miGameSettingsExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
-    miGameSettingsExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
+    miGameSettingsExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
+    miGameSettingsExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
 
     miGameSettingsExitDialogYesButton->SetCode(MENU_CODE_EXIT_TOURNAMENT_YES);
     miGameSettingsExitDialogNoButton->SetCode(MENU_CODE_EXIT_TOURNAMENT_NO);

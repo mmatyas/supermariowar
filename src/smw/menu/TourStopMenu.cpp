@@ -12,8 +12,8 @@ UI_TourStopMenu::UI_TourStopMenu() : UI_Menu()
     miTourStopExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miTourStopExitDialogExitTourText = new MI_Text("Exit Tour", 320, 205, 0, 2, 1);
 
-    miTourStopExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
-    miTourStopExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
+    miTourStopExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
+    miTourStopExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
 
     miTourStopExitDialogYesButton->SetCode(MENU_CODE_EXIT_TOUR_YES);
     miTourStopExitDialogNoButton->SetCode(MENU_CODE_EXIT_TOUR_NO);

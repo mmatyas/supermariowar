@@ -6,6 +6,8 @@
 #include "ui/MI_SelectField.h"
 #include "ui/MI_PowerupSlider.h"
 
+class MI_Button;
+
 class MI_FrenzyModeOptions : public UI_Control
 {
 public:

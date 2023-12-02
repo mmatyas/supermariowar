@@ -3,6 +3,7 @@
 
 #include "input.h"
 #include "uicontrol.h"
+#include "ui/MI_Button.h"
 #include "ui/MI_MapField.h"
 #include "ui/MI_PowerupSlider.h"
 #include "ui/MI_ImageSelectField.h"
@@ -22,8 +23,7 @@ class MI_StoredPowerupResetButton : public MI_Button
 {
 	public:
 
-		MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, const char * name, short width, short justified);
-		~MI_StoredPowerupResetButton() {}
+        MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, const char * name, short width, TextAlignment align = TextAlignment::LEFT);
 
 		void Draw();
 };

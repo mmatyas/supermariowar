@@ -1,6 +1,8 @@
 #include "MainMenu.h"
 
 #include "ResourceManager.h"
+#include "ui/MI_Button.h"
+
 extern CResourceManager* rm;
 
 UI_MainMenu::UI_MainMenu() : UI_Menu()
@@ -10,10 +12,10 @@ UI_MainMenu::UI_MainMenu() : UI_Menu()
         0, 0, rm->menu_version.getWidth(), rm->menu_version.getHeight(), 1, 1, 0);
     //miSMWVersionText = new MI_Text("Beta 2", 630, 45, 0, 2, 2);
 
-    miMainStartButton = new MI_Button(&rm->spr_selectfield, 120, 210, "Start", 310, 0);
+    miMainStartButton = new MI_Button(&rm->spr_selectfield, 120, 210, "Start", 310);
     miMainStartButton->SetCode(MENU_CODE_TO_MATCH_SELECTION_MENU);
 
-    miQuickGameButton = new MI_Button(&rm->spr_selectfield, 440, 210, "Go!", 80, 0);
+    miQuickGameButton = new MI_Button(&rm->spr_selectfield, 440, 210, "Go!", 80);
     miQuickGameButton->SetCode(MENU_CODE_QUICK_GAME_START);
 
     miPlayerSelect = new MI_PlayerSelect(&rm->menu_player_select, 120, 250, "Players", 400, 140);
@@ -24,11 +26,11 @@ UI_MainMenu::UI_MainMenu() : UI_Menu()
     miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 400, 0);
     miControlsButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Controls", 400, 0);
 #else
-    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer", 400, 0);
+    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer", 400);
     miMultiplayerButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
-    miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 200, 0);
-    miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Controls", 200, 0);
+    miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 200);
+    miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Controls", 200);
 #endif
     miOptionsButton->SetCode(MENU_CODE_TO_OPTIONS_MENU);
     miControlsButton->SetCode(MENU_CODE_TO_CONTROLS_MENU);
@@ -36,7 +38,7 @@ UI_MainMenu::UI_MainMenu() : UI_Menu()
 #ifdef __EMSCRIPTEN__
     miExitButton = NULL;
 #else
-    miExitButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Exit", 640 * 0.625f, 0);
+    miExitButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Exit", 640 * 0.625f);
     miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
 #endif
 

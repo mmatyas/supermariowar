@@ -4,6 +4,8 @@
 #include "uimenu.h"
 #include "uicontrol.h"
 
+class MI_Button;
+
 /*
 	This is the main options menu, where you can select the
 	settings category you want to modify, or regenerate the

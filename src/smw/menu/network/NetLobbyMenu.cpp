@@ -8,16 +8,16 @@ extern CResourceManager* rm;
 
 UI_NetLobbyMenu::UI_NetLobbyMenu() : UI_Menu()
 {
-    miNetLobbyNewRoomButton = new MI_Button(&rm->spr_selectfield, 320 + 20, 80, "New room", 320 - 30, 1);
+    miNetLobbyNewRoomButton = new MI_Button(&rm->spr_selectfield, 320 + 20, 80, "New room", 320 - 30, TextAlignment::CENTER);
     miNetLobbyNewRoomButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 
     miNetLobbyFilterField = new MI_TextField(&rm->menu_plain_field, 320 + 20, 160, "Search", 320 - 30, 90);
     miNetLobbyFilterField->SetData(netplay.roomFilter, NET_MAX_ROOM_NAME_LENGTH);
 
-    miNetLobbyRefreshButton = new MI_Button(&rm->spr_selectfield, 320 + 20, 200, "Refresh", 320 - 30, 1);
+    miNetLobbyRefreshButton = new MI_Button(&rm->spr_selectfield, 320 + 20, 200, "Refresh", 320 - 30, TextAlignment::CENTER);
     miNetLobbyRefreshButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
-    miNetLobbyBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miNetLobbyBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
     miNetLobbyBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
     miNetLobbyScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 15, 40, 320, 11, "Rooms", MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS, MENU_CODE_TO_NET_SERVERS_MENU);

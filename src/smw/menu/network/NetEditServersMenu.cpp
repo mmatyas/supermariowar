@@ -2,6 +2,7 @@
 
 #include "net.h"
 #include "ResourceManager.h"
+#include "ui/MI_Button.h"
 #include "ui/MI_TextField.h"
 
 #include <cassert>
@@ -14,16 +15,16 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     currentState = DEFAULT;
     std::fill(dialogTextData, dialogTextData + 128, 0);
 
-    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
     miBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
-    miAddButton = new MI_Button(&rm->spr_selectfield, 40, 40, "Add", 200, 1);
+    miAddButton = new MI_Button(&rm->spr_selectfield, 40, 40, "Add", 200, TextAlignment::CENTER);
     miAddButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_ADD_BTN);
 
-    miEditButton = new MI_Button(&rm->spr_selectfield, 40, 80, "Edit", 200, 1);
+    miEditButton = new MI_Button(&rm->spr_selectfield, 40, 80, "Edit", 200, TextAlignment::CENTER);
     miEditButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_EDIT_BTN);
 
-    miRemoveButton = new MI_Button(&rm->spr_selectfield, 40, 120, "Remove", 200, 1);
+    miRemoveButton = new MI_Button(&rm->spr_selectfield, 40, 120, "Remove", 200, TextAlignment::CENTER);
     miRemoveButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE_BTN);
 
     miInstructionsText1 = new MI_Text("", 40, 195, 0, 2, 0);
@@ -42,9 +43,9 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     miDialogTitle = new MI_Text("Enter a new server address below:", 40, 370, 0, 2, 0);
     miDialogTextField = new MI_TextField(&rm->menu_plain_field, 40, 395, "URL or IP", 640 - 2 * 40, 150);
     miDialogTextField->SetData(dialogTextData, 127);
-    miDialogOK = new MI_Button(&rm->spr_selectfield, 40, 432, "OK", 100, 1);
+    miDialogOK = new MI_Button(&rm->spr_selectfield, 40, 432, "OK", 100, TextAlignment::CENTER);
     miDialogOK->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DIALOG_OK_BTN);
-    miDialogCancel = new MI_Button(&rm->spr_selectfield, 150, 432, "Cancel", 100, 1);
+    miDialogCancel = new MI_Button(&rm->spr_selectfield, 150, 432, "Cancel", 100, TextAlignment::CENTER);
     miDialogCancel->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
     miDialogTitle->Show(false);

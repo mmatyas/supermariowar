@@ -28,6 +28,7 @@
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"
+#include "ui/MI_Button.h"
 #include "ui/MI_MapField.h"
 #include "ui/MI_ImageSelectField.h"
 #include "ui/MI_TextField.h"
@@ -701,7 +702,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Mode Settings Button
-	miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 100, "Settings", 140, 0);
+    miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 100, "Settings", 140);
 	miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
 
 	//Points Field
@@ -722,7 +723,7 @@ int main(int argc, char *argv[])
 	miMapField = new MI_MapField(&rm->spr_selectfield, 70, 180, "Map", 500, 120, true);
 
 	//Bonus Item Picker Menu Button
-	miBonusItemsButton= new MI_Button(&rm->spr_selectfield, 430, 220, "Bonuses", 140, 0);
+    miBonusItemsButton= new MI_Button(&rm->spr_selectfield, 430, 220, "Bonuses", 140);
 	miBonusItemsButton->SetCode(MENU_CODE_TO_BONUS_PICKER_MENU);
 
 	//Bonus Type
@@ -745,15 +746,15 @@ int main(int argc, char *argv[])
 	miBonusTextField[4]->SetDisallowedChars(",|");
 
 	//Delete Stage Button
-	miDeleteStageButton = new MI_Button(&rm->spr_selectfield, 430, 440, "Delete", 140, 0);
+    miDeleteStageButton = new MI_Button(&rm->spr_selectfield, 430, 440, "Delete", 140);
 	miDeleteStageButton->SetCode(MENU_CODE_DELETE_STAGE_BUTTON);
 
 	//Are You Sure Dialog for Delete Stage
 	miDeleteStageDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
 	miDeleteStageDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
 	miDeleteStageDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
-	miDeleteStageDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
-	miDeleteStageDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
+    miDeleteStageDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
+    miDeleteStageDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
 
 	miDeleteStageDialogYesButton->SetCode(MENU_CODE_DELETE_STAGE_YES);
 	miDeleteStageDialogNoButton->SetCode(MENU_CODE_DELETE_STAGE_NO);
@@ -905,7 +906,7 @@ int main(int argc, char *argv[])
 	miVehicleBoundaryField->SetKey(g_wvVehicleStamp.iBoundary);
 	miVehicleBoundaryField->AllowFastScroll(true);
 
-	miVehicleCreateButton = new MI_Button(&rm->spr_selectfield, 430, 360, "OK", 140, 1);
+    miVehicleCreateButton = new MI_Button(&rm->spr_selectfield, 430, 360, "OK", 140, TextAlignment::CENTER);
 	miVehicleCreateButton->SetCode(MENU_CODE_CREATE_VEHICLE);
 
 	miTitleText = new MI_Text("Clicking on the map will add the vehicle configured below", 320, 50, 640, 2, 1);

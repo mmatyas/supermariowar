@@ -1,6 +1,7 @@
 #include "NetNewRoomMenu.h"
 
 #include "uicontrol.h"
+#include "ui/MI_Button.h"
 #include "ui/MI_SelectField.h"
 #include "ui/MI_TextField.h"
 
@@ -19,10 +20,10 @@ UI_NetNewRoomMenu::UI_NetNewRoomMenu() : UI_Menu()
     miNetNewRoomPasswordField = new MI_TextField(&rm->menu_plain_field, 70, 200, "Password (optional)", 640 - 2 * 70, 230);
     miNetNewRoomPasswordField->SetData(netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
 
-    miNetNewRoomCreateButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Create!", 640 - 2 * 70, 1);
+    miNetNewRoomCreateButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Create!", 640 - 2 * 70, TextAlignment::CENTER);
     miNetNewRoomCreateButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS);
 
-    miNetNewRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miNetNewRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlignment::CENTER);
     miNetNewRoomBackButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 
     AddControl(miNetNewRoomNameField, miNetNewRoomBackButton, miNetNewRoomPasswordField, NULL, NULL);

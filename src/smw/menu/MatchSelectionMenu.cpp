@@ -13,7 +13,7 @@ extern WorldList *worldlist;
 
 UI_MatchSelectionMenu::UI_MatchSelectionMenu() : UI_Menu()
 {
-	miMatchSelectionStartButton = new MI_Button(&rm->spr_selectfield, 270, 420, "Start", 100, 0);
+    miMatchSelectionStartButton = new MI_Button(&rm->spr_selectfield, 270, 420, "Start", 100);
     miMatchSelectionStartButton->SetCode(MENU_CODE_MATCH_SELECTION_START);
 
     miMatchSelectionField = new MI_SelectField(&rm->spr_selectfield, 130, 340, "Match", 380, 100);

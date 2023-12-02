@@ -6,6 +6,7 @@
 
 #include "ui/MI_StringScroll.h"
 
+class MI_Button;
 class MI_TextField;
 
 /*
