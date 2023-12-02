@@ -18,6 +18,7 @@
 
 class SimpleFileList;
 class MapListNode;
+class MI_ScoreText;
 class MI_Text;
 
 class MI_StoredPowerupResetButton : public MI_Button

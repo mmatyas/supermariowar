@@ -201,20 +201,4 @@ private:
     bool fBlinkShow;
 };
 
-class MI_ScoreText : public UI_Control
-{
-public:
-    MI_ScoreText(short x, short y);
-    virtual ~MI_ScoreText() {}
-
-    void Draw();
-    void SetScore(short iScore);
-
-private:
-    short iScore;
-    short iDigitLeftSrcX, iDigitMiddleSrcX, iDigitRightSrcX;
-    short iDigitLeftDstX, iDigitMiddleDstX, iDigitRightDstX;
-
-};
-
 #endif // UICONTROL_H

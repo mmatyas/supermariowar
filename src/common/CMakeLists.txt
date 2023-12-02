@@ -70,6 +70,8 @@ add_library(CommonFiles STATIC
     ui/MI_Button.cpp
     ui/MI_Text.h
     ui/MI_Text.cpp
+    ui/MI_ScoreText.h
+    ui/MI_ScoreText.cpp
 )
 
 if (USE_PNG_SAVE AND NOT USE_SDL2_LIBS)
