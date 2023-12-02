@@ -1,6 +1,8 @@
 #include "MI_SliderField.h"
 
 #include "ResourceManager.h"
+#include "ui/MI_Image.h"
+
 extern CResourceManager* rm;
 
 /**************************************

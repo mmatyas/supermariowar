@@ -2,6 +2,7 @@
 
 #include "MapList.h"
 #include "ResourceManager.h"
+#include "ui/MI_Image.h"
 
 #include <cstring>
 
@@ -218,7 +219,7 @@ MenuCodeEnum MI_MapField::MouseClick(short iMouseX, short iMouseY)
     //If we are modifying this control, see if we clicked on a next/prev button
     if (fModifying) {
         short x, y, w, h;
-        miModifyImageLeft->GetPositionAndSize(&x, &y, &w, &h);
+        miModifyImageLeft->GetPositionAndSize(x, y, w, h);
 
         if (iMouseX >= x && iMouseX < x + w &&
                 iMouseY >= y && iMouseY < y + h) {
@@ -226,7 +227,7 @@ MenuCodeEnum MI_MapField::MouseClick(short iMouseX, short iMouseY)
                 return MENU_CODE_MAP_CHANGED;
         }
 
-        miModifyImageRight->GetPositionAndSize(&x, &y, &w, &h);
+        miModifyImageRight->GetPositionAndSize(x, y, w, h);
 
         if (iMouseX >= x && iMouseX < x + w &&
                 iMouseY >= y && iMouseY < y + h) {

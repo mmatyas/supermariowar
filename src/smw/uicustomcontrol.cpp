@@ -12,6 +12,7 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
+#include "ui/MI_Image.h"
 #include "ui/MI_ScoreText.h"
 #include "ui/MI_Text.h"
 

@@ -2,6 +2,7 @@
 
 #include "GameValues.h"
 #include "ResourceManager.h"
+#include "ui/MI_Image.h"
 
 #include <array>
 

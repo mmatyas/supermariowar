@@ -4,6 +4,8 @@
 #include "uimenu.h"
 #include "uicontrol.h"
 
+class MI_Image;
+
 class MI_TeamSelect : public UI_Control
 {
 	public:

@@ -1,5 +1,7 @@
 #include "MI_PowerupSlider.h"
 
+#include "ui/MI_Image.h"
+
 /**************************************
  * MI_PowerupSlider Class
  **************************************/

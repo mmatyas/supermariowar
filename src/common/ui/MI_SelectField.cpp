@@ -1,6 +1,8 @@
 #include "MI_SelectField.h"
 
 #include "ResourceManager.h"
+#include "ui/MI_Image.h"
+
 extern CResourceManager* rm;
 
 #include <cstring>
@@ -466,7 +468,7 @@ MenuCodeEnum MI_SelectField::MouseClick(short iMouseX, short iMouseY)
     //If we are modifying this control, see if we clicked on a next/prev button
     if (fModifying) {
         short x, y, w, h;
-        miModifyImageLeft->GetPositionAndSize(&x, &y, &w, &h);
+        miModifyImageLeft->GetPositionAndSize(x, y, w, h);
 
         if (iMouseX >= x && iMouseX < x + w &&
                 iMouseY >= y && iMouseY < y + h) {
@@ -478,7 +480,7 @@ MenuCodeEnum MI_SelectField::MouseClick(short iMouseX, short iMouseY)
             }
         }
 
-        miModifyImageRight->GetPositionAndSize(&x, &y, &w, &h);
+        miModifyImageRight->GetPositionAndSize(x, y, w, h);
 
         if (iMouseX >= x && iMouseX < x + w &&
                 iMouseY >= y && iMouseY < y + h) {

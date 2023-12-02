@@ -1,6 +1,7 @@
 #include "TeamSelectMenu.h"
 
 #include "ResourceManager.h"
+#include "ui/MI_Image.h"
 #include "ui/MI_Text.h"
 
 extern CResourceManager* rm;
@@ -22,7 +23,7 @@ UI_TeamSelectMenu::UI_TeamSelectMenu() : UI_Menu()
 
     SetHeadControl(miTeamSelect);
     SetCancelCode(MENU_CODE_BACK_TO_MATCH_SELECTION_MENU);
-};
+}
 
 UI_TeamSelectMenu::~UI_TeamSelectMenu() {
 }

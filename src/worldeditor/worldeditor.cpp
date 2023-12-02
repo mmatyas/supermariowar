@@ -29,6 +29,7 @@
 #include "sfx.h"
 #include "TilesetManager.h"
 #include "ui/MI_Button.h"
+#include "ui/MI_Image.h"
 #include "ui/MI_MapField.h"
 #include "ui/MI_ImageSelectField.h"
 #include "ui/MI_Text.h"

@@ -2,11 +2,10 @@
 #define MENU_NET_EDIT_SERVER_LIST_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
-
-#include "ui/MI_StringScroll.h"
 
 class MI_Button;
+class MI_Image;
+class MI_StringScroll;
 class MI_Text;
 class MI_TextField;
 

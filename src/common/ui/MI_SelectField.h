@@ -6,6 +6,8 @@
 
 #include <string>
 
+class MI_Image;
+
 class SF_ListItem
 {
 public:

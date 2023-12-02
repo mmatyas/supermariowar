@@ -6,6 +6,8 @@
 
 #include <functional>
 
+class MI_Image;
+
 class MI_NetRoomTeamSelect : public UI_Control {
 public:
     MI_NetRoomTeamSelect(short x, short y, short player_id, std::function<void()>&& on_change_accepted = [](){});

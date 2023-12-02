@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 
+class MI_Image;
+
 
 class MI_TextField : public UI_Control {
 public:

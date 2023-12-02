@@ -4,6 +4,8 @@
 #include "MI_MapPreview.h"
 #include <string>
 
+class MI_Image;
+
 class MI_MapField: public MI_MapPreview
 {
 public:

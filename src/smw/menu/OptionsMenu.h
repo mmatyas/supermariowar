@@ -2,9 +2,9 @@
 #define MENU_OPTIONSMENU_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
 
 class MI_Button;
+class MI_Image;
 class MI_Text;
 
 /*
