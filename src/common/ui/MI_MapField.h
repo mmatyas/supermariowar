@@ -1,47 +1,45 @@
-#ifndef UI_MAP_FIELD
-#define UI_MAP_FIELD
+#pragma once
 
 #include "MI_MapPreview.h"
+
+#include <memory>
 #include <string>
 
 class MI_Image;
 
-class MI_MapField: public MI_MapPreview
-{
-public:
 
-    MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags);
-    virtual ~MI_MapField();
+class MI_MapField: public MI_MapPreview {
+public:
+    MI_MapField(gfxSprite* nspr, short x, short y, std::string name, short width, short indent, bool showtags);
+    virtual ~MI_MapField() = default;
 
     //Called when user selects this control to change it's value
-    MenuCodeEnum Modify(bool modify);
+    MenuCodeEnum Modify(bool modify) override;
 
     //Updates animations or other events every frame
-    void Update();
+    void Update() override;
 
     //Draws every frame
-    void Draw();
+    void Draw() override;
 
     //Sends player input to control on every frame
-    MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    MenuCodeEnum SendInput(CPlayerInput * playerInput) override;
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY)  override;
 
     MenuCodeEnum ChooseRandomMap();
-
-    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
     bool MovePrev(bool fScrollFast);
     bool MoveNext(bool fScrollFast);
 
-    void SetDimensions(short iWidth, short iIndent);
+    void SetDimensions(short iWidth, short iIndent) override;
 
 protected:
-
     bool Move(bool fNext, bool fScrollFast);
 
     std::string szName;
 
-    MI_Image * miModifyImageLeft;
-    MI_Image * miModifyImageRight;
+    std::unique_ptr<MI_Image> miModifyImageLeft;
+    std::unique_ptr<MI_Image> miModifyImageRight;
 
     short iSlideListOutGoal;
 
@@ -50,5 +48,3 @@ protected:
 
     bool fShowtags;
 };
-
-#endif // UI_MAP_FIELD
