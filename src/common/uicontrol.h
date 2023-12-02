@@ -224,43 +224,7 @@ private:
     short iDigitLeftDstX, iDigitMiddleDstX, iDigitRightDstX;
 
 };
-/*********************************************************
- *    Selectable Controls (Buttons, Fields)
- *********************************************************/
-class MI_IPField : public UI_Control
-{
 
-public:
-
-    MI_IPField(gfxSprite * nspr, short x, short y);
-    virtual ~MI_IPField();
-
-    char * GetValue();
-
-    void Update();
-    void Draw();
-
-    MenuCodeEnum SendInput(CPlayerInput * playerInput);
-    MenuCodeEnum Modify(bool modify);
-
-    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
-
-private:
-
-    void AssignHostAddress();
-    void MoveImage();
-
-    gfxSprite * spr;
-
-    int iSelectedDigit;
-
-    int values[12];
-
-    char szValue[16];
-    short iDigitPosition[12];
-
-    MI_Image * miModifyImage;
-};
 
 class MI_Button : public UI_Control
 {
