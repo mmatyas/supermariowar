@@ -3,6 +3,7 @@
 #include "uicontrol.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_SelectField.h"
+#include "ui/MI_Text.h"
 #include "ui/MI_TextField.h"
 
 #include "net.h"
@@ -32,7 +33,7 @@ UI_NetNewRoomMenu::UI_NetNewRoomMenu() : UI_Menu()
     AddControl(miNetNewRoomBackButton, miNetNewRoomCreateButton, miNetNewRoomNameField, NULL, NULL);
 
     miNetNewRoomCreatingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miNetNewRoomCreatingDialogText = new MI_Text("Creating...", 320, 240 - 12, 0, 2, 1);
+    miNetNewRoomCreatingDialogText = new MI_HeaderText("Creating...", 320, 240 - 12);
 
     miNetNewRoomCreatingDialogImage->Show(false);
     miNetNewRoomCreatingDialogText->Show(false);
@@ -42,7 +43,7 @@ UI_NetNewRoomMenu::UI_NetNewRoomMenu() : UI_Menu()
 
     miNetNewRoomLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miNetNewRoomRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miNetNewRoomHeaderText = new MI_Text("New Room Settings Menu", 320, 5, 0, 2, 1);
+    miNetNewRoomHeaderText = new MI_HeaderText("New Room Settings Menu", 320, 5);
 
     AddNonControl(miNetNewRoomLeftHeaderBar);
     AddNonControl(miNetNewRoomRightHeaderBar);

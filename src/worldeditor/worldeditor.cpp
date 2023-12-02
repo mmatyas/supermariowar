@@ -31,6 +31,7 @@
 #include "ui/MI_Button.h"
 #include "ui/MI_MapField.h"
 #include "ui/MI_ImageSelectField.h"
+#include "ui/MI_Text.h"
 #include "ui/MI_TextField.h"
 #include "world.h"
 
@@ -751,8 +752,8 @@ int main(int argc, char *argv[])
 
 	//Are You Sure Dialog for Delete Stage
 	miDeleteStageDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-	miDeleteStageDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
-	miDeleteStageDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
+    miDeleteStageDialogAreYouText = new MI_HeaderText("Are You", 320, 195);
+    miDeleteStageDialogSureText = new MI_HeaderText("Sure?", 320, 220);
     miDeleteStageDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
     miDeleteStageDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
 
@@ -909,7 +910,7 @@ int main(int argc, char *argv[])
     miVehicleCreateButton = new MI_Button(&rm->spr_selectfield, 430, 360, "OK", 140, TextAlignment::CENTER);
 	miVehicleCreateButton->SetCode(MENU_CODE_CREATE_VEHICLE);
 
-	miTitleText = new MI_Text("Clicking on the map will add the vehicle configured below", 320, 50, 640, 2, 1);
+    miTitleText = new MI_Text("Clicking on the map will add the vehicle configured below", 320, 50, 640, true, TextAlignment::CENTER);
 
 	mVehicleMenu.AddNonControl(miTitleText);
 

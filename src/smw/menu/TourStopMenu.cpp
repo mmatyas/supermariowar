@@ -1,6 +1,7 @@
 #include "TourStopMenu.h"
 
 #include "ResourceManager.h"
+#include "ui/MI_Text.h"
 
 extern CResourceManager* rm;
 
@@ -10,7 +11,7 @@ UI_TourStopMenu::UI_TourStopMenu() : UI_Menu()
 
     //Exit tour dialog box
     miTourStopExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miTourStopExitDialogExitTourText = new MI_Text("Exit Tour", 320, 205, 0, 2, 1);
+    miTourStopExitDialogExitTourText = new MI_HeaderText("Exit Tour", 320, 205);
 
     miTourStopExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
     miTourStopExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);

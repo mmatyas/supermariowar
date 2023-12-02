@@ -2,6 +2,7 @@
 
 #include "ResourceManager.h"
 #include "ui/MI_Button.h"
+#include "ui/MI_Text.h"
 
 extern CResourceManager* rm;
 
@@ -24,7 +25,7 @@ UI_PlayerControlsSelectMenu::UI_PlayerControlsSelectMenu() : UI_Menu()
 
     miPlayerControlsLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miPlayerControlsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miPlayerControlsMenuHeaderText = new MI_Text("Player Controls Menu", 320, 5, 0, 2, 1);
+    miPlayerControlsMenuHeaderText = new MI_HeaderText("Player Controls Menu", 320, 5);
 
     AddControl(miPlayer1ControlsButton, miPlayerControlsBackButton, miPlayer2ControlsButton, NULL, miPlayerControlsBackButton);
     AddControl(miPlayer2ControlsButton, miPlayer1ControlsButton, miPlayer3ControlsButton, NULL, miPlayerControlsBackButton);

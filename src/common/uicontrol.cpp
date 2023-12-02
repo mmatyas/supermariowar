@@ -152,53 +152,6 @@ void MI_Image::Draw()
         spr->draw(ix + iXOffset, iy + iYOffset, iXFrame, iYFrame, iw, ih);
 }
 
-
-/**************************************
- * MI_Text Class
- **************************************/
-
-MI_Text::MI_Text(const char * text, short x, short y, short w, short size, short justified) :
-    UI_Control(x, y)
-{
-    szText = new char[strlen(text) + 1];
-    strcpy(szText, text);
-
-    iw = w;
-    iJustified = justified;
-
-    if (size == 0)
-        font = &rm->menu_font_small;
-    else
-        font = &rm->menu_font_large;
-}
-
-MI_Text::~MI_Text()
-{
-    delete [] szText;
-}
-
-void MI_Text::SetText(const char * text)
-{
-    delete [] szText;
-    szText = new char[strlen(text) + 1];
-    strcpy(szText, text);
-}
-
-void MI_Text::Draw()
-{
-    if (!fShow)
-        return;
-
-    if (iJustified == 0 && iw == 0)
-        font->draw(ix, iy, szText);
-    else if (iJustified == 0)
-        font->drawChopRight(ix, iy, iw, szText);
-    else if (iJustified == 1)
-        font->drawCentered(ix, iy, szText);
-    else if (iJustified == 2)
-        font->drawRightJustified(ix, iy, szText);
-}
-
 /**************************************
  * MI_ScoreText Class
  **************************************/

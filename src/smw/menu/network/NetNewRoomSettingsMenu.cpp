@@ -3,6 +3,7 @@
 #include "GameMode.h"
 #include "net.h"
 #include "ResourceManager.h"
+#include "ui/MI_Text.h"
 
 extern CResourceManager* rm;
 
@@ -48,7 +49,7 @@ UI_NetNewRoomSettingsMenu::UI_NetNewRoomSettingsMenu(const UI_GameSettingsMenu* 
 
     miLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miHeaderText = new MI_Text("Multiplayer Level Select Menu", 320, 5, 0, 2, 1);
+    miHeaderText = new MI_HeaderText("Multiplayer Level Select Menu", 320, 5);
 
     AddNonControl(miLeftHeaderBar);
     AddNonControl(miRightHeaderBar);

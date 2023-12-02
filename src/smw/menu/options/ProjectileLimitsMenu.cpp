@@ -3,6 +3,7 @@
 #include "uicontrol.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_SelectField.h"
+#include "ui/MI_Text.h"
 
 #include "GameValues.h"
 #include "ResourceManager.h"
@@ -161,7 +162,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu() : UI_Menu()
 
     miProjectilesLimitsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miProjectilesLimitsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miProjectilesLimitsMenuHeaderText = new MI_Text("Weapon Use Limits Menu", 320, 5, 0, 2, 1);
+    miProjectilesLimitsMenuHeaderText = new MI_HeaderText("Weapon Use Limits Menu", 320, 5);
 
     AddControl(miFireballLimitField, miProjectilesLimitsMenuBackButton, miHammerLimitField, NULL, miProjectilesLimitsMenuBackButton);
     AddControl(miHammerLimitField, miFireballLimitField, miBoomerangLimitField, NULL, miProjectilesLimitsMenuBackButton);

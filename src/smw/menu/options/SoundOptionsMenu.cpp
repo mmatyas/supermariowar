@@ -3,6 +3,7 @@
 #include "FileList.h"
 #include "GameValues.h"
 #include "ResourceManager.h"
+#include "ui/MI_Text.h"
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
@@ -72,7 +73,7 @@ UI_SoundOptionsMenu::UI_SoundOptionsMenu() : UI_Menu()
 
     miSoundOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miSoundOptionsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miSoundOptionsMenuHeaderText = new MI_Text("Sound Options Menu", 320, 5, 0, 2, 1);
+    miSoundOptionsMenuHeaderText = new MI_HeaderText("Sound Options Menu", 320, 5);
 
     AddControl(miSoundVolumeField, miSoundOptionsMenuBackButton, miMusicVolumeField, NULL, miSoundOptionsMenuBackButton);
     AddControl(miMusicVolumeField, miSoundVolumeField, miPlayNextMusicField, NULL, miSoundOptionsMenuBackButton);

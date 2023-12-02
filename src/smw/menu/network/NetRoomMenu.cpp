@@ -4,6 +4,7 @@
 #include "net.h"
 #include "path.h"
 #include "ResourceManager.h"
+#include "ui/MI_Text.h"
 #include "ui/MI_TextField.h"
 
 #include <sstream>
@@ -15,7 +16,7 @@ extern short LookupTeamID(short id);
 
 UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
 {
-    miNetRoomName = new MI_Text("" /* Room name here */, 40, 50, 0, 2, 0);
+    miNetRoomName = new MI_Text("" /* Room name here */, 40, 50, 0, true, TextAlignment::LEFT);
     //AddNonControl(miNetRoomName);
 
     miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, 300, 310, "(waiting)", 331, TextAlignment::CENTER);
@@ -34,7 +35,7 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
     miNetRoomBackButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
     for (short p = 0; p < 4; p++) {
-        miNetRoomPlayerName[p] = new MI_Text("" /* Px name here */, 60, 80 + p * 60, 0, 2, 0);
+        miNetRoomPlayerName[p] = new MI_Text("" /* Px name here */, 60, 80 + p * 60, 0, true, TextAlignment::LEFT);
         AddNonControl(miNetRoomPlayerName[p]);
 
         miSkinSelector[p] = new MI_NetRoomTeamSelect(16, 72 + p * 60, p, [](){
@@ -55,7 +56,7 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
     AddControl(miNetRoomBackButton, miNetRoomStartButton, miNetRoomStartButton, miNetRoomSendButton, miNetRoomMessageField);
 
     miNetRoomStartingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miNetRoomStartingDialogText = new MI_Text("Starting...", 320, 240 - 40, 0, 2, 1);
+    miNetRoomStartingDialogText = new MI_HeaderText("Starting...", 320, 240 - 40);
 
     miNetRoomStartingDialogImage->Show(false);
     miNetRoomStartingDialogText->Show(false);
@@ -65,7 +66,7 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
 
     miNetRoomLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miNetRoomRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miNetRoomHeaderText = new MI_Text("Multiplayer Room Menu", 320, 5, 0, 2, 1);
+    miNetRoomHeaderText = new MI_HeaderText("Multiplayer Room Menu", 320, 5);
 
     AddNonControl(miNetRoomLeftHeaderBar);
     AddNonControl(miNetRoomRightHeaderBar);

@@ -3,6 +3,7 @@
 #include "net.h"
 #include "ResourceManager.h"
 #include "ui/MI_Button.h"
+#include "ui/MI_Text.h"
 #include "ui/MI_TextField.h"
 
 #include <cassert>
@@ -27,12 +28,12 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     miRemoveButton = new MI_Button(&rm->spr_selectfield, 40, 120, "Remove", 200, TextAlignment::CENTER);
     miRemoveButton->SetCode(MENU_CODE_NET_ADDREMOVE_SERVER_ON_DELETE_BTN);
 
-    miInstructionsText1 = new MI_Text("", 40, 195, 0, 2, 0);
-    miInstructionsText2 = new MI_Text("", 40, 215, 0, 2, 0);
+    miInstructionsText1 = new MI_Text("", 40, 195, 0, true, TextAlignment::LEFT);
+    miInstructionsText2 = new MI_Text("", 40, 215, 0, true, TextAlignment::LEFT);
 
     miLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miHeaderText = new MI_Text("Add/Remove Servers Menu", 320, 5, 0, 2, 1);
+    miHeaderText = new MI_HeaderText("Add/Remove Servers Menu", 320, 5);
 
     miServerScroll = new MI_StringScroll(&rm->menu_plain_field, 260, 32, 350, 9);
     miServerScroll->SetAutoModify(true);
@@ -40,7 +41,7 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     miServerScroll->SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
     miServerScroll->Deactivate();
 
-    miDialogTitle = new MI_Text("Enter a new server address below:", 40, 370, 0, 2, 0);
+    miDialogTitle = new MI_Text("Enter a new server address below:", 40, 370, 0, true, TextAlignment::LEFT);
     miDialogTextField = new MI_TextField(&rm->menu_plain_field, 40, 395, "URL or IP", 640 - 2 * 40, 150);
     miDialogTextField->SetData(dialogTextData, 127);
     miDialogOK = new MI_Button(&rm->spr_selectfield, 40, 432, "OK", 100, TextAlignment::CENTER);

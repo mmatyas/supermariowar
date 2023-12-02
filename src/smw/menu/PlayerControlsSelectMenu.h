@@ -5,6 +5,7 @@
 #include "uicontrol.h"
 
 class MI_Button;
+class MI_Text;
 
 /*
 	This menu leads to the control settings of player 1-4.

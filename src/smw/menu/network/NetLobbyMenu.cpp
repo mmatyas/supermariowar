@@ -2,6 +2,7 @@
 
 #include "net.h"
 #include "ResourceManager.h"
+#include "ui/MI_Text.h"
 #include "ui/MI_TextField.h"
 
 extern CResourceManager* rm;
@@ -28,7 +29,7 @@ UI_NetLobbyMenu::UI_NetLobbyMenu() : UI_Menu()
     netplay.client.setRoomListUIControl(miNetLobbyScroll);
 
     miNetLobbyJoiningDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miNetLobbyJoiningDialogText = new MI_Text("Joining...", 320, 240 - 12, 0, 2, 1);
+    miNetLobbyJoiningDialogText = new MI_HeaderText("Joining...", 320, 240 - 12);
 
     miNetLobbyJoiningDialogImage->Show(false);
     miNetLobbyJoiningDialogText->Show(false);
@@ -41,7 +42,7 @@ UI_NetLobbyMenu::UI_NetLobbyMenu() : UI_Menu()
 
     miNetLobbyLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miNetLobbyRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miNetLobbyHeaderText = new MI_Text("Multiplayer Lobby Menu", 320, 5, 0, 2, 1);
+    miNetLobbyHeaderText = new MI_HeaderText("Multiplayer Lobby Menu", 320, 5);
 
     AddControl(miNetLobbyScroll, NULL, NULL, NULL, miNetLobbyNewRoomButton);
     AddControl(miNetLobbyNewRoomButton, miNetLobbyBackButton, miNetLobbyFilterField, miNetLobbyScroll, NULL);

@@ -6,6 +6,8 @@
 #include "ui/MI_PowerupSlider.h"
 #include "ui/MI_FrenzyModeOptions.h"
 
+class MI_Text;
+
 class UI_ModeOptionsMenu: public UI_Menu
 {
 	public:

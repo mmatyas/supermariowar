@@ -6,6 +6,7 @@
 #include "uicustomcontrol.h"
 #include "ui/MI_NetRoomTeamSelect.h"
 
+class MI_Text;
 class MI_TextField;
 
 /*

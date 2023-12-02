@@ -5,6 +5,8 @@
 #include "uicontrol.h"
 #include "ui/MI_TeamSelect.h"
 
+class MI_Text;
+
 /*
     Description.
 */

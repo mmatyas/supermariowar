@@ -3,6 +3,7 @@
 #include "uicontrol.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_SelectField.h"
+#include "ui/MI_Text.h"
 
 #include "GameValues.h"
 #include "ResourceManager.h"
@@ -76,7 +77,7 @@ UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu() : UI_Menu()
 
     miEyeCandyOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miEyeCandyOptionsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miEyeCandyOptionsMenuHeaderText = new MI_Text("Eye Candy Options Menu", 320, 5, 0, 2, 1);
+    miEyeCandyOptionsMenuHeaderText = new MI_HeaderText("Eye Candy Options Menu", 320, 5);
 
     AddControl(miSpawnStyleField, miEyeCandyOptionsMenuBackButton, miAwardStyleField, NULL, miEyeCandyOptionsMenuBackButton);
     AddControl(miAwardStyleField, miSpawnStyleField, miScoreStyleField, NULL, miEyeCandyOptionsMenuBackButton);

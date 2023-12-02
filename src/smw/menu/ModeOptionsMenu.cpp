@@ -4,6 +4,7 @@
 #include "GameMode.h"
 #include "ResourceManager.h"
 #include "ui/MI_Button.h"
+#include "ui/MI_Text.h"
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -33,7 +34,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miClassicModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miClassicModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miClassicModeHeaderText = new MI_Text("Classic Mode Menu", 320, 5, 0, 2, 1);
+    miClassicModeHeaderText = new MI_HeaderText("Classic Mode Menu", 320, 5);
 
     mModeSettingsMenu[0].AddControl(miClassicModeStyleField, miClassicModeBackButton, miClassicModeScoringField, NULL, miClassicModeBackButton);
     mModeSettingsMenu[0].AddControl(miClassicModeScoringField, miClassicModeStyleField, miClassicModeBackButton, NULL, miClassicModeBackButton);
@@ -68,7 +69,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miFragModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miFragModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miFragModeHeaderText = new MI_Text("Frag Mode Menu", 320, 5, 0, 2, 1);
+    miFragModeHeaderText = new MI_HeaderText("Frag Mode Menu", 320, 5);
 
     mModeSettingsMenu[1].AddControl(miFragModeStyleField, miFragModeBackButton, miFragModeScoringField, NULL, miFragModeBackButton);
     mModeSettingsMenu[1].AddControl(miFragModeScoringField, miFragModeStyleField, miFragModeBackButton, NULL, miFragModeBackButton);
@@ -129,7 +130,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miTimeLimitModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miTimeLimitModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miTimeLimitModeHeaderText = new MI_Text("Time Mode Menu", 320, 5, 0, 2, 1);
+    miTimeLimitModeHeaderText = new MI_HeaderText("Time Mode Menu", 320, 5);
 
     mModeSettingsMenu[2].AddControl(miTimeLimitModeStyleField, miTimeLimitModeBackButton, miTimeLimitModeScoringField, NULL, miTimeLimitModeBackButton);
     mModeSettingsMenu[2].AddControl(miTimeLimitModeScoringField, miTimeLimitModeStyleField, miTimeLimitModePercentExtraTime, NULL, miTimeLimitModeBackButton);
@@ -210,7 +211,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miJailModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miJailModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miJailModeHeaderText = new MI_Text("Jail Mode Menu", 320, 5, 0, 2, 1);
+    miJailModeHeaderText = new MI_HeaderText("Jail Mode Menu", 320, 5);
 
     mModeSettingsMenu[3].AddControl(miJailModeStyleField, miJailModeBackButton, miJailModeTimeFreeField, NULL, miJailModeBackButton);
     mModeSettingsMenu[3].AddControl(miJailModeTimeFreeField, miJailModeStyleField, miJailModeTagFreeField, NULL, miJailModeBackButton);
@@ -282,7 +283,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miCoinModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miCoinModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miCoinModeHeaderText = new MI_Text("Coin Collection Mode Menu", 320, 5, 0, 2, 1);
+    miCoinModeHeaderText = new MI_HeaderText("Coin Collection Mode Menu", 320, 5);
 
     mModeSettingsMenu[4].AddControl(miCoinModePenaltyField, miCoinModeBackButton, miCoinModeQuantityField, NULL, miCoinModeBackButton);
     mModeSettingsMenu[4].AddControl(miCoinModeQuantityField, miCoinModePenaltyField, miCoinModePercentExtraCoin, NULL, miCoinModeBackButton);
@@ -335,7 +336,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miStompModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miStompModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miStompModeHeaderText = new MI_Text("Stomp Mode Menu", 320, 5, 0, 2, 1);
+    miStompModeHeaderText = new MI_HeaderText("Stomp Mode Menu", 320, 5);
 
 
     mModeSettingsMenu[5].AddControl(miStompModeRateField, miStompModeBackButton, miStompModeEnemySlider[0], NULL, miStompModeBackButton);
@@ -404,7 +405,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miEggModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miEggModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miEggModeHeaderText = new MI_Text("Yoshi's Eggs Mode Menu", 320, 5, 0, 2, 1);
+    miEggModeHeaderText = new MI_HeaderText("Yoshi's Eggs Mode Menu", 320, 5);
 
     mModeSettingsMenu[6].AddControl(miEggModeEggQuantityField[0], miEggModeBackButton, miEggModeEggQuantityField[1], NULL, miEggModeBackButton);
     mModeSettingsMenu[6].AddControl(miEggModeEggQuantityField[1], miEggModeEggQuantityField[0], miEggModeEggQuantityField[2], NULL, miEggModeBackButton);
@@ -496,7 +497,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miFlagModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miFlagModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miFlagModeHeaderText = new MI_Text("Capture The Flag Mode Menu", 320, 5, 0, 2, 1);
+    miFlagModeHeaderText = new MI_HeaderText("Capture The Flag Mode Menu", 320, 5);
 
     mModeSettingsMenu[7].AddControl(miFlagModeSpeedField, miFlagModeBackButton, miFlagModeTouchReturnField, NULL, miFlagModeBackButton);
     mModeSettingsMenu[7].AddControl(miFlagModeTouchReturnField, miFlagModeSpeedField, miFlagModePointMoveField, NULL, miFlagModeBackButton);
@@ -538,7 +539,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miChickenModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miChickenModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miChickenModeHeaderText = new MI_Text("Chicken Mode Menu", 320, 5, 0, 2, 1);
+    miChickenModeHeaderText = new MI_HeaderText("Chicken Mode Menu", 320, 5);
 
 
     mModeSettingsMenu[8].AddControl(miChickenModeShowTargetField, miChickenModeBackButton, miChickenModeGlideField, NULL, miChickenModeBackButton);
@@ -569,7 +570,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miTagModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miTagModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miTagModeHeaderText = new MI_Text("Tag Mode Menu", 320, 5, 0, 2, 1);
+    miTagModeHeaderText = new MI_HeaderText("Tag Mode Menu", 320, 5);
 
 
     mModeSettingsMenu[9].AddControl(miTagModeTagOnTouchField, miTagModeBackButton, miTagModeBackButton, NULL, miTagModeBackButton);
@@ -642,7 +643,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miStarModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miStarModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miStarModeHeaderText = new MI_Text("Star Mode Menu", 320, 5, 0, 2, 1);
+    miStarModeHeaderText = new MI_HeaderText("Star Mode Menu", 320, 5);
 
     mModeSettingsMenu[10].AddControl(miStarModeTimeField, miStarModeBackButton, miStarModeShineField, NULL, miStarModeBackButton);
     mModeSettingsMenu[10].AddControl(miStarModeShineField, miStarModeTimeField, miStarModePercentExtraTime, NULL, miStarModeBackButton);
@@ -705,7 +706,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
     miDominationModeRelocateFrequencyField->SetData(&game_values.gamemodemenusettings.domination.relocationfrequency, NULL, NULL);
     miDominationModeRelocateFrequencyField->SetKey(game_values.gamemodemenusettings.domination.relocationfrequency);
 
-    miDominationModeDeathText = new MI_Text("On Death", 120, 210, 0, 2, 0);
+    miDominationModeDeathText = new MI_Text("On Death", 120, 210, 0, true, TextAlignment::LEFT);
 
     miDominationModeLoseOnDeathField = new MI_SelectField(&rm->spr_selectfield, 120, 240, "Lose Bases", 400, 180);
     miDominationModeLoseOnDeathField->Add("Off", 0, "", false, false);
@@ -734,7 +735,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miDominationModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miDominationModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miDominationModeHeaderText = new MI_Text("Domination Mode Menu", 320, 5, 0, 2, 1);
+    miDominationModeHeaderText = new MI_HeaderText("Domination Mode Menu", 320, 5);
 
     mModeSettingsMenu[11].AddControl(miDominationModeQuantityField, miDominationModeBackButton, miDominationModeRelocateFrequencyField, NULL, miDominationModeBackButton);
     mModeSettingsMenu[11].AddControl(miDominationModeRelocateFrequencyField, miDominationModeQuantityField, miDominationModeLoseOnDeathField, NULL, miDominationModeBackButton);
@@ -797,7 +798,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miKingOfTheHillModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miKingOfTheHillModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miKingOfTheHillModeHeaderText = new MI_Text("King of the Hill Mode Menu", 320, 5, 0, 2, 1);
+    miKingOfTheHillModeHeaderText = new MI_HeaderText("King of the Hill Mode Menu", 320, 5);
 
     mModeSettingsMenu[12].AddControl(miKingOfTheHillModeSizeField, miKingOfTheHillModeBackButton, miKingOfTheHillModeRelocateFrequencyField, NULL, miKingOfTheHillModeBackButton);
     mModeSettingsMenu[12].AddControl(miKingOfTheHillModeRelocateFrequencyField, miKingOfTheHillModeSizeField, miKingOfTheHillModeMultiplierField, NULL, miKingOfTheHillModeBackButton);
@@ -852,7 +853,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miRaceModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miRaceModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miRaceModeHeaderText = new MI_Text("Race Mode Menu", 320, 5, 0, 2, 1);
+    miRaceModeHeaderText = new MI_HeaderText("Race Mode Menu", 320, 5);
 
     mModeSettingsMenu[13].AddControl(miRaceModeQuantityField, miRaceModeBackButton, miRaceModeSpeedField, NULL, miRaceModeBackButton);
     mModeSettingsMenu[13].AddControl(miRaceModeSpeedField, miRaceModeQuantityField, miRaceModePenaltyField, NULL, miRaceModeBackButton);
@@ -877,7 +878,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miFrenzyModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miFrenzyModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miFrenzyModeHeaderText = new MI_Text("Frenzy Mode Menu", 320, 5, 0, 2, 1);
+    miFrenzyModeHeaderText = new MI_HeaderText("Frenzy Mode Menu", 320, 5);
 
     mModeSettingsMenu[15].AddControl(miFrenzyModeOptions, NULL, NULL, NULL, NULL);
 
@@ -945,7 +946,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miSurvivalModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miSurvivalModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miSurvivalModeHeaderText = new MI_Text("Survival Mode Menu", 320, 5, 0, 2, 1);
+    miSurvivalModeHeaderText = new MI_HeaderText("Survival Mode Menu", 320, 5);
 
     mModeSettingsMenu[16].AddControl(miSurvivalModeEnemySlider[0], miSurvivalModeBackButton, miSurvivalModeEnemySlider[1], NULL, miSurvivalModeBackButton);
     mModeSettingsMenu[16].AddControl(miSurvivalModeEnemySlider[1], miSurvivalModeEnemySlider[0], miSurvivalModeEnemySlider[2], NULL, miSurvivalModeBackButton);
@@ -1034,7 +1035,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miGreedModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miGreedModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miGreedModeHeaderText = new MI_Text("Greed Mode Menu", 320, 5, 0, 2, 1);
+    miGreedModeHeaderText = new MI_HeaderText("Greed Mode Menu", 320, 5);
 
     mModeSettingsMenu[17].AddControl(miGreedModeCoinLife, miGreedModeBackButton, miGreedModeOwnCoins, NULL, miGreedModeBackButton);
     mModeSettingsMenu[17].AddControl(miGreedModeOwnCoins, miGreedModeCoinLife, miGreedModeMultiplier, NULL, miGreedModeBackButton);
@@ -1115,7 +1116,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miHealthModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miHealthModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miHealthModeHeaderText = new MI_Text("Health Mode Menu", 320, 5, 0, 2, 1);
+    miHealthModeHeaderText = new MI_HeaderText("Health Mode Menu", 320, 5);
 
     mModeSettingsMenu[18].AddControl(miHealthModeStartLife, miHealthModeBackButton, miHealthModeMaxLife, NULL, miHealthModeBackButton);
     mModeSettingsMenu[18].AddControl(miHealthModeMaxLife, miHealthModeStartLife, miHealthModePercentExtraLife, NULL, miHealthModeBackButton);
@@ -1202,7 +1203,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miCollectionModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miCollectionModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miCollectionModeHeaderText = new MI_Text("Card Collection Mode Menu", 320, 5, 0, 2, 1);
+    miCollectionModeHeaderText = new MI_HeaderText("Card Collection Mode Menu", 320, 5);
 
     mModeSettingsMenu[19].AddControl(miCollectionModeQuantityField, miCollectionModeBackButton, miCollectionModeRateField, NULL, miCollectionModeBackButton);
     mModeSettingsMenu[19].AddControl(miCollectionModeRateField, miCollectionModeQuantityField, miCollectionModeBankTimeField, NULL, miCollectionModeBackButton);
@@ -1250,7 +1251,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miChaseModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miChaseModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miChaseModeHeaderText = new MI_Text("Phanto Mode Menu", 320, 5, 0, 2, 1);
+    miChaseModeHeaderText = new MI_HeaderText("Phanto Mode Menu", 320, 5);
 
     mModeSettingsMenu[20].AddControl(miChaseModeSpeedField, miChaseModeBackButton, miChaseModeQuantitySlider[0], NULL, miChaseModeBackButton);
 
@@ -1306,7 +1307,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miShyGuyTagModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miShyGuyTagModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miShyGuyTagModeHeaderText = new MI_Text("Shyguy Tag Mode Menu", 320, 5, 0, 2, 1);
+    miShyGuyTagModeHeaderText = new MI_HeaderText("Shyguy Tag Mode Menu", 320, 5);
 
     mModeSettingsMenu[21].AddControl(miShyGuyTagModeTagOnSuicideField, miShyGuyTagModeBackButton, miShyGuyTagModeTagOnStompField, NULL, miShyGuyTagModeBackButton);
     mModeSettingsMenu[21].AddControl(miShyGuyTagModeTagOnStompField, miShyGuyTagModeTagOnSuicideField, miShyGuyTagModeFreeTimeField, NULL, miShyGuyTagModeBackButton);
@@ -1370,7 +1371,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 
     miBossModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miBossModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miBossModeHeaderText = new MI_Text("Boss Minigame Menu", 320, 5, 0, 2, 1);
+    miBossModeHeaderText = new MI_HeaderText("Boss Minigame Menu", 320, 5);
 
     mBossSettingsMenu.AddControl(miBossModeTypeField, miBossModeBackButton, miBossModeDifficultyField, NULL, miBossModeBackButton);
     mBossSettingsMenu.AddControl(miBossModeDifficultyField, miBossModeTypeField, miBossModeHitPointsField, NULL, miBossModeBackButton);

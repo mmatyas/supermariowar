@@ -2,6 +2,7 @@
 
 #include "net.h"
 #include "ResourceManager.h"
+#include "ui/MI_Text.h"
 #include "ui/MI_TextField.h"
 
 extern CResourceManager* rm;
@@ -13,7 +14,7 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
 
     miNetServersLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miNetServersRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miNetServersHeaderText = new MI_Text("Multiplayer Servers Menu", 320, 5, 0, 2, 1);
+    miNetServersHeaderText = new MI_HeaderText("Multiplayer Servers Menu", 320, 5);
 
     miNetServersScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 90, 72, 640 - 2 * 90, 9, "Saved Servers", MENU_CODE_NET_SERVERLIST_EXIT, MENU_CODE_NET_SERVERLIST_EXIT);
     miNetServersScroll->SetAutoModify(true);
@@ -31,9 +32,9 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
     miNetServersSelectButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Selected Server", 640 - 2 * 70);
     miNetServersSelectButton->SetCode(MENU_CODE_TO_NET_SERVERLIST);
     if (netplay.savedServers.size() > 0)
-        miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), 640 - 90, 205, 0, 2, 2);
+        miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), 640 - 90, 205, 0, true, TextAlignment::RIGHT);
     else
-        miNetServersSelectedHostText = new MI_Text("(none)", 640 - 90, 205, 0, 2, 2);
+        miNetServersSelectedHostText = new MI_Text("(none)", 640 - 90, 205, 0, true, TextAlignment::RIGHT);
 
     miNetServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Connect", 640 - 2 * 70, TextAlignment::CENTER);
     miNetServersConnectButton->SetCode(MENU_CODE_NET_CONNECT_IN_PROGRESS);
@@ -42,7 +43,7 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
     miNetServersAddRemoveButton->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
     miNetServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miNetServersConnectingDialogText = new MI_Text("Connecting...", 640 / 2, 240 - 12, 0, 2, 1);
+    miNetServersConnectingDialogText = new MI_HeaderText("Connecting...", 640 / 2, 240 - 12);
 
     miNetServersConnectingDialogImage->Show(false);
     miNetServersConnectingDialogText->Show(false);

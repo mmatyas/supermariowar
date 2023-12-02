@@ -12,6 +12,7 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
+#include "ui/MI_Text.h"
 
 #include <cmath>
 #include <cstdlib> // abs()
@@ -304,8 +305,8 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 
     //Are You Sure dialog box
     miDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
-    miDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
+    miDialogAreYouText = new MI_HeaderText("Are You", 320, 195);
+    miDialogSureText = new MI_HeaderText("Sure?", 320, 220);
     miDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
     miDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
 
@@ -1118,7 +1119,7 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
 
     miTourStopLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miTourStopMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miTourStopMenuHeaderText = new MI_Text("Tour Stop", 320, 5, 0, 2, 1);
+    miTourStopMenuHeaderText = new MI_HeaderText("Tour Stop", 320, 5);
 }
 
 MI_TourStop::~MI_TourStop()

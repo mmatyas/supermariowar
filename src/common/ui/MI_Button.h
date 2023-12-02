@@ -6,13 +6,6 @@
 #include <string>
 
 
-enum class TextAlignment: unsigned char {
-    LEFT,
-    CENTER,
-    RIGHT,
-};
-
-
 class MI_Button : public UI_Control {
 public:
     MI_Button(gfxSprite* nspr, short x, short y, std::string name, short width, TextAlignment align = TextAlignment::LEFT);

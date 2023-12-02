@@ -3,6 +3,7 @@
 #include "GameValues.h"
 #include "ResourceManager.h"
 #include "ui/MI_Button.h"
+#include "ui/MI_Text.h"
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
@@ -46,11 +47,11 @@ UI_OptionsMenu::UI_OptionsMenu() : UI_Menu()
 
     miOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miOptionsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miOptionsMenuHeaderText = new MI_Text("Options Menu", 320, 5, 0, 2, 1);
+    miOptionsMenuHeaderText = new MI_HeaderText("Options Menu", 320, 5);
 
     miGenerateThumbsDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miGenerateThumbsDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
-    miGenerateThumbsDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
+    miGenerateThumbsDialogAreYouText = new MI_HeaderText("Are You", 320, 195);
+    miGenerateThumbsDialogSureText = new MI_HeaderText("Sure?", 320, 220);
     miGenerateThumbsDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
     miGenerateThumbsDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
 

@@ -5,6 +5,7 @@
 #include "uicontrol.h"
 
 class MI_Button;
+class MI_Text;
 
 /*
 	This is the main options menu, where you can select the

@@ -6,6 +6,7 @@
 #include "path.h"
 #include "ResourceManager.h"
 #include "ui/MI_Button.h"
+#include "ui/MI_Text.h"
 
 extern CGameMode * gamemodes[GAMEMODE_LAST];
 extern short currentgamemode;
@@ -77,13 +78,13 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
 
     miGameSettingsLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miGameSettingsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miGameSettingsMenuHeaderText = new MI_Text("Single Game Menu", 320, 5, 0, 2, 1);
+    miGameSettingsMenuHeaderText = new MI_HeaderText("Single Game Menu", 320, 5);
 
 
     //Exit tournament dialog box
     miGameSettingsExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miGameSettingsExitDialogExitText = new MI_Text("Exit", 320, 195, 0, 2, 1);
-    miGameSettingsExitDialogTournamentText = new MI_Text("Tournament", 320, 220, 0, 2, 1);
+    miGameSettingsExitDialogExitText = new MI_HeaderText("Exit", 320, 195);
+    miGameSettingsExitDialogTournamentText = new MI_HeaderText("Tournament", 320, 220);
     miGameSettingsExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, TextAlignment::CENTER);
     miGameSettingsExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, TextAlignment::CENTER);
 
@@ -129,7 +130,7 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
     SetHeadControl(miSettingsStartButton);
 
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
-};
+}
 
 UI_GameSettingsMenu::~UI_GameSettingsMenu() {
 }

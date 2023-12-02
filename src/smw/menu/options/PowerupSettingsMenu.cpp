@@ -2,6 +2,7 @@
 
 #include "GameValues.h"
 #include "ResourceManager.h"
+#include "ui/MI_Text.h"
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
@@ -80,7 +81,7 @@ UI_PowerupSettingsMenu::UI_PowerupSettingsMenu() : UI_Menu()
 
     miPowerupSettingsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miPowerupSettingsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miPowerupSettingsMenuHeaderText = new MI_Text("Item Settings Menu", 320, 5, 0, 2, 1);
+    miPowerupSettingsMenuHeaderText = new MI_HeaderText("Item Settings Menu", 320, 5);
 
     AddControl(miStoredPowerupDelayField, miPowerupSettingsMenuBackButton, miItemRespawnField, NULL, miPowerupSettingsMenuBackButton);
     AddControl(miItemRespawnField, miStoredPowerupDelayField, miHiddenBlockRespawnField, NULL, miPowerupSettingsMenuBackButton);

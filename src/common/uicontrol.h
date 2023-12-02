@@ -12,6 +12,14 @@
 
 class UI_Menu;
 
+
+enum class TextAlignment: unsigned char {
+    LEFT,
+    CENTER,
+    RIGHT,
+};
+
+
 class UI_Control
 {
 public:
@@ -191,22 +199,6 @@ private:
     short iBlinkInterval;
     short iBlinkCounter;
     bool fBlinkShow;
-};
-
-class MI_Text : public UI_Control
-{
-public:
-    MI_Text(const char * text, short x, short y, short w, short size, short justified);
-    virtual ~MI_Text();
-
-    void SetText(const char * text);
-    void Draw();
-
-private:
-    char * szText;
-    short iw;
-    short iJustified;
-    gfxFont * font;
 };
 
 class MI_ScoreText : public UI_Control

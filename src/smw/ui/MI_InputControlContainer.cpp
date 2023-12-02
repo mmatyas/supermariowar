@@ -4,6 +4,7 @@
 #include "gfx/gfxSprite.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_SelectField.h"
+#include "ui/MI_Text.h"
 #include "ResourceManager.h"
 
 #include <cstdlib>
@@ -363,7 +364,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
 
     char szTitle[128];
     sprintf(szTitle, "Player %d Controls", iPlayerID + 1);
-    miText = new MI_Text(szTitle, 320, 5, 0, 2, 1);
+    miText = new MI_HeaderText(szTitle, 320, 5);
 
     miImage[0] = new MI_Image(spr_button, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miImage[1] = new MI_Image(spr_button, 320, 0, 192, 0, 320, 32, 1, 1, 0);

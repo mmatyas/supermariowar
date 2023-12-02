@@ -4,6 +4,7 @@
 #include "GameValues.h"
 #include "path.h"
 #include "ResourceManager.h"
+#include "ui/MI_Text.h"
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -72,7 +73,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu() : UI_Menu()
 
     miMatchSelectionMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miMatchSelectionMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miMatchSelectionMenuHeaderText = new MI_Text("Match Type Menu", 320, 5, 0, 2, 1);
+    miMatchSelectionMenuHeaderText = new MI_HeaderText("Match Type Menu", 320, 5);
 
     miMatchSelectionDisplayImage = new MI_Image(&rm->menu_match_select, 160, 80, 0, 0, 320, 240, 1, 1, 0);
     miWorldPreviewDisplay = new MI_WorldPreviewDisplay(160, 80, 20, 15);
