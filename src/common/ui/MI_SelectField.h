@@ -5,6 +5,7 @@
 #include "gfx/gfxSprite.h"
 #include "RandomNumberGenerator.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -62,7 +63,7 @@ class MI_SelectField : public UI_Control
 {
 public:
 
-    MI_SelectField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+    MI_SelectField(gfxSprite * nspr, short x, short y, std::string name, short width, short indent);
     MI_SelectField(const MI_SelectField&);
     virtual ~MI_SelectField();
 
@@ -151,39 +152,38 @@ public:
     }
 
 protected:
-
     bool MoveNext();
     bool MovePrev();
     bool MoveRandom();
 
-    gfxSprite * spr;
+    gfxSprite* spr = nullptr;
     std::string szName;
 
-    short * iValue;
-    std::string * sValue;
-    bool * fValue;
+    short* iValue = nullptr;
+    std::string* sValue = nullptr;
+    bool* fValue = nullptr;
 
     std::vector<SF_ListItem*> items;
     std::vector<SF_ListItem*>::iterator current;
 
     std::vector<SF_ListItem*> goodRandomItems;
 
-    short iIndex;
+    short iIndex = 0;
+    short iWidth = 0;
+    short iIndent = 0;
 
-    short iWidth, iIndent;
+    std::unique_ptr<MI_Image> miModifyImageLeft;
+    std::unique_ptr<MI_Image> miModifyImageRight;
 
-    MI_Image * miModifyImageLeft;
-    MI_Image * miModifyImageRight;
+    MenuCodeEnum mcItemChangedCode = MENU_CODE_NONE;
+    MenuCodeEnum mcControlSelectedCode = MENU_CODE_NONE;
 
-    MenuCodeEnum mcItemChangedCode;
-    MenuCodeEnum mcControlSelectedCode;
+    bool fAutoAdvance = false;
+    bool fNoWrap = false;
 
-    bool fAutoAdvance;
-    bool fNoWrap;
+    short iAdjustmentY = 0;
 
-    short iAdjustmentY;
-
-    bool fFastScroll;
+    bool fFastScroll = false;
 };
 
 #endif // UI_SELECT_FIELD_H

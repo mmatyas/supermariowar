@@ -12,37 +12,19 @@ extern CResourceManager* rm;
  * MI_SelectField Class
  **************************************/
 
-MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
-    UI_Control(x, y)
+MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, std::string name, short width, short indent)
+    : UI_Control(x, y)
+    , spr(nspr)
+    , szName(std::move(name))
+    , iWidth(width)
+    , iIndent(indent)
+    , iAdjustmentY(width > 256 ? 0 : 128)
 {
-    spr = nspr;
-
-    szName = name;
-
-    iWidth = width;
-    iIndent = indent;
-
-    mcItemChangedCode = MENU_CODE_NONE;
-    mcControlSelectedCode = MENU_CODE_NONE;
-
-    fAutoAdvance = false;
-    fNoWrap = false;
-
-    iValue = NULL;
-    sValue = NULL;
-    fValue = NULL;
-
-    iIndex = 0;
-
-    miModifyImageLeft = new MI_Image(nspr, ix + indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
+    miModifyImageLeft = std::make_unique<MI_Image>(nspr, ix + indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
     miModifyImageLeft->Show(false);
 
-    miModifyImageRight = new MI_Image(nspr, ix + iWidth - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
+    miModifyImageRight = std::make_unique<MI_Image>(nspr, ix + iWidth - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
     miModifyImageRight->Show(false);
-
-    iAdjustmentY = width > 256 ? 0 : 128;
-
-    fFastScroll = false;
 }
 
 MI_SelectField::MI_SelectField(const MI_SelectField& other)
@@ -64,10 +46,10 @@ MI_SelectField::MI_SelectField(const MI_SelectField& other)
     iWidth = other.iWidth;
     iIndent = other.iIndent;
 
-    miModifyImageLeft = new MI_Image(spr, ix + iIndent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
+    miModifyImageLeft = std::make_unique<MI_Image>(spr, ix + iIndent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
     miModifyImageLeft->Show(false);
 
-    miModifyImageRight = new MI_Image(spr, ix + iWidth - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
+    miModifyImageRight = std::make_unique<MI_Image>(spr, ix + iWidth - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
     miModifyImageRight->Show(false);
 
     mcItemChangedCode = other.mcItemChangedCode;
@@ -81,19 +63,9 @@ MI_SelectField::MI_SelectField(const MI_SelectField& other)
 
 MI_SelectField::~MI_SelectField()
 {
-    delete miModifyImageLeft;
-    delete miModifyImageRight;
-
-    goodRandomItems.clear();
-
-    std::vector<SF_ListItem*>::iterator iterateAll = items.begin(), lim = items.end();
-
-    while (iterateAll != lim) {
-        delete *iterateAll;
-        iterateAll++;
+    for (SF_ListItem* item : items) {
+        delete item;
     }
-
-    items.clear();
 }
 
 void MI_SelectField::SetTitle(std::string name)

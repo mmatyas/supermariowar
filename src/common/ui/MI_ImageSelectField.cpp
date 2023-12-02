@@ -9,14 +9,17 @@ extern CResourceManager* rm;
  * MI_ImageSelectField Class
  **************************************/
 
-MI_ImageSelectField::MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, short x, short y, const char * name, short width, short indent, short imageHeight, short imageWidth) :
-    MI_SelectField(nspr, x, y, name, width, indent)
-{
-    spr_image = nspr_image;
-
-    iImageWidth = imageWidth;
-    iImageHeight = imageHeight;
-}
+MI_ImageSelectField::MI_ImageSelectField(
+        gfxSprite* nspr, gfxSprite* nspr_image,
+        short x, short y,
+        std::string name,
+        short width, short indent,
+        short imageHeight, short imageWidth)
+    : MI_SelectField(nspr, x, y, std::move(name), width, indent)
+    , spr_image(nspr_image)
+    , iImageWidth(imageWidth)
+    , iImageHeight(imageHeight)
+{}
 
 MI_ImageSelectField::MI_ImageSelectField(const MI_ImageSelectField& other)
     : MI_SelectField(other)
@@ -25,9 +28,6 @@ MI_ImageSelectField::MI_ImageSelectField(const MI_ImageSelectField& other)
     iImageWidth = other.iImageWidth;
     iImageHeight = other.iImageHeight;
 }
-
-MI_ImageSelectField::~MI_ImageSelectField()
-{}
 
 void MI_ImageSelectField::Draw()
 {
