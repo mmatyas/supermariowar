@@ -10,42 +10,26 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 
 UI_Control::UI_Control(short x, short y)
+    : ix(x)
+    , iy(y)
 {
-    fSelected = false;
-    fModifying = false;
-    fAutoModify = false;
-    fDisable = false;
-
-    ix = x;
-    iy = y;
-
-    fShow = true;
-
-    for (int iNeighbor = 0; iNeighbor < 4; iNeighbor++)
-        neighborControls[iNeighbor] = NULL;
-
-    uiMenu = NULL;
-
-    iControllingTeam = -1;
+    neighborControls.fill(nullptr);
 }
 
 UI_Control& UI_Control::operator= (const UI_Control& other)
 {
     if (this != &other) {
+        ix = other.ix;
+        iy = other.iy;
+
         fSelected = other.fSelected;
         fModifying = other.fModifying;
         fAutoModify = other.fAutoModify;
         fDisable = other.fDisable;
-
-        ix = other.ix;
-        iy = other.iy;
-
         fShow = other.fShow;
 
-        for (int iNeighbor = 0; iNeighbor < 4; iNeighbor++)
-            neighborControls[iNeighbor] = NULL;
-
-        uiMenu = NULL;
+        uiMenu = nullptr;
+        neighborControls.fill(nullptr);
         iControllingTeam = other.iControllingTeam;
     }
     return *this;

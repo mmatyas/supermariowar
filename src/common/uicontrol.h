@@ -6,6 +6,7 @@
 #include "RandomNumberGenerator.h"
 #include "uimenu.h"
 
+#include <array>
 #include <cassert>
 #include <functional>
 
@@ -46,7 +47,7 @@ public:
     void SetAutoModify(bool autoModify) {
         fAutoModify = autoModify;
     }
-    bool IsAutoModify() {
+    bool IsAutoModify() const {
         return fAutoModify;
     }
 
@@ -66,7 +67,7 @@ public:
     void Show(bool show) {
         fShow = show;
     }
-    bool IsVisible() {
+    bool IsVisible() const {
         return fShow;
     }
 
@@ -93,21 +94,18 @@ public:
     }
 
 protected:
-
-    bool fSelected;
-    bool fModifying;
-    bool fAutoModify;
-    bool fDisable;
-
     short ix, iy;
 
-    UI_Control * neighborControls[4];
+    bool fSelected = false;
+    bool fModifying = false;
+    bool fAutoModify = false;
+    bool fDisable = false;
+    bool fShow = true;
 
-    bool fShow;
+    std::array<UI_Control*, 4> neighborControls;
 
-    UI_Menu * uiMenu;
-
-    short iControllingTeam;
+    UI_Menu* uiMenu = nullptr;
+    short iControllingTeam = -1;
 };
 
 /*********************************************************
