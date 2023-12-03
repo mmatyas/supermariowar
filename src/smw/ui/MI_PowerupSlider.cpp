@@ -2,24 +2,16 @@
 
 #include "ui/MI_Image.h"
 
-/**************************************
- * MI_PowerupSlider Class
- **************************************/
 
-MI_PowerupSlider::MI_PowerupSlider(gfxSprite * nspr, gfxSprite * nsprSlider, gfxSprite * nsprPowerup, short x, short y, short width, short powerupIndex) :
-    MI_SliderField(nspr, nsprSlider, x, y, "", width, 0, 0)
+MI_PowerupSlider::MI_PowerupSlider(gfxSprite* nspr, gfxSprite* nsprSlider, gfxSprite* nsprPowerup, short x, short y, short width, short powerupIndex)
+    : MI_SliderField(nspr, nsprSlider, x, y, "", width, 0, 0)
+    , sprPowerup(nsprPowerup)
+    , iPowerupIndex(powerupIndex)
+    , iHalfWidth((width - 38) / 2)
 {
-    sprPowerup = nsprPowerup;
-    iPowerupIndex = powerupIndex;
-
     miModifyImageLeft->SetPosition(ix + 25, iy + 4);
     miModifyImageRight->SetPosition(ix + iWidth - 12, iy + 4);
-
-    iHalfWidth = (width - 38) >> 1;
 }
-
-MI_PowerupSlider::~MI_PowerupSlider()
-{}
 
 void MI_PowerupSlider::Draw()
 {

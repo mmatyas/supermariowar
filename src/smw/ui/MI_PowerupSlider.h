@@ -1,24 +1,19 @@
-#ifndef UI_POWERUP_SLIDER_H
-#define UI_POWERUP_SLIDER_H
+#pragma once
 
 #include "ui/MI_SliderField.h"
-#include "gfx/gfxSprite.h"
 
-class MI_PowerupSlider : public MI_SliderField
-{
+class gfxSprite;
+
+
+class MI_PowerupSlider : public MI_SliderField {
 public:
-
-    MI_PowerupSlider(gfxSprite * nspr, gfxSprite * nsprSlider, gfxSprite * nsprPowerup, short x, short y, short width, short powerupIndex);
-    virtual ~MI_PowerupSlider();
+    MI_PowerupSlider(gfxSprite* nspr, gfxSprite* nsprSlider, gfxSprite* nsprPowerup, short x, short y, short width, short powerupIndex);
 
     //Draws every frame
-    void Draw();
+    void Draw() override;
 
 protected:
-
-    gfxSprite * sprPowerup;
-    short iPowerupIndex;
-    short iHalfWidth;
+    gfxSprite* sprPowerup = nullptr;
+    short iPowerupIndex = 0;
+    short iHalfWidth = 0;
 };
-
-#endif // UI_POWERUP_SLIDER_H
