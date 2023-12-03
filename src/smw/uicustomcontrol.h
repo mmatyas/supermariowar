@@ -23,40 +23,6 @@ class MI_ScoreText;
 class MI_Text;
 
 
-class MI_TourStop : public UI_Control
-{
-	public:
-
-		MI_TourStop(short x, short y, bool fWorld);
-		virtual ~MI_TourStop();
-
-		MenuCodeEnum Modify(bool fModify);
-
-		void Update();
-		void Draw();
-		void Refresh(short iTourStop);
-
-	private:
-
-		MI_ImageSelectField * miModeField;
-		MI_SelectField * miGoalField;
-		MI_SelectField * miPointsField;
-		MI_MapField * miMapField;
-		MI_Button * miStartButton;
-
-		MI_SelectField * miBonusField;
-		MI_Image * miEndStageImage[2];
-
-		MI_Image * miBonusIcon[10];
-		MI_Image * miBonusBackground[10];
-
-		MI_Image * miTourStopLeftHeaderBar;
-		MI_Image * miTourStopMenuRightHeaderBar;
-		MI_Text * miTourStopMenuHeaderText;
-
-		bool fIsWorld;
-};
-
 class MI_TournamentScoreboard : public UI_Control
 {
 	public:

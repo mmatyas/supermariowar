@@ -209,6 +209,8 @@ target_sources(smw PRIVATE
         ui/MI_PacksField.h
         ui/MI_PlaylistField.cpp
         ui/MI_PlaylistField.h
+        ui/MI_TourStop.cpp
+        ui/MI_TourStop.h
 )
 
 if(NO_NETWORK)

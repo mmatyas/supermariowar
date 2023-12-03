@@ -10,6 +10,7 @@
 #include "MapList.h"
 #include "ResourceManager.h"
 #include "Score.h"
+#include "ui/MI_TourStop.h"
 
 #include "menu/BonusWheelMenu.h"
 #include "menu/GameSettingsMenu.h"

@@ -2,8 +2,11 @@
 #define MENU_TOURSTOP_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
-#include "uicustomcontrol.h"
+
+class MI_Button;
+class MI_Image;
+class MI_Text;
+class MI_TourStop;
 
 /*
     Description.
