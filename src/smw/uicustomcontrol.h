@@ -21,54 +21,6 @@ class MapListNode;
 class MI_ScoreText;
 class MI_Text;
 
-class MI_PowerupSelection : public UI_Control
-{
-	public:
-
-		MI_PowerupSelection(short x, short y, short width, short numlines);
-		virtual ~MI_PowerupSelection();
-
-		MenuCodeEnum Modify(bool modify);
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-
-		void Update();
-		void Draw();
-
-		void MoveNext();
-		void MovePrev();
-
-	private:
-
-		void AdjustDisplayArrows();
-
-		void SetupPowerupFields();
-		void EnablePowerupFields(bool fEnable);
-
-		short iIndex, iOffset;
-		short iTopStop, iBottomStop;
-		short iNumLines;
-		short iWidth;
-
-		UI_Menu * mMenu;
-
-		MI_SelectField * miOverride;
-		MI_SelectField * miPreset;
-
-		MI_PowerupSlider * miPowerupSlider[NUM_POWERUPS];
-
-		MI_Button * miRestoreDefaultsButton;
-		MI_Button * miClearButton;
-
-		MI_Image * miDialogImage;
-		MI_Text * miDialogAreYouText;
-		MI_Text * miDialogSureText;
-		MI_Button * miDialogYesButton;
-		MI_Button * miDialogNoButton;
-
-		MI_Image * miUpArrow;
-		MI_Image * miDownArrow;
-};
-
 
 class MI_WorldPreviewDisplay : public UI_Control
 {

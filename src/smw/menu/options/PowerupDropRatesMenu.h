@@ -2,8 +2,10 @@
 #define MENU_POWERUPDROPRATES_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
-#include "uicustomcontrol.h"
+
+class MI_Image;
+class MI_PowerupSelection;
+class MI_Text;
 
 /*
     In this menu you can set how frequently can various
