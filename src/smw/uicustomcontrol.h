@@ -23,19 +23,6 @@ class MI_ScoreText;
 class MI_Text;
 
 
-class MI_PacksField : public MI_AnnouncerField
-{
-	public:
-
-		MI_PacksField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, SimpleFileList * pList, MenuCodeEnum code);
-		virtual ~MI_PacksField();
-
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-
-	private:
-		MenuCodeEnum itemChangedCode;
-};
-
 class MI_PlaylistField : public UI_Control
 {
 	public:

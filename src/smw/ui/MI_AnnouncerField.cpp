@@ -25,6 +25,8 @@ MI_AnnouncerField::MI_AnnouncerField(gfxSprite* nspr, short x, short y, std::str
     miModifyImageRight->Show(false);
 }
 
+MI_AnnouncerField::~MI_AnnouncerField() = default;
+
 MenuCodeEnum MI_AnnouncerField::Modify(bool modify)
 {
     miModifyImageLeft->Show(modify);

@@ -6,13 +6,14 @@
 #include <string>
 
 class gfxSprite;
-class MI_Image;
 class SimpleFileList;
+class MI_Image;
 
 
 class MI_AnnouncerField : public UI_Control {
 public:
     MI_AnnouncerField(gfxSprite* nspr, short x, short y, std::string name, short width, short indent, SimpleFileList* pList);
+    virtual ~MI_AnnouncerField();
 
     //Called when user selects this control to change it's value
     MenuCodeEnum Modify(bool modify) override;

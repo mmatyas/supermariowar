@@ -2,8 +2,13 @@
 #define MENU_GRAPHICSOPTIONS_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
-#include "uicustomcontrol.h"
+
+class MI_Button;
+class MI_Image;
+class MI_PacksField;
+class MI_SelectField;
+class MI_Text;
+
 
 /*
     You can switch between windowed and fullscreen mode,

@@ -205,6 +205,8 @@ target_sources(smw PRIVATE
         ui/MI_WorldPreviewDisplay.h
         ui/MI_AnnouncerField.cpp
         ui/MI_AnnouncerField.h
+        ui/MI_PacksField.cpp
+        ui/MI_PacksField.h
 )
 
 if(NO_NETWORK)
