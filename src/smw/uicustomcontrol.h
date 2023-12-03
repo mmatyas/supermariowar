@@ -22,47 +22,6 @@ class MI_ScoreText;
 class MI_Text;
 
 
-class MI_WorldPreviewDisplay : public UI_Control
-{
-	public:
-
-		MI_WorldPreviewDisplay(short x, short y, short cols, short rows);
-		virtual ~MI_WorldPreviewDisplay();
-
-		//Updates animations or other events every frame
-		void Update();
-
-		//Draws every frame
-		void Draw();
-
-		void SetWorld();
-
-	protected:
-
-		void Init();
-		void UpdateMapSurface(bool fFullRefresh);
-
-		SDL_Surface * sMapSurface;
-		SDL_Rect rectDst;
-
-		short iCols, iRows;
-
-		short iMapOffsetX, iMapOffsetY;
-		short iMapGlobalOffsetX, iMapGlobalOffsetY;
-		short iMapDrawOffsetCol, iMapDrawOffsetRow;
-
-		short iMoveDirection;
-
-		short iAnimationTimer;
-		short iAnimationFrame;
-
-		short iScrollCols, iScrollRows;
-
-		SDL_Rect rectSrcSurface, rectDstSurface;
-
-		short iScrollSpeed, iScrollSpeedTimer;
-};
-
 class MI_AnnouncerField : public UI_Control
 {
 	public:

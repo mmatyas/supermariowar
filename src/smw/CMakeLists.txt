@@ -201,6 +201,8 @@ target_sources(smw PRIVATE
         ui/MI_PlayerSelect.h
         ui/MI_PowerupSelection.cpp
         ui/MI_PowerupSelection.h
+        ui/MI_WorldPreviewDisplay.cpp
+        ui/MI_WorldPreviewDisplay.h
 )
 
 if(NO_NETWORK)
