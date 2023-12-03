@@ -23,36 +23,6 @@ class MI_ScoreText;
 class MI_Text;
 
 
-class MI_PlaylistField : public UI_Control
-{
-	public:
-
-		MI_PlaylistField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
-		virtual ~MI_PlaylistField();
-
-		//Called when user selects this control to change it's value
-		MenuCodeEnum Modify(bool modify);
-
-		//Updates animations or other events every frame
-		void Update();
-
-		//Draws every frame
-		virtual void Draw();
-
-		//Sends player input to control on every frame
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-
-	protected:
-
-		gfxSprite * spr;
-
-		char * szName;
-		short iWidth, iIndent;
-
-		MI_Image * miModifyImageLeft;
-		MI_Image * miModifyImageRight;
-};
-
 class MI_TourStop : public UI_Control
 {
 	public:

@@ -246,7 +246,7 @@ MenuCodeEnum MI_PowerupSelection::Modify(bool modify)
     return MENU_CODE_MODIFY_ACCEPTED;
 }
 
-MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
+MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
 {
     MenuCodeEnum ret = mMenu->SendInput(playerInput);
 
