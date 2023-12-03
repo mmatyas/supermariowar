@@ -21,34 +21,6 @@ class MapListNode;
 class MI_ScoreText;
 class MI_Text;
 
-class MI_PlayerSelect : public UI_Control
-{
-	public:
-
-		MI_PlayerSelect(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
-		virtual ~MI_PlayerSelect();
-
-		void SetImagePosition();
-
-		void Update();
-		void Draw();
-
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		MenuCodeEnum Modify(bool modify);
-
-	private:
-
-		gfxSprite * spr;
-
-		char * szName;
-		short iWidth, iIndent;
-
-		short iSelectedPlayer;
-		short iPlayerPosition[4];
-
-		MI_Image * miModifyImage;
-};
-
 class MI_PowerupSelection : public UI_Control
 {
 	public:

@@ -2,8 +2,10 @@
 #define MENU_MAIN_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
-#include "uicustomcontrol.h"
+
+class MI_Button;
+class MI_Image;
+class MI_PlayerSelect;
 
 /*
 	This is the main menu you see at the start of the game.
