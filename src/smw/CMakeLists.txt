@@ -195,6 +195,8 @@ target_sources(smw PRIVATE
 	ui/MI_TeamSelect.h
 	ui/MI_NetRoomTeamSelect.cpp
 	ui/MI_NetRoomTeamSelect.h
+        ui/MI_StoredPowerupResetButton.cpp
+        ui/MI_StoredPowerupResetButton.h
 )
 
 if(NO_NETWORK)

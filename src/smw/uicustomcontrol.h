@@ -21,15 +21,6 @@ class MapListNode;
 class MI_ScoreText;
 class MI_Text;
 
-class MI_StoredPowerupResetButton : public MI_Button
-{
-	public:
-
-        MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, const char * name, short width, TextAlign align = TextAlign::LEFT);
-
-		void Draw();
-};
-
 class MI_PlayerSelect : public UI_Control
 {
 	public:

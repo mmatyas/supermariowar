@@ -1031,44 +1031,6 @@ void MI_PlaylistField::Draw()
     miModifyImageRight->Draw();
 }
 
-
-/**************************************
- * MI_StoredPowerupResetButton Class
- **************************************/
-
-MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, const char * name, short width, TextAlign align) :
-    MI_Button(nspr, x, y, name, width, align)
-{
-    spr = nspr;
-
-    szName = name;
-
-    iWidth = width;
-    fSelected = false;
-    menuCode = MENU_CODE_NONE;
-
-    sprImage = NULL;
-    iImageSrcX = 0;
-    iImageSrcY = 0;
-    iImageW = 0;
-    iImageH = 0;
-
-    iTextW = (short)rm->menu_font_large.getWidth(name);
-}
-
-void MI_StoredPowerupResetButton::Draw()
-{
-    if (!fShow)
-        return;
-
-    MI_Button::Draw();
-
-    for (short iPowerup = 0; iPowerup < 4; iPowerup++) {
-        rm->spr_selectfield.draw(ix + iWidth - 142 + iPowerup * 30, iy + 4, 188, 88, 24, 24);
-        rm->spr_storedpowerupsmall.draw(ix + iWidth - 138 + iPowerup * 30, iy + 8, game_values.storedpowerups[iPowerup] * 16, 0, 16, 16);
-    }
-}
-
 /**************************************
  * MI_TourStop Class
  **************************************/

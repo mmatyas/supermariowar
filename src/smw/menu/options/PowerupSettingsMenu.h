@@ -5,6 +5,8 @@
 #include "uicontrol.h"
 #include "uicustomcontrol.h"
 
+class MI_StoredPowerupResetButton;
+
 /*
     In this menu, you can change some powerup settings,
     like fire rate, reloading of [?] blocks and bonus items.
