@@ -179,39 +179,10 @@ target_sources(smw PRIVATE
 	menu/network/NetRoomMenu.cpp
 	menu/network/NetRoomMenu.h
 	menu/network/NetServersMenu.cpp
-	menu/network/NetServersMenu.h
-
-	ui/NetworkListScroll.cpp
-	ui/NetworkListScroll.h
-	ui/MI_StringScroll.cpp
-	ui/MI_StringScroll.h
-	ui/MI_PowerupSlider.cpp
-	ui/MI_PowerupSlider.h
-	ui/MI_FrenzyModeOptions.cpp
-	ui/MI_FrenzyModeOptions.h
-	ui/MI_InputControlContainer.cpp
-	ui/MI_InputControlContainer.h
-	ui/MI_TeamSelect.cpp
-	ui/MI_TeamSelect.h
-	ui/MI_NetRoomTeamSelect.cpp
-	ui/MI_NetRoomTeamSelect.h
-        ui/MI_StoredPowerupResetButton.cpp
-        ui/MI_StoredPowerupResetButton.h
-        ui/MI_PlayerSelect.cpp
-        ui/MI_PlayerSelect.h
-        ui/MI_PowerupSelection.cpp
-        ui/MI_PowerupSelection.h
-        ui/MI_WorldPreviewDisplay.cpp
-        ui/MI_WorldPreviewDisplay.h
-        ui/MI_AnnouncerField.cpp
-        ui/MI_AnnouncerField.h
-        ui/MI_PacksField.cpp
-        ui/MI_PacksField.h
-        ui/MI_PlaylistField.cpp
-        ui/MI_PlaylistField.h
-        ui/MI_TourStop.cpp
-        ui/MI_TourStop.h
+        menu/network/NetServersMenu.h
 )
+
+add_subdirectory(ui)
 
 if(NO_NETWORK)
 	target_compile_definitions(smw PRIVATE NETWORK_DISABLED)
