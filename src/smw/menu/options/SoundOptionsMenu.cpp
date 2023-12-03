@@ -5,6 +5,11 @@
 #include "ResourceManager.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_Text.h"
+#include "ui/MI_AnnouncerField.h"
+#include "ui/MI_Button.h"
+#include "ui/MI_SelectField.h"
+#include "ui/MI_SliderField.h"
+#include "uicustomcontrol.h"
 
 extern CResourceManager* rm;
 extern CGameValues game_values;

@@ -203,6 +203,8 @@ target_sources(smw PRIVATE
         ui/MI_PowerupSelection.h
         ui/MI_WorldPreviewDisplay.cpp
         ui/MI_WorldPreviewDisplay.h
+        ui/MI_AnnouncerField.cpp
+        ui/MI_AnnouncerField.h
 )
 
 if(NO_NETWORK)

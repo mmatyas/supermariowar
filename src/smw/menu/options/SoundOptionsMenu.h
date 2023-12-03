@@ -2,8 +2,15 @@
 #define MENU_SOUNDOPTIONS_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
-#include "uicustomcontrol.h"
+
+class MI_AnnouncerField;
+class MI_Button;
+class MI_Image;
+class MI_SelectField;
+class MI_SliderField;
+class MI_PacksField;
+class MI_PlaylistField;
+class MI_Text;
 
 /*
     Description.

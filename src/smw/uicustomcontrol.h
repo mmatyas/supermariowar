@@ -3,6 +3,7 @@
 
 #include "input.h"
 #include "uicontrol.h"
+#include "ui/MI_AnnouncerField.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_MapField.h"
 #include "ui/MI_PowerupSlider.h"
@@ -21,42 +22,6 @@ class MapListNode;
 class MI_ScoreText;
 class MI_Text;
 
-
-class MI_AnnouncerField : public UI_Control
-{
-	public:
-
-		MI_AnnouncerField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, SimpleFileList * pList);
-		virtual ~MI_AnnouncerField();
-
-		//Called when user selects this control to change it's value
-		MenuCodeEnum Modify(bool modify);
-
-		//Updates animations or other events every frame
-		void Update();
-
-		//Draws every frame
-		void Draw();
-
-		//Sends player input to control on every frame
-		virtual MenuCodeEnum SendInput(CPlayerInput * playerInput);
-
-	protected:
-
-		void UpdateName();
-
-		gfxSprite * spr;
-
-		char * szName;
-		short iWidth, iIndent;
-
-		std::string szFieldName;
-
-		MI_Image * miModifyImageLeft;
-		MI_Image * miModifyImageRight;
-
-		SimpleFileList * list;
-};
 
 class MI_PacksField : public MI_AnnouncerField
 {
