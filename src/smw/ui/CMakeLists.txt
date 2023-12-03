@@ -23,6 +23,8 @@ target_sources(smw PRIVATE
     MI_StringScroll.h
     MI_TeamSelect.cpp
     MI_TeamSelect.h
+    MI_TournamentScoreboard.cpp
+    MI_TournamentScoreboard.h
     MI_TourStop.cpp
     MI_TourStop.h
     MI_WorldPreviewDisplay.cpp

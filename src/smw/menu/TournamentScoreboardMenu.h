@@ -2,8 +2,10 @@
 #define MENU_TOURNAMENTSCOREBOARD_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
-#include "uicustomcontrol.h"
+
+class MI_Button;
+class MI_Image;
+class MI_TournamentScoreboard;
 
 /*
     Description.
