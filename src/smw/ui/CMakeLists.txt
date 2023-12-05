@@ -1,6 +1,8 @@
 target_sources(smw PRIVATE
     MI_AnnouncerField.cpp
     MI_AnnouncerField.h
+    MI_BonusWheel.cpp
+    MI_BonusWheel.h
     MI_FrenzyModeOptions.cpp
     MI_FrenzyModeOptions.h
     MI_InputControlContainer.cpp

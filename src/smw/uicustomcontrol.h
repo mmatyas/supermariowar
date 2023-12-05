@@ -23,60 +23,6 @@ class MI_ScoreText;
 class MI_Text;
 
 
-class MI_BonusWheel : public UI_Control
-{
-	public:
-
-		MI_BonusWheel(short x, short y);
-		virtual ~MI_BonusWheel();
-
-		MenuCodeEnum Modify(bool modify);
-
-		void Update();
-		void Draw();
-
-    bool GetPowerupSelectionDone() {
-        return fPowerupSelectionDone;
-    }
-		void Reset(bool fTournament);
-
-	private:
-
-		short iState;
-		short iDisplayPowerupIndex;
-		short iDisplayPowerupTimer;
-
-		MI_Image * miBonusImages[NUMBONUSITEMSONWHEEL];
-		MI_Image ** miPlayerImages;
-
-		MI_Button * miContinueButton;
-
-		short iChosenPowerups[NUMBONUSITEMSONWHEEL];
-
-		short iPressSelectTimer;
-		bool fPressedSelect;
-		bool fPowerupSelectionDone;
-
-		short iSelectorAnimation;
-		short iSelectorAnimationCounter;
-
-		float dSelectionSpeed;
-		float dSelectionAngle;
-		short iSelectedPowerup;
-		short iNextSelectionSoundIndex;
-		float dSelectionSector[NUMBONUSITEMSONWHEEL + 1];
-
-		float dSelectionWinddownSpeed;
-
-		float dSelectionSpeedGoal;
-		short iSelectionSpeedTimer;
-
-		short iNumPlayers;
-		short iWinningTeam;
-
-		bool fCpuControlled;
-};
-
 #ifdef _XBOX
 class MI_ScreenResize : public UI_Control
 {

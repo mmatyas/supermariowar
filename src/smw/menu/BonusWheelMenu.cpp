@@ -1,5 +1,8 @@
 #include "BonusWheelMenu.h"
 
+#include "ui/MI_BonusWheel.h"
+
+
 UI_BonusWheelMenu::UI_BonusWheelMenu() : UI_Menu()
 {
     miBonusWheel = new MI_BonusWheel(144, 38);
@@ -8,6 +11,3 @@ UI_BonusWheelMenu::UI_BonusWheelMenu() : UI_Menu()
     SetHeadControl(miBonusWheel);
     SetCancelCode(MENU_CODE_BONUS_DONE);
 };
-
-UI_BonusWheelMenu::~UI_BonusWheelMenu() {
-}

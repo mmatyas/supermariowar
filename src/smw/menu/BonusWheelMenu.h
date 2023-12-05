@@ -1,20 +1,13 @@
-#ifndef MENU_BONUSWHEEL_H
-#define MENU_BONUSWHEEL_H
+#pragma once
 
 #include "uimenu.h"
-#include "uicustomcontrol.h"
 
-/*
-    Description.
-*/
+class MI_BonusWheel;
 
-class UI_BonusWheelMenu : public UI_Menu
-{
+
+class UI_BonusWheelMenu : public UI_Menu {
 public:
     UI_BonusWheelMenu();
-    ~UI_BonusWheelMenu();
 
-    MI_BonusWheel * miBonusWheel;
+    MI_BonusWheel* miBonusWheel = nullptr;
 };
-
-#endif // MENU_BONUSWHEEL_H
