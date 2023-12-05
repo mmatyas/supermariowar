@@ -15,6 +15,7 @@
 #include "ui/MI_MapFilterScroll.h"
 #include "ui/MI_TournamentScoreboard.h"
 #include "ui/MI_TourStop.h"
+#include "ui/MI_World.h"
 
 #include "menu/BonusWheelMenu.h"
 #include "menu/GameSettingsMenu.h"

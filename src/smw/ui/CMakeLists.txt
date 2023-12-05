@@ -33,6 +33,8 @@ target_sources(smw PRIVATE
     MI_TournamentScoreboard.h
     MI_TourStop.cpp
     MI_TourStop.h
+    MI_World.cpp
+    MI_World.h
     MI_WorldPreviewDisplay.cpp
     MI_WorldPreviewDisplay.h
     NetworkListScroll.cpp
