@@ -2,7 +2,9 @@
 
 #include "GameValues.h"
 #include "ResourceManager.h"
+#include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
+#include "ui/MI_SelectField.h"
 #include "ui/MI_StoredPowerupResetButton.h"
 #include "ui/MI_Text.h"
 

@@ -1,18 +1,15 @@
-#ifndef MENU_NETSERVERS_H
-#define MENU_NETSERVERS_H
+#pragma once
 
 #include "uimenu.h"
-#include "uicontrol.h"
-#include "uicustomcontrol.h"
 
+class MI_Button;
+class MI_Image;
+class MI_NetworkListScroll;
+class MI_Text;
 class MI_TextField;
 
-/*
-    Description.
-*/
 
-class UI_NetServersMenu : public UI_Menu
-{
+class UI_NetServersMenu : public UI_Menu {
 public:
     UI_NetServersMenu();
     ~UI_NetServersMenu();
@@ -24,21 +21,19 @@ public:
     void RefreshScroll();
 
 private:
-    MI_Button * miNetServersSelectButton;
-    MI_Text * miNetServersSelectedHostText;
-    MI_Button * miNetServersConnectButton;
-    MI_Button * miNetServersAddRemoveButton;
-    MI_TextField * miNetServersNicknameField;
-    MI_Button * miNetServersBackButton;
+    MI_Button* miNetServersSelectButton = nullptr;
+    MI_Text* miNetServersSelectedHostText = nullptr;
+    MI_Button* miNetServersConnectButton = nullptr;
+    MI_Button* miNetServersAddRemoveButton = nullptr;
+    MI_TextField* miNetServersNicknameField = nullptr;
+    MI_Button* miNetServersBackButton = nullptr;
 
-    MI_NetworkListScroll * miNetServersScroll;
+    MI_NetworkListScroll* miNetServersScroll = nullptr;
 
-    MI_Image * miNetServersConnectingDialogImage;
-    MI_Text * miNetServersConnectingDialogText;
+    MI_Image* miNetServersConnectingDialogImage = nullptr;
+    MI_Text* miNetServersConnectingDialogText = nullptr;
 
-    MI_Image * miNetServersLeftHeaderBar;
-    MI_Image * miNetServersRightHeaderBar;
-    MI_Text * miNetServersHeaderText;
+    MI_Image* miNetServersLeftHeaderBar = nullptr;
+    MI_Image* miNetServersRightHeaderBar = nullptr;
+    MI_Text* miNetServersHeaderText = nullptr;
 };
-
-#endif // MENU_NETSERVERS_H

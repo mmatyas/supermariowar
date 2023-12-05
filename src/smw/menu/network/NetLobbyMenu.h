@@ -1,17 +1,18 @@
-#ifndef MENU_NETLOBBY_H
-#define MENU_NETLOBBY_H
+#pragma once
 
 #include "uimenu.h"
-#include "uicustomcontrol.h"
 
+class MI_Button;
+class MI_Image;
+class MI_NetworkListScroll;
+class MI_Text;
 class MI_TextField;
 
 /*
     Description.
 */
 
-class UI_NetLobbyMenu : public UI_Menu
-{
+class UI_NetLobbyMenu : public UI_Menu {
 public:
     UI_NetLobbyMenu();
     ~UI_NetLobbyMenu();
@@ -21,19 +22,17 @@ public:
     void Restore();
 
 private:
-    MI_NetworkListScroll * miNetLobbyScroll;
+    MI_NetworkListScroll* miNetLobbyScroll = nullptr;
 
-    MI_Button * miNetLobbyNewRoomButton;
-    MI_TextField * miNetLobbyFilterField;
-    MI_Button * miNetLobbyRefreshButton;
-    MI_Button * miNetLobbyBackButton;
+    MI_Button* miNetLobbyNewRoomButton = nullptr;
+    MI_TextField* miNetLobbyFilterField = nullptr;
+    MI_Button* miNetLobbyRefreshButton = nullptr;
+    MI_Button* miNetLobbyBackButton = nullptr;
 
-    MI_Image * miNetLobbyJoiningDialogImage;
-    MI_Text * miNetLobbyJoiningDialogText;
+    MI_Image* miNetLobbyJoiningDialogImage = nullptr;
+    MI_Text* miNetLobbyJoiningDialogText = nullptr;
 
-    MI_Image * miNetLobbyLeftHeaderBar;
-    MI_Image * miNetLobbyRightHeaderBar;
-    MI_Text * miNetLobbyHeaderText;
+    MI_Image* miNetLobbyLeftHeaderBar = nullptr;
+    MI_Image* miNetLobbyRightHeaderBar = nullptr;
+    MI_Text* miNetLobbyHeaderText = nullptr;
 };
-
-#endif // MENU_NETLOBBY_H

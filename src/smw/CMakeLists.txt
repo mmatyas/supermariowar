@@ -27,8 +27,6 @@ add_executable(smw WIN32
 	objecthazard.h
 	player.cpp
 	player.h
-	uicustomcontrol.cpp
-	uicustomcontrol.h
 	world.cpp
 	world.h
 

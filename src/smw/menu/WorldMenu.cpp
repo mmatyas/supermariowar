@@ -7,7 +7,6 @@
 #include "ui/MI_Text.h"
 #include "ui/MI_TourStop.h"
 #include "ui/MI_World.h"
-#include "uicustomcontrol.h"
 
 extern CResourceManager* rm;
 extern CGameValues game_values;

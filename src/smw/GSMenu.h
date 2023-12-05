@@ -1,9 +1,11 @@
 #ifndef GAMESTATE_MENU_H
 #define GAMESTATE_MENU_H
 
-#include "uicustomcontrol.h"
-
 #include "GameState.h"
+
+#include <vector>
+
+class UI_Menu;
 
 class UI_BonusWheelMenu;
 class UI_GameSettingsMenu;

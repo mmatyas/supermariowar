@@ -12,10 +12,12 @@
 #include "Score.h"
 #include "ui/MI_BonusWheel.h"
 #include "ui/MI_MapBrowser.h"
+#include "ui/MI_MapField.h"
 #include "ui/MI_MapFilterScroll.h"
 #include "ui/MI_TournamentScoreboard.h"
 #include "ui/MI_TourStop.h"
 #include "ui/MI_World.h"
+#include "world.h"
 
 #include "menu/BonusWheelMenu.h"
 #include "menu/GameSettingsMenu.h"
