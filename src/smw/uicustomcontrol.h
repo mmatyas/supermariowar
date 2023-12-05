@@ -22,25 +22,4 @@ class MapListNode;
 class MI_ScoreText;
 class MI_Text;
 
-
-#ifdef _XBOX
-class MI_ScreenResize : public UI_Control
-{
-	public:
-
-		MI_ScreenResize();
-		virtual ~MI_ScreenResize();
-
-		void Draw();
-
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		MenuCodeEnum Modify(bool modify);
-
-	private:
-
-		MI_Text * miText[7];
-		float dPreset;
-};
-#endif //_XBOX
-
 #endif // UICUSTOMCONTROL_H
