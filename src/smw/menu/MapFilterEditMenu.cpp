@@ -1,5 +1,8 @@
 #include "MapFilterEditMenu.h"
 
+#include "ui/MI_MapBrowser.h"
+
+
 UI_MapFilterEditMenu::UI_MapFilterEditMenu() : UI_Menu()
 {
     miMapBrowser = new MI_MapBrowser();
@@ -9,6 +12,3 @@ UI_MapFilterEditMenu::UI_MapFilterEditMenu() : UI_Menu()
     SetHeadControl(miMapBrowser);
     SetCancelCode(MENU_CODE_MAP_BROWSER_EXIT);
 };
-
-UI_MapFilterEditMenu::~UI_MapFilterEditMenu() {
-}

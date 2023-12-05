@@ -1,20 +1,13 @@
-#ifndef MENU_MAPFILTEREDIT_H
-#define MENU_MAPFILTEREDIT_H
+#pragma once
 
 #include "uimenu.h"
-#include "uicustomcontrol.h"
 
-/*
-    Description.
-*/
+class MI_MapBrowser;
 
-class UI_MapFilterEditMenu : public UI_Menu
-{
+
+class UI_MapFilterEditMenu : public UI_Menu {
 public:
     UI_MapFilterEditMenu();
-    ~UI_MapFilterEditMenu();
 
-	MI_MapBrowser * miMapBrowser;
+    MI_MapBrowser* miMapBrowser = nullptr;
 };
-
-#endif // MENU_MAPFILTEREDIT_H

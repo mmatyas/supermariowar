@@ -43,44 +43,6 @@ class MI_ScreenResize : public UI_Control
 };
 #endif //_XBOX
 
-class MI_MapBrowser : public UI_Control
-{
-	public:
-		MI_MapBrowser();
-		virtual ~MI_MapBrowser();
-
-		void Update();
-		void Draw();
-
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		MenuCodeEnum Modify(bool modify);
-
-		void Reset(short type);
-
-	private:
-
-		void LoadPage(short page, bool fUseFilters);
-
-		short iPage;
-		short iSelectedCol;
-		short iSelectedRow;
-		short iSelectedIndex;
-
-		SDL_Surface * mapSurfaces[9];
-		MapListNode * mapListNodes[9];
-		const char * mapNames[9];
-		std::map<std::string, MapListNode*>::iterator mapListItr[9];
-
-		short iFilterTagAnimationTimer;
-		short iFilterTagAnimationFrame;
-
-		short iType;
-		short iMapCount;
-
-		SDL_Rect srcRectBackground;
-		SDL_Rect dstRectBackground;
-};
-
 class MI_World : public UI_Control
 {
 	public:
