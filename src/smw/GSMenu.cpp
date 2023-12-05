@@ -11,6 +11,7 @@
 #include "ResourceManager.h"
 #include "Score.h"
 #include "ui/MI_BonusWheel.h"
+#include "ui/MI_MapFilterScroll.h"
 #include "ui/MI_TournamentScoreboard.h"
 #include "ui/MI_TourStop.h"
 

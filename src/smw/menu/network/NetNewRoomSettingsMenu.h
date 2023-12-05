@@ -2,11 +2,16 @@
 #define MENU_NETNEWLEVEL_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
-
-#include "../GameSettingsMenu.h"
 
 #include <string>
+
+class MI_Button;
+class MI_Image;
+class MI_ImageSelectField;
+class MI_MapField;
+class MI_SelectField;
+class MI_Text;
+class UI_GameSettingsMenu;
 
 /*
     TODO: Description.

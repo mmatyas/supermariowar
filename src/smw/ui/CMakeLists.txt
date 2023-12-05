@@ -7,6 +7,8 @@ target_sources(smw PRIVATE
     MI_FrenzyModeOptions.h
     MI_InputControlContainer.cpp
     MI_InputControlContainer.h
+    MI_MapFilterScroll.cpp
+    MI_MapFilterScroll.h
     MI_NetRoomTeamSelect.cpp
     MI_NetRoomTeamSelect.h
     MI_PacksField.cpp

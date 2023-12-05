@@ -43,62 +43,6 @@ class MI_ScreenResize : public UI_Control
 };
 #endif //_XBOX
 
-class MFS_ListItem
-{
-	public:
-		MFS_ListItem() {
-			sName = "";
-			fSelected = false;
-		}
-
-		MFS_ListItem(std::string sname, short icon, bool fselected) {
-			sName = sname;
-			iIcon = icon;
-			fSelected = fselected;
-		}
-
-		~MFS_ListItem();
-
-		std::string sName;  //Display name
-		short iIcon;        //Icon to display with name
-		bool fSelected;     //Filter selected
-};
-
-class MI_MapFilterScroll : public UI_Control
-{
-	public:
-		MI_MapFilterScroll(gfxSprite * nspr, short x, short y, short width, short numlines);
-		virtual ~MI_MapFilterScroll();
-
-		void Update();
-		void Draw();
-
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		MenuCodeEnum Modify(bool modify);
-
-		void Add(std::string name, short icon);
-
-		bool MoveNext();
-		bool MovePrev();
-
-	private:
-
-		std::vector<MFS_ListItem*> items;
-		std::vector<MFS_ListItem*>::iterator current;
-
-		gfxSprite * spr;
-
-		short iSelectedColumn;
-		short iNumLines;
-		short iSelectedLine;
-		unsigned short iIndex;
-		short iWidth;
-		short iOffset;
-
-		short iTopStop;
-		short iBottomStop;
-};
-
 class MI_MapBrowser : public UI_Control
 {
 	public:

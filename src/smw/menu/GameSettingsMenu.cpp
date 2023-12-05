@@ -7,6 +7,10 @@
 #include "ResourceManager.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
+#include "ui/MI_ImageSelectField.h"
+#include "ui/MI_MapField.h"
+#include "ui/MI_MapFilterScroll.h"
+#include "ui/MI_SelectField.h"
 #include "ui/MI_Text.h"
 
 extern CGameMode * gamemodes[GAMEMODE_LAST];
