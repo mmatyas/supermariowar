@@ -11,8 +11,6 @@ public:
     void SetScore(short iScore);
 
 private:
-    short iScore = 0;
-
     short iDigitLeftSrcX = 0;
     short iDigitMiddleSrcX = 0;
     short iDigitRightSrcX = 0;
