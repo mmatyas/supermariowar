@@ -1,18 +1,18 @@
 #include "EyeCandyOptionsMenu.h"
 
-#include "uicontrol.h"
+#include "GameValues.h"
+#include "ResourceManager.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_SelectField.h"
 #include "ui/MI_Text.h"
 
-#include "GameValues.h"
-#include "ResourceManager.h"
-
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu() : UI_Menu()
+
+UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu()
+    : UI_Menu()
 {
     miSpawnStyleField = new MI_SelectField(&rm->spr_selectfield, 70, 80, "Spawn Style", 500, 220);
     miSpawnStyleField->Add("Instant", 0, "", false, false);
@@ -98,6 +98,3 @@ UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu() : UI_Menu()
     SetHeadControl(miSpawnStyleField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };
-
-UI_EyeCandyOptionsMenu::~UI_EyeCandyOptionsMenu() {
-}

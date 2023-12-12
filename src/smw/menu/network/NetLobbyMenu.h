@@ -8,14 +8,10 @@ class MI_NetworkListScroll;
 class MI_Text;
 class MI_TextField;
 
-/*
-    Description.
-*/
 
 class UI_NetLobbyMenu : public UI_Menu {
 public:
     UI_NetLobbyMenu();
-    ~UI_NetLobbyMenu();
 
     void JoinInProgress();
     void AbortJoin();

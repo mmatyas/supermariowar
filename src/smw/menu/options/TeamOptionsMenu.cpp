@@ -1,20 +1,20 @@
 #include "TeamOptionsMenu.h"
 
-#include "uicontrol.h"
+#include "GameValues.h"
+#include "ResourceManager.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_SelectField.h"
 #include "ui/MI_Text.h"
 
-#include "GameValues.h"
-#include "ResourceManager.h"
-
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-UI_TeamOptionsMenu::UI_TeamOptionsMenu() : UI_Menu()
+
+UI_TeamOptionsMenu::UI_TeamOptionsMenu()
+    : UI_Menu()
 {
-	miTeamKillsField = new MI_SelectField(&rm->spr_selectfield, 70, 180, "Player Collision", 500, 220);
+    miTeamKillsField = new MI_SelectField(&rm->spr_selectfield, 70, 180, "Player Collision", 500, 220);
     miTeamKillsField->Add("Off", 0, "", false, false);
     miTeamKillsField->Add("Assist", 1, "", false, false);
     miTeamKillsField->Add("On", 2, "", false, false);
@@ -59,6 +59,3 @@ UI_TeamOptionsMenu::UI_TeamOptionsMenu() : UI_Menu()
     SetHeadControl(miTeamKillsField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };
-
-UI_TeamOptionsMenu::~UI_TeamOptionsMenu() {
-}

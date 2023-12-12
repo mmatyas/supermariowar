@@ -1,18 +1,18 @@
 #include "ProjectileOptionsMenu.h"
 
-#include "uicontrol.h"
+#include "GameValues.h"
+#include "ResourceManager.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_SelectField.h"
 #include "ui/MI_Text.h"
 
-#include "GameValues.h"
-#include "ResourceManager.h"
-
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu() : UI_Menu()
+
+UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
+    : UI_Menu()
 {
     miFireballLifeField = new MI_SelectField(&rm->spr_selectfield, 10, 80, "Life", 305, 120);
     miFireballLifeField->Add("1 Second", 62, "", false, false);
@@ -239,6 +239,3 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu() : UI_Menu()
     SetHeadControl(miFireballLifeField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };
-
-UI_ProjectileOptionsMenu::~UI_ProjectileOptionsMenu() {
-}

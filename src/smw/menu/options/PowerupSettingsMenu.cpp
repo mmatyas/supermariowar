@@ -11,7 +11,9 @@
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-UI_PowerupSettingsMenu::UI_PowerupSettingsMenu() : UI_Menu()
+
+UI_PowerupSettingsMenu::UI_PowerupSettingsMenu()
+    : UI_Menu()
 {
     miStoredPowerupDelayField = new MI_SelectField(&rm->spr_selectfield, 70, 100, "Item Use Speed", 500, 220);
     miStoredPowerupDelayField->Add("Very Slow", 2, "", false, false);
@@ -104,6 +106,3 @@ UI_PowerupSettingsMenu::UI_PowerupSettingsMenu() : UI_Menu()
     SetHeadControl(miStoredPowerupDelayField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };
-
-UI_PowerupSettingsMenu::~UI_PowerupSettingsMenu() {
-}

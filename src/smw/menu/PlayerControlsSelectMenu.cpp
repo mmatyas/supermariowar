@@ -7,7 +7,8 @@
 
 extern CResourceManager* rm;
 
-UI_PlayerControlsSelectMenu::UI_PlayerControlsSelectMenu() : UI_Menu()
+UI_PlayerControlsSelectMenu::UI_PlayerControlsSelectMenu()
+    : UI_Menu()
 {
     miPlayer1ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 140, "Player 1", 400, TextAlign::CENTER);
     miPlayer1ControlsButton->SetCode(MENU_CODE_TO_PLAYER_1_CONTROLS);
@@ -40,7 +41,4 @@ UI_PlayerControlsSelectMenu::UI_PlayerControlsSelectMenu() : UI_Menu()
 
     SetHeadControl(miPlayer1ControlsButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-}
-
-UI_PlayerControlsSelectMenu::~UI_PlayerControlsSelectMenu() {
 }

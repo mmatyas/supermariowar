@@ -1,18 +1,18 @@
 #include "ProjectileLimitsMenu.h"
 
-#include "uicontrol.h"
+#include "GameValues.h"
+#include "ResourceManager.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_SelectField.h"
 #include "ui/MI_Text.h"
 
-#include "GameValues.h"
-#include "ResourceManager.h"
-
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu() : UI_Menu()
+
+UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
+    : UI_Menu()
 {
     miFireballLimitField = new MI_SelectField(&rm->spr_selectfield, 70, 60, "Fireball Limit", 500, 220);
     miFireballLimitField->Add("Unlimited", 0, "", false, false);
@@ -111,52 +111,52 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu() : UI_Menu()
     miPwingsLimitField->SetKey(game_values.pwingslimit);
 
     miTanookiLimitField = new MI_SelectField(&rm->spr_selectfield, 70, 300, "Tanooki Limit", 500, 220);
-    miTanookiLimitField ->Add("Unlimited", 0, "", false, false);
-    miTanookiLimitField ->Add("2", 2, "", false, false);
-    miTanookiLimitField ->Add("5", 5, "", false, false);
-    miTanookiLimitField ->Add("8", 8, "", false, false);
-    miTanookiLimitField ->Add("10", 10, "", false, false);
-    miTanookiLimitField ->Add("12", 12, "", false, false);
-    miTanookiLimitField ->Add("15", 15, "", false, false);
-    miTanookiLimitField ->Add("20", 20, "", false, false);
-    miTanookiLimitField ->Add("25", 25, "", false, false);
-    miTanookiLimitField ->Add("30", 30, "", false, false);
-    miTanookiLimitField ->Add("40", 40, "", false, false);
-    miTanookiLimitField ->Add("50", 50, "", false, false);
-    miTanookiLimitField ->SetData(&game_values.tanookilimit, NULL, NULL);
-    miTanookiLimitField ->SetKey(game_values.tanookilimit);
+    miTanookiLimitField->Add("Unlimited", 0, "", false, false);
+    miTanookiLimitField->Add("2", 2, "", false, false);
+    miTanookiLimitField->Add("5", 5, "", false, false);
+    miTanookiLimitField->Add("8", 8, "", false, false);
+    miTanookiLimitField->Add("10", 10, "", false, false);
+    miTanookiLimitField->Add("12", 12, "", false, false);
+    miTanookiLimitField->Add("15", 15, "", false, false);
+    miTanookiLimitField->Add("20", 20, "", false, false);
+    miTanookiLimitField->Add("25", 25, "", false, false);
+    miTanookiLimitField->Add("30", 30, "", false, false);
+    miTanookiLimitField->Add("40", 40, "", false, false);
+    miTanookiLimitField->Add("50", 50, "", false, false);
+    miTanookiLimitField->SetData(&game_values.tanookilimit, NULL, NULL);
+    miTanookiLimitField->SetKey(game_values.tanookilimit);
 
     miBombLimitField = new MI_SelectField(&rm->spr_selectfield, 70, 340, "Bomb Limit", 500, 220);
-    miBombLimitField ->Add("Unlimited", 0, "", false, false);
-    miBombLimitField ->Add("2", 2, "", false, false);
-    miBombLimitField ->Add("5", 5, "", false, false);
-    miBombLimitField ->Add("8", 8, "", false, false);
-    miBombLimitField ->Add("10", 10, "", false, false);
-    miBombLimitField ->Add("12", 12, "", false, false);
-    miBombLimitField ->Add("15", 15, "", false, false);
-    miBombLimitField ->Add("20", 20, "", false, false);
-    miBombLimitField ->Add("25", 25, "", false, false);
-    miBombLimitField ->Add("30", 30, "", false, false);
-    miBombLimitField ->Add("40", 40, "", false, false);
-    miBombLimitField ->Add("50", 50, "", false, false);
-    miBombLimitField ->SetData(&game_values.bombslimit, NULL, NULL);
-    miBombLimitField ->SetKey(game_values.bombslimit);
+    miBombLimitField->Add("Unlimited", 0, "", false, false);
+    miBombLimitField->Add("2", 2, "", false, false);
+    miBombLimitField->Add("5", 5, "", false, false);
+    miBombLimitField->Add("8", 8, "", false, false);
+    miBombLimitField->Add("10", 10, "", false, false);
+    miBombLimitField->Add("12", 12, "", false, false);
+    miBombLimitField->Add("15", 15, "", false, false);
+    miBombLimitField->Add("20", 20, "", false, false);
+    miBombLimitField->Add("25", 25, "", false, false);
+    miBombLimitField->Add("30", 30, "", false, false);
+    miBombLimitField->Add("40", 40, "", false, false);
+    miBombLimitField->Add("50", 50, "", false, false);
+    miBombLimitField->SetData(&game_values.bombslimit, NULL, NULL);
+    miBombLimitField->SetKey(game_values.bombslimit);
 
     miWandLimitField = new MI_SelectField(&rm->spr_selectfield, 70, 380, "Wand Limit", 500, 220);
-    miWandLimitField ->Add("Unlimited", 0, "", false, false);
-    miWandLimitField ->Add("2", 2, "", false, false);
-    miWandLimitField ->Add("5", 5, "", false, false);
-    miWandLimitField ->Add("8", 8, "", false, false);
-    miWandLimitField ->Add("10", 10, "", false, false);
-    miWandLimitField ->Add("12", 12, "", false, false);
-    miWandLimitField ->Add("15", 15, "", false, false);
-    miWandLimitField ->Add("20", 20, "", false, false);
-    miWandLimitField ->Add("25", 25, "", false, false);
-    miWandLimitField ->Add("30", 30, "", false, false);
-    miWandLimitField ->Add("40", 40, "", false, false);
-    miWandLimitField ->Add("50", 50, "", false, false);
-    miWandLimitField ->SetData(&game_values.wandlimit, NULL, NULL);
-    miWandLimitField ->SetKey(game_values.wandlimit);
+    miWandLimitField->Add("Unlimited", 0, "", false, false);
+    miWandLimitField->Add("2", 2, "", false, false);
+    miWandLimitField->Add("5", 5, "", false, false);
+    miWandLimitField->Add("8", 8, "", false, false);
+    miWandLimitField->Add("10", 10, "", false, false);
+    miWandLimitField->Add("12", 12, "", false, false);
+    miWandLimitField->Add("15", 15, "", false, false);
+    miWandLimitField->Add("20", 20, "", false, false);
+    miWandLimitField->Add("25", 25, "", false, false);
+    miWandLimitField->Add("30", 30, "", false, false);
+    miWandLimitField->Add("40", 40, "", false, false);
+    miWandLimitField->Add("50", 50, "", false, false);
+    miWandLimitField->SetData(&game_values.wandlimit, NULL, NULL);
+    miWandLimitField->SetKey(game_values.wandlimit);
 
     miProjectilesLimitsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miProjectilesLimitsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -184,6 +184,3 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu() : UI_Menu()
     SetHeadControl(miFireballLimitField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };
-
-UI_ProjectileLimitsMenu::~UI_ProjectileLimitsMenu() {
-}

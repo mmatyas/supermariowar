@@ -3,8 +3,8 @@
 #include "FileList.h"
 #include "GameMode.h"
 #include "GameValues.h"
-#include "path.h"
 #include "ResourceManager.h"
+#include "path.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_ImageSelectField.h"
@@ -13,17 +13,19 @@
 #include "ui/MI_SelectField.h"
 #include "ui/MI_Text.h"
 
-extern CGameMode * gamemodes[GAMEMODE_LAST];
+extern CGameMode* gamemodes[GAMEMODE_LAST];
 extern short currentgamemode;
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-extern FiltersList *filterslist;
+extern FiltersList* filterslist;
 
-extern const char * g_szAutoFilterNames[NUM_AUTO_FILTERS];
+extern const char* g_szAutoFilterNames[NUM_AUTO_FILTERS];
 extern short g_iAutoFilterIcons[NUM_AUTO_FILTERS];
 
-UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
+
+UI_GameSettingsMenu::UI_GameSettingsMenu()
+    : UI_Menu()
 {
     miSettingsStartButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Start", 500);
     miSettingsStartButton->SetCode(MENU_CODE_START_GAME);
@@ -39,11 +41,11 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
 
     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
         miGoalField[iGameMode] = new MI_SelectField(&rm->spr_selectfield, 70, 125, gamemodes[iGameMode]->GetGoalName().c_str(), 352, 120);
-        //miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
+        // miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
         miGoalField[iGameMode]->Show(iGameMode == 0);
 
         for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS; iGameModeOption++) {
-            SModeOption * option = &gamemodes[iGameMode]->GetOptions()[iGameModeOption];
+            SModeOption* option = &gamemodes[iGameMode]->GetOptions()[iGameModeOption];
             miGoalField[iGameMode]->Add(option->szName, option->iValue, "", false, false);
         }
 
@@ -69,12 +71,12 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
     miMapFilterScroll->SetAutoModify(true);
     miMapFilterScroll->Show(false);
 
-    //Add auto map filters
+    // Add auto map filters
     for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
         miMapFilterScroll->Add(g_szAutoFilterNames[iFilter], g_iAutoFilterIcons[iFilter]);
     }
 
-    //Add user defined filters
+    // Add user defined filters
     for (short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
         std::string szTemp = GetNameFromFileName(filterslist->GetIndex(iFilter), true);
         miMapFilterScroll->Add(std::move(szTemp), game_values.piFilterIcons[NUM_AUTO_FILTERS + iFilter]);
@@ -86,7 +88,7 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
     miGameSettingsMenuHeaderText = new MI_HeaderText("Single Game Menu", 320, 5);
 
 
-    //Exit tournament dialog box
+    // Exit tournament dialog box
     miGameSettingsExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miGameSettingsExitDialogExitText = new MI_HeaderText("Exit", 320, 195);
     miGameSettingsExitDialogTournamentText = new MI_HeaderText("Tournament", 320, 220);
@@ -137,15 +139,12 @@ UI_GameSettingsMenu::UI_GameSettingsMenu() : UI_Menu()
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 }
 
-UI_GameSettingsMenu::~UI_GameSettingsMenu() {
-}
-
 void UI_GameSettingsMenu::RefreshGameModeButtons()
 {
     // Unhide/hide the settings button
     miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
 
-    //Show the approprate goal field
+    // Show the approprate goal field
     for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
         miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
     }

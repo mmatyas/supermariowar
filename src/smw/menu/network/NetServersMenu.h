@@ -12,7 +12,6 @@ class MI_TextField;
 class UI_NetServersMenu : public UI_Menu {
 public:
     UI_NetServersMenu();
-    ~UI_NetServersMenu();
 
     void Refresh();
     void OpenServerList();

@@ -12,11 +12,9 @@ class MI_Text;
     In this menu, you can change some powerup settings,
     like fire rate, reloading of [?] blocks and bonus items.
 */
-
 class UI_PowerupSettingsMenu : public UI_Menu {
 public:
     UI_PowerupSettingsMenu();
-    ~UI_PowerupSettingsMenu();
 
 private:
     MI_SelectField* miStoredPowerupDelayField = nullptr;

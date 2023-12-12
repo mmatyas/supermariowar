@@ -29,7 +29,7 @@ public:
     void SetSpecialMap(const char * szMapName, const char * szMapPath);
 
     const char * GetMapName() { return szMapName; }
-    const std::string GetMapFilePath();
+    std::string GetMapFilePath() const;
 
     virtual void SetDimensions(short iWidth, short iIndent);
 

@@ -9,7 +9,9 @@
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-UI_OptionsMenu::UI_OptionsMenu() : UI_Menu()
+
+UI_OptionsMenu::UI_OptionsMenu()
+    : UI_Menu()
 {
     miGameplayOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 40, "Gameplay", 400, TextAlign::CENTER);
     miGameplayOptionsMenuButton->SetCode(MENU_CODE_TO_GAMEPLAY_OPTIONS_MENU);
@@ -93,10 +95,8 @@ UI_OptionsMenu::UI_OptionsMenu() : UI_Menu()
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 };
 
-UI_OptionsMenu::~UI_OptionsMenu() {
-}
-
-void UI_OptionsMenu::showThumbnailsPopup() {
+void UI_OptionsMenu::showThumbnailsPopup()
+{
     miGenerateThumbsDialogImage->Show(true);
     miGenerateThumbsDialogAreYouText->Show(true);
     miGenerateThumbsDialogSureText->Show(true);
@@ -109,7 +109,8 @@ void UI_OptionsMenu::showThumbnailsPopup() {
     SetCancelCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);
 }
 
-void UI_OptionsMenu::hideThumbnailsPopup() {
+void UI_OptionsMenu::hideThumbnailsPopup()
+{
     miGenerateThumbsDialogImage->Show(false);
     miGenerateThumbsDialogAreYouText->Show(false);
     miGenerateThumbsDialogSureText->Show(false);

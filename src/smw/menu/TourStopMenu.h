@@ -1,5 +1,4 @@
-#ifndef MENU_TOURSTOP_H
-#define MENU_TOURSTOP_H
+#pragma once
 
 #include "uimenu.h"
 
@@ -8,26 +7,19 @@ class MI_Image;
 class MI_Text;
 class MI_TourStop;
 
-/*
-    Description.
-*/
 
-class UI_TourStopMenu : public UI_Menu
-{
+class UI_TourStopMenu : public UI_Menu {
 public:
     UI_TourStopMenu();
-    ~UI_TourStopMenu();
 
     void OpenExitDialog();
     void CloseExitDialog();
 
-    MI_TourStop * miTourStop;
+    MI_TourStop* miTourStop;
 
 private:
-    MI_Image * miTourStopExitDialogImage;
-    MI_Text * miTourStopExitDialogExitTourText;
-    MI_Button * miTourStopExitDialogYesButton;
-    MI_Button * miTourStopExitDialogNoButton;
+    MI_Image* miTourStopExitDialogImage;
+    MI_Text* miTourStopExitDialogExitTourText;
+    MI_Button* miTourStopExitDialogYesButton;
+    MI_Button* miTourStopExitDialogNoButton;
 };
-
-#endif // MENU_TOURSTOP_H

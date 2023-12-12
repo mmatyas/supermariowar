@@ -1,20 +1,20 @@
 #include "NetNewRoomMenu.h"
 
-#include "uicontrol.h"
+#include "ResourceManager.h"
+#include "net.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_SelectField.h"
 #include "ui/MI_Text.h"
 #include "ui/MI_TextField.h"
 
-#include "net.h"
-#include "ResourceManager.h"
-
 #include <cstring>
 
 extern CResourceManager* rm;
 
-UI_NetNewRoomMenu::UI_NetNewRoomMenu() : UI_Menu()
+
+UI_NetNewRoomMenu::UI_NetNewRoomMenu()
+    : UI_Menu()
 {
     miNetNewRoomNameField = new MI_TextField(&rm->menu_plain_field, 70, 160, "Room name", 640 - 2 * 70, 230);
     miNetNewRoomNameField->SetData(netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
@@ -54,16 +54,13 @@ UI_NetNewRoomMenu::UI_NetNewRoomMenu() : UI_Menu()
     SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 };
 
-UI_NetNewRoomMenu::~UI_NetNewRoomMenu() {
-}
-
 void UI_NetNewRoomMenu::CreateInProgress()
 {
     if (strlen(netplay.newroom_name) > 2) {
         netplay.client.sendCreateRoomMessage();
         netplay.operationInProgress = true;
 
-        miNetNewRoomCreatingDialogImage ->Show(true);
+        miNetNewRoomCreatingDialogImage->Show(true);
         miNetNewRoomCreatingDialogText->Show(true);
 
         RememberCurrent();

@@ -2,8 +2,8 @@
 
 #include "FileList.h"
 #include "GameValues.h"
-#include "path.h"
 #include "ResourceManager.h"
+#include "path.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_SelectField.h"
@@ -13,10 +13,11 @@
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-extern TourList *tourlist;
-extern WorldList *worldlist;
+extern TourList* tourlist;
+extern WorldList* worldlist;
 
-UI_MatchSelectionMenu::UI_MatchSelectionMenu() : UI_Menu()
+UI_MatchSelectionMenu::UI_MatchSelectionMenu()
+    : UI_Menu()
 {
     miMatchSelectionStartButton = new MI_Button(&rm->spr_selectfield, 270, 420, "Start", 100);
     miMatchSelectionStartButton->SetCode(MENU_CODE_MATCH_SELECTION_START);
@@ -48,7 +49,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu() : UI_Menu()
     miTourField = new MI_SelectField(&rm->spr_selectfield, 130, 380, "Tour", 380, 100);
     for (short iTour = 0; iTour < tourlist->GetCount(); iTour++) {
         std::string szTemp = GetNameFromFileName(tourlist->GetIndex(iTour), true);
-        //strcat(szTemp, " Tour");
+        // strcat(szTemp, " Tour");
         miTourField->Add(std::move(szTemp), iTour, "", true, false);
     }
     miTourField->SetData(&game_values.tourindex, NULL, NULL);
@@ -101,9 +102,6 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu() : UI_Menu()
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 };
 
-UI_MatchSelectionMenu::~UI_MatchSelectionMenu() {
-}
-
 void UI_MatchSelectionMenu::SelectionChanged()
 {
     miTournamentField->Show(game_values.matchtype == MATCH_TYPE_TOURNAMENT);
@@ -111,7 +109,7 @@ void UI_MatchSelectionMenu::SelectionChanged()
     miWorldField->Show(game_values.matchtype == MATCH_TYPE_WORLD);
     miMinigameField->Show(game_values.matchtype == MATCH_TYPE_MINIGAME);
 
-    //miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
+    // miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
     miWorldPreviewDisplay->Show(game_values.matchtype == MATCH_TYPE_WORLD);
 
     if (game_values.matchtype == MATCH_TYPE_WORLD)
@@ -142,7 +140,7 @@ void UI_MatchSelectionMenu::ActivateMinigameField()
 
 short UI_MatchSelectionMenu::GetMinigameID()
 {
-     return miMinigameField->GetShortValue();
+    return miMinigameField->GetShortValue();
 }
 
 short UI_MatchSelectionMenu::GetSelectedMatchType()

@@ -11,7 +11,8 @@
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-UI_WorldMenu::UI_WorldMenu() : UI_Menu()
+UI_WorldMenu::UI_WorldMenu()
+    : UI_Menu()
 {
     miWorld = new MI_World();
     miWorld->SetAutoModify(true);
@@ -19,7 +20,7 @@ UI_WorldMenu::UI_WorldMenu() : UI_Menu()
     miWorldStop = new MI_TourStop(70, 45, true);
     miWorldStop->Show(false);
 
-    //Exit tour dialog box
+    // Exit tour dialog box
     miWorldExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miWorldExitDialogExitTourText = new MI_HeaderText("Exit World", 320, 205);
 
@@ -47,9 +48,6 @@ UI_WorldMenu::UI_WorldMenu() : UI_Menu()
     SetHeadControl(miWorld);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 };
-
-UI_WorldMenu::~UI_WorldMenu() {
-}
 
 void UI_WorldMenu::OpenStageStart()
 {

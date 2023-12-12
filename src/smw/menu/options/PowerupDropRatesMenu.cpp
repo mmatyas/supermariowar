@@ -7,7 +7,9 @@
 
 extern CResourceManager* rm;
 
-UI_PowerupDropRatesMenu::UI_PowerupDropRatesMenu() : UI_Menu()
+
+UI_PowerupDropRatesMenu::UI_PowerupDropRatesMenu()
+    : UI_Menu()
 {
     miPowerupSelection = new MI_PowerupSelection(50, 44, 640, 8);
     miPowerupSelection->SetAutoModify(true);
@@ -24,7 +26,4 @@ UI_PowerupDropRatesMenu::UI_PowerupDropRatesMenu() : UI_Menu()
 
     SetHeadControl(miPowerupSelection);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
-}
-
-UI_PowerupDropRatesMenu::~UI_PowerupDropRatesMenu() {
 }

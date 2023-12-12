@@ -15,12 +15,13 @@
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-extern AnnouncerList *announcerlist;
-extern MusicList *musiclist;
-extern WorldMusicList *worldmusiclist;
-extern SoundsList *soundpacklist;
+extern AnnouncerList* announcerlist;
+extern MusicList* musiclist;
+extern WorldMusicList* worldmusiclist;
+extern SoundsList* soundpacklist;
 
-UI_SoundOptionsMenu::UI_SoundOptionsMenu() : UI_Menu()
+UI_SoundOptionsMenu::UI_SoundOptionsMenu()
+    : UI_Menu()
 {
     miSoundVolumeField = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 70, 100, "Sound Volume", 500, 220, 484);
     miSoundVolumeField->Add("Off", 0, "", false, false);
@@ -99,11 +100,8 @@ UI_SoundOptionsMenu::UI_SoundOptionsMenu() : UI_Menu()
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };
 
-UI_SoundOptionsMenu::~UI_SoundOptionsMenu() {
-}
 
-
-short UI_SoundOptionsMenu::GetCurrentWorldMusicID()
+short UI_SoundOptionsMenu::GetCurrentWorldMusicID() const
 {
     return miWorldMusicField->GetShortValue();
 }

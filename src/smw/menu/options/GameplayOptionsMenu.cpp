@@ -1,20 +1,20 @@
 #include "GameplayOptionsMenu.h"
 
-#include "uicontrol.h"
+#include "GameValues.h"
+#include "ResourceManager.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_SelectField.h"
 #include "ui/MI_Text.h"
 
-#include "GameValues.h"
-#include "ResourceManager.h"
-
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
+
+UI_GameplayOptionsMenu::UI_GameplayOptionsMenu()
+    : UI_Menu()
 {
-	miRespawnField = new MI_SelectField(&rm->spr_selectfield, 70, 40, "Respawn Time", 500, 220);
+    miRespawnField = new MI_SelectField(&rm->spr_selectfield, 70, 40, "Respawn Time", 500, 220);
     miRespawnField->Add("Instant", 0, "", false, false);
     miRespawnField->Add("0.5 Seconds", 1, "", false, false);
     miRespawnField->Add("1.0 Seconds", 2, "", false, false);
@@ -162,6 +162,3 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu() : UI_Menu()
     SetHeadControl(miRespawnField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };
-
-UI_GameplayOptionsMenu::~UI_GameplayOptionsMenu() {
-}

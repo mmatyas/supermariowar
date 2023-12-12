@@ -1,7 +1,7 @@
 #include "NetEditServersMenu.h"
 
-#include "net.h"
 #include "ResourceManager.h"
+#include "net.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_StringScroll.h"
@@ -13,7 +13,9 @@
 
 extern CResourceManager* rm;
 
-UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
+
+UI_NetEditServersMenu::UI_NetEditServersMenu()
+    : UI_Menu()
 {
     currentState = DEFAULT;
     std::fill(dialogTextData, dialogTextData + 128, 0);
@@ -78,10 +80,8 @@ UI_NetEditServersMenu::UI_NetEditServersMenu() : UI_Menu()
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 };
 
-UI_NetEditServersMenu::~UI_NetEditServersMenu() {
-}
-
-void UI_NetEditServersMenu::ReloadScroll() {
+void UI_NetEditServersMenu::ReloadScroll()
+{
     miServerScroll->ClearItems();
     for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
         ServerAddress* host = &netplay.savedServers[iServer];
@@ -89,21 +89,24 @@ void UI_NetEditServersMenu::ReloadScroll() {
     }
 }
 
-void UI_NetEditServersMenu::ShowDialog() {
+void UI_NetEditServersMenu::ShowDialog()
+{
     miDialogTitle->Show(true);
     miDialogTextField->Show(true);
     miDialogOK->Show(true);
     miDialogCancel->Show(true);
 }
 
-void UI_NetEditServersMenu::HideDialog() {
+void UI_NetEditServersMenu::HideDialog()
+{
     miDialogTitle->Show(false);
     miDialogTextField->Show(false);
     miDialogOK->Show(false);
     miDialogCancel->Show(false);
 }
 
-void UI_NetEditServersMenu::Restore() {
+void UI_NetEditServersMenu::Restore()
+{
     if (savedCurrent)
         RestoreCurrent();
 
@@ -117,7 +120,8 @@ void UI_NetEditServersMenu::Restore() {
     ReloadScroll();
 }
 
-void UI_NetEditServersMenu::onPressAdd() {
+void UI_NetEditServersMenu::onPressAdd()
+{
     RememberCurrent();
     currentState = ADD;
 
@@ -126,7 +130,8 @@ void UI_NetEditServersMenu::onPressAdd() {
     SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 }
 
-void UI_NetEditServersMenu::onPressEdit() {
+void UI_NetEditServersMenu::onPressEdit()
+{
     if (netplay.savedServers.size() == 0)
         return;
 
@@ -141,7 +146,8 @@ void UI_NetEditServersMenu::onPressEdit() {
     miInstructionsText2->SetText("to edit");
 }
 
-void UI_NetEditServersMenu::onPressDelete() {
+void UI_NetEditServersMenu::onPressDelete()
+{
     if (netplay.savedServers.size() == 0)
         return;
 
@@ -156,7 +162,8 @@ void UI_NetEditServersMenu::onPressDelete() {
     miInstructionsText2->SetText("to delete");
 }
 
-void UI_NetEditServersMenu::onEntrySelect() {
+void UI_NetEditServersMenu::onEntrySelect()
+{
     assert(netplay.savedServers.size() > miServerScroll->CurrentIndex());
 
     switch (currentState) {
@@ -184,7 +191,8 @@ void UI_NetEditServersMenu::onEntrySelect() {
     }
 }
 
-void UI_NetEditServersMenu::onDialogOk() {
+void UI_NetEditServersMenu::onDialogOk()
+{
     ServerAddress new_address;
     new_address.hostname = dialogTextData;
 

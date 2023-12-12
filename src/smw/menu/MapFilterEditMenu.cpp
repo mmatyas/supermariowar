@@ -3,7 +3,8 @@
 #include "ui/MI_MapBrowser.h"
 
 
-UI_MapFilterEditMenu::UI_MapFilterEditMenu() : UI_Menu()
+UI_MapFilterEditMenu::UI_MapFilterEditMenu()
+    : UI_Menu()
 {
     miMapBrowser = new MI_MapBrowser();
     miMapBrowser->SetAutoModify(true);

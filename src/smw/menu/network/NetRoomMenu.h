@@ -1,5 +1,4 @@
-#ifndef MENU_NETROOM_H
-#define MENU_NETROOM_H
+#pragma once
 
 #include "uimenu.h"
 
@@ -11,14 +10,10 @@ class MI_NetRoomTeamSelect;
 class MI_Text;
 class MI_TextField;
 
-/*
-    Description.
-*/
 
 class UI_NetRoomMenu : public UI_Menu {
 public:
     UI_NetRoomMenu();
-    ~UI_NetRoomMenu();
 
     void Refresh();
     void StartInProgress();
@@ -47,5 +42,3 @@ private:
     MI_Image* miNetRoomRightHeaderBar;
     MI_Text* miNetRoomHeaderText;
 };
-
-#endif // MENU_NETROOM_H

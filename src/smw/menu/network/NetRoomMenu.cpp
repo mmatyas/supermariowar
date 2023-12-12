@@ -1,9 +1,9 @@
 #include "NetRoomMenu.h"
 
 #include "GameValues.h"
+#include "ResourceManager.h"
 #include "net.h"
 #include "path.h"
-#include "ResourceManager.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_ChatMessageBox.h"
 #include "ui/MI_Image.h"
@@ -14,15 +14,18 @@
 
 #include <sstream>
 
+
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
 extern short LookupTeamID(short id);
 
-UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
+
+UI_NetRoomMenu::UI_NetRoomMenu()
+    : UI_Menu()
 {
     miNetRoomName = new MI_Text("" /* Room name here */, 40, 50, 0, true, TextAlign::LEFT);
-    //AddNonControl(miNetRoomName);
+    // AddNonControl(miNetRoomName);
 
     miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, 300, 310, "(waiting)", 331, TextAlign::CENTER);
     miNetRoomStartButton->SetCode(MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS);
@@ -43,7 +46,7 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
         miNetRoomPlayerName[p] = new MI_Text("" /* Px name here */, 60, 80 + p * 60, 0, true, TextAlign::LEFT);
         AddNonControl(miNetRoomPlayerName[p]);
 
-        miSkinSelector[p] = new MI_NetRoomTeamSelect(16, 72 + p * 60, p, [](){
+        miSkinSelector[p] = new MI_NetRoomTeamSelect(16, 72 + p * 60, p, []() {
             netplay.client.sendSkinChange();
         });
         AddControl(miSkinSelector[p], miNetRoomMessageField, miNetRoomStartButton, NULL, NULL);
@@ -80,9 +83,6 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
     SetHeadControl(miNetRoomMessageField);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 };
-
-UI_NetRoomMenu::~UI_NetRoomMenu() {
-}
 
 void UI_NetRoomMenu::Refresh()
 {
@@ -131,8 +131,8 @@ void UI_NetRoomMenu::StartInProgress()
         RememberCurrent();
 
         SetHeadControl(miNetRoomStartingDialogText);
-        //SetCancelCode(MENU_CODE_NET_START_ABORT);
-        //SetCancelCode(MENU_CODE_NONE);
+        // SetCancelCode(MENU_CODE_NET_START_ABORT);
+        // SetCancelCode(MENU_CODE_NONE);
         SetCancelCode(MENU_CODE_TO_NET_ROOM_MENU);
         ResetMenu();
     }

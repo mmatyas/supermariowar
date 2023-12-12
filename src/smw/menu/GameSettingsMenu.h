@@ -1,5 +1,4 @@
-#ifndef MENU_GAMESETTINGS_H
-#define MENU_GAMESETTINGS_H
+#pragma once
 
 #include "uimenu.h"
 
@@ -11,14 +10,10 @@ class MI_MapFilterScroll;
 class MI_SelectField;
 class MI_Text;
 
-/*
-    Description.
-*/
 
 class UI_GameSettingsMenu : public UI_Menu {
 public:
     UI_GameSettingsMenu();
-    ~UI_GameSettingsMenu();
 
     void OpenMapFilters();
     void CloseMapFilters();
@@ -58,5 +53,3 @@ private:
 
 friend class UI_NetNewRoomSettingsMenu;
 };
-
-#endif // MENU_GAMESETTINGS_H

@@ -76,15 +76,12 @@ void UI_NetNewRoomSettingsMenu::RefreshGameModeButtons()
         miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
 }
 
-UI_NetNewRoomSettingsMenu::~UI_NetNewRoomSettingsMenu() {
-}
-
-std::string UI_NetNewRoomSettingsMenu::getCurrentMapPath()
+std::string UI_NetNewRoomSettingsMenu::getCurrentMapPath() const
 {
     return miMapField->GetMapFilePath();
 }
 
-short UI_NetNewRoomSettingsMenu::getSelectedGameModeID() {
+short UI_NetNewRoomSettingsMenu::getSelectedGameModeID() const {
     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
         if (miGoalField[iGameMode]->IsVisible())
             return iGameMode;

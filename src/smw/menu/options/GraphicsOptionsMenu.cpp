@@ -11,11 +11,13 @@
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
-extern GraphicsList *menugraphicspacklist;
-extern GraphicsList *worldgraphicspacklist;
-extern GraphicsList *gamegraphicspacklist;
+extern GraphicsList* menugraphicspacklist;
+extern GraphicsList* worldgraphicspacklist;
+extern GraphicsList* gamegraphicspacklist;
 
-UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu() : UI_Menu()
+
+UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
+    : UI_Menu()
 {
     miTopLayerField = new MI_SelectField(&rm->spr_selectfield, 70, 120, "Draw Top Layer", 500, 220);
     miTopLayerField->Add("Background", 0, "", false, false);
@@ -101,6 +103,3 @@ UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu() : UI_Menu()
     SetHeadControl(miTopLayerField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };
-
-UI_GraphicsOptionsMenu::~UI_GraphicsOptionsMenu() {
-}

@@ -7,7 +7,8 @@
 
 extern CResourceManager* rm;
 
-UI_TournamentScoreboardMenu::UI_TournamentScoreboardMenu() : UI_Menu()
+UI_TournamentScoreboardMenu::UI_TournamentScoreboardMenu()
+    : UI_Menu()
 {
     miTournamentScoreboard = new MI_TournamentScoreboard(&rm->spr_tournament_background, 70, 98);
 
@@ -22,6 +23,3 @@ UI_TournamentScoreboardMenu::UI_TournamentScoreboardMenu() : UI_Menu()
     SetHeadControl(miTournamentScoreboardNextButton);
     SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU);
 };
-
-UI_TournamentScoreboardMenu::~UI_TournamentScoreboardMenu() {
-}

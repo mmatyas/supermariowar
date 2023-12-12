@@ -8,11 +8,12 @@
 
 extern CResourceManager* rm;
 
-UI_TourStopMenu::UI_TourStopMenu() : UI_Menu()
+UI_TourStopMenu::UI_TourStopMenu()
+    : UI_Menu()
 {
     miTourStop = new MI_TourStop(70, 45, false);
 
-    //Exit tour dialog box
+    // Exit tour dialog box
     miTourStopExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miTourStopExitDialogExitTourText = new MI_HeaderText("Exit Tour", 320, 205);
 
@@ -38,9 +39,6 @@ UI_TourStopMenu::UI_TourStopMenu() : UI_Menu()
     SetHeadControl(miTourStop);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 };
-
-UI_TourStopMenu::~UI_TourStopMenu() {
-}
 
 void UI_TourStopMenu::OpenExitDialog()
 {

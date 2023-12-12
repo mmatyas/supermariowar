@@ -1,5 +1,4 @@
-#ifndef MENU_NETNEWLEVEL_H
-#define MENU_NETNEWLEVEL_H
+#pragma once
 
 #include "uimenu.h"
 
@@ -13,31 +12,24 @@ class MI_SelectField;
 class MI_Text;
 class UI_GameSettingsMenu;
 
-/*
-    TODO: Description.
-*/
 
-class UI_NetNewRoomSettingsMenu : public UI_Menu
-{
+class UI_NetNewRoomSettingsMenu : public UI_Menu {
 public:
     UI_NetNewRoomSettingsMenu(const UI_GameSettingsMenu*);
-    ~UI_NetNewRoomSettingsMenu();
 
-    std::string getCurrentMapPath();
+    std::string getCurrentMapPath() const;
     void RefreshGameModeButtons();
 
-    short getSelectedGameModeID();
+    short getSelectedGameModeID() const;
 
 private:
-    MI_ImageSelectField * miModeField;
-    MI_SelectField * miGoalField[22];
-    MI_Button * miModeSettingsButton;
-    MI_MapField * miMapField;
-    MI_Button * miContinueButton;
+    MI_ImageSelectField* miModeField;
+    MI_SelectField* miGoalField[22];
+    MI_Button* miModeSettingsButton;
+    MI_MapField* miMapField;
+    MI_Button* miContinueButton;
 
-    MI_Image * miLeftHeaderBar;
-    MI_Image * miRightHeaderBar;
-    MI_Text * miHeaderText;
+    MI_Image* miLeftHeaderBar;
+    MI_Image* miRightHeaderBar;
+    MI_Text* miHeaderText;
 };
-
-#endif // MENU_NETNEWLEVEL_H

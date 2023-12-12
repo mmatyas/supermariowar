@@ -1,7 +1,7 @@
 #include "NetLobbyMenu.h"
 
-#include "net.h"
 #include "ResourceManager.h"
+#include "net.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_Text.h"
@@ -10,7 +10,9 @@
 
 extern CResourceManager* rm;
 
-UI_NetLobbyMenu::UI_NetLobbyMenu() : UI_Menu()
+
+UI_NetLobbyMenu::UI_NetLobbyMenu()
+    : UI_Menu()
 {
     miNetLobbyNewRoomButton = new MI_Button(&rm->spr_selectfield, 320 + 20, 80, "New room", 320 - 30, TextAlign::CENTER);
     miNetLobbyNewRoomButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
@@ -63,9 +65,6 @@ UI_NetLobbyMenu::UI_NetLobbyMenu() : UI_Menu()
     SetHeadControl(miNetLobbyNewRoomButton);
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 };
-
-UI_NetLobbyMenu::~UI_NetLobbyMenu() {
-}
 
 void UI_NetLobbyMenu::JoinInProgress()
 {

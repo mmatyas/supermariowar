@@ -1,7 +1,7 @@
 #include "NetServersMenu.h"
 
-#include "net.h"
 #include "ResourceManager.h"
+#include "net.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_Text.h"
@@ -10,7 +10,9 @@
 
 extern CResourceManager* rm;
 
-UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
+
+UI_NetServersMenu::UI_NetServersMenu()
+    : UI_Menu()
 {
     miNetServersBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miNetServersBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
@@ -28,7 +30,7 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
     miNetServersNicknameField->SetData(netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
 
     for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
-        ServerAddress * host = &netplay.savedServers[iServer];
+        ServerAddress* host = &netplay.savedServers[iServer];
         miNetServersScroll->Add(host->hostname, "");
     }
 
@@ -52,13 +54,13 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
     miNetServersConnectingDialogText->Show(false);
     miNetServersConnectingDialogText->Disable(true);
 
-    //miNetServersConnectionDetector = new MI_NetworkStatusDetector(&rm->spr_selectfield, 320, 240 - 10, "Connecting...", 80, 1);
+    // miNetServersConnectionDetector = new MI_NetworkStatusDetector(&rm->spr_selectfield, 320, 240 - 10, "Connecting...", 80, 1);
     /*miNetServersConnectionDetector = new MI_NetworkStatusDetector(0, 0);
     miNetServersConnectingDialogImage->Show(false);
     miNetServersConnectionDetector->Show(false);*/
-    //miNetServersConnectionDetector->SetAutoModify(true);
+    // miNetServersConnectionDetector->SetAutoModify(true);
 
-    //miNetServersConnectionDetector->SetCode(MENU_CODE_NET_CONNECT_ABORT);
+    // miNetServersConnectionDetector->SetCode(MENU_CODE_NET_CONNECT_ABORT);
     /*miNetServersConnectionDetector->SuccessIfTrue(&netplay.connectSuccessful);
     miNetServersConnectionDetector->AbortCode(MENU_CODE_NET_CONNECT_ABORT);
     miNetServersConnectionDetector->SuccessCode(MENU_CODE_NET_CONNECT_SUCCESS);
@@ -79,16 +81,12 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
     AddNonControl(miNetServersConnectingDialogText);
 
     AddControl(miNetServersScroll, NULL, NULL, NULL, NULL);
-    //AddNonControl(miNetServersConnectingDialogImage);
-    //AddControl(miNetServersConnectionDetector, NULL, NULL, NULL, NULL);
+    // AddNonControl(miNetServersConnectingDialogImage);
+    // AddControl(miNetServersConnectionDetector, NULL, NULL, NULL, NULL);
 
     SetHeadControl(miNetServersSelectButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-
 };
-
-UI_NetServersMenu::~UI_NetServersMenu() {
-}
 
 void UI_NetServersMenu::Refresh()
 {
@@ -98,10 +96,11 @@ void UI_NetServersMenu::Refresh()
     }
 }
 
-void UI_NetServersMenu::RefreshScroll() {
+void UI_NetServersMenu::RefreshScroll()
+{
     miNetServersScroll->Clear();
     for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
-        ServerAddress * host = &netplay.savedServers[iServer];
+        ServerAddress* host = &netplay.savedServers[iServer];
         miNetServersScroll->Add(host->hostname, "");
     }
 
