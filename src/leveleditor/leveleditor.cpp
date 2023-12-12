@@ -197,9 +197,7 @@ CGameMode		*gamemodes[GAMEMODE_LAST];
 CPlayer			*list_players[4];
 short			list_players_cnt = 0;
 
-void DECLSPEC soundfinished(int channel){}
-void DECLSPEC musicfinished(){}
-//sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
+void SDLCALL musicfinished(){}
 
 IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)
 {

@@ -152,38 +152,16 @@ short LookupTeamID(short id)
     return LookupTeamID(id, NULL, NULL);
 }
 
-extern sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
-
-void DECLSPEC soundfinished(int channel)
-{
-    if (!g_PlayingSoundChannels[channel])
-        printf("Error: SoundFinished() tried to clear a channel that was already cleared!\n");
-    else {
-        g_PlayingSoundChannels[channel]->clearchannel();
-        g_PlayingSoundChannels[channel] = NULL;
-    }
-}
-
-void DECLSPEC musicfinished()
+void SDLCALL musicfinished()
 {
     if (!game_values.music)
         return;
 
-    if (game_values.gamestate == GS_GAME && !game_values.gamemode->gameover) {
+    if (game_values.gamestate == GS_GAME && !game_values.gamemode->gameover)
         return;
-        /*
-        if (game_values.playnextmusic) {
-            musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
-            rm->backgroundmusic[0].load(musiclist->GetCurrentMusic()); //In Game Music
-        }
 
-        rm->backgroundmusic[0].play(game_values.playnextmusic, false);
-        */
-    } else {
-        if (fResumeMusic) {
-            rm->backgroundmusic[3].play(false, false);
-        }
-    }
+    if (fResumeMusic)
+        rm->backgroundmusic[3].play(false, false);
 }
 
 short GetModeIconIndexFromMode(short iMode)

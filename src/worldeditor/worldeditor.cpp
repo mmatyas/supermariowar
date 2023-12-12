@@ -228,8 +228,7 @@ extern std::string RootDataDirectory;
 
 gfxSprite		spr_overlay, spr_overlayhole;
 
-void DECLSPEC soundfinished(int channel){}
-void DECLSPEC musicfinished(){}
+void SDLCALL musicfinished(){}
 
 CEyecandyContainer eyecandy[3];
 gfxSprite		spr_frontmap[2];
