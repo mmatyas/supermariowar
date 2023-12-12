@@ -4,84 +4,84 @@
 #include "eyecandy.h"
 #include "ui/MenuCode.h"
 
-#include <list>
+#include <memory>
+#include <vector>
 
 class UI_Control;
 class CPlayerInput;
 
 
-class UI_Menu
-{
-	public:
+class UI_Menu {
+public:
+    virtual ~UI_Menu() = default;
 
-		UI_Menu();
-		virtual ~UI_Menu();
+    void AddControl(UI_Control* control, UI_Control* up, UI_Control* down, UI_Control* left, UI_Control* right);
+    void AddNonControl(UI_Control* control);
 
-		void AddControl(UI_Control * control, UI_Control * up, UI_Control * down, UI_Control * left, UI_Control * right);
-		void AddNonControl(UI_Control * control);
-	    UI_Control * GetHeadControl() {
-	        return headControl;
-	    }
-			void SetHeadControl(UI_Control * control);
-			void ResetMenu();
+    UI_Control* GetHeadControl() const {
+        return headControl;
+    }
 
-	    void SetCancelCode(MenuCodeEnum code) {
-	        cancelCode = code;
-	    }
+    void SetHeadControl(UI_Control* control);
+    void ResetMenu();
 
-		void Update();
-		void Draw();
+    void SetCancelCode(MenuCodeEnum code) {
+        cancelCode = code;
+    }
 
-		void AddEyeCandy(CEyecandy * ec) {
-	        eyeCandy.add(ec);
-	    }
-	    void ClearEyeCandy() {
-	        eyeCandy.clean();
-	    }
+    void Update();
+    void Draw();
 
-		void ResetCurrentControl();
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    void AddEyeCandy(CEyecandy* ec) {
+        eyeCandy.add(ec);
+    }
+    void ClearEyeCandy() {
+        eyeCandy.clean();
+    }
+
+    void ResetCurrentControl();
+    MenuCodeEnum SendInput(CPlayerInput* playerInput);
 
 
-		void RememberCurrent();
-		void RestoreCurrent();
+    void RememberCurrent();
+    void RestoreCurrent();
 
-	    UI_Control * GetCurrentControl() {
-	        return current;
-	    }
+    UI_Control* GetCurrentControl() const {
+        return current;
+    }
 
-	    void SetControllingTeam(short teamid) {
-	        iControllingTeam = teamid;
-	    }
-	    void SetAllowExit(bool allowExit) {
-	        fAllowExitButton = allowExit;
-	    }
+    void SetControllingTeam(short teamid) {
+        iControllingTeam = teamid;
+    }
+    void SetAllowExit(bool allowExit) {
+        fAllowExitButton = allowExit;
+    }
 
-			MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
-	    bool IsModifying() {
-	        return fModifyingItem;
-	    }
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
-		void Refresh();
+    bool IsModifying() const {
+        return fModifyingItem;
+    }
 
-	protected:
+    void Refresh();
 
-		MenuCodeEnum MoveNextControl(MenuCodeEnum iDirection);
+protected:
+    MenuCodeEnum MoveNextControl(MenuCodeEnum iDirection);
 
-		std::list<UI_Control*> controls;
+    std::vector<std::unique_ptr<UI_Control>> controls;
 
-		UI_Control * current;
-		UI_Control * savedCurrent;
+    UI_Control* current = nullptr;
+    UI_Control* savedCurrent = nullptr;
 
-		MenuCodeEnum cancelCode;
-		bool fModifyingItem;
+    MenuCodeEnum cancelCode = MENU_CODE_NONE;
+    bool fModifyingItem = false;
 
-		UI_Control * headControl;
+    UI_Control* headControl = nullptr;
 
-		CEyecandyContainer eyeCandy;
+    CEyecandyContainer eyeCandy;
 
-		short iControllingTeam;
-		bool fAllowExitButton;
+    short iControllingTeam = -1;
+    bool fAllowExitButton = true;
 };
 
 #endif // UIMENU_H
