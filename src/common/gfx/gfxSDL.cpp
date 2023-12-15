@@ -33,6 +33,8 @@ enum SDL2_Errors {
 GraphicsSDL::GraphicsSDL() {}
 GraphicsSDL::~GraphicsSDL() {
     Close();
+    IMG_Quit();
+    SDL_Quit();
 }
 
 bool GraphicsSDL::Init(bool fullscreen)
@@ -54,28 +56,22 @@ bool GraphicsSDL::Init(bool fullscreen)
 
 void GraphicsSDL::init_sdl()
 {
-    // init SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("[gfx] SDL error: %s\n", SDL_GetError());
         throw E_INIT_SDL;
     }
-
-    // Clean up on exit
-    atexit(SDL_Quit);
 
     print_sdl_version();
 }
 
 void GraphicsSDL::init_sdl_img()
 {
-    // init SDL_image
     int img_flags = IMG_INIT_PNG;
     if ((IMG_Init(img_flags) & img_flags) != img_flags) {
         printf("[gfx] SDL_image error: %s\n", IMG_GetError());
         throw E_INIT_SDL_IMG;
     }
 
-    atexit(IMG_Quit);
     print_sdl_img_version();
 }
 
