@@ -51,29 +51,10 @@
 #include "menu/network/NetRoomMenu.h"
 #include "menu/network/NetServersMenu.h"
 
-#ifdef _XBOX
-#include "menu/xbox/ScreenResizeMenu.h"
-#include "menu/xbox/ScreenSettingsMenu.h"
-#endif
-
 #include <cstdlib> // atoi()
 #include <cassert>
 #include <sstream>
 
-#ifdef _XBOX
-#include <xtl.h>
-#endif
-
-#ifdef _WIN32
-#ifndef _XBOX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#endif
-
-#if defined(__APPLE__)
-#include <sys/stat.h>
-#endif
 
 bool LoadStartGraphics();
 

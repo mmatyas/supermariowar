@@ -4,28 +4,8 @@
 #include "GlobalConstants.h"
 #include "linfunc.h"
 
-#include <cstdio>
 #include <cstring>
-#include <ctype.h>
-#include <iostream>
 #include <algorithm>
-
-#ifdef _XBOX
-#include <xtl.h>
-#endif
-
-#ifdef _WIN32
-    #ifndef _XBOX
-        #define WIN32_LEAN_AND_MEAN
-        #include <windows.h>
-    #endif
-#else
-    #include <dirent.h>
-#endif
-
-using std::cout;
-using std::endl;
-using std::string;
 
 extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 extern short g_iDefaultMusicCategory[MAXMUSICCATEGORY];
@@ -389,7 +369,7 @@ MusicList::~MusicList()
     entries.clear();
 }
 
-string MusicList::GetMusic(int musicID)
+std::string MusicList::GetMusic(int musicID)
 {
     return entries[currentIndex]->GetMusic(musicID);
 }
@@ -404,7 +384,7 @@ void MusicList::SetNextMusic(int iMusicCategory, const char * szMapName, const c
     CurrentMusic = entries[currentIndex]->GetNextMusic(iMusicCategory, szMapName, szBackground);
 }
 
-string MusicList::GetCurrentMusic()
+std::string MusicList::GetCurrentMusic()
 {
     return CurrentMusic;
 }
@@ -655,7 +635,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
     */
 }
 
-string MusicEntry::GetMusic(unsigned int musicID)
+std::string MusicEntry::GetMusic(unsigned int musicID)
 {
     if (musicID >= songFileNames.size())
         return songFileNames[songFileNames.size()-1];
@@ -663,7 +643,7 @@ string MusicEntry::GetMusic(unsigned int musicID)
     return songFileNames[musicID];
 }
 
-string MusicEntry::GetRandomMusic(int iMusicCategory, const char * szMapName, const char * szBackground)
+std::string MusicEntry::GetRandomMusic(int iMusicCategory, const char * szMapName, const char * szBackground)
 {
     //First check if there is specific map music
     if (fUsesMapOverrides && mapoverride.find(szMapName) != mapoverride.end()) {
@@ -689,7 +669,7 @@ string MusicEntry::GetRandomMusic(int iMusicCategory, const char * szMapName, co
     return songFileNames[4];
 }
 
-string MusicEntry::GetNextMusic(int iMusicCategory, const char * szMapName, const char * szBackground)
+std::string MusicEntry::GetNextMusic(int iMusicCategory, const char * szMapName, const char * szBackground)
 {
     //First check if there is specific map music
     if (mapoverride.find(szMapName) != mapoverride.end()) {
@@ -771,12 +751,12 @@ WorldMusicList::~WorldMusicList()
     entries.clear();
 }
 
-string WorldMusicList::GetMusic(int musicID, const char * szWorldName)
+std::string WorldMusicList::GetMusic(int musicID, const char * szWorldName)
 {
     return entries[currentIndex]->GetMusic(musicID, szWorldName);
 }
 
-string WorldMusicList::GetCurrentMusic()
+std::string WorldMusicList::GetCurrentMusic()
 {
     return CurrentMusic;
 }
@@ -904,7 +884,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
     fclose(in);
 }
 
-string WorldMusicEntry::GetMusic(unsigned int musicID, const char * szWorldName)
+std::string WorldMusicEntry::GetMusic(unsigned int musicID, const char * szWorldName)
 {
     //First check if there is specific map music
     if (fUsesWorldOverrides && worldoverride.find(szWorldName) != worldoverride.end()) {

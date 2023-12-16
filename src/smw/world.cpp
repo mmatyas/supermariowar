@@ -45,9 +45,6 @@ extern MapList *maplist;
 extern SkinList *skinlist;
 extern WorldList *worldlist;
 
-using std::queue;
-using std::map;
-
 
 /**********************************
 * WorldMovingObject
