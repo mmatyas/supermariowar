@@ -1,77 +1,49 @@
-/*
-DirectoryList is a C++ class for enumerating the contents of directories.
-Copyright (C) 2005 Donny Viszneki <smirk@thebuicksix.com>
+#pragma once
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+#include <filesystem>
+#include <vector>
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+namespace fs = std::filesystem;
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
 
-#ifndef LIST_DIRECTORIES_HEADER
-#define LIST_DIRECTORIES_HEADER
+/// Base class for filtered directory iteration.
+class GenericDirIterator {
+public:
+    GenericDirIterator(const fs::path& dirpath);
 
-#ifdef _XBOX
-#  include <xtl.h>
-#else
-#  ifdef _WIN32
-#    define WIN32_LEAN_AND_MEAN
-#    include <windows.h>
-#include <cstdio>
-#  else
-#    include <sys/types.h>
-#    include <sys/stat.h>
-#    include <unistd.h>
-#    include <dirent.h>
-#  endif
-#endif
+    bool next(fs::path& out);
 
-#include <string>
+protected:
+    virtual bool passesFilter(const fs::directory_entry& entry) const = 0;
 
-class DirectoryListing
-{
-    public:
-        /* Constructor accepts path, optional filename extension */
-        DirectoryListing(std::string path, std::string file_ext="");
+private:
+    fs::directory_iterator m_dir_it;
 
-        /* Ask the listing whether or not it successfully got access to a folder */
-    bool GetSuccess() {
-        return Success;
-    };
-
-        /* Get next filename */
-        bool operator()(std::string &s);
-		bool NextDirectory (std::string &s);
-
-		std::string fullName(const std::string &s);
-
-        /* Destructor */
-        ~DirectoryListing();
-
-    private:
-        bool Success;
-		std::string path;
-        std::string Filename_Extension;
-
-        #ifdef _WIN32
-        WIN32_FIND_DATA	finddata;
-        HANDLE			findhandle;
-        std::string Stored_Filename;
-
-        #else
-        DIR * dhandle;
-        struct dirent * current;
-
-        #endif
+    bool entry_valid() const { return m_dir_it != fs::end(m_dir_it); };
 };
 
-#endif // LIST_DIRECTORIES_HEADER
+
+/// Iterator for finding files with the specific extensions.
+class FilesIterator : public GenericDirIterator {
+public:
+    FilesIterator(const fs::path& dirpath, std::string extension);
+    FilesIterator(const fs::path& dirpath);
+
+    FilesIterator& addExtension(std::string&& ext);
+
+protected:
+    virtual bool passesFilter(const fs::directory_entry& entry) const override;
+
+private:
+    std::vector<std::string> m_extensions;
+};
+
+
+/// Iterator for finding subdirectories.
+class SubdirsIterator : public GenericDirIterator {
+public:
+    SubdirsIterator(const fs::path& dirpath);
+
+protected:
+    virtual bool passesFilter(const fs::directory_entry& entry) const override;
+};

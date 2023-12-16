@@ -146,10 +146,12 @@ SimpleFileList::SimpleFileList()
 
 SimpleFileList::SimpleFileList(const std::string &path, const std::string &extension, bool fAlphabetize)
 {
-    DirectoryListing d(path, extension);
-    std::string curname;
-    while (d(curname)) {
-        filelist.insert(filelist.end(), d.fullName(curname));
+    namespace fs = std::filesystem;
+
+    FilesIterator dir(path, extension);
+    fs::path direntry;
+    while (dir.next(direntry)) {
+        filelist.emplace_back(direntry);
     }
 
     currentIndex = 0;
@@ -296,19 +298,12 @@ SkinListNode::SkinListNode(std::string skinName, std::string skinPath)
 
 SkinList::SkinList()
 {
-    DirectoryListing d(convertPath("gfx/skins/"));
-    std::string curname;
-    while (d(curname)) {
-        if (curname.length() < 5)
-            continue;
-
-        std::string file_ext = curname.substr(curname.length() - 4);
-        inPlaceLowerCase(file_ext);
-        if (file_ext != ".bmp" && file_ext != ".png") //Allow bmp and png skins
-            continue;
-
-        std::string sShortSkinName = stripCreatorAndDotMap(curname);
-        SkinListNode * node = new SkinListNode(sShortSkinName, d.fullName(curname));
+    FilesIterator dir(convertPath("gfx/skins/"));
+    dir.addExtension(".bmp").addExtension(".png");
+    fs::path direntry;
+    while (dir.next(direntry)) {
+        std::string sShortSkinName = stripCreatorAndDotMap(direntry.filename());
+        SkinListNode * node = new SkinListNode(sShortSkinName, direntry);
 
         if (skins.empty()) {
             skins.push_back(node);
@@ -346,10 +341,10 @@ const char * SkinList::GetSkinName(unsigned int index)
 ///////////// SimpleDirectoryList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
 {
-    DirectoryListing d(path);
-    std::string curname;
-    while (d.NextDirectory(curname)) {
-        filelist.insert(filelist.end(), d.fullName(curname));
+    SubdirsIterator dir(path);
+    fs::path direntry;
+    while (dir.next(direntry)) {
+        filelist.insert(filelist.end(), direntry);
     }
     if (filelist.empty()) {
         printf("ERROR: Empty directory.  %s\n", path.c_str());
@@ -363,10 +358,10 @@ SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
 ///////////// MusicList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MusicList::MusicList()
 {
-    DirectoryListing d(convertPath("music/game/"));
-    std::string currentdir;
-    while (d.NextDirectory(currentdir)) {
-        MusicEntry *m = new MusicEntry(d.fullName(currentdir));
+    SubdirsIterator dir(convertPath("music/game/"));
+    fs::path direntry;
+    while (dir.next(direntry)) {
+        MusicEntry *m = new MusicEntry(direntry);
         if (!m->fError)
             entries.push_back(m);
         else
@@ -745,10 +740,10 @@ void MusicEntry::UpdateWithOverrides()
 ///////////// MusicList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 WorldMusicList::WorldMusicList()
 {
-    DirectoryListing d(convertPath("music/world/"));
-    std::string currentdir;
-    while (d.NextDirectory(currentdir)) {
-        WorldMusicEntry *m = new WorldMusicEntry(d.fullName(currentdir));
+    SubdirsIterator dir(convertPath("music/world/"));
+    fs::path direntry;
+    while (dir.next(direntry)) {
+        WorldMusicEntry *m = new WorldMusicEntry(direntry);
         if (!m->fError)
             entries.push_back(m);
         else
