@@ -1,5 +1,6 @@
 #include "MI_TeamSelect.h"
 
+#include "gfx.h"
 #include "Game.h"
 #include "GameValues.h"
 #include "ResourceManager.h"
@@ -222,6 +223,10 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                     return MENU_CODE_BACK_TO_MATCH_SELECTION_MENU;
                 }
             }
+        }
+        if (DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice) {
+            short team = GetTeam(iPlayer);
+            gfx_setjoystickteamcolor(SDL_JoystickFromPlayerIndex(playerInput->inputControls[iPlayer]->iDevice), team, fReady[iPlayer] ? 200 : 100);
         }
     }
 
