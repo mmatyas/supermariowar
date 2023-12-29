@@ -224,10 +224,12 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                 }
             }
         }
+#ifdef USE_SDL2
         if (DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice) {
             short team = GetTeam(iPlayer);
             gfx_setjoystickteamcolor(SDL_JoystickFromPlayerIndex(playerInput->inputControls[iPlayer]->iDevice), team, fReady[iPlayer] ? 1.0 : 0.5);
         }
+#endif
     }
 
     return MENU_CODE_NONE;
