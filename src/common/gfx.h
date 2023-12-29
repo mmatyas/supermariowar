@@ -60,6 +60,6 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap = true,
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap = true, bool fUseAccel = true);
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, Uint8 b, bool fWrap = true, bool fUseAccel = true);
 
-void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, Uint8 brightness);
+void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, float brightness);
 
 #endif // GFX_H

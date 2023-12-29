@@ -5,6 +5,7 @@
 #include "SDL_image.h"
 #include "sdl12wrapper.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <iostream>
 #include <string>
@@ -638,9 +639,11 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, 
     return fRet;
 }
 
-void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, Uint8 brightness)
+void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, float brightness)
 {
+#ifdef USE_SDL2
     uint8_t r = 0, g = 0, b = 0;
     gfx.getPalette().copyColorSchemeTo(team, 0, 5, r, g, b);
-    SDL_JoystickSetLED(joystick, ((short)brightness + 1) * r >> 8, ((short)brightness + 1) * g >> 8, ((short)brightness + 1) * b >> 8);
+    SDL_JoystickSetLED(joystick, std::clamp((int)(brightness * r), 0, 255), std::clamp((int)(brightness * g), 0, 255), std::clamp((int)(brightness * b), 0, 255));
+#endif
 }
