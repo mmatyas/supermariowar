@@ -643,7 +643,8 @@ void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, floa
 {
 #ifdef USE_SDL2
     uint8_t r = 0, g = 0, b = 0;
+    brightness = max(0.f, min(1.f, brightness));
     gfx.getPalette().copyColorSchemeTo(team, 0, 5, r, g, b);
-    SDL_JoystickSetLED(joystick, std::clamp((int)(brightness * r), 0, 255), std::clamp((int)(brightness * g), 0, 255), std::clamp((int)(brightness * b), 0, 255));
+    SDL_JoystickSetLED(joystick, (Uint8)(brightness * r), (Uint8)(brightness * g), (Uint8)(brightness * b));
 #endif
 }
