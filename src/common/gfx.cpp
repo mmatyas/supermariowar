@@ -641,7 +641,7 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, 
 
 void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, float brightness)
 {
-#ifdef USE_SDL2
+#if SDL_VERSION_ATLEAST(2, 0, 14)
     uint8_t r = 0, g = 0, b = 0;
     brightness = max(0.f, min(1.f, brightness));
     gfx.getPalette().copyColorSchemeTo(team, 0, 5, r, g, b);
