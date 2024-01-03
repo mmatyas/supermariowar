@@ -341,10 +341,10 @@ void CGameMode::SetupModeStrings(const char * szMode, const char * szGoal, short
     for (short iMode = 0; iMode < GAMEMODE_NUM_OPTIONS; iMode++) {
         if (iMode == GAMEMODE_NUM_OPTIONS - 1) {
             modeOptions[iMode].iValue = -1;
-            modeOptions[iMode].szName += "Unlimited";
+            modeOptions[iMode].szName = "Unlimited";
         } else {
             modeOptions[iMode].iValue = (iMode + 1) * iGoalSpacing;
-            modeOptions[iMode].szName += std::to_string(modeOptions[iMode].iValue);
+            modeOptions[iMode].szName = std::to_string(modeOptions[iMode].iValue);
         }
     }
 }
