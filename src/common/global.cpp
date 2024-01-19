@@ -110,10 +110,6 @@ char szIPString[32] = "";
 SDL_Joystick **joysticks = NULL;
 short joystickcount = 0;
 
-
-const char * GameInputNames[NUM_KEYS] = {"Left", "Right", "Jump", "Down", "Turbo", "Use Item", "Pause", "Exit"};
-const char * MenuInputNames[NUM_KEYS] = {"Up", "Down", "Left", "Right", "Select", "Cancel", "Random", "Fast Map"};
-
 /*
 0 == poison mushroom
 1 == 1up

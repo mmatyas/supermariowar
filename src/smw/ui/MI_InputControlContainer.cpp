@@ -16,20 +16,41 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 
 extern short joystickcount;
-extern const char * GameInputNames[NUM_KEYS];
-extern const char * MenuInputNames[NUM_KEYS];
+
+
+namespace {
+const std::array<std::string, NUM_KEYS> GameInputNames {
+    "Left",
+    "Right",
+    "Jump",
+    "Down",
+    "Turbo",
+    "Use Item",
+    "Pause",
+    "Exit",
+};
+const std::array<std::string, NUM_KEYS> MenuInputNames {
+    "Up",
+    "Down",
+    "Left",
+    "Right",
+    "Select",
+    "Cancel",
+    "Random",
+    "Fast Map",
+};
+} // namespace
 
 
 /**************************************
  * MI_InputControlField Class
  **************************************/
 
-MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
-    UI_Control(x, y)
+MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, std::string name, short width, short indent) :
+    UI_Control(x, y),
+    szName(std::move(name))
 {
     spr = nspr;
-
-    szName = name;
 
     iWidth = width;
     iIndent = indent;

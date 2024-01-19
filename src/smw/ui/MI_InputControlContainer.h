@@ -12,7 +12,7 @@ class MI_Button;
 class MI_InputControlField : public UI_Control
 {
 	public:
-		MI_InputControlField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+		MI_InputControlField(gfxSprite * nspr, short x, short y, std::string name, short width, short indent);
         virtual ~MI_InputControlField();
 
 		void Draw();
@@ -40,7 +40,7 @@ class MI_InputControlField : public UI_Control
 	private:
 
 		gfxSprite * spr;
-		std::string szName;
+		const std::string szName;
 
 		short iWidth, iIndent;
 
