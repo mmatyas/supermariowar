@@ -4833,8 +4833,7 @@ void loadcurrentmap()
 		}
 	}
 
-	char filename[128];
-	sprintf(filename, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
+	std::string filename = concat("gfx/packs/Classic/backgrounds/", g_map->szBackgroundFile);
 	std::string path = convertPath(filename);
     backgroundlist->SetCurrentName(filename);
 

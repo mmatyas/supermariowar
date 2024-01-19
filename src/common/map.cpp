@@ -1352,18 +1352,18 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
 {
     SDL_Surface * sThumbnail = SDL_CreateRGBSurface(screen->flags, 160, 120, 16, 0, 0, 0, 0);
 
-    char localSzBackgroundFile[128];
+    std::string localSzBackgroundFile;
     std::string path;
 
     if (fUseClassicPack) {
-        sprintf(localSzBackgroundFile, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
+        localSzBackgroundFile = concat("gfx/packs/Classic/backgrounds/", g_map->szBackgroundFile);
         path = convertPath(localSzBackgroundFile);
 
         //if the background file doesn't exist, use the classic background
         if (!File_Exists(path))
             path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
     } else {
-        sprintf(localSzBackgroundFile, "gfx/packs/backgrounds/%s", g_map->szBackgroundFile);
+        localSzBackgroundFile = concat("gfx/packs/backgrounds/", g_map->szBackgroundFile);
         path = convertPath(localSzBackgroundFile, gamegraphicspacklist->current_name());
 
         //if the background file doesn't exist, use the classic background
