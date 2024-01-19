@@ -2772,12 +2772,6 @@ int editor_type()
 {
 	bool done = false;
 
-	SDL_Rect r;
-	r.x = 0;
-	r.y = 0;
-	r.w = 640;
-	r.h = 480;
-
     while (!done) {
 		int framestart = SDL_GetTicks();
 
@@ -3411,12 +3405,6 @@ int editor_vehicles()
 int editor_path()
 {
 	bool done = false;
-
-	SDL_Rect r;
-	r.x = 0;
-	r.y = 0;
-	r.w = 640;
-	r.h = 480;
 
     while (!done) {
 		int framestart = SDL_GetTicks();
