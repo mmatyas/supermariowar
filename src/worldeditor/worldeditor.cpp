@@ -142,9 +142,9 @@ void CPlayer::flipsidesifneeded() {}
 bool CPlayer::isInvincible() const { return false; }
 bool CPlayer::isShielded() const { return false; }
 void CPlayer::AddKillerAward(CPlayer*, killstyle) {}
-short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId)
+PlayerKillType CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId)
 {
-    return 0;
+    return PlayerKillType::None;
 }
 bool PlayerCollisions::checktop(CPlayer&)
 {
@@ -176,9 +176,9 @@ bool CO_ThrowBox::HasKillVelocity()
     return false;
 }
 
-short PlayerKilledPlayer(short id, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
+PlayerKillType PlayerKilledPlayer(short id, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
 {
-    return 0;
+    return PlayerKillType::None;
 }
 void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style) {}
 

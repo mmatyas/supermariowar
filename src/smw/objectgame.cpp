@@ -499,7 +499,7 @@ bool PU_PoisonPowerup::collide(CPlayer * player)
 
         dead = true;
 
-        return player->KillPlayerMapHazard(false, kill_style_poisonmushroom, false) != player_kill_nonkill;
+        return player->KillPlayerMapHazard(false, kill_style_poisonmushroom, false) != PlayerKillType::NonKill;
     }
 
     return false;
@@ -1383,7 +1383,7 @@ bool MO_SuperFireball::collide(CPlayer * player)
         ifSoundOnPlay(rm->sfx_hit);
 
         if (!player->isInvincible() && !player->shyguy) {
-            return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+            return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
         }
     }
 
@@ -1566,7 +1566,7 @@ bool MO_SledgeHammer::collide(CPlayer * player)
         ifSoundOnPlay(rm->sfx_hit);
 
         if (!player->isInvincible() && !player->shyguy) {
-            return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+            return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
         }
     }
 
@@ -2219,7 +2219,7 @@ void OMO_Thwomp::update()
 bool OMO_Thwomp::collide(CPlayer * player)
 {
     if (!player->isInvincible() && !player->isShielded() && (player->Score().score > 0 || game_values.gamemode->goal == -1))
-        return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+        return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
 
     return false;
 }
@@ -4020,7 +4020,7 @@ bool MO_WalkingEnemy::hitother(CPlayer * player)
     if (player->isShielded())
         return false;
 
-    return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+    return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
 }
 
 void MO_WalkingEnemy::collide(IO_MovingObject * object)
@@ -4389,7 +4389,7 @@ bool MO_Spiny::hittop(CPlayer * player)
 {
     //Kill player here
     if (player->isready() && !player->isShielded() && !player->isInvincible() && !player->kuriboshoe.is_on())
-        return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+        return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
 
     if (player->kuriboshoe.is_on()) {
         player->setYi(iy - PH - 1);
@@ -4539,7 +4539,7 @@ bool MO_CheepCheep::hitother(CPlayer * player)
     if (player->isShielded())
         return false;
 
-    return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+    return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
 }
 
 void MO_CheepCheep::collide(IO_MovingObject * object)
@@ -5007,7 +5007,7 @@ bool MO_SledgeBrother::hit(CPlayer * player)
     if (player->isShielded())
         return false;
 
-    return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+    return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
 }
 
 void MO_SledgeBrother::collide(IO_MovingObject * object)
@@ -6768,7 +6768,7 @@ bool OMO_PipeBonus::collide(CPlayer * player)
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix - 1, iy - 1, 3, 8));
 
             if (!player->isInvincible()) {
-                return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+                return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
             }
         }
 

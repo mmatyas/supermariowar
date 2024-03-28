@@ -67,11 +67,11 @@ bool B_BreakableBlock::hittop(CPlayer * player, bool useBehavior)
     IO_Block::hittop(player, useBehavior);
 
     if (state == 1 || state == 2) {
-        short iKillType = player_kill_nonkill;
+        PlayerKillType iKillType = PlayerKillType::NonKill;
         if (iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.teamcollision == 2))
             iKillType = PlayerKilledPlayer(iBumpPlayerID, player, death_style_jump, kill_style_bounce, false, false);
 
-        if (player_kill_nonkill == iKillType)
+        if (PlayerKillType::NonKill == iKillType)
             player->vely = -VELNOTEBLOCKREPEL;
     } else if (useBehavior) {
         player->vely = GRAVITATION;

@@ -46,11 +46,11 @@ class CGM_Frag : public CGameMode
         CGM_Frag();
 		virtual ~CGM_Frag() {}
 
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
     void setdebuggoal() {
@@ -72,8 +72,8 @@ class CGM_TimeLimit : public CGameMode
 		void think();
 		void draw_foreground();
 		void drawtime();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 
 		void addtime(short iTime);
 
@@ -97,8 +97,8 @@ class CGM_Classic : public CGameMode
 		virtual ~CGM_Classic() {}
 
 		virtual void init();
-		virtual short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		virtual short playerkilledself(CPlayer &player, killstyle style);
+		virtual PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		virtual PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		virtual void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
@@ -119,10 +119,10 @@ class CGM_Chicken : public CGameMode
 
 		void think();
 		void draw_foreground();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
     void setdebuggoal() {
@@ -140,8 +140,8 @@ class CGM_Tag : public CGameMode
 
 		void init();
 		void think();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
@@ -161,8 +161,8 @@ class CGM_ShyGuyTag : public CGameMode
 		void init();
 		void think();
 		void draw_foreground();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 		void SetShyGuy(short iTeam);
@@ -175,7 +175,7 @@ class CGM_ShyGuyTag : public CGameMode
 
 	private:
 
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 		short CountShyGuys();
 		void FreeShyGuys();
 
@@ -191,11 +191,11 @@ class CGM_Coins : public CGameMode
 		virtual ~CGM_Coins() {}
 
 		virtual void init();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
     void setdebuggoal() {
@@ -212,10 +212,10 @@ class CGM_Eggs : public CGameMode
 		virtual ~CGM_Eggs() {}
 
 		void init();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
     void setdebuggoal() {
@@ -269,10 +269,10 @@ class CGM_Domination : public CGameMode
 		virtual ~CGM_Domination() {}
 
 		void init();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
     void setdebuggoal() {
@@ -289,8 +289,8 @@ class CGM_Owned : public CGameMode
 		virtual ~CGM_Owned() {}
 
 		void think();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
@@ -300,7 +300,7 @@ class CGM_Owned : public CGameMode
 #endif
 
 	private:
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 };
 
@@ -316,7 +316,7 @@ class CGM_Jail : public CGM_Frag
         CGM_Jail();
 		virtual ~CGM_Jail() {}
 
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 		char *getMenuString(char *buffer64);
 };
@@ -331,15 +331,15 @@ class CGM_Stomp : public CGameMode
 		void init();
 		void think();
 
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 		char *getMenuString(char *buffer64);
 
 	private:
 		void ResetSpawnTimer();
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 		short spawntimer;
 		short iSelectedEnemy;
@@ -353,8 +353,8 @@ class CGM_Race : public CGameMode
         virtual ~CGM_Race() {}
 		CGM_Race();
 		void init();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
     short getNextGoal(short teamID) {
@@ -388,8 +388,8 @@ class CGM_Star : public CGM_TimeLimit
 		void init();
 		void think();
 		void draw_foreground();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 		bool isplayerstar(CPlayer * player);
@@ -427,10 +427,10 @@ class CGM_CaptureTheFlag : public CGameMode
 		virtual ~CGM_CaptureTheFlag() {}
 
 		void init();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
     void setdebuggoal() {
@@ -448,8 +448,8 @@ class CGM_KingOfTheHill : public CGM_Domination
 		virtual ~CGM_KingOfTheHill() {}
 
 		void init();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
@@ -467,11 +467,11 @@ class CGM_Greed : public CGM_Classic
 		virtual ~CGM_Greed() {}
 
 		void init();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
-		short ReleaseCoins(CPlayer &player, killstyle style);
+		PlayerKillType ReleaseCoins(CPlayer &player, killstyle style);
 
 #ifdef _DEBUG
     void setdebuggoal() {
@@ -489,8 +489,8 @@ class CGM_Health : public CGM_Classic
 		virtual ~CGM_Health() {}
 
 		virtual void init();
-		virtual short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		virtual short playerkilledself(CPlayer &player, killstyle style);
+		virtual PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		virtual PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		virtual void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
@@ -510,13 +510,13 @@ class CGM_Collection : public CGameMode
 
 		void init();
 		void think();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 		void ReleaseCard(CPlayer &player);
 
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
     void setdebuggoal() {
@@ -538,11 +538,11 @@ class CGM_Chase : public CGameMode
 
 		void init();
 		void think();
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 		CPlayer * GetKeyHolder();
 
@@ -568,8 +568,8 @@ class CGM_Boss_MiniGame : public CGameMode
 		void think();
 		void draw_foreground();
 
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 		char *getMenuString(char *buffer64);
@@ -604,11 +604,11 @@ class CGM_Bonus : public CGameMode
 		//Override so it doesn't display winner text after you choose a powerup
 		void think() {}
 
-    short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style) {
-        return false;
+    PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style) {
+        return PlayerKillType::None;
     }
-    short playerkilledself(CPlayer &player, killstyle style) {
-        return false;
+    PlayerKillType playerkilledself(CPlayer &player, killstyle style) {
+        return PlayerKillType::None;
     }
 		void playerextraguy(CPlayer &player, short iType) {}
 
@@ -631,10 +631,10 @@ class CGM_Pipe_MiniGame : public CGameMode
 		void init();
 		void think();
 
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 
 		void SetBonus(short iType, short iTimer, short iTeamID);
     bool IsSlowdown() {
@@ -664,13 +664,13 @@ class CGM_Boxes_MiniGame : public CGameMode
 		void init();
 		void think();
 
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		short playerkilledself(CPlayer &player, killstyle style);
+		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		PlayerKillType playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 		char *getMenuString(char *buffer64);
 
-		short CheckWinner(CPlayer * player);
+		PlayerKillType CheckWinner(CPlayer * player);
 		bool SetWinner(CPlayer * player);
 
     bool HasStoredPowerups() {

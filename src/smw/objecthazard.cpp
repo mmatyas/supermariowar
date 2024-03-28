@@ -101,7 +101,7 @@ void OMO_OrbitHazard::update()
 bool OMO_OrbitHazard::collide(CPlayer * player)
 {
     if (!player->isInvincible() && !player->isShielded() && !player->shyguy) {
-        return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+        return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
     }
 
     return false;
@@ -150,7 +150,7 @@ bool OMO_StraightPathHazard::collide(CPlayer * player)
         dead = true;
 
         if (!player->isInvincible() && !player->shyguy) {
-            return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+            return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
         }
     }
 
@@ -558,7 +558,7 @@ void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 bool IO_FlameCannon::collide(CPlayer * player)
 {
     if (state == 2 && !player->isInvincible() && !player->isShielded() && !player->shyguy)
-        return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+        return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
 
     return false;
 }
@@ -790,7 +790,7 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
     if (player->isInvincible() || player->tanookisuit.isStatue() || (player->kuriboshoe.is_on() && !fHitPlayerTop)) {
         KillPlant();
     } else if (!player->isShielded() && !player->shyguy) {
-        return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
+        return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
     }
 
     return false;

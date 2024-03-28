@@ -1,11 +1,8 @@
-#ifndef PLAYER_KILL_TYPES_H
-#define PLAYER_KILL_TYPES_H
+#pragma once
 
-enum PlayerKillType {
-    player_kill_none,
-    player_kill_normal,
-    player_kill_removed,
-    player_kill_nonkill
+enum class PlayerKillType: unsigned char {
+    None,
+    Normal,
+    Removed,
+    NonKill,
 };
-
-#endif // PLAYER_KILL_TYPES_H

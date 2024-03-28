@@ -1824,7 +1824,7 @@ void CPlayer::AddKillsInRowInAirAward() {
     awardeffects.addKillsInRowInAirAward(*this);
 }
 
-short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
+PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
 {
     CPlayer * killer = GetPlayerFromGlobalID(iKiller);
 
@@ -1833,12 +1833,12 @@ short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, kill
     } else {
         killed->DeathAwards();
 
-        short iKillType = game_values.gamemode->playerkilledself(*killed, style);
+        PlayerKillType iKillType = game_values.gamemode->playerkilledself(*killed, style);
 
-        if (player_kill_normal == iKillType || (fForce && player_kill_nonkill == iKillType))
+        if (PlayerKillType::Normal == iKillType || (fForce && PlayerKillType::NonKill == iKillType))
             killed->die(death_style_jump, false, fKillCarriedItem);
 
-        if (player_kill_nonkill != iKillType) {
+        if (PlayerKillType::NonKill != iKillType) {
             if (deathstyle == death_style_shatter)
                 ifSoundOnPlay(rm->sfx_breakblock);
             else
@@ -1849,13 +1849,13 @@ short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, kill
     }
 }
 
-short CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
+PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
 {
     CPlayer * killer = this;
 
     //If this player is already dead, then don't kill him again
     if (killed->state != player_ready)
-        return player_kill_none;
+        return PlayerKillType::None;
 
     if (game_values.gamemode->chicken == killer && style != kill_style_pow)
         ifSoundOnPlay(rm->sfx_chicken);
@@ -1870,9 +1870,9 @@ short CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killstyle style,
         killed->DeathAwards();
 
     //now kill the player (don't call this function earlier because we need the old position, etc.
-    short iKillType = game_values.gamemode->playerkilledplayer(*killer, *killed, style);
+    PlayerKillType iKillType = game_values.gamemode->playerkilledplayer(*killer, *killed, style);
 
-    if (player_kill_nonkill != iKillType || fForce) {
+    if (PlayerKillType::NonKill != iKillType || fForce) {
         if (killed->bobomb) {
             killed->diedas = 2;
             killer->SetPowerup(0);
@@ -1886,7 +1886,7 @@ short CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killstyle style,
             ifSoundOnPlay(rm->sfx_breakblock);
     }
 
-    if (player_kill_normal == iKillType || (fForce && player_kill_nonkill == iKillType))
+    if (PlayerKillType::Normal == iKillType || (fForce && PlayerKillType::NonKill == iKillType))
         killed->die(deathstyle, false, fKillCarriedItem);
 
     return iKillType;
@@ -2294,7 +2294,7 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
         if (netplay.active && netplay.theHostIsMe && collisionresult)
             netplay.client.local_gamehost.sendMapCollisionEvent();
     } else if (superDeathTileBehind || (deathTileBehind && !isInvincible() && !isShielded() && !shyguy)) {
-        if (player_kill_nonkill != KillPlayerMapHazard(superDeathTileBehind, kill_style_environment, false))
+        if (PlayerKillType::NonKill != KillPlayerMapHazard(superDeathTileBehind, kill_style_environment, false))
             return;
     }
     //collision on the side.
@@ -2435,7 +2435,7 @@ void CPlayer::mapcolldet_moveUpward(short txl, short txc, short txr,
                               ((alignedTileType & tile_flag_super_or_player_death_bottom) &&  !(unalignedTileType & tile_flag_solid)) ||
                               ((alignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom));
 
-        if (player_kill_nonkill != KillPlayerMapHazard(fRespawnPlayer, kill_style_environment, false))
+        if (PlayerKillType::NonKill != KillPlayerMapHazard(fRespawnPlayer, kill_style_environment, false))
             return;
     } else {
         setYf(fPrecalculatedY);
@@ -2604,7 +2604,7 @@ void CPlayer::mapcolldet_moveDownward(short txl, short txc, short txr,
             return;
         }
     } else if (fDeathTileUnderPlayer || fSuperDeathTileUnderPlayer) {
-        if (player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment, false))
+        if (PlayerKillType::NonKill != KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment, false))
             return;
     } else {
         //falling (in air)
@@ -2726,15 +2726,15 @@ void CPlayer::collision_detection_map()
 }
 
 //iPlayerIdCredit is passed in if this platform was triggered by another player and crushed this player (e.g. donut block)
-short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerIdCredit)
+PlayerKillType CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerIdCredit)
 {
     if (iPlayerIdCredit >= 0 || iSuicideCreditPlayerID >= 0) {
         return PlayerKilledPlayer(iPlayerIdCredit >= 0 ? iPlayerIdCredit : iSuicideCreditPlayerID, this, death_style_jump, kill_style_push, fForce, fKillCarriedItem);
     } else {
         DeathAwards();
 
-        short iKillType = game_values.gamemode->playerkilledself(*this, style);
-        if (player_kill_normal == iKillType || (player_kill_nonkill == iKillType && fForce))
+        PlayerKillType iKillType = game_values.gamemode->playerkilledself(*this, style);
+        if (PlayerKillType::Normal == iKillType || (PlayerKillType::NonKill == iKillType && fForce))
             die(death_style_jump, false, fKillCarriedItem);
 
         ifSoundOnPlay(rm->sfx_deathsound);

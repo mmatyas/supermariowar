@@ -1794,7 +1794,7 @@ void debugAutoKillEveryone()
         for (short k = 0; k < list_players_cnt; k++) {
             list_players[k]->DeathAwards();
 
-            if (!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
+            if (game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) != PlayerKillType::None)
                 list_players[k]->die(0, false, false);
         }
     }
@@ -2015,7 +2015,7 @@ void GameplayState::handleInput()
                 for (short k = 0; k < list_players_cnt; k++) {
                     list_players[k]->DeathAwards();
 
-                    if (game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == player_kill_normal)
+                    if (game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == PlayerKillType::Normal)
                         list_players[k]->die(0, false, false);
                 }
             } else if (event.key.keysym.sym == SDLK_x) {
