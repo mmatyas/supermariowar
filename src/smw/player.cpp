@@ -1586,7 +1586,7 @@ void CPlayer::Jump(short iMove, float jumpModifier, bool fKuriboBounce)
         vely = -VELKURIBOBOUNCE;
     else if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jail.isActive())
         vely = -VELSLOWJUMP * jumpModifier;
-    else if (ABS(velx) > VELMOVING && iMove != 0 && playerKeys->game_turbo.fDown)
+    else if (fabs(velx) > VELMOVING && iMove != 0 && playerKeys->game_turbo.fDown)
         vely = -VELTURBOJUMP * jumpModifier;
     else
         vely = -VELJUMP * jumpModifier;

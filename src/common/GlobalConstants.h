@@ -129,8 +129,6 @@
 
 #define MAXRACEGOALS        8
 
-#define ABS(x) (x>0?x:-x)
-
 #define TWO_PI              6.2831853f
 #define PI                  3.1415292f
 #define THREE_HALF_PI       4.7123890f
