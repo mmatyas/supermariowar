@@ -177,10 +177,19 @@ target_sources(smw PRIVATE
 	menu/network/NetRoomMenu.cpp
 	menu/network/NetRoomMenu.h
 	menu/network/NetServersMenu.cpp
-        menu/network/NetServersMenu.h
+	menu/network/NetServersMenu.h
+
+	gamemodes/MiniBoss.h
+	gamemodes/MiniBoss.cpp
+	gamemodes/MiniBoxes.h
+	gamemodes/MiniBoxes.cpp
+	gamemodes/MiniPipe.h
+	gamemodes/MiniPipe.cpp
 )
 
 add_subdirectory(ui)
+
+target_compile_features(smw PUBLIC cxx_std_14)
 
 if(NO_NETWORK)
 	target_compile_definitions(smw PRIVATE NETWORK_DISABLED)

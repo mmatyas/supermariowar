@@ -557,40 +557,6 @@ class CGM_Chase : public CGameMode
 };
 
 
-//Special mode where players try to kill a boss
-class CGM_Boss_MiniGame : public CGameMode
-{
-	public:
-        CGM_Boss_MiniGame();
-		virtual ~CGM_Boss_MiniGame() {}
-
-		void init();
-		void think();
-		void draw_foreground();
-
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-
-		char *getMenuString(char *buffer64);
-
-		bool SetWinner(CPlayer * player);
-		void SetBossType(short bosstype);
-    short GetBossType() {
-        return iBossType;
-    }
-
-    bool HasStoredPowerups() {
-        return false;
-    }
-
-	private:
-
-		short enemytimer, poweruptimer;
-		short iBossType;
-};
-
-
 //Special mode where players can collect a bonus item
 class CGM_Bonus : public CGameMode
 {
@@ -619,68 +585,6 @@ class CGM_Bonus : public CGameMode
 	private:
 
 		TourStop * tsTourStop;
-};
-
-//Special mode where players collect coins from a pipe
-class CGM_Pipe_MiniGame : public CGameMode
-{
-	public:
-        CGM_Pipe_MiniGame();
-		virtual ~CGM_Pipe_MiniGame() {}
-
-		void init();
-		void think();
-
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-		PlayerKillType CheckWinner(CPlayer * player);
-
-		void SetBonus(short iType, short iTimer, short iTeamID);
-    bool IsSlowdown() {
-        return fSlowdown;
-    }
-
-    bool HasStoredPowerups() {
-        return false;
-    }
-
-	private:
-
-		short iNextItemTimer;
-		short iBonusTimer, iBonusType, iBonusTeam;
-
-		bool fSlowdown;
-};
-
-
-//Special mode where players break boxes
-class CGM_Boxes_MiniGame : public CGameMode
-{
-	public:
-        CGM_Boxes_MiniGame();
-		virtual ~CGM_Boxes_MiniGame() {}
-
-		void init();
-		void think();
-
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-
-		char *getMenuString(char *buffer64);
-
-		PlayerKillType CheckWinner(CPlayer * player);
-		bool SetWinner(CPlayer * player);
-
-    bool HasStoredPowerups() {
-        return false;
-    }
-
-	private:
-
-		void ReleaseCoin(CPlayer &player);
-		void ReleaseAllCoinsFromTeam(CPlayer &player);
 };
 
 #endif // GAMEMODES_H

@@ -17,6 +17,7 @@
 #include "ResourceManager.h"
 #include "Score.h"
 #include "sfx.h"
+#include "gamemodes/MiniBoss.h"
 
 #include <algorithm>
 #include <cmath>
