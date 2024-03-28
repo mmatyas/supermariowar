@@ -30,6 +30,9 @@
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"
+#include "gamemodes/MiniBoss.h"
+#include "gamemodes/MiniBoxes.h"
+#include "gamemodes/MiniPipe.h"
 
 #include "FPSLimiter.h"
 #include "GSSplashScreen.h"

@@ -122,4 +122,9 @@ class CGameMode
 		bool fReverseScoring;
 };
 
+void RemovePlayersButTeam(short teamid);
+bool RemoveTeam(short teamid);
+void SetupScoreBoard(bool fOrderMatters);
+void ShowScoreBoard();
+
 #endif // GAMEMODE_H

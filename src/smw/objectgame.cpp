@@ -10,6 +10,9 @@
 #include "objecthazard.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
+#include "gamemodes/MiniBoss.h"
+#include "gamemodes/MiniBoxes.h"
+#include "gamemodes/MiniPipe.h"
 
 #include <cstdlib> // abs()
 #include <cmath>
