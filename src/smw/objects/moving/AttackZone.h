@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_AttackZone_H
-#define SMW_GAMEOBJECT_BLOCK_MO_AttackZone_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_AttackZone : public IO_MovingObject
 {
@@ -24,6 +26,3 @@ class MO_AttackZone : public IO_MovingObject
 
 	friend class B_WeaponBreakableBlock;
 };
-
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_AttackZone_H

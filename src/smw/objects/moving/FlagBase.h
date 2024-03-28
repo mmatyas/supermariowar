@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_FlagBase_H
-#define SMW_GAMEOBJECT_BLOCK_MO_FlagBase_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class CO_Flag;
 
@@ -37,5 +39,3 @@ class MO_FlagBase : public IO_MovingObject
 	friend class CO_Flag;
 	friend class CPlayer;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_FlagBase_H

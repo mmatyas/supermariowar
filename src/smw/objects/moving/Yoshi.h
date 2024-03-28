@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_Yoshi_H
-#define SMW_GAMEOBJECT_BLOCK_MO_Yoshi_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_Yoshi : public IO_MovingObject
 {
@@ -19,5 +21,3 @@ class MO_Yoshi : public IO_MovingObject
 		short timer;
 		short color;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_Yoshi_H

@@ -1,7 +1,7 @@
-#ifndef SMW_GAMEOBJECT_MO_COIN_H
-#define SMW_GAMEOBJECT_MO_COIN_H
+#pragma once
 
 #include "MovingObject.h"
+
 
 class gfxSprite;
 class CPlayer;
@@ -26,5 +26,3 @@ class MO_Coin : public IO_MovingObject
 		short iTeam;
 		short iUncollectableTime;
 };
-
-#endif // SMW_GAMEOBJECT_MO_COIN_H

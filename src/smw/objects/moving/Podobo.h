@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_Podobo_H
-#define SMW_GAMEOBJECT_BLOCK_MO_Podobo_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_Podobo : public IO_MovingObject
 {
@@ -19,5 +21,3 @@ class MO_Podobo : public IO_MovingObject
 		bool fIsSpawned;
 		short iHiddenPlane;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_Podobo_H

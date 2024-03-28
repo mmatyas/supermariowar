@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_Powerup_H
-#define SMW_GAMEOBJECT_BLOCK_MO_Powerup_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_Powerup : public IO_MovingObject
 {
@@ -15,5 +17,3 @@ class MO_Powerup : public IO_MovingObject
 	protected:
 		float desty;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_Powerup_H

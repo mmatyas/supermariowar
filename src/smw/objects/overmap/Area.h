@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_OMO_Area_H
-#define SMW_GAMEOBJECT_BLOCK_OMO_Area_H
+#pragma once
+
+#include "OverMapObject.h"
+
 
 class OMO_Area : public IO_OverMapObject
 {
@@ -31,5 +33,3 @@ class OMO_Area : public IO_OverMapObject
 
 	friend class CObjectContainer;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_OMO_Area_H

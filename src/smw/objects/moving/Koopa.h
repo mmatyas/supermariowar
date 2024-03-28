@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_Koopa_H
-#define SMW_GAMEOBJECT_BLOCK_MO_Koopa_H
+#pragma once
+
+#include "WalkingEnemy.h"
+
 
 class MO_Koopa : public MO_WalkingEnemy
 {
@@ -17,5 +19,3 @@ class MO_Koopa : public MO_WalkingEnemy
 
 		bool fRed;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_Koopa_H

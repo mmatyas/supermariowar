@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_OMO_BowserFire_H
-#define SMW_GAMEOBJECT_BLOCK_OMO_BowserFire_H
+#pragma once
+
+#include "OverMapObject.h"
+
 
 class OMO_BowserFire : public IO_OverMapObject
 {
@@ -16,5 +18,3 @@ class OMO_BowserFire : public IO_OverMapObject
 		short iTeamID;
 		short iColorOffsetY;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_OMO_BowserFire_H

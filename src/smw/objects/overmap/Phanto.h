@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_OMO_Phanto_H
-#define SMW_GAMEOBJECT_BLOCK_OMO_Phanto_H
+#pragma once
+
+#include "OverMapObject.h"
+
 
 class OMO_Phanto : public IO_OverMapObject
 {
@@ -21,5 +23,3 @@ class OMO_Phanto : public IO_OverMapObject
 		float dReactionSpeed, dSpeedRatio;
 		short iSpeedTimer;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_OMO_Phanto_H

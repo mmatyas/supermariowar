@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_OMO_PipeBonus_H
-#define SMW_GAMEOBJECT_BLOCK_OMO_PipeBonus_H
+#pragma once
+
+#include "OverMapObject.h"
+
 
 class OMO_PipeBonus: public IO_OverMapObject
 {
@@ -19,6 +21,3 @@ class OMO_PipeBonus: public IO_OverMapObject
 		short iType, iDuration;
 		short iUncollectableTime;
 };
-
-//object phanto
-#endif // SMW_GAMEOBJECT_BLOCK_OMO_PipeBonus_H

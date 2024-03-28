@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_BonusHouseChest_H
-#define SMW_GAMEOBJECT_BLOCK_MO_BonusHouseChest_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_BonusHouseChest : public IO_MovingObject
 {
@@ -16,5 +18,3 @@ class MO_BonusHouseChest : public IO_MovingObject
 		short drawbonusitemy;
 		short drawbonusitemtimer;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_BonusHouseChest_H

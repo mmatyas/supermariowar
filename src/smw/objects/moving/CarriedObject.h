@@ -1,7 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_CARRIEDOBJECT_H
-#define SMW_GAMEOBJECT_BLOCK_MO_CARRIEDOBJECT_H
+#pragma once
 
 #include "MovingObject.h"
+
 
 class gfxSprite;
 class CPlayer;
@@ -41,5 +41,3 @@ private:
 friend class B_ThrowBlock;
 friend class CPlayer;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_CARRIEDOBJECT_H

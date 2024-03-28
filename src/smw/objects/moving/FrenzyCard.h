@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_FrenzyCard_H
-#define SMW_GAMEOBJECT_BLOCK_MO_FrenzyCard_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_FrenzyCard : public IO_MovingObject
 {
@@ -19,5 +21,3 @@ class MO_FrenzyCard : public IO_MovingObject
 		short sparkleanimationtimer;
 		short sparkledrawframe;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_FrenzyCard_H

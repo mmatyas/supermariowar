@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_WalkingEnemy_H
-#define SMW_GAMEOBJECT_BLOCK_MO_WalkingEnemy_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_WalkingEnemy : public IO_MovingObject
 {
@@ -49,5 +51,3 @@ class MO_WalkingEnemy : public IO_MovingObject
 		float frozenvelocity;
 		short frozenanimationspeed;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_WalkingEnemy_H

@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_CollectionCard_H
-#define SMW_GAMEOBJECT_BLOCK_MO_CollectionCard_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_CollectionCard : public IO_MovingObject
 {
@@ -29,5 +31,3 @@ class MO_CollectionCard : public IO_MovingObject
 
 		short uncollectabletime;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_CollectionCard_H

@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_Hammer_H
-#define SMW_GAMEOBJECT_BLOCK_MO_Hammer_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_Hammer : public IO_MovingObject
 {
@@ -18,5 +20,3 @@ class MO_Hammer : public IO_MovingObject
 		bool fSuper;
 		Spotlight * sSpotlight;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_Hammer_H

@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_IceBlast_H
-#define SMW_GAMEOBJECT_BLOCK_MO_IceBlast_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_IceBlast : public IO_MovingObject
 {
@@ -15,5 +17,3 @@ class MO_IceBlast : public IO_MovingObject
 		short ttl;
 		Spotlight * sSpotlight;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_IceBlast_H

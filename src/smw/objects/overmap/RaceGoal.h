@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_OMO_RaceGoal_H
-#define SMW_GAMEOBJECT_BLOCK_OMO_RaceGoal_H
+#pragma once
+
+#include "OverMapObject.h"
+
 
 class OMO_RaceGoal : public IO_OverMapObject
 {
@@ -33,5 +35,3 @@ class OMO_RaceGoal : public IO_OverMapObject
 
 	friend class CObjectContainer;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_OMO_RaceGoal_H

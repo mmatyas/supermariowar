@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_Goomba_H
-#define SMW_GAMEOBJECT_BLOCK_MO_Goomba_H
+#pragma once
+
+#include "WalkingEnemy.h"
+
 
 class MO_Goomba : public MO_WalkingEnemy
 {
@@ -15,5 +17,3 @@ class MO_Goomba : public MO_WalkingEnemy
         Die();
     }
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_Goomba_H

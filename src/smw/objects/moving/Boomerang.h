@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_Boomerang_H
-#define SMW_GAMEOBJECT_BLOCK_MO_Boomerang_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_Boomerang : public IO_MovingObject
 {
@@ -23,5 +25,3 @@ class MO_Boomerang : public IO_MovingObject
 		short iStyle;
 		Spotlight * sSpotlight;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_Boomerang_H

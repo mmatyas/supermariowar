@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_Fireball_H
-#define SMW_GAMEOBJECT_BLOCK_MO_Fireball_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_Fireball : public IO_MovingObject
 {
@@ -17,5 +19,3 @@ class MO_Fireball : public IO_MovingObject
 		short ttl;
 		Spotlight * sSpotlight;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_Fireball_H

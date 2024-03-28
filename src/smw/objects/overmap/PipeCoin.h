@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_OMO_PipeCoin_H
-#define SMW_GAMEOBJECT_BLOCK_OMO_PipeCoin_H
+#pragma once
+
+#include "OverMapObject.h"
+
 
 class OMO_PipeCoin: public IO_OverMapObject
 {
@@ -26,5 +28,3 @@ class OMO_PipeCoin: public IO_OverMapObject
 
 		short iUncollectableTime;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_OMO_PipeCoin_H

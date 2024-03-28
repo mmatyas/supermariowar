@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_SledgeHammer_H
-#define SMW_GAMEOBJECT_BLOCK_MO_SledgeHammer_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_SledgeHammer : public IO_MovingObject
 {
@@ -19,5 +21,3 @@ class MO_SledgeHammer : public IO_MovingObject
 	private:
 		bool fSuper;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_SledgeHammer_H

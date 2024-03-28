@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_SledgeBrother_H
-#define SMW_GAMEOBJECT_BLOCK_MO_SledgeBrother_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_SledgeBrother : public IO_MovingObject
 {
@@ -62,6 +64,3 @@ class MO_SledgeBrother : public IO_MovingObject
 		short last_action;
 		short last_action_count;
 };
-
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_SledgeBrother_H

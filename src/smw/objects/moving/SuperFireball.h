@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_SuperFireball_H
-#define SMW_GAMEOBJECT_BLOCK_MO_SuperFireball_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_SuperFireball : public IO_MovingObject
 {
@@ -16,6 +18,3 @@ class MO_SuperFireball : public IO_MovingObject
 		short directionOffset;
 		short ttl;
 };
-
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_SuperFireball_H

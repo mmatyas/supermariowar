@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_BuzzyBeetle_H
-#define SMW_GAMEOBJECT_BLOCK_MO_BuzzyBeetle_H
+#pragma once
+
+#include "WalkingEnemy.h"
+
 
 class MO_BuzzyBeetle : public MO_WalkingEnemy
 {
@@ -12,5 +14,3 @@ class MO_BuzzyBeetle : public MO_WalkingEnemy
 		void Die();
 		void DropShell(bool fBounce, bool fFlip);
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_BuzzyBeetle_H

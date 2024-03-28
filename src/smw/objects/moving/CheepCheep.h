@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_CheepCheep_H
-#define SMW_GAMEOBJECT_BLOCK_MO_CheepCheep_H
+#pragma once
+
+#include "MovingObject.h"
+
 
 class MO_CheepCheep : public IO_MovingObject
 {
@@ -23,5 +25,3 @@ class MO_CheepCheep : public IO_MovingObject
 		short iColorOffsetY;
 		bool frozen;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_CheepCheep_H
