@@ -140,6 +140,28 @@ float dBulletBillFrequency[3] = {10.0f, 5.0f, 2.5f};
 
 short iPirhanaPlantOffsetY[4][3] = {{0, 0, 0}, {48, 24, 12}, {96, 48, 24}, {160, 80, 40}};
 
+
+namespace {
+int GetScreenWidth(int iSize) {
+    switch (iSize) {
+        case 0: return smw->ScreenWidth;
+        case 1: return smw->ScreenWidth / 2;
+        case 2: return smw->ScreenWidth / 4;
+        default: throw "invalid iSize for width";
+    }
+}
+
+int GetScreenHeight(int iSize) {
+    switch (iSize) {
+        case 0: return smw->ScreenHeight;
+        case 1: return smw->ScreenHeight / 2;
+        case 2: return smw->ScreenHeight / 4;
+        default: throw "invalid iSize for height";
+    }
+}
+} // namespace
+
+
 void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 {
     short iSizeShift = 5 - iSize;
@@ -209,7 +231,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
             iBulletPathX = rPathDst.x + iTileSize;
 
         short iBulletPathSpacing = (short)(hazard->dparam[0] * dBulletBillFrequency[iSize]);
-        while (iBulletPathX >= 0 && iBulletPathX < smw->GetScreenWidth(iSize)) {
+        while (iBulletPathX >= 0 && iBulletPathX < GetScreenWidth(iSize)) {
             gfx_setrect(&rDotDst, iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
 
@@ -289,11 +311,11 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                 }
 
                 bool fNeedWrap = false;
-                if (iDstX + iTileSize >= smw->GetScreenWidth(iSize)) {
-                    iDstX -= smw->GetScreenWidth(iSize);
+                if (iDstX + iTileSize >= GetScreenWidth(iSize)) {
+                    iDstX -= GetScreenWidth(iSize);
                     fNeedWrap = true;
                 } else if (iDstX < 0) {
-                    iDstX += smw->GetScreenWidth(iSize);
+                    iDstX += GetScreenWidth(iSize);
                     fNeedWrap = true;
                 }
 
@@ -376,19 +398,19 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             short iWrapX = (short)dX;
             short iWrapY = (short)dY;
             bool fNeedWrap = false;
-            if (dX + iPlatformPathDotSize[iSize] >= smw->GetScreenWidth(iSize)) {
-                iWrapX = (short)(dX - smw->GetScreenWidth(iSize));
+            if (dX + iPlatformPathDotSize[iSize] >= GetScreenWidth(iSize)) {
+                iWrapX = (short)(dX - GetScreenWidth(iSize));
                 fNeedWrap = true;
             } else if (dX < 0.0f) {
-                iWrapX = (short)(dX + smw->GetScreenWidth(iSize));
+                iWrapX = (short)(dX + GetScreenWidth(iSize));
                 fNeedWrap = true;
             }
 
-            if (dY + iPlatformPathDotSize[iSize] >= smw->GetScreenHeight(iSize)) {
-                iWrapY = (short)(dY - smw->GetScreenHeight(iSize));
+            if (dY + iPlatformPathDotSize[iSize] >= GetScreenHeight(iSize)) {
+                iWrapY = (short)(dY - GetScreenHeight(iSize));
                 fNeedWrap = true;
             } else if (dY < 0.0f) {
-                iWrapY = (short)(dY + smw->GetScreenHeight(iSize));
+                iWrapY = (short)(dY + GetScreenHeight(iSize));
                 fNeedWrap = true;
             }
 
@@ -422,11 +444,11 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             gfx_setrect(&rPathDst, iX, iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
-            if (iX + iPlatformPathDotSize[iSize] >= smw->GetScreenWidth(iSize)) {
-                gfx_setrect(&rPathDst, iX - smw->GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+            if (iX + iPlatformPathDotSize[iSize] >= GetScreenWidth(iSize)) {
+                gfx_setrect(&rPathDst, iX - GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
                 SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             } else if (iX < 0) {
-                gfx_setrect(&rPathDst, iX + smw->GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+                gfx_setrect(&rPathDst, iX + GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
                 SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             }
 

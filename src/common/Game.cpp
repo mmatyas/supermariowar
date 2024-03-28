@@ -44,11 +44,4 @@ CGame::CGame(const char *rootDirectory)
 #else
     	MenuTransparency = 72;
 #endif
-
-    ScreenWidth = 640;
-    ScreenHeight = 480;
-}
-
-CGame::~CGame(void)
-{
 }
