@@ -42,7 +42,7 @@ void PlayerTail::spin(CPlayer& player)
 
     player.spin.spin(player);
 
-    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(), kill_style_leaf, player.isFacingRight(), 13));
+    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(), KillStyle::Leaf, player.isFacingRight(), 13));
 }
 
 //If player is shaking tail, slow decent

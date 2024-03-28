@@ -155,7 +155,7 @@ bool B_PowerupBlock::hittop(CPlayer* player, bool useBehavior)
     if (state == 1) {
         PlayerKillType iKillType = PlayerKillType::NonKill;
         if (iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.teamcollision == 2))
-            iKillType = PlayerKilledPlayer(iBumpPlayerID, player, death_style_jump, kill_style_bounce, false, false);
+            iKillType = PlayerKilledPlayer(iBumpPlayerID, player, death_style_jump, KillStyle::Bounce, false, false);
 
         if (PlayerKillType::NonKill == iKillType)
             player->vely = -VELNOTEBLOCKREPEL;

@@ -374,15 +374,15 @@ bool PlayerCollisions::is_stomping(CPlayer& player, CPlayer& other)
         player.bouncejump();
 
         if (fKillPotential) {
-            killstyle style = kill_style_stomp;
+            KillStyle style = KillStyle::Stomp;
             if (player.flying)
-                style = kill_style_pwings;
+                style = KillStyle::PWings;
             else if (player.kuriboshoe.is_on())
-                style = kill_style_kuriboshoe;
+                style = KillStyle::KuriboShoe;
             else if (player.tail.isInUse())
-                style = kill_style_leaf;
+                style = KillStyle::Leaf;
             else if (player.extrajumps > 0)
-                style = kill_style_feather;
+                style = KillStyle::Feather;
 
             player.KilledPlayer(&other, death_style_squish, style, false, false);
         } else {
@@ -459,12 +459,12 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
     //--- 1. kill frozen players ---
     bool fFrozenDeath = false;
     if (o1->frozen && !o1->isShielded() && !o1->isInvincible()) {
-        o2->KilledPlayer(o1, death_style_shatter, kill_style_iceblast, true, false);
+        o2->KilledPlayer(o1, death_style_shatter, KillStyle::IceBlast, true, false);
         fFrozenDeath = true;
     }
 
     if (o2->frozen && !o2->isShielded() && !o2->isInvincible()) {
-        o1->KilledPlayer(o2, death_style_shatter, kill_style_iceblast, true, false);
+        o1->KilledPlayer(o2, death_style_shatter, KillStyle::IceBlast, true, false);
         fFrozenDeath = true;
     }
 
@@ -473,12 +473,12 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
 
     //--- 2. is player invincible? ---
     if (o1->isInvincible() && !o2->isShielded() && !o2->isInvincible()) {
-        o1->KilledPlayer(o2, death_style_jump, kill_style_star, false, false);
+        o1->KilledPlayer(o2, death_style_jump, KillStyle::Star, false, false);
         return;
     }
 
     if (o2->isInvincible() && !o1->isShielded() && !o1->isInvincible()) {
-        o2->KilledPlayer(o1, death_style_jump, kill_style_star, false, false);
+        o2->KilledPlayer(o1, death_style_jump, KillStyle::Star, false, false);
         return;
     }
 

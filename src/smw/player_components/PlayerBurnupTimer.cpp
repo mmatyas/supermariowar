@@ -25,7 +25,7 @@ void PlayerBurnupTimer::update(CPlayer& player)
                     ifSoundOnPlay(rm->sfx_burnup);
 
                 if (++timer > 80)
-                    player.KillPlayerMapHazard(true, kill_style_environment, false);
+                    player.KillPlayerMapHazard(true, KillStyle::Environment, false);
                 else {
                     eyecandy[0].add(new EC_SingleAnimation(&rm->spr_burnup,
                         player.centerX() - 16,

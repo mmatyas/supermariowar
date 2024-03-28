@@ -35,7 +35,7 @@ void PlayerCape::spin(CPlayer &player)
 
     player.spin.spin(player);
 
-    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(),  kill_style_feather, player.isFacingRight(), 24));
+    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(),  KillStyle::Feather, player.isFacingRight(), 24));
 }
 
 void PlayerCape::draw(CPlayer &player)

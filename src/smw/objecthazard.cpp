@@ -101,7 +101,7 @@ void OMO_OrbitHazard::update()
 bool OMO_OrbitHazard::collide(CPlayer * player)
 {
     if (!player->isInvincible() && !player->isShielded() && !player->shyguy) {
-        return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
+        return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;
     }
 
     return false;
@@ -150,7 +150,7 @@ bool OMO_StraightPathHazard::collide(CPlayer * player)
         dead = true;
 
         if (!player->isInvincible() && !player->shyguy) {
-            return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
+            return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;
         }
     }
 
@@ -250,7 +250,7 @@ bool MO_BulletBill::collide(CPlayer * player)
     }
 
     if (player->isInvincible() || player->shyguy) {
-        player->AddKillerAward(NULL, kill_style_bulletbill);
+        player->AddKillerAward(NULL, KillStyle::BulletBill);
         ifSoundOnPlay(rm->sfx_kicksound);
 
         Die();
@@ -272,7 +272,7 @@ bool MO_BulletBill::hittop(CPlayer * player)
     player->collisions.checktop(*player);
     player->platform = NULL;
 
-    player->AddKillerAward(NULL, kill_style_bulletbill);
+    player->AddKillerAward(NULL, KillStyle::BulletBill);
 
     ifSoundOnPlay(rm->sfx_mip);
 
@@ -290,7 +290,7 @@ bool MO_BulletBill::hitother(CPlayer * player)
         return false;
 
     //Find the player that owns this bullet bill so we can attribute a kill
-    PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_bulletbill, false, false);
+    PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::BulletBill, false, false);
 
     return true;
 }
@@ -320,7 +320,7 @@ void MO_BulletBill::collide(IO_MovingObject * object)
         short iCenterX = ((ix + iOffsetX - bulletbill->ix) >> 1) + (bulletbill->ix + (bulletbill->iw >> 1));
         short iCenterY = ((iy - bulletbill->iy) >> 1) + (bulletbill->iy + (bulletbill->ih >> 1));
 
-        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, kill_style_bulletbill));
+        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, KillStyle::BulletBill));
         ifSoundOnPlay(rm->sfx_bobombsound);
     } else if (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
         //Don't kill things with shells that are sitting still
@@ -387,7 +387,7 @@ void IO_BulletBillCannon::SetNewTimer()
 //------------------------------------------------------------------------------
 // class explosion (for bob-omb mode)
 //------------------------------------------------------------------------------
-MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short playerid, short teamid, killstyle style) :
+MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short playerid, short teamid, KillStyle style) :
     IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed)
 {
     state = 1;
@@ -558,7 +558,7 @@ void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 bool IO_FlameCannon::collide(CPlayer * player)
 {
     if (state == 2 && !player->isInvincible() && !player->isShielded() && !player->shyguy)
-        return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
+        return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;
 
     return false;
 }
@@ -790,7 +790,7 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
     if (player->isInvincible() || player->tanookisuit.isStatue() || (player->kuriboshoe.is_on() && !fHitPlayerTop)) {
         KillPlant();
     } else if (!player->isShielded() && !player->shyguy) {
-        return player->KillPlayerMapHazard(false, kill_style_environment, false) != PlayerKillType::NonKill;
+        return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;
     }
 
     return false;

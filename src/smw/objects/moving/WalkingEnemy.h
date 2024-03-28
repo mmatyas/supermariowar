@@ -28,7 +28,7 @@ class MO_WalkingEnemy : public IO_MovingObject
     }
 		virtual void DropShell(bool fBounce, bool fFlip) {}
 
-    killstyle getKillStyle() {
+    KillStyle getKillStyle() {
         return killStyle;
     }
 
@@ -37,7 +37,7 @@ class MO_WalkingEnemy : public IO_MovingObject
 		float spawnangle;
 
 		short iSpawnIconOffset;
-		killstyle killStyle;
+		KillStyle killStyle;
 
 		short burnuptimer;
 		bool fKillOnWeakWeapon;

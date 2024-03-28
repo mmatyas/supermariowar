@@ -25,7 +25,7 @@ void PlayerOutOfArenaTimer::update(CPlayer& player)
                 timer = 0;
 
                 if (--displaytimer < 0) {
-                    player.KillPlayerMapHazard(false, kill_style_environment, false);
+                    player.KillPlayerMapHazard(false, KillStyle::Environment, false);
                 }
             }
         }

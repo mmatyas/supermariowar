@@ -1358,7 +1358,7 @@ void CPlayer::CommitAction()
 {
     if (player_action_bobomb == action) {
         bobomb = false;
-        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, kill_style_bobomb));
+        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, KillStyle::Bobomb));
         ifSoundOnPlay(rm->sfx_bobombsound);
     } else if (player_action_fireball == action) {
         objectcontainer[0].add(new MO_Fireball(&rm->spr_fireball, ix + 6, iy, 4, isFacingRight(), 5, globalID, teamID, colorID));
@@ -1812,7 +1812,7 @@ bool CPlayer::bouncejump()
     }
 }
 
-void CPlayer::AddKillerAward(CPlayer* killed, killstyle style) {
+void CPlayer::AddKillerAward(CPlayer* killed, KillStyle style) {
     awardeffects.addKillerAward(*this, killed, style);
 }
 
@@ -1824,7 +1824,7 @@ void CPlayer::AddKillsInRowInAirAward() {
     awardeffects.addKillsInRowInAirAward(*this);
 }
 
-PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
+PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem)
 {
     CPlayer * killer = GetPlayerFromGlobalID(iKiller);
 
@@ -1849,7 +1849,7 @@ PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathst
     }
 }
 
-PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
+PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem)
 {
     CPlayer * killer = this;
 
@@ -1857,7 +1857,7 @@ PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killsty
     if (killed->state != player_ready)
         return PlayerKillType::None;
 
-    if (game_values.gamemode->chicken == killer && style != kill_style_pow)
+    if (game_values.gamemode->chicken == killer && style != KillStyle::Pow)
         ifSoundOnPlay(rm->sfx_chicken);
 
     if (killed->frozen)
@@ -2270,7 +2270,7 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
         return;
     } else if (fTopBlockSolid || fBottomBlockSolid) {
         if (iHorizontalPlatformCollision == direction) {
-            KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+            KillPlayerMapHazard(true, KillStyle::Environment, true, iPlatformCollisionPlayerId);
             return;
         }
 
@@ -2294,13 +2294,13 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
         if (netplay.active && netplay.theHostIsMe && collisionresult)
             netplay.client.local_gamehost.sendMapCollisionEvent();
     } else if (superDeathTileBehind || (deathTileBehind && !isInvincible() && !isShielded() && !shyguy)) {
-        if (PlayerKillType::NonKill != KillPlayerMapHazard(superDeathTileBehind, kill_style_environment, false))
+        if (PlayerKillType::NonKill != KillPlayerMapHazard(superDeathTileBehind, KillStyle::Environment, false))
             return;
     }
     //collision on the side.
     else if ((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) { //collide with solid, ice, and death and all sides death
         if (iHorizontalPlatformCollision == direction) {
-            KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+            KillPlayerMapHazard(true, KillStyle::Environment, true, iPlatformCollisionPlayerId);
             return;
         }
 
@@ -2352,7 +2352,7 @@ void CPlayer::mapcolldet_moveUpward(short txl, short txc, short txr,
         if (!centerblock->collide(this, 0,
             netplay.active ? netplay.theHostIsMe || netplay.allowMapCollisionEvent : true)) {
             if (iVerticalPlatformCollision == 2 && !centerblock->isHidden())
-                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+                KillPlayerMapHazard(true, KillStyle::Environment, true, iPlatformCollisionPlayerId);
 
             if (netplay.active && netplay.theHostIsMe)
                 netplay.client.local_gamehost.sendMapCollisionEvent();
@@ -2379,7 +2379,7 @@ void CPlayer::mapcolldet_moveUpward(short txl, short txc, short txr,
             vely = -vely * BOUNCESTRENGTH;
 
         if (iVerticalPlatformCollision == 2)
-            KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+            KillPlayerMapHazard(true, KillStyle::Environment, true, iPlatformCollisionPlayerId);
 
         return;
     }
@@ -2393,7 +2393,7 @@ void CPlayer::mapcolldet_moveUpward(short txl, short txc, short txr,
         if (!leftblock->collide(this, 0,
             netplay.active ? (netplay.theHostIsMe || netplay.allowMapCollisionEvent) && useBehavior : useBehavior)) {
             if (iVerticalPlatformCollision == 2 && !leftblock->isHidden())
-                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+                KillPlayerMapHazard(true, KillStyle::Environment, true, iPlatformCollisionPlayerId);
 
             if (netplay.active && netplay.theHostIsMe)
                 netplay.client.local_gamehost.sendMapCollisionEvent();
@@ -2411,7 +2411,7 @@ void CPlayer::mapcolldet_moveUpward(short txl, short txc, short txr,
         if (!rightblock->collide(this, 0,
             netplay.active ? (netplay.theHostIsMe || netplay.allowMapCollisionEvent) && useBehavior : useBehavior)) {
             if (iVerticalPlatformCollision == 2 && !rightblock->isHidden())
-                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+                KillPlayerMapHazard(true, KillStyle::Environment, true, iPlatformCollisionPlayerId);
 
             if (netplay.active && netplay.theHostIsMe)
                 netplay.client.local_gamehost.sendMapCollisionEvent();
@@ -2435,7 +2435,7 @@ void CPlayer::mapcolldet_moveUpward(short txl, short txc, short txr,
                               ((alignedTileType & tile_flag_super_or_player_death_bottom) &&  !(unalignedTileType & tile_flag_solid)) ||
                               ((alignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom));
 
-        if (PlayerKillType::NonKill != KillPlayerMapHazard(fRespawnPlayer, kill_style_environment, false))
+        if (PlayerKillType::NonKill != KillPlayerMapHazard(fRespawnPlayer, KillStyle::Environment, false))
             return;
     } else {
         setYf(fPrecalculatedY);
@@ -2511,7 +2511,7 @@ void CPlayer::mapcolldet_moveDownward(short txl, short txc, short txr,
             onice = false;
 
             if (iVerticalPlatformCollision == 0)
-                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+                KillPlayerMapHazard(true, KillStyle::Environment, true, iPlatformCollisionPlayerId);
 
             return;
         }
@@ -2564,7 +2564,7 @@ void CPlayer::mapcolldet_moveDownward(short txl, short txc, short txr,
         platform = NULL;
 
         if (iVerticalPlatformCollision == 0)
-            KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+            KillPlayerMapHazard(true, KillStyle::Environment, true, iPlatformCollisionPlayerId);
 
         return;
     }
@@ -2600,11 +2600,11 @@ void CPlayer::mapcolldet_moveDownward(short txl, short txc, short txr,
         platform = NULL;
 
         if (iVerticalPlatformCollision == 0) {
-            KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+            KillPlayerMapHazard(true, KillStyle::Environment, true, iPlatformCollisionPlayerId);
             return;
         }
     } else if (fDeathTileUnderPlayer || fSuperDeathTileUnderPlayer) {
-        if (PlayerKillType::NonKill != KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment, false))
+        if (PlayerKillType::NonKill != KillPlayerMapHazard(fSuperDeathTileUnderPlayer, KillStyle::Environment, false))
             return;
     } else {
         //falling (in air)
@@ -2726,10 +2726,10 @@ void CPlayer::collision_detection_map()
 }
 
 //iPlayerIdCredit is passed in if this platform was triggered by another player and crushed this player (e.g. donut block)
-PlayerKillType CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerIdCredit)
+PlayerKillType CPlayer::KillPlayerMapHazard(bool fForce, KillStyle style, bool fKillCarriedItem, short iPlayerIdCredit)
 {
     if (iPlayerIdCredit >= 0 || iSuicideCreditPlayerID >= 0) {
-        return PlayerKilledPlayer(iPlayerIdCredit >= 0 ? iPlayerIdCredit : iSuicideCreditPlayerID, this, death_style_jump, kill_style_push, fForce, fKillCarriedItem);
+        return PlayerKilledPlayer(iPlayerIdCredit >= 0 ? iPlayerIdCredit : iSuicideCreditPlayerID, this, death_style_jump, KillStyle::Push, fForce, fKillCarriedItem);
     } else {
         DeathAwards();
 

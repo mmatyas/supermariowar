@@ -349,7 +349,7 @@ void CGameMode::SetupModeStrings(const char * szMode, const char * szGoal, short
     }
 }
 
-PlayerKillType CGameMode::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGameMode::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     //Penalize killing your team mates
     if (!gameover) {
@@ -362,7 +362,7 @@ PlayerKillType CGameMode::playerkilledplayer(CPlayer &inflictor, CPlayer &other,
     return PlayerKillType::Normal;
 };
 
-PlayerKillType CGameMode::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGameMode::playerkilledself(CPlayer &player, KillStyle style)
 {
     if (player.IsBobomb())
         player.SetCorpseType(2); //flag to use bobomb corpse sprite
@@ -469,13 +469,13 @@ CGM_Frag::CGM_Frag() : CGameMode()
     SetupModeStrings("Frag Limit", "Kills", 5);
 };
 
-PlayerKillType CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;
 
     //Don't score if "sumo" style scoring is turned on
-    if (game_values.gamemode->gamemode != game_mode_frag || game_values.gamemodesettings.frag.scoring == 0 || style == kill_style_push) {
+    if (game_values.gamemode->gamemode != game_mode_frag || game_values.gamemodesettings.frag.scoring == 0 || style == KillStyle::Push) {
         //Penalize killing your team mates
         if (inflictor.getTeamID() == other.getTeamID())
             inflictor.Score().AdjustScore(-1);
@@ -494,7 +494,7 @@ PlayerKillType CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
     return iRet;
 }
 
-PlayerKillType CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Frag::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -585,10 +585,10 @@ void CGM_TimeLimit::think()
 }
 
 
-PlayerKillType CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (!gameover) {
-        if (game_values.gamemode->gamemode != game_mode_timelimit || game_values.gamemodesettings.time.scoring == 0 || style == kill_style_push) {
+        if (game_values.gamemode->gamemode != game_mode_timelimit || game_values.gamemodesettings.time.scoring == 0 || style == KillStyle::Push) {
             //Penalize killing your team mates
             if (inflictor.getTeamID() == other.getTeamID())
                 inflictor.Score().AdjustScore(-1);
@@ -606,7 +606,7 @@ PlayerKillType CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &ot
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_TimeLimit::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_TimeLimit::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -654,13 +654,13 @@ void CGM_Classic::init()
 }
 
 
-PlayerKillType CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;
 
     //If we are playing classic "sumo" mode, then only score hazard kills
-    if (game_values.gamemode->gamemode != game_mode_classic || game_values.gamemodesettings.classic.scoring == 0 || style == kill_style_push) {
+    if (game_values.gamemode->gamemode != game_mode_classic || game_values.gamemodesettings.classic.scoring == 0 || style == KillStyle::Push) {
         if (fReverseScoring) {
             other.Score().AdjustScore(1);
         } else {
@@ -696,7 +696,7 @@ PlayerKillType CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &othe
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Classic::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -805,7 +805,7 @@ void CGM_Chicken::draw_foreground()
 }
 
 
-PlayerKillType CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (!chicken || &other == chicken) {
         chicken = &inflictor;
@@ -826,7 +826,7 @@ PlayerKillType CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &othe
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Chicken::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Chicken::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -951,7 +951,7 @@ void CGM_Tag::think()
     }
 }
 
-PlayerKillType CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (&inflictor == tagged) {
         tagged = &other;
@@ -992,7 +992,7 @@ PlayerKillType CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, k
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Tag::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Tag::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -1143,7 +1143,7 @@ void CGM_ShyGuyTag::draw_foreground()
     }
 }
 
-PlayerKillType CGM_ShyGuyTag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_ShyGuyTag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (gameover || other.shyguy)
         return PlayerKillType::Normal;
@@ -1155,7 +1155,7 @@ PlayerKillType CGM_ShyGuyTag::playerkilledplayer(CPlayer &inflictor, CPlayer &ot
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_ShyGuyTag::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_ShyGuyTag::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -1257,7 +1257,7 @@ void CGM_Coins::init()
 }
 
 
-PlayerKillType CGM_Coins::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+PlayerKillType CGM_Coins::playerkilledplayer(CPlayer &player, CPlayer &other, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;
@@ -1268,7 +1268,7 @@ PlayerKillType CGM_Coins::playerkilledplayer(CPlayer &player, CPlayer &other, ki
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Coins::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Coins::playerkilledself(CPlayer &player, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;
@@ -1354,12 +1354,12 @@ void CGM_Eggs::init()
     }
 }
 
-PlayerKillType CGM_Eggs::playerkilledplayer(CPlayer &, CPlayer &, killstyle)
+PlayerKillType CGM_Eggs::playerkilledplayer(CPlayer &, CPlayer &, KillStyle)
 {
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Eggs::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Eggs::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -1572,7 +1572,7 @@ void CGM_Domination::init()
         objectcontainer[0].add(new OMO_Area(&rm->spr_areas, iNumAreas));
 }
 
-PlayerKillType CGM_Domination::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+PlayerKillType CGM_Domination::playerkilledplayer(CPlayer &player, CPlayer &other, KillStyle style)
 {
     //Update areas the dead player owned
     objectcontainer[0].adjustPlayerAreas(&player, &other);
@@ -1580,7 +1580,7 @@ PlayerKillType CGM_Domination::playerkilledplayer(CPlayer &player, CPlayer &othe
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Domination::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Domination::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -1665,7 +1665,7 @@ void CGM_Owned::think()
     }
 }
 
-PlayerKillType CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (!gameover) {
         //Give a bonus to the killer if he already owned this player
@@ -1691,7 +1691,7 @@ PlayerKillType CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other,
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Owned::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Owned::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -1743,7 +1743,7 @@ CGM_Jail::CGM_Jail() : CGM_Frag()
     szModeName = "Jail";
 }
 
-PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (!gameover) {
         //Penalize killing your teammates
@@ -2004,12 +2004,12 @@ void CGM_Stomp::think()
     }
 }
 
-PlayerKillType CGM_Stomp::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+PlayerKillType CGM_Stomp::playerkilledplayer(CPlayer &player, CPlayer &other, KillStyle style)
 {
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Stomp::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Stomp::playerkilledself(CPlayer &player, KillStyle style)
 {
     return PlayerKillType::Normal;
 }
@@ -2082,13 +2082,13 @@ void CGM_Race::init()
         nextGoal[iPlayer] = 0;
 }
 
-PlayerKillType CGM_Race::playerkilledplayer(CPlayer &, CPlayer &other, killstyle style)
+PlayerKillType CGM_Race::playerkilledplayer(CPlayer &, CPlayer &other, KillStyle style)
 {
     PenalizeRaceGoals(other);
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Race::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Race::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -2283,7 +2283,7 @@ void CGM_Star::think()
 
         if (iCurrentModeType == 0) {
             if (score[starPlayer[0]->getTeamID()]->score > 1 || fReverseScoring)
-                starPlayer[0]->KillPlayerMapHazard(true, kill_style_environment, false);
+                starPlayer[0]->KillPlayerMapHazard(true, KillStyle::Environment, false);
 
             if (fReverseScoring) {
                 starPlayer[0]->Score().AdjustScore(1);
@@ -2305,7 +2305,7 @@ void CGM_Star::think()
 
                 //Let the cleanup function remove the player on the last kill
                 if (score[list_players[iPlayer]->getTeamID()]->score > 1 || fReverseScoring)
-                    list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment, false);
+                    list_players[iPlayer]->KillPlayerMapHazard(true, KillStyle::Environment, false);
             }
 
             if (fReverseScoring) {
@@ -2339,7 +2339,7 @@ void CGM_Star::think()
                     continue;
 
                 if (score[list_players[iPlayer]->getTeamID()]->score > 1 || fReverseScoring)
-                    list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment, false);
+                    list_players[iPlayer]->KillPlayerMapHazard(true, KillStyle::Environment, false);
 
                 bool fNeedRebalance = true;
                 if (fReverseScoring) {
@@ -2412,12 +2412,12 @@ void CGM_Star::draw_foreground()
 }
 
 
-PlayerKillType CGM_Star::playerkilledplayer(CPlayer &, CPlayer &, killstyle)
+PlayerKillType CGM_Star::playerkilledplayer(CPlayer &, CPlayer &, KillStyle)
 {
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Star::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Star::playerkilledself(CPlayer &player, KillStyle style)
 {
     return CGameMode::playerkilledself(player, style);
 }
@@ -2508,12 +2508,12 @@ void CGM_CaptureTheFlag::init()
     }
 }
 
-PlayerKillType CGM_CaptureTheFlag::playerkilledplayer(CPlayer &, CPlayer &, killstyle)
+PlayerKillType CGM_CaptureTheFlag::playerkilledplayer(CPlayer &, CPlayer &, KillStyle)
 {
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_CaptureTheFlag::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_CaptureTheFlag::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -2568,12 +2568,12 @@ void CGM_KingOfTheHill::init()
     objectcontainer[2].add(new OMO_KingOfTheHillZone(&rm->spr_kingofthehillarea));
 }
 
-PlayerKillType CGM_KingOfTheHill::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_KingOfTheHill::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_KingOfTheHill::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_KingOfTheHill::playerkilledself(CPlayer &player, KillStyle style)
 {
     return CGameMode::playerkilledself(player, style);
 }
@@ -2585,38 +2585,40 @@ void CGM_KingOfTheHill::playerextraguy(CPlayer &player, short iType)
         CheckWinner(&player);
     }
 }
-/*
-kill_style_stomp = 0,
-kill_style_star = 1,
-kill_style_fireball = 2,
-kill_style_bobomb = 3,
-kill_style_bounce = 4,
-kill_style_pow = 5,
-kill_style_goomba = 6,
-kill_style_bulletbill = 7,
-kill_style_hammer = 8,
-kill_style_shell = 9,
-kill_style_throwblock = 10,
-kill_style_cheepcheep = 11,
-kill_style_koopa = 12,
-kill_style_boomerang = 13,
-kill_style_feather = 14,
-kill_style_iceblast = 15,
-kill_style_podobo = 16,
-kill_style_bomb = 17,
-kill_style_leaf = 18,
-kill_style_pwings = 19,
-kill_style_kuriboshoe = 20,
-kill_style_poisonmushroom = 21,
-kill_style_environment = 22,
-kill_style_push = 23,
-kill_style_buzzybeetle = 24,
-kill_style_spiny = 25,
-kill_style_phanto = 26
-*/
-//Greed - steal other players coins - if you have 0 coins, you're removed from the game!
-short g_iKillStyleDamage[KILL_STYLE_LAST] = {5,5,3,8,3,5,2,3,3,5, 5,2,2,3,5,8,3,8,5,5, 8,5,3,3,2,2,2};
 
+constexpr short killStyleDamage(KillStyle style) {
+    switch (style) {
+        case KillStyle::Stomp: return 5;
+        case KillStyle::Star: return 5;
+        case KillStyle::Fireball: return 3;
+        case KillStyle::Bobomb: return 8;
+        case KillStyle::Bounce: return 3;
+        case KillStyle::Pow: return 5;
+        case KillStyle::Goomba: return 2;
+        case KillStyle::BulletBill: return 3;
+        case KillStyle::Hammer: return 3;
+        case KillStyle::Shell: return 5;
+        case KillStyle::ThrowBlock: return 5;
+        case KillStyle::CheepCheep: return 2;
+        case KillStyle::Koopa: return 2;
+        case KillStyle::Boomerang: return 3;
+        case KillStyle::Feather: return 5;
+        case KillStyle::IceBlast: return 8;
+        case KillStyle::Podobo: return 3;
+        case KillStyle::Bomb: return 8;
+        case KillStyle::Leaf: return 5;
+        case KillStyle::PWings: return 5;
+        case KillStyle::KuriboShoe: return 8;
+        case KillStyle::PoisonMushroom: return 5;
+        case KillStyle::Environment: return 3;
+        case KillStyle::Push: return 3;
+        case KillStyle::BuzzyBeetle: return 2;
+        case KillStyle::Spiny: return 2;
+        case KillStyle::Phanto: return 2;
+    }
+}
+
+//Greed - steal other players coins - if you have 0 coins, you're removed from the game!
 CGM_Greed::CGM_Greed() : CGM_Classic()
 {
     goal = 40;
@@ -2636,7 +2638,7 @@ void CGM_Greed::init()
     }
 }
 
-PlayerKillType CGM_Greed::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Greed::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;
@@ -2645,7 +2647,7 @@ PlayerKillType CGM_Greed::playerkilledplayer(CPlayer &inflictor, CPlayer &other,
     return ReleaseCoins(other, style);
 }
 
-PlayerKillType CGM_Greed::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Greed::playerkilledself(CPlayer &player, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;
@@ -2660,13 +2662,13 @@ void CGM_Greed::playerextraguy(CPlayer &player, short iType)
         player.Score().AdjustScore(iType * 5);
 }
 
-PlayerKillType CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
+PlayerKillType CGM_Greed::ReleaseCoins(CPlayer &player, KillStyle style)
 {
     ifSoundOnPlay(rm->sfx_cannon);
 
     player.Shield().turn_on();
 
-    short iDamage = g_iKillStyleDamage[style] * game_values.gamemodesettings.greed.multiplier / 2;
+    short iDamage = killStyleDamage(style) * game_values.gamemodesettings.greed.multiplier / 2;
 
     if (goal != -1) {
         if (player.Score().score < iDamage)
@@ -2736,12 +2738,12 @@ void CGM_Health::init()
     }
 }
 
-PlayerKillType CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;
 
-    if (style == kill_style_bobomb || style == kill_style_bomb || style == kill_style_iceblast)
+    if (style == KillStyle::Bobomb || style == KillStyle::Bomb || style == KillStyle::IceBlast)
         other.Score().subscore[0] -= 2;
     else
         other.Score().subscore[0]--;
@@ -2762,12 +2764,12 @@ PlayerKillType CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other
     return PlayerKillType::NonKill;
 }
 
-PlayerKillType CGM_Health::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Health::playerkilledself(CPlayer &player, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;
 
-    if (style == kill_style_bobomb || style == kill_style_bomb || style == kill_style_environment)
+    if (style == KillStyle::Bobomb || style == KillStyle::Bomb || style == KillStyle::Environment)
         player.Score().subscore[0] -= 2;
     else
         player.Score().subscore[0]--;
@@ -2874,7 +2876,7 @@ void CGM_Collection::think()
     }
 }
 
-PlayerKillType CGM_Collection::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+PlayerKillType CGM_Collection::playerkilledplayer(CPlayer &player, CPlayer &other, KillStyle style)
 {
     //Causes a card to come out of the player
     ReleaseCard(other);
@@ -2882,7 +2884,7 @@ PlayerKillType CGM_Collection::playerkilledplayer(CPlayer &player, CPlayer &othe
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Collection::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Collection::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -2995,12 +2997,12 @@ void CGM_Chase::think()
     }
 }
 
-PlayerKillType CGM_Chase::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+PlayerKillType CGM_Chase::playerkilledplayer(CPlayer &player, CPlayer &other, KillStyle style)
 {
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Chase::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Chase::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -3128,7 +3130,7 @@ void CGM_Boss_MiniGame::draw_foreground()
     }
 }
 
-PlayerKillType CGM_Boss_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Boss_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (!gameover) {
         other.Score().AdjustScore(-1);
@@ -3151,7 +3153,7 @@ PlayerKillType CGM_Boss_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Boss_MiniGame::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Boss_MiniGame::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
@@ -3374,13 +3376,13 @@ void CGM_Pipe_MiniGame::think()
     }
 }
 
-PlayerKillType CGM_Pipe_MiniGame::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+PlayerKillType CGM_Pipe_MiniGame::playerkilledplayer(CPlayer &player, CPlayer &other, KillStyle style)
 {
     //other.Score().AdjustScore(-2);
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Pipe_MiniGame::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Pipe_MiniGame::playerkilledself(CPlayer &player, KillStyle style)
 {
     //player.Score().AdjustScore(-2);
     return PlayerKillType::Normal;
@@ -3473,7 +3475,7 @@ void CGM_Boxes_MiniGame::think()
     }
 }
 
-PlayerKillType CGM_Boxes_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+PlayerKillType CGM_Boxes_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;
@@ -3505,7 +3507,7 @@ PlayerKillType CGM_Boxes_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlaye
     return PlayerKillType::Normal;
 }
 
-PlayerKillType CGM_Boxes_MiniGame::playerkilledself(CPlayer &player, killstyle style)
+PlayerKillType CGM_Boxes_MiniGame::playerkilledself(CPlayer &player, KillStyle style)
 {
     if (gameover)
         return PlayerKillType::Normal;

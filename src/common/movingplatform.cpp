@@ -661,11 +661,11 @@ void MovingPlatform::collide(CPlayer * player)
                                              (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_or_player_death_left));
 
                 if (player->iHorizontalPlatformCollision == 3) {
-                    player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
+                    player->KillPlayerMapHazard(true, KillStyle::Environment, true, iPlayerId);
                     //printf("Platform Right Side Killed Player\n");
                     return;
                 } else if (fSuperDeathTileToLeft || (fDeathTileToLeft && !player->isInvincible() && !player->isShielded() && !player->shyguy)) {
-                    if (PlayerKillType::NonKill != player->KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment, false, iPlayerId))
+                    if (PlayerKillType::NonKill != player->KillPlayerMapHazard(fSuperDeathTileToLeft, KillStyle::Environment, false, iPlayerId))
                         return;
                 } else {
                     player->setXf((float)((tx << 5) - PW) - 0.2f + fx - iHalfWidth);
@@ -724,11 +724,11 @@ void MovingPlatform::collide(CPlayer * player)
                                               (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_or_player_death_right));
 
                 if (player->iHorizontalPlatformCollision == 1) {
-                    player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
+                    player->KillPlayerMapHazard(true, KillStyle::Environment, true, iPlayerId);
                     //printf("Platform Left Side Killed Player\n");
                     return;
                 } else if (fSuperDeathTileToRight || (fDeathTileToRight && !player->isInvincible() && !player->isShielded() && !player->shyguy)) {
-                    if (PlayerKillType::NonKill != player->KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment, false, iPlayerId))
+                    if (PlayerKillType::NonKill != player->KillPlayerMapHazard(fSuperDeathTileToRight, KillStyle::Environment, false, iPlayerId))
                         return;
                 } else {
                     player->setXf((float)((tx << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
@@ -810,7 +810,7 @@ void MovingPlatform::collide(CPlayer * player)
             if (fSolidTileOverPlayer && !fSuperDeathTileOverPlayer &&
                     (!fDeathTileOverPlayer || player->isInvincible() || player->isShielded() || player->shyguy)) {
                 if (player->iVerticalPlatformCollision == 2) {
-                    player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
+                    player->KillPlayerMapHazard(true, KillStyle::Environment, true, iPlayerId);
                     //printf("Platform Bottom Killed Player\n");
                     return;
                 } else {
@@ -831,7 +831,7 @@ void MovingPlatform::collide(CPlayer * player)
 
                 return;
             } else if ((t1 & tile_flag_player_or_death_on_bottom) || (t2 & tile_flag_player_or_death_on_bottom)) {
-                if (PlayerKillType::NonKill != player->KillPlayerMapHazard(true, kill_style_environment, false, iPlayerId))
+                if (PlayerKillType::NonKill != player->KillPlayerMapHazard(true, KillStyle::Environment, false, iPlayerId))
                     return;
             }
         }
@@ -863,7 +863,7 @@ void MovingPlatform::collide(CPlayer * player)
                     //printf("Fell Through Solid On Top Platform\n");
                 } else {
                     if (player->iVerticalPlatformCollision == 0) {
-                        player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
+                        player->KillPlayerMapHazard(true, KillStyle::Environment, true, iPlayerId);
                         //printf("Solid On Top Platform Killed Player\n");
                         return;
                     } else {
@@ -900,7 +900,7 @@ void MovingPlatform::collide(CPlayer * player)
                 //on ground
 
                 if (player->iVerticalPlatformCollision == 0) {
-                    player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
+                    player->KillPlayerMapHazard(true, KillStyle::Environment, true, iPlayerId);
                     //printf("Platform Top Killed Player\n");
                     return;
                 } else {
@@ -929,7 +929,7 @@ void MovingPlatform::collide(CPlayer * player)
                     return;
                 }
             } else if (fDeathTileUnderPlayer || fSuperDeathTileUnderPlayer) {
-                if (PlayerKillType::NonKill != player->KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment, false, iPlayerId))
+                if (PlayerKillType::NonKill != player->KillPlayerMapHazard(fSuperDeathTileUnderPlayer, KillStyle::Environment, false, iPlayerId))
                     return;
             } else {
                 if (player->platform == this)

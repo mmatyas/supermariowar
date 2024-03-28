@@ -44,7 +44,7 @@
 void CPlayer::flipsidesifneeded() {}
 bool CPlayer::isInvincible() const { return false; }
 bool CPlayer::isShielded() const { return false; }
-PlayerKillType CPlayer::KillPlayerMapHazard(bool, killstyle, bool, short) { return PlayerKillType::None; }
+PlayerKillType CPlayer::KillPlayerMapHazard(bool, KillStyle, bool, short) { return PlayerKillType::None; }
 bool PlayerKuriboShoe::is_on() const { return false; }
 void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard(short playerID) {}

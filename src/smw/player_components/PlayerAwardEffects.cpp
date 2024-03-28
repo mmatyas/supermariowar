@@ -147,7 +147,7 @@ void PlayerAwardEffects::addDeathAward(CPlayer& player)
     player.killsinrowinair = 0;
 }
 
-void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, killstyle style)
+void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillStyle style)
 {
     killer.killsinrow++;
 
@@ -168,7 +168,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, killst
     }
     */
 
-    if (killer.inair && (style == kill_style_stomp || style == kill_style_goomba || style == kill_style_koopa || style == kill_style_cheepcheep || style == kill_style_bulletbill || style == kill_style_feather))
+    if (killer.inair && (style == KillStyle::Stomp || style == KillStyle::Goomba || style == KillStyle::Koopa || style == KillStyle::CheepCheep || style == KillStyle::BulletBill || style == KillStyle::Feather))
         killer.killsinrowinair++;
 
     //Play announcer
@@ -205,13 +205,13 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, killst
         else if (game_values.awardstyle == award_style_souls) {
             if (killed)
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = killed->getColorID();
-            else if (style == kill_style_goomba)
+            else if (style == KillStyle::Goomba)
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = 4; //soul id for goomba
-            else if (style == kill_style_bulletbill)
+            else if (style == KillStyle::BulletBill)
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = 5; //soul id for bullet bill
-            else if (style == kill_style_cheepcheep)
+            else if (style == KillStyle::CheepCheep)
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = 6; //soul id for cheep cheep
-            else if (style == kill_style_koopa)
+            else if (style == KillStyle::Koopa)
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = 7; //soul id for koopa
             else
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = 8; //soul id for ?

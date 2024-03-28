@@ -59,8 +59,8 @@ class CGameMode
 		virtual void draw_foreground() {}
 		//called when a player stomps another player, after the p2p logic has run
 		//returns true if the other was deleted
-		virtual PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
-		virtual PlayerKillType playerkilledself(CPlayer &player, killstyle style);
+		virtual PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
+		virtual PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
 		virtual void playerextraguy(CPlayer &player, short iType);
 
     virtual PlayerKillType CheckWinner(CPlayer *) {

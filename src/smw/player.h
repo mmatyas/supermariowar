@@ -146,7 +146,7 @@ public:
 
     void spawnText(const char * szText);
     void DeathAwards();
-    void AddKillerAward(CPlayer* killed, killstyle style);
+    void AddKillerAward(CPlayer* killed, KillStyle style);
     void AddKillsInRowInAirAward();
     gfxSprite ** GetScoreboardSprite() { return pScoreboardSprite; }
 
@@ -245,7 +245,7 @@ private:
 		PlayerCollisions collisions;
 		PlayerAwardEffects awardeffects;
 
-		PlayerKillType KillPlayerMapHazard(bool fForce, killstyle ks, bool fKillCarriedItem, short iPlayerId = -1);
+		PlayerKillType KillPlayerMapHazard(bool fForce, KillStyle ks, bool fKillCarriedItem, short iPlayerId = -1);
 
 		bool canSuperStomp() const;
 		bool wantsToSuperStomp() const;
@@ -399,8 +399,8 @@ private:
 		friend bool coldec_player2obj(CPlayer * o1, CObject * o2);
 		friend bool collisionhandler_p2o(CPlayer * o1, CObject * o2);
 
-		friend PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem);
-		PlayerKillType KilledPlayer(CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem);
+		friend PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem);
+		PlayerKillType KilledPlayer(CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem);
 
 		friend void RemovePlayersButHighestScoring();
 		friend void RemovePlayersButTeam(short teamID);

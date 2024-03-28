@@ -4,7 +4,7 @@
 class MO_AttackZone : public IO_MovingObject
 {
 	public:
-		MO_AttackZone(short playerID, short teamID, short x, short y, short w, short h, short time, killstyle style, bool dieoncollision);
+		MO_AttackZone(short playerID, short teamID, short x, short y, short w, short h, short time, KillStyle style, bool dieoncollision);
 		~MO_AttackZone(){};
 
 		virtual void update();
@@ -20,7 +20,7 @@ class MO_AttackZone : public IO_MovingObject
 		bool fDieOnCollision;
 
 		short iTimer;
-		killstyle iStyle;
+		KillStyle iStyle;
 
 	friend class B_WeaponBreakableBlock;
 };

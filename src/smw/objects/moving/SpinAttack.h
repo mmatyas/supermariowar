@@ -4,7 +4,7 @@
 class MO_SpinAttack : public MO_AttackZone
 {
 	public:
-		MO_SpinAttack(short playerID, short teamID, killstyle style, bool direction, short offsety);
+		MO_SpinAttack(short playerID, short teamID, KillStyle style, bool direction, short offsety);
 		~MO_SpinAttack(){};
 
 		void update();

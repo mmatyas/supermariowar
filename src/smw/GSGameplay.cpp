@@ -571,7 +571,7 @@ void shakeScreen()
     if (iNumKillPlayers > 0) {
         short iRandPlayer = RANDOM_INT( iNumKillPlayers);
         for (short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
-            PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
+            PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, KillStyle::Pow, false, false);
 
             if (++iRandPlayer >= iNumKillPlayers)
                 iRandPlayer = 0;
@@ -1794,7 +1794,7 @@ void debugAutoKillEveryone()
         for (short k = 0; k < list_players_cnt; k++) {
             list_players[k]->DeathAwards();
 
-            if (game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) != PlayerKillType::None)
+            if (game_values.gamemode->playerkilledself(*(list_players[k]), KillStyle::Environment) != PlayerKillType::None)
                 list_players[k]->die(0, false, false);
         }
     }
@@ -2015,7 +2015,7 @@ void GameplayState::handleInput()
                 for (short k = 0; k < list_players_cnt; k++) {
                     list_players[k]->DeathAwards();
 
-                    if (game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == PlayerKillType::Normal)
+                    if (game_values.gamemode->playerkilledself(*(list_players[k]), KillStyle::Environment) == PlayerKillType::Normal)
                         list_players[k]->die(0, false, false);
                 }
             } else if (event.key.keysym.sym == SDLK_x) {

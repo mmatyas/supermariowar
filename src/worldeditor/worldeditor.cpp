@@ -141,8 +141,8 @@ extern CGameValues game_values;
 void CPlayer::flipsidesifneeded() {}
 bool CPlayer::isInvincible() const { return false; }
 bool CPlayer::isShielded() const { return false; }
-void CPlayer::AddKillerAward(CPlayer*, killstyle) {}
-PlayerKillType CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId)
+void CPlayer::AddKillerAward(CPlayer*, KillStyle) {}
+PlayerKillType CPlayer::KillPlayerMapHazard(bool fForce, KillStyle style, bool fKillCarriedItem, short iPlayerId)
 {
     return PlayerKillType::None;
 }
@@ -176,11 +176,11 @@ bool CO_ThrowBox::HasKillVelocity()
     return false;
 }
 
-PlayerKillType PlayerKilledPlayer(short id, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
+PlayerKillType PlayerKilledPlayer(short id, CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem)
 {
     return PlayerKillType::None;
 }
-void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style) {}
+void AddAwardKill(CPlayer * killer, CPlayer * killed, KillStyle style) {}
 
 CPlayer * GetPlayerFromGlobalID(short id)
 {

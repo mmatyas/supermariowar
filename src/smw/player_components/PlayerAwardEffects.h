@@ -10,7 +10,7 @@ class PlayerAwardEffects
 {
 public:
     void addDeathAward(CPlayer&);
-    void addKillerAward(CPlayer& killer, CPlayer* killed, killstyle style);
+    void addKillerAward(CPlayer& killer, CPlayer* killed, KillStyle style);
     void addKillsInRowInAirAward(CPlayer&);
 
     void drawRingAward(CPlayer& player);

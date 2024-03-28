@@ -28,7 +28,7 @@ void PlayerSuicideTimer::update(CPlayer& player)
             counttimer = 0;
 
             if (--displaytimer < 0)
-                player.KillPlayerMapHazard(true, kill_style_environment, false);
+                player.KillPlayerMapHazard(true, KillStyle::Environment, false);
         }
     }
 }

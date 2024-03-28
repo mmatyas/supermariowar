@@ -197,7 +197,7 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
         ifSoundOnPlay(rm->sfx_kicksound);
 
         MO_WalkingEnemy * enemy = (MO_WalkingEnemy *)object;
-        killstyle style = enemy->getKillStyle();
+        KillStyle style = enemy->getKillStyle();
 
         enemy->DieAndDropShell(true, true);
 
@@ -240,7 +240,7 @@ void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
                 player->fOldY + PH >= iposy && player->fOldY < iposy + TILESIZE) {
             player->iSuicideCreditPlayerID = playerID;
             player->iSuicideCreditTimer = 1;
-            player->KillPlayerMapHazard(true, kill_style_environment, true);
+            player->KillPlayerMapHazard(true, KillStyle::Environment, true);
         }
     }
 
