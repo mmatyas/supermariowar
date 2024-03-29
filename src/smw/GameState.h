@@ -1,43 +1,40 @@
-#ifndef GAMESTATE_H
-#define GAMESTATE_H
+#pragma once
 
-class GameState
-{
-    public:
-        virtual bool init() { return true; }
-        virtual void update() = 0;
-        virtual void cleanup() {}
+#include <cassert>
 
-    protected:
-        virtual void onEnterState() {}
-        virtual void onLeaveState() {}
 
-    friend class GameStateManager;
+class GameState {
+public:
+    virtual bool init() { return true; }
+    virtual void update() = 0;
+    virtual void cleanup() {}
+
+protected:
+    virtual void onEnterState() {}
+    virtual void onLeaveState() {}
+
+friend class GameStateManager;
 };
 
-class GameStateManager
-{
-    public:
-        GameState* currentState;
 
-        void changeStateTo(GameState* newState) {
-            //assert(newState != 0);
-            currentState->onLeaveState();
-            currentState = newState;
-            currentState->onEnterState();
-        }
+class GameStateManager {
+public:
+    GameState* currentState = nullptr;
 
-        static GameStateManager& instance() {
-            static GameStateManager gsm;
-            return gsm;
-        }
+    void changeStateTo(GameState* newState) {
+        assert(newState);
+        currentState->onLeaveState();
+        currentState = newState;
+        currentState->onEnterState();
+    }
 
-    private:
+    static GameStateManager& instance() {
+        static GameStateManager gsm;
+        return gsm;
+    }
 
-        GameStateManager() {}
-        GameStateManager(GameStateManager const&);
-        void operator=(GameStateManager const&);
-
+private:
+    GameStateManager() {}
+    GameStateManager(GameStateManager const&);
+    void operator=(GameStateManager const&);
 };
-
-#endif // GAMESTATE_H
