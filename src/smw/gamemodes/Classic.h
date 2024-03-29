@@ -2,6 +2,7 @@
 
 #include "GameMode.h"
 
+
 //mariowar classic
 class CGM_Classic : public CGameMode {
 public:

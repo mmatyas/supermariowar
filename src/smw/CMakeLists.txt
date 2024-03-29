@@ -5,8 +5,6 @@ add_executable(smw WIN32
 	ai.h
 	FPSLimiter.cpp
 	FPSLimiter.h
-	gamemodes.cpp
-	gamemodes.h
 	GSGameplay.cpp
 	GSGameplay.h
 	GSMenu.cpp
@@ -178,39 +176,9 @@ target_sources(smw PRIVATE
 	menu/network/NetRoomMenu.h
 	menu/network/NetServersMenu.cpp
 	menu/network/NetServersMenu.h
-
-	gamemodes/BonusHouse.cpp
-	gamemodes/BonusHouse.h
-	gamemodes/CaptureTheFlag.cpp
-	gamemodes/CaptureTheFlag.h
-	gamemodes/CardCollection.cpp
-	gamemodes/CardCollection.h
-	gamemodes/Chase.cpp
-	gamemodes/Chase.h
-	gamemodes/Classic.cpp
-	gamemodes/Classic.h
-	gamemodes/Domination.cpp
-	gamemodes/Domination.h
-	gamemodes/GameModeTimer.cpp
-	gamemodes/GameModeTimer.h
-	gamemodes/Greed.cpp
-	gamemodes/Greed.h
-	gamemodes/Health.cpp
-	gamemodes/Health.h
-	gamemodes/KingOfTheHill.cpp
-	gamemodes/KingOfTheHill.h
-	gamemodes/MiniBoss.cpp
-	gamemodes/MiniBoss.h
-	gamemodes/MiniBoxes.cpp
-	gamemodes/MiniBoxes.h
-	gamemodes/MiniPipe.cpp
-	gamemodes/MiniPipe.h
-	gamemodes/Star.cpp
-	gamemodes/Star.h
-	gamemodes/TimeLimit.cpp
-	gamemodes/TimeLimit.h
 )
 
+add_subdirectory(gamemodes)
 add_subdirectory(ui)
 
 target_compile_features(smw PUBLIC cxx_std_14)

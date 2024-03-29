@@ -1,7 +1,7 @@
 #include "PlayerSuicideTimer.h"
 
+#include "GameMode.h"
 #include "GameValues.h"
-#include "gamemodes.h"
 #include "player.h"
 #include "ResourceManager.h"
 

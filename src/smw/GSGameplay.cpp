@@ -2,7 +2,6 @@
 
 #include "FileList.h"
 #include "GameMode.h"
-#include "gamemodes.h"
 #include "GameValues.h"
 #include "GSMenu.h"
 #include "net.h"

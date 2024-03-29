@@ -2,8 +2,8 @@
 
 #include "IO_Block.h"
 #include "eyecandy.h"
+#include "GameMode.h"
 #include "GameValues.h"
-#include "gamemodes.h"
 #include "gfx.h"
 #include "map.h"
 #include "movingplatform.h"

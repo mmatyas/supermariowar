@@ -1,7 +1,6 @@
 #include "player.h"
 
 #include "eyecandy.h"
-#include "gamemodes.h"
 #include "GameValues.h"
 #include "map.h"
 #include "movingplatform.h"
@@ -12,6 +11,7 @@
 #include "objecthazard.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
+#include "gamemodes/ShyGuyTag.h"
 #include "gamemodes/Star.h"
 
 #include <cassert>

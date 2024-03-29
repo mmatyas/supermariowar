@@ -1,6 +1,6 @@
 #include "PlayerInvincibility.h"
 
-#include "gamemodes.h"
+#include "GameMode.h"
 #include "GameValues.h"
 #include "player.h"
 #include "ResourceManager.h"

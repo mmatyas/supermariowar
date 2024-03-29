@@ -1,6 +1,5 @@
 #include "ai.h"
 
-#include "gamemodes.h"
 #include "GameValues.h"
 #include "input.h"
 #include "map.h"
@@ -11,6 +10,7 @@
 #include "objecthazard.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
+#include "gamemodes/Race.h"
 #include "gamemodes/Star.h"
 
 #include <cstdlib> // abs()

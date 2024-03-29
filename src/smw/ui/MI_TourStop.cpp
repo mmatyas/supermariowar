@@ -1,6 +1,5 @@
 #include "MI_TourStop.h"
 
-#include "gamemodes.h"
 #include "GameValues.h"
 #include "ResourceManager.h"
 #include "gamemodes/MiniBoss.h"

@@ -1,6 +1,6 @@
 #include "PlayerShield.h"
 
-#include "gamemodes.h"
+#include "GameMode.h"
 #include "GameValues.h"
 
 extern CGameValues game_values;

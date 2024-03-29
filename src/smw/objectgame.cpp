@@ -2,7 +2,6 @@
 
 #include "eyecandy.h"
 #include "GameMode.h"
-#include "gamemodes.h"
 #include "GameValues.h"
 #include "map.h"
 #include "movingplatform.h"
@@ -12,6 +11,7 @@
 #include "ResourceManager.h"
 #include "gamemodes/BonusHouse.h"
 #include "gamemodes/Chase.h"
+#include "gamemodes/Race.h"
 #include "gamemodes/Star.h"
 #include "gamemodes/MiniBoss.h"
 #include "gamemodes/MiniBoxes.h"

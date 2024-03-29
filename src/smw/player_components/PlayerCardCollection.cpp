@@ -1,6 +1,5 @@
 #include "PlayerCardCollection.h"
 
-#include "gamemodes.h"
 #include "GameValues.h"
 #include "player.h"
 #include "gamemodes/CardCollection.h"

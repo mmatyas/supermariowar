@@ -3,7 +3,6 @@
 #include "FileList.h"
 #include "Game.h"
 #include "GameValues.h"
-#include "gamemodes.h"
 #include "GSGameplay.h"
 #include "net.h"
 #include "map.h"
