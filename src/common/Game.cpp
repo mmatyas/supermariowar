@@ -14,7 +14,7 @@
 #include <unistd.h>
 #endif
 
-CGame::CGame(const char *rootDirectory)
+CGame::CGame()
 {
     // make sure that the .smw directory is created
     std::string smwHome = GetHomeDirectory();

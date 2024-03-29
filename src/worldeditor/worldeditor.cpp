@@ -453,7 +453,7 @@ int main(int argc, char *argv[])
     if (!cmd.data_root.empty())
         RootDataDirectory = cmd.data_root;
 
-    smw = new CGame(RootDataDirectory.c_str());
+    smw = new CGame();
     rm = new CResourceManager();
 
 	g_map = new CMap();

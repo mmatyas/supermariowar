@@ -180,7 +180,7 @@ void gameloop_frame()
 void create_globals()
 {
     // this instance will contain the other relevant objects
-    smw = new CGame(RootDataDirectory.c_str());
+    smw = new CGame();
     rm = new CResourceManager();
 #pragma warning ("delete these or use boost GC shared_ptr")
 

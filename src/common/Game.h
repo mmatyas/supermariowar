@@ -2,9 +2,9 @@
 
 class CGame {
 public:
-    CGame(const char *);
+    CGame();
 
-	int ScreenWidth = 640;
-	int ScreenHeight = 480;
-	int MenuTransparency;
+    int ScreenWidth = 640;
+    int ScreenHeight = 480;
+    int MenuTransparency;
 };

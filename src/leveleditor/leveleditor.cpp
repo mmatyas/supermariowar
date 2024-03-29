@@ -420,7 +420,7 @@ int main(int argc, char *argv[])
         RootDataDirectory = cmd.data_root;
     }
 
-	smw = new CGame(RootDataDirectory.c_str());
+	smw = new CGame();
 	rm = new CResourceManager();
 	g_map = new CMap();
 	g_tilesetmanager = new CTilesetManager();
