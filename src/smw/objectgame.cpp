@@ -1476,7 +1476,7 @@ void MO_Hammer::update()
     IO_Block * blocks[4];
     GetCollisionBlocks(blocks);
     for (short iBlock = 0; iBlock < 4; iBlock++) {
-        if (blocks[iBlock] && blocks[iBlock]->getBlockType() == block_weaponbreakable) {
+        if (blocks[iBlock] && blocks[iBlock]->getBlockType() == BlockType::WeaponBreakable) {
             B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
             if (weaponbreakableblock->iType == 5) {
                 weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
@@ -1743,7 +1743,7 @@ void MO_Boomerang::update()
     IO_Block * blocks[4];
     GetCollisionBlocks(blocks);
     for (short iBlock = 0; iBlock < 4; iBlock++) {
-        if (blocks[iBlock] && blocks[iBlock]->getBlockType() == block_weaponbreakable) {
+        if (blocks[iBlock] && blocks[iBlock]->getBlockType() == BlockType::WeaponBreakable) {
             B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
             if (weaponbreakableblock->iType == 4) {
                 weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);

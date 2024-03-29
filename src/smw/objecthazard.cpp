@@ -430,7 +430,7 @@ void MO_Explosion::update()
                 short iTestRow = iTestY / TILESIZE;
                 for (short iCol = 0; iCol < 7; iCol++) {
                     IO_Block * block = g_map->block(iTestX / TILESIZE, iTestRow);
-                    if (block && block->getBlockType() == block_weaponbreakable) {
+                    if (block && block->getBlockType() == BlockType::WeaponBreakable) {
                         B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)block;
                         if (weaponbreakableblock->iType == 3) {
                             weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);

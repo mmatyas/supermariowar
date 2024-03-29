@@ -18,7 +18,7 @@ class IO_Block : public CObject
 		virtual bool collide(CPlayer * player, short direction, bool useBehavior);
 		virtual bool collide(IO_MovingObject * object, short direction);
 
-		virtual BlockType getBlockType() = 0;
+		virtual BlockType getBlockType() const = 0;
 
     virtual bool isTransparent() {
         return false;

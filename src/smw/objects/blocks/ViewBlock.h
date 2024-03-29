@@ -1,31 +1,28 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_VIEW_H
-#define SMW_GAMEOBJECT_BLOCK_VIEW_H
+#pragma once
 
 #include "PowerupBlock.h"
 
-class B_ViewBlock : public B_PowerupBlock
-{
-	public:
-		B_ViewBlock(gfxSprite *nspr, short x, short y, bool fHidden, short * piSettings);
-		~B_ViewBlock(){};
 
-    BlockType getBlockType() {
-        return block_view;
+class B_ViewBlock : public B_PowerupBlock {
+public:
+	B_ViewBlock(gfxSprite *nspr, short x, short y, bool fHidden, short * piSettings);
+	~B_ViewBlock(){};
+
+    BlockType getBlockType() const override {
+        return BlockType::View;
     }
 
-		void draw();
-		void update();
+	void draw();
+	void update();
 
-		short SelectPowerup();
+	short SelectPowerup();
 
-	protected:
-		void GetNextPowerup();
+protected:
+	void GetNextPowerup();
 
-		short poweruptimer;
-		short powerupindex;
+	short poweruptimer;
+	short powerupindex;
 
-		bool fNoPowerupsSelected;
-		short iCountWeight;
+	bool fNoPowerupsSelected;
+	short iCountWeight;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_VIEW_H

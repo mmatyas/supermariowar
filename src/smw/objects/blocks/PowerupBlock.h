@@ -1,5 +1,4 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_POWERUP_H
-#define SMW_GAMEOBJECT_BLOCK_POWERUP_H
+#pragma once
 
 #include "IO_Block.h"
 #include "GlobalConstants.h"
@@ -8,48 +7,46 @@ class gfxSprite;
 class CPlayer;
 class IO_MovingObject;
 
-class B_PowerupBlock : public IO_Block
-{
-    public:
-        B_PowerupBlock(gfxSprite* nspr, short x, short y,
-            short iNumSpr, short aniSpeed, bool fHidden, short * piSettings);
-        virtual ~B_PowerupBlock();
 
-        BlockType getBlockType() {
-            return block_powerup;
-        }
+class B_PowerupBlock : public IO_Block {
+public:
+    B_PowerupBlock(gfxSprite* nspr, short x, short y,
+        short iNumSpr, short aniSpeed, bool fHidden, short * piSettings);
+    virtual ~B_PowerupBlock();
 
-        void draw();
-        void update();
-        void reset();
+    BlockType getBlockType() const override {
+        return BlockType::Powerup;
+    }
 
-        bool collide(CPlayer* player, short direction, bool useBehavior);
-        bool collide(IO_MovingObject* object, short direction);
+    void draw();
+    void update();
+    void reset();
 
-        bool hittop(CPlayer* player, bool useBehavior);
-        bool hitbottom(CPlayer* player, bool useBehavior);
+    bool collide(CPlayer* player, short direction, bool useBehavior);
+    bool collide(IO_MovingObject* object, short direction);
 
-        bool hittop(IO_MovingObject* object);
-        bool hitright(IO_MovingObject* object);
-        bool hitleft(IO_MovingObject* object);
+    bool hittop(CPlayer* player, bool useBehavior);
+    bool hitbottom(CPlayer* player, bool useBehavior);
 
-        void triggerBehavior();
-        virtual short SelectPowerup();
+    bool hittop(IO_MovingObject* object);
+    bool hitright(IO_MovingObject* object);
+    bool hitleft(IO_MovingObject* object);
 
-    protected:
-        short iCountWeight;
+    void triggerBehavior();
+    virtual short SelectPowerup();
 
-        short timer;
-        bool side;
-        short iNumSprites;
-        short animationSpeed;
-        short drawFrame;
-        short animationTimer;
-        short animationWidth;
+protected:
+    short iCountWeight;
 
-        short settings[NUM_POWERUPS];
+    short timer;
+    bool side;
+    short iNumSprites;
+    short animationSpeed;
+    short drawFrame;
+    short animationTimer;
+    short animationWidth;
 
-    friend class CPlayer;
+    short settings[NUM_POWERUPS];
+
+friend class CPlayer;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_POWERUP_H
