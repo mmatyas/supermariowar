@@ -10,6 +10,7 @@
 #include "MapList.h"
 #include "ResourceManager.h"
 #include "Score.h"
+#include "gamemodes/BonusHouse.h"
 #include "gamemodes/MiniBoss.h"
 #include "gamemodes/MiniBoxes.h"
 #include "gamemodes/MiniPipe.h"

@@ -3,6 +3,7 @@
 #include "gamemodes.h"
 #include "GameValues.h"
 #include "player.h"
+#include "gamemodes/CardCollection.h"
 
 extern CGameValues game_values;
 

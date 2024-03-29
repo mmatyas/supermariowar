@@ -2,41 +2,13 @@
 #define GAMEMODES_H
 
 #include "GameMode.h"
+#include "gamemodes/Classic.h"
+#include "gamemodes/GameModeTimer.h"
 
 class CPlayer;
 struct TourStop;
 class CO_PhantoKey;
 class CO_Star;
-
-class GameTimerDisplay
-{
-    public:
-        GameTimerDisplay();
-        ~GameTimerDisplay() {}
-
-        void Init(short iTime, bool fCountDown);
-        short RunClock();
-        void Draw();
-        void SetTime(short iTime);
-        void AddTime(short iTime);
-
-    protected:
-        void SetDigitCounters();
-
-        short timeleft;
-        bool countdown;
-
-        short framesleft_persecond;
-        short iDigitLeftSrcX;
-        short iDigitMiddleSrcX;
-        short iDigitRightSrcX;
-        short iDigitLeftDstX;
-        short iDigitMiddleDstX;
-        short iDigitRightDstX;
-        short iScoreOffsetX;
-
-        short iFramesPerSecond;
-};
 
 
 //Fraglimit
@@ -51,55 +23,6 @@ class CGM_Frag : public CGameMode
 		void playerextraguy(CPlayer &player, short iType);
 
 		PlayerKillType CheckWinner(CPlayer * player);
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 5;
-    }
-#endif
-
-};
-
-
-//Timelimit
-class CGM_TimeLimit : public CGameMode
-{
-	public:
-        CGM_TimeLimit();
-		virtual ~CGM_TimeLimit() {}
-
-		void init();
-		void think();
-		void draw_foreground();
-		void drawtime();
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-
-		void addtime(short iTime);
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 30;
-    }
-#endif
-
-	protected:
-		GameTimerDisplay gameClock;
-
-};
-
-
-//mariowar classic
-class CGM_Classic : public CGameMode
-{
-	public:
-        CGM_Classic();
-		virtual ~CGM_Classic() {}
-
-		virtual void init();
-		virtual PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		virtual PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		virtual void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
     void setdebuggoal() {
@@ -260,27 +183,6 @@ class CGM_Survival : public CGM_Classic
 		short iEnemyWeightCount;
 };
 
-
-//Domination (capture the area blocks)
-class CGM_Domination : public CGameMode
-{
-	public:
-        CGM_Domination();
-		virtual ~CGM_Domination() {}
-
-		void init();
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-		PlayerKillType CheckWinner(CPlayer * player);
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 100;
-    }
-#endif
-};
-
 //Similar to frag limit, but players get bonus frags for the number of players they have "owned"
 class CGM_Owned : public CGameMode
 {
@@ -373,218 +275,6 @@ class CGM_Race : public CGameMode
 		short nextGoal[4];
 		short quantity;
 		short penalty;
-};
-
-
-//Star mode - shared timer ticks down and the players must pass around
-//a hot potato.  When the timer hits zero, the player with the star
-//loses a point.
-class CGM_Star : public CGM_TimeLimit
-{
-	public:
-        CGM_Star();
-		virtual ~CGM_Star() {}
-
-		void init();
-		void think();
-		void draw_foreground();
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-
-		bool isplayerstar(CPlayer * player);
-		CPlayer * swapplayer(short id, CPlayer * player);
-    CPlayer * getstarplayer(short id) {
-        return starPlayer[id];
-    }
-
-    short getcurrentmodetype() {
-        return iCurrentModeType;
-    }
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 1;
-    }
-#endif
-
-	private:
-		void SetupMode();
-
-		CO_Star * starItem[3];
-		CPlayer * starPlayer[3];
-		short iCurrentModeType;
-		bool fDisplayTimer;
-};
-
-//Capture The Flag mode - each team has a base and a flag
-//Protect your colored flag from being taken and score a point
-//for stealing another teams flag and returning it to your base
-class CGM_CaptureTheFlag : public CGameMode
-{
-	public:
-        CGM_CaptureTheFlag();
-		virtual ~CGM_CaptureTheFlag() {}
-
-		void init();
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-		PlayerKillType CheckWinner(CPlayer * player);
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 5;
-    }
-#endif
-};
-
-
-//Domination (capture the area blocks)
-class CGM_KingOfTheHill : public CGM_Domination
-{
-	public:
-        CGM_KingOfTheHill();
-		virtual ~CGM_KingOfTheHill() {}
-
-		void init();
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 100;
-    }
-#endif
-};
-
-//Greed mode (players try to steal each other's coins)
-class CGM_Greed : public CGM_Classic
-{
-	public:
-        CGM_Greed();
-		virtual ~CGM_Greed() {}
-
-		void init();
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-
-		PlayerKillType ReleaseCoins(CPlayer &player, KillStyle style);
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 10;
-    }
-#endif
-
-};
-
-//health mode
-class CGM_Health : public CGM_Classic
-{
-	public:
-        CGM_Health();
-		virtual ~CGM_Health() {}
-
-		virtual void init();
-		virtual PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		virtual PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		virtual void playerextraguy(CPlayer &player, short iType);
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 5;
-    }
-#endif
-
-};
-
-//Collection (Collect cards for points)
-class CGM_Collection : public CGameMode
-{
-	public:
-        CGM_Collection();
-		virtual ~CGM_Collection() {}
-
-		void init();
-		void think();
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-
-		void ReleaseCard(CPlayer &player);
-
-		PlayerKillType CheckWinner(CPlayer * player);
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 5;
-    }
-#endif
-
-	private:
-		short timer;
-};
-
-
-//Chase (player is chased by phanto)
-class CGM_Chase : public CGameMode
-{
-	public:
-        CGM_Chase();
-		virtual ~CGM_Chase() {}
-
-		void init();
-		void think();
-		PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-		PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-		void playerextraguy(CPlayer &player, short iType);
-
-		PlayerKillType CheckWinner(CPlayer * player);
-
-		CPlayer * GetKeyHolder();
-
-#ifdef _DEBUG
-    void setdebuggoal() {
-        goal = 50;
-    }
-#endif
-
-	private:
-		CO_PhantoKey * key;
-};
-
-
-//Special mode where players can collect a bonus item
-class CGM_Bonus : public CGameMode
-{
-	public:
-        CGM_Bonus();
-		virtual ~CGM_Bonus() {}
-
-		void init();
-		void draw_background();
-
-		//Override so it doesn't display winner text after you choose a powerup
-		void think() {}
-
-    PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) {
-        return PlayerKillType::None;
-    }
-    PlayerKillType playerkilledself(CPlayer &player, KillStyle style) {
-        return PlayerKillType::None;
-    }
-		void playerextraguy(CPlayer &player, short iType) {}
-
-    bool HasStoredPowerups() {
-        return false;
-    }
-
-	private:
-
-		TourStop * tsTourStop;
 };
 
 #endif // GAMEMODES_H

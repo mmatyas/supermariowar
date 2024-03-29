@@ -11,6 +11,7 @@
 #include "objecthazard.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
+#include "gamemodes/Star.h"
 
 #include <cstdlib> // abs()
 

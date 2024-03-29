@@ -12,6 +12,7 @@
 #include "objecthazard.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
+#include "gamemodes/Star.h"
 
 #include <cassert>
 #include <cmath>

@@ -126,5 +126,6 @@ void RemovePlayersButTeam(short teamid);
 bool RemoveTeam(short teamid);
 void SetupScoreBoard(bool fOrderMatters);
 void ShowScoreBoard();
+void RemovePlayersButHighestScoring();
 
 #endif // GAMEMODE_H
