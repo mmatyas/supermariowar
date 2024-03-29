@@ -1,4 +1,4 @@
-os: Visual Studio 2015
+os: Visual Studio 2017
 
 platform:
   - x86
@@ -74,7 +74,7 @@ build_script:
       -DCMAKE_BUILD_TYPE=Release
       -DUSE_SDL2_LIBS=%WITH_SDL2%
       -DUSE_PNG_SAVE=%WITH_PNG%
-      -G "Visual Studio 14 2015" .
+      -G "Visual Studio 15 2017" .
   - cmake --build . --config Release
 
 artifacts:
