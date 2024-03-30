@@ -58,12 +58,12 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
     miRateField->SetData(&game_values.gamemodemenusettings.frenzy.rate, NULL, NULL);
     miRateField->SetKey(game_values.gamemodemenusettings.frenzy.rate);
 
-    miStoredShellsField = new MI_SelectField(&rm->spr_selectfield, 120, 120, "Store Shells", 400, 180);
-    miStoredShellsField->Add("Off", 0, "", false, false);
-    miStoredShellsField->Add("On", 1, "", true, false);
-    miStoredShellsField->SetData(NULL, NULL, &game_values.gamemodemenusettings.frenzy.storedshells);
-    miStoredShellsField->SetKey(game_values.gamemodemenusettings.frenzy.storedshells ? 1 : 0);
-    miStoredShellsField->SetAutoAdvance(true);
+    miStoredShellsField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 120, "Store Shells", 400, 180);
+    miStoredShellsField->add("Off", false);
+    miStoredShellsField->add("On", true);
+    miStoredShellsField->setOutputPtr(&game_values.gamemodemenusettings.frenzy.storedshells);
+    miStoredShellsField->setCurrentValue(game_values.gamemodemenusettings.frenzy.storedshells ? 1 : 0);
+    miStoredShellsField->setAutoAdvance(true);
 
     short iPowerupMap[] = {8, 5, 11, 17, 19, 21, 23, 24, 25, 20, 9, 16, 10, 22, 12, 13, 14, 15, 27};
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
@@ -240,7 +240,7 @@ void MI_FrenzyModeOptions::SetRandomGameModeSettings()
 {
     game_values.gamemodesettings.frenzy.quantity = miQuantityField->GetRandomShortValue();
     game_values.gamemodesettings.frenzy.rate = miRateField->GetRandomShortValue();
-    game_values.gamemodesettings.frenzy.storedshells = miStoredShellsField->GetRandomBoolValue();
+    game_values.gamemodesettings.frenzy.storedshells = miStoredShellsField->randomValue();
 
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
         game_values.gamemodesettings.frenzy.powerupweight[iPowerup] = miPowerupSlider[iPowerup]->GetRandomShortValue();

@@ -9,6 +9,7 @@ class MI_PowerupSlider;
 class MI_SelectField;
 class MI_SliderField;
 class MI_Text;
+template<typename T> class MI_SelectFieldDyn;
 
 
 class UI_ModeOptionsMenu : public UI_Menu {
@@ -66,7 +67,7 @@ private:
 
     // Jail
     MI_SelectField* miJailModeStyleField;
-    MI_SelectField* miJailModeTagFreeField;
+    MI_SelectFieldDyn<bool>* miJailModeTagFreeField;
     MI_SelectField* miJailModeTimeFreeField;
     MI_SliderField* miJailModeJailKeyField;
     MI_Button* miJailModeBackButton;
@@ -76,7 +77,7 @@ private:
     MI_Text* miJailModeHeaderText;
 
     // Coins
-    MI_SelectField* miCoinModePenaltyField;
+    MI_SelectFieldDyn<bool>* miCoinModePenaltyField;
     MI_SelectField* miCoinModeQuantityField;
     MI_SelectField* miCoinModePercentExtraCoin;
     MI_Button* miCoinModeBackButton;
@@ -97,11 +98,11 @@ private:
 
     // Capture The Flag
     MI_SliderField* miFlagModeSpeedField;
-    MI_SelectField* miFlagModeTouchReturnField;
-    MI_SelectField* miFlagModePointMoveField;
+    MI_SelectFieldDyn<bool>* miFlagModeTouchReturnField;
+    MI_SelectFieldDyn<bool>* miFlagModePointMoveField;
     MI_SelectField* miFlagModeAutoReturnField;
-    MI_SelectField* miFlagModeHomeScoreField;
-    MI_SelectField* miFlagModeCenterFlagField;
+    MI_SelectFieldDyn<bool>* miFlagModeHomeScoreField;
+    MI_SelectFieldDyn<bool>* miFlagModeCenterFlagField;
     MI_Button* miFlagModeBackButton;
 
     MI_Image* miFlagModeLeftHeaderBar;
@@ -109,8 +110,8 @@ private:
     MI_Text* miFlagModeHeaderText;
 
     // Chicken
-    MI_SelectField* miChickenModeShowTargetField;
-    MI_SelectField* miChickenModeGlideField;
+    MI_SelectFieldDyn<bool>* miChickenModeShowTargetField;
+    MI_SelectFieldDyn<bool>* miChickenModeGlideField;
     MI_Button* miChickenModeBackButton;
 
     MI_Image* miChickenModeLeftHeaderBar;
@@ -118,7 +119,7 @@ private:
     MI_Text* miChickenModeHeaderText;
 
     // Tag
-    MI_SelectField* miTagModeTagOnTouchField;
+    MI_SelectFieldDyn<bool>* miTagModeTagOnTouchField;
     MI_Button* miTagModeBackButton;
 
     MI_Image* miTagModeLeftHeaderBar;
@@ -137,9 +138,9 @@ private:
 
     // Domination
     MI_SelectField* miDominationModeQuantityField;
-    MI_SelectField* miDominationModeLoseOnDeathField;
-    MI_SelectField* miDominationModeRelocateOnDeathField;
-    MI_SelectField* miDominationModeStealOnDeathField;
+    MI_SelectFieldDyn<bool>* miDominationModeLoseOnDeathField;
+    MI_SelectFieldDyn<bool>* miDominationModeRelocateOnDeathField;
+    MI_SelectFieldDyn<bool>* miDominationModeStealOnDeathField;
     MI_SelectField* miDominationModeRelocateFrequencyField;
 
     MI_Text* miDominationModeDeathText;
@@ -191,7 +192,7 @@ private:
     MI_PowerupSlider* miSurvivalModeEnemySlider[NUMSURVIVALENEMIES];
     MI_SelectField* miSurvivalModeDensityField;
     MI_SelectField* miSurvivalModeSpeedField;
-    MI_SelectField* miSurvivalModeShieldField;
+    MI_SelectFieldDyn<bool>* miSurvivalModeShieldField;
     MI_Button* miSurvivalModeBackButton;
 
     MI_Image* miSurvivalModeLeftHeaderBar;
@@ -200,7 +201,7 @@ private:
 
     // Greed
     MI_SelectField* miGreedModeCoinLife;
-    MI_SelectField* miGreedModeOwnCoins;
+    MI_SelectFieldDyn<bool>* miGreedModeOwnCoins;
     MI_SelectField* miGreedModeMultiplier;
     MI_SelectField* miGreedModePercentExtraCoin;
     MI_Button* miGreedModeBackButton;
@@ -240,7 +241,7 @@ private:
     MI_Text* miChaseModeHeaderText;
 
     // Shyguy Tag
-    MI_SelectField* miShyGuyTagModeTagOnSuicideField;
+    MI_SelectFieldDyn<bool>* miShyGuyTagModeTagOnSuicideField;
     MI_SelectField* miShyGuyTagModeTagOnStompField;
     MI_SelectField* miShyGuyTagModeFreeTimeField;
     MI_Button* miShyGuyTagModeBackButton;

@@ -44,7 +44,7 @@ private:
 
     MI_SelectField * miQuantityField;
     MI_SelectField * miRateField;
-    MI_SelectField * miStoredShellsField;
+    MI_SelectFieldDyn<bool>* miStoredShellsField;
     MI_PowerupSlider * miPowerupSlider[NUMFRENZYCARDS];
     MI_Button * miBackButton;
 

@@ -85,16 +85,10 @@ public:
     std::string GetStringValue() {
         return (*current)->sValue;
     }
-    bool GetBoolValue() {
-        return (*current)->fValue;
-    }
 
     //Gets a random value, but does not set the control to that value
     short GetRandomShortValue() {
         return goodRandomItems[RANDOM_INT(goodRandomItems.size())]->iValue;
-    }
-    bool GetRandomBoolValue() {
-        return goodRandomItems[RANDOM_INT(goodRandomItems.size())]->fValue;
     }
 
     //sets the currently selected item
