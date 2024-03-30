@@ -114,9 +114,14 @@ bool MI_SelectField::SetIndex(unsigned short index)
     return true;
 }
 
-void MI_SelectField::Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom, short iIconOverride)
+void MI_SelectField::Add(std::string name, short ivalue)
 {
-    SF_ListItem * item = new SF_ListItem(name, ivalue, svalue, fvalue, fhidden, iIconOverride);
+    Add(std::move(name), ivalue, false);
+}
+
+void MI_SelectField::Add(std::string name, short ivalue, bool fhidden, bool fGoodRandom, short iIconOverride)
+{
+    SF_ListItem * item = new SF_ListItem(name, ivalue, fhidden, iIconOverride);
     items.push_back(item);
 
     if (fGoodRandom)
@@ -306,12 +311,6 @@ void MI_SelectField::SetValues()
 {
     if (iValue)
         *iValue = (*current)->iValue;
-
-    if (sValue)
-        *sValue = (*current)->sValue;
-
-    if (fValue)
-        *fValue = (*current)->fValue;
 }
 
 bool MI_SelectField::MoveNext()

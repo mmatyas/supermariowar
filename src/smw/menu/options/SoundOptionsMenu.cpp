@@ -24,37 +24,37 @@ UI_SoundOptionsMenu::UI_SoundOptionsMenu()
     : UI_Menu()
 {
     miSoundVolumeField = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 70, 100, "Sound Volume", 500, 220, 484);
-    miSoundVolumeField->Add("Off", 0, "", false, false);
-    miSoundVolumeField->Add("1", 16, "", false, false);
-    miSoundVolumeField->Add("2", 32, "", false, false);
-    miSoundVolumeField->Add("3", 48, "", false, false);
-    miSoundVolumeField->Add("4", 64, "", false, false);
-    miSoundVolumeField->Add("5", 80, "", false, false);
-    miSoundVolumeField->Add("6", 96, "", false, false);
-    miSoundVolumeField->Add("7", 112, "", false, false);
-    miSoundVolumeField->Add("Max", 128, "", false, false);
+    miSoundVolumeField->Add("Off", 0);
+    miSoundVolumeField->Add("1", 16);
+    miSoundVolumeField->Add("2", 32);
+    miSoundVolumeField->Add("3", 48);
+    miSoundVolumeField->Add("4", 64);
+    miSoundVolumeField->Add("5", 80);
+    miSoundVolumeField->Add("6", 96);
+    miSoundVolumeField->Add("7", 112);
+    miSoundVolumeField->Add("Max", 128);
     miSoundVolumeField->SetData(&game_values.soundvolume, NULL, NULL);
     miSoundVolumeField->SetKey(game_values.soundvolume);
     miSoundVolumeField->SetNoWrap(true);
     miSoundVolumeField->SetItemChangedCode(MENU_CODE_SOUND_VOLUME_CHANGED);
 
     miMusicVolumeField = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 70, 140, "Music Volume", 500, 220, 484);
-    miMusicVolumeField->Add("Off", 0, "", false, false);
-    miMusicVolumeField->Add("1", 16, "", false, false);
-    miMusicVolumeField->Add("2", 32, "", false, false);
-    miMusicVolumeField->Add("3", 48, "", false, false);
-    miMusicVolumeField->Add("4", 64, "", false, false);
-    miMusicVolumeField->Add("5", 80, "", false, false);
-    miMusicVolumeField->Add("6", 96, "", false, false);
-    miMusicVolumeField->Add("7", 112, "", false, false);
-    miMusicVolumeField->Add("Max", 128, "", false, false);
+    miMusicVolumeField->Add("Off", 0);
+    miMusicVolumeField->Add("1", 16);
+    miMusicVolumeField->Add("2", 32);
+    miMusicVolumeField->Add("3", 48);
+    miMusicVolumeField->Add("4", 64);
+    miMusicVolumeField->Add("5", 80);
+    miMusicVolumeField->Add("6", 96);
+    miMusicVolumeField->Add("7", 112);
+    miMusicVolumeField->Add("Max", 128);
     miMusicVolumeField->SetData(&game_values.musicvolume, NULL, NULL);
     miMusicVolumeField->SetKey(game_values.musicvolume);
     miMusicVolumeField->SetNoWrap(true);
     miMusicVolumeField->SetItemChangedCode(MENU_CODE_MUSIC_VOLUME_CHANGED);
 
     miPlayNextMusicField = new MI_SelectField(&rm->spr_selectfield, 70, 180, "Next Music", 500, 220);
-    miPlayNextMusicField->Add("Off", 0, "", false, false);
+    miPlayNextMusicField->Add("Off", 0);
     miPlayNextMusicField->Add("On", 1, "", true, false);
     miPlayNextMusicField->SetData(NULL, NULL, &game_values.playnextmusic);
     miPlayNextMusicField->SetKey(game_values.playnextmusic ? 1 : 0);

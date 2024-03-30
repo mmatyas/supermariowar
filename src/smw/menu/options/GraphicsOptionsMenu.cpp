@@ -20,39 +20,39 @@ UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
     : UI_Menu()
 {
     miTopLayerField = new MI_SelectField(&rm->spr_selectfield, 70, 120, "Draw Top Layer", 500, 220);
-    miTopLayerField->Add("Background", 0, "", false, false);
+    miTopLayerField->Add("Background", 0);
     miTopLayerField->Add("Foreground", 1, "", true, false);
     miTopLayerField->SetData(NULL, NULL, &game_values.toplayer);
     miTopLayerField->SetKey(game_values.toplayer ? 1 : 0);
     miTopLayerField->SetAutoAdvance(true);
 
     miFrameLimiterField = new MI_SelectField(&rm->spr_selectfield, 70, 160, "Frame Limit", 500, 220);
-    miFrameLimiterField->Add("10 FPS", 100, "", false, false);
-    miFrameLimiterField->Add("15 FPS", 67, "", false, false);
-    miFrameLimiterField->Add("20 FPS", 50, "", false, false);
-    miFrameLimiterField->Add("25 FPS", 40, "", false, false);
-    miFrameLimiterField->Add("30 FPS", 33, "", false, false);
-    miFrameLimiterField->Add("35 FPS", 28, "", false, false);
-    miFrameLimiterField->Add("40 FPS", 25, "", false, false);
-    miFrameLimiterField->Add("45 FPS", 22, "", false, false);
-    miFrameLimiterField->Add("50 FPS", 20, "", false, false);
-    miFrameLimiterField->Add("55 FPS", 18, "", false, false);
-    miFrameLimiterField->Add("62 FPS (Normal)", 16, "", false, false);
-    miFrameLimiterField->Add("66 FPS", 15, "", false, false);
-    miFrameLimiterField->Add("71 FPS", 14, "", false, false);
-    miFrameLimiterField->Add("77 FPS", 13, "", false, false);
-    miFrameLimiterField->Add("83 FPS", 12, "", false, false);
-    miFrameLimiterField->Add("90 FPS", 11, "", false, false);
-    miFrameLimiterField->Add("100 FPS", 10, "", false, false);
-    miFrameLimiterField->Add("111 FPS", 9, "", false, false);
-    miFrameLimiterField->Add("125 FPS", 8, "", false, false);
-    miFrameLimiterField->Add("142 FPS", 7, "", false, false);
-    miFrameLimiterField->Add("166 FPS", 6, "", false, false);
-    miFrameLimiterField->Add("200 FPS", 5, "", false, false);
-    miFrameLimiterField->Add("250 FPS", 4, "", false, false);
-    miFrameLimiterField->Add("333 FPS", 3, "", false, false);
-    miFrameLimiterField->Add("500 FPS", 2, "", false, false);
-    miFrameLimiterField->Add("No Limit", 0, "", false, false);
+    miFrameLimiterField->Add("10 FPS", 100);
+    miFrameLimiterField->Add("15 FPS", 67);
+    miFrameLimiterField->Add("20 FPS", 50);
+    miFrameLimiterField->Add("25 FPS", 40);
+    miFrameLimiterField->Add("30 FPS", 33);
+    miFrameLimiterField->Add("35 FPS", 28);
+    miFrameLimiterField->Add("40 FPS", 25);
+    miFrameLimiterField->Add("45 FPS", 22);
+    miFrameLimiterField->Add("50 FPS", 20);
+    miFrameLimiterField->Add("55 FPS", 18);
+    miFrameLimiterField->Add("62 FPS (Normal)", 16);
+    miFrameLimiterField->Add("66 FPS", 15);
+    miFrameLimiterField->Add("71 FPS", 14);
+    miFrameLimiterField->Add("77 FPS", 13);
+    miFrameLimiterField->Add("83 FPS", 12);
+    miFrameLimiterField->Add("90 FPS", 11);
+    miFrameLimiterField->Add("100 FPS", 10);
+    miFrameLimiterField->Add("111 FPS", 9);
+    miFrameLimiterField->Add("125 FPS", 8);
+    miFrameLimiterField->Add("142 FPS", 7);
+    miFrameLimiterField->Add("166 FPS", 6);
+    miFrameLimiterField->Add("200 FPS", 5);
+    miFrameLimiterField->Add("250 FPS", 4);
+    miFrameLimiterField->Add("333 FPS", 3);
+    miFrameLimiterField->Add("500 FPS", 2);
+    miFrameLimiterField->Add("No Limit", 0);
     miFrameLimiterField->SetData(&game_values.framelimiter, NULL, NULL);
     miFrameLimiterField->SetKey(game_values.framelimiter);
 
@@ -61,7 +61,7 @@ UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
     miScreenSettingsButton->SetCode(MENU_CODE_TO_SCREEN_SETTINGS);
 #else
     miFullscreenField = new MI_SelectField(&rm->spr_selectfield, 70, 200, "Screen Size", 500, 220);
-    miFullscreenField->Add("Windowed", 0, "", false, false);
+    miFullscreenField->Add("Windowed", 0);
     miFullscreenField->Add("Fullscreen", 1, "", true, false);
     miFullscreenField->SetData(NULL, NULL, &game_values.fullscreen);
     miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);

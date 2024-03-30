@@ -667,10 +667,10 @@ int main(int argc, char *argv[])
 		//miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
 	}
 
-	miModeField->Add("Bonus House", 24, "", false, false);
-	miModeField->Add("Pipe Minigame", 25, "", false, false);
-	miModeField->Add("Boss Minigame", 26, "", false, false);
-	miModeField->Add("Boxes Minigame", 27, "", false, false);
+	miModeField->Add("Bonus House", 24);
+	miModeField->Add("Pipe Minigame", 25);
+	miModeField->Add("Boss Minigame", 26);
+	miModeField->Add("Boxes Minigame", 27);
 
 	//Create goal field for pipe game
 	miSpecialGoalField[0] = new MI_SelectField(&rm->spr_selectfield, 70, 100, "Points", 352, 120);
@@ -717,7 +717,7 @@ int main(int argc, char *argv[])
 
 	//Final Stage Field
 	miFinalStageField = new MI_SelectField(&rm->spr_selectfield, 325, 140, "End Stage", 245, 120);
-	miFinalStageField->Add("No", 0, "", false, false);
+	miFinalStageField->Add("No", 0);
 	miFinalStageField->Add("Yes", 1, "", true, false);
 	miFinalStageField->SetAutoAdvance(true);
 
@@ -730,7 +730,7 @@ int main(int argc, char *argv[])
 
 	//Bonus Type
 	miBonusType = new MI_SelectField(&rm->spr_selectfield, 70, 100, "Type", 500, 120);
-	miBonusType->Add("Fixed", 0, "", false, false);
+	miBonusType->Add("Fixed", 0);
 	miBonusType->Add("Random", 1, "", true, false);
 	miBonusType->SetAutoAdvance(true);
 
@@ -838,15 +838,15 @@ int main(int argc, char *argv[])
 
 	//Create Vehicle Menu
 	miVehicleSpriteField = new MI_ImageSelectField(&rm->spr_selectfield, &spr_vehicleicons, 70, 80, "Sprite", 500, 150, 16, 16);
-	miVehicleSpriteField->Add("Hammer Brother", 0, "", false, false);
-	miVehicleSpriteField->Add("Boomerang Brother", 1, "", false, false);
-	miVehicleSpriteField->Add("Fire Brother", 2, "", false, false);
-	miVehicleSpriteField->Add("Tank 1", 3, "", false, false);
-	miVehicleSpriteField->Add("Boat 1", 4, "", false, false);
-	miVehicleSpriteField->Add("Boat 2", 5, "", false, false);
-	miVehicleSpriteField->Add("Airship 1", 6, "", false, false);
-	miVehicleSpriteField->Add("Airship 2", 7, "", false, false);
-	miVehicleSpriteField->Add("Tank 2", 8, "", false, false);
+	miVehicleSpriteField->Add("Hammer Brother", 0);
+	miVehicleSpriteField->Add("Boomerang Brother", 1);
+	miVehicleSpriteField->Add("Fire Brother", 2);
+	miVehicleSpriteField->Add("Tank 1", 3);
+	miVehicleSpriteField->Add("Boat 1", 4);
+	miVehicleSpriteField->Add("Boat 2", 5);
+	miVehicleSpriteField->Add("Airship 1", 6);
+	miVehicleSpriteField->Add("Airship 2", 7);
+	miVehicleSpriteField->Add("Tank 2", 8);
 	miVehicleSpriteField->SetData(&g_wvVehicleStamp.iDrawSprite, NULL, NULL);
 	miVehicleSpriteField->SetKey(g_wvVehicleStamp.iDrawSprite);
 
@@ -882,21 +882,21 @@ int main(int argc, char *argv[])
 	miVehicleMaxMovesField->AllowFastScroll(true);
 
 	miVehiclePacesField = new MI_SelectField(&rm->spr_selectfield, 70, 240, "Paces", 500, 150);
-	miVehiclePacesField->Add("No", 0, "", false, false);
+	miVehiclePacesField->Add("No", 0);
 	miVehiclePacesField->Add("Yes", 1, "", true, false);
 	miVehiclePacesField->SetData(NULL, NULL, &g_wvVehicleStamp.fSpritePaces);
 	miVehiclePacesField->SetKey(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
 	miVehiclePacesField->SetAutoAdvance(true);
 
 	miVehicleDirectionField = new MI_SelectField(&rm->spr_selectfield, 70, 280, "Direction", 500, 150);
-	miVehicleDirectionField->Add("Left", 0, "", false, false);
+	miVehicleDirectionField->Add("Left", 0);
 	miVehicleDirectionField->Add("Right", 1, "", true, false);
 	miVehiclePacesField->SetData(&g_wvVehicleStamp.iDrawDirection, NULL, NULL);
 	miVehiclePacesField->SetKey(g_wvVehicleStamp.iDrawDirection);
 	miVehicleDirectionField->SetAutoAdvance(true);
 
 	miVehicleBoundaryField = new MI_SelectField(&rm->spr_selectfield, 70, 320, "Boundary", 500, 150);
-	miVehicleBoundaryField->Add("No Boundary", 0, "", false, false);
+	miVehicleBoundaryField->Add("No Boundary", 0);
 
     for (short iBoundary = 1; iBoundary <= 100; iBoundary++) {
 		char szBoundary[8];
@@ -3303,7 +3303,7 @@ int editor_vehicles()
 		TourStop * ts = game_values.tourstops[iStage];
 		char szStageName[256];
 		sprintf(szStageName, "(%d) %s", iStage + 1, ts->szName);
-		miVehicleStageField->Add(szStageName, iStage, "", false, false, true, ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode));
+		miVehicleStageField->Add(szStageName, iStage, false, true, ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode));
 	}
 
 	miVehicleStageField->SetKey(g_wvVehicleStamp.iActionId);

@@ -23,25 +23,25 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
     miMatchSelectionStartButton->SetCode(MENU_CODE_MATCH_SELECTION_START);
 
     miMatchSelectionField = new MI_SelectField(&rm->spr_selectfield, 130, 340, "Match", 380, 100);
-    miMatchSelectionField->Add("Single Game", MATCH_TYPE_SINGLE_GAME, "", false, false);
-    miMatchSelectionField->Add("Tournament", MATCH_TYPE_TOURNAMENT, "", false, false);
-    miMatchSelectionField->Add("Tour", MATCH_TYPE_TOUR, "", false, false);
-    miMatchSelectionField->Add("World", MATCH_TYPE_WORLD, "", false, false);
-    miMatchSelectionField->Add("Minigame", MATCH_TYPE_MINIGAME, "", false, false);
+    miMatchSelectionField->Add("Single Game", MATCH_TYPE_SINGLE_GAME);
+    miMatchSelectionField->Add("Tournament", MATCH_TYPE_TOURNAMENT);
+    miMatchSelectionField->Add("Tour", MATCH_TYPE_TOUR);
+    miMatchSelectionField->Add("World", MATCH_TYPE_WORLD);
+    miMatchSelectionField->Add("Minigame", MATCH_TYPE_MINIGAME);
     miMatchSelectionField->SetData(&game_values.matchtype, NULL, NULL);
     miMatchSelectionField->SetKey(game_values.matchtype);
     miMatchSelectionField->SetItemChangedCode(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED);
 
     miTournamentField = new MI_SelectField(&rm->spr_selectfield, 130, 380, "Wins", 380, 100);
-    miTournamentField->Add("2", 2, "", false, false);
-    miTournamentField->Add("3", 3, "", false, false);
-    miTournamentField->Add("4", 4, "", false, false);
-    miTournamentField->Add("5", 5, "", false, false);
-    miTournamentField->Add("6", 6, "", false, false);
-    miTournamentField->Add("7", 7, "", false, false);
-    miTournamentField->Add("8", 8, "", false, false);
-    miTournamentField->Add("9", 9, "", false, false);
-    miTournamentField->Add("10", 10, "", false, false);
+    miTournamentField->Add("2", 2);
+    miTournamentField->Add("3", 3);
+    miTournamentField->Add("4", 4);
+    miTournamentField->Add("5", 5);
+    miTournamentField->Add("6", 6);
+    miTournamentField->Add("7", 7);
+    miTournamentField->Add("8", 8);
+    miTournamentField->Add("9", 9);
+    miTournamentField->Add("10", 10);
     miTournamentField->SetData(&game_values.tournamentgames, NULL, NULL);
     miTournamentField->SetKey(game_values.tournamentgames);
     miTournamentField->Show(false);
@@ -67,11 +67,11 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
     miWorldField->Show(false);
 
     miMinigameField = new MI_SelectField(&rm->spr_selectfield, 130, 380, "Game", 380, 100);
-    miMinigameField->Add("Pipe Coin Game", 0, "", false, false);
-    miMinigameField->Add("Hammer Boss Game", 1, "", false, false);
-    miMinigameField->Add("Bomb Boss Game", 2, "", false, false);
-    miMinigameField->Add("Fire Boss Game", 3, "", false, false);
-    miMinigameField->Add("Boxes Game", 4, "", false, false);
+    miMinigameField->Add("Pipe Coin Game", 0);
+    miMinigameField->Add("Hammer Boss Game", 1);
+    miMinigameField->Add("Bomb Boss Game", 2);
+    miMinigameField->Add("Fire Boss Game", 3);
+    miMinigameField->Add("Boxes Game", 4);
     miMinigameField->SetData(&game_values.selectedminigame, NULL, NULL);
     miMinigameField->SetKey(game_values.selectedminigame);
     miMinigameField->Show(false);

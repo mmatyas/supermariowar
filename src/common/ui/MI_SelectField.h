@@ -18,31 +18,21 @@ class SF_ListItem
 public:
     SF_ListItem() {
         sName = "";
-
         iValue = 0;
-        sValue = "";
-        fValue = false;
         fHidden = false;
         iIconOverride = -1;
     }
 
-    SF_ListItem(std::string sname, short ivalue, std::string svalue, bool fvalue, bool fhidden, short iiconoverride) {
+    SF_ListItem(std::string sname, short ivalue, bool fhidden, short iiconoverride) {
         sName = sname;
-
         iValue = ivalue;
-        sValue = svalue;
-        fValue = fvalue;
         fHidden = fhidden;
         iIconOverride = iiconoverride;
     }
 
     SF_ListItem(const SF_ListItem& other) {
         sName = other.sName;
-
         iValue = other.iValue;
-        sValue = other.sValue;
-        fValue = other.fValue;
-
         fHidden = other.fHidden;
         iIconOverride = other.iIconOverride;
     }
@@ -50,13 +40,8 @@ public:
     ~SF_ListItem() {}
 
     std::string sName;  //Display name
-
     short iValue;  //int data
-    std::string sValue;  //string data
-    bool fValue;  //bool data for toggle controls
-
     bool fHidden;
-
     short iIconOverride;
 };
 
@@ -82,9 +67,6 @@ public:
     short GetShortValue() {
         return (*current)->iValue;
     }
-    std::string GetStringValue() {
-        return (*current)->sValue;
-    }
 
     //Gets a random value, but does not set the control to that value
     short GetRandomShortValue() {
@@ -104,7 +86,8 @@ public:
     MenuCodeEnum Modify(bool modify);
 
     //Adds an item to the list
-    void Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom = true, short iIconOverride = -1);
+    void Add(std::string name, short ivalue);
+    void Add(std::string name, short ivalue, bool fhidden, bool fGoodRandom = true, short iIconOverride = -1);
     void Clear() {
         items.clear();
     }
