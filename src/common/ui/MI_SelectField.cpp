@@ -500,6 +500,33 @@ MI_SelectFieldDyn<T>::MI_SelectFieldDyn(gfxSprite* nspr, short x, short y, std::
 
 
 template<typename T>
+MI_SelectFieldDyn<T>::MI_SelectFieldDyn(const MI_SelectFieldDyn<T>& other)
+    : UI_Control(other)
+    , m_spr(other.m_spr)
+    , m_name(other.m_name)
+    , mcItemChangedCode(other.mcItemChangedCode)
+    , mcControlSelectedCode(other.mcControlSelectedCode)
+    , m_autoAdvance(other.m_autoAdvance)
+    , m_wraps(other.m_wraps)
+    , m_fastScroll(other.m_fastScroll)
+    , m_adjustmentY(other.m_adjustmentY)
+    , m_width(other.m_width)
+    , m_indent(other.m_indent)
+    , m_items(other.m_items)
+    , m_goodRandomIndices(other.m_goodRandomIndices)
+    , m_outputPtr(other.m_outputPtr)
+{
+    setCurrentIndex(other.m_index);
+
+    miModifyImageLeft = std::make_unique<MI_Image>(m_spr, ix + m_indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
+    miModifyImageLeft->Show(false);
+
+    miModifyImageRight = std::make_unique<MI_Image>(m_spr, ix + m_width - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
+    miModifyImageRight->Show(false);
+}
+
+
+template<typename T>
 void MI_SelectFieldDyn<T>::Update()
 {
     miModifyImageRight->Update();
@@ -690,7 +717,7 @@ void MI_SelectFieldDyn<T>::updateOutput() const
 
 
 template<typename T>
-void MI_SelectFieldDyn<T>::add(std::string name, T value, bool hidden, bool goodRandom)
+SF_ListItemDyn<T>& MI_SelectFieldDyn<T>::add(std::string name, T value, bool hidden, bool goodRandom)
 {
     size_t new_idx = m_items.size();
     m_items.emplace_back(std::move(name), std::move(value), hidden, -1);
@@ -698,6 +725,8 @@ void MI_SelectFieldDyn<T>::add(std::string name, T value, bool hidden, bool good
 
     if (goodRandom)
         m_goodRandomIndices.push_back(new_idx);
+
+    return m_items.back();
 }
 
 

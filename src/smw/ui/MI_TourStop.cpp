@@ -130,7 +130,7 @@ void MI_TourStop::Refresh(short iTourStop)
     TourStop * tourstop = game_values.tourstops[iTourStop];
 
     if (tourstop->iStageType == 0) {
-        miModeField->Clear();
+        miModeField->clear();
 
         CGameMode * gamemode = NULL;
         short tourstopicon = 0;
@@ -149,7 +149,7 @@ void MI_TourStop::Refresh(short iTourStop)
             tourstopicon = tourstop->iMode;
         }
 
-        miModeField->Add(gamemode->GetModeName(), tourstopicon, "", false, false);
+        miModeField->add(gamemode->GetModeName(), tourstopicon);
 
         miGoalField->Clear();
         char szTemp[16];

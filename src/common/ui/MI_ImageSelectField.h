@@ -3,7 +3,7 @@
 #include "ui/MI_SelectField.h"
 
 
-class MI_ImageSelectField : public MI_SelectField {
+class MI_ImageSelectField : public MI_SelectFieldDyn<short> {
 public:
     MI_ImageSelectField(
         gfxSprite* nspr, gfxSprite* nspr_image,
@@ -11,7 +11,6 @@ public:
         std::string name,
         short width, short indent,
         short imageHeight, short imageWidth);
-    MI_ImageSelectField(const MI_ImageSelectField&);
     virtual ~MI_ImageSelectField() = default;
 
     void Draw() override;

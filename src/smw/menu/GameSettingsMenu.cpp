@@ -33,11 +33,11 @@ UI_GameSettingsMenu::UI_GameSettingsMenu()
     miModeField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
 
     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-        miModeField->Add(gamemodes[iGameMode]->GetModeName(), iGameMode, "", false, false);
+        miModeField->add(gamemodes[iGameMode]->GetModeName(), iGameMode);
     }
-    miModeField->SetData(&currentgamemode, NULL, NULL);
-    miModeField->SetKey(0);
-    miModeField->SetItemChangedCode(MENU_CODE_MODE_CHANGED);
+    miModeField->setOutputPtr(&currentgamemode);
+    miModeField->setCurrentValue(0);
+    miModeField->setItemChangedCode(MENU_CODE_MODE_CHANGED);
 
     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
         miGoalField[iGameMode] = new MI_SelectField(&rm->spr_selectfield, 70, 125, gamemodes[iGameMode]->GetGoalName().c_str(), 352, 120);
@@ -142,11 +142,11 @@ UI_GameSettingsMenu::UI_GameSettingsMenu()
 void UI_GameSettingsMenu::RefreshGameModeButtons()
 {
     // Unhide/hide the settings button
-    miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
+    miModeSettingsButton->Show(miModeField->currentValue() != game_mode_owned);
 
     // Show the approprate goal field
     for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
-        miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
+        miGoalField[iMode]->Show(miModeField->currentValue() == iMode);
     }
 }
 
@@ -208,7 +208,7 @@ void UI_GameSettingsMenu::SetHeaderText(const char* string)
 
 void UI_GameSettingsMenu::GameModeChanged(short gmID)
 {
-    miModeField->SetKey(gmID);
+    miModeField->setCurrentValue(gmID);
 
     RefreshGameModeButtons();
 }
@@ -220,7 +220,7 @@ void UI_GameSettingsMenu::HideGMSettingsBtn()
 
 short UI_GameSettingsMenu::GetCurrentGameModeID()
 {
-    return miModeField->GetShortValue();
+    return miModeField->currentValue();
 }
 
 const char* UI_GameSettingsMenu::GetCurrentMapName()

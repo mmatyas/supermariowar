@@ -650,27 +650,27 @@ int main(int argc, char *argv[])
 	miModeField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 60, "Mode", 500, 120, 16, 16);
 	//miModeField->SetData(game_values.tourstops[0]->iMode, NULL, NULL);
 	//miModeField->SetKey(0);
-	miModeField->SetItemChangedCode(MENU_CODE_MODE_CHANGED);
+	miModeField->setItemChangedCode(MENU_CODE_MODE_CHANGED);
 
     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-		miModeField->Add(stagemodes[iGameMode].szName, iGameMode, "", false, false);
+		miModeField->add(stagemodes[iGameMode].szName, iGameMode);
 
 		miGoalField[iGameMode] = new MI_SelectField(&rm->spr_selectfield, 70, 100, stagemodes[iGameMode].szGoal, 352, 120);
 		miGoalField[iGameMode]->Show(iGameMode == 0);
 
         for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
 			StageModeOption * option = &stagemodes[iGameMode].options[iGameModeOption];
-			miGoalField[iGameMode]->Add(option->szName, option->iValue, "", false, false);
+			miGoalField[iGameMode]->Add(option->szName, option->iValue);
 		}
 
 		//miGoalField[iGameMode]->SetData(&gamemodes[iGameMode]->goal, NULL, NULL);
 		//miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
 	}
 
-	miModeField->Add("Bonus House", 24);
-	miModeField->Add("Pipe Minigame", 25);
-	miModeField->Add("Boss Minigame", 26);
-	miModeField->Add("Boxes Minigame", 27);
+	miModeField->add("Bonus House", 24);
+	miModeField->add("Pipe Minigame", 25);
+	miModeField->add("Boss Minigame", 26);
+	miModeField->add("Boxes Minigame", 27);
 
 	//Create goal field for pipe game
 	miSpecialGoalField[0] = new MI_SelectField(&rm->spr_selectfield, 70, 100, "Points", 352, 120);
@@ -838,20 +838,20 @@ int main(int argc, char *argv[])
 
 	//Create Vehicle Menu
 	miVehicleSpriteField = new MI_ImageSelectField(&rm->spr_selectfield, &spr_vehicleicons, 70, 80, "Sprite", 500, 150, 16, 16);
-	miVehicleSpriteField->Add("Hammer Brother", 0);
-	miVehicleSpriteField->Add("Boomerang Brother", 1);
-	miVehicleSpriteField->Add("Fire Brother", 2);
-	miVehicleSpriteField->Add("Tank 1", 3);
-	miVehicleSpriteField->Add("Boat 1", 4);
-	miVehicleSpriteField->Add("Boat 2", 5);
-	miVehicleSpriteField->Add("Airship 1", 6);
-	miVehicleSpriteField->Add("Airship 2", 7);
-	miVehicleSpriteField->Add("Tank 2", 8);
-	miVehicleSpriteField->SetData(&g_wvVehicleStamp.iDrawSprite, NULL, NULL);
-	miVehicleSpriteField->SetKey(g_wvVehicleStamp.iDrawSprite);
+	miVehicleSpriteField->add("Hammer Brother", 0);
+	miVehicleSpriteField->add("Boomerang Brother", 1);
+	miVehicleSpriteField->add("Fire Brother", 2);
+	miVehicleSpriteField->add("Tank 1", 3);
+	miVehicleSpriteField->add("Boat 1", 4);
+	miVehicleSpriteField->add("Boat 2", 5);
+	miVehicleSpriteField->add("Airship 1", 6);
+	miVehicleSpriteField->add("Airship 2", 7);
+	miVehicleSpriteField->add("Tank 2", 8);
+	miVehicleSpriteField->setOutputPtr(&g_wvVehicleStamp.iDrawSprite);
+	miVehicleSpriteField->setCurrentValue(g_wvVehicleStamp.iDrawSprite);
 
 	miVehicleStageField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 120, "Stage", 500, 150, 16, 16);
-	miVehicleStageField->SetData(&g_wvVehicleStamp.iActionId, NULL, NULL);
+	miVehicleStageField->setOutputPtr(&g_wvVehicleStamp.iActionId);
 
 	miVehicleMinMovesField = new MI_SelectField(&rm->spr_selectfield, 70, 160, "Min Moves", 500, 150);
 
@@ -1195,8 +1195,8 @@ int editor_edit()
 									g_wvVehicleStamp.iDrawDirection = vehicle->iDrawDirection;
 									g_wvVehicleStamp.iBoundary = vehicle->iBoundary;
 
-									miVehicleSpriteField->SetKey(g_wvVehicleStamp.iDrawSprite);
-									miVehicleStageField->SetKey(g_wvVehicleStamp.iActionId);
+									miVehicleSpriteField->setCurrentValue(g_wvVehicleStamp.iDrawSprite);
+									miVehicleStageField->setCurrentValue(g_wvVehicleStamp.iActionId);
 									miVehicleMinMovesField->SetKey(g_wvVehicleStamp.iMinMoves);
 									miVehicleMaxMovesField->SetKey(g_wvVehicleStamp.iMaxMoves);
 									miVehiclePacesField->SetKey(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
@@ -3297,16 +3297,18 @@ int editor_vehicles()
 
 	bool done = false;
 
-	miVehicleStageField->Clear();
+	miVehicleStageField->clear();
 
     for (short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
 		TourStop * ts = game_values.tourstops[iStage];
 		char szStageName[256];
 		sprintf(szStageName, "(%d) %s", iStage + 1, ts->szName);
-		miVehicleStageField->Add(szStageName, iStage, false, true, ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode));
+
+		SF_ListItemDyn<short>& item = miVehicleStageField->add(szStageName, iStage, false, true);
+		item.iconOverride = ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode);
 	}
 
-	miVehicleStageField->SetKey(g_wvVehicleStamp.iActionId);
+	miVehicleStageField->setCurrentValue(g_wvVehicleStamp.iActionId);
 
     while (!done) {
 		int framestart = SDL_GetTicks();
@@ -3705,7 +3707,7 @@ void EditStage(short iEditStage)
 	//Set fields to write data to the selected stage
 	TourStop * ts = game_values.tourstops[iEditStage];
 
-	miModeField->SetData(&ts->iMode, NULL, NULL);
+	miModeField->setOutputPtr(&ts->iMode);
 	miNameField->SetData(ts->szName, 128);
 
 	miPointsField->SetData(&ts->iPoints, NULL, NULL);
@@ -3750,7 +3752,7 @@ void EditStage(short iEditStage)
 	miBonusItemsButton->SetPosition(430, iStageType == 0 ? 220 : 340);
 
     if (iStageType == 0 && iMode >= 0 && iMode < GAMEMODE_LAST) {
-		miModeField->SetKey(iMode);
+		miModeField->setCurrentValue(iMode);
 
 		miModeSettingsButton->Show(iMode != game_mode_owned);
 
@@ -3774,9 +3776,9 @@ void EditStage(short iEditStage)
 		}
 
         if (iStageType == 1) { //Bonus House
-			miModeField->SetKey(24);
+			miModeField->setCurrentValue(24);
         } else if (iMode >= 1000 && iMode <= 1002) { //Pipe, Boss and Boxes Game
-			miModeField->SetKey(iMode - 975);
+			miModeField->setCurrentValue(iMode - 975);
 			miSpecialGoalField[iMode-1000]->SetData(&game_values.tourstops[iEditStage]->iGoal, NULL, NULL);
 			miSpecialGoalField[iMode-1000]->SetKey(game_values.tourstops[iEditStage]->iGoal);
 			miPointsField->SetKey(game_values.tourstops[iEditStage]->iPoints);
@@ -4064,7 +4066,7 @@ int editor_stage()
 				//We are no longer working on a specific stage
 				iEditStage = -1;
             } else if (MENU_CODE_MODE_CHANGED == code) {
-				short iMode = miModeField->GetShortValue();
+				short iMode = miModeField->currentValue();
 
 				miPointsField->Show(iMode != 24);
 				miFinalStageField->Show(iMode != 24);

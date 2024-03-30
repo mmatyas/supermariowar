@@ -176,13 +176,6 @@ struct SF_ListItemDyn {
         static_assert(std::is_trivially_copyable<T>::value, "");
     }
 
-    /*SF_ListItemDyn(const SF_ListItemDyn& other)
-        : name(other.name)
-        , value(other.value)
-        , hidden(other.hidden)
-        , iconOverride(other.iconOverride)
-    {}*/
-
     const std::string name;  //!< Display name
     const T value;
     bool hidden = false;
@@ -196,6 +189,7 @@ class MI_SelectFieldDyn : public UI_Control {
 
 public:
     MI_SelectFieldDyn(gfxSprite* nspr, short x, short y, std::string name, short width, short indent);
+    MI_SelectFieldDyn(const MI_SelectFieldDyn<T>&);
     virtual ~MI_SelectFieldDyn() = default;
 
     //! Set the displayed name.
@@ -243,7 +237,7 @@ public:
     //! Sets the currently selected item
     bool setCurrentIndex(size_t index);
     //! Adds an item to the list
-    void add(std::string name, T value, bool hidden = false, bool goodRandom = true);
+    Item& add(std::string name, T value, bool hidden = false, bool goodRandom = true);
     //! Removes all items
     void clear();
     //! Hides the items containing the specified value
