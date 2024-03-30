@@ -79,7 +79,7 @@ private:
     // Coins
     MI_SelectFieldDyn<bool>* miCoinModePenaltyField;
     MI_SelectField* miCoinModeQuantityField;
-    MI_SelectField* miCoinModePercentExtraCoin;
+    MI_SliderField* miCoinModePercentExtraCoin;
     MI_Button* miCoinModeBackButton;
 
     MI_Image* miCoinModeLeftHeaderBar;
@@ -203,7 +203,7 @@ private:
     MI_SelectField* miGreedModeCoinLife;
     MI_SelectFieldDyn<bool>* miGreedModeOwnCoins;
     MI_SelectField* miGreedModeMultiplier;
-    MI_SelectField* miGreedModePercentExtraCoin;
+    MI_SliderField* miGreedModePercentExtraCoin;
     MI_Button* miGreedModeBackButton;
 
     MI_Image* miGreedModeLeftHeaderBar;

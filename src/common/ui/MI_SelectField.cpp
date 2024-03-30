@@ -690,10 +690,10 @@ void MI_SelectFieldDyn<T>::updateOutput() const
 
 
 template<typename T>
-void MI_SelectFieldDyn<T>::add(std::string name, T value, bool hidden, bool goodRandom, short iconOverride)
+void MI_SelectFieldDyn<T>::add(std::string name, T value, bool hidden, bool goodRandom)
 {
     size_t new_idx = m_items.size();
-    m_items.emplace_back(std::move(name), std::move(value), hidden, iconOverride);
+    m_items.emplace_back(std::move(name), std::move(value), hidden, -1);
     m_index = 0;
 
     if (goodRandom)
@@ -797,3 +797,4 @@ bool MI_SelectFieldDyn<T>::moveRandom()
 
 // Actual typed classes
 template class MI_SelectFieldDyn<bool>;
+template class MI_SelectFieldDyn<short>;

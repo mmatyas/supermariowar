@@ -104,30 +104,30 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miTimeLimitModeScoringField->SetKey(game_values.gamemodemenusettings.time.scoring);
 
     miTimeLimitModePercentExtraTime = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 120, 260, "Extra Time", 400, 150, 384);
-    miTimeLimitModePercentExtraTime->Add("0", 0, false, false);
-    miTimeLimitModePercentExtraTime->Add("5", 5, false, false);
-    miTimeLimitModePercentExtraTime->Add("10", 10);
-    miTimeLimitModePercentExtraTime->Add("15", 15);
-    miTimeLimitModePercentExtraTime->Add("20", 20);
-    miTimeLimitModePercentExtraTime->Add("25", 25);
-    miTimeLimitModePercentExtraTime->Add("30", 30);
-    miTimeLimitModePercentExtraTime->Add("35", 35);
-    miTimeLimitModePercentExtraTime->Add("40", 40);
-    miTimeLimitModePercentExtraTime->Add("45", 45);
-    miTimeLimitModePercentExtraTime->Add("50", 50);
-    miTimeLimitModePercentExtraTime->Add("55", 55, false, false);
-    miTimeLimitModePercentExtraTime->Add("60", 60, false, false);
-    miTimeLimitModePercentExtraTime->Add("65", 65, false, false);
-    miTimeLimitModePercentExtraTime->Add("70", 70, false, false);
-    miTimeLimitModePercentExtraTime->Add("75", 75, false, false);
-    miTimeLimitModePercentExtraTime->Add("80", 80, false, false);
-    miTimeLimitModePercentExtraTime->Add("85", 85, false, false);
-    miTimeLimitModePercentExtraTime->Add("90", 90, false, false);
-    miTimeLimitModePercentExtraTime->Add("95", 95, false, false);
-    miTimeLimitModePercentExtraTime->Add("100", 100, false, false);
-    miTimeLimitModePercentExtraTime->SetData(&game_values.gamemodemenusettings.time.percentextratime, NULL, NULL);
-    miTimeLimitModePercentExtraTime->SetKey(game_values.gamemodemenusettings.time.percentextratime);
-    miTimeLimitModePercentExtraTime->SetNoWrap(true);
+    miTimeLimitModePercentExtraTime->add("0", 0, false, false);
+    miTimeLimitModePercentExtraTime->add("5", 5, false, false);
+    miTimeLimitModePercentExtraTime->add("10", 10);
+    miTimeLimitModePercentExtraTime->add("15", 15);
+    miTimeLimitModePercentExtraTime->add("20", 20);
+    miTimeLimitModePercentExtraTime->add("25", 25);
+    miTimeLimitModePercentExtraTime->add("30", 30);
+    miTimeLimitModePercentExtraTime->add("35", 35);
+    miTimeLimitModePercentExtraTime->add("40", 40);
+    miTimeLimitModePercentExtraTime->add("45", 45);
+    miTimeLimitModePercentExtraTime->add("50", 50);
+    miTimeLimitModePercentExtraTime->add("55", 55, false, false);
+    miTimeLimitModePercentExtraTime->add("60", 60, false, false);
+    miTimeLimitModePercentExtraTime->add("65", 65, false, false);
+    miTimeLimitModePercentExtraTime->add("70", 70, false, false);
+    miTimeLimitModePercentExtraTime->add("75", 75, false, false);
+    miTimeLimitModePercentExtraTime->add("80", 80, false, false);
+    miTimeLimitModePercentExtraTime->add("85", 85, false, false);
+    miTimeLimitModePercentExtraTime->add("90", 90, false, false);
+    miTimeLimitModePercentExtraTime->add("95", 95, false, false);
+    miTimeLimitModePercentExtraTime->add("100", 100, false, false);
+    miTimeLimitModePercentExtraTime->setOutputPtr(&game_values.gamemodemenusettings.time.percentextratime);
+    miTimeLimitModePercentExtraTime->setCurrentValue(game_values.gamemodemenusettings.time.percentextratime);
+    miTimeLimitModePercentExtraTime->allowWrap(false);
 
     miTimeLimitModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miTimeLimitModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -185,30 +185,30 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miJailModeTagFreeField->setAutoAdvance(true);
 
     miJailModeJailKeyField = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 120, 280, "Jail Key", 400, 150, 384);
-    miJailModeJailKeyField->Add("0", 0, false, false);
-    miJailModeJailKeyField->Add("5", 5, false, false);
-    miJailModeJailKeyField->Add("10", 10);
-    miJailModeJailKeyField->Add("15", 15);
-    miJailModeJailKeyField->Add("20", 20);
-    miJailModeJailKeyField->Add("25", 25);
-    miJailModeJailKeyField->Add("30", 30);
-    miJailModeJailKeyField->Add("35", 35);
-    miJailModeJailKeyField->Add("40", 40);
-    miJailModeJailKeyField->Add("45", 45);
-    miJailModeJailKeyField->Add("50", 50);
-    miJailModeJailKeyField->Add("55", 55, false, false);
-    miJailModeJailKeyField->Add("60", 60, false, false);
-    miJailModeJailKeyField->Add("65", 65, false, false);
-    miJailModeJailKeyField->Add("70", 70, false, false);
-    miJailModeJailKeyField->Add("75", 75, false, false);
-    miJailModeJailKeyField->Add("80", 80, false, false);
-    miJailModeJailKeyField->Add("85", 85, false, false);
-    miJailModeJailKeyField->Add("90", 90, false, false);
-    miJailModeJailKeyField->Add("95", 95, false, false);
-    miJailModeJailKeyField->Add("100", 100, false, false);
-    miJailModeJailKeyField->SetData(&game_values.gamemodemenusettings.jail.percentkey, NULL, NULL);
-    miJailModeJailKeyField->SetKey(game_values.gamemodemenusettings.jail.percentkey);
-    miJailModeJailKeyField->SetNoWrap(true);
+    miJailModeJailKeyField->add("0", 0, false, false);
+    miJailModeJailKeyField->add("5", 5, false, false);
+    miJailModeJailKeyField->add("10", 10);
+    miJailModeJailKeyField->add("15", 15);
+    miJailModeJailKeyField->add("20", 20);
+    miJailModeJailKeyField->add("25", 25);
+    miJailModeJailKeyField->add("30", 30);
+    miJailModeJailKeyField->add("35", 35);
+    miJailModeJailKeyField->add("40", 40);
+    miJailModeJailKeyField->add("45", 45);
+    miJailModeJailKeyField->add("50", 50);
+    miJailModeJailKeyField->add("55", 55, false, false);
+    miJailModeJailKeyField->add("60", 60, false, false);
+    miJailModeJailKeyField->add("65", 65, false, false);
+    miJailModeJailKeyField->add("70", 70, false, false);
+    miJailModeJailKeyField->add("75", 75, false, false);
+    miJailModeJailKeyField->add("80", 80, false, false);
+    miJailModeJailKeyField->add("85", 85, false, false);
+    miJailModeJailKeyField->add("90", 90, false, false);
+    miJailModeJailKeyField->add("95", 95, false, false);
+    miJailModeJailKeyField->add("100", 100, false, false);
+    miJailModeJailKeyField->setOutputPtr(&game_values.gamemodemenusettings.jail.percentkey);
+    miJailModeJailKeyField->setCurrentValue(game_values.gamemodemenusettings.jail.percentkey);
+    miJailModeJailKeyField->allowWrap(false);
 
     miJailModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miJailModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -257,30 +257,30 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miCoinModeQuantityField->SetKey(game_values.gamemodemenusettings.coins.quantity);
 
     miCoinModePercentExtraCoin = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 120, 260, "Extra Coins", 400, 150, 384);
-    miCoinModePercentExtraCoin->Add("0", 0, false, false);
-    miCoinModePercentExtraCoin->Add("5", 5, false, false);
-    miCoinModePercentExtraCoin->Add("10", 10);
-    miCoinModePercentExtraCoin->Add("15", 15);
-    miCoinModePercentExtraCoin->Add("20", 20);
-    miCoinModePercentExtraCoin->Add("25", 25);
-    miCoinModePercentExtraCoin->Add("30", 30);
-    miCoinModePercentExtraCoin->Add("35", 35);
-    miCoinModePercentExtraCoin->Add("40", 40);
-    miCoinModePercentExtraCoin->Add("45", 45);
-    miCoinModePercentExtraCoin->Add("50", 50);
-    miCoinModePercentExtraCoin->Add("55", 55, false, false);
-    miCoinModePercentExtraCoin->Add("60", 60, false, false);
-    miCoinModePercentExtraCoin->Add("65", 65, false, false);
-    miCoinModePercentExtraCoin->Add("70", 70, false, false);
-    miCoinModePercentExtraCoin->Add("75", 75, false, false);
-    miCoinModePercentExtraCoin->Add("80", 80, false, false);
-    miCoinModePercentExtraCoin->Add("85", 85, false, false);
-    miCoinModePercentExtraCoin->Add("90", 90, false, false);
-    miCoinModePercentExtraCoin->Add("95", 95, false, false);
-    miCoinModePercentExtraCoin->Add("100", 100, false, false);
-    miCoinModePercentExtraCoin->SetData(&game_values.gamemodemenusettings.coins.percentextracoin, NULL, NULL);
-    miCoinModePercentExtraCoin->SetKey(game_values.gamemodemenusettings.coins.percentextracoin);
-    miCoinModePercentExtraCoin->SetNoWrap(true);
+    miCoinModePercentExtraCoin->add("0", 0, false, false);
+    miCoinModePercentExtraCoin->add("5", 5, false, false);
+    miCoinModePercentExtraCoin->add("10", 10);
+    miCoinModePercentExtraCoin->add("15", 15);
+    miCoinModePercentExtraCoin->add("20", 20);
+    miCoinModePercentExtraCoin->add("25", 25);
+    miCoinModePercentExtraCoin->add("30", 30);
+    miCoinModePercentExtraCoin->add("35", 35);
+    miCoinModePercentExtraCoin->add("40", 40);
+    miCoinModePercentExtraCoin->add("45", 45);
+    miCoinModePercentExtraCoin->add("50", 50);
+    miCoinModePercentExtraCoin->add("55", 55, false, false);
+    miCoinModePercentExtraCoin->add("60", 60, false, false);
+    miCoinModePercentExtraCoin->add("65", 65, false, false);
+    miCoinModePercentExtraCoin->add("70", 70, false, false);
+    miCoinModePercentExtraCoin->add("75", 75, false, false);
+    miCoinModePercentExtraCoin->add("80", 80, false, false);
+    miCoinModePercentExtraCoin->add("85", 85, false, false);
+    miCoinModePercentExtraCoin->add("90", 90, false, false);
+    miCoinModePercentExtraCoin->add("95", 95, false, false);
+    miCoinModePercentExtraCoin->add("100", 100, false, false);
+    miCoinModePercentExtraCoin->setOutputPtr(&game_values.gamemodemenusettings.coins.percentextracoin);
+    miCoinModePercentExtraCoin->setCurrentValue(game_values.gamemodemenusettings.coins.percentextracoin);
+    miCoinModePercentExtraCoin->allowWrap(false);
 
     miCoinModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miCoinModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -319,20 +319,20 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
 
     for (short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++) {
         miStompModeEnemySlider[iEnemy] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->menu_stomp, 120, 80 + 40 * iEnemy, 400, iEnemy);
-        miStompModeEnemySlider[iEnemy]->Add("", 0, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 1, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 2, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 3, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 4, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 5, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 6, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 7, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 8, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 9, "", false, false);
-        miStompModeEnemySlider[iEnemy]->Add("", 10, "", false, false);
-        miStompModeEnemySlider[iEnemy]->SetNoWrap(true);
-        miStompModeEnemySlider[iEnemy]->SetData(&game_values.gamemodemenusettings.stomp.enemyweight[iEnemy], NULL, NULL);
-        miStompModeEnemySlider[iEnemy]->SetKey(game_values.gamemodemenusettings.stomp.enemyweight[iEnemy]);
+        miStompModeEnemySlider[iEnemy]->add("", 0);
+        miStompModeEnemySlider[iEnemy]->add("", 1);
+        miStompModeEnemySlider[iEnemy]->add("", 2);
+        miStompModeEnemySlider[iEnemy]->add("", 3);
+        miStompModeEnemySlider[iEnemy]->add("", 4);
+        miStompModeEnemySlider[iEnemy]->add("", 5);
+        miStompModeEnemySlider[iEnemy]->add("", 6);
+        miStompModeEnemySlider[iEnemy]->add("", 7);
+        miStompModeEnemySlider[iEnemy]->add("", 8);
+        miStompModeEnemySlider[iEnemy]->add("", 9);
+        miStompModeEnemySlider[iEnemy]->add("", 10);
+        miStompModeEnemySlider[iEnemy]->allowWrap(false);
+        miStompModeEnemySlider[iEnemy]->setOutputPtr(&game_values.gamemodemenusettings.stomp.enemyweight[iEnemy]);
+        miStompModeEnemySlider[iEnemy]->setCurrentValue(game_values.gamemodemenusettings.stomp.enemyweight[iEnemy]);
     }
 
     miStompModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
@@ -371,26 +371,26 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
 
     for (short iEggField = 0; iEggField < 4; iEggField++) {
         miEggModeEggQuantityField[iEggField] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->menu_egg, 170, 60 + 40 * iEggField, 300, iEggField);
-        miEggModeEggQuantityField[iEggField]->Add("0", 0, false, iEggField == 0 ? false : true);
-        miEggModeEggQuantityField[iEggField]->Add("1", 1, false, iEggField >= 2 ? false : true);
-        miEggModeEggQuantityField[iEggField]->Add("2", 2, false, iEggField >= 2 ? false : true);
-        miEggModeEggQuantityField[iEggField]->Add("3", 3, false, iEggField >= 1 ? false : true);
-        miEggModeEggQuantityField[iEggField]->Add("4", 4, false, false);
-        miEggModeEggQuantityField[iEggField]->SetData(&game_values.gamemodemenusettings.egg.eggs[iEggField], NULL, NULL);
-        miEggModeEggQuantityField[iEggField]->SetKey(game_values.gamemodemenusettings.egg.eggs[iEggField]);
-        miEggModeEggQuantityField[iEggField]->SetNoWrap(true);
+        miEggModeEggQuantityField[iEggField]->add("0", 0, false, iEggField == 0 ? false : true);
+        miEggModeEggQuantityField[iEggField]->add("1", 1, false, iEggField >= 2 ? false : true);
+        miEggModeEggQuantityField[iEggField]->add("2", 2, false, iEggField >= 2 ? false : true);
+        miEggModeEggQuantityField[iEggField]->add("3", 3, false, iEggField >= 1 ? false : true);
+        miEggModeEggQuantityField[iEggField]->add("4", 4, false, false);
+        miEggModeEggQuantityField[iEggField]->setOutputPtr(&game_values.gamemodemenusettings.egg.eggs[iEggField]);
+        miEggModeEggQuantityField[iEggField]->setCurrentValue(game_values.gamemodemenusettings.egg.eggs[iEggField]);
+        miEggModeEggQuantityField[iEggField]->allowWrap(false);
     }
 
     for (short iYoshiField = 0; iYoshiField < 4; iYoshiField++) {
         miEggModeYoshiQuantityField[iYoshiField] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->menu_egg, 170, 220 + 40 * iYoshiField, 300, iYoshiField + 4);
-        miEggModeYoshiQuantityField[iYoshiField]->Add("0", 0, false, iYoshiField == 0 ? false : true);
-        miEggModeYoshiQuantityField[iYoshiField]->Add("1", 1, false, iYoshiField >= 2 ? false : true);
-        miEggModeYoshiQuantityField[iYoshiField]->Add("2", 2, false, iYoshiField >= 1 ? false : true);
-        miEggModeYoshiQuantityField[iYoshiField]->Add("3", 3, false, false);
-        miEggModeYoshiQuantityField[iYoshiField]->Add("4", 4, false, false);
-        miEggModeYoshiQuantityField[iYoshiField]->SetData(&game_values.gamemodemenusettings.egg.yoshis[iYoshiField], NULL, NULL);
-        miEggModeYoshiQuantityField[iYoshiField]->SetKey(game_values.gamemodemenusettings.egg.yoshis[iYoshiField]);
-        miEggModeYoshiQuantityField[iYoshiField]->SetNoWrap(true);
+        miEggModeYoshiQuantityField[iYoshiField]->add("0", 0, false, iYoshiField == 0 ? false : true);
+        miEggModeYoshiQuantityField[iYoshiField]->add("1", 1, false, iYoshiField >= 2 ? false : true);
+        miEggModeYoshiQuantityField[iYoshiField]->add("2", 2, false, iYoshiField >= 1 ? false : true);
+        miEggModeYoshiQuantityField[iYoshiField]->add("3", 3, false, false);
+        miEggModeYoshiQuantityField[iYoshiField]->add("4", 4, false, false);
+        miEggModeYoshiQuantityField[iYoshiField]->setOutputPtr(&game_values.gamemodemenusettings.egg.yoshis[iYoshiField]);
+        miEggModeYoshiQuantityField[iYoshiField]->setCurrentValue(game_values.gamemodemenusettings.egg.yoshis[iYoshiField]);
+        miEggModeYoshiQuantityField[iYoshiField]->allowWrap(false);
     }
 
     miEggModeExplosionTimeField = new MI_SelectField(&rm->spr_selectfield, 120, 380, "Explosion Timer", 400, 180);
@@ -437,19 +437,19 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     //***********************
 
     miFlagModeSpeedField = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 120, 120, "Speed", 400, 180, 380);
-    miFlagModeSpeedField->Add("-", -1);
-    miFlagModeSpeedField->Add("0", 0);
-    miFlagModeSpeedField->Add("1", 1);
-    miFlagModeSpeedField->Add("2", 2);
-    miFlagModeSpeedField->Add("3", 3);
-    miFlagModeSpeedField->Add("4", 4);
-    miFlagModeSpeedField->Add("5", 5);
-    miFlagModeSpeedField->Add("6", 6, false, false);
-    miFlagModeSpeedField->Add("7", 7, false, false);
-    miFlagModeSpeedField->Add("8", 8, false, false);
-    miFlagModeSpeedField->SetData(&game_values.gamemodemenusettings.flag.speed, NULL, NULL);
-    miFlagModeSpeedField->SetKey(game_values.gamemodemenusettings.flag.speed);
-    miFlagModeSpeedField->SetNoWrap(true);
+    miFlagModeSpeedField->add("-", -1);
+    miFlagModeSpeedField->add("0", 0);
+    miFlagModeSpeedField->add("1", 1);
+    miFlagModeSpeedField->add("2", 2);
+    miFlagModeSpeedField->add("3", 3);
+    miFlagModeSpeedField->add("4", 4);
+    miFlagModeSpeedField->add("5", 5);
+    miFlagModeSpeedField->add("6", 6, false, false);
+    miFlagModeSpeedField->add("7", 7, false, false);
+    miFlagModeSpeedField->add("8", 8, false, false);
+    miFlagModeSpeedField->setOutputPtr(&game_values.gamemodemenusettings.flag.speed);
+    miFlagModeSpeedField->setCurrentValue(game_values.gamemodemenusettings.flag.speed);
+    miFlagModeSpeedField->allowWrap(false);
 
     miFlagModeTouchReturnField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 160, "Touch Return", 400, 180);
     miFlagModeTouchReturnField->add("Off", false);
@@ -617,30 +617,30 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miStarModeShineField->SetKey(game_values.gamemodemenusettings.star.shine);
 
     miStarModePercentExtraTime = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 120, 260, "Extra Time", 400, 150, 384);
-    miStarModePercentExtraTime->Add("0", 0, false, false);
-    miStarModePercentExtraTime->Add("5", 5, false, false);
-    miStarModePercentExtraTime->Add("10", 10);
-    miStarModePercentExtraTime->Add("15", 15);
-    miStarModePercentExtraTime->Add("20", 20);
-    miStarModePercentExtraTime->Add("25", 25);
-    miStarModePercentExtraTime->Add("30", 30);
-    miStarModePercentExtraTime->Add("35", 35);
-    miStarModePercentExtraTime->Add("40", 40);
-    miStarModePercentExtraTime->Add("45", 45);
-    miStarModePercentExtraTime->Add("50", 50);
-    miStarModePercentExtraTime->Add("55", 55, false, false);
-    miStarModePercentExtraTime->Add("60", 60, false, false);
-    miStarModePercentExtraTime->Add("65", 65, false, false);
-    miStarModePercentExtraTime->Add("70", 70, false, false);
-    miStarModePercentExtraTime->Add("75", 75, false, false);
-    miStarModePercentExtraTime->Add("80", 80, false, false);
-    miStarModePercentExtraTime->Add("85", 85, false, false);
-    miStarModePercentExtraTime->Add("90", 90, false, false);
-    miStarModePercentExtraTime->Add("95", 95, false, false);
-    miStarModePercentExtraTime->Add("100", 100, false, false);
-    miStarModePercentExtraTime->SetData(&game_values.gamemodemenusettings.star.percentextratime, NULL, NULL);
-    miStarModePercentExtraTime->SetKey(game_values.gamemodemenusettings.star.percentextratime);
-    miStarModePercentExtraTime->SetNoWrap(true);
+    miStarModePercentExtraTime->add("0", 0, false, false);
+    miStarModePercentExtraTime->add("5", 5, false, false);
+    miStarModePercentExtraTime->add("10", 10);
+    miStarModePercentExtraTime->add("15", 15);
+    miStarModePercentExtraTime->add("20", 20);
+    miStarModePercentExtraTime->add("25", 25);
+    miStarModePercentExtraTime->add("30", 30);
+    miStarModePercentExtraTime->add("35", 35);
+    miStarModePercentExtraTime->add("40", 40);
+    miStarModePercentExtraTime->add("45", 45);
+    miStarModePercentExtraTime->add("50", 50);
+    miStarModePercentExtraTime->add("55", 55, false, false);
+    miStarModePercentExtraTime->add("60", 60, false, false);
+    miStarModePercentExtraTime->add("65", 65, false, false);
+    miStarModePercentExtraTime->add("70", 70, false, false);
+    miStarModePercentExtraTime->add("75", 75, false, false);
+    miStarModePercentExtraTime->add("80", 80, false, false);
+    miStarModePercentExtraTime->add("85", 85, false, false);
+    miStarModePercentExtraTime->add("90", 90, false, false);
+    miStarModePercentExtraTime->add("95", 95, false, false);
+    miStarModePercentExtraTime->add("100", 100, false, false);
+    miStarModePercentExtraTime->setOutputPtr(&game_values.gamemodemenusettings.star.percentextratime);
+    miStarModePercentExtraTime->setCurrentValue(game_values.gamemodemenusettings.star.percentextratime);
+    miStarModePercentExtraTime->allowWrap(false);
 
     miStarModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miStarModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -900,20 +900,20 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
 
     for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++) {
         miSurvivalModeEnemySlider[iEnemy] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->menu_survival, 120, 120 + 40 * iEnemy, 400, iEnemy);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 0, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 1, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 2, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 3, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 4, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 5, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 6, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 7, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 8, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 9, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->Add("", 10, "", false, false);
-        miSurvivalModeEnemySlider[iEnemy]->SetNoWrap(true);
-        miSurvivalModeEnemySlider[iEnemy]->SetData(&game_values.gamemodemenusettings.survival.enemyweight[iEnemy], NULL, NULL);
-        miSurvivalModeEnemySlider[iEnemy]->SetKey(game_values.gamemodemenusettings.survival.enemyweight[iEnemy]);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 0);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 1);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 2);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 3);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 4);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 5);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 6);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 7);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 8);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 9);
+        miSurvivalModeEnemySlider[iEnemy]->add("", 10);
+        miSurvivalModeEnemySlider[iEnemy]->allowWrap(false);
+        miSurvivalModeEnemySlider[iEnemy]->setOutputPtr(&game_values.gamemodemenusettings.survival.enemyweight[iEnemy]);
+        miSurvivalModeEnemySlider[iEnemy]->setCurrentValue(game_values.gamemodemenusettings.survival.enemyweight[iEnemy]);
     }
 
     miSurvivalModeDensityField = new MI_SelectField(&rm->spr_selectfield, 120, 240, "Density", 400, 180);
@@ -1009,30 +1009,30 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miGreedModeMultiplier->SetKey(game_values.gamemodemenusettings.greed.multiplier);
 
     miGreedModePercentExtraCoin = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 120, 280, "Extra Coins", 400, 150, 384);
-    miGreedModePercentExtraCoin->Add("0", 0, false, false);
-    miGreedModePercentExtraCoin->Add("5", 5, false, false);
-    miGreedModePercentExtraCoin->Add("10", 10);
-    miGreedModePercentExtraCoin->Add("15", 15);
-    miGreedModePercentExtraCoin->Add("20", 20);
-    miGreedModePercentExtraCoin->Add("25", 25);
-    miGreedModePercentExtraCoin->Add("30", 30);
-    miGreedModePercentExtraCoin->Add("35", 35);
-    miGreedModePercentExtraCoin->Add("40", 40);
-    miGreedModePercentExtraCoin->Add("45", 45);
-    miGreedModePercentExtraCoin->Add("50", 50);
-    miGreedModePercentExtraCoin->Add("55", 55, false, false);
-    miGreedModePercentExtraCoin->Add("60", 60, false, false);
-    miGreedModePercentExtraCoin->Add("65", 65, false, false);
-    miGreedModePercentExtraCoin->Add("70", 70, false, false);
-    miGreedModePercentExtraCoin->Add("75", 75, false, false);
-    miGreedModePercentExtraCoin->Add("80", 80, false, false);
-    miGreedModePercentExtraCoin->Add("85", 85, false, false);
-    miGreedModePercentExtraCoin->Add("90", 90, false, false);
-    miGreedModePercentExtraCoin->Add("95", 95, false, false);
-    miGreedModePercentExtraCoin->Add("100", 100, false, false);
-    miGreedModePercentExtraCoin->SetData(&game_values.gamemodemenusettings.greed.percentextracoin, NULL, NULL);
-    miGreedModePercentExtraCoin->SetKey(game_values.gamemodemenusettings.greed.percentextracoin);
-    miGreedModePercentExtraCoin->SetNoWrap(true);
+    miGreedModePercentExtraCoin->add("0", 0, false, false);
+    miGreedModePercentExtraCoin->add("5", 5, false, false);
+    miGreedModePercentExtraCoin->add("10", 10);
+    miGreedModePercentExtraCoin->add("15", 15);
+    miGreedModePercentExtraCoin->add("20", 20);
+    miGreedModePercentExtraCoin->add("25", 25);
+    miGreedModePercentExtraCoin->add("30", 30);
+    miGreedModePercentExtraCoin->add("35", 35);
+    miGreedModePercentExtraCoin->add("40", 40);
+    miGreedModePercentExtraCoin->add("45", 45);
+    miGreedModePercentExtraCoin->add("50", 50);
+    miGreedModePercentExtraCoin->add("55", 55, false, false);
+    miGreedModePercentExtraCoin->add("60", 60, false, false);
+    miGreedModePercentExtraCoin->add("65", 65, false, false);
+    miGreedModePercentExtraCoin->add("70", 70, false, false);
+    miGreedModePercentExtraCoin->add("75", 75, false, false);
+    miGreedModePercentExtraCoin->add("80", 80, false, false);
+    miGreedModePercentExtraCoin->add("85", 85, false, false);
+    miGreedModePercentExtraCoin->add("90", 90, false, false);
+    miGreedModePercentExtraCoin->add("95", 95, false, false);
+    miGreedModePercentExtraCoin->add("100", 100, false, false);
+    miGreedModePercentExtraCoin->setOutputPtr(&game_values.gamemodemenusettings.greed.percentextracoin);
+    miGreedModePercentExtraCoin->setCurrentValue(game_values.gamemodemenusettings.greed.percentextracoin);
+    miGreedModePercentExtraCoin->allowWrap(false);
 
     miGreedModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miGreedModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -1090,30 +1090,30 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miHealthModeMaxLife->SetItemChangedCode(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED);
 
     miHealthModePercentExtraLife = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 120, 260, "Extra Life", 400, 150, 384);
-    miHealthModePercentExtraLife->Add("0", 0, false, false);
-    miHealthModePercentExtraLife->Add("5", 5, false, false);
-    miHealthModePercentExtraLife->Add("10", 10);
-    miHealthModePercentExtraLife->Add("15", 15);
-    miHealthModePercentExtraLife->Add("20", 20);
-    miHealthModePercentExtraLife->Add("25", 25);
-    miHealthModePercentExtraLife->Add("30", 30);
-    miHealthModePercentExtraLife->Add("35", 35);
-    miHealthModePercentExtraLife->Add("40", 40);
-    miHealthModePercentExtraLife->Add("45", 45);
-    miHealthModePercentExtraLife->Add("50", 50);
-    miHealthModePercentExtraLife->Add("55", 55, false, false);
-    miHealthModePercentExtraLife->Add("60", 60, false, false);
-    miHealthModePercentExtraLife->Add("65", 65, false, false);
-    miHealthModePercentExtraLife->Add("70", 70, false, false);
-    miHealthModePercentExtraLife->Add("75", 75, false, false);
-    miHealthModePercentExtraLife->Add("80", 80, false, false);
-    miHealthModePercentExtraLife->Add("85", 85, false, false);
-    miHealthModePercentExtraLife->Add("90", 90, false, false);
-    miHealthModePercentExtraLife->Add("95", 95, false, false);
-    miHealthModePercentExtraLife->Add("100", 100, false, false);
-    miHealthModePercentExtraLife->SetData(&game_values.gamemodemenusettings.health.percentextralife, NULL, NULL);
-    miHealthModePercentExtraLife->SetKey(game_values.gamemodemenusettings.health.percentextralife);
-    miHealthModePercentExtraLife->SetNoWrap(true);
+    miHealthModePercentExtraLife->add("0", 0, false, false);
+    miHealthModePercentExtraLife->add("5", 5, false, false);
+    miHealthModePercentExtraLife->add("10", 10);
+    miHealthModePercentExtraLife->add("15", 15);
+    miHealthModePercentExtraLife->add("20", 20);
+    miHealthModePercentExtraLife->add("25", 25);
+    miHealthModePercentExtraLife->add("30", 30);
+    miHealthModePercentExtraLife->add("35", 35);
+    miHealthModePercentExtraLife->add("40", 40);
+    miHealthModePercentExtraLife->add("45", 45);
+    miHealthModePercentExtraLife->add("50", 50);
+    miHealthModePercentExtraLife->add("55", 55, false, false);
+    miHealthModePercentExtraLife->add("60", 60, false, false);
+    miHealthModePercentExtraLife->add("65", 65, false, false);
+    miHealthModePercentExtraLife->add("70", 70, false, false);
+    miHealthModePercentExtraLife->add("75", 75, false, false);
+    miHealthModePercentExtraLife->add("80", 80, false, false);
+    miHealthModePercentExtraLife->add("85", 85, false, false);
+    miHealthModePercentExtraLife->add("90", 90, false, false);
+    miHealthModePercentExtraLife->add("95", 95, false, false);
+    miHealthModePercentExtraLife->add("100", 100, false, false);
+    miHealthModePercentExtraLife->setOutputPtr(&game_values.gamemodemenusettings.health.percentextralife);
+    miHealthModePercentExtraLife->setCurrentValue(game_values.gamemodemenusettings.health.percentextralife);
+    miHealthModePercentExtraLife->allowWrap(false);
 
     miHealthModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miHealthModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -1239,15 +1239,15 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
 
     for (short iPhanto = 0; iPhanto < 3; iPhanto++) {
         miChaseModeQuantitySlider[iPhanto] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->spr_phanto, 120, 200 + 40 * iPhanto, 400, iPhanto);
-        miChaseModeQuantitySlider[iPhanto]->Add("", 0, false, iPhanto == 0 ? false : true);
-        miChaseModeQuantitySlider[iPhanto]->Add("", 1);
-        miChaseModeQuantitySlider[iPhanto]->Add("", 2);
-        miChaseModeQuantitySlider[iPhanto]->Add("", 3, false, false);
-        miChaseModeQuantitySlider[iPhanto]->Add("", 4, false, false);
-        miChaseModeQuantitySlider[iPhanto]->Add("", 5, false, false);
-        miChaseModeQuantitySlider[iPhanto]->SetNoWrap(true);
-        miChaseModeQuantitySlider[iPhanto]->SetData(&game_values.gamemodemenusettings.chase.phantoquantity[iPhanto], NULL, NULL);
-        miChaseModeQuantitySlider[iPhanto]->SetKey(game_values.gamemodemenusettings.chase.phantoquantity[iPhanto]);
+        miChaseModeQuantitySlider[iPhanto]->add("", 0, false, iPhanto == 0 ? false : true);
+        miChaseModeQuantitySlider[iPhanto]->add("", 1);
+        miChaseModeQuantitySlider[iPhanto]->add("", 2);
+        miChaseModeQuantitySlider[iPhanto]->add("", 3, false, false);
+        miChaseModeQuantitySlider[iPhanto]->add("", 4, false, false);
+        miChaseModeQuantitySlider[iPhanto]->add("", 5, false, false);
+        miChaseModeQuantitySlider[iPhanto]->allowWrap(false);
+        miChaseModeQuantitySlider[iPhanto]->setOutputPtr(&game_values.gamemodemenusettings.chase.phantoquantity[iPhanto]);
+        miChaseModeQuantitySlider[iPhanto]->setCurrentValue(game_values.gamemodemenusettings.chase.phantoquantity[iPhanto]);
     }
 
     miChaseModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
@@ -1407,31 +1407,31 @@ void UI_ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
     } else if (iMode == game_mode_timelimit) { // time
         game_values.gamemodesettings.time.style = miTimeLimitModeStyleField->GetRandomShortValue();
         game_values.gamemodesettings.time.scoring = miTimeLimitModeScoringField->GetRandomShortValue();
-        game_values.gamemodesettings.time.percentextratime = miTimeLimitModePercentExtraTime->GetRandomShortValue();
+        game_values.gamemodesettings.time.percentextratime = miTimeLimitModePercentExtraTime->currentValue();
     } else if (iMode == game_mode_jail) { // jail
         game_values.gamemodesettings.jail.style = miJailModeStyleField->GetRandomShortValue();
         game_values.gamemodesettings.jail.timetofree = miJailModeTimeFreeField->GetRandomShortValue();
         game_values.gamemodesettings.jail.tagfree = miJailModeTagFreeField->randomValue();
-        game_values.gamemodesettings.jail.percentkey = miJailModeJailKeyField->GetRandomShortValue();
+        game_values.gamemodesettings.jail.percentkey = miJailModeJailKeyField->currentValue();
     } else if (iMode == game_mode_coins) { // coins
         game_values.gamemodesettings.coins.penalty = miCoinModePenaltyField->randomValue();
         game_values.gamemodesettings.coins.quantity = miCoinModeQuantityField->GetRandomShortValue();
-        game_values.gamemodesettings.coins.percentextracoin = miCoinModePercentExtraCoin->GetRandomShortValue();
+        game_values.gamemodesettings.coins.percentextracoin = miCoinModePercentExtraCoin->currentValue();
     } else if (iMode == game_mode_stomp) { // stomp
         game_values.gamemodesettings.stomp.rate = miStompModeRateField->GetRandomShortValue();
 
         for (short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
-            game_values.gamemodesettings.stomp.enemyweight[iEnemy] = miStompModeEnemySlider[iEnemy]->GetRandomShortValue();
+            game_values.gamemodesettings.stomp.enemyweight[iEnemy] = miStompModeEnemySlider[iEnemy]->currentValue();
     } else if (iMode == game_mode_eggs) { // egg
         for (int iEgg = 0; iEgg < 4; iEgg++)
-            game_values.gamemodesettings.egg.eggs[iEgg] = miEggModeEggQuantityField[iEgg]->GetRandomShortValue();
+            game_values.gamemodesettings.egg.eggs[iEgg] = miEggModeEggQuantityField[iEgg]->currentValue();
 
         for (int iYoshi = 0; iYoshi < 4; iYoshi++)
-            game_values.gamemodesettings.egg.yoshis[iYoshi] = miEggModeYoshiQuantityField[iYoshi]->GetRandomShortValue();
+            game_values.gamemodesettings.egg.yoshis[iYoshi] = miEggModeYoshiQuantityField[iYoshi]->currentValue();
 
         game_values.gamemodesettings.egg.explode = miEggModeExplosionTimeField->GetRandomShortValue();
     } else if (iMode == game_mode_ctf) { // capture the flag
-        game_values.gamemodesettings.flag.speed = miFlagModeSpeedField->GetRandomShortValue();
+        game_values.gamemodesettings.flag.speed = miFlagModeSpeedField->currentValue();
         game_values.gamemodesettings.flag.touchreturn = miFlagModeTouchReturnField->randomValue();
         game_values.gamemodesettings.flag.pointmove = miFlagModePointMoveField->randomValue();
         game_values.gamemodesettings.flag.autoreturn = miFlagModeAutoReturnField->GetRandomShortValue();
@@ -1445,7 +1445,7 @@ void UI_ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
     } else if (iMode == game_mode_star) { // star
         game_values.gamemodesettings.star.time = miStarModeTimeField->GetRandomShortValue();
         game_values.gamemodesettings.star.shine = miStarModeShineField->GetRandomShortValue();
-        game_values.gamemodesettings.star.percentextratime = miStarModePercentExtraTime->GetRandomShortValue();
+        game_values.gamemodesettings.star.percentextratime = miStarModePercentExtraTime->currentValue();
     } else if (iMode == game_mode_domination) { // domination
         game_values.gamemodesettings.domination.quantity = miDominationModeQuantityField->GetRandomShortValue();
         game_values.gamemodesettings.domination.loseondeath = miDominationModeLoseOnDeathField->randomValue();
@@ -1468,16 +1468,16 @@ void UI_ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
         game_values.gamemodesettings.survival.shield = miSurvivalModeShieldField->randomValue();
 
         for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
-            game_values.gamemodesettings.survival.enemyweight[iEnemy] = miSurvivalModeEnemySlider[iEnemy]->GetRandomShortValue();
+            game_values.gamemodesettings.survival.enemyweight[iEnemy] = miSurvivalModeEnemySlider[iEnemy]->currentValue();
     } else if (iMode == game_mode_greed) { // greed
         game_values.gamemodesettings.greed.coinlife = miGreedModeCoinLife->GetRandomShortValue();
         game_values.gamemodesettings.greed.owncoins = miGreedModeOwnCoins->randomValue();
         game_values.gamemodesettings.greed.multiplier = miGreedModeMultiplier->GetRandomShortValue();
-        game_values.gamemodesettings.greed.percentextracoin = miGreedModePercentExtraCoin->GetRandomShortValue();
+        game_values.gamemodesettings.greed.percentextracoin = miGreedModePercentExtraCoin->currentValue();
     } else if (iMode == game_mode_health) { // health
         game_values.gamemodesettings.health.startlife = miHealthModeStartLife->GetRandomShortValue();
         game_values.gamemodesettings.health.maxlife = miHealthModeMaxLife->GetRandomShortValue();
-        game_values.gamemodesettings.health.percentextralife = miHealthModePercentExtraLife->GetRandomShortValue();
+        game_values.gamemodesettings.health.percentextralife = miHealthModePercentExtraLife->currentValue();
     } else if (iMode == game_mode_collection) { // card collection
         game_values.gamemodesettings.collection.quantity = miCollectionModeQuantityField->GetRandomShortValue();
         game_values.gamemodesettings.collection.rate = miCollectionModeRateField->GetRandomShortValue();
@@ -1487,7 +1487,7 @@ void UI_ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
         game_values.gamemodesettings.chase.phantospeed = miChaseModeSpeedField->GetRandomShortValue();
 
         for (short iPhanto = 0; iPhanto < 3; iPhanto++)
-            game_values.gamemodesettings.chase.phantoquantity[iPhanto] = miChaseModeQuantitySlider[iPhanto]->GetRandomShortValue();
+            game_values.gamemodesettings.chase.phantoquantity[iPhanto] = miChaseModeQuantitySlider[iPhanto]->currentValue();
     } else if (iMode == game_mode_shyguytag) { // shyguy tag
         game_values.gamemodesettings.shyguytag.tagonsuicide = miShyGuyTagModeTagOnSuicideField->randomValue();
         game_values.gamemodesettings.shyguytag.tagtransfer = miShyGuyTagModeTagOnStompField->GetRandomShortValue();

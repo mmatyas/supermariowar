@@ -68,20 +68,20 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
     short iPowerupMap[] = {8, 5, 11, 17, 19, 21, 23, 24, 25, 20, 9, 16, 10, 22, 12, 13, 14, 15, 27};
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
         miPowerupSlider[iPowerup] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->spr_storedpoweruplarge, iPowerup < 10 ? 65 : 330, 0, 245, iPowerupMap[iPowerup]);
-        miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 2, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 3, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 4, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 5, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 6, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 7, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 8, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 9, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 10, "", false, false);
-        miPowerupSlider[iPowerup]->SetNoWrap(true);
-        miPowerupSlider[iPowerup]->SetData(&game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup], NULL, NULL);
-        miPowerupSlider[iPowerup]->SetKey(game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
+        miPowerupSlider[iPowerup]->add("", 0);
+        miPowerupSlider[iPowerup]->add("", 1);
+        miPowerupSlider[iPowerup]->add("", 2);
+        miPowerupSlider[iPowerup]->add("", 3);
+        miPowerupSlider[iPowerup]->add("", 4);
+        miPowerupSlider[iPowerup]->add("", 5);
+        miPowerupSlider[iPowerup]->add("", 6);
+        miPowerupSlider[iPowerup]->add("", 7);
+        miPowerupSlider[iPowerup]->add("", 8);
+        miPowerupSlider[iPowerup]->add("", 9);
+        miPowerupSlider[iPowerup]->add("", 10);
+        miPowerupSlider[iPowerup]->allowWrap(false);
+        miPowerupSlider[iPowerup]->setOutputPtr(&game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
+        miPowerupSlider[iPowerup]->setCurrentValue(game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
     }
 
     miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
@@ -243,7 +243,7 @@ void MI_FrenzyModeOptions::SetRandomGameModeSettings()
     game_values.gamemodesettings.frenzy.storedshells = miStoredShellsField->randomValue();
 
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
-        game_values.gamemodesettings.frenzy.powerupweight[iPowerup] = miPowerupSlider[iPowerup]->GetRandomShortValue();
+        game_values.gamemodesettings.frenzy.powerupweight[iPowerup] = miPowerupSlider[iPowerup]->randomValue();
 }
 
 void MI_FrenzyModeOptions::AdjustDisplayArrows()

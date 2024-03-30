@@ -13,7 +13,7 @@ public:
     void Draw() override;
 
 protected:
-    gfxSprite* sprPowerup = nullptr;
-    short iPowerupIndex = 0;
-    short iHalfWidth = 0;
+    gfxSprite* m_sprPowerup = nullptr;
+    short m_powerupIndex = 0;
+    short m_halfWidth = 0;
 };

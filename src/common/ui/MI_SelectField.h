@@ -243,7 +243,7 @@ public:
     //! Sets the currently selected item
     bool setCurrentIndex(size_t index);
     //! Adds an item to the list
-    void add(std::string name, T value, bool hidden = false, bool goodRandom = true, short iconOverride = -1);
+    void add(std::string name, T value, bool hidden = false, bool goodRandom = true);
     //! Removes all items
     void clear();
     //! Hides the items containing the specified value

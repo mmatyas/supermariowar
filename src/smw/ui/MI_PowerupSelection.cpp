@@ -108,21 +108,21 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 
     for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
         miPowerupSlider[iPowerup] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->spr_storedpoweruplarge, 0, 0, 245, iPowerupPositionMap[iPowerup]);
-        miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 2, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 3, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 4, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 5, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 6, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 7, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 8, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 9, "", false, false);
-        miPowerupSlider[iPowerup]->Add("", 10, "", false, false);
-        miPowerupSlider[iPowerup]->SetNoWrap(true);
-        miPowerupSlider[iPowerup]->SetData(&game_values.powerupweights[iPowerupPositionMap[iPowerup]], NULL, NULL);
-        miPowerupSlider[iPowerup]->SetKey(game_values.powerupweights[iPowerupPositionMap[iPowerup]]);
-        miPowerupSlider[iPowerup]->SetItemChangedCode(MENU_CODE_POWERUP_SETTING_CHANGED);
+        miPowerupSlider[iPowerup]->add("", 0);
+        miPowerupSlider[iPowerup]->add("", 1);
+        miPowerupSlider[iPowerup]->add("", 2);
+        miPowerupSlider[iPowerup]->add("", 3);
+        miPowerupSlider[iPowerup]->add("", 4);
+        miPowerupSlider[iPowerup]->add("", 5);
+        miPowerupSlider[iPowerup]->add("", 6);
+        miPowerupSlider[iPowerup]->add("", 7);
+        miPowerupSlider[iPowerup]->add("", 8);
+        miPowerupSlider[iPowerup]->add("", 9);
+        miPowerupSlider[iPowerup]->add("", 10);
+        miPowerupSlider[iPowerup]->allowWrap(false);
+        miPowerupSlider[iPowerup]->setOutputPtr(&game_values.powerupweights[iPowerupPositionMap[iPowerup]]);
+        miPowerupSlider[iPowerup]->setCurrentValue(game_values.powerupweights[iPowerupPositionMap[iPowerup]]);
+        miPowerupSlider[iPowerup]->setItemChangedCode(MENU_CODE_POWERUP_SETTING_CHANGED);
     }
 
     miRestoreDefaultsButton = new MI_Button(&rm->spr_selectfield, 160, 432, "Defaults", 150, TextAlign::CENTER);
@@ -256,7 +256,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
     } else if (MENU_CODE_POWERUP_PRESET_CHANGED == ret) {
         for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
             short iCurrentValue = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]];
-            miPowerupSlider[iPowerup]->SetKey(iCurrentValue);
+            miPowerupSlider[iPowerup]->setCurrentValue(iCurrentValue);
             game_values.powerupweights[iPowerupPositionMap[iPowerup]] = iCurrentValue;
         }
 
@@ -300,7 +300,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
             //restore default powerup weights for powerup selection menu
             for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
                 short iDefaultValue = g_iDefaultPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]];
-                miPowerupSlider[iPowerup]->SetKey(iDefaultValue);
+                miPowerupSlider[iPowerup]->setCurrentValue(iDefaultValue);
                 game_values.powerupweights[iPowerupPositionMap[iPowerup]] = iDefaultValue;
 
                 g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]] = iDefaultValue;
@@ -308,7 +308,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
         } else if (MENU_CODE_POWERUP_CLEAR_YES == ret) {
             //restore default powerup weights for powerup selection menu
             for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
-                miPowerupSlider[iPowerup]->SetKey(0);
+                miPowerupSlider[iPowerup]->setCurrentValue(0);
                 game_values.powerupweights[iPowerup] = 0;
 
                 g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup] = 0;

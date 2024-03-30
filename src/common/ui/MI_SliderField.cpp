@@ -10,11 +10,11 @@ extern CResourceManager* rm;
  * MI_SliderField Class
  **************************************/
 
-MI_SliderField::MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2) :
-    MI_SelectField(nspr, x, y, name, width, indent1)
+MI_SliderField::MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2)
+    : MI_SelectFieldDyn<short>(nspr, x, y, name, width, indent1)
 {
-    iIndent2 = indent2;
-    sprSlider = nsprSlider;
+    m_indent2 = indent2;
+    m_sprSlider = nsprSlider;
 
     SetPosition(x, y);
 }
@@ -24,9 +24,9 @@ MI_SliderField::~MI_SliderField()
 
 void MI_SliderField::SetPosition(short x, short y)
 {
-    MI_SelectField::SetPosition(x, y);
-    miModifyImageLeft->SetPosition(ix + iIndent - 26, iy + 4);
-    miModifyImageRight->SetPosition(ix + iWidth - 16, iy + 4);
+    MI_SelectFieldDyn<short>::SetPosition(x, y);
+    miModifyImageLeft->SetPosition(ix + m_indent - 26, iy + 4);
+    miModifyImageRight->SetPosition(ix + m_width - 16, iy + 4);
 }
 
 void MI_SliderField::Draw()
@@ -34,34 +34,36 @@ void MI_SliderField::Draw()
     if (!fShow)
         return;
 
-    spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);
-    spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
-    spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
+    m_spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + m_adjustmentY, m_indent - 16, 32);
+    m_spr->draw(ix + m_indent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
+    m_spr->draw(ix + m_indent + 16, iy, 528 - m_width + m_indent, (fSelected ? 32 : 0) + m_adjustmentY, m_width - m_indent - 16, 32);
 
-    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName.c_str());
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, m_indent - 8, m_name.c_str());
 
-    if (!items.empty()) {
-        rm->menu_font_large.drawChopRight(ix + iIndent2 + 16, iy + 5, iWidth - iIndent2 - 24, (*current)->sName.c_str());
+    if (!m_items.empty()) {
+        rm->menu_font_large.drawChopRight(ix + m_indent2 + 16, iy + 5, m_width - m_indent2 - 24, currentItem().name.c_str());
     }
 
-    short iSpacing = (iIndent2 - iIndent - 20) / ((short)items.size() - 1);
+    short iSpacing = (m_indent2 - m_indent - 20) / ((short)m_items.size() - 1);
     short iSpot = 0;
 
-    for (unsigned int index = 0; index < items.size(); index++) {
-        if (index < items.size() - 1)
-            sprSlider->draw(ix + iIndent + iSpot + 16, iy + 10, 0, 0, iSpacing, 13);
+    for (unsigned int index = 0; index < m_items.size(); index++) {
+        if (index < m_items.size() - 1)
+            m_sprSlider->draw(ix + m_indent + iSpot + 16, iy + 10, 0, 0, iSpacing, 13);
         else
-            sprSlider->draw(ix + iIndent + iSpot + 16, iy + 10, 164, 0, 4, 13);
+            m_sprSlider->draw(ix + m_indent + iSpot + 16, iy + 10, 164, 0, 4, 13);
 
         iSpot += iSpacing;
     }
 
-    sprSlider->draw(ix + iIndent + (iIndex * iSpacing) + 14, iy + 8, 168, 0, 8, 16);
+    m_sprSlider->draw(ix + m_indent + (m_index * iSpacing) + 14, iy + 8, 168, 0, 8, 16);
 
-    if (current != items.begin() || !fNoWrap)
+    const bool drawLeft = m_index > 0;
+    if (m_wraps || drawLeft)
         miModifyImageLeft->Draw();
 
-    if (current != --items.end() || !fNoWrap)
+    const bool drawRight = (m_index + 1) < m_items.size();
+    if (m_wraps || drawRight)
         miModifyImageRight->Draw();
 }
 
@@ -69,14 +71,14 @@ MenuCodeEnum MI_SliderField::SendInput(CPlayerInput * playerInput)
 {
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if (playerInput->outputControls[iPlayer].menu_scrollfast.fPressed) {
-            if (iIndex == 0)
-                while (MoveNext());
+            if (m_index == 0)
+                while (moveNext());
             else
-                while (MovePrev());
+                while (movePrev());
 
             return mcItemChangedCode;
         }
     }
 
-    return MI_SelectField::SendInput(playerInput);
+    return MI_SelectFieldDyn<short>::SendInput(playerInput);
 }

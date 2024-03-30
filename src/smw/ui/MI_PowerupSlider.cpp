@@ -5,12 +5,12 @@
 
 MI_PowerupSlider::MI_PowerupSlider(gfxSprite* nspr, gfxSprite* nsprSlider, gfxSprite* nsprPowerup, short x, short y, short width, short powerupIndex)
     : MI_SliderField(nspr, nsprSlider, x, y, "", width, 0, 0)
-    , sprPowerup(nsprPowerup)
-    , iPowerupIndex(powerupIndex)
-    , iHalfWidth((width - 38) / 2)
+    , m_sprPowerup(nsprPowerup)
+    , m_powerupIndex(powerupIndex)
+    , m_halfWidth((width - 38) / 2)
 {
     miModifyImageLeft->SetPosition(ix + 25, iy + 4);
-    miModifyImageRight->SetPosition(ix + iWidth - 12, iy + 4);
+    miModifyImageRight->SetPosition(ix + m_width - 12, iy + 4);
 }
 
 void MI_PowerupSlider::Draw()
@@ -18,30 +18,30 @@ void MI_PowerupSlider::Draw()
     if (!fShow)
         return;
 
-    spr->draw(ix + 38, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iHalfWidth, 32);
-    spr->draw(ix + 38 + iHalfWidth, iy, 550 - iWidth + iHalfWidth, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iHalfWidth - 38, 32);
+    m_spr->draw(ix + 38, iy, 0, (fSelected ? 32 : 0) + m_adjustmentY, m_halfWidth, 32);
+    m_spr->draw(ix + 38 + m_halfWidth, iy, 550 - m_width + m_halfWidth, (fSelected ? 32 : 0) + m_adjustmentY, m_width - m_halfWidth - 38, 32);
 
-    short iSpacing = (iWidth - 100) / ((short)items.size() - 1);
+    short iSpacing = (m_width - 100) / ((short)m_items.size() - 1);
     short iSpot = 0;
 
-    for (unsigned int index = 0; index < items.size(); index++) {
-        if (index < items.size() - 1)
-            sprSlider->draw(ix + iSpot + 56, iy + 10, 0, 0, iSpacing, 13);
+    for (unsigned int index = 0; index < m_items.size(); index++) {
+        if (index < m_items.size() - 1)
+            m_sprSlider->draw(ix + iSpot + 56, iy + 10, 0, 0, iSpacing, 13);
         else
-            sprSlider->draw(ix + iSpot + 56, iy + 10, 164, 0, 4, 13);
+            m_sprSlider->draw(ix + iSpot + 56, iy + 10, 164, 0, 4, 13);
 
         iSpot += iSpacing;
     }
 
-    sprSlider->draw(ix + (iIndex * iSpacing) + 54, iy + 8, 168, 0, 8, 16);
+    m_sprSlider->draw(ix + (m_index * iSpacing) + 54, iy + 8, 168, 0, 8, 16);
+    m_sprSlider->draw(ix + m_width - 34, iy + 8, m_index * 16, 16, 16, 16);
+    m_sprPowerup->draw(ix, iy, m_powerupIndex * 32, 0, 32, 32);
 
-    sprSlider->draw(ix + iWidth - 34, iy + 8, iIndex * 16, 16, 16, 16);
-
-    sprPowerup->draw(ix, iy, iPowerupIndex * 32, 0, 32, 32);
-
-    if (current != items.begin() || !fNoWrap)
+    const bool drawLeft = m_index > 0;
+    if (m_wraps || drawLeft)
         miModifyImageLeft->Draw();
 
-    if (current != --items.end() || !fNoWrap)
+    const bool drawRight = (m_index + 1) < m_items.size();
+    if (m_wraps || drawRight)
         miModifyImageRight->Draw();
 }
