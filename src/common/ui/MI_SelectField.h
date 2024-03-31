@@ -242,6 +242,8 @@ public:
     void hideItem(T value, bool hide);
     //! Hides all items
     void hideAllItems(bool hide);
+    //! Updates the value pointed by the output pointer, if it's set
+    void updateOutput() const;
 
 public:
     void Update() override;  //! Updates animations or other events every frame
@@ -273,7 +275,6 @@ protected:
     size_t m_index = 0;
     T* m_outputPtr = nullptr;
 
-    void updateOutput() const;
     bool moveNext();
     bool movePrev();
     bool moveRandom();
