@@ -55,6 +55,7 @@ add_library(CommonFiles STATIC
     ResourceManager.h
     sfx.cpp
     sfx.h
+    SpawnStyles.h
     TilesetManager.cpp
     TilesetManager.h
     ui/MI_MapPreview.cpp

@@ -5,6 +5,7 @@
 #include "GameModeSettings.h"
 #include "input.h"
 #include "MatchTypes.h"
+#include "SpawnStyles.h"
 
 #include <vector>
 
@@ -71,7 +72,7 @@ public:
     short		soundvolume;
     short		musicvolume;
     bool		fullscreen;
-    short		spawnstyle;
+    SpawnStyle spawnstyle;
     AwardStyle awardstyle;
     short		teamcollision;
     short		shellttl;

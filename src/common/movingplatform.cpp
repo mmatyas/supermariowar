@@ -66,10 +66,10 @@ MovingPlatformPath::MovingPlatformPath(float vel, float startX, float startY, fl
 void MovingPlatformPath::Reset()
 {
     //advance the spawn test platform
-    if (game_values.spawnstyle == 1) {
+    if (game_values.spawnstyle == SpawnStyle::Door) {
         for (short i = 0; i < 36; i++)
             Move(1);
-    } else if (game_values.spawnstyle == 2) {
+    } else if (game_values.spawnstyle == SpawnStyle::Swirl) {
         for (short i = 0; i < 50; i++)
             Move(1);
     }

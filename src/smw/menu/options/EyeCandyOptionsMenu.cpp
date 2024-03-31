@@ -14,10 +14,10 @@ extern CGameValues game_values;
 UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu()
     : UI_Menu()
 {
-    miSpawnStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 80, "Spawn Style", 500, 220);
-    miSpawnStyleField->add("Instant", 0);
-    miSpawnStyleField->add("Door", 1);
-    miSpawnStyleField->add("Swirl", 2);
+    miSpawnStyleField = new MI_SelectField<SpawnStyle>(&rm->spr_selectfield, 70, 80, "Spawn Style", 500, 220);
+    miSpawnStyleField->add("Instant", SpawnStyle::Instant);
+    miSpawnStyleField->add("Door", SpawnStyle::Door);
+    miSpawnStyleField->add("Swirl", SpawnStyle::Swirl);
     miSpawnStyleField->setOutputPtr(&game_values.spawnstyle);
     miSpawnStyleField->setCurrentValue(game_values.spawnstyle);
 

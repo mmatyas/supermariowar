@@ -364,8 +364,11 @@ bool MI_SelectField<T>::moveRandom()
 template class MI_SelectField<bool>;
 template class MI_SelectField<short>;
 
+#include "AwardStyles.h"
+template class MI_SelectField<AwardStyle>;
+
 #include "MatchTypes.h"
 template class MI_SelectField<MatchType>;
 
-#include "AwardStyles.h"
-template class MI_SelectField<AwardStyle>;
+#include "SpawnStyles.h"
+template class MI_SelectField<SpawnStyle>;

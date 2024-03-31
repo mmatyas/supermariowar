@@ -124,7 +124,7 @@ void CGameValues::init()
     exitinggame     = false;
     exityes       = false;
     awardstyle      = AwardStyle::Fireworks;
-    spawnstyle      = 2;
+    spawnstyle      = SpawnStyle::Swirl;
     tournamentgames   = 2;
     tournamentwinner  = -1;
     selectedminigame  = 0;
@@ -334,7 +334,7 @@ void CGameValues::ReadBinaryConfig() {
         SDL_XBOX_SetScreenStretch(screenResizeW, screenResizeH);
 #endif
 
-        spawnstyle = options.read_u8();
+        spawnstyle = static_cast<SpawnStyle>(options.read_u8());
         awardstyle = static_cast<AwardStyle>(options.read_u8());
         teamcollision = options.read_u8();
         screencrunch = options.read_u8();
@@ -492,7 +492,7 @@ void CGameValues::WriteConfig()
         options.write_float(screenResizeH);
 #endif
 
-        options.write_u8(spawnstyle);
+        options.write_u8(static_cast<uint8_t>(spawnstyle));
         options.write_u8(static_cast<uint8_t>(awardstyle));
         options.write_u8(teamcollision);
         options.write_u8(screencrunch);

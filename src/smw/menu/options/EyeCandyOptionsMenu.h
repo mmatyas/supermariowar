@@ -7,6 +7,7 @@ class MI_Image;
 class MI_Text;
 template<typename T> class MI_SelectField;
 enum class AwardStyle : unsigned char;
+enum class SpawnStyle : unsigned char;
 
 
 class UI_EyeCandyOptionsMenu : public UI_Menu {
@@ -14,7 +15,7 @@ public:
     UI_EyeCandyOptionsMenu();
 
 private:
-    MI_SelectField<short>* miSpawnStyleField;
+    MI_SelectField<SpawnStyle>* miSpawnStyleField;
     MI_SelectField<AwardStyle>* miAwardStyleField;
     MI_SelectField<short>* miScoreStyleField;
     MI_SelectField<bool>* miCrunchField;

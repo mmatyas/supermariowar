@@ -648,9 +648,9 @@ void CPlayer::update_waitingForRespawn()
 
             state = player_spawning;
 
-            if (game_values.spawnstyle == 0) {
+            if (game_values.spawnstyle == SpawnStyle::Instant) {
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-            } else if (game_values.spawnstyle == 1) {
+            } else if (game_values.spawnstyle == SpawnStyle::Door) {
                 eyecandy[0].add(new EC_Door(&rm->spr_spawndoor, sprites[sprite_state], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
             }
         }
@@ -661,26 +661,30 @@ void CPlayer::update_respawning()
 {
     assert(isspawning());
 
-    if (game_values.spawnstyle == 0) {
-        state = player_ready;
-    } else if (game_values.spawnstyle == 1) {
-        //Wait for door eyecandy to open to let mario out (20 frames for door to appear and 16 frames to open)
-        if (++spawntimer > 36) {
-            spawntimer = 0;
+    switch (game_values.spawnstyle) {
+        case SpawnStyle::Instant:
             state = player_ready;
-        }
-    } else if (game_values.spawnstyle == 2) {
-        if (++spawntimer >= 50) {
-            state = player_ready;
-        } else if (spawntimer % 2) {
-            short swirlindex = spawntimer >> 1;
-            short ixoffset = ix - PWOFFSET;
-            short iyoffset = iy - PHOFFSET;
-            short iColorIdOffset = colorID << 5;
+            break;
+        case SpawnStyle::Door:
+            //Wait for door eyecandy to open to let mario out (20 frames for door to appear and 16 frames to open)
+            if (++spawntimer > 36) {
+                spawntimer = 0;
+                state = player_ready;
+            }
+            break;
+        case SpawnStyle::Swirl:
+            if (++spawntimer >= 50) {
+                state = player_ready;
+            } else if (spawntimer % 2) {
+                short swirlindex = spawntimer >> 1;
+                short ixoffset = ix - PWOFFSET;
+                short iyoffset = iy - PHOFFSET;
+                short iColorIdOffset = colorID << 5;
 
-            for (short iSwirl = 0; iSwirl < 4; iSwirl++)
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
-        }
+                for (short iSwirl = 0; iSwirl < 4; iSwirl++)
+                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
+            }
+            break;
     }
 }
 
@@ -1695,7 +1699,7 @@ void CPlayer::SetupNewPlayer()
     velx = 0.0f;
     oldvelx = velx;
 
-    if (game_values.spawnstyle == 1)
+    if (game_values.spawnstyle == SpawnStyle::Door)
         vely = 0.0f;
     else
         vely = -(VELJUMP / 2);	//make the player jump up on respawn
