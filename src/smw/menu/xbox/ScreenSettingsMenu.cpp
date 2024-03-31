@@ -10,46 +10,46 @@ UI_ScreenSettingsMenu::UI_ScreenSettingsMenu() : UI_Menu()
     miScreenResizeButton = new MI_Button(&rm->spr_selectfield, 70, 160, "Resize Screen", 500, 0);
     miScreenResizeButton->SetCode(MENU_CODE_TO_SCREEN_RESIZE);
 
-    miScreenHardwareFilterField = new MI_SelectField(&rm->spr_selectfield, 70, 200, "Screen Filter", 500, 220);
-    //miScreenHardwareFilterField->Add("None", 0);
-    miScreenHardwareFilterField->Add("Point", 1);
-    miScreenHardwareFilterField->Add("Bilinear", 2);
-    miScreenHardwareFilterField->Add("Trilinear", 3);
-    miScreenHardwareFilterField->Add("Anisotrpoic", 4);
-    miScreenHardwareFilterField->Add("Quincunx", 5);
-    miScreenHardwareFilterField->Add("Gaussian Cubic", 6);
-    miScreenHardwareFilterField->SetData(&game_values.hardwarefilter, NULL, NULL);
-    miScreenHardwareFilterField->SetKey(game_values.hardwarefilter);
-    miScreenHardwareFilterField->SetItemChangedCode(MENU_CODE_SCREEN_FILTER_CHANGED);
+    miScreenHardwareFilterField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 200, "Screen Filter", 500, 220);
+    //miScreenHardwareFilterField->add("None", 0);
+    miScreenHardwareFilterField->add("Point", 1);
+    miScreenHardwareFilterField->add("Bilinear", 2);
+    miScreenHardwareFilterField->add("Trilinear", 3);
+    miScreenHardwareFilterField->add("Anisotrpoic", 4);
+    miScreenHardwareFilterField->add("Quincunx", 5);
+    miScreenHardwareFilterField->add("Gaussian Cubic", 6);
+    miScreenHardwareFilterField->setOutputPtr(&game_values.hardwarefilter);
+    miScreenHardwareFilterField->setCurrenzValue(game_values.hardwarefilter);
+    miScreenHardwareFilterField->setItemChangedCode(MENU_CODE_SCREEN_FILTER_CHANGED);
 
-    miScreenFlickerFilterField = new MI_SliderField(&rm->spr_selectfield, &rm->menu_slider_bar, 70, 240, "Flicker Filter", 500, 220, 380);
-    miScreenFlickerFilterField->Add("0", 0);
-    miScreenFlickerFilterField->Add("1", 1);
-    miScreenFlickerFilterField->Add("2", 2);
-    miScreenFlickerFilterField->Add("3", 3);
-    miScreenFlickerFilterField->Add("4", 4);
-    miScreenFlickerFilterField->Add("5", 5);
-    miScreenFlickerFilterField->SetData(&game_values.flickerfilter, NULL, NULL);
-    miScreenFlickerFilterField->SetKey(game_values.flickerfilter);
-    miScreenFlickerFilterField->SetNoWrap(true);
-    miScreenFlickerFilterField->SetItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
+    miScreenFlickerFilterField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, &rm->menu_slider_bar, 70, 240, "Flicker Filter", 500, 220, 380);
+    miScreenFlickerFilterField->add("0", 0);
+    miScreenFlickerFilterField->add("1", 1);
+    miScreenFlickerFilterField->add("2", 2);
+    miScreenFlickerFilterField->add("3", 3);
+    miScreenFlickerFilterField->add("4", 4);
+    miScreenFlickerFilterField->add("5", 5);
+    miScreenFlickerFilterField->setOutputPtr(&game_values.flickerfilter);
+    miScreenFlickerFilterField->setCurrenzValue(game_values.flickerfilter);
+    miScreenFlickerFilterField->allowWrap(false);
+    miScreenFlickerFilterField->setItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
 
-    miScreenSoftFilterField = new MI_SelectField(&rm->spr_selectfield, 70, 280, "Soften Filter", 500, 220);
-    miScreenSoftFilterField->Add("Off", 0);
-    miScreenSoftFilterField->Add("On", 1, "", true, false);
-    miScreenSoftFilterField->SetData(&game_values.softfilter, NULL, NULL);
-    miScreenSoftFilterField->SetKey(game_values.softfilter);
-    miScreenSoftFilterField->SetAutoAdvance(true);
-    miScreenSoftFilterField->SetItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
+    miScreenSoftFilterField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 280, "Soften Filter", 500, 220);
+    miScreenSoftFilterField->add("Off", false);
+    miScreenSoftFilterField->add("On", true);
+    miScreenSoftFilterField->setOutputPtr(&game_values.softfilter);
+    miScreenSoftFilterField->setCurrenzValue(game_values.softfilter);
+    miScreenSoftFilterField->setAutoAdvance(true);
+    miScreenSoftFilterField->setItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
 
     /*
-    miScreenAspectRatioField = new MI_SelectField(&rm->spr_selectfield, 70, 300, "10x11 Aspect", 500, 220);
-    miScreenAspectRatioField->Add("Off", 0);
-    miScreenAspectRatioField->Add("On", 1, "", true, false);
-    miScreenAspectRatioField->SetData(NULL, NULL, &game_values.aspectratio10x11);
-    miScreenAspectRatioField->SetKey(game_values.aspectratio10x11 ? 1 : 0);
-    miScreenAspectRatioField->SetAutoAdvance(true);
-    miScreenAspectRatioField->SetItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
+    miScreenAspectRatioField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 300, "10x11 Aspect", 500, 220);
+    miScreenAspectRatioField->add("Off", false);
+    miScreenAspectRatioField->add("On", true);
+    miScreenAspectRatioField->setOutputPtr(&game_values.aspectratio10x11);
+    miScreenAspectRatioField->setCurrenzValue(game_values.aspectratio10x11);
+    miScreenAspectRatioField->setAutoAdvance(true);
+    miScreenAspectRatioField->setItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
     */
 
     miScreenSettingsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);

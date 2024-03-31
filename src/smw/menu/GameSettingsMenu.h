@@ -7,8 +7,8 @@ class MI_Image;
 class MI_ImageSelectField;
 class MI_MapField;
 class MI_MapFilterScroll;
-class MI_SelectField;
 class MI_Text;
+template<typename T> class MI_SelectFieldDyn;
 
 
 class UI_GameSettingsMenu : public UI_Menu {
@@ -30,7 +30,7 @@ public:
 
     MI_MapFilterScroll* miMapFilterScroll = nullptr;
     MI_MapField* miMapField = nullptr;
-    MI_SelectField* miGoalField[22];
+    MI_SelectFieldDyn<short>* miGoalField[22];
 
 private:
     MI_ImageSelectField* miModeField = nullptr;

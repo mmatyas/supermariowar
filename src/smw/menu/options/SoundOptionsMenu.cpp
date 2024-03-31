@@ -69,7 +69,7 @@ UI_SoundOptionsMenu::UI_SoundOptionsMenu()
     int iCurrentMusic = worldmusiclist->GetCurrentIndex();
     worldmusiclist->SetCurrent(0);
     for (short iMusic = 0; iMusic < worldmusiclist->GetCount(); iMusic++) {
-        miWorldMusicField->add(worldmusiclist->current_name(), iMusic, false);
+        miWorldMusicField->add(worldmusiclist->current_name(), iMusic);
         worldmusiclist->next();
     }
     miWorldMusicField->setCurrentValue(iCurrentMusic);

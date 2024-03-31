@@ -4,7 +4,6 @@
 
 class MI_Button;
 class MI_Image;
-class MI_SelectField;
 class MI_Text;
 class MI_TextField;
 

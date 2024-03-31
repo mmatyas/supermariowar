@@ -16,10 +16,10 @@ public:
 
 private:
     MI_Button * miScreenResizeButton;
-    MI_SelectField * miScreenHardwareFilterField;
-    MI_SelectField * miScreenFlickerFilterField;
-    MI_SelectField * miScreenSoftFilterField;
-    //MI_SelectField * miScreenAspectRatioField;
+    MI_SelectFieldDyn<short>* miScreenHardwareFilterField;
+    MI_SelectFieldDyn<short>* miScreenFlickerFilterField;
+    MI_SelectFieldDyn<short>* miScreenSoftFilterField;
+    //MI_SelectFieldDyn<short>* miScreenAspectRatioField;
 
     MI_Button * miScreenSettingsMenuBackButton;
 
