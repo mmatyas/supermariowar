@@ -1,7 +1,6 @@
 #pragma once
 
 #include "uicontrol.h"
-#include "RandomNumberGenerator.h"
 
 #include <memory>
 #include <string>
@@ -73,10 +72,7 @@ public:
         return currentItem().value;
     }
     //! Gets a random value, but does not set the control to that value
-    T randomValue() const {
-        const size_t idx = m_goodRandomIndices.at(RANDOM_INT(m_goodRandomIndices.size()));
-        return m_items.at(idx).value;
-    }
+    T randomValue() const;
 
     //! Set the current selected item based on its value
     bool setCurrentValue(T value);

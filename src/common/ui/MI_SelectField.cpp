@@ -211,6 +211,14 @@ void MI_SelectFieldDyn<T>::Refresh()
 
 
 template<typename T>
+T MI_SelectFieldDyn<T>::randomValue() const
+{
+    const size_t idx = m_goodRandomIndices.at(RANDOM_INT(m_goodRandomIndices.size()));
+    return m_items.at(idx).value;
+}
+
+
+template<typename T>
 bool MI_SelectFieldDyn<T>::setCurrentValue(T value)
 {
     for (m_index = 0; m_index < m_items.size(); m_index++) {
