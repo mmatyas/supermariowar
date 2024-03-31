@@ -75,36 +75,36 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 {
     mMenu = std::make_unique<UI_Menu>();
 
-    miOverride = new MI_SelectField(&rm->spr_selectfield, 70, iy, "Use Settings From", 500, 250);
-    miOverride->Add("Map Only", 0);
-    miOverride->Add("Game Only", 1);
-    miOverride->Add("Basic Average", 2);
-    miOverride->Add("Weighted Average", 3);
-    miOverride->SetData(&game_values.overridepowerupsettings, NULL, NULL);
-    miOverride->SetKey(game_values.overridepowerupsettings);
+    miOverride = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, iy, "Use Settings From", 500, 250);
+    miOverride->add("Map Only", 0);
+    miOverride->add("Game Only", 1);
+    miOverride->add("Basic Average", 2);
+    miOverride->add("Weighted Average", 3);
+    miOverride->setOutputPtr(&game_values.overridepowerupsettings);
+    miOverride->setCurrentValue(game_values.overridepowerupsettings);
     //miOverride->SetItemChangedCode(MENU_CODE_POWERUP_OVERRIDE_CHANGED);
 
-    miPreset = new MI_SelectField(&rm->spr_selectfield, 70, iy + 40, "Item Set", 500, 250);
-    miPreset->Add("Custom Set 1", 0);
-    miPreset->Add("Custom Set 2", 1);
-    miPreset->Add("Custom Set 3", 2);
-    miPreset->Add("Custom Set 4", 3);
-    miPreset->Add("Custom Set 5", 4);
-    miPreset->Add("Balanced Set", 5);
-    miPreset->Add("Weapons Only", 6);
-    miPreset->Add("Koopa Bros Weapons", 7);
-    miPreset->Add("Support Items", 8);
-    miPreset->Add("Booms and Shakes", 9);
-    miPreset->Add("Fly and Glide", 10);
-    miPreset->Add("Shells Only", 11);
-    miPreset->Add("Mushrooms Only", 12);
-    miPreset->Add("Super Mario Bros 1", 13);
-    miPreset->Add("Super Mario Bros 2", 14);
-    miPreset->Add("Super Mario Bros 3", 15);
-    miPreset->Add("Super Mario World", 16);
-    miPreset->SetData(&game_values.poweruppreset, NULL, NULL);
-    miPreset->SetKey(game_values.poweruppreset);
-    miPreset->SetItemChangedCode(MENU_CODE_POWERUP_PRESET_CHANGED);
+    miPreset = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, iy + 40, "Item Set", 500, 250);
+    miPreset->add("Custom Set 1", 0);
+    miPreset->add("Custom Set 2", 1);
+    miPreset->add("Custom Set 3", 2);
+    miPreset->add("Custom Set 4", 3);
+    miPreset->add("Custom Set 5", 4);
+    miPreset->add("Balanced Set", 5);
+    miPreset->add("Weapons Only", 6);
+    miPreset->add("Koopa Bros Weapons", 7);
+    miPreset->add("Support Items", 8);
+    miPreset->add("Booms and Shakes", 9);
+    miPreset->add("Fly and Glide", 10);
+    miPreset->add("Shells Only", 11);
+    miPreset->add("Mushrooms Only", 12);
+    miPreset->add("Super Mario Bros 1", 13);
+    miPreset->add("Super Mario Bros 2", 14);
+    miPreset->add("Super Mario Bros 3", 15);
+    miPreset->add("Super Mario World", 16);
+    miPreset->setOutputPtr(&game_values.poweruppreset);
+    miPreset->setCurrentValue(game_values.poweruppreset);
+    miPreset->setItemChangedCode(MENU_CODE_POWERUP_PRESET_CHANGED);
 
     for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
         miPowerupSlider[iPowerup] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->spr_storedpoweruplarge, 0, 0, 245, iPowerupPositionMap[iPowerup]);

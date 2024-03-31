@@ -42,8 +42,8 @@ private:
 
     UI_Menu * mMenu;
 
-    MI_SelectField * miQuantityField;
-    MI_SelectField * miRateField;
+    MI_SelectFieldDyn<short> * miQuantityField;
+    MI_SelectFieldDyn<short> * miRateField;
     MI_SelectFieldDyn<bool>* miStoredShellsField;
     MI_PowerupSlider * miPowerupSlider[NUMFRENZYCARDS];
     MI_Button * miBackButton;

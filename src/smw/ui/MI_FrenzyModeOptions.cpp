@@ -29,34 +29,34 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 
     mMenu = new UI_Menu();
 
-    miQuantityField = new MI_SelectField(&rm->spr_selectfield, 120, 40, "Limit", 400, 180);
-    miQuantityField->Add("Single Powerup", 0);
-    miQuantityField->Add("1 Powerup", 1);
-    miQuantityField->Add("2 Powerups", 2);
-    miQuantityField->Add("3 Powerups", 3);
-    miQuantityField->Add("4 Powerups", 4);
-    miQuantityField->Add("5 Powerups", 5);
-    miQuantityField->Add("# Players - 1", 6);
-    miQuantityField->Add("# Players", 7);
-    miQuantityField->Add("# Players + 1", 8, false, false);
-    miQuantityField->Add("# Players + 2", 9, false, false);
-    miQuantityField->Add("# Players + 3", 10, false, false);
-    miQuantityField->SetData(&game_values.gamemodemenusettings.frenzy.quantity, NULL, NULL);
-    miQuantityField->SetKey(game_values.gamemodemenusettings.frenzy.quantity);
+    miQuantityField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 40, "Limit", 400, 180);
+    miQuantityField->add("Single Powerup", 0);
+    miQuantityField->add("1 Powerup", 1);
+    miQuantityField->add("2 Powerups", 2);
+    miQuantityField->add("3 Powerups", 3);
+    miQuantityField->add("4 Powerups", 4);
+    miQuantityField->add("5 Powerups", 5);
+    miQuantityField->add("# Players - 1", 6);
+    miQuantityField->add("# Players", 7);
+    miQuantityField->add("# Players + 1", 8, false);
+    miQuantityField->add("# Players + 2", 9, false);
+    miQuantityField->add("# Players + 3", 10, false);
+    miQuantityField->setOutputPtr(&game_values.gamemodemenusettings.frenzy.quantity);
+    miQuantityField->setCurrentValue(game_values.gamemodemenusettings.frenzy.quantity);
 
-    miRateField = new MI_SelectField(&rm->spr_selectfield, 120, 80, "Rate", 400, 180);
-    miRateField->Add("Instant", 0);
-    miRateField->Add("1 Second", 62);
-    miRateField->Add("2 Seconds", 124);
-    miRateField->Add("3 Seconds", 186);
-    miRateField->Add("5 Seconds", 310);
-    miRateField->Add("10 Seconds", 620, false, false);
-    miRateField->Add("15 Seconds", 930, false, false);
-    miRateField->Add("20 Seconds", 1240, false, false);
-    miRateField->Add("25 Seconds", 1550, false, false);
-    miRateField->Add("30 Seconds", 1860, false, false);
-    miRateField->SetData(&game_values.gamemodemenusettings.frenzy.rate, NULL, NULL);
-    miRateField->SetKey(game_values.gamemodemenusettings.frenzy.rate);
+    miRateField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 80, "Rate", 400, 180);
+    miRateField->add("Instant", 0);
+    miRateField->add("1 Second", 62);
+    miRateField->add("2 Seconds", 124);
+    miRateField->add("3 Seconds", 186);
+    miRateField->add("5 Seconds", 310);
+    miRateField->add("10 Seconds", 620, false);
+    miRateField->add("15 Seconds", 930, false);
+    miRateField->add("20 Seconds", 1240, false);
+    miRateField->add("25 Seconds", 1550, false);
+    miRateField->add("30 Seconds", 1860, false);
+    miRateField->setOutputPtr(&game_values.gamemodemenusettings.frenzy.rate);
+    miRateField->setCurrentValue(game_values.gamemodemenusettings.frenzy.rate);
 
     miStoredShellsField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 120, "Store Shells", 400, 180);
     miStoredShellsField->add("Off", false);
@@ -238,8 +238,8 @@ void MI_FrenzyModeOptions::MovePrev()
 
 void MI_FrenzyModeOptions::SetRandomGameModeSettings()
 {
-    game_values.gamemodesettings.frenzy.quantity = miQuantityField->GetRandomShortValue();
-    game_values.gamemodesettings.frenzy.rate = miRateField->GetRandomShortValue();
+    game_values.gamemodesettings.frenzy.quantity = miQuantityField->randomValue();
+    game_values.gamemodesettings.frenzy.rate = miRateField->randomValue();
     game_values.gamemodesettings.frenzy.storedshells = miStoredShellsField->randomValue();
 
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)

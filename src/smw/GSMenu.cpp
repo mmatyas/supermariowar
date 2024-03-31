@@ -517,7 +517,7 @@ void MenuState::update()
                 short iRandOption = (RANDOM_INT(6)) + 1;
                 game_values.gamemode->goal  = options[iRandOption].iValue;
 
-                mGameSettingsMenu->miGoalField[currentgamemode]->SetKey(gamemodes[currentgamemode]->goal);
+                mGameSettingsMenu->miGoalField[currentgamemode]->setCurrentValue(gamemodes[currentgamemode]->goal);
 
                 mModeOptionsMenu->SetRandomGameModeSettings(game_values.gamemode->gamemode);
 
@@ -796,7 +796,7 @@ void MenuState::update()
                         game_values.gamemode = gamemodes[mGameSettingsMenu->GetCurrentGameModeID()];
 
                         for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
-                            gamemodes[iMode]->goal = mGameSettingsMenu->miGoalField[iMode]->GetShortValue();
+                            gamemodes[iMode]->goal = mGameSettingsMenu->miGoalField[iMode]->currentValue();
                         }
 
                         if (mGameSettingsMenu->GetCurrentGameModeID() == game_mode_owned)
@@ -822,7 +822,7 @@ void MenuState::update()
 
                     //Setup items on next menu
                     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-                        mGameSettingsMenu->miGoalField[iGameMode]->HideItem(-1, game_values.matchtype == MATCH_TYPE_TOURNAMENT);
+                        mGameSettingsMenu->miGoalField[iGameMode]->hideItem(-1, game_values.matchtype == MATCH_TYPE_TOURNAMENT);
                     }
 
                     if (game_values.matchtype == MATCH_TYPE_WORLD)
