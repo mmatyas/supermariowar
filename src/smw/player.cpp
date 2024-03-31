@@ -1867,7 +1867,7 @@ PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, KillSty
     if (killer->teamID != killed->teamID)
         killer->AddKillerAward(killed, style);
 
-    if (game_values.awardstyle != award_style_none)
+    if (game_values.awardstyle != AwardStyle::None)
         killed->DeathAwards();
 
     //now kill the player (don't call this function earlier because we need the old position, etc.
@@ -2091,7 +2091,7 @@ void CPlayer::draw()
     suicidetimer.draw(*this);
 
     //Draw the Ring awards
-    if (game_values.awardstyle == award_style_halo && killsinrow >= MINAWARDSNEEDED)
+    if (game_values.awardstyle == AwardStyle::Halo && killsinrow >= MINAWARDSNEEDED)
         awardeffects.drawRingAward(*this);
 
     //Draw the powerup ring when a powerup is being used

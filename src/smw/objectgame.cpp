@@ -5314,7 +5314,7 @@ bool CO_Shell::KillPlayer(CPlayer * player)
 
 void CO_Shell::AddMovingKill(CPlayer * killer)
 {
-    if (state == 1 && game_values.awardstyle != award_style_none) { //If the shell is moving, the keep track of how many people we kill in a row with it
+    if (state == 1 && game_values.awardstyle != AwardStyle::None) { //If the shell is moving, the keep track of how many people we kill in a row with it
         if (++iKillCounter > 1)
             killer->AddKillsInRowInAirAward();
     }

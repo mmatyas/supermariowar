@@ -1,6 +1,7 @@
 #ifndef GAMEVALUES_H
 #define GAMEVALUES_H
 
+#include "AwardStyles.h"
 #include "GameModeSettings.h"
 #include "input.h"
 #include "MatchTypes.h"
@@ -62,15 +63,6 @@ struct TourStop {
     char szBonusText[5][128];
 };
 
-enum awardstyle {
-    award_style_none = 0,
-    award_style_fireworks = 1,
-    award_style_swirl = 2,
-    award_style_halo = 3,
-    award_style_souls = 4,
-    award_style_text = 5
-};
-
 
 // the real configuration class
 class CGameConfig {
@@ -80,7 +72,7 @@ public:
     short		musicvolume;
     bool		fullscreen;
     short		spawnstyle;
-    short		awardstyle;
+    AwardStyle awardstyle;
     short		teamcollision;
     short		shellttl;
     short		blueblockttl;

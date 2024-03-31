@@ -1,4 +1,6 @@
 add_library(CommonFiles STATIC
+    AwardStyles.h
+    BlockTypes.h
     CmdArgs.cpp
     CmdArgs.h
     dirlist.cpp

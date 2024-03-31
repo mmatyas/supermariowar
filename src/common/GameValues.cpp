@@ -123,7 +123,7 @@ void CGameValues::init()
     pausegame     = false;
     exitinggame     = false;
     exityes       = false;
-    awardstyle      = award_style_fireworks;
+    awardstyle      = AwardStyle::Fireworks;
     spawnstyle      = 2;
     tournamentgames   = 2;
     tournamentwinner  = -1;
@@ -335,7 +335,7 @@ void CGameValues::ReadBinaryConfig() {
 #endif
 
         spawnstyle = options.read_u8();
-        awardstyle = options.read_u8();
+        awardstyle = static_cast<AwardStyle>(options.read_u8());
         teamcollision = options.read_u8();
         screencrunch = options.read_u8();
         toplayer = options.read_u8();
@@ -493,7 +493,7 @@ void CGameValues::WriteConfig()
 #endif
 
         options.write_u8(spawnstyle);
-        options.write_u8(awardstyle);
+        options.write_u8(static_cast<uint8_t>(awardstyle));
         options.write_u8(teamcollision);
         options.write_u8(screencrunch);
         options.write_u8(toplayer);

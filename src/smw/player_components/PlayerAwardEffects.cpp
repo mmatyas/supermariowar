@@ -134,9 +134,9 @@ void PlayerAwardEffects::addRocket(CPlayer& player)
 
 void PlayerAwardEffects::addDeathAward(CPlayer& player)
 {
-    if (game_values.awardstyle == award_style_halo)
+    if (game_values.awardstyle == AwardStyle::Halo)
         addExploding(player);
-    else if (game_values.awardstyle == award_style_souls && player.killsinrow >= MINAWARDSNEEDED)
+    else if (game_values.awardstyle == AwardStyle::Souls && player.killsinrow >= MINAWARDSNEEDED)
         eyecandy[2].add(new EC_SoulsAward(&rm->spr_awardsouls,
             &rm->spr_awardsoulspawn,
             player.centerX(), player.centerY(),
@@ -199,10 +199,10 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
     }
 
     //Add eyecandy
-    if (game_values.awardstyle != award_style_none) {
-        if (game_values.awardstyle == award_style_halo)
+    if (game_values.awardstyle != AwardStyle::None) {
+        if (game_values.awardstyle == AwardStyle::Halo)
             killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = (short)style;
-        else if (game_values.awardstyle == award_style_souls) {
+        else if (game_values.awardstyle == AwardStyle::Souls) {
             if (killed)
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = killed->getColorID();
             else if (style == KillStyle::Goomba)
@@ -216,9 +216,9 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
             else
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = 8; //soul id for ?
 
-        } else if (game_values.awardstyle == award_style_swirl)
+        } else if (game_values.awardstyle == AwardStyle::Swirl)
             killer.awardeffects.addSwirling(killer);
-        else if (game_values.awardstyle == award_style_fireworks)
+        else if (game_values.awardstyle == AwardStyle::Fireworks)
             killer.awardeffects.addRocket(killer);
 
         if (killer.killsinrowinair > 1)
@@ -226,7 +226,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
 
         //if we have enough kills in a row -> spawn an award
 
-        if (game_values.awardstyle == award_style_text) {
+        if (game_values.awardstyle == AwardStyle::Text) {
             if (killer.killsinrow >= 2) {
                 char    text[128];              //text to show
                 sprintf(text, "%d - %s", killer.killsinrow, awardtexts[awardIndex].name);

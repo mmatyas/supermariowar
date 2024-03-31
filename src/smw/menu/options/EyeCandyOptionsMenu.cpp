@@ -21,13 +21,13 @@ UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu()
     miSpawnStyleField->setOutputPtr(&game_values.spawnstyle);
     miSpawnStyleField->setCurrentValue(game_values.spawnstyle);
 
-    miAwardStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 120, "Award Style", 500, 220);
-    miAwardStyleField->add("None", 0);
-    miAwardStyleField->add("Fireworks", 1);
-    miAwardStyleField->add("Spiral", 2);
-    miAwardStyleField->add("Ring", 3);
-    miAwardStyleField->add("Souls", 4);
-    miAwardStyleField->add("Text", 5);
+    miAwardStyleField = new MI_SelectField<AwardStyle>(&rm->spr_selectfield, 70, 120, "Award Style", 500, 220);
+    miAwardStyleField->add("None", AwardStyle::None);
+    miAwardStyleField->add("Fireworks", AwardStyle::Fireworks);
+    miAwardStyleField->add("Spiral", AwardStyle::Swirl);
+    miAwardStyleField->add("Ring", AwardStyle::Halo);
+    miAwardStyleField->add("Souls", AwardStyle::Souls);
+    miAwardStyleField->add("Text", AwardStyle::Text);
     miAwardStyleField->setOutputPtr(&game_values.awardstyle);
     miAwardStyleField->setCurrentValue(game_values.awardstyle);
 

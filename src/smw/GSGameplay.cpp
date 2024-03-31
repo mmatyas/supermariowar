@@ -636,7 +636,7 @@ void shakeScreen()
     }
 
     //Add kills in row for kills from pow and mod
-    if (game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none) {
+    if (game_values.screenshakekillscount > 1 && game_values.awardstyle != AwardStyle::None) {
         game_values.screenshakekillscount = 0;
 
         CPlayer * killer2 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);

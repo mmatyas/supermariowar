@@ -366,3 +366,6 @@ template class MI_SelectField<short>;
 
 #include "MatchTypes.h"
 template class MI_SelectField<MatchType>;
+
+#include "AwardStyles.h"
+template class MI_SelectField<AwardStyle>;
