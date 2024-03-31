@@ -512,29 +512,13 @@ void MapList::ReadFilters()
         if (!ffp)
             continue;
 
-        short iVersion[4] = {0, 0, 0, 0};
         short iReadState = 0;
         while (fgets(buffer, 256, ffp)) {
             if (buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
                 continue;
 
             if (0 == iReadState) {
-                char * psz = strtok(buffer, ".\n");
-                if (psz)
-                    iVersion[0] = atoi(psz);
-
-                psz = strtok(NULL, ".\n");
-                if (psz)
-                    iVersion[1] = atoi(psz);
-
-                psz = strtok(NULL, ".\n");
-                if (psz)
-                    iVersion[2] = atoi(psz);
-
-                psz = strtok(NULL, ".\n");
-                if (psz)
-                    iVersion[3] = atoi(psz);
-
+                // Version number
                 iReadState = 1;
                 continue;
             } else if (1 == iReadState) {
