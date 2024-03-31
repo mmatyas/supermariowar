@@ -1,11 +1,10 @@
 #ifndef GAMEVALUES_H
 #define GAMEVALUES_H
 
-#include "AwardStyles.h"
+#include "EyecandyStyles.h"
 #include "GameModeSettings.h"
 #include "input.h"
 #include "MatchTypes.h"
-#include "SpawnStyles.h"
 
 #include <vector>
 
@@ -116,7 +115,7 @@ public:
     short		pointspeed;
     short		poweruppreset;
     bool		randomskin[4];
-    short		scoreboardstyle;
+    ScoreboardStyle scoreboardstyle;
     bool		screencrunch;
     short		shieldtime;
     short		shieldstyle;

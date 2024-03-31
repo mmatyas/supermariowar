@@ -21,7 +21,7 @@ void GameTimerDisplay::Init(short iTime, bool fCountDown)
     SetDigitCounters();
     framesleft_persecond = iFramesPerSecond;
 
-    if (game_values.scoreboardstyle == 0)
+    if (game_values.scoreboardstyle == ScoreboardStyle::Top)
         iScoreOffsetX = 5;
     else
         iScoreOffsetX = 291;

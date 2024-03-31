@@ -1,5 +1,4 @@
 add_library(CommonFiles STATIC
-    AwardStyles.h
     BlockTypes.h
     CmdArgs.cpp
     CmdArgs.h
@@ -7,6 +6,7 @@ add_library(CommonFiles STATIC
     dirlist.h
     eyecandy.cpp
     eyecandy.h
+    EyecandyStyles.h
     FileIO.cpp
     FileIO.h
     FileList.cpp
@@ -55,7 +55,6 @@ add_library(CommonFiles STATIC
     ResourceManager.h
     sfx.cpp
     sfx.h
-    SpawnStyles.h
     TilesetManager.cpp
     TilesetManager.h
     ui/MI_MapPreview.cpp

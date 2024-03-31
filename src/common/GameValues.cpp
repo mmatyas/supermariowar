@@ -143,7 +143,7 @@ void CGameValues::init()
     toplayer      = true;
     loadedannouncer   = -1;
     loadedmusic     = -1;
-    scoreboardstyle     = 0;
+    scoreboardstyle = ScoreboardStyle::Top;
     teamcolors          = true;
     cputurn       = -1;
     shieldtime      = 62;
@@ -339,7 +339,7 @@ void CGameValues::ReadBinaryConfig() {
         teamcollision = options.read_u8();
         screencrunch = options.read_u8();
         toplayer = options.read_u8();
-        scoreboardstyle = options.read_u8();
+        scoreboardstyle = static_cast<ScoreboardStyle>(options.read_u8());
         teamcolors = options.read_u8();
         sound = options.read_u8();
         music = options.read_u8();
@@ -497,7 +497,7 @@ void CGameValues::WriteConfig()
         options.write_u8(teamcollision);
         options.write_u8(screencrunch);
         options.write_u8(toplayer);
-        options.write_u8(scoreboardstyle);
+        options.write_u8(static_cast<uint8_t>(scoreboardstyle));
         options.write_u8(teamcolors);
         options.write_u8(sound);
         options.write_u8(music);

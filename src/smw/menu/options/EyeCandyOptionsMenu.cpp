@@ -31,10 +31,10 @@ UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu()
     miAwardStyleField->setOutputPtr(&game_values.awardstyle);
     miAwardStyleField->setCurrentValue(game_values.awardstyle);
 
-    miScoreStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 160, "Score Location", 500, 220);
-    miScoreStyleField->add("Top", 0);
-    miScoreStyleField->add("Bottom", 1);
-    miScoreStyleField->add("Corners", 2);
+    miScoreStyleField = new MI_SelectField<ScoreboardStyle>(&rm->spr_selectfield, 70, 160, "Score Location", 500, 220);
+    miScoreStyleField->add("Top", ScoreboardStyle::Top);
+    miScoreStyleField->add("Bottom", ScoreboardStyle::Bottom);
+    miScoreStyleField->add("Corners", ScoreboardStyle::Corners);
     miScoreStyleField->setOutputPtr(&game_values.scoreboardstyle);
     miScoreStyleField->setCurrentValue(game_values.scoreboardstyle);
 

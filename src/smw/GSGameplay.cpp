@@ -224,7 +224,7 @@ void GameplayState::initScoreDisplayPosition()
     totalspace += 20 * (score_cnt - 1);
 
     for (i = 0; i < score_cnt; i++) {
-        if (game_values.scoreboardstyle == 0 || game_values.scoreboardstyle == 1) {
+        if (game_values.scoreboardstyle == ScoreboardStyle::Top || game_values.scoreboardstyle == ScoreboardStyle::Bottom) {
             score[i]->x = ((smw->ScreenWidth - totalspace) >> 1);
 
             for (short k = 0; k < i; k++)
@@ -234,7 +234,7 @@ void GameplayState::initScoreDisplayPosition()
             if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
                 iScoreOffsetY = 18;
 
-            score[i]->y = 5 + (game_values.scoreboardstyle == 1 ? 429 - iScoreOffsetY : 0);
+            score[i]->y = 5 + (game_values.scoreboardstyle == ScoreboardStyle::Bottom ? 429 - iScoreOffsetY : 0);
         } else {
             short iScoreOffsetY = 0;
             if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
@@ -1136,7 +1136,7 @@ void GameplayState::drawFrontLayer()
 void GameplayState::drawWindMeter()
 {
     if (game_values.windaffectsplayers) {
-        short iDisplayWindMeterY = game_values.scoreboardstyle == 1 ? 8 : 440;
+        short iDisplayWindMeterY = game_values.scoreboardstyle == ScoreboardStyle::Bottom ? 8 : 440;
         rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
         rm->spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + smw->ScreenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
     }
