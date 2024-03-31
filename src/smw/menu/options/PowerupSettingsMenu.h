@@ -4,9 +4,9 @@
 
 class MI_Button;
 class MI_Image;
-class MI_SelectField;
 class MI_StoredPowerupResetButton;
 class MI_Text;
+template<typename T> class MI_SelectFieldDyn;
 
 /*
     In this menu, you can change some powerup settings,
@@ -17,12 +17,12 @@ public:
     UI_PowerupSettingsMenu();
 
 private:
-    MI_SelectField* miStoredPowerupDelayField = nullptr;
-    MI_SelectField* miItemRespawnField = nullptr;
-    MI_SelectField* miSwapStyleField = nullptr;
-    MI_SelectField* miBonusWheelField = nullptr;
-    MI_SelectField* miKeepPowerupField = nullptr;
-    MI_SelectField* miHiddenBlockRespawnField = nullptr;
+    MI_SelectFieldDyn<short>* miStoredPowerupDelayField = nullptr;
+    MI_SelectFieldDyn<short>* miItemRespawnField = nullptr;
+    MI_SelectFieldDyn<short>* miSwapStyleField = nullptr;
+    MI_SelectFieldDyn<short>* miBonusWheelField = nullptr;
+    MI_SelectFieldDyn<bool>* miKeepPowerupField = nullptr;
+    MI_SelectFieldDyn<short>* miHiddenBlockRespawnField = nullptr;
     MI_StoredPowerupResetButton* miStoredPowerupResetButton = nullptr;
     MI_Button* miPowerupSettingsMenuBackButton = nullptr;
 

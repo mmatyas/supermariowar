@@ -19,54 +19,54 @@ extern GraphicsList* gamegraphicspacklist;
 UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
     : UI_Menu()
 {
-    miTopLayerField = new MI_SelectField(&rm->spr_selectfield, 70, 120, "Draw Top Layer", 500, 220);
-    miTopLayerField->Add("Background", 0);
-    miTopLayerField->Add("Foreground", 1, "", true, false);
-    miTopLayerField->SetData(NULL, NULL, &game_values.toplayer);
-    miTopLayerField->SetKey(game_values.toplayer ? 1 : 0);
-    miTopLayerField->SetAutoAdvance(true);
+    miTopLayerField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 120, "Draw Top Layer", 500, 220);
+    miTopLayerField->add("Background", false);
+    miTopLayerField->add("Foreground", true);
+    miTopLayerField->setOutputPtr(&game_values.toplayer);
+    miTopLayerField->setCurrentValue(game_values.toplayer ? 1 : 0);
+    miTopLayerField->setAutoAdvance(true);
 
-    miFrameLimiterField = new MI_SelectField(&rm->spr_selectfield, 70, 160, "Frame Limit", 500, 220);
-    miFrameLimiterField->Add("10 FPS", 100);
-    miFrameLimiterField->Add("15 FPS", 67);
-    miFrameLimiterField->Add("20 FPS", 50);
-    miFrameLimiterField->Add("25 FPS", 40);
-    miFrameLimiterField->Add("30 FPS", 33);
-    miFrameLimiterField->Add("35 FPS", 28);
-    miFrameLimiterField->Add("40 FPS", 25);
-    miFrameLimiterField->Add("45 FPS", 22);
-    miFrameLimiterField->Add("50 FPS", 20);
-    miFrameLimiterField->Add("55 FPS", 18);
-    miFrameLimiterField->Add("62 FPS (Normal)", 16);
-    miFrameLimiterField->Add("66 FPS", 15);
-    miFrameLimiterField->Add("71 FPS", 14);
-    miFrameLimiterField->Add("77 FPS", 13);
-    miFrameLimiterField->Add("83 FPS", 12);
-    miFrameLimiterField->Add("90 FPS", 11);
-    miFrameLimiterField->Add("100 FPS", 10);
-    miFrameLimiterField->Add("111 FPS", 9);
-    miFrameLimiterField->Add("125 FPS", 8);
-    miFrameLimiterField->Add("142 FPS", 7);
-    miFrameLimiterField->Add("166 FPS", 6);
-    miFrameLimiterField->Add("200 FPS", 5);
-    miFrameLimiterField->Add("250 FPS", 4);
-    miFrameLimiterField->Add("333 FPS", 3);
-    miFrameLimiterField->Add("500 FPS", 2);
-    miFrameLimiterField->Add("No Limit", 0);
-    miFrameLimiterField->SetData(&game_values.framelimiter, NULL, NULL);
-    miFrameLimiterField->SetKey(game_values.framelimiter);
+    miFrameLimiterField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 160, "Frame Limit", 500, 220);
+    miFrameLimiterField->add("10 FPS", 100);
+    miFrameLimiterField->add("15 FPS", 67);
+    miFrameLimiterField->add("20 FPS", 50);
+    miFrameLimiterField->add("25 FPS", 40);
+    miFrameLimiterField->add("30 FPS", 33);
+    miFrameLimiterField->add("35 FPS", 28);
+    miFrameLimiterField->add("40 FPS", 25);
+    miFrameLimiterField->add("45 FPS", 22);
+    miFrameLimiterField->add("50 FPS", 20);
+    miFrameLimiterField->add("55 FPS", 18);
+    miFrameLimiterField->add("62 FPS (Normal)", 16);
+    miFrameLimiterField->add("66 FPS", 15);
+    miFrameLimiterField->add("71 FPS", 14);
+    miFrameLimiterField->add("77 FPS", 13);
+    miFrameLimiterField->add("83 FPS", 12);
+    miFrameLimiterField->add("90 FPS", 11);
+    miFrameLimiterField->add("100 FPS", 10);
+    miFrameLimiterField->add("111 FPS", 9);
+    miFrameLimiterField->add("125 FPS", 8);
+    miFrameLimiterField->add("142 FPS", 7);
+    miFrameLimiterField->add("166 FPS", 6);
+    miFrameLimiterField->add("200 FPS", 5);
+    miFrameLimiterField->add("250 FPS", 4);
+    miFrameLimiterField->add("333 FPS", 3);
+    miFrameLimiterField->add("500 FPS", 2);
+    miFrameLimiterField->add("No Limit", 0);
+    miFrameLimiterField->setOutputPtr(&game_values.framelimiter);
+    miFrameLimiterField->setCurrentValue(game_values.framelimiter);
 
 #ifdef _XBOX
     miScreenSettingsButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Screen Settings", 500, 0);
     miScreenSettingsButton->SetCode(MENU_CODE_TO_SCREEN_SETTINGS);
 #else
-    miFullscreenField = new MI_SelectField(&rm->spr_selectfield, 70, 200, "Screen Size", 500, 220);
-    miFullscreenField->Add("Windowed", 0);
-    miFullscreenField->Add("Fullscreen", 1, "", true, false);
-    miFullscreenField->SetData(NULL, NULL, &game_values.fullscreen);
-    miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
-    miFullscreenField->SetAutoAdvance(true);
-    miFullscreenField->SetItemChangedCode(MENU_CODE_TOGGLE_FULLSCREEN);
+    miFullscreenField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 200, "Screen Size", 500, 220);
+    miFullscreenField->add("Windowed", false);
+    miFullscreenField->add("Fullscreen", true);
+    miFullscreenField->setOutputPtr(&game_values.fullscreen);
+    miFullscreenField->setCurrentValue(game_values.fullscreen ? 1 : 0);
+    miFullscreenField->setAutoAdvance(true);
+    miFullscreenField->setItemChangedCode(MENU_CODE_TOGGLE_FULLSCREEN);
 #endif //_XBOX
 
     miMenuGraphicsPackField = new MI_PacksField(&rm->spr_selectfield, 70, 240, "Menu Graphics", 500, 220, menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);

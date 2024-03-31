@@ -5,8 +5,8 @@
 class MI_Button;
 class MI_Image;
 class MI_PacksField;
-class MI_SelectField;
 class MI_Text;
+template<typename T> class MI_SelectFieldDyn;
 
 
 /*
@@ -18,13 +18,13 @@ public:
     UI_GraphicsOptionsMenu();
 
 private:
-    MI_SelectField* miTopLayerField;
-    MI_SelectField* miFrameLimiterField;
+    MI_SelectFieldDyn<bool>* miTopLayerField;
+    MI_SelectFieldDyn<short>* miFrameLimiterField;
 
 #ifdef _XBOX
     MI_Button* miScreenSettingsButton;
 #else
-    MI_SelectField* miFullscreenField;
+    MI_SelectFieldDyn<bool>* miFullscreenField;
 #endif //_XBOX
 
     MI_PacksField* miMenuGraphicsPackField;

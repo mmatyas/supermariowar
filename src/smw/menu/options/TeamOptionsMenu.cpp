@@ -14,31 +14,31 @@ extern CGameValues game_values;
 UI_TeamOptionsMenu::UI_TeamOptionsMenu()
     : UI_Menu()
 {
-    miTeamKillsField = new MI_SelectField(&rm->spr_selectfield, 70, 180, "Player Collision", 500, 220);
-    miTeamKillsField->Add("Off", 0);
-    miTeamKillsField->Add("Assist", 1);
-    miTeamKillsField->Add("On", 2);
-    miTeamKillsField->SetData(&game_values.teamcollision, NULL, NULL);
-    miTeamKillsField->SetKey(game_values.teamcollision);
+    miTeamKillsField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 180, "Player Collision", 500, 220);
+    miTeamKillsField->add("Off", 0);
+    miTeamKillsField->add("Assist", 1);
+    miTeamKillsField->add("On", 2);
+    miTeamKillsField->setOutputPtr(&game_values.teamcollision);
+    miTeamKillsField->setCurrentValue(game_values.teamcollision);
 
-    miTeamColorsField = new MI_SelectField(&rm->spr_selectfield, 70, 220, "Colors", 500, 220);
-    miTeamColorsField->Add("Individual", 0);
-    miTeamColorsField->Add("Team", 1, "", true, false);
-    miTeamColorsField->SetData(NULL, NULL, &game_values.teamcolors);
-    miTeamColorsField->SetKey(game_values.teamcolors ? 1 : 0);
-    miTeamColorsField->SetAutoAdvance(true);
+    miTeamColorsField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 220, "Colors", 500, 220);
+    miTeamColorsField->add("Individual", false);
+    miTeamColorsField->add("Team", true);
+    miTeamColorsField->setOutputPtr(&game_values.teamcolors);
+    miTeamColorsField->setCurrentValue(game_values.teamcolors ? 1 : 0);
+    miTeamColorsField->setAutoAdvance(true);
 
-    miTournamentControlField = new MI_SelectField(&rm->spr_selectfield, 70, 260, "Tournament Control", 500, 220);
-    miTournamentControlField->Add("All", 0);
-    miTournamentControlField->Add("Game Winner", 1);
-    miTournamentControlField->Add("Game Loser", 2);
-    miTournamentControlField->Add("Leading Teams", 3);
-    miTournamentControlField->Add("Trailing Teams", 4);
-    miTournamentControlField->Add("Random", 5);
-    miTournamentControlField->Add("Random Loser", 6);
-    miTournamentControlField->Add("Round Robin", 7);
-    miTournamentControlField->SetData(&game_values.tournamentcontrolstyle, NULL, NULL);
-    miTournamentControlField->SetKey(game_values.tournamentcontrolstyle);
+    miTournamentControlField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 260, "Tournament Control", 500, 220);
+    miTournamentControlField->add("All", 0);
+    miTournamentControlField->add("Game Winner", 1);
+    miTournamentControlField->add("Game Loser", 2);
+    miTournamentControlField->add("Leading Teams", 3);
+    miTournamentControlField->add("Trailing Teams", 4);
+    miTournamentControlField->add("Random", 5);
+    miTournamentControlField->add("Random Loser", 6);
+    miTournamentControlField->add("Round Robin", 7);
+    miTournamentControlField->setOutputPtr(&game_values.tournamentcontrolstyle);
+    miTournamentControlField->setCurrentValue(game_values.tournamentcontrolstyle);
 
     miTeamOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miTeamOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
