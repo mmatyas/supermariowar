@@ -97,7 +97,7 @@ void SetupScoreBoard(bool fOrderMatters)
     }
 
     //Add the treasure chests to the map in world mode if there were any awards for winning this match
-    if (game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->winningteam > -1 && game_values.gamemode->gamemode != game_mode_bonus) {
+    if (game_values.matchtype == MatchType::World && game_values.gamemode->winningteam > -1 && game_values.gamemode->gamemode != game_mode_bonus) {
         TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
         short iNumBonuses = tourStop->iNumBonuses;
 

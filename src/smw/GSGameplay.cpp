@@ -986,7 +986,7 @@ void GameplayState::drawScreenFade()
             game_values.screenfade = 0;
 
             //display the mode and goal at the start of the game
-            //if (game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+            //if (game_values.matchtype == MatchType::QuickGame)
             if (game_values.startmodedisplay && game_values.singleplayermode == -1) {
                 char szMode[128];
                 if (game_values.gamemode->goal < 0)
@@ -1233,7 +1233,7 @@ bool IsExitAllowed()
 
 void UpdateScoreBoard()
 {
-    if (game_values.matchtype == MATCH_TYPE_WORLD) {
+    if (game_values.matchtype == MatchType::World) {
         //If no one won, then nothing on the world map has changed
         if (game_values.gamemode->winningteam < 0)
             return;
@@ -1279,7 +1279,7 @@ void UpdateScoreBoard()
                     game_values.worldpowerups[iTeamId][game_values.worldpowerupcount[iTeamId]++] = game_values.gamepowerups[iPlayer];
             }
         }
-    } else if (game_values.matchtype == MATCH_TYPE_TOUR) {
+    } else if (game_values.matchtype == MatchType::Tour) {
         //If no one won (tied game), then there is no need to update the scores because nothing has changed
         if (game_values.gamemode->winningteam < 0)
             return;
@@ -1326,7 +1326,7 @@ void UpdateScoreBoard()
             game_values.tournamentwinner = iWinningTeam;
             rm->backgroundmusic[4].play(true, true);
         }
-    } else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+    } else if (game_values.matchtype == MatchType::Tournament) {
         short maxScore = -1;  //Max score for game
         short maxTeam = -1;  //Team ID with the max score -> reset to -1 if two teams tied for win
 
@@ -1589,7 +1589,7 @@ bool updateExitPauseDialog(short iCountDownState) // true on exit
 
             if ((playerKeys->game_cancel.fPressed || (playerKeys->game_start.fPressed && game_values.gamemode->gameover)) && IsExitAllowed()) {
                 if (game_values.gamemode->gameover) {
-                    if (game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+                    if (game_values.matchtype == MatchType::Tour || game_values.matchtype == MatchType::Tournament)
                         UpdateScoreBoard();
 
                     CleanUp();
@@ -1690,7 +1690,7 @@ void SetGameModeSettingsFromMenu()
 {
     //If this is a tour stop and the tour has settings in it, use those.  Otherwise use the menu settings.
     if (game_values.tourstops[game_values.tourstopcurrent]->fUseSettings &&
-            (game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_WORLD))
+            (game_values.matchtype == MatchType::Tour || game_values.matchtype == MatchType::World))
         memcpy(&game_values.gamemodesettings, &game_values.tourstops[game_values.tourstopcurrent]->gmsSettings, sizeof(GameModeSettings));
     else
         memcpy(&game_values.gamemodesettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
@@ -1916,7 +1916,7 @@ void debug_gameplay()
             if (--endgametimer < 0) {
                 endgametimer = (short)(RANDOM_INT(200));
 
-                if (game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
+                if (game_values.matchtype != MatchType::SingleGame && game_values.matchtype != MatchType::QuickGame && game_values.matchtype != MatchType::MiniGame)
                     UpdateScoreBoard();
 
                 CleanUp();
@@ -2316,7 +2316,7 @@ void GameplayState::update_world()
     spinScreen();
     updateBulletBillPowerup();
 
-    if (game_values.matchtype == MATCH_TYPE_WORLD &&
+    if (game_values.matchtype == MatchType::World &&
         game_values.gamemode->gameover &&
         game_values.forceexittimer <= 0) {
         if (--game_values.noexittimer <= 0)

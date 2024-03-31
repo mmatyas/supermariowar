@@ -3,6 +3,7 @@
 
 #include "GameModeSettings.h"
 #include "input.h"
+#include "MatchTypes.h"
 
 #include <vector>
 
@@ -25,16 +26,6 @@ enum CurrentGameState {
     GS_END_GAME,
     GS_GAME,
     GS_QUIT
-};
-
-enum MatchType {
-    MATCH_TYPE_SINGLE_GAME = 0,
-    MATCH_TYPE_TOURNAMENT = 1,
-    MATCH_TYPE_TOUR = 2,
-    MATCH_TYPE_WORLD = 4,
-    MATCH_TYPE_MINIGAME = 3,
-    MATCH_TYPE_QUICK_GAME = 5,
-    MATCH_TYPE_NET_GAME = 6
 };
 
 //tournament scores
@@ -190,7 +181,7 @@ public:
     bool		showscoreboard;
     float		scorepercentmove;
 
-    short		matchtype;	//The currently selected match type: quick game, single, tournament, tour, world, minigame
+    MatchType matchtype;	//The currently selected match type: quick game, single, tournament, tour, world, minigame
 
     short		tournamentgames;	//How many games that are played in this tournament
     short		tournamentwinner;     //-2 for a tied tournament (for tours), -1 for no winner yet, 0 or greater for the team that has won the tournament

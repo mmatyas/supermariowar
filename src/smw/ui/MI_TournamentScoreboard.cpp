@@ -137,7 +137,7 @@ void MI_TournamentScoreboard::Update()
             worldPointsBackground[iTeam]->Update();
     }
 
-    if (game_values.matchtype == MATCH_TYPE_TOUR) {
+    if (game_values.matchtype == MatchType::Tour) {
         for (short iGame = 0; iGame < iNumGames; iGame++) {
             if (tourBonus[iGame])
                 tourBonus[iGame]->Update();
@@ -222,7 +222,7 @@ void MI_TournamentScoreboard::Draw()
     }
 
            //Draw tour totals
-    if (game_values.matchtype == MATCH_TYPE_TOUR) {
+    if (game_values.matchtype == MatchType::Tour) {
         for (short iTeam = 0; iTeam < iNumTeams; iTeam++)
             tourScores[iTeam]->Draw();
 
@@ -236,7 +236,7 @@ void MI_TournamentScoreboard::Draw()
         }
     }
 
-    if (game_values.matchtype == MATCH_TYPE_WORLD) {
+    if (game_values.matchtype == MatchType::World) {
         for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
             worldPointsBackground[iTeam]->Draw();
         }
@@ -286,8 +286,8 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
     miIconImages = new MI_Image ** [iNumTeams];
     miPlayerImages = new MI_Image ** [iNumTeams];
 
-    bool fTour = game_values.matchtype == MATCH_TYPE_TOUR;
-    bool fNotTournament = game_values.matchtype != MATCH_TYPE_TOURNAMENT;
+    bool fTour = game_values.matchtype == MatchType::Tour;
+    bool fNotTournament = game_values.matchtype != MatchType::Tournament;
 
     for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
         short iTeamY = GetYFromPlace(iTeam);
@@ -295,11 +295,11 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
         if (fTour)
             iTeamY += 28; //shift down 28 pxls for extra tour points bar
 
-        miTeamImages[iTeam] = new MI_Image(sprBackground, ix - (fNotTournament ? 40 : 0), iTeamY, 0, game_values.matchtype == MATCH_TYPE_WORLD ? 160 : 0, fNotTournament ? 580 : 500, 64, 1, 2, 0);
+        miTeamImages[iTeam] = new MI_Image(sprBackground, ix - (fNotTournament ? 40 : 0), iTeamY, 0, game_values.matchtype == MatchType::World ? 160 : 0, fNotTournament ? 580 : 500, 64, 1, 2, 0);
         miIconImages[iTeam] = new MI_Image * [iNumGames];
         miPlayerImages[iTeam] = new MI_Image * [iTeamCounts[iTeam]];
 
-        if (game_values.matchtype != MATCH_TYPE_WORLD) {
+        if (game_values.matchtype != MatchType::World) {
             for (short iGame = 0; iGame < iNumGames; iGame++) {
                 float dSpacing = GetIconSpacing();
 
@@ -315,7 +315,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
         if (fNotTournament)
             tourScores[iTeam] = new MI_ScoreText(0, 0);
 
-        if (game_values.matchtype == MATCH_TYPE_WORLD) {
+        if (game_values.matchtype == MatchType::World) {
             worldPointsBackground[iTeam] = new MI_Image(sprBackground, ix + 476, iTeamY, 516, 160, 64, 64, 1, 2, 0);
             worldPlace[iTeam] = new MI_Image(sprIcons, ix + 102, iTeamY + 14, 0, 0, 32, 32, 4, 1, 8);
 
@@ -326,7 +326,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
         }
     }
 
-    if (game_values.matchtype == MATCH_TYPE_WORLD) {
+    if (game_values.matchtype == MatchType::World) {
         worldScoreModifier = new MI_Image(&rm->spr_worlditems, 0, 0, 0, 0, 32, 32, 1, 1, 0);
         worldScore = new MI_ScoreText(0, 0);
     }

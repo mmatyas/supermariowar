@@ -42,6 +42,7 @@ add_library(CommonFiles STATIC
     map/MapReader18xx.cpp
     MapList.cpp
     MapList.h
+    MatchTypes.h
     ObjectBase.cpp
     ObjectBase.h
     path.cpp

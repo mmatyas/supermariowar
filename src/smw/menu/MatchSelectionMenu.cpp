@@ -22,12 +22,12 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
     miMatchSelectionStartButton = new MI_Button(&rm->spr_selectfield, 270, 420, "Start", 100);
     miMatchSelectionStartButton->SetCode(MENU_CODE_MATCH_SELECTION_START);
 
-    miMatchSelectionField = new MI_SelectField<short>(&rm->spr_selectfield, 130, 340, "Match", 380, 100);
-    miMatchSelectionField->add("Single Game", MATCH_TYPE_SINGLE_GAME);
-    miMatchSelectionField->add("Tournament", MATCH_TYPE_TOURNAMENT);
-    miMatchSelectionField->add("Tour", MATCH_TYPE_TOUR);
-    miMatchSelectionField->add("World", MATCH_TYPE_WORLD);
-    miMatchSelectionField->add("Minigame", MATCH_TYPE_MINIGAME);
+    miMatchSelectionField = new MI_SelectField<MatchType>(&rm->spr_selectfield, 130, 340, "Match", 380, 100);
+    miMatchSelectionField->add("Single Game", MatchType::SingleGame);
+    miMatchSelectionField->add("Tournament", MatchType::Tournament);
+    miMatchSelectionField->add("Tour", MatchType::Tour);
+    miMatchSelectionField->add("World", MatchType::World);
+    miMatchSelectionField->add("Minigame", MatchType::MiniGame);
     miMatchSelectionField->setOutputPtr(&game_values.matchtype);
     miMatchSelectionField->setCurrentValue(game_values.matchtype);
     miMatchSelectionField->setItemChangedCode(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED);
@@ -104,18 +104,18 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
 
 void UI_MatchSelectionMenu::SelectionChanged()
 {
-    miTournamentField->Show(game_values.matchtype == MATCH_TYPE_TOURNAMENT);
-    miTourField->Show(game_values.matchtype == MATCH_TYPE_TOUR);
-    miWorldField->Show(game_values.matchtype == MATCH_TYPE_WORLD);
-    miMinigameField->Show(game_values.matchtype == MATCH_TYPE_MINIGAME);
+    miTournamentField->Show(game_values.matchtype == MatchType::Tournament);
+    miTourField->Show(game_values.matchtype == MatchType::Tour);
+    miWorldField->Show(game_values.matchtype == MatchType::World);
+    miMinigameField->Show(game_values.matchtype == MatchType::MiniGame);
 
-    // miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
-    miWorldPreviewDisplay->Show(game_values.matchtype == MATCH_TYPE_WORLD);
+    // miMatchSelectionDisplayImage->Show(game_values.matchtype != MatchType::World);
+    miWorldPreviewDisplay->Show(game_values.matchtype == MatchType::World);
 
-    if (game_values.matchtype == MATCH_TYPE_WORLD)
+    if (game_values.matchtype == MatchType::World)
         miMatchSelectionDisplayImage->SetImage(320, 0, 320, 240);
     else
-        miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
+        miMatchSelectionDisplayImage->SetImage(0, 240 * static_cast<int>(game_values.matchtype), 320, 240);
 }
 
 void UI_MatchSelectionMenu::WorldMapChanged()
@@ -125,8 +125,8 @@ void UI_MatchSelectionMenu::WorldMapChanged()
 
 void UI_MatchSelectionMenu::ActivateMinigameField()
 {
-    miMatchSelectionField->hideItem(MATCH_TYPE_MINIGAME, false);
-    miMatchSelectionField->setCurrentValue(MATCH_TYPE_MINIGAME);
+    miMatchSelectionField->hideItem(MatchType::MiniGame, false);
+    miMatchSelectionField->setCurrentValue(MatchType::MiniGame);
 
     miTournamentField->Show(false);
     miTourField->Show(false);
@@ -135,7 +135,7 @@ void UI_MatchSelectionMenu::ActivateMinigameField()
 
     miMatchSelectionDisplayImage->Show(true);
     miWorldPreviewDisplay->Show(false);
-    miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
+    miMatchSelectionDisplayImage->SetImage(0, 240 * static_cast<int>(game_values.matchtype), 320, 240);
 }
 
 short UI_MatchSelectionMenu::GetMinigameID()
@@ -143,7 +143,7 @@ short UI_MatchSelectionMenu::GetMinigameID()
     return miMinigameField->currentValue();
 }
 
-short UI_MatchSelectionMenu::GetSelectedMatchType()
+MatchType UI_MatchSelectionMenu::GetSelectedMatchType()
 {
     return miMatchSelectionField->currentValue();
 }

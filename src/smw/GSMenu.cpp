@@ -196,23 +196,23 @@ void MenuState::onEnterState()
     fNeedMenuMusicReset = false;
 
     if (game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1 &&
-            (((game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_QUICK_GAME || game_values.matchtype == MATCH_TYPE_MINIGAME || game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_NET_GAME) && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
+            (((game_values.matchtype == MatchType::SingleGame || game_values.matchtype == MatchType::QuickGame || game_values.matchtype == MatchType::MiniGame || game_values.matchtype == MatchType::Tournament || game_values.matchtype == MatchType::NetGame) && game_values.bonuswheel == 2) || (game_values.matchtype == MatchType::Tour && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
         mBonusWheelMenu->miBonusWheel->Reset(false);
         mCurrentMenu = mBonusWheelMenu;
-    } else if (game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME && game_values.matchtype != MATCH_TYPE_NET_GAME) {
+    } else if (game_values.matchtype != MatchType::SingleGame && game_values.matchtype != MatchType::QuickGame && game_values.matchtype != MatchType::MiniGame && game_values.matchtype != MatchType::NetGame) {
         mCurrentMenu = mTournamentScoreboardMenu;
-    } else if (game_values.matchtype == MATCH_TYPE_QUICK_GAME) {
+    } else if (game_values.matchtype == MatchType::QuickGame) {
         //Reset back to main menu after quick game
         mCurrentMenu = mMainMenu;
         mCurrentMenu->ResetMenu();
-    } else if (game_values.matchtype == MATCH_TYPE_NET_GAME) {
+    } else if (game_values.matchtype == MatchType::NetGame) {
         mCurrentMenu = mNetLobbyMenu;
         mCurrentMenu->ResetMenu();
         netplay.joinSuccessful = false;
         netplay.gameRunning = false;
     }
 
-    if (game_values.matchtype == MATCH_TYPE_WORLD) {
+    if (game_values.matchtype == MatchType::World) {
         if (game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1) { //Stage is completed
             mWorldMenu->miWorld->SetControllingTeam(game_values.gamemode->winningteam);
             mWorldMenu->miWorld->SetCurrentStageToCompleted(game_values.gamemode->winningteam);
@@ -245,12 +245,12 @@ void MenuState::onEnterState()
         } else {
             mTournamentScoreboardMenu->miTournamentScoreboard->RefreshWorldScores(game_values.gamemode->winningteam);
         }
-    } else if (game_values.matchtype == MATCH_TYPE_TOUR) {
+    } else if (game_values.matchtype == MatchType::Tour) {
         mTournamentScoreboardMenu->miTournamentScoreboard->RefreshTourScores();
 
         if (game_values.tourstopcurrent < game_values.tourstoptotal)
             mTourStopMenu->miTourStop->Refresh(game_values.tourstopcurrent);
-    } else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+    } else if (game_values.matchtype == MatchType::Tournament) {
         mTournamentScoreboardMenu->miTournamentScoreboard->StopSwirl();
         if (game_values.gamemode->winningteam > -1) {
             mTournamentScoreboardMenu->miTournamentScoreboard->RefreshTournamentScores(game_values.gamemode->winningteam);
@@ -367,21 +367,21 @@ void MenuState::onEnterState()
 
     //Keep track if we entered the menu loop as part of a tournament, if we exit the tournament
     //we need to reset the menu music back to normal
-    if (game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME && game_values.matchtype != MATCH_TYPE_NET_GAME)
+    if (game_values.matchtype != MatchType::SingleGame && game_values.matchtype != MatchType::QuickGame && game_values.matchtype != MatchType::MiniGame && game_values.matchtype != MatchType::NetGame)
         fNeedMenuMusicReset = true;
 
     if (game_values.music) {
         if (game_values.tournamentwinner < 0) {
-            if (game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_QUICK_GAME || game_values.matchtype == MATCH_TYPE_MINIGAME || game_values.matchtype == MATCH_TYPE_NET_GAME)
+            if (game_values.matchtype == MatchType::SingleGame || game_values.matchtype == MatchType::QuickGame || game_values.matchtype == MatchType::MiniGame || game_values.matchtype == MatchType::NetGame)
                 rm->backgroundmusic[2].play(false, false);
-            else if (game_values.matchtype == MATCH_TYPE_WORLD)
+            else if (game_values.matchtype == MatchType::World)
                 rm->backgroundmusic[5].play(false, false);
             else
                 rm->backgroundmusic[3].play(false, false);
         }
     }
 
-    if (game_values.matchtype != MATCH_TYPE_WORLD && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_NET_GAME) {
+    if (game_values.matchtype != MatchType::World && game_values.matchtype != MatchType::QuickGame && game_values.matchtype != MatchType::NetGame) {
         if (mCurrentMenu == mGameSettingsMenu || mCurrentMenu == mTournamentScoreboardMenu)
             mGameSettingsMenu->miMapField->LoadCurrentMap();
     }
@@ -495,7 +495,7 @@ void MenuState::update()
     }
 
     //If AI is controlling the tournament menu, select the options
-    if (game_values.matchtype == MATCH_TYPE_TOURNAMENT && iTournamentAITimer > 0 && mCurrentMenu == mGameSettingsMenu && mGameSettingsMenu->IsOnStartBtn()) {
+    if (game_values.matchtype == MatchType::Tournament && iTournamentAITimer > 0 && mCurrentMenu == mGameSettingsMenu && mGameSettingsMenu->IsOnStartBtn()) {
         if (--iTournamentAITimer == 0) {
             iTournamentAIStep++;
 
@@ -607,7 +607,7 @@ void MenuState::update()
             printf("itt vagyok\n");
 
             if (MENU_CODE_QUICK_GAME_START == code)
-                game_values.matchtype = MATCH_TYPE_QUICK_GAME;
+                game_values.matchtype = MatchType::QuickGame;
             else
                 game_values.matchtype = mMatchSelectionMenu->GetSelectedMatchType();
 
@@ -616,7 +616,7 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
             printf("Hello\n");
 
-            if (game_values.matchtype != MATCH_TYPE_TOURNAMENT) {
+            if (game_values.matchtype != MatchType::Tournament) {
                 game_values.tournamentcontrolteam = -1;
                 SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
             }
@@ -688,7 +688,7 @@ void MenuState::update()
             iDisplayErrorTimer = 0;
             bool fErrorReadingTourFile = false;
 
-            if (MATCH_TYPE_MINIGAME == game_values.matchtype) {
+            if (MatchType::MiniGame == game_values.matchtype) {
                 printf(" Match type: Minigame\n");
                 short iMiniGameType = mMatchSelectionMenu->GetMinigameID();
 
@@ -708,7 +708,7 @@ void MenuState::update()
                 }
 
                 StartGame();
-            } else if (MATCH_TYPE_QUICK_GAME == game_values.matchtype) {
+            } else if (MatchType::QuickGame == game_values.matchtype) {
                 printf(" Match type: Quick game\n");
                 short iRandomMode = RANDOM_INT( GAMEMODE_LAST);
                 game_values.gamemode = gamemodes[iRandomMode];
@@ -725,7 +725,7 @@ void MenuState::update()
             } else {
 
                 //Load the tour here if one was selected
-                if (game_values.matchtype == MATCH_TYPE_TOUR) {
+                if (game_values.matchtype == MatchType::Tour) {
                     printf("  Match type: Tour\n");
                     if (!ReadTourFile()) {
                         iDisplayError = DISPLAY_ERROR_READ_TOUR_FILE;
@@ -734,7 +734,7 @@ void MenuState::update()
                     } else {
                         mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &rm->spr_tour_markers);
                     }
-                } else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+                } else if (game_values.matchtype == MatchType::Tournament) {
                     printf("  Match type: Tournament\n");
                     //Set who is controlling the tournament menu
                     if (game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
@@ -747,7 +747,7 @@ void MenuState::update()
                     game_values.tournamentnextcontrol = 1;  //if round robin is selected, choose the next team next
 
                     mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &rm->menu_mode_large);
-                } else if (game_values.matchtype == MATCH_TYPE_WORLD) {
+                } else if (game_values.matchtype == MatchType::World) {
                     printf("  Match type: World\n");
                     if (!g_worldmap.Load(TILESIZE)) {
                         iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
@@ -787,8 +787,8 @@ void MenuState::update()
                         game_values.tournament_scores[k].total = 0;
                     }
 
-                    if (MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype || MATCH_TYPE_NET_GAME == game_values.matchtype) {
-                        printf("  MATCH_TYPE_SINGLE_GAME || MATCH_TYPE_TOURNAMENT\n");
+                    if (MatchType::SingleGame == game_values.matchtype || MatchType::Tournament == game_values.matchtype || MatchType::NetGame == game_values.matchtype) {
+                        printf("  MatchType::SingleGame || MatchType::Tournament\n");
                         printf("current map: %s\n", szCurrentMapName);
                         maplist->findexact(szCurrentMapName, false);
                         mGameSettingsMenu->miMapField->LoadCurrentMap();
@@ -806,12 +806,12 @@ void MenuState::update()
                         mCurrentMenu->ResetMenu();
 
                         //If it is a tournament, then set the controlling team
-                        if (MATCH_TYPE_TOURNAMENT == game_values.matchtype)
+                        if (MatchType::Tournament == game_values.matchtype)
                             SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
-                        } else if (MATCH_TYPE_TOUR == game_values.matchtype) {
+                        } else if (MatchType::Tour == game_values.matchtype) {
                             mCurrentMenu = mTourStopMenu;
                             mCurrentMenu->ResetMenu();
-                        } else if (MATCH_TYPE_WORLD == game_values.matchtype) {
+                        } else if (MatchType::World == game_values.matchtype) {
                             game_values.screenfadespeed = 8;
                             game_values.screenfade = 8;
                             game_values.gamestate = GS_START_WORLD;
@@ -822,14 +822,14 @@ void MenuState::update()
 
                     //Setup items on next menu
                     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-                        mGameSettingsMenu->miGoalField[iGameMode]->hideItem(-1, game_values.matchtype == MATCH_TYPE_TOURNAMENT);
+                        mGameSettingsMenu->miGoalField[iGameMode]->hideItem(-1, game_values.matchtype == MatchType::Tournament);
                     }
 
-                    if (game_values.matchtype == MATCH_TYPE_WORLD)
+                    if (game_values.matchtype == MatchType::World)
                         mGameSettingsMenu->SetHeaderText("World Game Menu");
-                    else if (game_values.matchtype == MATCH_TYPE_TOUR)
+                    else if (game_values.matchtype == MatchType::Tour)
                         mGameSettingsMenu->SetHeaderText("Tour Game Menu");
-                    else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+                    else if (game_values.matchtype == MatchType::Tournament)
                         mGameSettingsMenu->SetHeaderText("Tournament Game Menu");
                     else
                         mGameSettingsMenu->SetHeaderText("Single Game Menu");
@@ -838,7 +838,7 @@ void MenuState::update()
             }
         } else if (MENU_CODE_BACK_TO_GAME_SETUP_MENU == code) {
             bool fNeedTeamAnnouncement = false;
-            if (game_values.matchtype == MATCH_TYPE_WORLD) {
+            if (game_values.matchtype == MatchType::World) {
                 if (game_values.tournamentwinner == -2 || (game_values.tournamentwinner >= 0 && game_values.bonuswheel == 0)) {
                     ResetTournamentBackToMainMenu();
                 } else if (game_values.tournamentwinner >= 0) {
@@ -854,14 +854,14 @@ void MenuState::update()
                 if (game_values.tournamentwinner == -2) { //Tied Tour Result
                     ResetTournamentBackToMainMenu();
                 } else if (game_values.tournamentwinner >= 0) { //Tournament/Tour Won and Bonus Wheel will be spun
-                    if (game_values.bonuswheel == 0 || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)) {
+                    if (game_values.bonuswheel == 0 || (game_values.matchtype == MatchType::Tour && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)) {
                         ResetTournamentBackToMainMenu();
                     } else {
                         mBonusWheelMenu->miBonusWheel->Reset(true);
                         mCurrentMenu = mBonusWheelMenu;
                     }
                 } else { //Next Tour/Tourament Game
-                    if (game_values.matchtype == MATCH_TYPE_TOUR) {
+                    if (game_values.matchtype == MatchType::Tour) {
                         mCurrentMenu = mTourStopMenu;
                     } else {
                         mCurrentMenu = mGameSettingsMenu;
@@ -872,7 +872,7 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
 
             //Set the controlling team for tournament mode
-            if (MATCH_TYPE_TOURNAMENT == game_values.matchtype && game_values.tournamentwinner == -1)
+            if (MatchType::Tournament == game_values.matchtype && game_values.tournamentwinner == -1)
                 SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
 
             if (fNeedTeamAnnouncement)
@@ -887,11 +887,11 @@ void MenuState::update()
             mGameSettingsMenu->RefreshGameModeButtons();
             mNetNewRoomSettingsMenu->RefreshGameModeButtons();
         } else if (MENU_CODE_BACK_TEAM_SELECT_MENU == code) {
-            if (game_values.matchtype == MATCH_TYPE_WORLD) {
+            if (game_values.matchtype == MatchType::World) {
                 mWorldMenu->OpenExitDialog();
-            } else if (game_values.matchtype == MATCH_TYPE_TOUR) {
+            } else if (game_values.matchtype == MatchType::Tour) {
                 mTourStopMenu->OpenExitDialog();
-            } else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+            } else if (game_values.matchtype == MatchType::Tournament) {
                 mGameSettingsMenu->OpenExitDialog();
 
                 if (iTournamentAITimer > 0)
@@ -940,16 +940,16 @@ void MenuState::update()
             }
         } else if (MENU_CODE_BONUS_DONE == code) {
             if (mBonusWheelMenu->miBonusWheel->GetPowerupSelectionDone()) {
-                if (game_values.matchtype == MATCH_TYPE_WORLD) {
+                if (game_values.matchtype == MatchType::World) {
                     if (game_values.tournamentwinner == -1)
                         mCurrentMenu = mTournamentScoreboardMenu;
                     else
                         ResetTournamentBackToMainMenu();
                 } else {
-                    if ((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
-                            ((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
+                    if ((game_values.matchtype == MatchType::Tour || game_values.matchtype == MatchType::Tournament) && game_values.tournamentwinner == -1 &&
+                            ((game_values.matchtype != MatchType::Tour && game_values.bonuswheel == 2) || (game_values.matchtype == MatchType::Tour && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
                         mCurrentMenu = mTournamentScoreboardMenu;
-                    } else if (game_values.matchtype == MATCH_TYPE_SINGLE_GAME) {
+                    } else if (game_values.matchtype == MatchType::SingleGame) {
                         mCurrentMenu = mGameSettingsMenu;
                         mCurrentMenu->ResetMenu();
                         mGameSettingsMenu->miMapField->LoadCurrentMap();
@@ -1035,7 +1035,7 @@ void MenuState::update()
             mWorldMenu->miWorld->ClearCloud();
 
             //Tour bonus house
-            if (game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
+            if (game_values.matchtype == MatchType::World && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
                 bonushousemode->goal = 0;
                 game_values.gamemode = bonushousemode;
             } else {
@@ -1064,7 +1064,7 @@ void MenuState::update()
                 printf("[net] Selected map: %s\n", netplay.mapfilepath.c_str());
                 mNetRoomMenu->SetPreviewMapPath(netplay.mapfilepath);
             }
-            else if (game_values.matchtype != MATCH_TYPE_TOUR)
+            else if (game_values.matchtype != MatchType::Tour)
                 szCurrentMapName = mGameSettingsMenu->miMapField->GetMapName();
         } else if (MENU_CODE_MAP_FILTER_EXIT == code) {
             maplist->ApplyFilters(game_values.pfFilters);
@@ -1233,7 +1233,7 @@ void MenuState::update()
                 mNetRoomMenu->StartInProgress();
             } else if (MENU_CODE_NET_ROOM_GO == code) {
                 netplay.operationInProgress = false;
-                game_values.matchtype = MATCH_TYPE_NET_GAME;
+                game_values.matchtype = MatchType::NetGame;
 
                 mTeamSelectMenu->ResetTeamSelect();
                 mTeamSelectMenu->ResetMenu();
@@ -1309,15 +1309,15 @@ void MenuState::update()
 
     if (game_values.screenfade == 255) {
         if (GS_START_GAME == game_values.gamestate) {
-            if (game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+            if (game_values.matchtype == MatchType::QuickGame)
                 mModeOptionsMenu->SetRandomGameModeSettings(game_values.gamemode->gamemode);
-            else if (game_values.matchtype == MATCH_TYPE_NET_GAME)
+            else if (game_values.matchtype == MatchType::NetGame)
                 // TODO: set from network
                 mModeOptionsMenu->SetRandomGameModeSettings(game_values.gamemode->gamemode);
             else
                 SetGameModeSettingsFromMenu();
 
-            if (game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
+            if (game_values.matchtype == MatchType::World && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
                 g_map->loadMap(convertPath("maps/special/two52_special_bonushouse.map"), read_type_full);
                 LoadCurrentMapBackground();
 
@@ -1330,7 +1330,7 @@ void MenuState::update()
 
                 bool fMiniGameMapFound = false;
 
-                if (game_values.matchtype == MATCH_TYPE_WORLD) {
+                if (game_values.matchtype == MatchType::World) {
                     if (game_values.gamemode->gamemode == game_mode_pipe_minigame ||
                             game_values.gamemode->gamemode == game_mode_boss_minigame ||
                             game_values.gamemode->gamemode == game_mode_boxes_minigame) {
@@ -1366,13 +1366,13 @@ void MenuState::update()
                         g_map->loadMap(convertPath("maps/special/two52_special_boxes_minigame.map"), read_type_full);
                         sShortMapName = "minigameboxes";
                     }
-                } else if (game_values.matchtype == MATCH_TYPE_QUICK_GAME) {
+                } else if (game_values.matchtype == MatchType::QuickGame) {
                     //Load a random map for the quick game
                     const char * szMapName = maplist->randomFilename();
                     g_map->loadMap(szMapName, read_type_full);
                     sShortMapName = stripPathAndExtension(szMapName);
 
-                    printf("  State: GS_START_GAME, Match type: MATCH_TYPE_QUICK_GAME\n");
+                    printf("  State: GS_START_GAME, Match type: MatchType::QuickGame\n");
                 } else if (netplay.active) {
                     // NOTE: for the host, netplay.mapfilepath will be ./data/something
                     // while for the other players, it's ~/.smw/net_last.map
@@ -1698,7 +1698,7 @@ void MenuState::ResetTournamentBackToMainMenu()
     mCurrentMenu = mMainMenu;
     mCurrentMenu->ResetMenu();
 
-    if (game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME && game_values.matchtype != MATCH_TYPE_NET_GAME) {
+    if (game_values.matchtype != MatchType::SingleGame && game_values.matchtype != MatchType::QuickGame && game_values.matchtype != MatchType::MiniGame && game_values.matchtype != MatchType::NetGame) {
         if (fNeedMenuMusicReset) {
             rm->backgroundmusic[3].stop();
             rm->backgroundmusic[2].play(false, false);

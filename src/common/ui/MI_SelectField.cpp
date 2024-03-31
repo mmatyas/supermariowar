@@ -360,5 +360,9 @@ bool MI_SelectField<T>::moveRandom()
 
 
 // Actual typed classes
+
 template class MI_SelectField<bool>;
 template class MI_SelectField<short>;
+
+#include "MatchTypes.h"
+template class MI_SelectField<MatchType>;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "uimenu.h"
+#include "MatchTypes.h"
 
 class MI_Button;
 class MI_Image;
@@ -17,12 +18,12 @@ public:
     void WorldMapChanged();
     void ActivateMinigameField();
     short GetMinigameID();
-    short GetSelectedMatchType();
+    MatchType GetSelectedMatchType();
 
 private:
     MI_Image* miMatchSelectionDisplayImage;
 
-    MI_SelectField<short>* miMatchSelectionField;
+    MI_SelectField<MatchType>* miMatchSelectionField;
     MI_SelectField<short>* miTournamentField;
     MI_SelectField<short>* miTourField;
     MI_SelectField<short>* miWorldField;
