@@ -6,7 +6,6 @@ class MI_Button;
 class MI_Image;
 class MI_FrenzyModeOptions;
 class MI_PowerupSlider;
-class MI_SelectField;
 class MI_SliderField;
 class MI_Text;
 template<typename T> class MI_SelectFieldDyn;
@@ -38,8 +37,8 @@ private:
     UI_Menu mBossSettingsMenu;
 
     // Classic
-    MI_SelectField* miClassicModeStyleField;
-    MI_SelectField* miClassicModeScoringField;
+    MI_SelectFieldDyn<short>* miClassicModeStyleField;
+    MI_SelectFieldDyn<short>* miClassicModeScoringField;
     MI_Button* miClassicModeBackButton;
 
     MI_Image* miClassicModeLeftHeaderBar;
@@ -47,8 +46,8 @@ private:
     MI_Text* miClassicModeHeaderText;
 
     // Frag
-    MI_SelectField* miFragModeStyleField;
-    MI_SelectField* miFragModeScoringField;
+    MI_SelectFieldDyn<short>* miFragModeStyleField;
+    MI_SelectFieldDyn<short>* miFragModeScoringField;
     MI_Button* miFragModeBackButton;
 
     MI_Image* miFragModeLeftHeaderBar;
@@ -56,8 +55,8 @@ private:
     MI_Text* miFragModeHeaderText;
 
     // Time Limit
-    MI_SelectField* miTimeLimitModeStyleField;
-    MI_SelectField* miTimeLimitModeScoringField;
+    MI_SelectFieldDyn<short>* miTimeLimitModeStyleField;
+    MI_SelectFieldDyn<short>* miTimeLimitModeScoringField;
     MI_SliderField* miTimeLimitModePercentExtraTime;
     MI_Button* miTimeLimitModeBackButton;
 
@@ -66,9 +65,9 @@ private:
     MI_Text* miTimeLimitModeHeaderText;
 
     // Jail
-    MI_SelectField* miJailModeStyleField;
+    MI_SelectFieldDyn<short>* miJailModeStyleField;
     MI_SelectFieldDyn<bool>* miJailModeTagFreeField;
-    MI_SelectField* miJailModeTimeFreeField;
+    MI_SelectFieldDyn<short>* miJailModeTimeFreeField;
     MI_SliderField* miJailModeJailKeyField;
     MI_Button* miJailModeBackButton;
 
@@ -78,7 +77,7 @@ private:
 
     // Coins
     MI_SelectFieldDyn<bool>* miCoinModePenaltyField;
-    MI_SelectField* miCoinModeQuantityField;
+    MI_SelectFieldDyn<short>* miCoinModeQuantityField;
     MI_SliderField* miCoinModePercentExtraCoin;
     MI_Button* miCoinModeBackButton;
 
@@ -89,7 +88,7 @@ private:
     // Yoshi's Eggs
     MI_PowerupSlider* miEggModeEggQuantityField[4];
     MI_PowerupSlider* miEggModeYoshiQuantityField[4];
-    MI_SelectField* miEggModeExplosionTimeField;
+    MI_SelectFieldDyn<short>* miEggModeExplosionTimeField;
     MI_Button* miEggModeBackButton;
 
     MI_Image* miEggModeLeftHeaderBar;
@@ -100,7 +99,7 @@ private:
     MI_SliderField* miFlagModeSpeedField;
     MI_SelectFieldDyn<bool>* miFlagModeTouchReturnField;
     MI_SelectFieldDyn<bool>* miFlagModePointMoveField;
-    MI_SelectField* miFlagModeAutoReturnField;
+    MI_SelectFieldDyn<short>* miFlagModeAutoReturnField;
     MI_SelectFieldDyn<bool>* miFlagModeHomeScoreField;
     MI_SelectFieldDyn<bool>* miFlagModeCenterFlagField;
     MI_Button* miFlagModeBackButton;
@@ -127,8 +126,8 @@ private:
     MI_Text* miTagModeHeaderText;
 
     // Star
-    MI_SelectField* miStarModeTimeField;
-    MI_SelectField* miStarModeShineField;
+    MI_SelectFieldDyn<short>* miStarModeTimeField;
+    MI_SelectFieldDyn<short>* miStarModeShineField;
     MI_SliderField* miStarModePercentExtraTime;
     MI_Button* miStarModeBackButton;
 
@@ -137,11 +136,11 @@ private:
     MI_Text* miStarModeHeaderText;
 
     // Domination
-    MI_SelectField* miDominationModeQuantityField;
+    MI_SelectFieldDyn<short>* miDominationModeQuantityField;
     MI_SelectFieldDyn<bool>* miDominationModeLoseOnDeathField;
     MI_SelectFieldDyn<bool>* miDominationModeRelocateOnDeathField;
     MI_SelectFieldDyn<bool>* miDominationModeStealOnDeathField;
-    MI_SelectField* miDominationModeRelocateFrequencyField;
+    MI_SelectFieldDyn<short>* miDominationModeRelocateFrequencyField;
 
     MI_Text* miDominationModeDeathText;
 
@@ -152,9 +151,9 @@ private:
     MI_Text* miDominationModeHeaderText;
 
     // King of the Hill
-    MI_SelectField* miKingOfTheHillModeSizeField;
-    MI_SelectField* miKingOfTheHillModeRelocateFrequencyField;
-    MI_SelectField* miKingOfTheHillModeMultiplierField;
+    MI_SelectFieldDyn<short>* miKingOfTheHillModeSizeField;
+    MI_SelectFieldDyn<short>* miKingOfTheHillModeRelocateFrequencyField;
+    MI_SelectFieldDyn<short>* miKingOfTheHillModeMultiplierField;
 
     MI_Button* miKingOfTheHillModeBackButton;
 
@@ -163,9 +162,9 @@ private:
     MI_Text* miKingOfTheHillModeHeaderText;
 
     // Race
-    MI_SelectField* miRaceModeQuantityField;
-    MI_SelectField* miRaceModeSpeedField;
-    MI_SelectField* miRaceModePenaltyField;
+    MI_SelectFieldDyn<short>* miRaceModeQuantityField;
+    MI_SelectFieldDyn<short>* miRaceModeSpeedField;
+    MI_SelectFieldDyn<short>* miRaceModePenaltyField;
     MI_Button* miRaceModeBackButton;
 
     MI_Image* miRaceModeLeftHeaderBar;
@@ -173,7 +172,7 @@ private:
     MI_Text* miRaceModeHeaderText;
 
     // Stomp
-    MI_SelectField* miStompModeRateField;
+    MI_SelectFieldDyn<short>* miStompModeRateField;
     MI_PowerupSlider* miStompModeEnemySlider[NUMSTOMPENEMIES];
     MI_Button* miStompModeBackButton;
 
@@ -190,8 +189,8 @@ private:
 
     // Survival
     MI_PowerupSlider* miSurvivalModeEnemySlider[NUMSURVIVALENEMIES];
-    MI_SelectField* miSurvivalModeDensityField;
-    MI_SelectField* miSurvivalModeSpeedField;
+    MI_SelectFieldDyn<short>* miSurvivalModeDensityField;
+    MI_SelectFieldDyn<short>* miSurvivalModeSpeedField;
     MI_SelectFieldDyn<bool>* miSurvivalModeShieldField;
     MI_Button* miSurvivalModeBackButton;
 
@@ -200,9 +199,9 @@ private:
     MI_Text* miSurvivalModeHeaderText;
 
     // Greed
-    MI_SelectField* miGreedModeCoinLife;
+    MI_SelectFieldDyn<short>* miGreedModeCoinLife;
     MI_SelectFieldDyn<bool>* miGreedModeOwnCoins;
-    MI_SelectField* miGreedModeMultiplier;
+    MI_SelectFieldDyn<short>* miGreedModeMultiplier;
     MI_SliderField* miGreedModePercentExtraCoin;
     MI_Button* miGreedModeBackButton;
 
@@ -211,8 +210,8 @@ private:
     MI_Text* miGreedModeHeaderText;
 
     // Health
-    MI_SelectField* miHealthModeStartLife;
-    MI_SelectField* miHealthModeMaxLife;
+    MI_SelectFieldDyn<short>* miHealthModeStartLife;
+    MI_SelectFieldDyn<short>* miHealthModeMaxLife;
     MI_SliderField* miHealthModePercentExtraLife;
     MI_Button* miHealthModeBackButton;
 
@@ -221,10 +220,10 @@ private:
     MI_Text* miHealthModeHeaderText;
 
     // Card Collection
-    MI_SelectField* miCollectionModeQuantityField;
-    MI_SelectField* miCollectionModeRateField;
-    MI_SelectField* miCollectionModeBankTimeField;
-    MI_SelectField* miCollectionModeCardLifeField;
+    MI_SelectFieldDyn<short>* miCollectionModeQuantityField;
+    MI_SelectFieldDyn<short>* miCollectionModeRateField;
+    MI_SelectFieldDyn<short>* miCollectionModeBankTimeField;
+    MI_SelectFieldDyn<short>* miCollectionModeCardLifeField;
     MI_Button* miCollectionModeBackButton;
 
     MI_Image* miCollectionModeLeftHeaderBar;
@@ -232,7 +231,7 @@ private:
     MI_Text* miCollectionModeHeaderText;
 
     // Phanto Chase
-    MI_SelectField* miChaseModeSpeedField;
+    MI_SelectFieldDyn<short>* miChaseModeSpeedField;
     MI_PowerupSlider* miChaseModeQuantitySlider[3];
     MI_Button* miChaseModeBackButton;
 
@@ -242,8 +241,8 @@ private:
 
     // Shyguy Tag
     MI_SelectFieldDyn<bool>* miShyGuyTagModeTagOnSuicideField;
-    MI_SelectField* miShyGuyTagModeTagOnStompField;
-    MI_SelectField* miShyGuyTagModeFreeTimeField;
+    MI_SelectFieldDyn<short>* miShyGuyTagModeTagOnStompField;
+    MI_SelectFieldDyn<short>* miShyGuyTagModeFreeTimeField;
     MI_Button* miShyGuyTagModeBackButton;
 
     MI_Image* miShyGuyTagModeLeftHeaderBar;
@@ -251,9 +250,9 @@ private:
     MI_Text* miShyGuyTagModeHeaderText;
 
     // Boss
-    MI_SelectField* miBossModeTypeField;
-    MI_SelectField* miBossModeDifficultyField;
-    MI_SelectField* miBossModeHitPointsField;
+    MI_SelectFieldDyn<short>* miBossModeTypeField;
+    MI_SelectFieldDyn<short>* miBossModeDifficultyField;
+    MI_SelectFieldDyn<short>* miBossModeHitPointsField;
     MI_Button* miBossModeBackButton;
 
     MI_Image* miBossModeLeftHeaderBar;
