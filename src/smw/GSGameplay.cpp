@@ -157,7 +157,7 @@ void SDLCALL musicfinished()
     if (!game_values.music)
         return;
 
-    if (game_values.gamestate == GS_GAME && !game_values.gamemode->gameover)
+    if (game_values.gamestate == AppState::Game && !game_values.gamemode->gameover)
         return;
 
     if (fResumeMusic)
@@ -1554,7 +1554,7 @@ bool updateExitPauseDialog(short iCountDownState) // true on exit
         //If the cancel button is pressed
         if (game_values.forceexittimer > 0) {
             if (--game_values.forceexittimer <= 0) {
-                game_values.gamestate = GS_END_GAME;
+                game_values.gamestate = AppState::EndGame;
                 game_values.screenfade = 8;
                 game_values.screenfadespeed = 8;
             }
@@ -1593,7 +1593,7 @@ bool updateExitPauseDialog(short iCountDownState) // true on exit
                         UpdateScoreBoard();
 
                     CleanUp();
-                    game_values.gamestate = GS_MENU;
+                    game_values.gamestate = AppState::Menu;
 
                     return true;
                 } else {
@@ -1622,7 +1622,7 @@ bool updateExitPauseDialog(short iCountDownState) // true on exit
                         CleanUp();
                         game_values.exitinggame = false;
                         game_values.exityes = false;
-                        game_values.gamestate = GS_MENU;
+                        game_values.gamestate = AppState::Menu;
                         return true;
                     } else {
                         game_values.exitinggame = false;
@@ -1920,7 +1920,7 @@ void debug_gameplay()
                     UpdateScoreBoard();
 
                 CleanUp();
-                game_values.gamestate = GS_MENU;
+                game_values.gamestate = AppState::Menu;
 
                 return;
             }
@@ -1929,7 +1929,7 @@ void debug_gameplay()
                 CleanUp();
                 game_values.exitinggame = false;
                 game_values.exityes = false;
-                game_values.gamestate = GS_MENU;
+                game_values.gamestate = AppState::Menu;
 
                 return;
             }
@@ -1969,7 +1969,7 @@ void GameplayState::handleInput()
 #ifndef _XBOX
         case SDL_QUIT: {
             CleanUp();
-            game_values.gamestate = GS_QUIT;
+            game_values.gamestate = AppState::Quit;
             return;
         }
         break;
@@ -1979,7 +1979,7 @@ void GameplayState::handleInput()
             if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                 if (event.key.keysym.sym == SDLK_F4) {
                     CleanUp();
-                    game_values.gamestate = GS_QUIT;
+                    game_values.gamestate = AppState::Quit;
                     return;
                 } else if (event.key.keysym.sym == SDLK_RETURN) {
                     game_values.fullscreen = !game_values.fullscreen;
@@ -2263,7 +2263,7 @@ void start_gameplay()
 {
     CleanUp();
     SetGameModeSettingsFromMenu();
-    game_values.gamestate = GS_GAME;
+    game_values.gamestate = AppState::Game;
 
     //secretBoss();
 
@@ -2277,7 +2277,7 @@ void start_gameplay()
 void end_gameplay()
 {
     CleanUp();
-    game_values.gamestate = GS_MENU;
+    game_values.gamestate = AppState::Menu;
     game_values.screenfadespeed = -8;
     GameStateManager::instance().changeStateTo(&MenuState::instance());
 }
@@ -2435,10 +2435,10 @@ void GameplayState::update()
         network_broadcast_game_state();
 
         if (game_values.screenfade == 255) {
-            if (game_values.gamestate == GS_START_GAME) {
+            if (game_values.gamestate == AppState::StartGame) {
                 start_gameplay();
                 return;
-            } else if (game_values.gamestate == GS_END_GAME) {
+            } else if (game_values.gamestate == AppState::EndGame) {
                 end_gameplay();
                 return;
             }

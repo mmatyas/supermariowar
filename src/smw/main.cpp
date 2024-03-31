@@ -161,7 +161,7 @@ void gameloop()
 
 void gameloop_frame()
 #else
-    while (game_values.gamestate != GS_QUIT)
+    while (game_values.gamestate != AppState::Quit)
 #endif
     {
         FPSLimiter::instance().frameStart();

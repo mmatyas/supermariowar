@@ -18,14 +18,14 @@ void ifSoundOnPlay(sfxSound&);
 
 class CGameMode;
 
-enum CurrentGameState {
-    GS_SPLASH,
-    GS_MENU,
-    GS_START_GAME,
-    GS_START_WORLD,
-    GS_END_GAME,
-    GS_GAME,
-    GS_QUIT
+enum class AppState: unsigned char {
+    Splash,
+    Menu,
+    StartGame,
+    StartWorld,
+    EndGame,
+    Game,
+    Quit,
 };
 
 //tournament scores
@@ -160,7 +160,7 @@ public:
     bool		frameadvance;
     bool		autokill;
 
-    CurrentGameState   gamestate;
+    AppState gamestate;
 
     float		screenResizeX;
     float		screenResizeY;
