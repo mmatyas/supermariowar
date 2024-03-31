@@ -11,7 +11,7 @@ extern CResourceManager* rm;
  **************************************/
 
 MI_SliderField::MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2)
-    : MI_SelectFieldDyn<short>(nspr, x, y, name, width, indent1)
+    : MI_SelectField<short>(nspr, x, y, name, width, indent1)
 {
     m_indent2 = indent2;
     m_sprSlider = nsprSlider;
@@ -24,7 +24,7 @@ MI_SliderField::~MI_SliderField()
 
 void MI_SliderField::SetPosition(short x, short y)
 {
-    MI_SelectFieldDyn<short>::SetPosition(x, y);
+    MI_SelectField<short>::SetPosition(x, y);
     miModifyImageLeft->SetPosition(ix + m_indent - 26, iy + 4);
     miModifyImageRight->SetPosition(ix + m_width - 16, iy + 4);
 }
@@ -80,5 +80,5 @@ MenuCodeEnum MI_SliderField::SendInput(CPlayerInput * playerInput)
         }
     }
 
-    return MI_SelectFieldDyn<short>::SendInput(playerInput);
+    return MI_SelectField<short>::SendInput(playerInput);
 }

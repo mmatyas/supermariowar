@@ -5,7 +5,7 @@
 class MI_Button;
 class MI_Image;
 class MI_Text;
-template<typename T> class MI_SelectFieldDyn;
+template<typename T> class MI_SelectField;
 
 /*
     You can set the maximum number of uses of certain
@@ -16,15 +16,15 @@ public:
     UI_ProjectileLimitsMenu();
 
 private:
-    MI_SelectFieldDyn<short>* miFireballLimitField;
-    MI_SelectFieldDyn<short>* miHammerLimitField;
-    MI_SelectFieldDyn<short>* miBoomerangLimitField;
-    MI_SelectFieldDyn<short>* miFeatherLimitField;
-    MI_SelectFieldDyn<short>* miLeafLimitField;
-    MI_SelectFieldDyn<short>* miPwingsLimitField;
-    MI_SelectFieldDyn<short>* miTanookiLimitField;
-    MI_SelectFieldDyn<short>* miBombLimitField;
-    MI_SelectFieldDyn<short>* miWandLimitField;
+    MI_SelectField<short>* miFireballLimitField;
+    MI_SelectField<short>* miHammerLimitField;
+    MI_SelectField<short>* miBoomerangLimitField;
+    MI_SelectField<short>* miFeatherLimitField;
+    MI_SelectField<short>* miLeafLimitField;
+    MI_SelectField<short>* miPwingsLimitField;
+    MI_SelectField<short>* miTanookiLimitField;
+    MI_SelectField<short>* miBombLimitField;
+    MI_SelectField<short>* miWandLimitField;
 
     MI_Button* miProjectilesLimitsMenuBackButton;
 

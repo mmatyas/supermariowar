@@ -6,7 +6,7 @@ class MI_Button;
 class MI_Image;
 class MI_Text;
 class MI_WorldPreviewDisplay;
-template<typename T> class MI_SelectFieldDyn;
+template<typename T> class MI_SelectField;
 
 
 class UI_MatchSelectionMenu : public UI_Menu {
@@ -22,11 +22,11 @@ public:
 private:
     MI_Image* miMatchSelectionDisplayImage;
 
-    MI_SelectFieldDyn<short>* miMatchSelectionField;
-    MI_SelectFieldDyn<short>* miTournamentField;
-    MI_SelectFieldDyn<short>* miTourField;
-    MI_SelectFieldDyn<short>* miWorldField;
-    MI_SelectFieldDyn<short>* miMinigameField;
+    MI_SelectField<short>* miMatchSelectionField;
+    MI_SelectField<short>* miTournamentField;
+    MI_SelectField<short>* miTourField;
+    MI_SelectField<short>* miWorldField;
+    MI_SelectField<short>* miMinigameField;
     MI_WorldPreviewDisplay* miWorldPreviewDisplay;
 
     MI_Button* miMatchSelectionStartButton;

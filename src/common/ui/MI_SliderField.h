@@ -3,7 +3,7 @@
 #include "ui/MI_SelectField.h"
 
 
-class MI_SliderField : public MI_SelectFieldDyn<short> {
+class MI_SliderField : public MI_SelectField<short> {
 public:
     MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2);
     virtual ~MI_SliderField();

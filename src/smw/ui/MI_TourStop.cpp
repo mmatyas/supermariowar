@@ -28,10 +28,10 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld)
 {
     if (fIsWorld) {
         miModeField = std::make_unique<MI_ImageSelectField>(&rm->spr_selectfielddisabled, &rm->menu_mode_small, 70, 85, "Mode", 305, 90, 16, 16);
-        miGoalField = std::make_unique<MI_SelectFieldDyn<short>>(&rm->spr_selectfielddisabled, 380, 85, "Goal", 190, 90);
-        miPointsField = std::make_unique<MI_SelectFieldDyn<short>>(&rm->spr_selectfielddisabled, 380, 125, "Score", 190, 90);
+        miGoalField = std::make_unique<MI_SelectField<short>>(&rm->spr_selectfielddisabled, 380, 85, "Goal", 190, 90);
+        miPointsField = std::make_unique<MI_SelectField<short>>(&rm->spr_selectfielddisabled, 380, 125, "Score", 190, 90);
 
-        miBonusField = std::make_unique<MI_SelectFieldDyn<short>>(&rm->spr_selectfielddisabled, 70, 125, "Bonus", 305, 90);
+        miBonusField = std::make_unique<MI_SelectField<short>>(&rm->spr_selectfielddisabled, 70, 125, "Bonus", 305, 90);
         miBonusField->Disable(true);
 
         miEndStageImage[0] = std::make_unique<MI_Image>(&rm->spr_worlditemsplace, 54, 201, 0, 20, 80, 248, 1, 1, 0);
@@ -49,8 +49,8 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld)
         }
     } else {
         miModeField = std::make_unique<MI_ImageSelectField>(&rm->spr_selectfielddisabled, &rm->menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
-        miGoalField = std::make_unique<MI_SelectFieldDyn<short>>(&rm->spr_selectfielddisabled, 70, 125, "Goal", 246, 120);
-        miPointsField = std::make_unique<MI_SelectFieldDyn<short>>(&rm->spr_selectfielddisabled, 70 + 254, 125, "Score", 246, 120);
+        miGoalField = std::make_unique<MI_SelectField<short>>(&rm->spr_selectfielddisabled, 70, 125, "Goal", 246, 120);
+        miPointsField = std::make_unique<MI_SelectField<short>>(&rm->spr_selectfielddisabled, 70 + 254, 125, "Score", 246, 120);
 
         miBonusField = 0;
     }

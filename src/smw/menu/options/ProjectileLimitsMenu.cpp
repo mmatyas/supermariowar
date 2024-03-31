@@ -14,7 +14,7 @@ extern CGameValues game_values;
 UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     : UI_Menu()
 {
-    miFireballLimitField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 60, "Fireball Limit", 500, 220);
+    miFireballLimitField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 60, "Fireball Limit", 500, 220);
     miFireballLimitField->add("Unlimited", 0);
     miFireballLimitField->add("2", 2);
     miFireballLimitField->add("5", 5);
@@ -30,7 +30,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     miFireballLimitField->setOutputPtr(&game_values.fireballlimit);
     miFireballLimitField->setCurrentValue(game_values.fireballlimit);
 
-    miHammerLimitField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 100, "Hammer Limit", 500, 220);
+    miHammerLimitField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, "Hammer Limit", 500, 220);
     miHammerLimitField->add("Unlimited", 0);
     miHammerLimitField->add("2", 2);
     miHammerLimitField->add("5", 5);
@@ -46,7 +46,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     miHammerLimitField->setOutputPtr(&game_values.hammerlimit);
     miHammerLimitField->setCurrentValue(game_values.hammerlimit);
 
-    miBoomerangLimitField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 140, "Boomerang Limit", 500, 220);
+    miBoomerangLimitField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 140, "Boomerang Limit", 500, 220);
     miBoomerangLimitField->add("Unlimited", 0);
     miBoomerangLimitField->add("2", 2);
     miBoomerangLimitField->add("5", 5);
@@ -62,7 +62,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     miBoomerangLimitField->setOutputPtr(&game_values.boomeranglimit);
     miBoomerangLimitField->setCurrentValue(game_values.boomeranglimit);
 
-    miFeatherLimitField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 180, "Feather Limit", 500, 220);
+    miFeatherLimitField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 180, "Feather Limit", 500, 220);
     miFeatherLimitField->add("Unlimited", 0);
     miFeatherLimitField->add("2", 2);
     miFeatherLimitField->add("5", 5);
@@ -78,7 +78,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     miFeatherLimitField->setOutputPtr(&game_values.featherlimit);
     miFeatherLimitField->setCurrentValue(game_values.featherlimit);
 
-    miLeafLimitField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 220, "Leaf Limit", 500, 220);
+    miLeafLimitField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 220, "Leaf Limit", 500, 220);
     miLeafLimitField->add("Unlimited", 0);
     miLeafLimitField->add("2", 2);
     miLeafLimitField->add("5", 5);
@@ -94,7 +94,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     miLeafLimitField->setOutputPtr(&game_values.leaflimit);
     miLeafLimitField->setCurrentValue(game_values.leaflimit);
 
-    miPwingsLimitField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 260, "P-Wings Limit", 500, 220);
+    miPwingsLimitField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 260, "P-Wings Limit", 500, 220);
     miPwingsLimitField->add("Unlimited", 0);
     miPwingsLimitField->add("2", 2);
     miPwingsLimitField->add("5", 5);
@@ -110,7 +110,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     miPwingsLimitField->setOutputPtr(&game_values.pwingslimit);
     miPwingsLimitField->setCurrentValue(game_values.pwingslimit);
 
-    miTanookiLimitField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 300, "Tanooki Limit", 500, 220);
+    miTanookiLimitField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 300, "Tanooki Limit", 500, 220);
     miTanookiLimitField->add("Unlimited", 0);
     miTanookiLimitField->add("2", 2);
     miTanookiLimitField->add("5", 5);
@@ -126,7 +126,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     miTanookiLimitField->setOutputPtr(&game_values.tanookilimit);
     miTanookiLimitField->setCurrentValue(game_values.tanookilimit);
 
-    miBombLimitField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 340, "Bomb Limit", 500, 220);
+    miBombLimitField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 340, "Bomb Limit", 500, 220);
     miBombLimitField->add("Unlimited", 0);
     miBombLimitField->add("2", 2);
     miBombLimitField->add("5", 5);
@@ -142,7 +142,7 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     miBombLimitField->setOutputPtr(&game_values.bombslimit);
     miBombLimitField->setCurrentValue(game_values.bombslimit);
 
-    miWandLimitField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 380, "Wand Limit", 500, 220);
+    miWandLimitField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 380, "Wand Limit", 500, 220);
     miWandLimitField->add("Unlimited", 0);
     miWandLimitField->add("2", 2);
     miWandLimitField->add("5", 5);

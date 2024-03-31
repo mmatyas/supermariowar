@@ -13,8 +13,8 @@ class MI_Image;
 
 
 template<typename T>
-struct SF_ListItemDyn {
-    SF_ListItemDyn(std::string&& name, T value)
+struct SF_ListItem {
+    SF_ListItem(std::string&& name, T value)
         : name(std::move(name))
         , value(value)
     {
@@ -29,13 +29,13 @@ struct SF_ListItemDyn {
 
 
 template<typename T>
-class MI_SelectFieldDyn : public UI_Control {
-    using Item = SF_ListItemDyn<T>;
+class MI_SelectField : public UI_Control {
+    using Item = SF_ListItem<T>;
 
 public:
-    MI_SelectFieldDyn(gfxSprite* nspr, short x, short y, std::string name, short width, short indent);
-    MI_SelectFieldDyn(const MI_SelectFieldDyn<T>&);
-    virtual ~MI_SelectFieldDyn() = default;
+    MI_SelectField(gfxSprite* nspr, short x, short y, std::string name, short width, short indent);
+    MI_SelectField(const MI_SelectField<T>&);
+    virtual ~MI_SelectField() = default;
 
     //! Set the displayed name.
     void setTitle(std::string name) {

@@ -392,7 +392,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
     miImage[0] = new MI_Image(spr_button, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miImage[1] = new MI_Image(spr_button, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 
-    miDeviceSelectField = new MI_SelectFieldDyn<short>(spr_button, x + 16, y + 38, "Device", 420, 150);
+    miDeviceSelectField = new MI_SelectField<short>(spr_button, x + 16, y + 38, "Device", 420, 150);
     miDeviceSelectField->setItemChangedCode(MENU_CODE_INPUT_DEVICE_CHANGED);
     miDeviceSelectField->add("Keyboard", -1);
 #ifdef _XBOX

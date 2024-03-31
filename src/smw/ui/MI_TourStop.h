@@ -9,7 +9,7 @@ class MI_Image;
 class MI_ImageSelectField;
 class MI_MapField;
 class MI_Text;
-template<typename T> class MI_SelectFieldDyn;
+template<typename T> class MI_SelectField;
 
 
 class MI_TourStop : public UI_Control {
@@ -24,12 +24,12 @@ public:
 
 private:
     std::unique_ptr<MI_ImageSelectField> miModeField;
-    std::unique_ptr<MI_SelectFieldDyn<short>> miGoalField;
-    std::unique_ptr<MI_SelectFieldDyn<short>> miPointsField;
+    std::unique_ptr<MI_SelectField<short>> miGoalField;
+    std::unique_ptr<MI_SelectField<short>> miPointsField;
     std::unique_ptr<MI_MapField> miMapField;
     std::unique_ptr<MI_Button> miStartButton;
 
-    std::unique_ptr<MI_SelectFieldDyn<short>> miBonusField;
+    std::unique_ptr<MI_SelectField<short>> miBonusField;
     std::array<std::unique_ptr<MI_Image>, 2> miEndStageImage;
 
     std::array<std::unique_ptr<MI_Image>, 10> miBonusIcon;

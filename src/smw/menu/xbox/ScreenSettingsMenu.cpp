@@ -10,7 +10,7 @@ UI_ScreenSettingsMenu::UI_ScreenSettingsMenu() : UI_Menu()
     miScreenResizeButton = new MI_Button(&rm->spr_selectfield, 70, 160, "Resize Screen", 500, 0);
     miScreenResizeButton->SetCode(MENU_CODE_TO_SCREEN_RESIZE);
 
-    miScreenHardwareFilterField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 200, "Screen Filter", 500, 220);
+    miScreenHardwareFilterField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 200, "Screen Filter", 500, 220);
     //miScreenHardwareFilterField->add("None", 0);
     miScreenHardwareFilterField->add("Point", 1);
     miScreenHardwareFilterField->add("Bilinear", 2);
@@ -22,7 +22,7 @@ UI_ScreenSettingsMenu::UI_ScreenSettingsMenu() : UI_Menu()
     miScreenHardwareFilterField->setCurrenzValue(game_values.hardwarefilter);
     miScreenHardwareFilterField->setItemChangedCode(MENU_CODE_SCREEN_FILTER_CHANGED);
 
-    miScreenFlickerFilterField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, &rm->menu_slider_bar, 70, 240, "Flicker Filter", 500, 220, 380);
+    miScreenFlickerFilterField = new MI_SelectField<short>(&rm->spr_selectfield, &rm->menu_slider_bar, 70, 240, "Flicker Filter", 500, 220, 380);
     miScreenFlickerFilterField->add("0", 0);
     miScreenFlickerFilterField->add("1", 1);
     miScreenFlickerFilterField->add("2", 2);
@@ -34,7 +34,7 @@ UI_ScreenSettingsMenu::UI_ScreenSettingsMenu() : UI_Menu()
     miScreenFlickerFilterField->allowWrap(false);
     miScreenFlickerFilterField->setItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
 
-    miScreenSoftFilterField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 280, "Soften Filter", 500, 220);
+    miScreenSoftFilterField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 280, "Soften Filter", 500, 220);
     miScreenSoftFilterField->add("Off", false);
     miScreenSoftFilterField->add("On", true);
     miScreenSoftFilterField->setOutputPtr(&game_values.softfilter);
@@ -43,7 +43,7 @@ UI_ScreenSettingsMenu::UI_ScreenSettingsMenu() : UI_Menu()
     miScreenSoftFilterField->setItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
 
     /*
-    miScreenAspectRatioField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 300, "10x11 Aspect", 500, 220);
+    miScreenAspectRatioField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 300, "10x11 Aspect", 500, 220);
     miScreenAspectRatioField->add("Off", false);
     miScreenAspectRatioField->add("On", true);
     miScreenAspectRatioField->setOutputPtr(&game_values.aspectratio10x11);

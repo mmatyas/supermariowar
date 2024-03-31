@@ -10,7 +10,7 @@ class MI_ImageSelectField;
 class MI_MapField;
 class MI_Text;
 class UI_GameSettingsMenu;
-template<typename T> class MI_SelectFieldDyn;
+template<typename T> class MI_SelectField;
 
 
 class UI_NetNewRoomSettingsMenu : public UI_Menu {
@@ -24,7 +24,7 @@ public:
 
 private:
     MI_ImageSelectField* miModeField;
-    MI_SelectFieldDyn<short>* miGoalField[22];
+    MI_SelectField<short>* miGoalField[22];
     MI_Button* miModeSettingsButton;
     MI_MapField* miMapField;
     MI_Button* miContinueButton;

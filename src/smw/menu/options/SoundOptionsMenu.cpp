@@ -53,7 +53,7 @@ UI_SoundOptionsMenu::UI_SoundOptionsMenu()
     miMusicVolumeField->allowWrap(false);
     miMusicVolumeField->setItemChangedCode(MENU_CODE_MUSIC_VOLUME_CHANGED);
 
-    miPlayNextMusicField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 180, "Next Music", 500, 220);
+    miPlayNextMusicField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 180, "Next Music", 500, 220);
     miPlayNextMusicField->add("Off", false);
     miPlayNextMusicField->add("On", true);
     miPlayNextMusicField->setOutputPtr(&game_values.playnextmusic);
@@ -64,7 +64,7 @@ UI_SoundOptionsMenu::UI_SoundOptionsMenu()
     miSoundPackField = new MI_PacksField(&rm->spr_selectfield, 70, 260, "Sound Pack", 500, 220, soundpacklist, MENU_CODE_SOUND_PACK_CHANGED);
 
     miPlaylistField = new MI_PlaylistField(&rm->spr_selectfield, 70, 300, "Game Music Pack", 500, 220);
-    miWorldMusicField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 340, "World Music Pack", 500, 220);
+    miWorldMusicField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 340, "World Music Pack", 500, 220);
 
     int iCurrentMusic = worldmusiclist->GetCurrentIndex();
     worldmusiclist->SetCurrent(0);

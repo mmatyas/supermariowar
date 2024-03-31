@@ -21,13 +21,13 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Classic Mode Settings
     //***********************
 
-    miClassicModeStyleField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 200, "On Kill", 400, 180);
+    miClassicModeStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 200, "On Kill", 400, 180);
     miClassicModeStyleField->add("Respawn", 0);
     miClassicModeStyleField->add("Shield", 1);
     miClassicModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.classic.style);
     miClassicModeStyleField->setCurrentValue(game_values.gamemodemenusettings.classic.style);
 
-    miClassicModeScoringField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 240, "Scoring", 400, 180);
+    miClassicModeScoringField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 240, "Scoring", 400, 180);
     miClassicModeScoringField->add("All Kills", 0);
     miClassicModeScoringField->add("Push Kills Only", 1, false);
     miClassicModeScoringField->setOutputPtr(&game_values.gamemodemenusettings.classic.scoring);
@@ -56,13 +56,13 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Frag Mode Settings
     //***********************
 
-    miFragModeStyleField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 200, "On Kill", 400, 180);
+    miFragModeStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 200, "On Kill", 400, 180);
     miFragModeStyleField->add("Respawn", 0);
     miFragModeStyleField->add("Shield", 1);
     miFragModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.frag.style);
     miFragModeStyleField->setCurrentValue(game_values.gamemodemenusettings.frag.style);
 
-    miFragModeScoringField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 240, "Scoring", 400, 180);
+    miFragModeScoringField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 240, "Scoring", 400, 180);
     miFragModeScoringField->add("All Kills", 0);
     miFragModeScoringField->add("Push Kills Only", 1, false);
     miFragModeScoringField->setOutputPtr(&game_values.gamemodemenusettings.frag.scoring);
@@ -91,13 +91,13 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Time Limit Mode Settings
     //***********************
 
-    miTimeLimitModeStyleField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 180, "On Kill", 400, 150);
+    miTimeLimitModeStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 180, "On Kill", 400, 150);
     miTimeLimitModeStyleField->add("Respawn", 0);
     miTimeLimitModeStyleField->add("Shield", 1);
     miTimeLimitModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.time.style);
     miTimeLimitModeStyleField->setCurrentValue(game_values.gamemodemenusettings.time.style);
 
-    miTimeLimitModeScoringField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 220, "Scoring", 400, 150);
+    miTimeLimitModeScoringField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Scoring", 400, 150);
     miTimeLimitModeScoringField->add("All Kills", 0);
     miTimeLimitModeScoringField->add("Push Kills Only", 1, false);
     miTimeLimitModeScoringField->setOutputPtr(&game_values.gamemodemenusettings.time.scoring);
@@ -153,14 +153,14 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Jail Mode Settings
     //***********************
 
-    miJailModeStyleField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 160, "Style", 400, 150);
+    miJailModeStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 160, "Style", 400, 150);
     miJailModeStyleField->add("Classic", 0);
     miJailModeStyleField->add("Owned", 1, false);
     miJailModeStyleField->add("Free For All", 2, false);
     miJailModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.jail.style);
     miJailModeStyleField->setCurrentValue(game_values.gamemodemenusettings.jail.style);
 
-    miJailModeTimeFreeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 200, "Free Timer", 400, 150);
+    miJailModeTimeFreeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 200, "Free Timer", 400, 150);
     miJailModeTimeFreeField->add("None", 1);
     miJailModeTimeFreeField->add("5 Seconds", 310, false);
     miJailModeTimeFreeField->add("10 Seconds", 620);
@@ -177,7 +177,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miJailModeTimeFreeField->setOutputPtr(&game_values.gamemodemenusettings.jail.timetofree);
     miJailModeTimeFreeField->setCurrentValue(game_values.gamemodemenusettings.jail.timetofree);
 
-    miJailModeTagFreeField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 240, "Tag Free", 400, 150);
+    miJailModeTagFreeField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 240, "Tag Free", 400, 150);
     miJailModeTagFreeField->add("Off", false);
     miJailModeTagFreeField->add("On", true);
     miJailModeTagFreeField->setOutputPtr(&game_values.gamemodemenusettings.jail.tagfree);
@@ -235,14 +235,14 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Coins Mode Settings
     //***********************
 
-    miCoinModePenaltyField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 180, "Penalty", 400, 150);
+    miCoinModePenaltyField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 180, "Penalty", 400, 150);
     miCoinModePenaltyField->add("Off", false);
     miCoinModePenaltyField->add("On", true);
     miCoinModePenaltyField->setOutputPtr(&game_values.gamemodemenusettings.coins.penalty);
     miCoinModePenaltyField->setCurrentValue(game_values.gamemodemenusettings.coins.penalty ? 1 : 0);
     miCoinModePenaltyField->setAutoAdvance(true);
 
-    miCoinModeQuantityField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 220, "Quantity", 400, 150);
+    miCoinModeQuantityField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Quantity", 400, 150);
     miCoinModeQuantityField->add("1", 1);
     miCoinModeQuantityField->add("2", 2);
     miCoinModeQuantityField->add("3", 3);
@@ -306,7 +306,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Stomp Mode Settings
     //***********************
 
-    miStompModeRateField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 40, "Rate", 400, 180);
+    miStompModeRateField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 40, "Rate", 400, 180);
     miStompModeRateField->add("Very Slow", 150, false);
     miStompModeRateField->add("Slow", 120);
     miStompModeRateField->add("Moderate", 90);
@@ -393,7 +393,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
         miEggModeYoshiQuantityField[iYoshiField]->allowWrap(false);
     }
 
-    miEggModeExplosionTimeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 380, "Explosion Timer", 400, 180);
+    miEggModeExplosionTimeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 380, "Explosion Timer", 400, 180);
     miEggModeExplosionTimeField->add("Off", 0);
     miEggModeExplosionTimeField->add("3 Seconds", 3, false);
     miEggModeExplosionTimeField->add("5 Seconds", 5);
@@ -451,21 +451,21 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miFlagModeSpeedField->setCurrentValue(game_values.gamemodemenusettings.flag.speed);
     miFlagModeSpeedField->allowWrap(false);
 
-    miFlagModeTouchReturnField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 160, "Touch Return", 400, 180);
+    miFlagModeTouchReturnField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 160, "Touch Return", 400, 180);
     miFlagModeTouchReturnField->add("Off", false);
     miFlagModeTouchReturnField->add("On", true);
     miFlagModeTouchReturnField->setOutputPtr(&game_values.gamemodemenusettings.flag.touchreturn);
     miFlagModeTouchReturnField->setCurrentValue(game_values.gamemodemenusettings.flag.touchreturn ? 1 : 0);
     miFlagModeTouchReturnField->setAutoAdvance(true);
 
-    miFlagModePointMoveField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 200, "Point Move", 400, 180);
+    miFlagModePointMoveField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 200, "Point Move", 400, 180);
     miFlagModePointMoveField->add("Off", false);
     miFlagModePointMoveField->add("On", true);
     miFlagModePointMoveField->setOutputPtr(&game_values.gamemodemenusettings.flag.pointmove);
     miFlagModePointMoveField->setCurrentValue(game_values.gamemodemenusettings.flag.pointmove ? 1 : 0);
     miFlagModePointMoveField->setAutoAdvance(true);
 
-    miFlagModeAutoReturnField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 240, "Auto Return", 400, 180);
+    miFlagModeAutoReturnField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 240, "Auto Return", 400, 180);
     miFlagModeAutoReturnField->add("None", 0);
     miFlagModeAutoReturnField->add("5 Seconds", 310, false);
     miFlagModeAutoReturnField->add("10 Seconds", 620);
@@ -482,14 +482,14 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miFlagModeAutoReturnField->setOutputPtr(&game_values.gamemodemenusettings.flag.autoreturn);
     miFlagModeAutoReturnField->setCurrentValue(game_values.gamemodemenusettings.flag.autoreturn);
 
-    miFlagModeHomeScoreField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 280, "Need Home", 400, 180);
+    miFlagModeHomeScoreField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 280, "Need Home", 400, 180);
     miFlagModeHomeScoreField->add("Off", false);
     miFlagModeHomeScoreField->add("On", true);
     miFlagModeHomeScoreField->setOutputPtr(&game_values.gamemodemenusettings.flag.homescore);
     miFlagModeHomeScoreField->setCurrentValue(game_values.gamemodemenusettings.flag.homescore ? 1 : 0);
     miFlagModeHomeScoreField->setAutoAdvance(true);
 
-    miFlagModeCenterFlagField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 320, "Center Flag", 400, 180);
+    miFlagModeCenterFlagField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 320, "Center Flag", 400, 180);
     miFlagModeCenterFlagField->add("Off", false);
     miFlagModeCenterFlagField->add("On", true);
     miFlagModeCenterFlagField->setOutputPtr(&game_values.gamemodemenusettings.flag.centerflag);
@@ -524,14 +524,14 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Chicken Mode Settings
     //***********************
 
-    miChickenModeShowTargetField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 200, "Show Target", 400, 180);
+    miChickenModeShowTargetField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 200, "Show Target", 400, 180);
     miChickenModeShowTargetField->add("Off", false);
     miChickenModeShowTargetField->add("On", true);
     miChickenModeShowTargetField->setOutputPtr(&game_values.gamemodemenusettings.chicken.usetarget);
     miChickenModeShowTargetField->setCurrentValue(game_values.gamemodemenusettings.chicken.usetarget ? 1 : 0);
     miChickenModeShowTargetField->setAutoAdvance(true);
 
-    miChickenModeGlideField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 240, "Chicken Glide", 400, 180);
+    miChickenModeGlideField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 240, "Chicken Glide", 400, 180);
     miChickenModeGlideField->add("Off", false);
     miChickenModeGlideField->add("On", true);
     miChickenModeGlideField->setOutputPtr(&game_values.gamemodemenusettings.chicken.glide);
@@ -562,7 +562,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Tag Mode Settings
     //***********************
 
-    miTagModeTagOnTouchField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 220, "Touch Tag", 400, 180);
+    miTagModeTagOnTouchField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 220, "Touch Tag", 400, 180);
     miTagModeTagOnTouchField->add("Off", false);
     miTagModeTagOnTouchField->add("On", true);
     miTagModeTagOnTouchField->setOutputPtr(&game_values.gamemodemenusettings.tag.tagontouch);
@@ -592,7 +592,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Star Mode Settings
     //***********************
 
-    miStarModeTimeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 180, "Time", 400, 150);
+    miStarModeTimeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 180, "Time", 400, 150);
     miStarModeTimeField->add("5 Seconds", 5, false);
     miStarModeTimeField->add("10 Seconds", 10, false);
     miStarModeTimeField->add("15 Seconds", 15);
@@ -608,7 +608,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miStarModeTimeField->setOutputPtr(&game_values.gamemodemenusettings.star.time);
     miStarModeTimeField->setCurrentValue(game_values.gamemodemenusettings.star.time);
 
-    miStarModeShineField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 220, "Star Type", 400, 150);
+    miStarModeShineField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Star Type", 400, 150);
     miStarModeShineField->add("Ztar", 0);
     miStarModeShineField->add("Shine", 1);
     miStarModeShineField->add("Multi Star", 2);
@@ -666,7 +666,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Domination Mode Settings
     //***********************
 
-    miDominationModeQuantityField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 120, "Quantity", 400, 180);
+    miDominationModeQuantityField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 120, "Quantity", 400, 180);
     miDominationModeQuantityField->add("1 Base", 1, false);
     miDominationModeQuantityField->add("2 Bases", 2, false);
     miDominationModeQuantityField->add("3 Bases", 3);
@@ -694,7 +694,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miDominationModeQuantityField->setOutputPtr(&game_values.gamemodemenusettings.domination.quantity);
     miDominationModeQuantityField->setCurrentValue(game_values.gamemodemenusettings.domination.quantity);
 
-    miDominationModeRelocateFrequencyField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 160, "Relocate", 400, 180);
+    miDominationModeRelocateFrequencyField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 160, "Relocate", 400, 180);
     miDominationModeRelocateFrequencyField->add("Never", 0);
     miDominationModeRelocateFrequencyField->add("5 Seconds", 310, false);
     miDominationModeRelocateFrequencyField->add("10 Seconds", 620);
@@ -712,21 +712,21 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
 
     miDominationModeDeathText = new MI_Text("On Death", 120, 210, 0, true, TextAlign::LEFT);
 
-    miDominationModeLoseOnDeathField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 240, "Lose Bases", 400, 180);
+    miDominationModeLoseOnDeathField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 240, "Lose Bases", 400, 180);
     miDominationModeLoseOnDeathField->add("Off", false);
     miDominationModeLoseOnDeathField->add("On", true);
     miDominationModeLoseOnDeathField->setOutputPtr(&game_values.gamemodemenusettings.domination.loseondeath);
     miDominationModeLoseOnDeathField->setCurrentValue(game_values.gamemodemenusettings.domination.loseondeath ? 1 : 0);
     miDominationModeLoseOnDeathField->setAutoAdvance(true);
 
-    miDominationModeRelocateOnDeathField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 280, "Move Bases", 400, 180);
+    miDominationModeRelocateOnDeathField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 280, "Move Bases", 400, 180);
     miDominationModeRelocateOnDeathField->add("Off", false);
     miDominationModeRelocateOnDeathField->add("On", true);
     miDominationModeRelocateOnDeathField->setOutputPtr(&game_values.gamemodemenusettings.domination.relocateondeath);
     miDominationModeRelocateOnDeathField->setCurrentValue(game_values.gamemodemenusettings.domination.relocateondeath ? 1 : 0);
     miDominationModeRelocateOnDeathField->setAutoAdvance(true);
 
-    miDominationModeStealOnDeathField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 320, "Steal Bases", 400, 180);
+    miDominationModeStealOnDeathField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 320, "Steal Bases", 400, 180);
     miDominationModeStealOnDeathField->add("Off", false);
     miDominationModeStealOnDeathField->add("On", true);
     miDominationModeStealOnDeathField->setOutputPtr(&game_values.gamemodemenusettings.domination.stealondeath);
@@ -762,7 +762,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // King of the Hill Mode Settings
     //***********************
 
-    miKingOfTheHillModeSizeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 180, "Size", 400, 180);
+    miKingOfTheHillModeSizeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 180, "Size", 400, 180);
     miKingOfTheHillModeSizeField->add("2 x 2", 2);
     miKingOfTheHillModeSizeField->add("3 x 3", 3);
     miKingOfTheHillModeSizeField->add("4 x 4", 4);
@@ -772,7 +772,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miKingOfTheHillModeSizeField->setOutputPtr(&game_values.gamemodemenusettings.kingofthehill.areasize);
     miKingOfTheHillModeSizeField->setCurrentValue(game_values.gamemodemenusettings.kingofthehill.areasize);
 
-    miKingOfTheHillModeRelocateFrequencyField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 220, "Relocate", 400, 180);
+    miKingOfTheHillModeRelocateFrequencyField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Relocate", 400, 180);
     miKingOfTheHillModeRelocateFrequencyField->add("Never", 0);
     miKingOfTheHillModeRelocateFrequencyField->add("5 Seconds", 310, false);
     miKingOfTheHillModeRelocateFrequencyField->add("10 Seconds", 620);
@@ -788,7 +788,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miKingOfTheHillModeRelocateFrequencyField->setOutputPtr(&game_values.gamemodemenusettings.kingofthehill.relocationfrequency);
     miKingOfTheHillModeRelocateFrequencyField->setCurrentValue(game_values.gamemodemenusettings.kingofthehill.relocationfrequency);
 
-    miKingOfTheHillModeMultiplierField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 260, "Max Multiplier", 400, 180);
+    miKingOfTheHillModeMultiplierField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 260, "Max Multiplier", 400, 180);
     miKingOfTheHillModeMultiplierField->add("None", 1);
     miKingOfTheHillModeMultiplierField->add("2", 2);
     miKingOfTheHillModeMultiplierField->add("3", 3);
@@ -822,7 +822,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Race Mode Settings
     //***********************
 
-    miRaceModeQuantityField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 180, "Quantity", 400, 180);
+    miRaceModeQuantityField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 180, "Quantity", 400, 180);
     miRaceModeQuantityField->add("2", 2, false);
     miRaceModeQuantityField->add("3", 3);
     miRaceModeQuantityField->add("4", 4);
@@ -833,7 +833,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miRaceModeQuantityField->setOutputPtr(&game_values.gamemodemenusettings.race.quantity);
     miRaceModeQuantityField->setCurrentValue(game_values.gamemodemenusettings.race.quantity);
 
-    miRaceModeSpeedField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 220, "Speed", 400, 180);
+    miRaceModeSpeedField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Speed", 400, 180);
     miRaceModeSpeedField->add("Stationary", 0);
     miRaceModeSpeedField->add("Very Slow", 2);
     miRaceModeSpeedField->add("Slow", 3);
@@ -845,7 +845,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miRaceModeSpeedField->setOutputPtr(&game_values.gamemodemenusettings.race.speed);
     miRaceModeSpeedField->setCurrentValue(game_values.gamemodemenusettings.race.speed);
 
-    miRaceModePenaltyField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 260, "Penalty", 400, 180);
+    miRaceModePenaltyField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 260, "Penalty", 400, 180);
     miRaceModePenaltyField->add("None", 0);
     miRaceModePenaltyField->add("One Goal", 1);
     miRaceModePenaltyField->add("All Goals", 2);
@@ -916,7 +916,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
         miSurvivalModeEnemySlider[iEnemy]->setCurrentValue(game_values.gamemodemenusettings.survival.enemyweight[iEnemy]);
     }
 
-    miSurvivalModeDensityField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 240, "Density", 400, 180);
+    miSurvivalModeDensityField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 240, "Density", 400, 180);
     miSurvivalModeDensityField->add("Very Low", 40, false);
     miSurvivalModeDensityField->add("Low", 30);
     miSurvivalModeDensityField->add("Medium", 20);
@@ -927,7 +927,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miSurvivalModeDensityField->setOutputPtr(&game_values.gamemodemenusettings.survival.density);
     miSurvivalModeDensityField->setCurrentValue(game_values.gamemodemenusettings.survival.density);
 
-    miSurvivalModeSpeedField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 280, "Speed", 400, 180);
+    miSurvivalModeSpeedField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 280, "Speed", 400, 180);
     miSurvivalModeSpeedField->add("Very Slow", 2, false);
     miSurvivalModeSpeedField->add("Slow", 3);
     miSurvivalModeSpeedField->add("Moderate", 4);
@@ -938,7 +938,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miSurvivalModeSpeedField->setOutputPtr(&game_values.gamemodemenusettings.survival.speed);
     miSurvivalModeSpeedField->setCurrentValue(game_values.gamemodemenusettings.survival.speed);
 
-    miSurvivalModeShieldField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 320, "Shield", 400, 180);
+    miSurvivalModeShieldField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 320, "Shield", 400, 180);
     miSurvivalModeShieldField->add("Off", false);
     miSurvivalModeShieldField->add("On", true);
     miSurvivalModeShieldField->setOutputPtr(&game_values.gamemodemenusettings.survival.shield);
@@ -971,7 +971,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     //***********************
     // Greed Mode Settings
     //***********************
-    miGreedModeCoinLife = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 160, "Coin Life", 400, 150);
+    miGreedModeCoinLife = new MI_SelectField<short>(&rm->spr_selectfield, 120, 160, "Coin Life", 400, 150);
     miGreedModeCoinLife->add("1 Second", 62, false);
     miGreedModeCoinLife->add("2 Seconds", 124, false);
     miGreedModeCoinLife->add("3 Seconds", 186);
@@ -991,14 +991,14 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miGreedModeCoinLife->setOutputPtr(&game_values.gamemodemenusettings.greed.coinlife);
     miGreedModeCoinLife->setCurrentValue(game_values.gamemodemenusettings.greed.coinlife);
 
-    miGreedModeOwnCoins = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 200, "Own Coins", 400, 150);
+    miGreedModeOwnCoins = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 200, "Own Coins", 400, 150);
     miGreedModeOwnCoins->add("Yes", true);
     miGreedModeOwnCoins->add("No", false);
     miGreedModeOwnCoins->setOutputPtr(&game_values.gamemodemenusettings.greed.owncoins);
     miGreedModeOwnCoins->setCurrentValue(game_values.gamemodemenusettings.greed.owncoins);
     miGreedModeOwnCoins->setAutoAdvance(true);
 
-    miGreedModeMultiplier = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 240, "Multipler", 400, 150);
+    miGreedModeMultiplier = new MI_SelectField<short>(&rm->spr_selectfield, 120, 240, "Multipler", 400, 150);
     miGreedModeMultiplier->add("0.5", 1, false);
     miGreedModeMultiplier->add("1", 2);
     miGreedModeMultiplier->add("1.5", 3);
@@ -1059,7 +1059,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     //***********************
     // Health Mode Settings
     //***********************
-    miHealthModeStartLife = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 180, "Start Life", 400, 150);
+    miHealthModeStartLife = new MI_SelectField<short>(&rm->spr_selectfield, 120, 180, "Start Life", 400, 150);
     miHealthModeStartLife->add("2", 2, false);
     miHealthModeStartLife->add("3", 3, false);
     miHealthModeStartLife->add("4", 4);
@@ -1074,7 +1074,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miHealthModeStartLife->allowWrap(false);
     miHealthModeStartLife->setItemChangedCode(MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED);
 
-    miHealthModeMaxLife = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 220, "Max Life", 400, 150);
+    miHealthModeMaxLife = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Max Life", 400, 150);
     miHealthModeMaxLife->add("2", 2, false);
     miHealthModeMaxLife->add("3", 3, false);
     miHealthModeMaxLife->add("4", 4, false);
@@ -1139,7 +1139,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Card Collection Mode Settings
     //***********************
 
-    miCollectionModeQuantityField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 160, "Limit", 400, 180);
+    miCollectionModeQuantityField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 160, "Limit", 400, 180);
     miCollectionModeQuantityField->add("1 Card", 1);
     miCollectionModeQuantityField->add("2 Cards", 2);
     miCollectionModeQuantityField->add("3 Cards", 3);
@@ -1153,7 +1153,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miCollectionModeQuantityField->setOutputPtr(&game_values.gamemodemenusettings.collection.quantity);
     miCollectionModeQuantityField->setCurrentValue(game_values.gamemodemenusettings.collection.quantity);
 
-    miCollectionModeRateField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 200, "Rate", 400, 180);
+    miCollectionModeRateField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 200, "Rate", 400, 180);
     miCollectionModeRateField->add("Instant", 0);
     miCollectionModeRateField->add("1 Second", 62);
     miCollectionModeRateField->add("2 Seconds", 124);
@@ -1167,7 +1167,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miCollectionModeRateField->setOutputPtr(&game_values.gamemodemenusettings.collection.rate);
     miCollectionModeRateField->setCurrentValue(game_values.gamemodemenusettings.collection.rate);
 
-    miCollectionModeBankTimeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 240, "Bank Time", 400, 180);
+    miCollectionModeBankTimeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 240, "Bank Time", 400, 180);
     miCollectionModeBankTimeField->add("Instant", 0, false);
     miCollectionModeBankTimeField->add("1 Second", 62, false);
     miCollectionModeBankTimeField->add("2 Seconds", 124);
@@ -1182,7 +1182,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miCollectionModeBankTimeField->setOutputPtr(&game_values.gamemodemenusettings.collection.banktime);
     miCollectionModeBankTimeField->setCurrentValue(game_values.gamemodemenusettings.collection.banktime);
 
-    miCollectionModeCardLifeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 280, "Card Life", 400, 180);
+    miCollectionModeCardLifeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 280, "Card Life", 400, 180);
     miCollectionModeCardLifeField->add("1 Second", 62, false);
     miCollectionModeCardLifeField->add("2 Seconds", 124, false);
     miCollectionModeCardLifeField->add("3 Seconds", 186);
@@ -1226,7 +1226,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Chase Mode Settings
     //***********************
 
-    miChaseModeSpeedField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 160, "Speed", 400, 180);
+    miChaseModeSpeedField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 160, "Speed", 400, 180);
     miChaseModeSpeedField->add("Very Slow", 3, false);
     miChaseModeSpeedField->add("Slow", 4);
     miChaseModeSpeedField->add("Moderate", 5);
@@ -1277,21 +1277,21 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Shyguy Tag Mode Settings
     //***********************
 
-    miShyGuyTagModeTagOnSuicideField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 180, "Suicide Tag", 400, 180);
+    miShyGuyTagModeTagOnSuicideField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 180, "Suicide Tag", 400, 180);
     miShyGuyTagModeTagOnSuicideField->add("Off", false);
     miShyGuyTagModeTagOnSuicideField->add("On", true);
     miShyGuyTagModeTagOnSuicideField->setOutputPtr(&game_values.gamemodemenusettings.shyguytag.tagonsuicide);
     miShyGuyTagModeTagOnSuicideField->setCurrentValue(game_values.gamemodemenusettings.shyguytag.tagonsuicide ? 1 : 0);
     miShyGuyTagModeTagOnSuicideField->setAutoAdvance(true);
 
-    miShyGuyTagModeTagOnStompField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 220, "Tag Transfer", 400, 180);
+    miShyGuyTagModeTagOnStompField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Tag Transfer", 400, 180);
     miShyGuyTagModeTagOnStompField->add("Touch Only", 0);
     miShyGuyTagModeTagOnStompField->add("Kills Only", 1);
     miShyGuyTagModeTagOnStompField->add("Touch and Kills", 2);
     miShyGuyTagModeTagOnStompField->setOutputPtr(&game_values.gamemodemenusettings.shyguytag.tagtransfer);
     miShyGuyTagModeTagOnStompField->setCurrentValue(game_values.gamemodemenusettings.shyguytag.tagtransfer);
 
-    miShyGuyTagModeFreeTimeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 260, "Free Time", 400, 180);
+    miShyGuyTagModeFreeTimeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 260, "Free Time", 400, 180);
     miShyGuyTagModeFreeTimeField->add("Instant", 0);
     miShyGuyTagModeFreeTimeField->add("1 Second", 1);
     miShyGuyTagModeFreeTimeField->add("2 Seconds", 2);
@@ -1330,14 +1330,14 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Boss Mode Settings
     //***********************
 
-    miBossModeTypeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 180, "Type", 400, 180);
+    miBossModeTypeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 180, "Type", 400, 180);
     miBossModeTypeField->add("Hammer", 0);
     miBossModeTypeField->add("Bomb", 1);
     miBossModeTypeField->add("Fire", 2);
     miBossModeTypeField->setOutputPtr(&game_values.gamemodemenusettings.boss.bosstype);
     miBossModeTypeField->setCurrentValue(game_values.gamemodemenusettings.boss.bosstype);
 
-    miBossModeDifficultyField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 220, "Difficulty", 400, 180);
+    miBossModeDifficultyField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Difficulty", 400, 180);
     miBossModeDifficultyField->add("Very Easy", 0, false);
     miBossModeDifficultyField->add("Easy", 1);
     miBossModeDifficultyField->add("Moderate", 2);
@@ -1346,7 +1346,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miBossModeDifficultyField->setOutputPtr(&game_values.gamemodemenusettings.boss.difficulty);
     miBossModeDifficultyField->setCurrentValue(game_values.gamemodemenusettings.boss.difficulty);
 
-    miBossModeHitPointsField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 260, "Health", 400, 180);
+    miBossModeHitPointsField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 260, "Health", 400, 180);
     miBossModeHitPointsField->add("1", 1, false);
     miBossModeHitPointsField->add("2", 2, false);
     miBossModeHitPointsField->add("3", 3);

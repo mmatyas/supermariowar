@@ -7,7 +7,7 @@ class gfxSprite;
 class MI_Image;
 class MI_Text;
 class MI_Button;
-template<typename T> class MI_SelectFieldDyn;
+template<typename T> class MI_SelectField;
 
 class MI_InputControlField : public UI_Control
 {
@@ -86,7 +86,7 @@ class MI_InputControlContainer : public UI_Control
 
 		MI_Image * miImage[2];
 		MI_Text * miText;
-		MI_SelectFieldDyn<short>* miDeviceSelectField;
+		MI_SelectField<short>* miDeviceSelectField;
 		MI_Button * miInputTypeButton;
 		MI_InputControlField * miGameInputControlFields[NUM_KEYS];
 		MI_InputControlField * miMenuInputControlFields[NUM_KEYS];

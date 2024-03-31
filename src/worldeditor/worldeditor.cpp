@@ -357,16 +357,16 @@ UI_Menu mStageSettingsMenu;
 UI_Menu mBonusItemPicker;
 
 MI_ImageSelectField * miModeField;
-MI_SelectFieldDyn<short> * miGoalField[GAMEMODE_LAST];
+MI_SelectField<short> * miGoalField[GAMEMODE_LAST];
 MI_Button * miModeSettingsButton;
 MI_Button * miBonusItemsButton;
-MI_SelectFieldDyn<short> * miSpecialGoalField[3];
+MI_SelectField<short> * miSpecialGoalField[3];
 
-MI_SelectFieldDyn<bool> * miFinalStageField;
-MI_SelectFieldDyn<short> * miPointsField;
+MI_SelectField<bool> * miFinalStageField;
+MI_SelectField<short> * miPointsField;
 
 MI_TextField * miNameField;
-MI_SelectFieldDyn<short> * miBonusType;
+MI_SelectField<short> * miBonusType;
 MI_TextField * miBonusTextField[5];
 
 MI_MapField * miMapField;
@@ -383,11 +383,11 @@ MI_Button * miDeleteStageDialogNoButton;
 UI_Menu mVehicleMenu;
 MI_ImageSelectField * miVehicleSpriteField;
 MI_ImageSelectField * miVehicleStageField;
-MI_SelectFieldDyn<short> * miVehicleMinMovesField;
-MI_SelectFieldDyn<short> * miVehicleMaxMovesField;
-MI_SelectFieldDyn<bool> * miVehiclePacesField;
-MI_SelectFieldDyn<short> * miVehicleDirectionField;
-MI_SelectFieldDyn<short> * miVehicleBoundaryField;
+MI_SelectField<short> * miVehicleMinMovesField;
+MI_SelectField<short> * miVehicleMaxMovesField;
+MI_SelectField<bool> * miVehiclePacesField;
+MI_SelectField<short> * miVehicleDirectionField;
+MI_SelectField<short> * miVehicleBoundaryField;
 MI_Button * miVehicleCreateButton;
 MI_Text * miTitleText;
 
@@ -655,7 +655,7 @@ int main(int argc, char *argv[])
     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
 		miModeField->add(stagemodes[iGameMode].szName, iGameMode);
 
-		miGoalField[iGameMode] = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 100, stagemodes[iGameMode].szGoal, 352, 120);
+		miGoalField[iGameMode] = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, stagemodes[iGameMode].szGoal, 352, 120);
 		miGoalField[iGameMode]->Show(iGameMode == 0);
 
         for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
@@ -673,7 +673,7 @@ int main(int argc, char *argv[])
 	miModeField->add("Boxes Minigame", 27);
 
 	//Create goal field for pipe game
-	miSpecialGoalField[0] = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 100, "Points", 352, 120);
+	miSpecialGoalField[0] = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, "Points", 352, 120);
 	miSpecialGoalField[0]->Show(false);
 
     for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
@@ -684,7 +684,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Create goal field for boss game
-	miSpecialGoalField[1] = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 100, "Lives", 352, 120);
+	miSpecialGoalField[1] = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, "Lives", 352, 120);
 	miSpecialGoalField[1]->Show(false);
 
     for (short iGameLives = 1; iGameLives <= 30; iGameLives++) {
@@ -694,7 +694,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Create goal field for boxes game
-	miSpecialGoalField[2] = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 100, "Lives", 352, 120);
+	miSpecialGoalField[2] = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, "Lives", 352, 120);
 	miSpecialGoalField[2]->Show(false);
 
     for (short iGameLives = 1; iGameLives <= 30; iGameLives++) {
@@ -708,7 +708,7 @@ int main(int argc, char *argv[])
 	miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
 
 	//Points Field
-	miPointsField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 140, "Points", 245, 120);
+	miPointsField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 140, "Points", 245, 120);
     for (short iPoints = 0; iPoints <= 20; iPoints++) {
 		char szPoints[8];
 		sprintf(szPoints, "%d", iPoints);
@@ -716,7 +716,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Final Stage Field
-	miFinalStageField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 325, 140, "End Stage", 245, 120);
+	miFinalStageField = new MI_SelectField<bool>(&rm->spr_selectfield, 325, 140, "End Stage", 245, 120);
 	miFinalStageField->add("No", false);
 	miFinalStageField->add("Yes", true);
 	miFinalStageField->setAutoAdvance(true);
@@ -729,7 +729,7 @@ int main(int argc, char *argv[])
 	miBonusItemsButton->SetCode(MENU_CODE_TO_BONUS_PICKER_MENU);
 
 	//Bonus Type
-	miBonusType = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 100, "Type", 500, 120);
+	miBonusType = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, "Type", 500, 120);
 	miBonusType->add("Fixed", false);
 	miBonusType->add("Random", true);
 	miBonusType->setAutoAdvance(true);
@@ -853,7 +853,7 @@ int main(int argc, char *argv[])
 	miVehicleStageField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 120, "Stage", 500, 150, 16, 16);
 	miVehicleStageField->setOutputPtr(&g_wvVehicleStamp.iActionId);
 
-	miVehicleMinMovesField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 160, "Min Moves", 500, 150);
+	miVehicleMinMovesField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 160, "Min Moves", 500, 150);
 
     for (short iMinMoves = 0; iMinMoves <= 100; iMinMoves++) {
 		char szMinMoves[8];
@@ -867,7 +867,7 @@ int main(int argc, char *argv[])
 	miVehicleMinMovesField->allowWrap(false);
 	miVehicleMinMovesField->allowFastScroll(true);
 
-	miVehicleMaxMovesField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 200, "Max Moves", 500, 150);
+	miVehicleMaxMovesField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 200, "Max Moves", 500, 150);
 
     for (short iMaxMoves = 0; iMaxMoves <= 100; iMaxMoves++) {
 		char szMaxMoves[8];
@@ -881,21 +881,21 @@ int main(int argc, char *argv[])
 	miVehicleMaxMovesField->allowWrap(false);
 	miVehicleMaxMovesField->allowFastScroll(true);
 
-	miVehiclePacesField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 240, "Paces", 500, 150);
+	miVehiclePacesField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 240, "Paces", 500, 150);
 	miVehiclePacesField->add("No", false);
 	miVehiclePacesField->add("Yes", true);
 	miVehiclePacesField->setOutputPtr(&g_wvVehicleStamp.fSpritePaces);
 	miVehiclePacesField->setCurrentValue(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
 	miVehiclePacesField->setAutoAdvance(true);
 
-	miVehicleDirectionField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 280, "Direction", 500, 150);
+	miVehicleDirectionField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 280, "Direction", 500, 150);
 	miVehicleDirectionField->add("Left", false);
 	miVehicleDirectionField->add("Right", true);
 	miVehicleDirectionField->setOutputPtr(&g_wvVehicleStamp.iDrawDirection);
 	miVehicleDirectionField->setCurrentValue(g_wvVehicleStamp.iDrawDirection);
 	miVehicleDirectionField->setAutoAdvance(true);
 
-	miVehicleBoundaryField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 320, "Boundary", 500, 150);
+	miVehicleBoundaryField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 320, "Boundary", 500, 150);
 	miVehicleBoundaryField->add("No Boundary", 0);
 
     for (short iBoundary = 1; iBoundary <= 100; iBoundary++) {
@@ -3304,7 +3304,7 @@ int editor_vehicles()
 		char szStageName[256];
 		sprintf(szStageName, "(%d) %s", iStage + 1, ts->szName);
 
-		SF_ListItemDyn<short>& item = miVehicleStageField->add(szStageName, iStage);
+		SF_ListItem<short>& item = miVehicleStageField->add(szStageName, iStage);
 		item.iconOverride = ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode);
 	}
 

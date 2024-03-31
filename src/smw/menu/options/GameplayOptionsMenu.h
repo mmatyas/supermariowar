@@ -5,7 +5,7 @@
 class MI_Button;
 class MI_Image;
 class MI_Text;
-template<typename T> class MI_SelectFieldDyn;
+template<typename T> class MI_SelectField;
 
 /*
     This menu is where you can change various gameplay-related
@@ -16,16 +16,16 @@ public:
     UI_GameplayOptionsMenu();
 
 private:
-    MI_SelectFieldDyn<short>* miRespawnField;
-    MI_SelectFieldDyn<short>* miShieldStyleField;
-    MI_SelectFieldDyn<short>* miShieldTimeField;
-    MI_SelectFieldDyn<short>* miBoundsTimeField;
-    MI_SelectFieldDyn<short>* miSuicideTimeField;
-    MI_SelectFieldDyn<short>* miWarpLockStyleField;
-    MI_SelectFieldDyn<short>* miWarpLockTimeField;
-    MI_SelectFieldDyn<short>* miBotsField;
-    MI_SelectFieldDyn<short>* miPointSpeedField;
-    MI_SelectFieldDyn<bool>* miSecretsField;
+    MI_SelectField<short>* miRespawnField;
+    MI_SelectField<short>* miShieldStyleField;
+    MI_SelectField<short>* miShieldTimeField;
+    MI_SelectField<short>* miBoundsTimeField;
+    MI_SelectField<short>* miSuicideTimeField;
+    MI_SelectField<short>* miWarpLockStyleField;
+    MI_SelectField<short>* miWarpLockTimeField;
+    MI_SelectField<short>* miBotsField;
+    MI_SelectField<short>* miPointSpeedField;
+    MI_SelectField<bool>* miSecretsField;
     MI_Button* miGameplayOptionsMenuBackButton;
 
     MI_Image* miGameplayOptionsMenuLeftHeaderBar;

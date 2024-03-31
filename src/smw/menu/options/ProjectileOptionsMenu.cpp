@@ -14,7 +14,7 @@ extern CGameValues game_values;
 UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     : UI_Menu()
 {
-    miFireballLifeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 10, 80, "Life", 305, 120);
+    miFireballLifeField = new MI_SelectField<short>(&rm->spr_selectfield, 10, 80, "Life", 305, 120);
     miFireballLifeField->add("1 Second", 62);
     miFireballLifeField->add("2 Seconds", 124);
     miFireballLifeField->add("3 Seconds", 186);
@@ -28,7 +28,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miFireballLifeField->setOutputPtr(&game_values.fireballttl);
     miFireballLifeField->setCurrentValue(game_values.fireballttl);
 
-    miFeatherJumpsField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 10, 150, "Jumps", 305, 120);
+    miFeatherJumpsField = new MI_SelectField<short>(&rm->spr_selectfield, 10, 150, "Jumps", 305, 120);
     miFeatherJumpsField->add("1", 1);
     miFeatherJumpsField->add("2", 2);
     miFeatherJumpsField->add("3", 3);
@@ -37,7 +37,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miFeatherJumpsField->setOutputPtr(&game_values.featherjumps);
     miFeatherJumpsField->setCurrentValue(game_values.featherjumps);
 
-    miBoomerangStyleField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 10, 220, "Style", 305, 120);
+    miBoomerangStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 10, 220, "Style", 305, 120);
     miBoomerangStyleField->add("Flat", 0);
     miBoomerangStyleField->add("SMB3", 1);
     miBoomerangStyleField->add("Zelda", 2);
@@ -45,7 +45,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miBoomerangStyleField->setOutputPtr(&game_values.boomerangstyle);
     miBoomerangStyleField->setCurrentValue(game_values.boomerangstyle);
 
-    miBoomerangLifeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 10, 260, "Life", 305, 120);
+    miBoomerangLifeField = new MI_SelectField<short>(&rm->spr_selectfield, 10, 260, "Life", 305, 120);
     miBoomerangLifeField->add("1 Second", 62);
     miBoomerangLifeField->add("2 Seconds", 124);
     miBoomerangLifeField->add("3 Seconds", 186);
@@ -59,7 +59,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miBoomerangLifeField->setOutputPtr(&game_values.boomeranglife);
     miBoomerangLifeField->setCurrentValue(game_values.boomeranglife);
 
-    miHammerLifeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 325, 80, "Life", 305, 120);
+    miHammerLifeField = new MI_SelectField<short>(&rm->spr_selectfield, 325, 80, "Life", 305, 120);
     miHammerLifeField->add("No Limit", 310);
     miHammerLifeField->add("0.5 Seconds", 31);
     miHammerLifeField->add("0.6 Seconds", 37);
@@ -72,7 +72,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miHammerLifeField->setOutputPtr(&game_values.hammerttl);
     miHammerLifeField->setCurrentValue(game_values.hammerttl);
 
-    miHammerDelayField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 325, 120, "Delay", 305, 120);
+    miHammerDelayField = new MI_SelectField<short>(&rm->spr_selectfield, 325, 120, "Delay", 305, 120);
     miHammerDelayField->add("None", 0);
     miHammerDelayField->add("0.1 Seconds", 6);
     miHammerDelayField->add("0.2 Seconds", 12);
@@ -87,14 +87,14 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miHammerDelayField->setOutputPtr(&game_values.hammerdelay);
     miHammerDelayField->setCurrentValue(game_values.hammerdelay);
 
-    miHammerOneKillField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 325, 160, "Power", 305, 120);
+    miHammerOneKillField = new MI_SelectField<bool>(&rm->spr_selectfield, 325, 160, "Power", 305, 120);
     miHammerOneKillField->add("One Kill", true);
     miHammerOneKillField->add("Multiple Kills", false);
     miHammerOneKillField->setOutputPtr(&game_values.hammerpower);
     miHammerOneKillField->setCurrentValue(game_values.hammerpower);
     miHammerOneKillField->setAutoAdvance(true);
 
-    miShellLifeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 10, 330, "Life", 305, 120);
+    miShellLifeField = new MI_SelectField<short>(&rm->spr_selectfield, 10, 330, "Life", 305, 120);
     miShellLifeField->add("Unlimited", 0);
     miShellLifeField->add("1 Second", 62);
     miShellLifeField->add("2 Seconds", 124);
@@ -113,7 +113,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miShellLifeField->setOutputPtr(&game_values.shellttl);
     miShellLifeField->setCurrentValue(game_values.shellttl);
 
-    miWandFreezeTimeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 10, 400, "Freeze", 305, 120);
+    miWandFreezeTimeField = new MI_SelectField<short>(&rm->spr_selectfield, 10, 400, "Freeze", 305, 120);
     miWandFreezeTimeField->add("1 Second", 62);
     miWandFreezeTimeField->add("2 Seconds", 124);
     miWandFreezeTimeField->add("3 Seconds", 186);
@@ -131,7 +131,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miWandFreezeTimeField->setOutputPtr(&game_values.wandfreezetime);
     miWandFreezeTimeField->setCurrentValue(game_values.wandfreezetime);
 
-    miBlueBlockLifeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 325, 230, "Blue Life", 305, 120);
+    miBlueBlockLifeField = new MI_SelectField<short>(&rm->spr_selectfield, 325, 230, "Blue Life", 305, 120);
     miBlueBlockLifeField->add("Unlimited", 0);
     miBlueBlockLifeField->add("1 Second", 62);
     miBlueBlockLifeField->add("2 Seconds", 124);
@@ -150,7 +150,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miBlueBlockLifeField->setOutputPtr(&game_values.blueblockttl);
     miBlueBlockLifeField->setCurrentValue(game_values.blueblockttl);
 
-    miGrayBlockLifeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 325, 270, "Gray Life", 305, 120);
+    miGrayBlockLifeField = new MI_SelectField<short>(&rm->spr_selectfield, 325, 270, "Gray Life", 305, 120);
     miGrayBlockLifeField->add("Unlimited", 0);
     miGrayBlockLifeField->add("1 Second", 62);
     miGrayBlockLifeField->add("2 Seconds", 124);
@@ -169,7 +169,7 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miGrayBlockLifeField->setOutputPtr(&game_values.grayblockttl);
     miGrayBlockLifeField->setCurrentValue(game_values.grayblockttl);
 
-    miRedBlockLifeField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 325, 310, "Red Life", 305, 120);
+    miRedBlockLifeField = new MI_SelectField<short>(&rm->spr_selectfield, 325, 310, "Red Life", 305, 120);
     miRedBlockLifeField->add("Unlimited", 0);
     miRedBlockLifeField->add("1 Second", 62);
     miRedBlockLifeField->add("2 Seconds", 124);

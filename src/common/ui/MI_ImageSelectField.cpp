@@ -15,7 +15,7 @@ MI_ImageSelectField::MI_ImageSelectField(
         std::string name,
         short width, short indent,
         short imageHeight, short imageWidth)
-    : MI_SelectFieldDyn<short>(nspr, x, y, std::move(name), width, indent)
+    : MI_SelectField<short>(nspr, x, y, std::move(name), width, indent)
     , spr_image(nspr_image)
     , iImageWidth(imageWidth)
     , iImageHeight(imageHeight)

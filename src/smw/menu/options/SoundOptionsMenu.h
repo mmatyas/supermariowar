@@ -9,7 +9,7 @@ class MI_SliderField;
 class MI_PacksField;
 class MI_PlaylistField;
 class MI_Text;
-template<typename T> class MI_SelectFieldDyn;
+template<typename T> class MI_SelectField;
 
 
 class UI_SoundOptionsMenu : public UI_Menu {
@@ -21,10 +21,10 @@ public:
 private:
     MI_SliderField* miSoundVolumeField;
     MI_SliderField* miMusicVolumeField;
-    MI_SelectFieldDyn<bool>* miPlayNextMusicField;
+    MI_SelectField<bool>* miPlayNextMusicField;
     MI_AnnouncerField* miAnnouncerField;
     MI_PlaylistField* miPlaylistField;
-    MI_SelectFieldDyn<short>* miWorldMusicField;
+    MI_SelectField<short>* miWorldMusicField;
     MI_PacksField* miSoundPackField;
     MI_Button* miSoundOptionsMenuBackButton;
 

@@ -5,7 +5,7 @@
 class MI_Button;
 class MI_Image;
 class MI_Text;
-template<typename T> class MI_SelectFieldDyn;
+template<typename T> class MI_SelectField;
 
 
 class UI_ProjectileOptionsMenu : public UI_Menu {
@@ -13,19 +13,19 @@ public:
     UI_ProjectileOptionsMenu();
 
 private:
-    MI_SelectFieldDyn<short>* miFireballLifeField;
-    MI_SelectFieldDyn<short>* miHammerLifeField;
-    MI_SelectFieldDyn<short>* miHammerDelayField;
-    MI_SelectFieldDyn<bool>* miHammerOneKillField;
-    MI_SelectFieldDyn<short>* miShellLifeField;
-    MI_SelectFieldDyn<short>* miWandFreezeTimeField;
+    MI_SelectField<short>* miFireballLifeField;
+    MI_SelectField<short>* miHammerLifeField;
+    MI_SelectField<short>* miHammerDelayField;
+    MI_SelectField<bool>* miHammerOneKillField;
+    MI_SelectField<short>* miShellLifeField;
+    MI_SelectField<short>* miWandFreezeTimeField;
 
-    MI_SelectFieldDyn<short>* miBlueBlockLifeField;
-    MI_SelectFieldDyn<short>* miGrayBlockLifeField;
-    MI_SelectFieldDyn<short>* miRedBlockLifeField;
-    MI_SelectFieldDyn<short>* miBoomerangStyleField;
-    MI_SelectFieldDyn<short>* miBoomerangLifeField;
-    MI_SelectFieldDyn<short>* miFeatherJumpsField;
+    MI_SelectField<short>* miBlueBlockLifeField;
+    MI_SelectField<short>* miGrayBlockLifeField;
+    MI_SelectField<short>* miRedBlockLifeField;
+    MI_SelectField<short>* miBoomerangStyleField;
+    MI_SelectField<short>* miBoomerangLifeField;
+    MI_SelectField<short>* miFeatherJumpsField;
 
     MI_Button* miProjectileOptionsMenuBackButton;
 

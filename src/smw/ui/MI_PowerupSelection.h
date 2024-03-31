@@ -11,7 +11,7 @@ class MI_Image;
 class MI_PowerupSlider;
 class MI_Text;
 class UI_Menu;
-template<typename T> class MI_SelectFieldDyn;
+template<typename T> class MI_SelectField;
 
 
 class MI_PowerupSelection : public UI_Control {
@@ -42,8 +42,8 @@ private:
     // TODO: Ownership of most members gets passed to this menu
     std::unique_ptr<UI_Menu> mMenu;
 
-    MI_SelectFieldDyn<short>* miOverride = nullptr;
-    MI_SelectFieldDyn<short>* miPreset = nullptr;
+    MI_SelectField<short>* miOverride = nullptr;
+    MI_SelectField<short>* miPreset = nullptr;
 
     std::array<MI_PowerupSlider*, NUM_POWERUPS> miPowerupSlider;
 

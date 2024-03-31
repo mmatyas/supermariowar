@@ -23,7 +23,7 @@ UI_NetNewRoomSettingsMenu::UI_NetNewRoomSettingsMenu(const UI_GameSettingsMenu* 
 
     miModeField = new MI_ImageSelectField(*(gsm->miModeField));
     for (short iGoalField = 0; iGoalField < GAMEMODE_LAST; iGoalField++)
-        miGoalField[iGoalField] = new MI_SelectFieldDyn<short>(*(gsm->miGoalField[iGoalField]));
+        miGoalField[iGoalField] = new MI_SelectField<short>(*(gsm->miGoalField[iGoalField]));
 
     miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 400, 120, true);
     netplay.mapfilepath = getCurrentMapPath();

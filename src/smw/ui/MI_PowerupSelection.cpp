@@ -75,7 +75,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 {
     mMenu = std::make_unique<UI_Menu>();
 
-    miOverride = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, iy, "Use Settings From", 500, 250);
+    miOverride = new MI_SelectField<short>(&rm->spr_selectfield, 70, iy, "Use Settings From", 500, 250);
     miOverride->add("Map Only", 0);
     miOverride->add("Game Only", 1);
     miOverride->add("Basic Average", 2);
@@ -84,7 +84,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
     miOverride->setCurrentValue(game_values.overridepowerupsettings);
     //miOverride->SetItemChangedCode(MENU_CODE_POWERUP_OVERRIDE_CHANGED);
 
-    miPreset = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, iy + 40, "Item Set", 500, 250);
+    miPreset = new MI_SelectField<short>(&rm->spr_selectfield, 70, iy + 40, "Item Set", 500, 250);
     miPreset->add("Custom Set 1", 0);
     miPreset->add("Custom Set 2", 1);
     miPreset->add("Custom Set 3", 2);

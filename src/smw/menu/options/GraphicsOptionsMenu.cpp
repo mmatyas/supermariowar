@@ -19,14 +19,14 @@ extern GraphicsList* gamegraphicspacklist;
 UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
     : UI_Menu()
 {
-    miTopLayerField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 120, "Draw Top Layer", 500, 220);
+    miTopLayerField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 120, "Draw Top Layer", 500, 220);
     miTopLayerField->add("Background", false);
     miTopLayerField->add("Foreground", true);
     miTopLayerField->setOutputPtr(&game_values.toplayer);
     miTopLayerField->setCurrentValue(game_values.toplayer ? 1 : 0);
     miTopLayerField->setAutoAdvance(true);
 
-    miFrameLimiterField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 160, "Frame Limit", 500, 220);
+    miFrameLimiterField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 160, "Frame Limit", 500, 220);
     miFrameLimiterField->add("10 FPS", 100);
     miFrameLimiterField->add("15 FPS", 67);
     miFrameLimiterField->add("20 FPS", 50);
@@ -60,7 +60,7 @@ UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
     miScreenSettingsButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Screen Settings", 500, 0);
     miScreenSettingsButton->SetCode(MENU_CODE_TO_SCREEN_SETTINGS);
 #else
-    miFullscreenField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 200, "Screen Size", 500, 220);
+    miFullscreenField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 200, "Screen Size", 500, 220);
     miFullscreenField->add("Windowed", false);
     miFullscreenField->add("Fullscreen", true);
     miFullscreenField->setOutputPtr(&game_values.fullscreen);

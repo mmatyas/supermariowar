@@ -29,7 +29,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 
     mMenu = new UI_Menu();
 
-    miQuantityField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 40, "Limit", 400, 180);
+    miQuantityField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 40, "Limit", 400, 180);
     miQuantityField->add("Single Powerup", 0);
     miQuantityField->add("1 Powerup", 1);
     miQuantityField->add("2 Powerups", 2);
@@ -44,7 +44,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
     miQuantityField->setOutputPtr(&game_values.gamemodemenusettings.frenzy.quantity);
     miQuantityField->setCurrentValue(game_values.gamemodemenusettings.frenzy.quantity);
 
-    miRateField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 120, 80, "Rate", 400, 180);
+    miRateField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 80, "Rate", 400, 180);
     miRateField->add("Instant", 0);
     miRateField->add("1 Second", 62);
     miRateField->add("2 Seconds", 124);
@@ -58,7 +58,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
     miRateField->setOutputPtr(&game_values.gamemodemenusettings.frenzy.rate);
     miRateField->setCurrentValue(game_values.gamemodemenusettings.frenzy.rate);
 
-    miStoredShellsField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 120, 120, "Store Shells", 400, 180);
+    miStoredShellsField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 120, "Store Shells", 400, 180);
     miStoredShellsField->add("Off", false);
     miStoredShellsField->add("On", true);
     miStoredShellsField->setOutputPtr(&game_values.gamemodemenusettings.frenzy.storedshells);

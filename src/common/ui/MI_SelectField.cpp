@@ -10,7 +10,7 @@ extern CResourceManager* rm;
 
 
 template<typename T>
-MI_SelectFieldDyn<T>::MI_SelectFieldDyn(gfxSprite* nspr, short x, short y, std::string name, short width, short indent)
+MI_SelectField<T>::MI_SelectField(gfxSprite* nspr, short x, short y, std::string name, short width, short indent)
     : UI_Control(x, y)
     , m_spr(nspr)
     , m_name(std::move(name))
@@ -27,7 +27,7 @@ MI_SelectFieldDyn<T>::MI_SelectFieldDyn(gfxSprite* nspr, short x, short y, std::
 
 
 template<typename T>
-MI_SelectFieldDyn<T>::MI_SelectFieldDyn(const MI_SelectFieldDyn<T>& other)
+MI_SelectField<T>::MI_SelectField(const MI_SelectField<T>& other)
     : UI_Control(other)
     , m_spr(other.m_spr)
     , m_name(other.m_name)
@@ -54,7 +54,7 @@ MI_SelectFieldDyn<T>::MI_SelectFieldDyn(const MI_SelectFieldDyn<T>& other)
 
 
 template<typename T>
-void MI_SelectFieldDyn<T>::Update()
+void MI_SelectField<T>::Update()
 {
     miModifyImageRight->Update();
     miModifyImageLeft->Update();
@@ -62,7 +62,7 @@ void MI_SelectFieldDyn<T>::Update()
 
 
 template<typename T>
-void MI_SelectFieldDyn<T>::Draw()
+void MI_SelectField<T>::Draw()
 {
     if (!fShow)
         return;
@@ -96,7 +96,7 @@ void MI_SelectFieldDyn<T>::Draw()
 
 
 template<typename T>
-MenuCodeEnum MI_SelectFieldDyn<T>::Modify(bool modify)
+MenuCodeEnum MI_SelectField<T>::Modify(bool modify)
 {
     if (fDisable)
         return MENU_CODE_UNSELECT_ITEM;
@@ -117,7 +117,7 @@ MenuCodeEnum MI_SelectFieldDyn<T>::Modify(bool modify)
 
 
 template<typename T>
-MenuCodeEnum MI_SelectFieldDyn<T>::SendInput(CPlayerInput * playerInput)
+MenuCodeEnum MI_SelectField<T>::SendInput(CPlayerInput * playerInput)
 {
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         short iNumMoves = 1;
@@ -166,7 +166,7 @@ MenuCodeEnum MI_SelectFieldDyn<T>::SendInput(CPlayerInput * playerInput)
 
 
 template<typename T>
-MenuCodeEnum MI_SelectFieldDyn<T>::MouseClick(short iMouseX, short iMouseY) {
+MenuCodeEnum MI_SelectField<T>::MouseClick(short iMouseX, short iMouseY) {
     if (fDisable)
         return MENU_CODE_NONE;
 
@@ -203,7 +203,7 @@ MenuCodeEnum MI_SelectFieldDyn<T>::MouseClick(short iMouseX, short iMouseY) {
 
 
 template<typename T>
-void MI_SelectFieldDyn<T>::Refresh()
+void MI_SelectField<T>::Refresh()
 {
     if (m_outputPtr)
         setCurrentValue(*m_outputPtr);
@@ -211,7 +211,7 @@ void MI_SelectFieldDyn<T>::Refresh()
 
 
 template<typename T>
-T MI_SelectFieldDyn<T>::randomValue() const
+T MI_SelectField<T>::randomValue() const
 {
     const size_t idx = m_goodRandomIndices.at(RANDOM_INT(m_goodRandomIndices.size()));
     return m_items.at(idx).value;
@@ -219,7 +219,7 @@ T MI_SelectFieldDyn<T>::randomValue() const
 
 
 template<typename T>
-bool MI_SelectFieldDyn<T>::setCurrentValue(T value)
+bool MI_SelectField<T>::setCurrentValue(T value)
 {
     for (m_index = 0; m_index < m_items.size(); m_index++) {
         if (m_items[m_index].value == value) {
@@ -232,7 +232,7 @@ bool MI_SelectFieldDyn<T>::setCurrentValue(T value)
 
 
 template<typename T>
-bool MI_SelectFieldDyn<T>::setCurrentIndex(size_t index)
+bool MI_SelectField<T>::setCurrentIndex(size_t index)
 {
     if (m_index < m_items.size()) {
         m_index = index;
@@ -244,7 +244,7 @@ bool MI_SelectFieldDyn<T>::setCurrentIndex(size_t index)
 
 
 template<typename T>
-void MI_SelectFieldDyn<T>::updateOutput() const
+void MI_SelectField<T>::updateOutput() const
 {
     if (m_outputPtr)
         *m_outputPtr = currentValue();
@@ -252,7 +252,7 @@ void MI_SelectFieldDyn<T>::updateOutput() const
 
 
 template<typename T>
-SF_ListItemDyn<T>& MI_SelectFieldDyn<T>::add(std::string name, T value, bool goodRandom)
+SF_ListItem<T>& MI_SelectField<T>::add(std::string name, T value, bool goodRandom)
 {
     size_t new_idx = m_items.size();
     m_items.emplace_back(std::move(name), std::move(value));
@@ -266,7 +266,7 @@ SF_ListItemDyn<T>& MI_SelectFieldDyn<T>::add(std::string name, T value, bool goo
 
 
 template<typename T>
-void MI_SelectFieldDyn<T>::clear()
+void MI_SelectField<T>::clear()
 {
     m_items.clear();
     m_goodRandomIndices.clear();
@@ -274,7 +274,7 @@ void MI_SelectFieldDyn<T>::clear()
 
 
 template<typename T>
-void MI_SelectFieldDyn<T>::hideItem(T value, bool hide)
+void MI_SelectField<T>::hideItem(T value, bool hide)
 {
     for (Item& item : m_items) {
         if (item.value == value)
@@ -286,7 +286,7 @@ void MI_SelectFieldDyn<T>::hideItem(T value, bool hide)
 
 
 template<typename T>
-void MI_SelectFieldDyn<T>::hideAllItems(bool hide)
+void MI_SelectField<T>::hideAllItems(bool hide)
 {
     for (Item& item : m_items) {
         item.hidden = hide;
@@ -295,7 +295,7 @@ void MI_SelectFieldDyn<T>::hideAllItems(bool hide)
 
 
 template<typename T>
-bool MI_SelectFieldDyn<T>::moveNext()
+bool MI_SelectField<T>::moveNext()
 {
     if (m_items.empty())
         return false;
@@ -318,7 +318,7 @@ bool MI_SelectFieldDyn<T>::moveNext()
 
 
 template<typename T>
-bool MI_SelectFieldDyn<T>::movePrev()
+bool MI_SelectField<T>::movePrev()
 {
     if (m_items.empty())
         return false;
@@ -341,7 +341,7 @@ bool MI_SelectFieldDyn<T>::movePrev()
 
 
 template<typename T>
-bool MI_SelectFieldDyn<T>::moveRandom()
+bool MI_SelectField<T>::moveRandom()
 {
     std::vector<size_t> valid_indices;
     valid_indices.reserve(m_items.size());
@@ -360,5 +360,5 @@ bool MI_SelectFieldDyn<T>::moveRandom()
 
 
 // Actual typed classes
-template class MI_SelectFieldDyn<bool>;
-template class MI_SelectFieldDyn<short>;
+template class MI_SelectField<bool>;
+template class MI_SelectField<short>;

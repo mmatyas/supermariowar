@@ -14,14 +14,14 @@ extern CGameValues game_values;
 UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu()
     : UI_Menu()
 {
-    miSpawnStyleField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 80, "Spawn Style", 500, 220);
+    miSpawnStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 80, "Spawn Style", 500, 220);
     miSpawnStyleField->add("Instant", 0);
     miSpawnStyleField->add("Door", 1);
     miSpawnStyleField->add("Swirl", 2);
     miSpawnStyleField->setOutputPtr(&game_values.spawnstyle);
     miSpawnStyleField->setCurrentValue(game_values.spawnstyle);
 
-    miAwardStyleField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 120, "Award Style", 500, 220);
+    miAwardStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 120, "Award Style", 500, 220);
     miAwardStyleField->add("None", 0);
     miAwardStyleField->add("Fireworks", 1);
     miAwardStyleField->add("Spiral", 2);
@@ -31,42 +31,42 @@ UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu()
     miAwardStyleField->setOutputPtr(&game_values.awardstyle);
     miAwardStyleField->setCurrentValue(game_values.awardstyle);
 
-    miScoreStyleField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 160, "Score Location", 500, 220);
+    miScoreStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 160, "Score Location", 500, 220);
     miScoreStyleField->add("Top", 0);
     miScoreStyleField->add("Bottom", 1);
     miScoreStyleField->add("Corners", 2);
     miScoreStyleField->setOutputPtr(&game_values.scoreboardstyle);
     miScoreStyleField->setCurrentValue(game_values.scoreboardstyle);
 
-    miCrunchField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 200, "Screen Crunch", 500, 220);
+    miCrunchField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 200, "Screen Crunch", 500, 220);
     miCrunchField->add("Off", false);
     miCrunchField->add("On", true);
     miCrunchField->setOutputPtr(&game_values.screencrunch);
     miCrunchField->setCurrentValue(game_values.screencrunch ? 1 : 0);
     miCrunchField->setAutoAdvance(true);
 
-    miWinningCrownField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 240, "Leader Crown", 500, 220);
+    miWinningCrownField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 240, "Leader Crown", 500, 220);
     miWinningCrownField->add("Off", false);
     miWinningCrownField->add("On", true);
     miWinningCrownField->setOutputPtr(&game_values.showwinningcrown);
     miWinningCrownField->setCurrentValue(game_values.showwinningcrown ? 1 : 0);
     miWinningCrownField->setAutoAdvance(true);
 
-    miStartCountDownField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 280, "Start Countdown", 500, 220);
+    miStartCountDownField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 280, "Start Countdown", 500, 220);
     miStartCountDownField->add("Off", false);
     miStartCountDownField->add("On", true);
     miStartCountDownField->setOutputPtr(&game_values.startgamecountdown);
     miStartCountDownField->setCurrentValue(game_values.startgamecountdown ? 1 : 0);
     miStartCountDownField->setAutoAdvance(true);
 
-    miStartModeDisplayField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 320, "Show Mode", 500, 220);
+    miStartModeDisplayField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 320, "Show Mode", 500, 220);
     miStartModeDisplayField->add("Off", false);
     miStartModeDisplayField->add("On", true);
     miStartModeDisplayField->setOutputPtr(&game_values.startmodedisplay);
     miStartModeDisplayField->setCurrentValue(game_values.startmodedisplay ? 1 : 0);
     miStartModeDisplayField->setAutoAdvance(true);
 
-    miDeadTeamNoticeField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 360, "Dead Team Notice", 500, 220);
+    miDeadTeamNoticeField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 360, "Dead Team Notice", 500, 220);
     miDeadTeamNoticeField->add("Off", false);
     miDeadTeamNoticeField->add("On", true);
     miDeadTeamNoticeField->setOutputPtr(&game_values.deadteamnotice);

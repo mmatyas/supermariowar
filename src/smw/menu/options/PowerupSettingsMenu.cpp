@@ -15,7 +15,7 @@ extern CGameValues game_values;
 UI_PowerupSettingsMenu::UI_PowerupSettingsMenu()
     : UI_Menu()
 {
-    miStoredPowerupDelayField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 100, "Item Use Speed", 500, 220);
+    miStoredPowerupDelayField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, "Item Use Speed", 500, 220);
     miStoredPowerupDelayField->add("Very Slow", 2);
     miStoredPowerupDelayField->add("Slow", 3);
     miStoredPowerupDelayField->add("Moderate", 4);
@@ -24,7 +24,7 @@ UI_PowerupSettingsMenu::UI_PowerupSettingsMenu()
     miStoredPowerupDelayField->setOutputPtr(&game_values.storedpowerupdelay);
     miStoredPowerupDelayField->setCurrentValue(game_values.storedpowerupdelay);
 
-    miItemRespawnField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 140, "Item Spawn", 500, 220);
+    miItemRespawnField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 140, "Item Spawn", 500, 220);
     miItemRespawnField->add("Off", 0);
     miItemRespawnField->add("5 Seconds", 310);
     miItemRespawnField->add("10 Seconds", 620);
@@ -41,7 +41,7 @@ UI_PowerupSettingsMenu::UI_PowerupSettingsMenu()
     miItemRespawnField->setOutputPtr(&game_values.itemrespawntime);
     miItemRespawnField->setCurrentValue(game_values.itemrespawntime);
 
-    miHiddenBlockRespawnField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 180, "Hidden Block Hide", 500, 220);
+    miHiddenBlockRespawnField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 180, "Hidden Block Hide", 500, 220);
     miHiddenBlockRespawnField->add("Off", 0);
     miHiddenBlockRespawnField->add("5 Seconds", 310);
     miHiddenBlockRespawnField->add("10 Seconds", 620);
@@ -58,21 +58,21 @@ UI_PowerupSettingsMenu::UI_PowerupSettingsMenu()
     miHiddenBlockRespawnField->setOutputPtr(&game_values.hiddenblockrespawn);
     miHiddenBlockRespawnField->setCurrentValue(game_values.hiddenblockrespawn);
 
-    miSwapStyleField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 220, "Swap Style", 500, 220);
+    miSwapStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 220, "Swap Style", 500, 220);
     miSwapStyleField->add("Walk", 0);
     miSwapStyleField->add("Blink", 1);
     miSwapStyleField->add("Instant", 2);
     miSwapStyleField->setOutputPtr(&game_values.swapstyle);
     miSwapStyleField->setCurrentValue(game_values.swapstyle);
 
-    miBonusWheelField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 260, "Bonus Wheel", 500, 220);
+    miBonusWheelField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 260, "Bonus Wheel", 500, 220);
     miBonusWheelField->add("Off", 0);
     miBonusWheelField->add("Tournament Win", 1);
     miBonusWheelField->add("Every Game", 2);
     miBonusWheelField->setOutputPtr(&game_values.bonuswheel);
     miBonusWheelField->setCurrentValue(game_values.bonuswheel);
 
-    miKeepPowerupField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 300, "Bonus Item", 500, 220);
+    miKeepPowerupField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 300, "Bonus Item", 500, 220);
     miKeepPowerupField->add("Until Next Spin", false);
     miKeepPowerupField->add("Keep Always", true);
     miKeepPowerupField->setOutputPtr(&game_values.keeppowerup);

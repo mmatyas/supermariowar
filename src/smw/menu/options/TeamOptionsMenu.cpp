@@ -14,21 +14,21 @@ extern CGameValues game_values;
 UI_TeamOptionsMenu::UI_TeamOptionsMenu()
     : UI_Menu()
 {
-    miTeamKillsField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 180, "Player Collision", 500, 220);
+    miTeamKillsField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 180, "Player Collision", 500, 220);
     miTeamKillsField->add("Off", 0);
     miTeamKillsField->add("Assist", 1);
     miTeamKillsField->add("On", 2);
     miTeamKillsField->setOutputPtr(&game_values.teamcollision);
     miTeamKillsField->setCurrentValue(game_values.teamcollision);
 
-    miTeamColorsField = new MI_SelectFieldDyn<bool>(&rm->spr_selectfield, 70, 220, "Colors", 500, 220);
+    miTeamColorsField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 220, "Colors", 500, 220);
     miTeamColorsField->add("Individual", false);
     miTeamColorsField->add("Team", true);
     miTeamColorsField->setOutputPtr(&game_values.teamcolors);
     miTeamColorsField->setCurrentValue(game_values.teamcolors ? 1 : 0);
     miTeamColorsField->setAutoAdvance(true);
 
-    miTournamentControlField = new MI_SelectFieldDyn<short>(&rm->spr_selectfield, 70, 260, "Tournament Control", 500, 220);
+    miTournamentControlField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 260, "Tournament Control", 500, 220);
     miTournamentControlField->add("All", 0);
     miTournamentControlField->add("Game Winner", 1);
     miTournamentControlField->add("Game Loser", 2);

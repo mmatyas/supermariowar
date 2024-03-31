@@ -3,7 +3,7 @@
 #include "ui/MI_SelectField.h"
 
 
-class MI_ImageSelectField : public MI_SelectFieldDyn<short> {
+class MI_ImageSelectField : public MI_SelectField<short> {
 public:
     MI_ImageSelectField(
         gfxSprite* nspr, gfxSprite* nspr_image,
