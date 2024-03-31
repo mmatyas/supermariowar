@@ -48,6 +48,7 @@ constexpr short killStyleDamage(KillStyle style) {
         case KillStyle::Spiny: return 2;
         case KillStyle::Phanto: return 2;
     }
+    return 0;
 }
 } // namespace
 
