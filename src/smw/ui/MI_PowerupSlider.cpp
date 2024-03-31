@@ -1,5 +1,6 @@
 #include "MI_PowerupSlider.h"
 
+#include "gfx/gfxSprite.h"
 #include "ui/MI_Image.h"
 
 
