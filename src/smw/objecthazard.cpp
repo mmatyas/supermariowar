@@ -286,7 +286,7 @@ bool MO_BulletBill::hitother(CPlayer * player)
     if (player->isShielded() || player->globalID == iPlayerID)
         return false;
 
-    if (game_values.teamcollision != 2 && iTeamID == player->teamID)
+    if (game_values.teamcollision != TeamCollisionStyle::On && iTeamID == player->teamID)
         return false;
 
     //Find the player that owns this bullet bill so we can attribute a kill
@@ -403,7 +403,7 @@ MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 
 bool MO_Explosion::collide(CPlayer * player)
 {
-    if (player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded() && !player->shyguy) {
+    if (player->globalID != iPlayerID && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded() && !player->shyguy) {
         //Find the player that made this explosion so we can attribute a kill
         PlayerKilledPlayer(iPlayerID, player, death_style_jump, iStyle, false, false);
         return true;

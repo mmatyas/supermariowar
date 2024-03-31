@@ -6,6 +6,8 @@ class MI_Button;
 class MI_Image;
 class MI_Text;
 template<typename T> class MI_SelectField;
+enum class TeamCollisionStyle : unsigned char;
+enum class TournamentControlStyle : unsigned char;
 
 /*
     In this menu, you can set team-relates preferences,
@@ -16,9 +18,9 @@ public:
     UI_TeamOptionsMenu();
 
 private:
-    MI_SelectField<short>* miTeamKillsField;
+    MI_SelectField<TeamCollisionStyle>* miTeamKillsField;
     MI_SelectField<bool>* miTeamColorsField;
-    MI_SelectField<short>* miTournamentControlField;
+    MI_SelectField<TournamentControlStyle>* miTournamentControlField;
     MI_Button* miTeamOptionsMenuBackButton;
 
     MI_Image* miTeamOptionsMenuLeftHeaderBar;

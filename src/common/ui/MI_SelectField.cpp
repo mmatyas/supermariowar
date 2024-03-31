@@ -371,3 +371,7 @@ template class MI_SelectField<MatchType>;
 template class MI_SelectField<AwardStyle>;
 template class MI_SelectField<ScoreboardStyle>;
 template class MI_SelectField<SpawnStyle>;
+
+#include "GameplayStyles.h"
+template class MI_SelectField<TeamCollisionStyle>;
+template class MI_SelectField<TournamentControlStyle>;

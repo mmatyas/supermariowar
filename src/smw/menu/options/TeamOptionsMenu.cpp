@@ -14,10 +14,10 @@ extern CGameValues game_values;
 UI_TeamOptionsMenu::UI_TeamOptionsMenu()
     : UI_Menu()
 {
-    miTeamKillsField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 180, "Player Collision", 500, 220);
-    miTeamKillsField->add("Off", 0);
-    miTeamKillsField->add("Assist", 1);
-    miTeamKillsField->add("On", 2);
+    miTeamKillsField = new MI_SelectField<TeamCollisionStyle>(&rm->spr_selectfield, 70, 180, "Player Collision", 500, 220);
+    miTeamKillsField->add("Off", TeamCollisionStyle::Off);
+    miTeamKillsField->add("Assist", TeamCollisionStyle::Assist);
+    miTeamKillsField->add("On", TeamCollisionStyle::On);
     miTeamKillsField->setOutputPtr(&game_values.teamcollision);
     miTeamKillsField->setCurrentValue(game_values.teamcollision);
 
@@ -28,15 +28,15 @@ UI_TeamOptionsMenu::UI_TeamOptionsMenu()
     miTeamColorsField->setCurrentValue(game_values.teamcolors ? 1 : 0);
     miTeamColorsField->setAutoAdvance(true);
 
-    miTournamentControlField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 260, "Tournament Control", 500, 220);
-    miTournamentControlField->add("All", 0);
-    miTournamentControlField->add("Game Winner", 1);
-    miTournamentControlField->add("Game Loser", 2);
-    miTournamentControlField->add("Leading Teams", 3);
-    miTournamentControlField->add("Trailing Teams", 4);
-    miTournamentControlField->add("Random", 5);
-    miTournamentControlField->add("Random Loser", 6);
-    miTournamentControlField->add("Round Robin", 7);
+    miTournamentControlField = new MI_SelectField<TournamentControlStyle>(&rm->spr_selectfield, 70, 260, "Tournament Control", 500, 220);
+    miTournamentControlField->add("All", TournamentControlStyle::All);
+    miTournamentControlField->add("Game Winner", TournamentControlStyle::GameWinner);
+    miTournamentControlField->add("Game Loser", TournamentControlStyle::GameLoser);
+    miTournamentControlField->add("Leading Teams", TournamentControlStyle::LeadingTeams);
+    miTournamentControlField->add("Trailing Teams", TournamentControlStyle::TrailingTeams);
+    miTournamentControlField->add("Random", TournamentControlStyle::Random);
+    miTournamentControlField->add("Random Loser", TournamentControlStyle::RandomLoser);
+    miTournamentControlField->add("Round Robin", TournamentControlStyle::RoundRobin);
     miTournamentControlField->setOutputPtr(&game_values.tournamentcontrolstyle);
     miTournamentControlField->setCurrentValue(game_values.tournamentcontrolstyle);
 

@@ -135,7 +135,7 @@ void CGameValues::init()
     worldindex      = 0;
     slowdownon      = -1;
     slowdowncounter   = 0;
-    teamcollision   = 0;
+    teamcollision = TeamCollisionStyle::Off;
     screencrunch    = true;
     screenshaketimer  = 0;
     screenshakeplayerid = -1;
@@ -199,7 +199,7 @@ void CGameValues::init()
     overridepowerupsettings = 0;
     secretsenabled  = false;
     poweruppreset   = 0;
-    tournamentcontrolstyle = 0;
+    tournamentcontrolstyle = TournamentControlStyle::All;
 
 
     pfFilters     = new bool[NUM_AUTO_FILTERS + filterslist->GetCount()];
@@ -336,7 +336,7 @@ void CGameValues::ReadBinaryConfig() {
 
         spawnstyle = static_cast<SpawnStyle>(options.read_u8());
         awardstyle = static_cast<AwardStyle>(options.read_u8());
-        teamcollision = options.read_u8();
+        teamcollision = static_cast<TeamCollisionStyle>(options.read_u8());
         screencrunch = options.read_u8();
         toplayer = options.read_u8();
         scoreboardstyle = static_cast<ScoreboardStyle>(options.read_u8());
@@ -359,7 +359,7 @@ void CGameValues::ReadBinaryConfig() {
         secretsenabled = options.read_u8();
         startgamecountdown = options.read_u8();
         deadteamnotice = options.read_u8();
-        tournamentcontrolstyle = options.read_u8();
+        tournamentcontrolstyle = static_cast<TournamentControlStyle>(options.read_u8());
         startmodedisplay = options.read_u8();
 
         shieldtime = options.read_i16();
@@ -494,7 +494,7 @@ void CGameValues::WriteConfig()
 
         options.write_u8(static_cast<uint8_t>(spawnstyle));
         options.write_u8(static_cast<uint8_t>(awardstyle));
-        options.write_u8(teamcollision);
+        options.write_u8(static_cast<uint8_t>(teamcollision));
         options.write_u8(screencrunch);
         options.write_u8(toplayer);
         options.write_u8(static_cast<uint8_t>(scoreboardstyle));
@@ -517,7 +517,7 @@ void CGameValues::WriteConfig()
         options.write_u8(secretsenabled);
         options.write_u8(startgamecountdown);
         options.write_u8(deadteamnotice);
-        options.write_u8(tournamentcontrolstyle);
+        options.write_u8(static_cast<uint8_t>(tournamentcontrolstyle));
         options.write_u8(startmodedisplay);
 
         options.write_i16(shieldtime);

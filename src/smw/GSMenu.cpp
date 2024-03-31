@@ -257,12 +257,12 @@ void MenuState::onEnterState()
 
             //Set the next controlling team
             switch (game_values.tournamentcontrolstyle) {
-            case 1: { //Winning Team
+            case TournamentControlStyle::GameWinner: { //Winning Team
                 game_values.tournamentcontrolteam = game_values.gamemode->winningteam;
                 break;
             }
 
-            case 2: { //Losing Team
+            case TournamentControlStyle::GameLoser: { //Losing Team
                 short iNumInPlace = 0;
                 short iInPlace[4];
                 short iLowestPlace = 0;
@@ -280,7 +280,7 @@ void MenuState::onEnterState()
                 break;
             }
 
-            case 3: { //Tournament Ahead Teams
+            case TournamentControlStyle::LeadingTeams: { //Tournament Ahead Teams
                 short iNumInPlace = 0;
                 short iInPlace[4];
                 short iMostWins = 0;
@@ -298,7 +298,7 @@ void MenuState::onEnterState()
                 break;
             }
 
-            case 4: { //Tournament Behind Teams
+            case TournamentControlStyle::TrailingTeams: { //Tournament Behind Teams
                 short iNumInPlace = 0;
                 short iInPlace[4] = {0,0,0,0};
                 short iLeastWins = 20; //Most possible wins are 10
@@ -317,12 +317,12 @@ void MenuState::onEnterState()
                 break;
             }
 
-            case 5: { //Random
+            case TournamentControlStyle::Random: { //Random
                 game_values.tournamentcontrolteam = RANDOM_INT( score_cnt);
                 break;
             }
 
-            case 6: { //Random Losing Team
+            case TournamentControlStyle::RandomLoser: { //Random Losing Team
                 short iNumInPlace = 0;
                 short iInPlace[4] = {0, 0, 0, 0};
                 short iWinner = 0;
@@ -345,7 +345,7 @@ void MenuState::onEnterState()
                 break;
             }
 
-            case 7: { //Round Robin
+            case TournamentControlStyle::RoundRobin: { //Round Robin
                 game_values.tournamentcontrolteam = game_values.tournamentnextcontrol;
 
                 if (++game_values.tournamentnextcontrol >= score_cnt)
@@ -737,9 +737,9 @@ void MenuState::update()
                 } else if (game_values.matchtype == MatchType::Tournament) {
                     printf("  Match type: Tournament\n");
                     //Set who is controlling the tournament menu
-                    if (game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
+                    if (game_values.tournamentcontrolstyle == TournamentControlStyle::Random || game_values.tournamentcontrolstyle == TournamentControlStyle::RandomLoser) //Random
                         game_values.tournamentcontrolteam = RANDOM_INT( score_cnt);
-                    else if (game_values.tournamentcontrolstyle == 7) //Round robin
+                    else if (game_values.tournamentcontrolstyle == TournamentControlStyle::RoundRobin) //Round robin
                         game_values.tournamentcontrolteam = 0;
                     else //The first game of the tournament is controlled by all players
                         game_values.tournamentcontrolteam = -1;

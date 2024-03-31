@@ -549,7 +549,7 @@ void shakeScreen()
             continue;
 
         //Don't kill players on his team either (if friendly fire is off)
-        if (game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
+        if (game_values.teamcollision != TeamCollisionStyle::On && game_values.screenshaketeamid == player->teamID)
             continue;
 
         //Kill other players

@@ -414,15 +414,15 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
         }
 
         //Transfer tag if assist is on
-        if ((game_values.gamemode->gamemode == game_mode_tag && game_values.teamcollision == 1) || game_values.gamemodesettings.tag.tagontouch)
+        if ((game_values.gamemode->gamemode == game_mode_tag && game_values.teamcollision == TeamCollisionStyle::Assist) || game_values.gamemodesettings.tag.tagontouch)
             o1->TransferTag(o2);
 
         //Don't collision detect players on same team if friendly fire is turned off
-        if (game_values.teamcollision == 0)
+        if (game_values.teamcollision == TeamCollisionStyle::Off)
             return;
 
         //Team assist is enabled so allow powerup trading and super jumping
-        if (game_values.teamcollision == 1) {
+        if (game_values.teamcollision == TeamCollisionStyle::Assist) {
             o1->BounceAssistPlayer(o2);
             o2->BounceAssistPlayer(o1);
 

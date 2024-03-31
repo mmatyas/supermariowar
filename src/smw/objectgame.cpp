@@ -1318,7 +1318,7 @@ void MO_Fireball::update()
 
 bool MO_Fireball::collide(CPlayer * player)
 {
-    if (iPlayerID != player->getGlobalID() && (game_values.teamcollision == 2|| iTeamID != player->getTeamID())) {
+    if (iPlayerID != player->getGlobalID() && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->getTeamID())) {
         if (!player->isShielded()) {
             removeifprojectile(this, false, false);
 
@@ -1489,7 +1489,7 @@ void MO_Hammer::update()
 
 bool MO_Hammer::collide(CPlayer * player)
 {
-    if (iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID)) {
+    if (iPlayerID != player->globalID && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->teamID)) {
         if (!player->isShielded()) {
             removeifprojectile(this, false, false);
 
@@ -1672,7 +1672,7 @@ void MO_IceBlast::update()
 
 bool MO_IceBlast::collide(CPlayer * player)
 {
-    if (iPlayerID != player->globalID && (game_values.teamcollision == 2 || iTeamID != player->teamID)) {
+    if (iPlayerID != player->globalID && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->teamID)) {
         if (!player->isShielded() && !player->isInvincible() && !player->shyguy) {
             player->makefrozen(game_values.wandfreezetime);
             removeifprojectile(this, false, true);
@@ -1965,7 +1965,7 @@ void MO_Boomerang::forcedead()
 
 bool MO_Boomerang::collide(CPlayer * player)
 {
-    if (iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID)) {
+    if (iPlayerID != player->globalID && (game_values.teamcollision == TeamCollisionStyle::On|| iTeamID != player->teamID)) {
         if (!player->isShielded()) {
             removeifprojectile(this, false, false);
 
@@ -2278,7 +2278,7 @@ void MO_Podobo::draw()
 
 bool MO_Podobo::collide(CPlayer * player)
 {
-    if (player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded() && !player->shyguy) {
+    if (player->globalID != iPlayerID && (game_values.teamcollision == TeamCollisionStyle::On|| iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded() && !player->shyguy) {
         //Find the player that made this explosion so we can attribute a kill
         PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Podobo, false, false);
         return true;
@@ -2355,7 +2355,7 @@ bool OMO_BowserFire::collide(CPlayer * player)
         return false;
     }
 
-    if (player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded()) {
+    if (player->globalID != iPlayerID && (game_values.teamcollision == TeamCollisionStyle::On|| iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded()) {
         //Find the player that made this explosion so we can attribute a kill
         PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Fireball, false, false);
         return true;
@@ -5220,7 +5220,7 @@ bool CO_Shell::HitTop(CPlayer * player)
         player->collisions.checktop(*player);
         player->platform = NULL;
     } else if (state == 3) { //Holding
-        if (player != owner && (game_values.teamcollision == 2|| player->teamID != owner->teamID)) {
+        if (player != owner && (game_values.teamcollision == TeamCollisionStyle::On|| player->teamID != owner->teamID)) {
             if (owner)
                 owner->carriedItem = NULL;
 
@@ -5273,7 +5273,7 @@ bool CO_Shell::HitOther(CPlayer * player)
         if (iNoOwnerKillTime == 0 || player->globalID != iPlayerID || (player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f) || (player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f))
             return KillPlayer(player);
     } else if (state == 3) { //Holding
-        if (player != owner && (game_values.teamcollision == 2 || player->teamID != owner->teamID)) {
+        if (player != owner && (game_values.teamcollision == TeamCollisionStyle::On || player->teamID != owner->teamID)) {
             iPlayerID = owner->globalID;
             iTeamID = owner->teamID;
             return KillPlayer(player);
@@ -6012,7 +6012,7 @@ bool CO_ThrowBox::collide(CPlayer * player)
     //Kill player when another player is holding the box
     else
     {
-        if (owner && player != owner && (game_values.teamcollision == 2 || player->teamID != owner->teamID))
+        if (owner && player != owner && (game_values.teamcollision == TeamCollisionStyle::On || player->teamID != owner->teamID))
     	{
     		iPlayerID = owner->globalID;
     		iTeamID = owner->teamID;
@@ -6416,7 +6416,7 @@ bool MO_AttackZone::collide(CPlayer * player)
     if (player->isShielded() || player->isInvincible() || player->shyguy || dead)
         return false;
 
-    if (game_values.teamcollision != 2 && player->teamID == iTeamID)
+    if (game_values.teamcollision != TeamCollisionStyle::On && player->teamID == iTeamID)
         return false;
 
     CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);

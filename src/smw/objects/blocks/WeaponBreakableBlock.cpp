@@ -57,7 +57,7 @@ bool B_WeaponBreakableBlock::hittop(CPlayer * player, bool useBehavior)
 
     if (state == 1 || state == 2) {
         PlayerKillType iKillType = PlayerKillType::NonKill;
-        if (iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.teamcollision == 2))
+        if (iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.teamcollision == TeamCollisionStyle::On))
             PlayerKilledPlayer(iBumpPlayerID, player, death_style_jump, KillStyle::Bounce, false, false);
 
         if (PlayerKillType::NonKill == iKillType)

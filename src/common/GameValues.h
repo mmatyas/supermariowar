@@ -3,6 +3,7 @@
 
 #include "EyecandyStyles.h"
 #include "GameModeSettings.h"
+#include "GameplayStyles.h"
 #include "input.h"
 #include "MatchTypes.h"
 
@@ -73,7 +74,7 @@ public:
     bool		fullscreen;
     SpawnStyle spawnstyle;
     AwardStyle awardstyle;
-    short		teamcollision;
+    TeamCollisionStyle teamcollision;
     short		shellttl;
     short		blueblockttl;
     short		redblockttl;
@@ -122,7 +123,7 @@ public:
     bool		showwinningcrown;
 	short		skinids[4];
     short		wandlimit;
-    short		tournamentcontrolstyle;  //ID for the player selected control style
+    TournamentControlStyle tournamentcontrolstyle;  //ID for the player selected control style
     short		wandfreezetime;
     short		teamids[4][3];
     bool		toplayer;
