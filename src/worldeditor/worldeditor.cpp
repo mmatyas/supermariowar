@@ -3304,7 +3304,7 @@ int editor_vehicles()
 		char szStageName[256];
 		sprintf(szStageName, "(%d) %s", iStage + 1, ts->szName);
 
-		SF_ListItemDyn<short>& item = miVehicleStageField->add(szStageName, iStage, false, true);
+		SF_ListItemDyn<short>& item = miVehicleStageField->add(szStageName, iStage);
 		item.iconOverride = ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode);
 	}
 

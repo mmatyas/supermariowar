@@ -167,11 +167,9 @@ protected:
 
 template<typename T>
 struct SF_ListItemDyn {
-    SF_ListItemDyn(std::string&& name, T value, bool hidden, short iconOverride)
+    SF_ListItemDyn(std::string&& name, T value)
         : name(std::move(name))
         , value(value)
-        , hidden(hidden)
-        , iconOverride(iconOverride)
     {
         static_assert(std::is_trivially_copyable<T>::value, "");
     }
@@ -237,7 +235,7 @@ public:
     //! Sets the currently selected item
     bool setCurrentIndex(size_t index);
     //! Adds an item to the list
-    Item& add(std::string name, T value, bool hidden = false, bool goodRandom = true);
+    Item& add(std::string name, T value, bool goodRandom = true);
     //! Removes all items
     void clear();
     //! Hides the items containing the specified value

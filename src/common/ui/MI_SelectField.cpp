@@ -717,10 +717,10 @@ void MI_SelectFieldDyn<T>::updateOutput() const
 
 
 template<typename T>
-SF_ListItemDyn<T>& MI_SelectFieldDyn<T>::add(std::string name, T value, bool hidden, bool goodRandom)
+SF_ListItemDyn<T>& MI_SelectFieldDyn<T>::add(std::string name, T value, bool goodRandom)
 {
     size_t new_idx = m_items.size();
-    m_items.emplace_back(std::move(name), std::move(value), hidden, -1);
+    m_items.emplace_back(std::move(name), std::move(value));
     m_index = 0;
 
     if (goodRandom)
