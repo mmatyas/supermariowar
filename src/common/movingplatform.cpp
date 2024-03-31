@@ -1686,8 +1686,8 @@ bool MovingPlatform::IsInNoSpawnZone(short iX, short iY, short w, short h)
     //If we have reached this point, the item is colliding with the bounding rect of the platform
     //but not necessarily colliding with the platform (example a U shaped platform has an open area in the center)
 
-    short iRelativeX[2] = {iX - iLeft, iX + w - iLeft};
-    short iRelativeY[2] = {iY - iTop, iY + h - iTop};
+    short iRelativeX[2] = {static_cast<short>(iX - iLeft), static_cast<short>(iX + w - iLeft)};
+    short iRelativeY[2] = {static_cast<short>(iY - iTop), static_cast<short>(iY + h - iTop)};
 
     for (short sX = 0; sX < 2; sX++) {
         for (short sY = 0; sY < 2; sY++) {
