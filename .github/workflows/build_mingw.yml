@@ -7,7 +7,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Install dependencies
@@ -38,7 +38,7 @@ jobs:
           zip -r "supermariowar_$(date +%F)_windows.zip" supermariowar
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: supermariowar_windows
           path: supermariowar_*_windows.zip

@@ -11,7 +11,7 @@ jobs:
         sdl: [1, 2]
     name: X11 SDL${{ matrix.sdl }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Install dependencies
@@ -52,7 +52,7 @@ jobs:
 
       - name: Upload artifacts
         if: matrix.sdl == 2
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: supermariowar_linux
           path: supermariowar_*_linux.zip
