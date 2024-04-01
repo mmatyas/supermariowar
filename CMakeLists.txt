@@ -41,6 +41,8 @@ endif()
 # Set where the binary files will be built.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
+include(SmwGitInfo)
+
 #-----------------------------------------------------------------------------
 #
 # Platform-specific settings
