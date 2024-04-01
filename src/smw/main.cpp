@@ -378,7 +378,7 @@ void main_game()
     //currently this only sets the title, not the icon.
     //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
     char title[128];
-    sprintf(title, "%s %s", TITLESTRING, VERSIONNUMBER);
+    sprintf(title, "%s %s %s %s", TITLESTRING, VERSIONNUMBER, GIT_REVISION, GIT_DATE);
     gfx_settitle(title);
     SDL_ShowCursor(SDL_DISABLE);
 

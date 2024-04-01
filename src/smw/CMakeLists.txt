@@ -182,6 +182,10 @@ add_subdirectory(gamemodes)
 add_subdirectory(ui)
 
 target_compile_features(smw PUBLIC cxx_std_14)
+target_compile_definitions(smw PRIVATE
+	GIT_REVISION="${SMW_GIT_REVISION}"
+	GIT_DATE="${SMW_GIT_DATE}"
+)
 
 if(NO_NETWORK)
 	target_compile_definitions(smw PRIVATE NETWORK_DISABLED)
