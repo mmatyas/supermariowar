@@ -221,12 +221,16 @@ T MI_SelectField<T>::randomValue() const
 template<typename T>
 bool MI_SelectField<T>::setCurrentValue(T value)
 {
+    const size_t prev_idx = m_index;
+
     for (m_index = 0; m_index < m_items.size(); m_index++) {
         if (m_items[m_index].value == value) {
             updateOutput();
             return true;
         }
     }
+
+    m_index = prev_idx;
     return false;
 }
 
