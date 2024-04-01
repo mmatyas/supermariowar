@@ -48,7 +48,7 @@ jobs:
         run: |
           cmake --install build --prefix supermariowar --strip
           rm -rf supermariowar/include supermariowar/lib
-          zip -r "supermariowar_$(date +%F)_linux.zip" supermariowar
+          zip -9 -r "supermariowar_$(date +%F)_linux.zip" supermariowar
 
       - name: Upload artifacts
         if: matrix.sdl == 2
