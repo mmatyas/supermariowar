@@ -234,7 +234,7 @@ bool MI_SelectField<T>::setCurrentValue(T value)
 template<typename T>
 bool MI_SelectField<T>::setCurrentIndex(size_t index)
 {
-    if (m_index < m_items.size()) {
+    if (index < m_items.size()) {
         m_index = index;
         updateOutput();
         return true;
