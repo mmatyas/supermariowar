@@ -12,9 +12,9 @@ class CO_Spring : public MO_CarriedObject
 		CO_Spring(gfxSprite *nspr, short ix, short iy, bool fsuper);
 		~CO_Spring(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 		void place();
 

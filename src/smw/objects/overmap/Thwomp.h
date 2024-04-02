@@ -9,6 +9,6 @@ class OMO_Thwomp : public IO_OverMapObject
 		OMO_Thwomp(gfxSprite *nspr, short x, float nspeed);
 		~OMO_Thwomp(){};
 
-		void update();
-		bool collide(CPlayer * player);
+		void update() override;
+		bool collide(CPlayer * player) override;
 };

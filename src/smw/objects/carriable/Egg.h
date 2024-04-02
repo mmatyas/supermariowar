@@ -12,12 +12,12 @@ class CO_Egg : public MO_CarriedObject
 		CO_Egg(gfxSprite *nspr, short iColor);
 		~CO_Egg(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 		void placeEgg();
-		void Drop();
+		void Drop() override;
 
 		short getColor() { return color; }
 

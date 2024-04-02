@@ -9,10 +9,10 @@ class MO_Podobo : public IO_MovingObject
 		MO_Podobo(gfxSprite *nspr, short x, short y, float nspeed, short playerid, short teamid, short colorid, bool isSpawned);
 		~MO_Podobo(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
-		void collide(IO_MovingObject * object);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
+		void collide(IO_MovingObject * object) override;
 
 	private:
 

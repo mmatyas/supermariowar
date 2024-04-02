@@ -13,14 +13,14 @@ class CO_Flag : public MO_CarriedObject
 		CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColorID);
 		~CO_Flag(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
-		void MoveToOwner();
+		void MoveToOwner() override;
 
 		void placeFlag();
-		void Drop();
+		void Drop() override;
 
 		bool GetInBase() { return fInBase; }
 		short GetTeamID() { return teamID; }

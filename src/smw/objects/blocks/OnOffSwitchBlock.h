@@ -12,15 +12,15 @@ public:
         return BlockType::OnOffSwitch;
     }
 
-	void update();
-	void draw();
+	void update() override;
+	void draw() override;
 
-	bool hittop(CPlayer * player, bool useBehavior);
-	bool hitbottom(CPlayer * player, bool useBehavior);
+	bool hittop(CPlayer * player, bool useBehavior) override;
+	bool hitbottom(CPlayer * player, bool useBehavior) override;
 
-	bool hittop(IO_MovingObject * object);
-	bool hitleft(IO_MovingObject * object);
-	bool hitright(IO_MovingObject * object);
+	bool hittop(IO_MovingObject * object) override;
+	bool hitleft(IO_MovingObject * object) override;
+	bool hitright(IO_MovingObject * object) override;
 
     void FlipState() {
         state = (state < 3 ? state + 3 : state - 3);

@@ -13,23 +13,23 @@ class CO_ThrowBlock : public MO_CarriedObject
 		CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type);
 		~CO_ThrowBlock(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 		bool HitTop(CPlayer * player);
 		bool HitOther(CPlayer * player);
 
 		bool KillPlayer(CPlayer * player);
-		void Drop();
-		void Kick();
+		void Drop() override;
+		void Kick() override;
 
-		void collide(IO_MovingObject * object);
-		void CheckAndDie();
-		void Die();
+		void collide(IO_MovingObject * object) override;
+		void CheckAndDie() override;
+		void Die() override;
 		void ShatterDie();
 
-		void SideBounce(bool fRightSide);
+		void SideBounce(bool fRightSide) override;
 
 	private:
 		void DieHelper();

@@ -9,13 +9,13 @@ class MO_AttackZone : public IO_MovingObject
 		MO_AttackZone(short playerID, short teamID, short x, short y, short w, short h, short time, KillStyle style, bool dieoncollision);
 		~MO_AttackZone(){};
 
-		virtual void update();
-		virtual void draw() {} //This is invisible
+		void update() override;
+		void draw() override {} //This is invisible
 
-		virtual bool collide(CPlayer * player);
-		virtual void collide(IO_MovingObject * object);
+		bool collide(CPlayer * player) override;
+		void collide(IO_MovingObject * object) override;
 
-		void Die();
+		void Die() override;
 
 	protected:
 

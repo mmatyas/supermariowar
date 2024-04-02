@@ -11,28 +11,28 @@ public:
         return BlockType::Flip;
     }
 
-	void draw();
-	void update();
-	void reset();
+	void draw() override;
+	void update() override;
+	void reset() override;
 
-	bool collide(CPlayer * player, short direction, bool useBehavior);
-	bool collide(IO_MovingObject * object, short direction);
+	bool collide(CPlayer * player, short direction, bool useBehavior) override;
+	bool collide(IO_MovingObject * object, short direction) override;
 
-    bool isTransparent() {
+    bool isTransparent() override {
         return state == 1;
     }
 
-	bool hittop(CPlayer * player, bool useBehavior);
-	bool hitbottom(CPlayer * player, bool useBehavior);
-	bool hitright(CPlayer * player, bool useBehavior);
-	bool hitleft(CPlayer * player, bool useBehavior);
+	bool hittop(CPlayer * player, bool useBehavior) override;
+	bool hitbottom(CPlayer * player, bool useBehavior) override;
+	bool hitright(CPlayer * player, bool useBehavior) override;
+	bool hitleft(CPlayer * player, bool useBehavior) override;
 
-	bool hittop(IO_MovingObject * object);
-	bool hitbottom(IO_MovingObject * object);
-	bool hitright(IO_MovingObject * object);
-	bool hitleft(IO_MovingObject * object);
+	bool hittop(IO_MovingObject * object) override;
+	bool hitbottom(IO_MovingObject * object) override;
+	bool hitright(IO_MovingObject * object) override;
+	bool hitleft(IO_MovingObject * object) override;
 
-	void triggerBehavior();
+	void triggerBehavior() override;
 
 private:
 	void explode();

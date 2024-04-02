@@ -13,21 +13,21 @@ class CO_ThrowBox : public MO_CarriedObject
 		CO_ThrowBox(gfxSprite * nspr, short x, short y, short item);
 		~CO_ThrowBox(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 		bool KillPlayer(CPlayer * player);
 
-		void Drop();
-		void Kick();
+		void Drop() override;
+		void Kick() override;
 
-		void collide(IO_MovingObject * object);
-		void Die();
+		void collide(IO_MovingObject * object) override;
+		void Die() override;
 		void ShatterDie();
 
-		void SideBounce(bool fRightSide);
-		float BottomBounce();
+		void SideBounce(bool fRightSide) override;
+		float BottomBounce() override;
 
 		bool HasKillVelocity();
 

@@ -7,10 +7,10 @@ class PU_TreasureChestBonus : public MO_Powerup
 		PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem);
 		~PU_TreasureChestBonus(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
-		float BottomBounce();
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
+		float BottomBounce() override;
 
 	private:
 		short sparkleanimationtimer;

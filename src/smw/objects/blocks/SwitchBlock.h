@@ -12,22 +12,22 @@ public:
         return BlockType::OnOff;
     }
 
-	void draw();
-	bool collide(CPlayer * player, short direction, bool useBehavior);
+	void draw() override;
+	bool collide(CPlayer * player, short direction, bool useBehavior) override;
 
-    bool isTransparent() {
+    bool isTransparent() override {
         return state != 0;
     }
 
-	bool hittop(CPlayer * player, bool useBehavior);
-	bool hitbottom(CPlayer * player, bool useBehavior);
-	bool hitright(CPlayer * player, bool useBehavior);
-	bool hitleft(CPlayer * player, bool useBehavior);
+	bool hittop(CPlayer * player, bool useBehavior) override;
+	bool hitbottom(CPlayer * player, bool useBehavior) override;
+	bool hitright(CPlayer * player, bool useBehavior) override;
+	bool hitleft(CPlayer * player, bool useBehavior) override;
 
-	bool hittop(IO_MovingObject * object);
-	bool hitbottom(IO_MovingObject * object);
-	bool hitright(IO_MovingObject * object);
-	bool hitleft(IO_MovingObject * object);
+	bool hittop(IO_MovingObject * object) override;
+	bool hitbottom(IO_MovingObject * object) override;
+	bool hitright(IO_MovingObject * object) override;
+	bool hitleft(IO_MovingObject * object) override;
 
 	void FlipState(short playerID);
 

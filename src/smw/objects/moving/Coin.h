@@ -12,9 +12,9 @@ class MO_Coin : public IO_MovingObject
 		MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin);
 		~MO_Coin() {};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 		void placeCoin();
 
 	private:

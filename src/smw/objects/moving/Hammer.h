@@ -9,9 +9,9 @@ class MO_Hammer : public IO_MovingObject
 		MO_Hammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer);
 		~MO_Hammer(){};
 
-		void update();
-		bool collide(CPlayer * player);
-		void draw();
+		void update() override;
+		bool collide(CPlayer * player) override;
+		void draw() override;
 
 		short colorOffset;
 

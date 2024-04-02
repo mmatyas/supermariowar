@@ -12,10 +12,9 @@ public:
         return BlockType::View;
     }
 
-	void draw();
-	void update();
-
-	short SelectPowerup();
+	void draw() override;
+	void update() override;
+	short SelectPowerup() override;
 
 protected:
 	void GetNextPowerup();

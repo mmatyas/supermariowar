@@ -7,9 +7,9 @@ class PU_CoinPowerup : public MO_Powerup
 		PU_CoinPowerup(gfxSprite *nspr, short x, short y, short color, short value);
 		~PU_CoinPowerup(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 	protected:
 		short iColorOffsetY;

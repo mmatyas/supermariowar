@@ -9,9 +9,9 @@ class MO_Boomerang : public IO_MovingObject
 		MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID);
 		~MO_Boomerang(){};
 
-		void update();
-		bool collide(CPlayer * player);
-		void draw();
+		void update() override;
+		bool collide(CPlayer * player) override;
+		void draw() override;
 
 		short colorOffset;
 

@@ -7,10 +7,10 @@ class MO_SpinAttack : public MO_AttackZone
 		MO_SpinAttack(short playerID, short teamID, KillStyle style, bool direction, short offsety);
 		~MO_SpinAttack(){};
 
-		void update();
+		void update() override;
 
-		bool collide(CPlayer * player);
-		void collide(IO_MovingObject * object);
+		bool collide(CPlayer * player) override;
+		void collide(IO_MovingObject * object) override;
 
 	private:
 

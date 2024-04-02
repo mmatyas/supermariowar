@@ -11,10 +11,10 @@ public:
         return BlockType::Donut;
     }
 
-	void draw();
-	void update();
+	void draw() override;
+	void update() override;
 
-	bool hittop(CPlayer * player, bool useBehavior);
+	bool hittop(CPlayer * player, bool useBehavior) override;
 
 	void triggerBehavior(short iPlayerId);
 

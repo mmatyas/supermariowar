@@ -9,14 +9,14 @@ class MO_SledgeBrother : public IO_MovingObject
 		MO_SledgeBrother(gfxSprite *nspr, short platformY, short type);
 		virtual ~MO_SledgeBrother(){};
 
-		void draw();
-		void update();
-		bool collide(CPlayer * player);
-		void collide(IO_MovingObject * object);
+		void draw() override;
+		void update() override;
+		bool collide(CPlayer * player) override;
+		void collide(IO_MovingObject * object) override;
 
 		bool hit(CPlayer * player);
 
-		void Die();
+		void Die() override;
 		void Damage(short playerID);
 
 	protected:

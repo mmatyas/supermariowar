@@ -9,9 +9,9 @@ class OMO_BowserFire : public IO_OverMapObject
 		OMO_BowserFire(gfxSprite *nspr, short x, short y, float velx, float vely, short id, short teamid, short colorid);
 		~OMO_BowserFire(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 	private:
 		short iPlayerID;

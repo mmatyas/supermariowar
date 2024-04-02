@@ -9,9 +9,9 @@ class MO_Fireball : public IO_MovingObject
 		MO_Fireball(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID);
 		~MO_Fireball(){};
 
-		void update();
-		bool collide(CPlayer * player);
-		void draw();
+		void update() override;
+		bool collide(CPlayer * player) override;
+		void draw() override;
 
 		short colorOffset;
 

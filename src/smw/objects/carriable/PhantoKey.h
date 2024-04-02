@@ -12,9 +12,9 @@ class CO_PhantoKey : public MO_CarriedObject
 		CO_PhantoKey(gfxSprite *nspr);
 		~CO_PhantoKey(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 		void placeKey();
 

@@ -9,8 +9,8 @@ class OMO_Phanto : public IO_OverMapObject
 		OMO_Phanto(gfxSprite *nspr, short x, short y, float velx, float vely, short type);
 		~OMO_Phanto(){};
 
-		void update();
-		bool collide(CPlayer * player);
+		void update() override;
+		bool collide(CPlayer * player) override;
 
     short GetType() {
         return iType;

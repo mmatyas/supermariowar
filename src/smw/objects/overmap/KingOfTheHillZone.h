@@ -9,9 +9,9 @@ class OMO_KingOfTheHillZone : public IO_OverMapObject
 		OMO_KingOfTheHillZone(gfxSprite *nspr);
 		~OMO_KingOfTheHillZone(){};
 
-		void draw();
-		void update();
-		bool collide(CPlayer * player);
+		void draw() override;
+		void update() override;
+		bool collide(CPlayer * player) override;
 		void placeArea();
 		void reset();
     short getColorID() {
