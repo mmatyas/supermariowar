@@ -25,6 +25,7 @@ jobs:
           -DUSE_PNG_SAVE=ON
           -DUSE_SDL2_LIBS=ON
           -DSDL2_USE_MIXERX=ON
+          -DCMAKE_CXX_FLAGS=-fdiagnostics-color=always
       - name: Build
         run: cmake --build build --verbose
 
