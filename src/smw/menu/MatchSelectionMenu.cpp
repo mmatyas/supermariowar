@@ -66,12 +66,12 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
     miWorldField->setItemChangedCode(MENU_CODE_WORLD_MAP_CHANGED);
     miWorldField->Show(false);
 
-    miMinigameField = new MI_SelectField<short>(&rm->spr_selectfield, 130, 380, "Game", 380, 100);
-    miMinigameField->add("Pipe Coin Game", 0);
-    miMinigameField->add("Hammer Boss Game", 1);
-    miMinigameField->add("Bomb Boss Game", 2);
-    miMinigameField->add("Fire Boss Game", 3);
-    miMinigameField->add("Boxes Game", 4);
+    miMinigameField = new MI_SelectField<Minigame>(&rm->spr_selectfield, 130, 380, "Game", 380, 100);
+    miMinigameField->add("Pipe Coin Game", Minigame::PipeCoin);
+    miMinigameField->add("Hammer Boss Game", Minigame::HammerBoss);
+    miMinigameField->add("Bomb Boss Game", Minigame::BombBoss);
+    miMinigameField->add("Fire Boss Game", Minigame::FireBoss);
+    miMinigameField->add("Boxes Game", Minigame::Boxes);
     miMinigameField->setOutputPtr(&game_values.selectedminigame);
     miMinigameField->setCurrentValue(game_values.selectedminigame);
     miMinigameField->Show(false);
@@ -138,12 +138,12 @@ void UI_MatchSelectionMenu::ActivateMinigameField()
     miMatchSelectionDisplayImage->SetImage(0, 240 * static_cast<int>(game_values.matchtype), 320, 240);
 }
 
-short UI_MatchSelectionMenu::GetMinigameID()
+Minigame UI_MatchSelectionMenu::GetMinigame() const
 {
     return miMinigameField->currentValue();
 }
 
-MatchType UI_MatchSelectionMenu::GetSelectedMatchType()
+MatchType UI_MatchSelectionMenu::GetSelectedMatchType() const
 {
     return miMatchSelectionField->currentValue();
 }

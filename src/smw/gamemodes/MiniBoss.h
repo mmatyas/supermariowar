@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameMode.h"
+#include "MatchTypes.h"
 
 
 //Special mode where players try to kill a boss
@@ -21,8 +22,8 @@ class CGM_Boss_MiniGame : public CGameMode
         char *getMenuString(char *buffer64);
 
         bool SetWinner(CPlayer * player);
-        void SetBossType(short bosstype);
-    short GetBossType() {
+        void SetBossType(Boss bosstype);
+    Boss GetBossType() const {
         return iBossType;
     }
 
@@ -33,5 +34,5 @@ class CGM_Boss_MiniGame : public CGameMode
     private:
 
         short enemytimer, poweruptimer;
-        short iBossType;
+        Boss iBossType = Boss::Hammer;
 };

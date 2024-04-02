@@ -690,23 +690,39 @@ void MenuState::update()
 
             if (MatchType::MiniGame == game_values.matchtype) {
                 printf(" Match type: Minigame\n");
-                short iMiniGameType = mMatchSelectionMenu->GetMinigameID();
+                const Minigame minigame = mMatchSelectionMenu->GetMinigame();
+                switch (minigame) {
+                    case Minigame::PipeCoin:
+                        pipegamemode->goal = 50;
+                        game_values.gamemode = pipegamemode;
+                        break;
+                    case Minigame::HammerBoss:
+                    case Minigame::BombBoss:
+                    case Minigame::FireBoss:
+                        game_values.gamemodemenusettings.boss.difficulty = 2;
+                        game_values.gamemodemenusettings.boss.hitpoints = 5;
 
-                if (iMiniGameType == 0) { //Pipe minigame
-                    pipegamemode->goal = 50;
-                    game_values.gamemode = pipegamemode;
-                } else if (iMiniGameType >= 1 && iMiniGameType <= 3) { //3 types of boss minigames
-                    game_values.gamemodemenusettings.boss.bosstype = iMiniGameType - 1;
-                    game_values.gamemodemenusettings.boss.difficulty = 2;
-                    game_values.gamemodemenusettings.boss.hitpoints = 5;
-
-                    bossgamemode->goal = 5;
-                    game_values.gamemode = bossgamemode;
-                } else if (iMiniGameType == 4) { //boxes minigame
-                    boxesgamemode->goal = 10;
-                    game_values.gamemode = boxesgamemode;
+                        bossgamemode->goal = 5;
+                        game_values.gamemode = bossgamemode;
+                        break;
+                    case Minigame::Boxes:
+                        boxesgamemode->goal = 10;
+                        game_values.gamemode = boxesgamemode;
+                        break;
                 }
-
+                switch (minigame) {
+                    case Minigame::HammerBoss:
+                        game_values.gamemodemenusettings.boss.bosstype = Boss::Hammer;
+                        break;
+                    case Minigame::BombBoss:
+                        game_values.gamemodemenusettings.boss.bosstype = Boss::Bomb;
+                        break;
+                    case Minigame::FireBoss:
+                        game_values.gamemodemenusettings.boss.bosstype = Boss::Fire;
+                        break;
+                    default:
+                        break;
+                }
                 StartGame();
             } else if (MatchType::QuickGame == game_values.matchtype) {
                 printf(" Match type: Quick game\n");
@@ -1350,15 +1366,19 @@ void MenuState::update()
                     }
                 } else if (game_values.gamemode->gamemode == game_mode_boss_minigame) {
                     if (!fMiniGameMapFound) {
-                        short iBossType = game_values.gamemodesettings.boss.bosstype;
-                        bossgamemode->SetBossType(iBossType);
-                        if (iBossType == 0)
-                            g_map->loadMap(convertPath("maps/special/two52_special_hammerboss_minigame.map"), read_type_full);
-                        else if (iBossType == 1)
-                            g_map->loadMap(convertPath("maps/special/two52_special_bombboss_minigame.map"), read_type_full);
-                        else if (iBossType == 2)
-                            g_map->loadMap(convertPath("maps/special/two52_special_fireboss_minigame.map"), read_type_full);
-
+                        Boss bossType = game_values.gamemodesettings.boss.bosstype;
+                        bossgamemode->SetBossType(bossType);
+                        switch (bossType) {
+                            case Boss::Hammer:
+                                g_map->loadMap(convertPath("maps/special/two52_special_hammerboss_minigame.map"), read_type_full);
+                                break;
+                            case Boss::Bomb:
+                                g_map->loadMap(convertPath("maps/special/two52_special_bombboss_minigame.map"), read_type_full);
+                                break;
+                            case Boss::Fire:
+                                g_map->loadMap(convertPath("maps/special/two52_special_fireboss_minigame.map"), read_type_full);
+                                break;
+                        }
                         sShortMapName = "minigameboss";
                     }
                 } else if (game_values.gamemode->gamemode == game_mode_boxes_minigame) {

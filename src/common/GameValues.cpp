@@ -127,8 +127,8 @@ void CGameValues::init()
     spawnstyle      = SpawnStyle::Swirl;
     tournamentgames   = 2;
     tournamentwinner  = -1;
-    selectedminigame  = 0;
-    matchtype     = MatchType::SingleGame;
+    selectedminigame = Minigame::PipeCoin;
+    matchtype = MatchType::SingleGame;
     tourindex     = 0;
     tourstopcurrent   = 0;
     tourstoptotal   = 0;

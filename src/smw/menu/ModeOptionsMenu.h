@@ -9,6 +9,7 @@ class MI_PowerupSlider;
 class MI_SliderField;
 class MI_Text;
 template<typename T> class MI_SelectField;
+enum class Boss : unsigned char;
 
 
 class UI_ModeOptionsMenu : public UI_Menu {
@@ -250,7 +251,7 @@ private:
     MI_Text* miShyGuyTagModeHeaderText;
 
     // Boss
-    MI_SelectField<short>* miBossModeTypeField;
+    MI_SelectField<Boss>* miBossModeTypeField;
     MI_SelectField<short>* miBossModeDifficultyField;
     MI_SelectField<short>* miBossModeHitPointsField;
     MI_Button* miBossModeBackButton;

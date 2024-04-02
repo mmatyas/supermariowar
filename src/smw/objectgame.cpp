@@ -4656,10 +4656,10 @@ short g_iSledgeBrotherWaitTime[3][5][2] = {
     {{30,50},{25,45},{20,40},{15,30},{10,20}}
 };
 
-MO_SledgeBrother::MO_SledgeBrother(gfxSprite *nspr, short platformY, short type) :
+MO_SledgeBrother::MO_SledgeBrother(gfxSprite *nspr, short platformY, Boss type) :
     IO_MovingObject(nspr, 0, 0, 8, 0, 32, 56, 8, 8)
 {
-    iType = type;
+    iType = static_cast<short>(type);  // FIXME
     state = 1;
     iActionState = 0;
     location = 2;

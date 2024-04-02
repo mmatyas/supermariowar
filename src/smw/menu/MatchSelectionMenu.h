@@ -17,8 +17,8 @@ public:
     void SelectionChanged();
     void WorldMapChanged();
     void ActivateMinigameField();
-    short GetMinigameID();
-    MatchType GetSelectedMatchType();
+    Minigame GetMinigame() const;
+    MatchType GetSelectedMatchType() const;
 
 private:
     MI_Image* miMatchSelectionDisplayImage;
@@ -27,7 +27,7 @@ private:
     MI_SelectField<short>* miTournamentField;
     MI_SelectField<short>* miTourField;
     MI_SelectField<short>* miWorldField;
-    MI_SelectField<short>* miMinigameField;
+    MI_SelectField<Minigame>* miMinigameField;
     MI_WorldPreviewDisplay* miWorldPreviewDisplay;
 
     MI_Button* miMatchSelectionStartButton;

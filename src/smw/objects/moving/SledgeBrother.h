@@ -1,12 +1,13 @@
 #pragma once
 
+#include "MatchTypes.h"
 #include "MovingObject.h"
 
 
 class MO_SledgeBrother : public IO_MovingObject
 {
 	public:
-		MO_SledgeBrother(gfxSprite *nspr, short platformY, short type);
+		MO_SledgeBrother(gfxSprite *nspr, short platformY, Boss type);
 		virtual ~MO_SledgeBrother(){};
 
 		void draw() override;

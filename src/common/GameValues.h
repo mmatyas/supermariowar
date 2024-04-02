@@ -182,7 +182,7 @@ public:
     short		tournamentcontrolteam;   //The team ID that currently has control
     short		tournamentnextcontrol;  //For round robin control style
 
-    short		selectedminigame;
+    Minigame selectedminigame;
 
     short		tourindex;
     short		tourstopcurrent;
