@@ -12,17 +12,17 @@ public:
         return BlockType::Bounce;
     }
 
-	void update();
-	void draw();
-	void reset();
+	void update() override;
+	void draw() override;
+	void reset() override;
 
-	bool collide(CPlayer * player, short direction, bool useBehavior);
-	bool collide(IO_MovingObject * object, short direction);
+	bool collide(CPlayer * player, short direction, bool useBehavior) override;
+	bool collide(IO_MovingObject * object, short direction) override;
 
-	bool hittop(CPlayer * player, bool useBehavior);
-	bool hitbottom(CPlayer * player, bool useBehavior);
+	bool hittop(CPlayer * player, bool useBehavior) override;
+	bool hitbottom(CPlayer * player, bool useBehavior) override;
 
-	bool hittop(IO_MovingObject * object);
+	bool hittop(IO_MovingObject * object) override;
 
-	void triggerBehavior();
+	void triggerBehavior() override;
 };

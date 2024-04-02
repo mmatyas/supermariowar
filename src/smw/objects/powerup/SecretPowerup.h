@@ -7,9 +7,9 @@ class PU_SecretPowerup : public MO_Powerup
 		PU_SecretPowerup(gfxSprite * nspr, short x, short y, short type);
 		~PU_SecretPowerup(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 		void place();
 
 	private:

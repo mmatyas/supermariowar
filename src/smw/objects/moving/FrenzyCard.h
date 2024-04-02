@@ -9,9 +9,9 @@ class MO_FrenzyCard : public IO_MovingObject
 		MO_FrenzyCard(gfxSprite *nspr, short iType);
 		~MO_FrenzyCard(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 		void placeCard();
 
 	private:

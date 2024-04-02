@@ -7,7 +7,7 @@ class PU_BobombPowerup : public MO_Powerup
 		PU_BobombPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
 		~PU_BobombPowerup(){};
 
-		bool collide(CPlayer * player);
+		bool collide(CPlayer * player) override;
 };
 
 #endif // SMW_GAMEOBJECT_BLOCK_PU_BobombPowerup_H

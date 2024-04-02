@@ -13,13 +13,13 @@ class CO_Bomb : public MO_CarriedObject
 		CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, short timetolive);
 		~CO_Bomb(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 		void place();
 
-		void Die();
+		void Die() override;
 
 	protected:
 

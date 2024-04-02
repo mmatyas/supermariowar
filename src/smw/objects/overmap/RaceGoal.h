@@ -9,9 +9,9 @@ class OMO_RaceGoal : public IO_OverMapObject
 		OMO_RaceGoal(gfxSprite *nspr, short id);
 		~OMO_RaceGoal(){};
 
-		void draw();
-		void update();
-		bool collide(CPlayer * player);
+		void draw() override;
+		void update() override;
+		bool collide(CPlayer * player) override;
 		void placeRaceGoal();
     void reset(short teamID) {
         tagged[teamID] = -1;

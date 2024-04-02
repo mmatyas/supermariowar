@@ -7,7 +7,7 @@ class PU_StarPowerup : public MO_Powerup
 		PU_StarPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
 		~PU_StarPowerup(){};
 
-		bool collide(CPlayer * player);
+		bool collide(CPlayer * player) override;
 
 };
 

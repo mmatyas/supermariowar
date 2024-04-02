@@ -12,15 +12,15 @@ public:
         return BlockType::Throw;
     }
 
-	void draw();
-	void update();
+	void draw() override;
+	void update() override;
 
-	bool hittop(CPlayer * player, bool useBehavior);
-	bool hitright(CPlayer * player, bool useBehavior);
-	bool hitleft(CPlayer * player, bool useBehavior);
+	bool hittop(CPlayer * player, bool useBehavior) override;
+	bool hitright(CPlayer * player, bool useBehavior) override;
+	bool hitleft(CPlayer * player, bool useBehavior) override;
 
 	void GiveBlockToPlayer(CPlayer * player);
-	void triggerBehavior();
+	void triggerBehavior() override;
 
 private:
 	short iNumSprites;

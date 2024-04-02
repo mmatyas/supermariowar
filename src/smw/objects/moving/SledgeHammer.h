@@ -9,10 +9,10 @@ class MO_SledgeHammer : public IO_MovingObject
 		MO_SledgeHammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer);
 		~MO_SledgeHammer(){};
 
-		void update();
-		bool collide(CPlayer * player);
+		void update() override;
+		bool collide(CPlayer * player) override;
 		void explode();
-		void draw();
+		void draw() override;
 
 		short playerID;
 		short teamID;

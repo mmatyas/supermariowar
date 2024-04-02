@@ -16,17 +16,17 @@ public:
         return BlockType::Breakable;
     }
 
-	void draw();
-	void update();
+	void draw() override;
+	void update() override;
 
-	bool hittop(CPlayer * player, bool useBehavior);
-	bool hitbottom(CPlayer * player, bool useBehavior);
+	bool hittop(CPlayer * player, bool useBehavior) override;
+	bool hitbottom(CPlayer * player, bool useBehavior) override;
 
-	bool hittop(IO_MovingObject * object);
-	bool hitright(IO_MovingObject * object);
-	bool hitleft(IO_MovingObject * object);
+	bool hittop(IO_MovingObject * object) override;
+	bool hitright(IO_MovingObject * object) override;
+	bool hitleft(IO_MovingObject * object) override;
 
-	void triggerBehavior();
+	void triggerBehavior() override;
 
 private:
 	short iNumSprites;

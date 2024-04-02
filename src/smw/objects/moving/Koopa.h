@@ -9,11 +9,11 @@ class MO_Koopa : public MO_WalkingEnemy
 		MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing, bool fFallOffLedges);
 		~MO_Koopa(){};
 
-		void draw();
-		void update();
-		bool hittop(CPlayer * player);
-		void Die();
-		void DropShell(bool fBounce, bool fFlip);
+		void draw() override;
+		void update() override;
+		bool hittop(CPlayer * player) override;
+		void Die() override;
+		void DropShell(bool fBounce, bool fFlip) override;
 
 	private:
 

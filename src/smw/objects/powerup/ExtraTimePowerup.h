@@ -7,7 +7,7 @@ class PU_ExtraTimePowerup : public MO_Powerup
 		PU_ExtraTimePowerup(gfxSprite *nspr, short x, short y);
 		~PU_ExtraTimePowerup(){};
 
-		bool collide(CPlayer * player);
+		bool collide(CPlayer * player) override;
 };
 
 #endif // SMW_GAMEOBJECT_BLOCK_PU_ExtraTimePowerup_H

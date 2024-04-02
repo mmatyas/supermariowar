@@ -9,9 +9,9 @@ class OMO_PipeBonus: public IO_OverMapObject
 		OMO_PipeBonus(gfxSprite *nspr, float velx, float vely, short ix, short iy, short type, short duration, short uncollectabletime);
 		~OMO_PipeBonus(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
     short GetType() {
         return iType;

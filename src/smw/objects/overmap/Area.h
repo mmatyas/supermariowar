@@ -9,9 +9,9 @@ class OMO_Area : public IO_OverMapObject
 		OMO_Area(gfxSprite *nspr, short numAreas);
 		~OMO_Area(){};
 
-		void draw();
-		void update();
-		bool collide(CPlayer * player);
+		void draw() override;
+		void update() override;
+		bool collide(CPlayer * player) override;
 		void placeArea();
 		void reset();
     short getColorID() {

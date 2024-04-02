@@ -9,9 +9,9 @@ class OMO_PipeCoin: public IO_OverMapObject
 		OMO_PipeCoin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short teamid, short colorid, short uncollectabletime);
 		~OMO_PipeCoin(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
     short GetColor() {
         return iColorID;

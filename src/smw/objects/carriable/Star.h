@@ -12,9 +12,9 @@ class CO_Star : public MO_CarriedObject
 		CO_Star(gfxSprite *nspr, short type, short id);
 		~CO_Star(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 		void placeStar();
 

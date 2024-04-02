@@ -11,18 +11,18 @@ public:
         return BlockType::WeaponBreakable;
     }
 
-	void draw();
-	void update();
+	void draw() override;
+	void update() override;
 
-	bool hittop(CPlayer * player, bool useBehavior);
-	bool hitbottom(CPlayer * player, bool useBehavior);
-	bool hitleft(CPlayer * player, bool useBehavior);
-	bool hitright(CPlayer * player, bool useBehavior);
+	bool hittop(CPlayer * player, bool useBehavior) override;
+	bool hitbottom(CPlayer * player, bool useBehavior) override;
+	bool hitleft(CPlayer * player, bool useBehavior) override;
+	bool hitright(CPlayer * player, bool useBehavior) override;
 
-	bool hittop(IO_MovingObject * object);
-	bool hitbottom(IO_MovingObject * object);
-	bool hitright(IO_MovingObject * object);
-	bool hitleft(IO_MovingObject * object);
+	bool hittop(IO_MovingObject * object) override;
+	bool hitbottom(IO_MovingObject * object) override;
+	bool hitright(IO_MovingObject * object) override;
+	bool hitleft(IO_MovingObject * object) override;
 
 	void triggerBehavior(short iPlayerID, short iTeamID);
 

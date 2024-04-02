@@ -9,17 +9,17 @@ class MO_WalkingEnemy : public IO_MovingObject
 		MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool fBouncing, bool fallOffLedges);
 		virtual ~MO_WalkingEnemy(){};
 
-		virtual void draw();
-		virtual void update();
-		virtual bool collide(CPlayer * player);
-		virtual void collide(IO_MovingObject * object);
+		void draw() override;
+		void update() override;
+		bool collide(CPlayer * player) override;
+		void collide(IO_MovingObject * object) override;
 		virtual void place();
 
 		virtual bool hittop(CPlayer * player) = 0;
 		virtual bool hitother(CPlayer * player);
 
 		virtual void ShatterDie();
-		virtual void Die() {}
+		void Die() override {}
     virtual void DieAndDropShell(bool fBounce, bool fFlip) {
         if (frozen) {
             ShatterDie();

@@ -11,10 +11,10 @@ class MO_FlagBase : public IO_MovingObject
 		MO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID);
 		~MO_FlagBase(){};
 
-		void draw();
-		void update();
-		bool collide(CPlayer * player);
-		void collide(IO_MovingObject * object);
+		void draw() override;
+		void update() override;
+		bool collide(CPlayer * player) override;
+		void collide(IO_MovingObject * object) override;
 		void placeFlagBase(bool fInit);
 		void scoreFlag(CO_Flag * flag, CPlayer * player);
     void setFlag(CO_Flag * flag) {

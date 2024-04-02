@@ -7,9 +7,9 @@ class PU_IceWandPowerup : public MO_Powerup
 		PU_IceWandPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
 		~PU_IceWandPowerup(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 	private:
 		short sparkleanimationtimer;

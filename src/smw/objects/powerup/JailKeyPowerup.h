@@ -7,7 +7,7 @@ class PU_JailKeyPowerup : public MO_Powerup
 		PU_JailKeyPowerup(gfxSprite *nspr, short x, short y);
 		~PU_JailKeyPowerup(){};
 
-		bool collide(CPlayer * player);
+		bool collide(CPlayer * player) override;
 };
 
 #endif // SMW_GAMEOBJECT_BLOCK_PU_JailKeyPowerup_H

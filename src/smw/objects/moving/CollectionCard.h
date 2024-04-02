@@ -9,9 +9,9 @@ class MO_CollectionCard : public IO_MovingObject
 		MO_CollectionCard(gfxSprite *nspr, short iType, short iValue, short iUncollectableTime, float dvelx, float dvely, short ix, short iy);
 		~MO_CollectionCard(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 		void placeCard();
 
     short getType() {

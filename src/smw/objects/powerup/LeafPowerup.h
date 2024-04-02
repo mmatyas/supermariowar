@@ -7,7 +7,7 @@ class PU_LeafPowerup : public PU_FeatherPowerup
 		PU_LeafPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
 		~PU_LeafPowerup(){};
 
-		bool collide(CPlayer * player);
+		bool collide(CPlayer * player) override;
 };
 
 #endif // SMW_GAMEOBJECT_BLOCK_PU_LeafPowerup_H

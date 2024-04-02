@@ -7,9 +7,9 @@ class PU_FeatherPowerup : public IO_MovingObject
 		PU_FeatherPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
 		~PU_FeatherPowerup(){};
 
-		void update();
-		void draw();
-		virtual bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 		void nospawn(short y);
 

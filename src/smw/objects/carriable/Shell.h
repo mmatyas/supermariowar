@@ -13,9 +13,9 @@ class CO_Shell : public MO_CarriedObject
 		CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer);
 		~CO_Shell(){};
 
-		void update();
-		void draw();
-		bool collide(CPlayer * player);
+		void update() override;
+		void draw() override;
+		bool collide(CPlayer * player) override;
 
 		bool HitTop(CPlayer * player);
 		bool HitOther(CPlayer * player);
@@ -23,15 +23,15 @@ class CO_Shell : public MO_CarriedObject
 		void UsedAsStoredPowerup(CPlayer * player);
 
 		bool KillPlayer(CPlayer * player);
-		void Drop();
-		void Kick();
+		void Drop() override;
+		void Kick() override;
 
-		void collide(IO_MovingObject * object);
-		void CheckAndDie();
-		void Die();
+		void collide(IO_MovingObject * object) override;
+		void CheckAndDie() override;
+		void Die() override;
 		void ShatterDie();
 
-		void SideBounce(bool fRightSide);
+		void SideBounce(bool fRightSide) override;
 		void AddMovingKill(CPlayer * killer);
 
 		bool IsThreat() {

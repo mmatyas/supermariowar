@@ -7,7 +7,7 @@ class PU_MysteryMushroomPowerup : public MO_Powerup
 		PU_MysteryMushroomPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
 		~PU_MysteryMushroomPowerup(){};
 
-		bool collide(CPlayer * player);
+		bool collide(CPlayer * player) override;
 };
 
 #endif // SMW_GAMEOBJECT_BLOCK_PU_MysteryMushroomPowerup_H
