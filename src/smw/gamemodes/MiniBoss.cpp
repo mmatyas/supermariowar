@@ -24,7 +24,6 @@ CGM_Boss_MiniGame::CGM_Boss_MiniGame() : CGameMode()
 {
     gamemode = game_mode_boss_minigame;
     SetupModeStrings("Boss", "Lives", 5);
-    iBossType = 0;
 }
 
 void CGM_Boss_MiniGame::init()
@@ -39,7 +38,7 @@ void CGM_Boss_MiniGame::init()
     for (short iScore = 0; iScore < score_cnt; iScore++)
         score[iScore]->SetScore(goal);
 
-    objectcontainer[0].add(new MO_SledgeBrother(&rm->spr_sledgebrothers, (iBossType == 0 ? 256 : (iBossType == 1 ? 256 : smw->ScreenWidth/2)), iBossType));
+    objectcontainer[0].add(new MO_SledgeBrother(&rm->spr_sledgebrothers, (iBossType == Boss::Hammer ? 256 : (iBossType == Boss::Bomb ? 256 : smw->ScreenWidth/2)), iBossType));
 }
 
 
@@ -61,15 +60,15 @@ void CGM_Boss_MiniGame::think()
     if (gameover) {
         displayplayertext();
     } else {
-        if (iBossType == 0) {
+        if (iBossType == Boss::Hammer) {
             //Randomly spawn koopas
             if (--enemytimer <= 0) {
                 objectcontainer[0].add(new MO_Koopa(&rm->spr_koopa, RANDOM_BOOL(), false, false, true));
                 enemytimer = (short)RANDOM_INT(120) + 120;  //Spawn koopas slowly
             }
-        } else if (iBossType == 1) {
+        } else if (iBossType == Boss::Bomb) {
 
-        } else if (iBossType == 2) {
+        } else if (iBossType == Boss::Fire) {
             //Only create podobos if the difficulty is moderate or greater
             if (--enemytimer <= 0 && game_values.gamemodesettings.boss.difficulty >= 2) {
                 objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
@@ -93,12 +92,17 @@ void CGM_Boss_MiniGame::draw_foreground()
         if (winningteam == -1) {
             rm->game_font_large.drawCentered(smw->ScreenWidth/2, 96, "You Failed To Defeat");
 
-            if (iBossType == 0)
-                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Sledge Brother");
-            else if (iBossType == 1)
-                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Bomb Brother");
-            else if (iBossType == 2)
-                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Flame Brother");
+            switch (iBossType) {
+                case Boss::Hammer:
+                    rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Sledge Brother");
+                    break;
+                case Boss::Bomb:
+                    rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Bomb Brother");
+                    break;
+                case Boss::Fire:
+                    rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Flame Brother");
+                    break;
+            }
         }
     }
 }
@@ -196,7 +200,7 @@ bool CGM_Boss_MiniGame::SetWinner(CPlayer * player)
     return true;
 }
 
-void CGM_Boss_MiniGame::SetBossType(short bosstype)
+void CGM_Boss_MiniGame::SetBossType(Boss bosstype)
 {
     iBossType = bosstype;
 }

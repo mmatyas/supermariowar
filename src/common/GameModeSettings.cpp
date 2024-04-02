@@ -159,7 +159,7 @@ ShyGuyTagGameModeSettings::ShyGuyTagGameModeSettings()
 {}
 
 BossGameModeSettings::BossGameModeSettings()
-    : bosstype(0)           //Default to hammer boss
+    : bosstype(Boss::Hammer)  //Default to hammer boss
     , difficulty(2)         //Medium difficulty
     , hitpoints(5)          //5 hits to kill
 {}

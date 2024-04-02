@@ -369,7 +369,9 @@ template class MI_SelectField<bool>;
 template class MI_SelectField<short>;
 
 #include "MatchTypes.h"
+template class MI_SelectField<Boss>;
 template class MI_SelectField<MatchType>;
+template class MI_SelectField<Minigame>;
 
 #include "EyecandyStyles.h"
 template class MI_SelectField<AwardStyle>;

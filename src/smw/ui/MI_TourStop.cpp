@@ -170,13 +170,17 @@ void MI_TourStop::Refresh(short iTourStop)
             bool fFound = miMapField->SetMap(tourstop->pszMapFile, true);
 
             if (!fFound) {
-                short iBossType = tourstop->gmsSettings.boss.bosstype;
-                if (iBossType == 0)
-                    miMapField->SetSpecialMap("Hammer Boss Minigame", "maps/special/two52_special_hammerboss_minigame.map");
-                else if (iBossType == 1)
-                    miMapField->SetSpecialMap("Bomb Boss Minigame", "maps/special/two52_special_bombboss_minigame.map");
-                else if (iBossType == 2)
-                    miMapField->SetSpecialMap("Fire Boss Minigame", "maps/special/two52_special_fireboss_minigame.map");
+                switch (tourstop->gmsSettings.boss.bosstype) {
+                    case Boss::Hammer:
+                        miMapField->SetSpecialMap("Hammer Boss Minigame", "maps/special/two52_special_hammerboss_minigame.map");
+                        break;
+                    case Boss::Bomb:
+                        miMapField->SetSpecialMap("Bomb Boss Minigame", "maps/special/two52_special_bombboss_minigame.map");
+                        break;
+                    case Boss::Fire:
+                        miMapField->SetSpecialMap("Fire Boss Minigame", "maps/special/two52_special_fireboss_minigame.map");
+                        break;
+                }
             }
         } else if (tourstop->iMode == game_mode_boxes_minigame) {
             bool fFound = miMapField->SetMap(tourstop->pszMapFile, true);

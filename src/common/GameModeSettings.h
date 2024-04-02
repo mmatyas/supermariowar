@@ -2,6 +2,7 @@
 #define GAMEMODESETTINGS_H
 
 #include "GlobalConstants.h"
+#include "MatchTypes.h"
 
 struct ClassicGameModeSettings {
     short style;			//on kill, either respawn the player or shield them and let them keep playing
@@ -175,7 +176,7 @@ struct ShyGuyTagGameModeSettings {
 };
 
 struct BossGameModeSettings {
-    short bosstype;				//What type of boss battle it is
+    Boss bosstype;				//What type of boss battle it is
     short difficulty;			//How hard the boss is to defeat
     short hitpoints;			//How much life the boss has
 

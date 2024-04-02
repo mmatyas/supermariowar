@@ -1330,10 +1330,10 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Boss Mode Settings
     //***********************
 
-    miBossModeTypeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 180, "Type", 400, 180);
-    miBossModeTypeField->add("Hammer", 0);
-    miBossModeTypeField->add("Bomb", 1);
-    miBossModeTypeField->add("Fire", 2);
+    miBossModeTypeField = new MI_SelectField<Boss>(&rm->spr_selectfield, 120, 180, "Type", 400, 180);
+    miBossModeTypeField->add("Hammer", Boss::Hammer);
+    miBossModeTypeField->add("Bomb", Boss::Bomb);
+    miBossModeTypeField->add("Fire", Boss::Fire);
     miBossModeTypeField->setOutputPtr(&game_values.gamemodemenusettings.boss.bosstype);
     miBossModeTypeField->setCurrentValue(game_values.gamemodemenusettings.boss.bosstype);
 

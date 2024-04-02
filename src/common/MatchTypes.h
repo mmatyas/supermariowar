@@ -1,6 +1,6 @@
 #pragma once
 
-enum class MatchType: unsigned char {
+enum class MatchType : unsigned char {
     SingleGame,
     Tournament,
     Tour,
@@ -8,4 +8,20 @@ enum class MatchType: unsigned char {
     MiniGame,
     QuickGame,
     NetGame,
+};
+
+
+enum class Minigame : unsigned char {
+    PipeCoin,
+    HammerBoss,
+    BombBoss,
+    FireBoss,
+    Boxes,
+};
+
+
+enum class Boss : unsigned char {
+    Hammer,
+    Bomb,
+    Fire,
 };

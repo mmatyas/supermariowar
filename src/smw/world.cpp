@@ -2084,7 +2084,10 @@ TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
             } else if (ts->iMode == 1001) { //boss minigame
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.bosstype, NULL, game_values.gamemodemenusettings.boss.bosstype, false);
+                short bosstype_val = 0;
+                ts->iNumUsedSettings += ReadTourStopSetting(&bosstype_val, NULL, static_cast<short>(game_values.gamemodemenusettings.boss.bosstype), false);
+                ts->gmsSettings.boss.bosstype = static_cast<Boss>(bosstype_val);  // FIXME
+
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.difficulty, NULL, game_values.gamemodemenusettings.boss.difficulty, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.hitpoints, NULL, game_values.gamemodemenusettings.boss.hitpoints, false);
             }
@@ -2550,7 +2553,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                 }
             } else if (ts->iMode == 1001) { //boss minigame
                 if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.boss.bosstype);
+                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.boss.bosstype));
                     strcat(buffer, szTemp);
                 }
 
