@@ -1,25 +1,26 @@
 #ifndef GAMEMODESETTINGS_H
 #define GAMEMODESETTINGS_H
 
+#include "GameplayStyles.h"
 #include "GlobalConstants.h"
 #include "MatchTypes.h"
 
 struct ClassicGameModeSettings {
-    short style;			//on kill, either respawn the player or shield them and let them keep playing
+    DeathStyle style;		//on kill, either respawn the player or shield them and let them keep playing
     short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
 
     ClassicGameModeSettings();
 };
 
 struct FragGameModeSettings {
-    short style;			//on kill, either respawn the player or shield them and let them keep playing
+    DeathStyle style;		//on kill, either respawn the player or shield them and let them keep playing
     short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
 
     FragGameModeSettings();
 };
 
 struct TimeGameModeSettings {
-    short style;			//on kill, either respawn the player or shield them and let them keep playing
+    DeathStyle style;		//on kill, either respawn the player or shield them and let them keep playing
     short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
     short percentextratime; //percent chance a stopwatch with extra game time will spawn
 
@@ -27,7 +28,7 @@ struct TimeGameModeSettings {
 };
 
 struct JailGameModeSettings {
-    short style;			//Style of play: classic, owned, free for all
+    JailStyle style;		//Style of play: classic, owned, free for all
     bool tagfree;			//Free jailed player by tagging on same team
     short timetofree;		//Time it takes for a jailed player to be freed
     short percentkey;		//percent chance a jail key will spawn
@@ -84,7 +85,7 @@ struct TagGameModeSettings {
 
 struct StarGameModeSettings {
     short time;				//Time to get rid or keep star
-    short shine;			//If we are playing shine mode vs. ztar vs. stars mode
+    StarStyle shine;		//If we are playing shine mode vs. ztar vs. stars mode
     short percentextratime; //percent chance a stopwatch with extra game time will spawn
 
     StarGameModeSettings();

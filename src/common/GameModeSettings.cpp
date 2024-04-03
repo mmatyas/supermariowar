@@ -1,23 +1,23 @@
 #include "GameModeSettings.h"
 
 ClassicGameModeSettings::ClassicGameModeSettings()
-    : style(0)          	//Respawn on death
+    : style(DeathStyle::Respawn)  //Respawn on death
     , scoring(0)        	//All kills will score
 {}
 
 FragGameModeSettings::FragGameModeSettings()
-    : style(0)          	//Respawn on death
+    : style(DeathStyle::Respawn)  //Respawn on death
     , scoring(0)        	//All kills will score
 {}
 
 TimeGameModeSettings::TimeGameModeSettings()
-    : style(0)              //Respawn on death
+    : style(DeathStyle::Respawn)  //Respawn on death
     , scoring(0)            //All kills will score
     , percentextratime(10)  //10% chance of a heart spawning
 {}
 
 JailGameModeSettings::JailGameModeSettings()
-    : style(1)              //defaults to color jail play
+    : style(JailStyle::Owned)  //defaults to color jail play
     , tagfree(true)         //players on same team can free player by touching
     , timetofree(1240)      //20 seconds of jail
     , percentkey(30)        //30% chance of a key spawning
@@ -74,7 +74,7 @@ TagGameModeSettings::TagGameModeSettings()
 
 StarGameModeSettings::StarGameModeSettings()
     : time(30)              //default to 30 seconds
-    , shine(0)              //default to hot potato (ztar)
+    , shine(StarStyle::Ztar)  //default to hot potato (ztar)
     , percentextratime(10)  //10 percent chance of an extra time poweurp spawning
 {}
 

@@ -65,7 +65,7 @@ PlayerKillType CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &ot
                 inflictor.Score().AdjustScore(1);
         }
 
-        if (game_values.gamemode->gamemode == game_mode_timelimit && game_values.gamemodesettings.time.style == 1) {
+        if (game_values.gamemode->gamemode == game_mode_timelimit && game_values.gamemodesettings.time.style == DeathStyle::Shield) {
             ifSoundOnPlay(rm->sfx_powerdown);
             other.Shield().reset();
             return PlayerKillType::NonKill;

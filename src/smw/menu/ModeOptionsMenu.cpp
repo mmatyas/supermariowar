@@ -21,9 +21,9 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Classic Mode Settings
     //***********************
 
-    miClassicModeStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 200, "On Kill", 400, 180);
-    miClassicModeStyleField->add("Respawn", 0);
-    miClassicModeStyleField->add("Shield", 1);
+    miClassicModeStyleField = new MI_SelectField<DeathStyle>(&rm->spr_selectfield, 120, 200, "On Kill", 400, 180);
+    miClassicModeStyleField->add("Respawn", DeathStyle::Respawn);
+    miClassicModeStyleField->add("Shield", DeathStyle::Shield);
     miClassicModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.classic.style);
     miClassicModeStyleField->setCurrentValue(game_values.gamemodemenusettings.classic.style);
 
@@ -56,9 +56,9 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Frag Mode Settings
     //***********************
 
-    miFragModeStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 200, "On Kill", 400, 180);
-    miFragModeStyleField->add("Respawn", 0);
-    miFragModeStyleField->add("Shield", 1);
+    miFragModeStyleField = new MI_SelectField<DeathStyle>(&rm->spr_selectfield, 120, 200, "On Kill", 400, 180);
+    miFragModeStyleField->add("Respawn", DeathStyle::Respawn);
+    miFragModeStyleField->add("Shield", DeathStyle::Shield);
     miFragModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.frag.style);
     miFragModeStyleField->setCurrentValue(game_values.gamemodemenusettings.frag.style);
 
@@ -91,9 +91,9 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Time Limit Mode Settings
     //***********************
 
-    miTimeLimitModeStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 180, "On Kill", 400, 150);
-    miTimeLimitModeStyleField->add("Respawn", 0);
-    miTimeLimitModeStyleField->add("Shield", 1);
+    miTimeLimitModeStyleField = new MI_SelectField<DeathStyle>(&rm->spr_selectfield, 120, 180, "On Kill", 400, 150);
+    miTimeLimitModeStyleField->add("Respawn", DeathStyle::Respawn);
+    miTimeLimitModeStyleField->add("Shield", DeathStyle::Shield);
     miTimeLimitModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.time.style);
     miTimeLimitModeStyleField->setCurrentValue(game_values.gamemodemenusettings.time.style);
 
@@ -153,10 +153,10 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     // Jail Mode Settings
     //***********************
 
-    miJailModeStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 160, "Style", 400, 150);
-    miJailModeStyleField->add("Classic", 0);
-    miJailModeStyleField->add("Owned", 1, false);
-    miJailModeStyleField->add("Free For All", 2, false);
+    miJailModeStyleField = new MI_SelectField<JailStyle>(&rm->spr_selectfield, 120, 160, "Style", 400, 150);
+    miJailModeStyleField->add("Classic", JailStyle::Classic);
+    miJailModeStyleField->add("Owned", JailStyle::Owned);
+    miJailModeStyleField->add("Free For All", JailStyle::FreeForAll);
     miJailModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.jail.style);
     miJailModeStyleField->setCurrentValue(game_values.gamemodemenusettings.jail.style);
 
@@ -608,11 +608,11 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miStarModeTimeField->setOutputPtr(&game_values.gamemodemenusettings.star.time);
     miStarModeTimeField->setCurrentValue(game_values.gamemodemenusettings.star.time);
 
-    miStarModeShineField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Star Type", 400, 150);
-    miStarModeShineField->add("Ztar", 0);
-    miStarModeShineField->add("Shine", 1);
-    miStarModeShineField->add("Multi Star", 2);
-    miStarModeShineField->add("Random", 3);
+    miStarModeShineField = new MI_SelectField<StarStyle>(&rm->spr_selectfield, 120, 220, "Star Type", 400, 150);
+    miStarModeShineField->add("Ztar", StarStyle::Ztar);
+    miStarModeShineField->add("Shine", StarStyle::Shine);
+    miStarModeShineField->add("Multi Star", StarStyle::Multi);
+    miStarModeShineField->add("Random", StarStyle::Random);
     miStarModeShineField->setOutputPtr(&game_values.gamemodemenusettings.star.shine);
     miStarModeShineField->setCurrentValue(game_values.gamemodemenusettings.star.shine);
 

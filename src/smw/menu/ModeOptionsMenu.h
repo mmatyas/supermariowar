@@ -1,6 +1,8 @@
 #pragma once
 
 #include "uimenu.h"
+#include "GameplayStyles.h"
+#include "MatchTypes.h"
 
 class MI_Button;
 class MI_Image;
@@ -9,7 +11,6 @@ class MI_PowerupSlider;
 class MI_SliderField;
 class MI_Text;
 template<typename T> class MI_SelectField;
-enum class Boss : unsigned char;
 
 
 class UI_ModeOptionsMenu : public UI_Menu {
@@ -38,7 +39,7 @@ private:
     UI_Menu mBossSettingsMenu;
 
     // Classic
-    MI_SelectField<short>* miClassicModeStyleField;
+    MI_SelectField<DeathStyle>* miClassicModeStyleField;
     MI_SelectField<short>* miClassicModeScoringField;
     MI_Button* miClassicModeBackButton;
 
@@ -47,7 +48,7 @@ private:
     MI_Text* miClassicModeHeaderText;
 
     // Frag
-    MI_SelectField<short>* miFragModeStyleField;
+    MI_SelectField<DeathStyle>* miFragModeStyleField;
     MI_SelectField<short>* miFragModeScoringField;
     MI_Button* miFragModeBackButton;
 
@@ -56,7 +57,7 @@ private:
     MI_Text* miFragModeHeaderText;
 
     // Time Limit
-    MI_SelectField<short>* miTimeLimitModeStyleField;
+    MI_SelectField<DeathStyle>* miTimeLimitModeStyleField;
     MI_SelectField<short>* miTimeLimitModeScoringField;
     MI_SliderField* miTimeLimitModePercentExtraTime;
     MI_Button* miTimeLimitModeBackButton;
@@ -66,7 +67,7 @@ private:
     MI_Text* miTimeLimitModeHeaderText;
 
     // Jail
-    MI_SelectField<short>* miJailModeStyleField;
+    MI_SelectField<JailStyle>* miJailModeStyleField;
     MI_SelectField<bool>* miJailModeTagFreeField;
     MI_SelectField<short>* miJailModeTimeFreeField;
     MI_SliderField* miJailModeJailKeyField;
@@ -128,7 +129,7 @@ private:
 
     // Star
     MI_SelectField<short>* miStarModeTimeField;
-    MI_SelectField<short>* miStarModeShineField;
+    MI_SelectField<StarStyle>* miStarModeShineField;
     MI_SliderField* miStarModePercentExtraTime;
     MI_Button* miStarModeBackButton;
 

@@ -862,9 +862,9 @@ void CPlayer::update_spriteColor()
     } else {
         if (game_values.gamemode->gamemode == game_mode_star) {
             CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
-            short starmodetype = starmode->getcurrentmodetype();
-            if (starmodetype != 2 && starmode->isplayerstar(this)) {
-                iSrcOffsetX = starmodetype ? 224 : 192;
+            StarStyle starmodetype = starmode->getcurrentmodetype();
+            if (starmodetype != StarStyle::Multi && starmode->isplayerstar(this)) {
+                iSrcOffsetX = (starmodetype == StarStyle::Ztar) ? 192 : 224;
                 fColorChosen = true;
             }
         }

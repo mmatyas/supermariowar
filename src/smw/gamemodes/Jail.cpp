@@ -40,7 +40,7 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
             other.Jail().lockInBy(inflictor);
 
             //Apply rules for "Classic" jail
-            if (game_values.gamemodesettings.jail.style == 0) {
+            if (game_values.gamemodesettings.jail.style == JailStyle::Classic) {
                 short jailedteams[4];
 
                 short i;
@@ -91,7 +91,7 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
                 }
             }
             //Apply rules for "Owned" jail
-            else if (game_values.gamemodesettings.jail.style == 1) {
+            else if (game_values.gamemodesettings.jail.style == JailStyle::Owned) {
                 short jailedteams[4] = {-1, -1, -1, -1};
 
                 //Figure out which teams have been jailed

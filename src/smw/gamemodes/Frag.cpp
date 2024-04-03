@@ -34,7 +34,7 @@ PlayerKillType CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
 
     PlayerKillType iRet = CheckWinner(&inflictor);
 
-    if (game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1) {
+    if (game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == DeathStyle::Shield) {
         ifSoundOnPlay(rm->sfx_powerdown);
         other.Shield().reset();
         return PlayerKillType::NonKill;
@@ -50,7 +50,7 @@ PlayerKillType CGM_Frag::playerkilledself(CPlayer &player, KillStyle style)
     if (!gameover) {
         player.Score().AdjustScore(-1);
 
-        if (game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1) {
+        if (game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == DeathStyle::Shield) {
             ifSoundOnPlay(rm->sfx_powerdown);
             player.Shield().reset();
             return PlayerKillType::NonKill;

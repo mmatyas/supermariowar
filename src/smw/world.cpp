@@ -1761,6 +1761,19 @@ short ReadTourStopSetting(short * iSetting, bool * fSetting, short iDefault, boo
     return 0;
 }
 
+template<typename T>
+short ReadTourStopSetting(T& output, T defaultVal)
+{
+    char* tok = strtok(NULL, ",\n");
+    if (tok) {
+        output = static_cast<T>(atoi(tok));
+        return 1;
+    } else {
+        output = defaultVal;
+        return 0;
+    }
+}
+
 TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
 {
     TourStop * ts = new TourStop();
@@ -1945,21 +1958,21 @@ TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
 
             if (ts->iMode == 0) { //classic
                 ts->fUseSettings = true;
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.classic.style, NULL, game_values.gamemodemenusettings.classic.style, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.classic.style, game_values.gamemodemenusettings.classic.style);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.classic.scoring, NULL, game_values.gamemodemenusettings.classic.scoring, false);
             } else if (ts->iMode == 1) { //frag
                 ts->fUseSettings = true;
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frag.style, NULL, game_values.gamemodemenusettings.frag.style, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frag.style, game_values.gamemodemenusettings.frag.style);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frag.scoring, NULL, game_values.gamemodemenusettings.frag.scoring, false);
             } else if (ts->iMode == 2) { //time
                 ts->fUseSettings = true;
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.style, NULL, game_values.gamemodemenusettings.time.style, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.style, game_values.gamemodemenusettings.time.style);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.scoring, NULL, game_values.gamemodemenusettings.time.scoring, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.percentextratime, NULL, game_values.gamemodemenusettings.time.percentextratime, false);
             } else if (ts->iMode == 3) { //jail
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.style, NULL, game_values.gamemodemenusettings.jail.style, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.style, game_values.gamemodemenusettings.jail.style);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.timetofree, NULL, game_values.gamemodemenusettings.jail.timetofree, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.jail.tagfree, 0, game_values.gamemodemenusettings.jail.tagfree);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.percentkey, NULL, game_values.gamemodemenusettings.jail.percentkey, false);
@@ -2008,7 +2021,7 @@ TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.time, NULL, game_values.gamemodemenusettings.star.time, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.shine, NULL, game_values.gamemodemenusettings.star.shine, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.shine, game_values.gamemodemenusettings.star.shine);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.percentextratime, NULL, game_values.gamemodemenusettings.star.percentextratime, false);
             } else if (ts->iMode == 11) { //domination
                 ts->fUseSettings = true;
@@ -2084,10 +2097,7 @@ TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
             } else if (ts->iMode == 1001) { //boss minigame
                 ts->fUseSettings = true;
 
-                short bosstype_val = 0;
-                ts->iNumUsedSettings += ReadTourStopSetting(&bosstype_val, NULL, static_cast<short>(game_values.gamemodemenusettings.boss.bosstype), false);
-                ts->gmsSettings.boss.bosstype = static_cast<Boss>(bosstype_val);  // FIXME
-
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.bosstype, game_values.gamemodemenusettings.boss.bosstype);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.difficulty, NULL, game_values.gamemodemenusettings.boss.difficulty, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.hitpoints, NULL, game_values.gamemodemenusettings.boss.hitpoints, false);
             }
@@ -2211,7 +2221,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
         if (ts->fUseSettings) {
             if (ts->iMode == 0) { //classic
                 if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.classic.style);
+                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.classic.style));
                     strcat(buffer, szTemp);
                 }
 
@@ -2221,7 +2231,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                 }
             } else if (ts->iMode == 1) { //frag
                 if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.frag.style);
+                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.frag.style));
                     strcat(buffer, szTemp);
                 }
 
@@ -2231,7 +2241,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                 }
             } else if (ts->iMode == 2) { //time
                 if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.time.style);
+                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.time.style));
                     strcat(buffer, szTemp);
                 }
 
@@ -2246,7 +2256,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                 }
             } else if (ts->iMode == 3) { //jail
                 if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.jail.style);
+                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.jail.style));
                     strcat(buffer, szTemp);
                 }
 
@@ -2362,7 +2372,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                 }
 
                 if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.star.shine);
+                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.star.shine));
                     strcat(buffer, szTemp);
                 }
 

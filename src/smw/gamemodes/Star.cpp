@@ -27,7 +27,7 @@ CGM_Star::CGM_Star() : CGM_TimeLimit()
     goal = 5;
     gamemode = game_mode_star;
     SetupModeStrings("Star", "Lives", 1);
-    iCurrentModeType = 0;
+    iCurrentModeType = StarStyle::Ztar;
 };
 
 void CGM_Star::init()
@@ -38,12 +38,9 @@ void CGM_Star::init()
 
     gameClock.Init(game_values.gamemodesettings.star.time < 1 ? 30 : game_values.gamemodesettings.star.time, true);
 
-    if (game_values.gamemodesettings.star.shine < 0 || game_values.gamemodesettings.star.shine > 3)
-        game_values.gamemodesettings.star.shine = 0;
-
     iCurrentModeType = game_values.gamemodesettings.star.shine;
-    if (iCurrentModeType == 3)
-        iCurrentModeType = RANDOM_INT(3);
+    if (iCurrentModeType == StarStyle::Random)
+        iCurrentModeType = static_cast<StarStyle>(RANDOM_INT(3));
 
     fReverseScoring = goal == -1;
 
@@ -77,7 +74,7 @@ void CGM_Star::SetupMode()
     }
 
     //If multi star, add more stars
-    if (iCurrentModeType == 2) {
+    if (iCurrentModeType == StarStyle::Multi) {
         CPlayer * players[4];
         short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
@@ -89,9 +86,9 @@ void CGM_Star::SetupMode()
             objectcontainer[1].add(starItem[iStar]);
         }
     } else { //otherwise, add just a single star
-        starPlayer[0] = GetHighestScorePlayer(!fReverseScoring && iCurrentModeType == 0);
+        starPlayer[0] = GetHighestScorePlayer(!fReverseScoring && iCurrentModeType == StarStyle::Ztar);
 
-        starItem[0] = new CO_Star(&rm->spr_star, iCurrentModeType == 0 ? 0 : 1, 0);
+        starItem[0] = new CO_Star(&rm->spr_star, iCurrentModeType == StarStyle::Ztar ? 0 : 1, 0);
         objectcontainer[1].add(starItem[0]);
     }
 }
@@ -104,7 +101,7 @@ void CGM_Star::think()
     }
 
     //Make sure there is a star player(s)
-    if (iCurrentModeType == 2) {
+    if (iCurrentModeType == StarStyle::Multi) {
         for (short iStar1 = 0; iStar1 < list_players_cnt - 1; iStar1++) {
             //If we're missing a star player, then reassign them all
             if (!starPlayer[iStar1]) {
@@ -122,7 +119,7 @@ void CGM_Star::think()
         }
     } else {
         if (!starPlayer[0]) {
-            starPlayer[0] = GetHighestScorePlayer(!fReverseScoring && !game_values.gamemodesettings.star.shine);
+            starPlayer[0] = GetHighestScorePlayer(!fReverseScoring && game_values.gamemodesettings.star.shine == StarStyle::Ztar);
             starItem[0]->placeStar();
         }
     }
@@ -138,7 +135,7 @@ void CGM_Star::think()
         gameClock.SetTime(game_values.gamemodesettings.star.time < 1 ? 30 : game_values.gamemodesettings.star.time);
         ifSoundOnPlay(rm->sfx_thunder);
 
-        if (iCurrentModeType == 0) {
+        if (iCurrentModeType == StarStyle::Ztar) {
             if (score[starPlayer[0]->getTeamID()]->score > 1 || fReverseScoring)
                 starPlayer[0]->KillPlayerMapHazard(true, KillStyle::Environment, false);
 
@@ -155,7 +152,7 @@ void CGM_Star::think()
 
             starPlayer[0] = GetHighestScorePlayer(!fReverseScoring);
             starItem[0]->placeStar();
-        } else if (iCurrentModeType == 1) {
+        } else if (iCurrentModeType == StarStyle::Shine) {
             for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
                 if (starPlayer[0]->getTeamID() == list_players[iPlayer]->getTeamID())
                     continue;
@@ -182,7 +179,7 @@ void CGM_Star::think()
 
             starPlayer[0] = GetHighestScorePlayer(false);
             starItem[0]->placeStar();
-        } else if (iCurrentModeType == 2) {
+        } else if (iCurrentModeType == StarStyle::Multi) {
             for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
                 bool fFound = false;
                 for (short iStar = 0; iStar < list_players_cnt - 1; iStar++) {
@@ -208,14 +205,14 @@ void CGM_Star::think()
                         fDisplayTimer = !RemoveTeam(list_players[iPlayer]->getTeamID());
 
                         //Don't setup the mode if this is a random game because it will be setup below
-                        if (game_values.gamemodesettings.star.shine != 3) {
+                        if (game_values.gamemodesettings.star.shine != StarStyle::Random) {
                             SetupMode();
                             fNeedRebalance = false;
                         }
                     }
                 }
 
-                if (game_values.gamemodesettings.star.shine != 3 && fNeedRebalance) {
+                if (game_values.gamemodesettings.star.shine != StarStyle::Random && fNeedRebalance) {
                     CPlayer * players[4];
                     short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
@@ -253,9 +250,8 @@ void CGM_Star::think()
         }
 
         //If random game, then choose a new game type
-        if (game_values.gamemodesettings.star.shine == 3 && fDisplayTimer) {
-#pragma warning ("neagix: This should be 4, possibly?")
-            iCurrentModeType = RANDOM_INT(3);
+        if (game_values.gamemodesettings.star.shine == StarStyle::Random && fDisplayTimer) {
+            iCurrentModeType = static_cast<StarStyle>(RANDOM_INT(3));
             SetupMode();
         }
     }
@@ -311,11 +307,11 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
 
     starPlayer[id] = player;
 
-    if (iCurrentModeType == 2)
+    if (iCurrentModeType == StarStyle::Multi)
         starItem[id]->setPlayerColor(starPlayer[id]->getColorID());
 
     if (starItem[id]->getType() == 1)
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), iCurrentModeType == 2 ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), iCurrentModeType == StarStyle::Multi ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
     else
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Ztarred!", -VELJUMP*1.5));
 

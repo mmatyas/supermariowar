@@ -38,7 +38,7 @@ void PlayerJail::lockInBy(CPlayer& inflictor)
     timer = game_values.gamemodesettings.jail.timetofree;
     owner_teamID = inflictor.teamID;
 
-    if (game_values.gamemodesettings.jail.style == 1)
+    if (game_values.gamemodesettings.jail.style == JailStyle::Owned)
         color = inflictor.colorID;
     else
         color = -1;

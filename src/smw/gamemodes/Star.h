@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TimeLimit.h"
+#include "GameplayStyles.h"
 
 class CO_Star;
 
@@ -27,7 +28,7 @@ class CGM_Star : public CGM_TimeLimit
         return starPlayer[id];
     }
 
-    short getcurrentmodetype() {
+    StarStyle getcurrentmodetype() const {
         return iCurrentModeType;
     }
 
@@ -42,6 +43,6 @@ class CGM_Star : public CGM_TimeLimit
 
         CO_Star * starItem[3];
         CPlayer * starPlayer[3];
-        short iCurrentModeType;
+        StarStyle iCurrentModeType;
         bool fDisplayTimer;
 };
