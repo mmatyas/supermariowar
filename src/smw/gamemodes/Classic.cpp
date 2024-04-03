@@ -68,7 +68,7 @@ PlayerKillType CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &othe
         }
     }
 
-    if (game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1) {
+    if (game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == DeathStyle::Shield) {
         ifSoundOnPlay(rm->sfx_powerdown);
         other.Shield().reset();
         return PlayerKillType::NonKill;
@@ -116,7 +116,7 @@ PlayerKillType CGM_Classic::playerkilledself(CPlayer &player, KillStyle style)
             }
         }
 
-        if (game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1) {
+        if (game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == DeathStyle::Shield) {
             ifSoundOnPlay(rm->sfx_powerdown);
             player.Shield().reset();
             return PlayerKillType::NonKill;
