@@ -192,7 +192,7 @@ void CPlayer::accelerate(float direction)
 
     float maxVel = 0.0f;
     if (!frozen) {
-        if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jail.isActive())
+        if ((game_values.flags.slowdownon != -1 && game_values.flags.slowdownon != teamID) || jail.isActive())
             maxVel = VELSLOWMOVING;
         else if (playerKeys->game_turbo.fDown)
             maxVel = VELTURBOMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
@@ -222,7 +222,7 @@ void CPlayer::accelerate(float direction)
         }
         // If the player suddently moved to the other direction, play skid sound
         else if (direction > 0.0f ? velx < 0.0f : velx > 0.0f)
-            game_values.playskidsound = true;
+            game_values.flags.playskidsound = true;
 
         //If rain candy is turned on
         if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && fabs(velx) > VELMOVINGADD && ++rainsteptimer > 7) {
@@ -415,20 +415,20 @@ void reference_code() {
         //Keep this code -> good for items that destroy blocks on the map
 
         //Active Super POW destroys and triggers blocks
-        if (super_pow && (game_values.screenshaketimer > 0 || powerupused == 9))
+        if (super_pow && (game_values.flags.screenshaketimer > 0 || powerupused == 9))
         {
-            if (game_values.screenshaketimer > 0)
+            if (game_values.flags.screenshaketimer > 0)
             {
                 if (++super_pow_timer >= 60)
                 {
-                    game_values.screenshaketimer = 0;
+                    game_values.flags.screenshaketimer = 0;
                     super_pow_timer = 0;
                     super_pow = false;
                 }
 
                 if (keymask & 16)
                 {
-                    game_values.screenshaketimer += 10;
+                    game_values.flags.screenshaketimer += 10;
 
                     IO_Block * block = (IO_Block*)noncolcontainer.getRandomObject();
 
@@ -444,20 +444,20 @@ void reference_code() {
         }
 
         //Active Super MOd Destroys and triggers blocks
-        if (super_mod && (game_values.screenshaketimer > 0 || powerupused == 16))
+        if (super_mod && (game_values.flags.screenshaketimer > 0 || powerupused == 16))
         {
-            if (game_values.screenshaketimer > 0)
+            if (game_values.flags.screenshaketimer > 0)
             {
                 if (++super_mod_timer >= 60)
                 {
-                    game_values.screenshaketimer = 0;
+                    game_values.flags.screenshaketimer = 0;
                     super_mod_timer = 0;
                     super_mod = false;
                 }
 
                 if (keymask & 16)
                 {
-                    game_values.screenshaketimer += 10;
+                    game_values.flags.screenshaketimer += 10;
 
                     IO_Block * block = (IO_Block*)noncolcontainer.getRandomObject();
 
@@ -733,11 +733,11 @@ void CPlayer::triggerPowerup()
     }
     case 9: {
         ifSoundOnPlay(rm->sfx_thunder);
-        game_values.screenshaketimer = 20;
-        game_values.screenshakeplayerid = globalID;
-        game_values.screenshaketeamid = teamID;
-        game_values.screenshakekillinair = false;
-        game_values.screenshakekillscount = 0;
+        game_values.flags.screenshaketimer = 20;
+        game_values.flags.screenshakeplayerid = globalID;
+        game_values.flags.screenshaketeamid = teamID;
+        game_values.flags.screenshakekillinair = false;
+        game_values.flags.screenshakekillscount = 0;
         break;
     }
     case 10: {
@@ -776,10 +776,10 @@ void CPlayer::triggerPowerup()
     }
     case 16: {
         ifSoundOnPlay(rm->sfx_thunder);
-        game_values.screenshaketimer = 20;
-        game_values.screenshakeplayerid = globalID;
-        game_values.screenshaketeamid = teamID;
-        game_values.screenshakekillinair = true;
+        game_values.flags.screenshaketimer = 20;
+        game_values.flags.screenshakeplayerid = globalID;
+        game_values.flags.screenshaketeamid = teamID;
+        game_values.flags.screenshakekillinair = true;
         break;
     }
     case 17: {
@@ -982,7 +982,7 @@ void CPlayer::tryStartFlying()
         return;
 
     flying = true;
-    game_values.playflyingsound = true;
+    game_values.flags.playflyingsound = true;
 
     lockjump = true;
     extrajumps++;
@@ -1167,10 +1167,10 @@ void CPlayer::move()
     }
 
     if (isInvincible())
-        game_values.playinvinciblesound = true;
+        game_values.flags.playinvinciblesound = true;
 
     if (flying)
-        game_values.playflyingsound = true;
+        game_values.flags.playflyingsound = true;
 
     int keymask =
         (playerKeys->game_jump.fPressed?1:0) |
@@ -1324,7 +1324,7 @@ void CPlayer::move()
 
         if (game_values.windaffectsplayers) {
             oldvelx = velx;
-            float windx = game_values.gamewindx / (kuriboshoe.is_on() ? 3.0f : 1.5f);
+            float windx = game_values.flags.gamewindx / (kuriboshoe.is_on() ? 3.0f : 1.5f);
             velx = CapSideVelocity(velx + windx);
         }
 
@@ -1442,7 +1442,7 @@ bool shouldUpdateSprite()
     if (netplay.active)
         return true;
 
-    return !game_values.pausegame && !game_values.exitinggame && !game_values.swapplayers;
+    return !game_values.flags.pausegame && !game_values.flags.exitinggame && !game_values.flags.swapplayers;
 }
 
 void CPlayer::updateSprite()
@@ -1568,7 +1568,7 @@ void CPlayer::updateSprite()
                 }
             }
         }
-    } else if (game_values.swapplayers) {
+    } else if (game_values.flags.swapplayers) {
         short iSpriteDirection = 0;
 
         if (fNewSwapX < fOldSwapX)
@@ -1589,7 +1589,7 @@ void CPlayer::Jump(short iMove, float jumpModifier, bool fKuriboBounce)
 {
     if (fKuriboBounce)
         vely = -VELKURIBOBOUNCE;
-    else if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jail.isActive())
+    else if ((game_values.flags.slowdownon != -1 && game_values.flags.slowdownon != teamID) || jail.isActive())
         vely = -VELSLOWJUMP * jumpModifier;
     else if (fabs(velx) > VELMOVING && iMove != 0 && playerKeys->game_turbo.fDown)
         vely = -VELTURBOJUMP * jumpModifier;
@@ -2113,11 +2113,11 @@ void CPlayer::updateswap()
         return;
 
     if (game_values.swapstyle == 1) {
-        setXf(game_values.swapplayersblink ? fOldSwapX : fNewSwapX);
-        setYf(game_values.swapplayersblink ? fOldSwapY : fNewSwapY);
+        setXf(game_values.flags.swapplayersblink ? fOldSwapX : fNewSwapX);
+        setYf(game_values.flags.swapplayersblink ? fOldSwapY : fNewSwapY);
     } else {
-        setXf(((fNewSwapX - fOldSwapX) * game_values.swapplayersposition) + fOldSwapX);
-        setYf(((fNewSwapY - fOldSwapY) * game_values.swapplayersposition) + fOldSwapY);
+        setXf(((fNewSwapX - fOldSwapX) * game_values.flags.swapplayersposition) + fOldSwapX);
+        setYf(((fNewSwapY - fOldSwapY) * game_values.flags.swapplayersposition) + fOldSwapY);
     }
 
     if (carriedItem)
@@ -2790,8 +2790,8 @@ void CPlayer::makefrozen(short iTime)
 
 void CPlayer::turnslowdownon()
 {
-    game_values.slowdownon = teamID;
-    game_values.slowdowncounter = 0;
+    game_values.flags.slowdownon = teamID;
+    game_values.flags.slowdowncounter = 0;
 }
 
 //Returns true if player facing right, false if left
@@ -2800,7 +2800,7 @@ bool CPlayer::isFacingRight() const
     bool fLeft = game_values.reversewalk;
     bool fRight = !fLeft;
 
-    if (game_values.swapplayers && game_values.swapstyle == 0) {
+    if (game_values.flags.swapplayers && game_values.swapstyle == 0) {
         if (fNewSwapX < fOldSwapX)
             return fLeft;
         else

@@ -120,9 +120,6 @@ void CGameValues::init()
     SDL_XBOX_SetScreenStretch(screenResizeW, screenResizeH);
 #endif
 
-    pausegame     = false;
-    exitinggame     = false;
-    exityes       = false;
     awardstyle      = AwardStyle::Fireworks;
     spawnstyle      = SpawnStyle::Swirl;
     tournamentgames   = 2;
@@ -133,13 +130,8 @@ void CGameValues::init()
     tourstopcurrent   = 0;
     tourstoptotal   = 0;
     worldindex      = 0;
-    slowdownon      = -1;
-    slowdowncounter   = 0;
     teamcollision = TeamCollisionStyle::Off;
     screencrunch    = true;
-    screenshaketimer  = 0;
-    screenshakeplayerid = -1;
-    screenshaketeamid = -1;
     toplayer      = true;
     loadedannouncer   = -1;
     loadedmusic     = -1;
@@ -247,34 +239,10 @@ void CGameValues::init()
 
 void CGameValues::resetGameplaySettings()
 {
-    pausegame = false;
-    exitinggame = false;
-    exityes = false;
-    teamdeadcounter = 0;
-    screenshaketimer = 0;
-    slowdownon = -1;
-    slowdowncounter = 0;
-    showscoreboard = false;
-    scorepercentmove = 0.0f;
-    playskidsound = false;
-    playinvinciblesound = false;
-    playflyingsound = false;
-    swapplayers = false;
-    swapplayersposition = 0.0f;
-    swapplayersblink = false;
-    swapplayersblinkcount = 0;
+    flags = GameplayFlags();
+
     screenfade = 255;
     screenfadespeed = -8;
-    noexit = false;
-    noexittimer = 0;
-    forceexittimer = 0;
-    gamewindx = 0.0f;
-    gamewindy = 0.0f;
-
-    windaffectsplayers = false;
-    spinscreen = false;
-    reversewalk = false;
-    spotlights = false;
 
     //Initialize game mode
     gamemode->init();

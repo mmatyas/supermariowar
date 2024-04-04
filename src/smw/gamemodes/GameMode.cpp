@@ -105,8 +105,8 @@ void SetupScoreBoard(bool fOrderMatters)
             if (tourStop->wsbBonuses[iBonus].iWinnerPlace == 0) {
                 short iBonusType = tourStop->wsbBonuses[iBonus].iBonus;
                 objectcontainer[0].add(new PU_TreasureChestBonus(&rm->spr_bonuschest, 1, 0, 30, 30, 1, 1, iBonusType));
-                game_values.noexittimer = 0;
-                game_values.noexit = false;
+                game_values.flags.noexittimer = 0;
+                game_values.flags.noexit = false;
             }
         }
     }
@@ -114,7 +114,7 @@ void SetupScoreBoard(bool fOrderMatters)
 
 void ShowScoreBoard()
 {
-    game_values.showscoreboard = true;
+    game_values.flags.showscoreboard = true;
 
     short iScoreboardElementHeight = 45;
     if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
@@ -139,7 +139,7 @@ bool RemoveTeam(short teamid)
 {
     //If we have already removed this team then return
     if (score[teamid]->order > -1)
-        return game_values.teamdeadcounter == score_cnt - 1;
+        return game_values.flags.teamdeadcounter == score_cnt - 1;
 
     //kill all players on the dead team
     short iAnnouncementColor = -1;
@@ -152,15 +152,15 @@ bool RemoveTeam(short teamid)
         }
     }
 
-    score[teamid]->order = game_values.teamdeadcounter++;
+    score[teamid]->order = game_values.flags.teamdeadcounter++;
 
     //Announce that a team was removed
-    if (game_values.deadteamnotice && game_values.teamdeadcounter < score_cnt - 1) {
+    if (game_values.deadteamnotice && game_values.flags.teamdeadcounter < score_cnt - 1) {
         eyecandy[2].add(new EC_Announcement(&rm->game_font_large, &rm->spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200));
         ifsoundonandreadyplay(rm->sfx_announcer[iAnnouncementColor + 16]);
     }
 
-    return game_values.teamdeadcounter == score_cnt - 1;
+    return game_values.flags.teamdeadcounter == score_cnt - 1;
 }
 
 

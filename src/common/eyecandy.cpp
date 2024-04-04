@@ -198,8 +198,8 @@ void EC_Leaf::update()
 {
     animate();
 
-    dx += velx + game_values.gamewindx;
-    dy += vely + game_values.gamewindy;
+    dx += velx + game_values.flags.gamewindx;
+    dy += vely + game_values.flags.gamewindy;
 
     if (dx >= smw->ScreenWidth)
         dx -= smw->ScreenWidth;
@@ -257,8 +257,8 @@ EC_Snow::EC_Snow(gfxSprite *nspr, float nx, float ny, short type) :
 
 void EC_Snow::update()
 {
-    dx += velx + game_values.gamewindx;
-    dy += vely + game_values.gamewindy;
+    dx += velx + game_values.flags.gamewindx;
+    dy += vely + game_values.flags.gamewindy;
 
     if (dx >= smw->ScreenWidth)
         dx -= smw->ScreenWidth;
