@@ -98,7 +98,7 @@ void CGameValues::init()
     framelimiter    = WAITTIME;
     sound       = true;
     music       = true;
-    gamestate     = AppState::Splash;
+    appstate     = AppState::Splash;
 #ifdef _DEBUG
     fullscreen      = false;
 #else

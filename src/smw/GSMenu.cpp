@@ -572,7 +572,7 @@ void MenuState::update()
 #endif
 
     bool fGenerateMapThumbs = false;
-    if (AppState::Menu == game_values.gamestate) {
+    if (AppState::Menu == game_values.appstate) {
         MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
         // Shortcut to game start
@@ -830,7 +830,7 @@ void MenuState::update()
                         } else if (MatchType::World == game_values.matchtype) {
                             game_values.screenfadespeed = 8;
                             game_values.screenfade = 8;
-                            game_values.gamestate = AppState::StartWorld;
+                            game_values.appstate = AppState::StartWorld;
 
                             //Play enter world sound
                             ifsoundonandreadyplay(rm->sfx_enterstage);
@@ -1324,7 +1324,7 @@ void MenuState::update()
     }
 
     if (game_values.screenfade == 255) {
-        if (AppState::StartGame == game_values.gamestate) {
+        if (AppState::StartGame == game_values.appstate) {
             if (game_values.matchtype == MatchType::QuickGame)
                 mModeOptionsMenu->SetRandomGameModeSettings(game_values.gamemode->gamemode);
             else if (game_values.matchtype == MatchType::NetGame)
@@ -1418,7 +1418,7 @@ void MenuState::update()
                 }
             }
 
-            game_values.gamestate = AppState::Game;
+            game_values.appstate = AppState::Game;
             printf("  GS_GAME\n");
 
             g_map->predrawbackground(rm->spr_background, rm->spr_backmap[0]);
@@ -1432,7 +1432,7 @@ void MenuState::update()
 
             GameStateManager::instance().changeStateTo(&GameplayState::instance());
             return;
-        } else if (AppState::StartWorld == game_values.gamestate) { //Fade to world match type
+        } else if (AppState::StartWorld == game_values.appstate) { //Fade to world match type
             game_values.screenfadespeed = -8;
 
             mCurrentMenu = mWorldMenu;
@@ -1445,7 +1445,7 @@ void MenuState::update()
 
             mWorldMenu->miWorld->DisplayTeamControlAnnouncement();
 
-            game_values.gamestate = AppState::Menu;
+            game_values.appstate = AppState::Menu;
         }
     }
 
@@ -1567,7 +1567,7 @@ void MenuState::StartGame()
     fScriptRunPreGameOptions = false;
 #endif
 
-    game_values.gamestate = AppState::StartGame;
+    game_values.appstate = AppState::StartGame;
     //backgroundonly = false;
     //fastmap = false;
 
@@ -1709,7 +1709,7 @@ void MenuState::Exit()
 #ifdef __EMSCRIPTEN__
     return;
 #endif
-    game_values.gamestate = AppState::Quit;
+    game_values.appstate = AppState::Quit;
     game_values.WriteConfig();
 }
 
@@ -1780,7 +1780,7 @@ void MenuState::ResetScript()
 
 void MenuState::GetNextScriptOperation()
 {
-    if (AppState::Menu != game_values.gamestate)
+    if (AppState::Menu != game_values.appstate)
         return;
 
     //static short slowdowntimer = 0;
