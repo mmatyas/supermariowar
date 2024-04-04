@@ -61,13 +61,6 @@
 
 bool LoadStartGraphics();
 
-/*
-#ifdef _XBOX
-extern void reconnectjoysticks();
-extern int joystickcount;
-#endif
-*/
-
 extern SDL_Surface* screen;
 extern SDL_Surface* blitdest;
 
@@ -168,11 +161,6 @@ void MenuState::CreateMenu()
     mNetNewRoomMenu = new UI_NetNewRoomMenu();
     mNetNewRoomSettingsMenu = new UI_NetNewRoomSettingsMenu(mGameSettingsMenu);
     mNetRoomMenu = new UI_NetRoomMenu();
-
-#ifdef _XBOX
-    mScreenSettingsMenu = new UI_ScreenSettingsMenu();
-    mScreenResizeMenu = new UI_ScreenResizeMenu();
-#endif
 
     mCurrentMenu = mMainMenu;
 
@@ -400,13 +388,6 @@ void MenuState::onEnterState()
 
 void MenuState::update()
 {
-    /*
-    #ifdef _XBOX
-        if (joystickcount != SDL_NumJoysticks())
-        reconnectjoysticks();
-    #endif
-    */
-
     if (netplay.active)
         netplay.client.update();
 
@@ -417,19 +398,15 @@ void MenuState::update()
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-#ifndef _XBOX
         case SDL_QUIT:
             Exit();
             return;
             break;
-#endif
 
         case SDL_KEYDOWN: {
             if (event.key.keysym.sym == SDLK_F1) {
                 game_values.showfps = !game_values.showfps;
             }
-
-#ifndef _XBOX
 
 #ifdef _DEBUG
             if (event.key.keysym.sym == SDLK_F2) {
@@ -454,7 +431,6 @@ void MenuState::update()
             if (event.key.keysym.sym == SDLK_INSERT) {
                 gfx_take_screenshot();
             }
-#endif
 #ifdef _DEBUG
             //Pressing insert in debug mode turns on automated testing
             if (event.key.keysym.sym == SDLK_F8) {
@@ -657,29 +633,10 @@ void MenuState::update()
             mCurrentMenu = mPlayerControlsMenu;
             mCurrentMenu->ResetMenu();
         }
-#ifdef _XBOX
-        else if (MENU_CODE_TO_SCREEN_SETTINGS == code) {
-            mCurrentMenu = mScreenSettingsMenu;
-            mCurrentMenu->ResetMenu();
-        } else if (MENU_CODE_TO_SCREEN_RESIZE == code) {
-            mCurrentMenu = mScreenResizeMenu;
-            mCurrentMenu->ResetMenu();
-        } else if (MENU_CODE_SCREEN_FILTER_CHANGED == code) {
-            SDL_SetHardwareFilter(game_values.hardwarefilter);
-            //Forces HW render so filter is applied
-            SDL_XBOX_SetScreenPosition(game_values.screenResizeX, game_values.screenResizeY);
-        } else if (MENU_CODE_SCREEN_SETTINGS_CHANGED == code) {
-            gfx_changefullscreen(false);
-            blitdest = screen;
-        } else if (MENU_CODE_BACK_TO_SCREEN_SETTINGS_MENU == code) {
-            mCurrentMenu = mScreenSettingsMenu;
-        }
-#else
         else if (MENU_CODE_TOGGLE_FULLSCREEN == code) {
 			gfx_changefullscreen(game_values.fullscreen);
             blitdest = screen;
         }
-#endif
         else if (MENU_CODE_TO_GAME_SETUP_MENU == code) {
             printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
             //Moves teams to the first arrays in the list and counts the number of teams

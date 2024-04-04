@@ -4,7 +4,7 @@ class CGame {
 public:
     CGame();
 
-    int ScreenWidth = 640;
-    int ScreenHeight = 480;
-    int MenuTransparency;
+    const int ScreenWidth = 640;
+    const int ScreenHeight = 480;
+    const int MenuTransparency = 72;
 };

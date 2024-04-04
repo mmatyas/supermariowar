@@ -64,7 +64,7 @@ UI_MainMenu::UI_MainMenu()
 #endif
 
     SetHeadControl(miMainStartButton);
-#if !defined(_XBOX) && !defined(__EMSCRIPTEN__)
+#ifndef __EMSCRIPTEN__
     SetCancelCode(MENU_CODE_EXIT_APPLICATION);
 #endif
 

@@ -56,10 +56,6 @@ UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
     miFrameLimiterField->setOutputPtr(&game_values.framelimiter);
     miFrameLimiterField->setCurrentValue(game_values.framelimiter);
 
-#ifdef _XBOX
-    miScreenSettingsButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Screen Settings", 500, 0);
-    miScreenSettingsButton->SetCode(MENU_CODE_TO_SCREEN_SETTINGS);
-#else
     miFullscreenField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 200, "Screen Size", 500, 220);
     miFullscreenField->add("Windowed", false);
     miFullscreenField->add("Fullscreen", true);
@@ -67,7 +63,6 @@ UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
     miFullscreenField->setCurrentValue(game_values.fullscreen ? 1 : 0);
     miFullscreenField->setAutoAdvance(true);
     miFullscreenField->setItemChangedCode(MENU_CODE_TOGGLE_FULLSCREEN);
-#endif //_XBOX
 
     miMenuGraphicsPackField = new MI_PacksField(&rm->spr_selectfield, 70, 240, "Menu Graphics", 500, 220, menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);
     miWorldGraphicsPackField = new MI_PacksField(&rm->spr_selectfield, 70, 280, "World Graphics", 500, 220, worldgraphicspacklist, MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED);
@@ -82,15 +77,9 @@ UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
 
     AddControl(miTopLayerField, miGraphicsOptionsMenuBackButton, miFrameLimiterField, NULL, miGraphicsOptionsMenuBackButton);
 
-#ifdef _XBOX
-    AddControl(miFrameLimiterField, miTopLayerField, miScreenSettingsButton, NULL, miGraphicsOptionsMenuBackButton);
-    AddControl(miScreenSettingsButton, miFrameLimiterField, miMenuGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
-    AddControl(miMenuGraphicsPackField, miScreenSettingsButton, miWorldGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
-#else
     AddControl(miFrameLimiterField, miTopLayerField, miFullscreenField, NULL, miGraphicsOptionsMenuBackButton);
     AddControl(miFullscreenField, miFrameLimiterField, miMenuGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
     AddControl(miMenuGraphicsPackField, miFullscreenField, miWorldGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
-#endif
 
     AddControl(miWorldGraphicsPackField, miMenuGraphicsPackField, miGameGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
     AddControl(miGameGraphicsPackField, miWorldGraphicsPackField, miGraphicsOptionsMenuBackButton, NULL, miGraphicsOptionsMenuBackButton);

@@ -20,12 +20,7 @@ public:
 private:
     MI_SelectField<bool>* miTopLayerField;
     MI_SelectField<short>* miFrameLimiterField;
-
-#ifdef _XBOX
-    MI_Button* miScreenSettingsButton;
-#else
     MI_SelectField<bool>* miFullscreenField;
-#endif //_XBOX
 
     MI_PacksField* miMenuGraphicsPackField;
     MI_PacksField* miWorldGraphicsPackField;

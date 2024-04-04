@@ -109,19 +109,11 @@ MI_InputControlField::~MI_InputControlField()
     #define Keynames(key) Keynames[key]
 #endif
 
-#ifdef _XBOX
-    const char * MI_InputControlField::Joynames[30] = {
-        "Left Stick Up", "Left Stick Down", "Left Stick Left", "Left Stick Right", "Right Stick Up", "Right Stick Down", "Right Stick Left", "Right Stick Right", "Pad Up", "Pad Down",
-        "Pad Left", "Pad Right", "A Button", "B Button", "X Button", "Y Button", "Black Button", "White Button", "Left Trigger", "Right Trigger",
-        "Start Button", "Back Button", "Left Stick Click", "Right Stick Click", "Button 1", "Button 2", "Button 3", "Button 4", "Button 5", "Button 6"
-    };
-#else
     const char * MI_InputControlField::Joynames[30] = {
         "Joystick Up", "Joystick Down", "Joystick Left", "Joystick Right", "Stick 2 Up", "Stick 2 Down", "Stick 2 Left", "Stick 2 Right", "Pad Up", "Pad Down",
         "Pad Left", "Pad Right", "Button 1", "Button 2", "Button 3", "Button 4", "Button 5", "Button 6", "Button 7", "Button 8",
         "Button 9", "Button 10", "Button 11", "Button 12", "Button 13", "Button 14", "Button 15", "Button 16", "Button 17", "Button 18"
     };
-#endif
 
 MenuCodeEnum MI_InputControlField::Modify(bool modify)
 {
@@ -310,8 +302,6 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
         }
     }
 
-    game_values.playerInput.CheckIfMouseUsed();
-
     //Need to clear down keys when coming into this (we'll ignore key up events in here)
     game_values.playerInput.ResetKeys();
 
@@ -395,16 +385,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
     miDeviceSelectField = new MI_SelectField<short>(spr_button, x + 16, y + 38, "Device", 420, 150);
     miDeviceSelectField->setItemChangedCode(MENU_CODE_INPUT_DEVICE_CHANGED);
     miDeviceSelectField->add("Keyboard", -1);
-#ifdef _XBOX
-    miDeviceSelectField->Disable(true);
 
-    for (int iJoystick = 0; iJoystick < 4; iJoystick++) {
-        char szJoystickNumber[2];
-        sprintf(szJoystickNumber, "%d", iJoystick + 1);
-        miDeviceSelectField->Add(std::string("Gamepad ") + std::string(szJoystickNumber), iJoystick, "", false, false);
-    }
-
-#else
     for (short iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
     #ifdef USE_SDL2
         miDeviceSelectField->add(SDL_JoystickNameForIndex(iJoystick), iJoystick, false);
@@ -412,7 +393,6 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
         miDeviceSelectField->add(SDL_JoystickName(iJoystick), iJoystick, false);
     #endif
     }
-#endif
 
     //If the device is not found, default to the keyboard
     if (!miDeviceSelectField->setCurrentValue(iDevice)) {

@@ -32,7 +32,7 @@ CTileset::CTileset(const char * szpath)
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/large.png");
-	gfx_loadimage(&sSprites[0], convertPartialPath(szFile), false);
+    gfx_loadimage(&sSprites[0], szFile, false);
 
 	sSurfaces[0] = sSprites[0].getSurface(); //optimization for repeat surface use
 
@@ -42,20 +42,20 @@ CTileset::CTileset(const char * szpath)
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/medium.png");
-	gfx_loadimage(&sSprites[1], convertPartialPath(szFile), false);
+    gfx_loadimage(&sSprites[1], szFile, false);
 
 	sSurfaces[1] = sSprites[1].getSurface();
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/small.png");
-	gfx_loadimage(&sSprites[2], convertPartialPath(szFile), false);
+    gfx_loadimage(&sSprites[2], szFile, false);
 
 	sSurfaces[2] = sSprites[2].getSurface();
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/tileset.tls");
 
-	strcpy(szTilesetPath, convertPartialPath(szFile).c_str());
+    strcpy(szTilesetPath, szFile);
 	ReadTileTypeFile(szTilesetPath);
 }
 
@@ -169,7 +169,7 @@ void CTilesetManager::Init(const char * szGfxPack)
 
 	//Add in tilesets from the new gfxpack (if the gfxpack isn't "Classic")
     if (strcmp(getFileFromPath(szGfxPack).c_str(), "Classic")) {
-		std::string s = convertPath("gfx/packs/tilesets", szGfxPack) + getDirectorySeperator();
+        std::string s = convertPath("gfx/packs/tilesets", szGfxPack) + '/';
 		SimpleDirectoryList dirlist(s);
 
 		short iLength = dirlist.GetCount();

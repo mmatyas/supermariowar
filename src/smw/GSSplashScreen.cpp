@@ -149,26 +149,22 @@ void SplashScreenState::update()
     while (SDL_PollEvent(&loop_event)) {
         switch (loop_event.type) {
 
-#ifndef _XBOX
         case SDL_QUIT: {
             game_values.appstate = AppState::Quit;
             return;
         }
         break;
-#endif
+
         case SDL_KEYDOWN: {
             switch (loop_event.key.keysym.sym) {
             case SDLK_RETURN:
                 if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
-#ifndef _XBOX
                     game_values.fullscreen = !game_values.fullscreen;
                     gfx_changefullscreen(game_values.fullscreen);
                     blitdest = screen;
-#endif
                 }
                 break;
 
-#ifndef _XBOX
             case SDLK_F4:
                 if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                     game_values.appstate = AppState::Quit;
@@ -179,7 +175,6 @@ void SplashScreenState::update()
             case SDLK_INSERT:
                 gfx_take_screenshot();
                 break;
-#endif
 
             default:
                 break;
