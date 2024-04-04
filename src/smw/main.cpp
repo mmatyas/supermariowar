@@ -67,10 +67,6 @@
 #include <emscripten.h>
 #endif
 
-#ifdef _XBOX
-#include <xtl.h>
-#endif
-
 #ifdef _MSC_VER
 #if _MSC_VER >= 1400
     #include <stdio.h>
@@ -412,24 +408,15 @@ void main_game()
         game_values.powerupweights[iPowerup] = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup];
     }
 
-#ifdef _XBOX
-    gfx_changefullscreen(false); //Sets flicker filter
-    SDL_SetHardwareFilter(game_values.hardwarefilter);
-    blitdest = screen;
-#else
     if (game_values.fullscreen) {
         gfx_changefullscreen(true);
         blitdest = screen;
     }
-#endif
 
     init_spawnlocations();
 
     //Load the gfx color palette
     gfx_loadpalette(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->current_name()));
-
-    //Call to setup input optimization
-    game_values.playerInput.CheckIfMouseUsed();
 
     srand((unsigned int)time(NULL));
 /*
@@ -459,13 +446,6 @@ void main_game()
     for (short i = 0; i < GAMEMODE_LAST; i++)
         delete gamemodes[i];
 
-#ifdef _XBOX
-    for (i = 0; i < joystickcount; i++)
-        SDL_JoystickClose(joysticks[i]);
-
-    delete[] joysticks;
-#endif
-
     sfx_close();
     gfx_close();
     net_close();
@@ -490,39 +470,7 @@ void main_game()
     delete [] game_values.pfFilters;
     delete [] game_values.piFilterIcons;
 
-//Return to dash on xbox
-#ifdef _XBOX
-    LD_LAUNCH_DASHBOARD LaunchData = { XLD_LAUNCH_DASHBOARD_MAIN_MENU };
-    XLaunchNewImage( NULL, (LAUNCH_DATA*)&LaunchData );
-#endif
-
 	// release all resources
 	delete rm;
     delete smw;
 }
-
-
-/*
-#ifdef _XBOX
-
-void reconnectjoysticks()
-{
-    for (int i = 0; i < joystickcount; i++)
-        SDL_JoystickClose(joysticks[i]);
-
-    delete[] joysticks;
-
-    SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-
-    joystickcount = SDL_NumJoysticks();
-    joysticks = new SDL_Joystick*[joystickcount];
-
-    for (i = 0; i < joystickcount; i++)
-        joysticks[i] = SDL_JoystickOpen(i);
-
-    SDL_JoystickEventState(SDL_ENABLE);
-}
-
-#endif
-*/

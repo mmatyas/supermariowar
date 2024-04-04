@@ -198,16 +198,6 @@ public:
 
     AppState appstate = AppState::Splash;
 
-    float		screenResizeX;
-    float		screenResizeY;
-    float		screenResizeW;
-    float		screenResizeH;
-
-    short		flickerfilter;
-    short		hardwarefilter;
-    short		softfilter;
-    bool		aspectratio10x11;
-
     GameplayFlags flags;
     CGameMode   *gamemode;
 

@@ -530,7 +530,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
                 char * pszMusic = strtok(NULL, ",\n");
                 while (pszMusic) {
-                    std::string sPath = musicdirectory + getDirectorySeperator() + convertPartialPath(std::string(pszMusic));
+                    std::string sPath = musicdirectory + getDirectorySeperator() + pszMusic;
 
                     if (File_Exists(sPath.c_str())) {
                         songFileNames.push_back(sPath);
@@ -548,7 +548,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
                     pszMusic = strtok(NULL, ",\n");
                 }
             } else {
-                std::string sPath = musicdirectory + getDirectorySeperator() + convertPartialPath(std::string(szBuffer));
+                std::string sPath = musicdirectory + getDirectorySeperator() + szBuffer;
 
                 if (File_Exists(sPath.c_str())) {
                     songFileNames.push_back(sPath);
@@ -855,7 +855,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
         }
 
         if (iAddToCategory > -1 && iAddToCategory <= WORLDMUSICSLEEP) {
-            std::string sPath = musicdirectory + getDirectorySeperator() + convertPartialPath(std::string(szBuffer));
+            std::string sPath = musicdirectory + getDirectorySeperator() + szBuffer;
 
             if (File_Exists(sPath.c_str()))
                 songFileNames[iAddToCategory] = sPath;
@@ -870,7 +870,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
             if (!pszMusic)
                 continue;
 
-            std::string sPath = musicdirectory + getDirectorySeperator() + convertPartialPath(std::string(pszMusic));
+            std::string sPath = musicdirectory + getDirectorySeperator() + pszMusic;
 
             if (!File_Exists(sPath.c_str()))
                 continue;

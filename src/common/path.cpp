@@ -10,12 +10,8 @@
 #include <sys/stat.h>
 
 #ifdef _WIN32
-    #ifdef _XBOX
-        #include <xtl.h>
-    #else
-        #include <shlobj.h>
-        #include "SDL_platform.h"
-    #endif
+#include <shlobj.h>
+#include "SDL_platform.h"
 #else
 #include <stdlib.h>
 #endif
@@ -28,11 +24,7 @@ std::string SMW_Root_Data_Dir;
 
 const std::string GetHomeDirectory()
 {
-#ifdef _XBOX
-    // NOTE: _WIN32 is also defined on _XBOX
-    return std::string("D:\\.smw\\");
-
-#elif __APPLE__
+#ifdef __APPLE__
     std::string result("/Library/Preferences/.smw/");
     char* folder = getenv("HOME");
     if (folder)
@@ -132,20 +124,6 @@ void Initialize_Paths()
 
 const string convertPath(const string& source)
 {
-    string s;
-
-/****** XBOX ******/
-#ifdef _XBOX
-
-	s = source;
-    int slash = string :: npos;
-
-    while (string::npos != (slash = s.find("/")))
-        s.replace(slash, 1, "\\");
-
-    s = "D:\\" + s;
-	return s;
-#else
     static bool are_paths_initialized = false;
 
     if (!are_paths_initialized) {
@@ -164,10 +142,7 @@ const string convertPath(const string& source)
 		are_paths_initialized = true;
     }
 
-    s = SMW_Root_Data_Dir;
-#endif
-    s += source;
-    return s;
+    return SMW_Root_Data_Dir + source;
 }
 
 const string convertPath(const string& source, const string& pack)
@@ -175,11 +150,7 @@ const string convertPath(const string& source, const string& pack)
     if (source.find("gfx/packs/") == 0) {
 		string trailingdir = source.substr(9);
 
-#ifdef _XBOX
-		const string s = convertPartialPath(pack + trailingdir);  //Hack because pack already has d:\ in it
-#else
 		const string s = pack + trailingdir;
-#endif
 
 		//If the file exists, return the path to it
 		if (File_Exists(s))
@@ -192,11 +163,7 @@ const string convertPath(const string& source, const string& pack)
     if (source.find("sfx/packs/") == 0) {
 		string trailingdir = source.substr(9);
 
-#ifdef _XBOX
-		const string s = convertPartialPath(pack + trailingdir);  //Hack because pack already has d:\ in it
-#else
 		const string s = pack + trailingdir;
-#endif
 
 		//If the file exists, return the path to it
 		if (File_Exists(s))
@@ -209,32 +176,9 @@ const string convertPath(const string& source, const string& pack)
 	return convertPath(source);
 }
 
-const string getDirectorySeperator()
-{
-#ifdef _XBOX
-	return std::string("\\");
-#else
-	return std::string("/");
-#endif
-}
-
-const string convertPartialPath(const string & source)
-{
-	string s = source;
-
-#ifdef _XBOX
-    int slash = string :: npos;
-
-    while (string::npos != (slash = s.find("/")))
-        s.replace(slash, 1, "\\");
-#endif
-
-    return s;
-}
-
 const string getFileFromPath(const string &path)
 {
-	short iPos = path.find_last_of(getDirectorySeperator()[0]);
+	short iPos = path.find_last_of(getDirectorySeperator());
 
 	if (iPos > 0)
 		return path.substr(iPos + 1);
@@ -245,11 +189,7 @@ const string getFileFromPath(const string &path)
 // Takes a path to a file and gives you back the file name (with or without author) as a char *
 std::string GetNameFromFileName(const std::string& path, bool strip_author)
 {
-#ifdef _XBOX
-    constexpr char PATH_SEPARATOR = '\\';
-#else
     constexpr char PATH_SEPARATOR = '/';
-#endif
 
     size_t left_pos = 0;
     size_t right_pos = path.length();

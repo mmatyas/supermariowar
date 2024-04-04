@@ -36,12 +36,4 @@ CGame::CGame()
     else if (!S_ISDIR(st.st_mode)) // inode exist, but not a directory
         perror("[error] Could not access settings directory");
 #endif
-
-#ifdef _XBOX
-    	//TODO: make this configurable!
-    	//TV's seem to need extra shade
-    	MenuTransparency = 96;
-#else
-    	MenuTransparency = 72;
-#endif
 }

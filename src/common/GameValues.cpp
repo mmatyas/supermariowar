@@ -46,23 +46,6 @@ SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_
             {SDLK_p, SDLK_SEMICOLON, SDLK_l, SDLK_QUOTE, SDLK_LEFTBRACKET, SDLK_o, SDLK_UNKNOWN, SDLK_UNKNOWN}
         }
     },
-#ifdef _XBOX
-    //left, right, jump, down, turbo, powerup, start, cancel
-    {   {   {JOY_HAT_LEFT, JOY_HAT_RIGHT, 12, JOY_HAT_DOWN, 14, 15, 20, 21},
-            {JOY_HAT_LEFT, JOY_HAT_RIGHT, 12, JOY_HAT_DOWN, 14, 15, 20, 21},
-            {JOY_HAT_LEFT, JOY_HAT_RIGHT, 12, JOY_HAT_DOWN, 14, 15, 20, 21},
-            {JOY_HAT_LEFT, JOY_HAT_RIGHT, 12, JOY_HAT_DOWN, 14, 15, 20, 21}
-        },
-
-        //up, down, left, right, select, cancel, random, fast scroll
-        {   {JOY_HAT_UP, JOY_HAT_DOWN, JOY_HAT_LEFT, JOY_HAT_RIGHT, 12, 21, 14, 15},
-            {JOY_HAT_UP, JOY_HAT_DOWN, JOY_HAT_LEFT, JOY_HAT_RIGHT, 12, 21, 14, 15},
-            {JOY_HAT_UP, JOY_HAT_DOWN, JOY_HAT_LEFT, JOY_HAT_RIGHT, 12, 21, 14, 15},
-            {JOY_HAT_UP, JOY_HAT_DOWN, JOY_HAT_LEFT, JOY_HAT_RIGHT, 12, 21, 14, 15}
-        }
-    }
-};
-#else
     //left, right, jump, down, turbo, powerup, start, cancel;
     { { {JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_STICK_1_DOWN, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3, JOY_BUTTON_START + 4},
             {JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_STICK_1_DOWN, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3, JOY_BUTTON_START + 4},
@@ -78,7 +61,6 @@ SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_
         }
     }
 };
-#endif
 
 extern CGameValues game_values;
 void ifSoundOnPlay(sfxSound& sfx)
@@ -103,21 +85,6 @@ void CGameValues::init()
     fullscreen      = false;
 #else
     fullscreen      = false;
-#endif
-
-    screenResizeX   = 20.0f;
-    screenResizeY   = 20.0f;
-    screenResizeW   = -40.0f;
-    screenResizeH   = -40.0f;
-
-    flickerfilter   = 5;  //Full flicker filter by default
-    hardwarefilter    = 2;  //Bilinear by default
-    softfilter      = 0;  //No soft filter by default
-    aspectratio10x11  = false;  //No 10x11 aspect ratio by default
-
-#ifdef _XBOX
-    SDL_XBOX_SetScreenPosition(screenResizeX, screenResizeY);
-    SDL_XBOX_SetScreenStretch(screenResizeW, screenResizeH);
 #endif
 
     awardstyle      = AwardStyle::Fireworks;
@@ -228,12 +195,7 @@ void CGameValues::init()
         }
 
         //Set the players input to the default configuration (will be overwritten by options.bin settings)
-#ifdef _XBOX
-        inputConfiguration[iPlayer][1].iDevice = iPlayer;
-        playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1];
-#else
         playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][0];
-#endif
     }
 }
 
@@ -286,21 +248,6 @@ void CGameValues::ReadBinaryConfig() {
             printf("Old options.bin detected. Skipped reading it.\n");
             return;
         }
-
-#ifdef _XBOX
-        flickerfilter = options.read_i16();
-        hardwarefilter = options.read_i16();
-        softfilter = options.read_i16();
-        aspectratio10x11 = options.read_bool();
-
-        screenResizeX = options.read_float();
-        screenResizeY = options.read_float();
-        screenResizeW = options.read_float();
-        screenResizeH = options.read_float();
-
-        SDL_XBOX_SetScreenPosition(screenResizeX, screenResizeY);
-        SDL_XBOX_SetScreenStretch(screenResizeW, screenResizeH);
-#endif
 
         spawnstyle = static_cast<SpawnStyle>(options.read_u8());
         awardstyle = static_cast<AwardStyle>(options.read_u8());
@@ -363,10 +310,6 @@ void CGameValues::ReadBinaryConfig() {
         poweruppreset = options.read_i16();
         options.read_i16_array((int16_t *)g_iCurrentPowerupPresets, NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
-#ifndef _XBOX
-        fullscreen = options.read_bool();
-#endif
-
         for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
             gamemodes[iGameMode]->goal = options.read_i16();
 
@@ -421,14 +364,10 @@ void CGameValues::ReadBinaryConfig() {
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             short iDevice = controls.read_i16();
 
-#ifdef _XBOX
-            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices on xbox
-#else
             if (iDevice >= joystickcount)
                 iDevice = DEVICE_KEYBOARD;
 
             playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
-#endif
         }
     }
     catch (std::exception const& error)
@@ -447,18 +386,6 @@ void CGameValues::WriteConfig()
             throw std::runtime_error("Could not open " + options_path);
 
         options.write_raw(g_iVersion, sizeof(int) * 4);
-
-#ifdef _XBOX
-        options.write_i16(flickerfilter);
-        options.write_i16(hardwarefilter);
-        options.write_i16(softfilter);
-        options.write_bool(aspectratio10x11);
-
-        options.write_float(screenResizeX);
-        options.write_float(screenResizeY);
-        options.write_float(screenResizeW);
-        options.write_float(screenResizeH);
-#endif
 
         options.write_u8(static_cast<uint8_t>(spawnstyle));
         options.write_u8(static_cast<uint8_t>(awardstyle));
@@ -521,9 +448,8 @@ void CGameValues::WriteConfig()
         options.write_i16(poweruppreset);
         options.write_raw(&g_iCurrentPowerupPresets, sizeof(short) * NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
-#ifndef _XBOX
         options.write_bool(fullscreen);
-#endif
+
         //Write out game mode goals
         for (short k = 0; k < GAMEMODE_LAST; k++)
             options.write_i16(gamemodes[k]->goal);

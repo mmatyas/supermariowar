@@ -109,9 +109,6 @@ class CPlayerInput
 		CPlayerInput();
 		~CPlayerInput(){}
 
-		//Called before
-		void CheckIfMouseUsed();
-
 		//Clears key pressed states
 		void ClearPressedKeys(short iGameState);
 		void ClearGameActionKeys();
@@ -126,9 +123,6 @@ class CPlayerInput
 		COutputControl outputControls[4];
 
 		SDL_KEYTYPE iPressedKey;
-
-	private:
-		bool fUsingMouse;
 };
 
 #endif // INPUT_H

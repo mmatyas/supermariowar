@@ -14,35 +14,7 @@ CPlayerInput::CPlayerInput()
 		}
 	}
 
-	iPressedKey = 0;
-
-	fUsingMouse = false;
-}
-
-void CPlayerInput::CheckIfMouseUsed()
-{
-#ifndef _XBOX
-
-    for (short iGameState = 0; iGameState < 2; iGameState++) {
-        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-			CInputControl * inputControl = &inputControls[iPlayer]->inputGameControls[iGameState];
-
-            for (short iKey = 0; iKey < NUM_KEYS; iKey++) {
-				SDL_KEYTYPE iInputKey = inputControl->keys[iKey];
-
-				//Need to reset analog mouse and joystick because there isn't a no longer moving event
-				if ((iInputKey >= MOUSE_UP && iInputKey <= MOUSE_RIGHT) ||
-                        iInputKey == MOUSE_BUTTON_START + 4 || iInputKey == MOUSE_BUTTON_START + 5) {
-					fUsingMouse = true;
-					return;
-				}
-			}
-		}
-	}
-
-#endif
-
-	fUsingMouse = false;
+    iPressedKey = 0;
 }
 
 //Pass in 0 for game and 1 for menu
@@ -50,32 +22,13 @@ void CPlayerInput::CheckIfMouseUsed()
 void CPlayerInput::ClearPressedKeys(short iGameState)
 {
     for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-		CInputControl * inputControl = &inputControls[iPlayer]->inputGameControls[iGameState];
-		COutputControl * outputControl = &outputControls[iPlayer];
-
+        COutputControl* outputControl = &outputControls[iPlayer];
         for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
-			outputControl->keys[iKey].fPressed = false;
+            outputControl->keys[iKey].fPressed = false;
+        }
+    }
 
-#ifndef _XBOX
-            if (fUsingMouse) {
-				SDL_KEYTYPE iInputKey = inputControl->keys[iKey];
-
-				//Need to reset analog mouse and joystick because there isn't a no longer moving event
-				if ((iInputKey >= MOUSE_UP && iInputKey <= MOUSE_RIGHT) /*||
-					(iInputKey >= JOY_STICK_1_UP && iInputKey <= JOY_STICK_2_RIGHT)*/) {
-					outputControl->keys[iKey].fDown = false;
-				}
-
-				//Clear mouse scroll inputs (scroll button down/up happen on same frame so it needs special case)
-                if (iInputKey == MOUSE_BUTTON_START + 4 || iInputKey == MOUSE_BUTTON_START + 5) {
-					outputControl->keys[iKey].fDown = false;
-				}
-			}
-#endif
-		}
-	}
-
-	iPressedKey = 0;
+    iPressedKey = 0;
 }
 
 void CPlayerInput::ClearGameActionKeys()

@@ -300,17 +300,7 @@ void GraphicsSDL::RecreateWindow(bool fullscreen)
     if (fullscreen)
         flags |= SDL_FULLSCREEN;
 
-#ifdef _XBOX
-    if (game_values.aspectratio10x11)
-        flags |= SDL_10X11PIXELASPECTRATIO;
-
-    screen = SDL_SetVideoModeWithFlickerFilter(GFX_SCREEN_W, GFX_SCREEN_H, GFX_BPP,
-        flags, game_values.flickerfilter, game_values.softfilter);
-
-#else
     screen = SDL_SetVideoMode(GFX_SCREEN_W, GFX_SCREEN_H, GFX_BPP, flags);
-#endif
-
     if (!screen) {
         printf("[gfx] Couldn't create window: %s\n", SDL_GetError());
         throw E_CREATE_WINDOW;
