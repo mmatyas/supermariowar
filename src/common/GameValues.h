@@ -130,7 +130,7 @@ public:
     short		boomeranglife;
     short		boomeranglimit;
     short		cpudifficulty;
-    short		warplockstyle;
+    WarpLockStyle warplockstyle;
     short		warplocktime;
     short		hammerttl;
     short		hammerdelay;
@@ -162,7 +162,7 @@ public:
     ScoreboardStyle scoreboardstyle;
     bool		screencrunch;
     short		shieldtime;
-    short		shieldstyle;
+    ShieldStyle shieldstyle;
     bool		showwinningcrown;
 	short		skinids[4];
     short		wandlimit;

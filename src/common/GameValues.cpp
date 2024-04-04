@@ -139,14 +139,14 @@ void CGameValues::init()
     teamcolors          = true;
     cputurn       = -1;
     shieldtime      = 62;
-    shieldstyle     = 2;
+    shieldstyle     = ShieldStyle::SoftWithStomp;
     musicvolume     = 128;
     soundvolume     = 128;
     respawn       = 2;
     itemrespawntime   = 1860;  //default item respawn is 30 seconds (30 * 62 fps)
     hiddenblockrespawn  = 1860;  //default item respawn is 30 seconds
     outofboundstime   = 5;
-    warplockstyle   = 1;  // Lock Warp Exit Only
+    warplockstyle   = WarpLockStyle::ExitOnly;  // Lock Warp Exit Only
     warplocktime    = 186;  // 3 seconds
 #ifdef _DEBUG
     suicidetime     = 0;  // Turn off suicide kills for debug
@@ -331,7 +331,7 @@ void CGameValues::ReadBinaryConfig() {
         startmodedisplay = options.read_u8();
 
         shieldtime = options.read_i16();
-        shieldstyle = options.read_i16();
+        shieldstyle = static_cast<ShieldStyle>(options.read_i16());
         itemrespawntime = options.read_i16();
         hiddenblockrespawn = options.read_i16();
         fireballttl = options.read_i16();
@@ -356,7 +356,7 @@ void CGameValues::ReadBinaryConfig() {
         redblockttl = options.read_i16();
         grayblockttl = options.read_i16();
         storedpowerupdelay = options.read_i16();
-        warplockstyle = options.read_i16();
+        warplockstyle = static_cast<WarpLockStyle>(options.read_i16());
         warplocktime = options.read_i16();
         suicidetime = options.read_i16();
 
@@ -489,7 +489,7 @@ void CGameValues::WriteConfig()
         options.write_u8(startmodedisplay);
 
         options.write_i16(shieldtime);
-        options.write_i16(shieldstyle);
+        options.write_i16(static_cast<short>(shieldstyle));
         options.write_i16(itemrespawntime);
         options.write_i16(hiddenblockrespawn);
         options.write_i16(fireballttl);
@@ -514,7 +514,7 @@ void CGameValues::WriteConfig()
         options.write_i16(redblockttl);
         options.write_i16(grayblockttl);
         options.write_i16(storedpowerupdelay);
-        options.write_i16(warplockstyle);
+        options.write_i16(static_cast<short>(warplockstyle));
         options.write_i16(warplocktime);
         options.write_i16(suicidetime);
 

@@ -127,12 +127,20 @@ void PlayerWarpStatus::enterWarp(CPlayer& player, Warp* warp)
     warpid = warp->id;
 
     if (game_values.warplocktime > 0) {
-        if (game_values.warplockstyle == 0 || game_values.warplockstyle == 2) //Lock the entrance
-            g_map->warpexits[warp->id].locktimer = game_values.warplocktime;
-        else if (game_values.warplockstyle == 3) //Lock the connection
-            g_map->lockconnection(warpconnection);
-        else if (game_values.warplockstyle == 4) //Lock all warps
-            g_map->lockconnection(-1);
+        switch (game_values.warplockstyle) {
+            case WarpLockStyle::EntranceOnly:
+            case WarpLockStyle::EntranceAndExit:
+                g_map->warpexits[warp->id].locktimer = game_values.warplocktime;
+                break;
+            case WarpLockStyle::EntireConnection:
+                g_map->lockconnection(warpconnection);
+                break;
+            case WarpLockStyle::AllWarps:
+                g_map->lockconnection(-1);
+                break;
+            default:
+                break;
+        }
     }
 
     ifSoundOnPlay(rm->sfx_pipe);
@@ -224,7 +232,7 @@ void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
     }
 
     //Make player shielded when exiting the warp (if that option is turned on)
-    if (game_values.shieldstyle > 0) {
+    if (game_values.shieldstyle != ShieldStyle::NoShield) {
         if (!player.isShielded() || player.shield.time_left() < game_values.shieldtime) {
             player.shield.reset();
         }
@@ -232,7 +240,7 @@ void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
 
     //Lock the warp (if that option is turned on)
     if (game_values.warplocktime > 0) {
-        if (game_values.warplockstyle == 1 || game_values.warplockstyle == 2) //Lock the warp exit
+        if (game_values.warplockstyle == WarpLockStyle::ExitOnly || game_values.warplockstyle == WarpLockStyle::EntranceAndExit) //Lock the warp exit
             exit->locktimer = game_values.warplocktime;
     }
 }
