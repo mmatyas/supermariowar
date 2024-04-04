@@ -799,7 +799,7 @@ bool PU_TreasureChestBonus::collide(CPlayer * player)
 
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
 
-        game_values.noexit = false;
+        game_values.flags.noexit = false;
     }
 
     return false;
@@ -909,7 +909,7 @@ bool MO_BonusHouseChest::collide(CPlayer * player)
         drawbonusitemy = iy + 32;
         drawbonusitemtimer = 75;
 
-        game_values.forceexittimer = 180;
+        game_values.flags.forceexittimer = 180;
         game_values.gamemode->gameover = true;
         game_values.gamemode->winningteam = player->teamID;
     }
@@ -4736,11 +4736,11 @@ void MO_SledgeBrother::update()
             if (iType == 0) {
                 //Shake screen and kill players
                 ifSoundOnPlay(rm->sfx_thunder);
-                game_values.screenshaketimer = 20;
-                game_values.screenshakeplayerid = -1;
-                game_values.screenshaketeamid = -1;
-                game_values.screenshakekillinair = false;
-                game_values.screenshakekillscount = 0;
+                game_values.flags.screenshaketimer = 20;
+                game_values.flags.screenshakeplayerid = -1;
+                game_values.flags.screenshaketeamid = -1;
+                game_values.flags.screenshakekillinair = false;
+                game_values.flags.screenshakekillscount = 0;
             } else if (iType == 1) {
                 //Spawn thwomps
                 ifSoundOnPlay(rm->sfx_thunder);

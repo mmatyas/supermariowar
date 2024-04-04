@@ -65,6 +65,49 @@ struct TourStop {
 };
 
 
+/// Gameplay-specific variables, which are reset on the start of a game.
+struct GameplayFlags {
+    bool pausegame = false;
+    bool exitinggame = false;
+    bool exityes = false;
+
+    bool noexit = false;
+    short noexittimer = 0;
+    short forceexittimer = 0;
+
+    short teamdeadcounter = 0;
+
+    short screenshaketimer = 0;
+    short screenshakeplayerid = -1;
+    short screenshaketeamid = -1;
+    short screenshakekillscount = 0;
+    bool screenshakekillinair = false;
+
+    short slowdownon = -1;
+    short slowdowncounter = 0;
+
+    bool showscoreboard = false;
+    float scorepercentmove = 0.0f;
+
+    bool playskidsound = false;
+    bool playinvinciblesound = false;
+    bool playflyingsound = false;
+
+    bool swapplayers = false;
+    float swapplayersposition = 0.0f;
+    bool swapplayersblink = false;
+    short swapplayersblinkcount = 0;
+
+    float gamewindx = 0.0f;
+    float gamewindy = 0.0f;
+
+    bool windaffectsplayers = false;
+    bool spinscreen = false;
+    bool reversewalk = false;
+    bool spotlights = false;
+};
+
+
 // the real configuration class
 class CGameConfig {
 public:
@@ -165,14 +208,11 @@ public:
     short		softfilter;
     bool		aspectratio10x11;
 
+    GameplayFlags flags;
     CGameMode   *gamemode;
 
-    bool		pausegame;
-    bool		exitinggame;
-    bool		exityes;
-
-    bool		showscoreboard;
-    float		scorepercentmove;
+    short screenfade = 0;
+    short screenfadespeed = 0;
 
     MatchType matchtype;	//The currently selected match type: quick game, single, tournament, tour, world, minigame
 
@@ -191,9 +231,6 @@ public:
 
     short		worldindex;
 
-    short		slowdownon;
-    short		slowdowncounter;
-
     short		storedpowerups[4];
     short		gamepowerups[4];
     short		powerupweights[NUM_POWERUPS];
@@ -205,19 +242,11 @@ public:
 
     short		colorids[4];
 
-    short		screenshaketimer;
-    short		screenshakeplayerid;
-    short		screenshaketeamid;
-    bool		screenshakekillinair;
-    short		screenshakekillscount;
-
     short		bulletbilltimer[4];
     short		bulletbillspawntimer[4];
 
     short		loadedannouncer;
     short		loadedmusic;
-
-    short		teamdeadcounter;
 
     short		cputurn;
 
@@ -228,18 +257,6 @@ public:
 
     GameModeSettings gamemodesettings;
 
-	bool		playskidsound;
-    bool		playinvinciblesound;
-    bool		playflyingsound;
-
-    bool		swapplayers;
-    float		swapplayersposition;
-    bool		swapplayersblink;
-    short		swapplayersblinkcount;
-
-    short		screenfade;
-    short		screenfadespeed;
-
     bool		soundcapable;
 
     bool *		pfFilters;
@@ -248,16 +265,9 @@ public:
     bool		fNeedWriteFilters;
     bool		fFiltersOn;
 
-    bool		noexit;
-    short		noexittimer;
-    short		forceexittimer;
-
     short		singleplayermode;
 
     bool		worldskipscoreboard;
-
-    float		gamewindx;
-    float		gamewindy;
 
     bool		windaffectsplayers;
     bool		spinscreen;

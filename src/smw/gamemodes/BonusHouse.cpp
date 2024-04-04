@@ -24,7 +24,7 @@ void CGM_Bonus::init()
     CGameMode::init();
 
     //Unlock the chests
-    game_values.noexit = true;
+    game_values.flags.noexit = true;
 
     //Will cause the flow to skip the scoreboard screen and go straight back to the world map
     game_values.worldskipscoreboard = true;

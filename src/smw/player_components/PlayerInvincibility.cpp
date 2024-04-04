@@ -27,7 +27,7 @@ void PlayerInvincibility::turn_on(CPlayer& player)
     ifsoundonstop(rm->sfx_invinciblemusic);
 
     if (!game_values.gamemode->gameover) {
-        game_values.playinvinciblesound = true;
+        game_values.flags.playinvinciblesound = true;
 
         if (game_values.music && game_values.sound)
             rm->backgroundmusic[0].stop();
