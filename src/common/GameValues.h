@@ -196,7 +196,7 @@ public:
     bool		frameadvance;
     bool		autokill;
 
-    AppState gamestate;
+    AppState appstate = AppState::Splash;
 
     float		screenResizeX;
     float		screenResizeY;

@@ -151,7 +151,7 @@ void SplashScreenState::update()
 
 #ifndef _XBOX
         case SDL_QUIT: {
-            game_values.gamestate = AppState::Quit;
+            game_values.appstate = AppState::Quit;
             return;
         }
         break;
@@ -171,7 +171,7 @@ void SplashScreenState::update()
 #ifndef _XBOX
             case SDLK_F4:
                 if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
-                    game_values.gamestate = AppState::Quit;
+                    game_values.appstate = AppState::Quit;
                     return;
                 }
                 break;
@@ -214,7 +214,7 @@ void SplashScreenState::update()
                 eyecandy[2].clean();
 
                 game_values.playerInput.ResetKeys();
-                game_values.gamestate = AppState::Menu;
+                game_values.appstate = AppState::Menu;
 
                 MenuState::instance().init();
                 GameplayState::instance().init();
