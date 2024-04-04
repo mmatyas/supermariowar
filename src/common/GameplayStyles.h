@@ -33,9 +33,26 @@ enum class JailStyle : unsigned char {
 };
 
 
+enum class ShieldStyle : unsigned char {
+    NoShield,
+    Soft,
+    SoftWithStomp,
+    Hard,
+};
+
+
 enum class StarStyle : unsigned char {
     Ztar,
     Shine,
     Multi,
     Random,
+};
+
+
+enum class WarpLockStyle : unsigned char {
+    EntranceOnly,
+    ExitOnly,
+    EntranceAndExit,
+    EntireConnection,
+    AllWarps,
 };

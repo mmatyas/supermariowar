@@ -39,11 +39,11 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu()
     miRespawnField->setOutputPtr(&game_values.respawn);
     miRespawnField->setCurrentValue(game_values.respawn);
 
-    miShieldStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 80, "Shield Style", 500, 220);
-    miShieldStyleField->add("No Shield", 0);
-    miShieldStyleField->add("Soft", 1);
-    miShieldStyleField->add("Soft with Stomp", 2);
-    miShieldStyleField->add("Hard", 3);
+    miShieldStyleField = new MI_SelectField<ShieldStyle>(&rm->spr_selectfield, 70, 80, "Shield Style", 500, 220);
+    miShieldStyleField->add("No Shield", ShieldStyle::NoShield);
+    miShieldStyleField->add("Soft", ShieldStyle::Soft);
+    miShieldStyleField->add("Soft with Stomp", ShieldStyle::SoftWithStomp);
+    miShieldStyleField->add("Hard", ShieldStyle::Hard);
     miShieldStyleField->setOutputPtr(&game_values.shieldstyle);
     miShieldStyleField->setCurrentValue(game_values.shieldstyle);
 
@@ -87,12 +87,12 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu()
     miSuicideTimeField->setOutputPtr(&game_values.suicidetime);
     miSuicideTimeField->setCurrentValue(game_values.suicidetime);
 
-    miWarpLockStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 240, "Warp Lock Style", 500, 220);
-    miWarpLockStyleField->add("Entrance Only", 0);
-    miWarpLockStyleField->add("Exit Only", 1);
-    miWarpLockStyleField->add("Entrance and Exit", 2);
-    miWarpLockStyleField->add("Entire Connection", 3);
-    miWarpLockStyleField->add("All Warps", 4);
+    miWarpLockStyleField = new MI_SelectField<WarpLockStyle>(&rm->spr_selectfield, 70, 240, "Warp Lock Style", 500, 220);
+    miWarpLockStyleField->add("Entrance Only", WarpLockStyle::EntranceOnly);
+    miWarpLockStyleField->add("Exit Only", WarpLockStyle::ExitOnly);
+    miWarpLockStyleField->add("Entrance and Exit", WarpLockStyle::EntranceAndExit);
+    miWarpLockStyleField->add("Entire Connection", WarpLockStyle::EntireConnection);
+    miWarpLockStyleField->add("All Warps", WarpLockStyle::AllWarps);
     miWarpLockStyleField->setOutputPtr(&game_values.warplockstyle);
     miWarpLockStyleField->setCurrentValue(game_values.warplockstyle);
 

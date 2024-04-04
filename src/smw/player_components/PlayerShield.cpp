@@ -14,7 +14,7 @@ void PlayerShield::reset()
             timer = game_values.shieldtime;
             type = (PlayerShieldType)game_values.shieldstyle;
         }
-    } else if (game_values.shieldstyle > 0) {
+    } else if (game_values.shieldstyle != ShieldStyle::NoShield) {
         timer = game_values.shieldtime;
         type = (PlayerShieldType)game_values.shieldstyle;
     }
@@ -22,7 +22,7 @@ void PlayerShield::reset()
 
 void PlayerShield::turn_on()
 {
-    type = game_values.shieldstyle > 0 ? (PlayerShieldType)game_values.shieldstyle : SOFT;
+    type = game_values.shieldstyle != ShieldStyle::NoShield ? (PlayerShieldType)game_values.shieldstyle : SOFT;
     timer = 60;
 }
 
