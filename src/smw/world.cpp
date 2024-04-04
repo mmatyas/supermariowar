@@ -1739,28 +1739,6 @@ void WorldMap::SetInitialPowerups()
 * Tour Stop functions
 **********************************/
 
-short ReadTourStopSetting(short * iSetting, bool * fSetting, short iDefault, bool fDefault)
-{
-    char * pszTemp = strtok(NULL, ",\n");
-    if (pszTemp) {
-        if (iSetting)
-            *iSetting = atoi(pszTemp);
-
-        if (fSetting)
-            *fSetting = atoi(pszTemp) == 1;
-
-        return 1;
-    } else {
-        if (iSetting)
-            *iSetting = iDefault;
-
-        if (fSetting)
-            *fSetting = fDefault;
-    }
-
-    return 0;
-}
-
 template<typename T>
 short ReadTourStopSetting(T& output, T defaultVal)
 {
@@ -1959,147 +1937,147 @@ TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
             if (ts->iMode == 0) { //classic
                 ts->fUseSettings = true;
                 ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.classic.style, game_values.gamemodemenusettings.classic.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.classic.scoring, NULL, game_values.gamemodemenusettings.classic.scoring, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.classic.scoring, game_values.gamemodemenusettings.classic.scoring);
             } else if (ts->iMode == 1) { //frag
                 ts->fUseSettings = true;
                 ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frag.style, game_values.gamemodemenusettings.frag.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frag.scoring, NULL, game_values.gamemodemenusettings.frag.scoring, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frag.scoring, game_values.gamemodemenusettings.frag.scoring);
             } else if (ts->iMode == 2) { //time
                 ts->fUseSettings = true;
                 ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.style, game_values.gamemodemenusettings.time.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.scoring, NULL, game_values.gamemodemenusettings.time.scoring, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.percentextratime, NULL, game_values.gamemodemenusettings.time.percentextratime, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.scoring, game_values.gamemodemenusettings.time.scoring);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.percentextratime, game_values.gamemodemenusettings.time.percentextratime);
             } else if (ts->iMode == 3) { //jail
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.style, game_values.gamemodemenusettings.jail.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.timetofree, NULL, game_values.gamemodemenusettings.jail.timetofree, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.jail.tagfree, 0, game_values.gamemodemenusettings.jail.tagfree);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.percentkey, NULL, game_values.gamemodemenusettings.jail.percentkey, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.timetofree, game_values.gamemodemenusettings.jail.timetofree);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.tagfree, game_values.gamemodemenusettings.jail.tagfree);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.percentkey, game_values.gamemodemenusettings.jail.percentkey);
             } else if (ts->iMode == 4) { //coins
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.coins.penalty, 0, game_values.gamemodemenusettings.coins.penalty);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.coins.quantity, NULL, game_values.gamemodemenusettings.coins.quantity, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.coins.percentextracoin, NULL, game_values.gamemodemenusettings.coins.percentextracoin, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.coins.penalty, game_values.gamemodemenusettings.coins.penalty);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.coins.quantity, game_values.gamemodemenusettings.coins.quantity);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.coins.percentextracoin, game_values.gamemodemenusettings.coins.percentextracoin);
             } else if (ts->iMode == 5) { //stomp
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.stomp.rate, NULL, game_values.gamemodemenusettings.stomp.rate, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.stomp.rate, game_values.gamemodemenusettings.stomp.rate);
 
                 for (int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
-                    ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.stomp.enemyweight[iEnemy]), NULL, game_values.gamemodemenusettings.stomp.enemyweight[iEnemy], false);
+                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.stomp.enemyweight[iEnemy]), game_values.gamemodemenusettings.stomp.enemyweight[iEnemy]);
             } else if (ts->iMode == 6) { //egg
                 ts->fUseSettings = true;
 
                 for (int iEgg = 0; iEgg < 4; iEgg++)
-                    ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.eggs[iEgg]), NULL, game_values.gamemodemenusettings.egg.eggs[iEgg], false);
+                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.egg.eggs[iEgg]), game_values.gamemodemenusettings.egg.eggs[iEgg]);
 
                 for (int iYoshi = 0; iYoshi < 4; iYoshi++)
-                    ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.yoshis[iYoshi]), NULL, game_values.gamemodemenusettings.egg.yoshis[iYoshi], false);
+                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.egg.yoshis[iYoshi]), game_values.gamemodemenusettings.egg.yoshis[iYoshi]);
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.explode), NULL, game_values.gamemodemenusettings.egg.explode, false);
+                ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.egg.explode), game_values.gamemodemenusettings.egg.explode);
             } else if (ts->iMode == 7) { //capture the flag
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.flag.speed, NULL, game_values.gamemodemenusettings.flag.speed, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.touchreturn, 0, game_values.gamemodemenusettings.flag.touchreturn);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.pointmove, 0, game_values.gamemodemenusettings.flag.pointmove);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.flag.autoreturn, NULL, game_values.gamemodemenusettings.flag.autoreturn, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.homescore, 0, game_values.gamemodemenusettings.flag.homescore);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.centerflag, 0, game_values.gamemodemenusettings.flag.centerflag);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.speed, game_values.gamemodemenusettings.flag.speed);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.touchreturn, game_values.gamemodemenusettings.flag.touchreturn);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.pointmove, game_values.gamemodemenusettings.flag.pointmove);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.autoreturn, game_values.gamemodemenusettings.flag.autoreturn);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.homescore, game_values.gamemodemenusettings.flag.homescore);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.centerflag, game_values.gamemodemenusettings.flag.centerflag);
             } else if (ts->iMode == 8) { //chicken
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.chicken.usetarget, 0, game_values.gamemodemenusettings.chicken.usetarget);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.chicken.glide, 0, game_values.gamemodemenusettings.chicken.glide);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chicken.usetarget, game_values.gamemodemenusettings.chicken.usetarget);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chicken.glide, game_values.gamemodemenusettings.chicken.glide);
             } else if (ts->iMode == 9) { //tag
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.tag.tagontouch, 0, game_values.gamemodemenusettings.tag.tagontouch);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.tag.tagontouch, game_values.gamemodemenusettings.tag.tagontouch);
             } else if (ts->iMode == 10) { //star
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.time, NULL, game_values.gamemodemenusettings.star.time, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.time, game_values.gamemodemenusettings.star.time);
                 ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.shine, game_values.gamemodemenusettings.star.shine);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.percentextratime, NULL, game_values.gamemodemenusettings.star.percentextratime, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.percentextratime, game_values.gamemodemenusettings.star.percentextratime);
             } else if (ts->iMode == 11) { //domination
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.domination.quantity, NULL, game_values.gamemodemenusettings.domination.quantity, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.domination.relocationfrequency, NULL, game_values.gamemodemenusettings.domination.relocationfrequency, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.domination.loseondeath, 0, game_values.gamemodemenusettings.domination.loseondeath);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.domination.relocateondeath, 0, game_values.gamemodemenusettings.domination.relocateondeath);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.domination.stealondeath, 0, game_values.gamemodemenusettings.domination.stealondeath);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.quantity, game_values.gamemodemenusettings.domination.quantity);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.relocationfrequency, game_values.gamemodemenusettings.domination.relocationfrequency);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.loseondeath, game_values.gamemodemenusettings.domination.loseondeath);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.relocateondeath, game_values.gamemodemenusettings.domination.relocateondeath);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.stealondeath, game_values.gamemodemenusettings.domination.stealondeath);
             } else if (ts->iMode == 12) { //king of the hill
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.areasize, NULL, game_values.gamemodemenusettings.kingofthehill.areasize, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.relocationfrequency, NULL, game_values.gamemodemenusettings.kingofthehill.relocationfrequency, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.maxmultiplier, NULL, game_values.gamemodemenusettings.kingofthehill.maxmultiplier, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.kingofthehill.areasize, game_values.gamemodemenusettings.kingofthehill.areasize);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.kingofthehill.relocationfrequency, game_values.gamemodemenusettings.kingofthehill.relocationfrequency);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.kingofthehill.maxmultiplier, game_values.gamemodemenusettings.kingofthehill.maxmultiplier);
             } else if (ts->iMode == 13) { //race
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.race.quantity, NULL, game_values.gamemodemenusettings.race.quantity, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.race.speed, NULL, game_values.gamemodemenusettings.race.speed, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.race.penalty, NULL, game_values.gamemodemenusettings.race.penalty, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.race.quantity, game_values.gamemodemenusettings.race.quantity);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.race.speed, game_values.gamemodemenusettings.race.speed);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.race.penalty, game_values.gamemodemenusettings.race.penalty);
             } else if (ts->iMode == 15) { //frenzy
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frenzy.quantity, NULL, game_values.gamemodemenusettings.frenzy.quantity, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frenzy.rate, NULL, game_values.gamemodemenusettings.frenzy.rate, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.frenzy.storedshells, 0, game_values.gamemodemenusettings.frenzy.storedshells);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frenzy.quantity, game_values.gamemodemenusettings.frenzy.quantity);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frenzy.rate, game_values.gamemodemenusettings.frenzy.rate);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frenzy.storedshells, game_values.gamemodemenusettings.frenzy.storedshells);
 
                 for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
-                    ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.frenzy.powerupweight[iPowerup]), NULL, game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup], false);
+                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.frenzy.powerupweight[iPowerup]), game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
             } else if (ts->iMode == 16) { //survival
                 ts->fUseSettings = true;
 
                 for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
-                    ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.survival.enemyweight[iEnemy]), NULL, game_values.gamemodemenusettings.survival.enemyweight[iEnemy], false);
+                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.survival.enemyweight[iEnemy]), game_values.gamemodemenusettings.survival.enemyweight[iEnemy]);
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.survival.density, NULL, game_values.gamemodemenusettings.survival.density, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.survival.speed, NULL, game_values.gamemodemenusettings.survival.speed, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.survival.shield, 0, game_values.gamemodemenusettings.survival.shield);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.survival.density, game_values.gamemodemenusettings.survival.density);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.survival.speed, game_values.gamemodemenusettings.survival.speed);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.survival.shield, game_values.gamemodemenusettings.survival.shield);
             } else if (ts->iMode == 17) { //greed
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.coinlife, NULL, game_values.gamemodemenusettings.greed.coinlife, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.greed.owncoins, 0, game_values.gamemodemenusettings.greed.owncoins);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.multiplier, NULL, game_values.gamemodemenusettings.greed.multiplier, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.percentextracoin, NULL, game_values.gamemodemenusettings.greed.percentextracoin, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.coinlife, game_values.gamemodemenusettings.greed.coinlife);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.owncoins, game_values.gamemodemenusettings.greed.owncoins);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.multiplier, game_values.gamemodemenusettings.greed.multiplier);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.percentextracoin, game_values.gamemodemenusettings.greed.percentextracoin);
             } else if (ts->iMode == 18) { //health
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.startlife, NULL, game_values.gamemodemenusettings.health.startlife, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.maxlife, NULL, game_values.gamemodemenusettings.health.maxlife, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.percentextralife, NULL, game_values.gamemodemenusettings.health.percentextralife, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.health.startlife, game_values.gamemodemenusettings.health.startlife);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.health.maxlife, game_values.gamemodemenusettings.health.maxlife);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.health.percentextralife, game_values.gamemodemenusettings.health.percentextralife);
             } else if (ts->iMode == 19) { //card collection
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.quantity, NULL, game_values.gamemodemenusettings.collection.quantity, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.rate, NULL, game_values.gamemodemenusettings.collection.rate, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.banktime, NULL, game_values.gamemodemenusettings.collection.banktime, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.cardlife, NULL, game_values.gamemodemenusettings.collection.cardlife, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.quantity, game_values.gamemodemenusettings.collection.quantity);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.rate, game_values.gamemodemenusettings.collection.rate);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.banktime, game_values.gamemodemenusettings.collection.banktime);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.cardlife, game_values.gamemodemenusettings.collection.cardlife);
             } else if (ts->iMode == 20) { //chase (phanto)
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.chase.phantospeed, NULL, game_values.gamemodemenusettings.chase.phantospeed, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chase.phantospeed, game_values.gamemodemenusettings.chase.phantospeed);
 
                 for (short iPhanto = 0; iPhanto < 3; iPhanto++)
-                    ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.chase.phantoquantity[iPhanto], NULL, game_values.gamemodemenusettings.chase.phantoquantity[iPhanto], false);
+                    ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chase.phantoquantity[iPhanto], game_values.gamemodemenusettings.chase.phantoquantity[iPhanto]);
             } else if (ts->iMode == 21) { //shyguy tag
                 ts->fUseSettings = true;
 
-                ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.shyguytag.tagonsuicide, 0, game_values.gamemodemenusettings.shyguytag.tagonsuicide);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.shyguytag.tagtransfer, NULL, game_values.gamemodemenusettings.shyguytag.tagtransfer, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.shyguytag.freetime, NULL, game_values.gamemodemenusettings.shyguytag.freetime, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.shyguytag.tagonsuicide, game_values.gamemodemenusettings.shyguytag.tagonsuicide);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.shyguytag.tagtransfer, game_values.gamemodemenusettings.shyguytag.tagtransfer);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.shyguytag.freetime, game_values.gamemodemenusettings.shyguytag.freetime);
             } else if (ts->iMode == 1001) { //boss minigame
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.bosstype, game_values.gamemodemenusettings.boss.bosstype);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.difficulty, NULL, game_values.gamemodemenusettings.boss.difficulty, false);
-                ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.hitpoints, NULL, game_values.gamemodemenusettings.boss.hitpoints, false);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.difficulty, game_values.gamemodemenusettings.boss.difficulty);
+                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.hitpoints, game_values.gamemodemenusettings.boss.hitpoints);
             }
         }
     } else if (iStageType == 1) { //Bonus House
