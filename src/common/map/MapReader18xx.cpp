@@ -12,6 +12,15 @@ extern short g_iTileTypeConversion[NUMTILETYPES];
 
 using namespace std;
 
+
+namespace {
+struct TilesetTranslation {
+    short iID;
+    char szName[128];
+};
+}  // namespace
+
+
 MapReader1800::MapReader1800()
     : MapReader1702()
     , iMaxTilesetID(-1)
