@@ -167,11 +167,6 @@ struct TilesetTile {
 	short iRow;
 };
 
-struct TilesetTranslation {
-	short iID;
-	char szName[128];
-};
-
 struct AnimatedTile {
 	short id;
 	TilesetTile layers[4];

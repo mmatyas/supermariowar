@@ -39,7 +39,6 @@ using std::endl;
 
 
 extern gfxSprite spr_frontmap[2];
-extern short g_iTileConversion[];
 // extern int32_t g_iVersion[];
 
 extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
@@ -96,40 +95,6 @@ SDL_Rect g_rPirhanaRects[4][4][4] = { { { {0, 0, 32, 48}, {32, 0, 32, 48}, {64, 
     }
 };
 
-// Conversion to switch 1.6 tiles into 1.7 tiles
-short g_iTileConversion[] = {
-    0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
-    10, 11, 12, 13, 14, 15, 575,670,702,703,
-    32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-    42, 43, 44, 45, 46, 47, 332,331,330,637,
-    64, 65, 66, 67, 68, 69, 70, 71, 72, 73,
-    74, 75, 76, 77, 78, 79, 365,299,366,853,
-    537,595,505,658,659,656,657,774,775,776,
-    540,96, 97, 98, 643,644,645,26, 27, 506,
-    122,123,124,690,691,688,689,745,746,747,
-    569,128,129,130,704,677,907,90, 91, 572,
-    931,602,539,885,728,729,730,731,186,187,
-    188,160,161,162,736,192,194,30, 31, 898,
-    737,738,739,800,760,761,762,763,218,219,
-    220,864,865,509,768,224,226,62, 63, 930,
-    769,770,771,508,598,599,600,507,601,510,
-    603,896,897,192,193,260,259,193,194,541,
-    627,699,697,940,941,942,860,861,862,250,
-    252,543,158,498,499,500,922,924,854,886,
-    605,125,126,127,720,721,752,754,753,722,
-    723,928,929,563,531,532,923,571,882,851,
-    309,310,311,343,278,341,99, 100,101,489,
-    490,491,384,385,386,147,113,148,914,664,
-    373,374,375,376,310,377,131,132,133,553,
-    554,555,416,417,418,179,145,180,946,570,
-    867,868,869,213,214,215,163,164,165,566,
-    567,568,448,449,450,863,530,504,892,883,
-    899,900,901,245,246,247,777,778,779,250,
-    251,252,856,857,858,859,562,712,893,905,
-    908,909,910,624,625,626,592,593,594,282,
-    283,284,888,889,890,891,710,711,894,937
-};
-
 short iPlatformPathDotOffset[3] = {0, 12, 18};
 short iPlatformPathDotSize[3] = {12, 6, 4};
 
@@ -137,8 +102,6 @@ short iFireballHazardSize[3] = {18, 9, 5};
 
 short iStandardOffset[3] = {0, 32, 48};
 float dBulletBillFrequency[3] = {10.0f, 5.0f, 2.5f};
-
-short iPirhanaPlantOffsetY[4][3] = {{0, 0, 0}, {48, 24, 12}, {96, 48, 24}, {160, 80, 40}};
 
 
 namespace {
@@ -238,7 +201,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
             iBulletPathX += hazard->iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
         }
     } else if (hazard->itype == 3) { //flame cannon
-        SDL_Rect * rect = &g_rFlameRects[hazard->iparam[1]][2];
+        const SDL_Rect * rect = &g_rFlameRects[hazard->iparam[1]][2];
 
         short iOffsetX = 0;
         short iOffsetY = 0;
@@ -251,7 +214,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 
         rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
     } else if (hazard->itype >= 4 && hazard->itype <= 7) { //pirhana plants
-        SDL_Rect * rect = &g_rPirhanaRects[hazard->itype - 4][hazard->iparam[1]][0];
+        const SDL_Rect * rect = &g_rPirhanaRects[hazard->itype - 4][hazard->iparam[1]][0];
         short iOffsetX = 0;
         short iOffsetY = 0;
 

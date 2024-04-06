@@ -541,7 +541,7 @@ void IO_FlameCannon::update()
 void IO_FlameCannon::draw()
 {
     if (state > 0) {
-        SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
+        const SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
         rm->spr_hazard_flame[0].draw(ix, iy, rect->x, rect->y, rect->w, rect->h);
     }
 }
@@ -550,7 +550,7 @@ void IO_FlameCannon::draw()
 void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 {
     if (state > 0) {
-        SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
+        const SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
         gfx_drawpreview(rm->spr_hazard_flame[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, rect->w >> 1, rect->h >> 1, iOffsetX, iOffsetY, 320, 240, true);
     }
 }
