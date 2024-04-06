@@ -129,11 +129,10 @@ If you'd rather use the system libraries, please see the [Build configuration](#
 Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. In short:
 
 ```sh
-unzip data.zip
 mkdir build && cd build
 cmake ..
 make -j4 # -jN = build on N threads
-./smw ../data
+./smw --datadir ../data
 ```
 
 The main build targets for `make` are:
