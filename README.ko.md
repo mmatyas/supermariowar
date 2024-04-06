@@ -116,11 +116,10 @@ git submodule update --init
 빌드할 디렉토리를 작성하고 CMake를 실행하여 프로젝트를 구성한다. 그리고 빌드하려고 할 때마다 `make`를 호출해라. 간단히 말하자면:
 
 ```sh
-unzip data.zip
 mkdir build && cd build
 cmake ..
 make -j4 # -jN = build on N threads
-./smw ../data
+./smw --datadir ../data
 ```
 
 `make`의 주요 빌드 대상:
@@ -162,7 +161,7 @@ SMW 당신의 브라우저에서 [Emscripten](https://kripken.github.io/emscript
 
 SDL(1.2 또는 2.0) 이 작동하는 모든 장치에 SMW을 이식할 수 있을 것이다. 일반적으로, 다음 단계들을 포함한다:
 
-- 너의 기기에 맞는 크로스 컴파일러 툴체인을 받아라 
+- 너의 기기에 맞는 크로스 컴파일러 툴체인을 받아라
 - SDL 라이브러리들이 포함되어있지 않으면 크로스 컴파일해라
   - SDL 빌드
   - PNG를 이용해 SDL_image 빌드
@@ -171,8 +170,8 @@ SDL(1.2 또는 2.0) 이 작동하는 모든 장치에 SMW을 이식할 수 있�
   - OGG를 이용해 SDL_mixer 빌드
     - libogg 필요
     - libvorbis 필요
-- CMake 툴체인 파일 생성 및 컴파일러와 경로 정의 
-- 툴체인 파일을 이용하여 빌드 
+- CMake 툴체인 파일 생성 및 컴파일러와 경로 정의
+- 툴체인 파일을 이용하여 빌드
 
 ### Build configuration
 
