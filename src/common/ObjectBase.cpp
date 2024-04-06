@@ -3,8 +3,6 @@
 #include "GlobalConstants.h"
 #include "map.h"
 
-extern int g_iNextNetworkID;
-
 extern CMap* g_map;
 
 float CapFallingVelocity(float vel)
@@ -51,8 +49,6 @@ CObject::CObject(gfxSprite *nspr1, short x, short y)
     collisionHeight = ih;
     collisionOffsetX = 0;
     collisionOffsetY = 0;
-
-    iNetworkID = g_iNextNetworkID++;
 }
 
 /*
