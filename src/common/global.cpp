@@ -4,7 +4,6 @@
 #include "gfx.h"
 #include "map.h"
 #include "MapList.h"
-#include "MovingObjectTypes.h"
 #include "ResourceManager.h"
 #include "TilesetManager.h"
 
@@ -100,11 +99,6 @@ CTilesetManager *g_tilesetmanager;
 
 
 bool g_fLoadMessages = true;
-
-//Network stuff
-int g_iNextNetworkID = 0;
-int g_iNextMessageID = 0;
-char szIPString[32] = "";
 
 //Joystick-Init
 SDL_Joystick **joysticks = NULL;
