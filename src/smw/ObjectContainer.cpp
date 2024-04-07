@@ -75,7 +75,7 @@ bool CObjectContainer::isBlockAt(short x, short y)
 
 float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
 {
-    int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
+    int dist = App::screenWidth * 1000;  //Longest distance from corner to corner squared
 
     for (short i = 0; i < list_end; i++) {
         if (list[i]->getObjectType() != objectType)
@@ -95,7 +95,7 @@ float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
 
 float CObjectContainer::getClosestMovingObject(short ix, short iy, short movingObjectType)
 {
-    int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
+    int dist = App::screenWidth * 1000;  //Longest distance from corner to corner squared
 
     for (short i = 0; i < list_end; i++) {
         if (list[i]->getObjectType() != object_moving || ((IO_MovingObject*)list[i])->getMovingObjectType() != movingObjectType)

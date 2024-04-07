@@ -62,10 +62,10 @@ void CGM_Survival::think()
 
 #pragma warning("Replace all these magic constants with proportional values")
             if (0 == iSelectedEnemy) {
-                objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)RANDOM_INT(smw->ScreenWidth * 0.92f), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(RANDOM_INT(20))/10.0f));
+                objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)RANDOM_INT(App::screenWidth * 0.92f), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(RANDOM_INT(20))/10.0f));
                 timer = (short)(RANDOM_INT(21) - 10 + rate);
             } else if (1 == iSelectedEnemy) {
-                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(smw->ScreenWidth * 0.95f ), smw->ScreenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 8.0f, -1, -1, -1, false));
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(App::screenWidth * 0.95f ), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 8.0f, -1, -1, -1, false));
                 timer = (short)(RANDOM_INT(21) - 10 + rate - 20);
             } else {
                 float dSpeed = ((float)(RANDOM_INT(21) + 20)) / 10.0f;
@@ -75,7 +75,7 @@ void CGM_Survival::think()
                 if (dVel < 0)
                     x = 694;
 
-                objectcontainer[2].add(new OMO_BowserFire(&rm->spr_bowserfire, x, (short)RANDOM_INT( smw->ScreenHeight * 0.93f ), dVel, 0.0f, -1, -1, -1));
+                objectcontainer[2].add(new OMO_BowserFire(&rm->spr_bowserfire, x, (short)RANDOM_INT( App::screenHeight * 0.93f ), dVel, 0.0f, -1, -1, -1));
                 timer = (short)(RANDOM_INT(21) - 10 + rate);
             }
         }

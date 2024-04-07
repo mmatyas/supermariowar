@@ -420,7 +420,8 @@ int main(int argc, char *argv[])
         RootDataDirectory = cmd.data_root;
     }
 
-	smw = new CGame();
+	ensureSettingsDir();
+
 	rm = new CResourceManager();
 	g_map = new CMap();
 	g_tilesetmanager = new CTilesetManager();

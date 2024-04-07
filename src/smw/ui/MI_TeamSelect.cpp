@@ -9,7 +9,6 @@
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-extern CGame* smw;
 
 extern SkinList *skinlist;
 
@@ -94,9 +93,9 @@ void MI_TeamSelect::Draw()
     }
 
     if (fAllReady) {
-        rm->menu_plain_field.draw(ix + 108, iy + smw->ScreenHeight * 0.47f, 0, 160, 100, 32);
-        rm->menu_plain_field.draw(ix + 208, iy + smw->ScreenHeight * 0.47f, 412, 160, 100, 32);
-        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, iy + smw->ScreenHeight * 0.48f, "Continue");
+        rm->menu_plain_field.draw(ix + 108, iy + App::screenHeight * 0.47f, 0, 160, 100, 32);
+        rm->menu_plain_field.draw(ix + 208, iy + App::screenHeight * 0.47f, 412, 160, 100, 32);
+        rm->menu_font_large.drawCentered(App::screenWidth/2, iy + App::screenHeight * 0.48f, "Continue");
     }
 }
 

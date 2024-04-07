@@ -14,7 +14,6 @@
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-extern CGame* smw;
 extern CScore* score[4];
 extern short iScoreboardPlayerOffsetsX[3][3];
 
@@ -190,8 +189,8 @@ void MI_TournamentScoreboard::Update()
                     sprintf(szWinnerText, "Team %d Wins!", iTournamentWinner + 1);
 
                 short iStringWidth = (short)rm->menu_font_large.getWidth(szWinnerText);
-                short iRandX = (short)(RANDOM_INT(smw->ScreenWidth - iStringWidth) + (iStringWidth >> 1));
-                short iRandY = (short)(RANDOM_INT(smw->ScreenHeight - 100) + 100);
+                short iRandX = (short)(RANDOM_INT(App::screenWidth - iStringWidth) + (iStringWidth >> 1));
+                short iRandY = (short)(RANDOM_INT(App::screenHeight - 100) + 100);
 
                 uiMenu->AddEyeCandy(new EC_GravText(&rm->menu_font_large, iRandX, iRandY, szWinnerText, -VELJUMP));
             }

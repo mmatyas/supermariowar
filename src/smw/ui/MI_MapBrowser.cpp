@@ -11,7 +11,6 @@
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-extern CGame* smw;
 extern CMap* g_map;
 extern MapList* maplist;
 
@@ -36,8 +35,8 @@ MI_MapBrowser::MI_MapBrowser()
 
     srcRectBackground.x = 0;
     srcRectBackground.y = 0;
-    srcRectBackground.w = smw->ScreenWidth;
-    srcRectBackground.h = smw->ScreenHeight;
+    srcRectBackground.w = App::screenWidth;
+    srcRectBackground.h = App::screenHeight;
 
     dstRectBackground.x = 0;
     dstRectBackground.y = 0;

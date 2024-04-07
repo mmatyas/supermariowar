@@ -100,7 +100,6 @@ extern short currentgamemode;
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
-extern CGame* smw;
 
 extern FiltersList *filterslist;
 extern MapList *maplist;
@@ -977,7 +976,7 @@ void MenuState::update()
             rm->LoadMenuGraphics();
 
             blitdest = rm->menu_backdrop.getSurface();
-            rm->menu_shade.setalpha(smw->MenuTransparency);
+            rm->menu_shade.setalpha(App::menuTransparency);
             rm->menu_shade.draw(0, 0);
             blitdest = screen;
         } else if (MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED == code) {
@@ -1408,18 +1407,18 @@ void MenuState::update()
 
     if (fGenerateMapThumbs) {
         rm->menu_dialog.draw(160, 176, 0, 0, 160, 64);
-		rm->menu_dialog.draw(smw->ScreenWidth/2, 176, 352, 0, 160, 64);
+		rm->menu_dialog.draw(App::screenWidth/2, 176, 352, 0, 160, 64);
         rm->menu_dialog.draw(160, 240, 0, 416, 160, 64);
-		rm->menu_dialog.draw(smw->ScreenWidth/2, smw->ScreenHeight/2, 352, 416, 160, 64);
-		rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 215, "Refreshing Map Thumbnails");
-		rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 245, "Please Wait...");
+		rm->menu_dialog.draw(App::screenWidth/2, App::screenHeight/2, 352, 416, 160, 64);
+		rm->menu_font_large.drawCentered(App::screenWidth/2, 215, "Refreshing Map Thumbnails");
+		rm->menu_font_large.drawCentered(App::screenWidth/2, 245, "Please Wait...");
     }
 
 // TODO: FIX
 /*#if	!_DEBUG
     if (game_values.showfps)
 #endif
-        rm->menu_font_large.drawf(0, smw->ScreenHeight - rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, 1000.0f / (float)WAITTIME, flipfps, 1000.0f / (float)ticks);
+        rm->menu_font_large.drawf(0, App::screenHeight - rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, 1000.0f / (float)WAITTIME, flipfps, 1000.0f / (float)ticks);
 */
 
 #ifdef _DEBUG

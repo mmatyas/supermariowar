@@ -14,7 +14,6 @@ extern CEyecandyContainer eyecandy[3];
 
 extern CMap* g_map;
 
-extern CGame * smw;
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
@@ -146,10 +145,10 @@ void EC_Cloud::update()
 {
     dx += velx;
 
-    if (dx > smw->ScreenWidth)
-        dx -= smw->ScreenWidth;
+    if (dx > App::screenWidth)
+        dx -= App::screenWidth;
     else if (dx < 0.0f)
-        dx += smw->ScreenWidth;
+        dx += App::screenWidth;
 
     ix = (short)dx;
 }
@@ -172,10 +171,10 @@ void EC_Ghost::update()
 
     dx += velx;
 
-    if (dx >= smw->ScreenWidth)
-        dx -= smw->ScreenWidth;
+    if (dx >= App::screenWidth)
+        dx -= App::screenWidth;
     else if (dx < 0.0f)
-        dx += smw->ScreenWidth;
+        dx += App::screenWidth;
 
     ix = (short)dx;
     iy = (short)dy;
@@ -201,19 +200,19 @@ void EC_Leaf::update()
     dx += velx + game_values.flags.gamewindx;
     dy += vely + game_values.flags.gamewindy;
 
-    if (dx >= smw->ScreenWidth)
-        dx -= smw->ScreenWidth;
+    if (dx >= App::screenWidth)
+        dx -= App::screenWidth;
     else if (dx < 0.0f)
-        dx += smw->ScreenWidth;
+        dx += App::screenWidth;
 
-    if (vely > 0.0f && iy >= smw->ScreenHeight) {
+    if (vely > 0.0f && iy >= App::screenHeight) {
         dy = -16.0f;
-        dx = RANDOM_INT(smw->ScreenWidth);
+        dx = RANDOM_INT(App::screenWidth);
 
         NextLeaf();
     } else if (vely < 0.0f && iy < -16) {
-        dy = smw->ScreenHeight;
-        dx = RANDOM_INT(smw->ScreenWidth);
+        dy = App::screenHeight;
+        dx = RANDOM_INT(App::screenWidth);
 
         NextLeaf();
     }
@@ -260,17 +259,17 @@ void EC_Snow::update()
     dx += velx + game_values.flags.gamewindx;
     dy += vely + game_values.flags.gamewindy;
 
-    if (dx >= smw->ScreenWidth)
-        dx -= smw->ScreenWidth;
+    if (dx >= App::screenWidth)
+        dx -= App::screenWidth;
     else if (dx < 0.0f)
-        dx += smw->ScreenWidth;
+        dx += App::screenWidth;
 
-    if (vely > 0.0f && iy >= smw->ScreenHeight) {
+    if (vely > 0.0f && iy >= App::screenHeight) {
         dy = -16.0f;
-        dx = RANDOM_INT(smw->ScreenWidth);
+        dx = RANDOM_INT(App::screenWidth);
     } else if (vely < 0.0f && iy < -16) {
-        dy = smw->ScreenHeight;
-        dx = RANDOM_INT(smw->ScreenWidth);
+        dy = App::screenHeight;
+        dx = RANDOM_INT(App::screenWidth);
     }
 
     ix = (short)dx;
@@ -296,10 +295,10 @@ void EC_Rain::update()
 
     //If rain is off left edge, wrap it
     if (dx < 0.0f)
-        dx += smw->ScreenWidth;
+        dx += App::screenWidth;
 
     //If rain is off bottom edge, change the rain gfx and start it from the top
-    if (iy >= smw->ScreenHeight)
+    if (iy >= App::screenHeight)
         NextRainDrop();
 
     ix = (short)dx;
@@ -312,7 +311,7 @@ void EC_Rain::NextRainDrop()
     vely = 4.0f + RANDOM_INT(5) / 4.0f;
 
     dy = -16.0f;
-    dx = RANDOM_INT(smw->ScreenWidth);
+    dx = RANDOM_INT(App::screenWidth);
 
     iSrcX = RANDOM_INT(8) * 10;
 }
@@ -338,9 +337,9 @@ void EC_Bubble::update()
 
     //If bubble is off the edges, wrap it
     if (dx < 0.0f)
-        dx += smw->ScreenWidth;
-    else if (dx + iAnimationW >= smw->ScreenWidth)
-        dx -= smw->ScreenWidth;
+        dx += App::screenWidth;
+    else if (dx + iAnimationW >= App::screenWidth)
+        dx -= App::screenWidth;
 
     //If bubble is off top edge, move it back to the bottom to start again
     if (iy + iAnimationH < 0)
@@ -355,8 +354,8 @@ void EC_Bubble::NextBubble()
     velx = -1.0f + RANDOM_INT(9) / 4.0f;
     vely = -4.0f + RANDOM_INT(9) / 4.0f;
 
-    dy = smw->ScreenHeight;
-    dx = RANDOM_INT(smw->ScreenWidth);
+    dy = App::screenHeight;
+    dx = RANDOM_INT(App::screenWidth);
 
     iAnimationFrame = RANDOM_INT(4) << 4;
 }
@@ -374,17 +373,17 @@ EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
     offsetx = iSrcOffsetX;
 
     if (ix + PWOFFSET < 0)
-		tx = (ix + smw->ScreenWidth + PWOFFSET) / TILESIZE;
+		tx = (ix + App::screenWidth + PWOFFSET) / TILESIZE;
     else
         tx = (ix + PWOFFSET) / TILESIZE;
 
-    if (ix + PWOFFSET + PW >= smw->ScreenWidth)
-        tx2 = (ix + PWOFFSET + PW - smw->ScreenWidth) / TILESIZE;
+    if (ix + PWOFFSET + PW >= App::screenWidth)
+        tx2 = (ix + PWOFFSET + PW - App::screenWidth) / TILESIZE;
     else
         tx2 = (ix + PWOFFSET + PW) / TILESIZE;
 
     //Wrap around screen properly
-    short width = smw->ScreenWidth / TILESIZE;
+    short width = App::screenWidth / TILESIZE;
     if (tx < 0) tx += width;
     else if (tx >= width) tx -= width;
     if (tx2 < 0) tx2 += width;
@@ -396,7 +395,7 @@ void EC_Corpse::update()
     if (vely != 0.0f) {
         short nexty = (short)(dy + 32.0f + vely);
 
-        if (nexty >= smw->ScreenHeight) {
+        if (nexty >= App::screenHeight) {
             dead = true;
             return;
         }
@@ -472,7 +471,7 @@ void EC_GravText::update()
     y += vely;
     vely += GRAVITATION;
 
-	if (y > smw->ScreenHeight)
+	if (y > App::screenHeight)
         dead = true;
 }
 
@@ -482,9 +481,9 @@ void EC_GravText::draw()
     font->draw((short)x, (short)y, text);
 
     if (x < 0)
-		font->draw((short)x + smw->ScreenWidth, (short)y, text);
-    else if (x + w > smw->ScreenWidth - 1)
-        font->draw((short)x - smw->ScreenWidth, (short)y, text);
+		font->draw((short)x + App::screenWidth, (short)y, text);
+    else if (x + w > App::screenWidth - 1)
+        font->draw((short)x - App::screenWidth, (short)y, text);
 
 }
 
@@ -527,7 +526,7 @@ EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char 
     short iWidth = 16 + iFontOffsetX + font->getWidth(text);
     short iHalfWidth = iWidth >> 1;
 
-    ix = smw->ScreenWidth/2 - iHalfWidth;
+    ix = App::screenWidth/2 - iHalfWidth;
 
     gfx_setrect(&rDstRect[0], ix, iy, iHalfWidth, 32);
     gfx_setrect(&rDstRect[1], ix + iHalfWidth, iy, iHalfWidth, 32);
@@ -535,9 +534,9 @@ EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char 
     gfx_setrect(&rDstRect[3], ix + iHalfWidth, iy + 32, iHalfWidth, 32);
 
     gfx_setrect(&rSrcRect[0], 0, 0, iHalfWidth, 32);
-    gfx_setrect(&rSrcRect[1], smw->ScreenWidth * 0.8f - iHalfWidth, 0, iHalfWidth, 32);
-    gfx_setrect(&rSrcRect[2], 0, smw->ScreenHeight * 0.93f, iHalfWidth, 32);
-    gfx_setrect(&rSrcRect[3], smw->ScreenWidth * 0.8f - iHalfWidth, smw->ScreenHeight * 0.93f, iHalfWidth, 32);
+    gfx_setrect(&rSrcRect[1], App::screenWidth * 0.8f - iHalfWidth, 0, iHalfWidth, 32);
+    gfx_setrect(&rSrcRect[2], 0, App::screenHeight * 0.93f, iHalfWidth, 32);
+    gfx_setrect(&rSrcRect[3], App::screenWidth * 0.8f - iHalfWidth, App::screenHeight * 0.93f, iHalfWidth, 32);
 }
 
 
@@ -589,7 +588,7 @@ void EC_FallingObject::update()
     ix = (short)fx;
     iy = (short)fy;
 
-    if (fy >= smw->ScreenHeight) {
+    if (fy >= App::screenHeight) {
         dead = true;
         return;
     }
@@ -1038,7 +1037,7 @@ EC_BossPeeker::EC_BossPeeker(gfxSprite *nspr, short speed, short bossType) :
     timer = 0;
     state = 0;
     ix = 592;
-    iy = smw->ScreenHeight;
+    iy = App::screenHeight;
 
 	game_values.bosspeeking = bossType;
 }
@@ -1063,7 +1062,7 @@ void EC_BossPeeker::update()
     else if (state == 2)
     {
         iy += 2;
-        if (iy >= smw->ScreenHeight)
+        if (iy >= App::screenHeight)
         {
             dead = true;
             game_values.bosspeeking = -1;
@@ -1270,10 +1269,10 @@ void Spotlight::Draw()
     SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDst);
 
     if (ix - iHalfWidth < 0) {
-		SDL_Rect rDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
+		SDL_Rect rDstWrap = {ix - iHalfWidth + App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
-	} else if (ix + iHalfWidth >= smw->ScreenWidth) {
-		SDL_Rect rDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
+	} else if (ix + iHalfWidth >= App::screenWidth) {
+		SDL_Rect rDstWrap = {ix - iHalfWidth - App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
 
@@ -1291,12 +1290,12 @@ void Spotlight::Draw()
 
     if (ix - iHalfWidth < 0)
     {
-        SDL_Rect rDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
+        SDL_Rect rDstWrap = {ix - iHalfWidth + App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
-    else if (ix + iHalfWidth >= smw->ScreenWidth)
+    else if (ix + iHalfWidth >= App::screenWidth)
     {
-        SDL_Rect rDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
+        SDL_Rect rDstWrap = {ix - iHalfWidth - App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
 
@@ -1310,12 +1309,12 @@ void Spotlight::Draw()
 
         if (ix - iHalfWidth < 0)
         {
-            SDL_Rect rTransDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
+            SDL_Rect rTransDstWrap = {ix - iHalfWidth + App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
             SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
         }
-		else if (ix + iHalfWidth >= smw->ScreenWidth)
+		else if (ix + iHalfWidth >= App::screenWidth)
         {
-            SDL_Rect rTransDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
+            SDL_Rect rTransDstWrap = {ix - iHalfWidth - App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
             SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
         }
     }

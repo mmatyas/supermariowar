@@ -14,26 +14,25 @@
 #include <unistd.h>
 #endif
 
-CGame::CGame()
+
+void ensureSettingsDir()
 {
-    // make sure that the .smw directory is created
-    std::string smwHome = GetHomeDirectory();
+    const std::string smwHome = GetHomeDirectory();
 
 #if	_WIN32
-    if (CreateDirectory(smwHome .c_str(), NULL) ||
-            ERROR_ALREADY_EXISTS == GetLastError()) {
-    	//TODO: print that directory already exists
+    const bool success = CreateDirectory(smwHome.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
+    if (!success)
+        perror("[error] Could not create settings directory");
 
-    } else {
-    	//TODO: print that we created the directory
-    }
 #else
     struct stat st;
     if (stat(smwHome.c_str(), &st) != 0) { // inode does not exist
         if (mkdir(smwHome.c_str(), 0775) != 0)
             perror("[error] Could not create settings directory");
     }
-    else if (!S_ISDIR(st.st_mode)) // inode exist, but not a directory
+    else if (!S_ISDIR(st.st_mode)) {  // inode exist, but not a directory
         perror("[error] Could not access settings directory");
+    }
+
 #endif
 }

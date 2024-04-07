@@ -75,15 +75,15 @@ void CGM_Bonus::draw_background()
     rm->spr_worldbonushouse.draw(544, 256, list_players[0]->leftX() > 544 ? 224 : 192, 0, 32, 64);
 
     //Draw Bonus House Title
-    rm->menu_plain_field.draw(0, 0, 0, 0, smw->ScreenWidth/2, 32);
-    rm->menu_plain_field.draw(smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32);
-    rm->game_font_large.drawCentered(smw->ScreenWidth/2, 5, tsTourStop->szName);
+    rm->menu_plain_field.draw(0, 0, 0, 0, App::screenWidth/2, 32);
+    rm->menu_plain_field.draw(App::screenWidth/2, 0, 192, 0, App::screenWidth/2, 32);
+    rm->game_font_large.drawCentered(App::screenWidth/2, 5, tsTourStop->szName);
 
     //Draw Bonus House Text
     if (tsTourStop->iBonusTextLines > 0) {
         rm->spr_worldbonushouse.draw(128, 128, 0, 64, 384, 128);
 
         for (short iTextLine = 0; iTextLine < tsTourStop->iBonusTextLines; iTextLine++)
-            rm->game_font_large.drawChopCentered(smw->ScreenWidth/2, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
+            rm->game_font_large.drawChopCentered(App::screenWidth/2, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
     }
 }

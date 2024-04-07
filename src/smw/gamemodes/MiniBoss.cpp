@@ -38,7 +38,7 @@ void CGM_Boss_MiniGame::init()
     for (short iScore = 0; iScore < score_cnt; iScore++)
         score[iScore]->SetScore(goal);
 
-    objectcontainer[0].add(new MO_SledgeBrother(&rm->spr_sledgebrothers, (iBossType == Boss::Hammer ? 256 : (iBossType == Boss::Bomb ? 256 : smw->ScreenWidth/2)), iBossType));
+    objectcontainer[0].add(new MO_SledgeBrother(&rm->spr_sledgebrothers, (iBossType == Boss::Hammer ? 256 : (iBossType == Boss::Bomb ? 256 : App::screenWidth/2)), iBossType));
 }
 
 
@@ -71,7 +71,7 @@ void CGM_Boss_MiniGame::think()
         } else if (iBossType == Boss::Fire) {
             //Only create podobos if the difficulty is moderate or greater
             if (--enemytimer <= 0 && game_values.gamemodesettings.boss.difficulty >= 2) {
-                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 enemytimer = (short)(RANDOM_INT(80) + 60);
             }
 
@@ -90,17 +90,17 @@ void CGM_Boss_MiniGame::draw_foreground()
 {
     if (gameover) {
         if (winningteam == -1) {
-            rm->game_font_large.drawCentered(smw->ScreenWidth/2, 96, "You Failed To Defeat");
+            rm->game_font_large.drawCentered(App::screenWidth/2, 96, "You Failed To Defeat");
 
             switch (iBossType) {
                 case Boss::Hammer:
-                    rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Sledge Brother");
+                    rm->game_font_large.drawCentered(App::screenWidth/2, 118, "The Mighty Sledge Brother");
                     break;
                 case Boss::Bomb:
-                    rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Bomb Brother");
+                    rm->game_font_large.drawCentered(App::screenWidth/2, 118, "The Mighty Bomb Brother");
                     break;
                 case Boss::Fire:
-                    rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Flame Brother");
+                    rm->game_font_large.drawCentered(App::screenWidth/2, 118, "The Mighty Flame Brother");
                     break;
             }
         }

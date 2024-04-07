@@ -30,7 +30,6 @@ extern short list_players_cnt;
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-extern CGame* smw;
 
 enum CollisionStyle {collision_none, collision_normal, collision_overlap_left, collision_overlap_right};
 
@@ -183,12 +182,12 @@ StraightPathContinuous::StraightPathContinuous(float vel, float startX, float st
         SetVelocity(type);
     }
 
-    dEdgeX = smw->ScreenWidth;
-    dEdgeY = smw->ScreenHeight;
+    dEdgeX = App::screenWidth;
+    dEdgeY = App::screenHeight;
 
     if (preview) {
-        dEdgeX = smw->ScreenWidth/2;
-        dEdgeY = smw->ScreenHeight/2;
+        dEdgeX = App::screenWidth/2;
+        dEdgeY = App::screenHeight/2;
     }
 }
 
@@ -297,7 +296,7 @@ bool FallingPath::Move(short type)
 {
     dVelY[type] = CapFallingVelocity(dVelY[type] + GRAVITATION);
 
-    if (pPlatform->fy - pPlatform->iHalfHeight >= smw->ScreenHeight) {
+    if (pPlatform->fy - pPlatform->iHalfHeight >= App::screenHeight) {
         //If a player is standing on this platform, clear him off
         for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
             if (list_players[iPlayer]->platform == pPlatform) {
@@ -445,10 +444,10 @@ void MovingPlatform::draw()
     //Deal with wrapping over sides of screen
     bool fBlitSide = false;
     if (ix - iHalfWidth < 0) {
-        rDstRect.x = ix - iHalfWidth + smw->ScreenWidth + x_shake;
+        rDstRect.x = ix - iHalfWidth + App::screenWidth + x_shake;
         fBlitSide = true;
-    } else if (ix + iHalfWidth >= smw->ScreenWidth) {
-        rDstRect.x = ix - iHalfWidth - smw->ScreenWidth + x_shake;
+    } else if (ix + iHalfWidth >= App::screenWidth) {
+        rDstRect.x = ix - iHalfWidth - App::screenWidth + x_shake;
         fBlitSide = true;
     }
 
@@ -467,7 +466,7 @@ void MovingPlatform::draw()
     /*
     if (iy - iHalfHeight < 0)
     {
-    	rDstRect.y = iy - iHalfHeight + smw->ScreenHeight;
+    	rDstRect.y = iy - iHalfHeight + App::screenHeight;
     	rDstRect.x = ix - iHalfWidth;
 
         if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
@@ -477,9 +476,9 @@ void MovingPlatform::draw()
 
     	rDstRect.y = iy - iHalfHeight;
     }
-    else if (iy + iHalfHeight >= smw->ScreenHeight)
+    else if (iy + iHalfHeight >= App::screenHeight)
     {
-    	rDstRect.y = iy - iHalfHeight - smw->ScreenHeight;
+    	rDstRect.y = iy - iHalfHeight - App::screenHeight;
     	rDstRect.x = ix - iHalfWidth;
 
         if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
@@ -492,8 +491,8 @@ void MovingPlatform::draw()
 
     if (ix - iHalfWidth < 0 && iy - iHalfHeight < 0)
     {
-    	rDstRect.x = ix - iHalfWidth + smw->ScreenWidth;
-    	rDstRect.y = iy - iHalfHeight + smw->ScreenHeight;
+    	rDstRect.x = ix - iHalfWidth + App::screenWidth;
+    	rDstRect.y = iy - iHalfHeight + App::screenHeight;
 
         if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
     	{
@@ -503,10 +502,10 @@ void MovingPlatform::draw()
     	rDstRect.x = ix - iHalfWidth;
     	rDstRect.y = iy - iHalfHeight;
     }
-    else if (ix + iHalfWidth >= smw->ScreenWidth && iy + iHalfHeight >= smw->ScreenHeight)
+    else if (ix + iHalfWidth >= App::screenWidth && iy + iHalfHeight >= App::screenHeight)
     {
-    	rDstRect.x = ix - iHalfWidth - smw->ScreenWidth;
-    	rDstRect.y = iy - iHalfHeight - smw->ScreenHeight;
+    	rDstRect.x = ix - iHalfWidth - App::screenWidth;
+    	rDstRect.y = iy - iHalfHeight - App::screenHeight;
 
         if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
     	{
@@ -528,7 +527,7 @@ void MovingPlatform::draw()
 //Draw path for map preview
 void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 {
-    gfx_drawpreview(sSurface[0], ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY, 0, 0, iWidth, iHeight, iOffsetX, iOffsetY, smw->ScreenWidth/2, smw->ScreenHeight/2, true);
+    gfx_drawpreview(sSurface[0], ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY, 0, 0, iWidth, iHeight, iOffsetX, iOffsetY, App::screenWidth/2, App::screenHeight/2, true);
 }
 
 void MovingPlatform::update()
@@ -629,13 +628,13 @@ void MovingPlatform::collide(CPlayer * player)
     if (fColVelX > 0.01f || player->iHorizontalPlatformCollision == 3) {
         float fRelativeX;
 
-        //if (player->fx + PW >= smw->ScreenWidth)
+        //if (player->fx + PW >= App::screenWidth)
         if (coldec == collision_normal)
             fRelativeX = player->fx + PW - fx + iHalfWidth;
         else if (coldec == collision_overlap_left)
-            fRelativeX = player->fx + PW - fx + iHalfWidth - smw->ScreenWidth;
+            fRelativeX = player->fx + PW - fx + iHalfWidth - App::screenWidth;
         else
-            fRelativeX = player->fx + PW - fx + iHalfWidth + smw->ScreenWidth;
+            fRelativeX = player->fx + PW - fx + iHalfWidth + App::screenWidth;
 
         //printf(">>>>Checking Right Side fRelativeX: %.5f  fRelativeY1: %.5f  fRelativeY2: %.5f\n", fRelativeX, fRelativeY1, fRelativeY2);
 
@@ -696,9 +695,9 @@ void MovingPlatform::collide(CPlayer * player)
         if (coldec == collision_normal)
             fRelativeX = player->fx - fx + iHalfWidth;
         else if (coldec == collision_overlap_left)
-            fRelativeX = player->fx - fx + iHalfWidth - smw->ScreenWidth;
+            fRelativeX = player->fx - fx + iHalfWidth - App::screenWidth;
         else
-            fRelativeX = player->fx - fx + iHalfWidth + smw->ScreenWidth;
+            fRelativeX = player->fx - fx + iHalfWidth + App::screenWidth;
 
         //printf(">>>>Checking Left Side fRelativeX: %.5f  fRelativeY1: %.5f  fRelativeY2: %.5f\n", fRelativeX, fRelativeY1, fRelativeY2);
 
@@ -768,11 +767,11 @@ void MovingPlatform::collide(CPlayer * player)
         fRelativeX1 = player->fx - fx + iHalfWidth;
         fRelativeX2 = player->fx + PW - fx + iHalfWidth;
     } else if (coldec == collision_overlap_left) {
-        fRelativeX1 = player->fx - fx + iHalfWidth - smw->ScreenWidth;
-        fRelativeX2 = player->fx + PW - fx + iHalfWidth - smw->ScreenWidth;
+        fRelativeX1 = player->fx - fx + iHalfWidth - App::screenWidth;
+        fRelativeX2 = player->fx + PW - fx + iHalfWidth - App::screenWidth;
     } else {
-        fRelativeX1 = player->fx - fx + iHalfWidth + smw->ScreenWidth;
-        fRelativeX2 = player->fx + PW - fx + iHalfWidth + smw->ScreenWidth;
+        fRelativeX1 = player->fx - fx + iHalfWidth + App::screenWidth;
+        fRelativeX2 = player->fx + PW - fx + iHalfWidth + App::screenWidth;
     }
 
     if (fColVelY < 0.0f) {
@@ -946,8 +945,8 @@ void MovingPlatform::check_map_collision_right(CPlayer * player)
         return;
 
     short iTestBackgroundX;
-    if (player->fx + PW >= smw->ScreenWidth)
-        iTestBackgroundX = ((short)player->fx + PW - smw->ScreenWidth) / TILESIZE;
+    if (player->fx + PW >= App::screenWidth)
+        iTestBackgroundX = ((short)player->fx + PW - App::screenWidth) / TILESIZE;
     else
         iTestBackgroundX = ((short)player->fx + PW) / TILESIZE;
 
@@ -1024,9 +1023,9 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
     //Check the left side
     float fRelativeXLeft = object->fx - fx + iHalfWidth;
     if (coldec == collision_overlap_left)
-        fRelativeXLeft -= smw->ScreenWidth;
+        fRelativeXLeft -= App::screenWidth;
     else if (coldec == collision_overlap_right)
-        fRelativeXLeft += smw->ScreenWidth;
+        fRelativeXLeft += App::screenWidth;
 
     //Check the right side
     float fRelativeXRight = fRelativeXLeft + object->collisionWidth;
@@ -1266,12 +1265,12 @@ short MovingPlatform::coldec_player(CPlayer * player)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
     if (player->fx + PW < fx - iHalfWidth) {
-        if (player->fx + smw->ScreenWidth >= fx + iHalfWidth || player->fx + PW + smw->ScreenWidth < fx - iHalfWidth || player->fPrecalculatedY >= fy + iHalfHeight || player->fPrecalculatedY + PH < fy - iHalfHeight)
+        if (player->fx + App::screenWidth >= fx + iHalfWidth || player->fx + PW + App::screenWidth < fx - iHalfWidth || player->fPrecalculatedY >= fy + iHalfHeight || player->fPrecalculatedY + PH < fy - iHalfHeight)
             return collision_none;
         else
             return collision_overlap_right;
     } else if (fx + iHalfWidth < player->fx) {
-        if (player->fx >= fx + iHalfWidth + smw->ScreenWidth || player->fx + PW < fx - iHalfWidth + smw->ScreenWidth || player->fPrecalculatedY >= fy + iHalfHeight || player->fPrecalculatedY + PH < fy - iHalfHeight)
+        if (player->fx >= fx + iHalfWidth + App::screenWidth || player->fx + PW < fx - iHalfWidth + App::screenWidth || player->fPrecalculatedY >= fy + iHalfHeight || player->fPrecalculatedY + PH < fy - iHalfHeight)
             return collision_none;
         else
             return collision_overlap_left;
@@ -1299,8 +1298,8 @@ void MovingPlatform::GetTileTypesFromPlayer(CPlayer * player, int * lefttile, in
     float fRelativeX1 = player->fx - fx + iHalfWidth;
 
     float fRelativeX2;
-    if (player->fx + PW > smw->ScreenWidth)
-        fRelativeX2 = player->fx + PW - smw->ScreenWidth - fx + iHalfWidth;
+    if (player->fx + PW > App::screenWidth)
+        fRelativeX2 = player->fx + PW - App::screenWidth - fx + iHalfWidth;
     else
         fRelativeX2 = player->fx + PW - fx + iHalfWidth;
 
@@ -1318,10 +1317,10 @@ int MovingPlatform::GetTileTypeFromCoord(short x, short y)
     if (fRelativeY < 0.0f || fRelativeY >= iHeight)
         return tile_flag_nonsolid;
 
-    if (x >= smw->ScreenWidth)
-        x -= smw->ScreenWidth;
+    if (x >= App::screenWidth)
+        x -= App::screenWidth;
     else if (x < 0)
-        x += smw->ScreenWidth;
+        x += App::screenWidth;
 
     float fRelativeX = x - fx + iHalfWidth;
 
@@ -1378,9 +1377,9 @@ void MovingPlatform::collide(IO_MovingObject * object)
     if (fColVelX > 0.01f || object->iHorizontalPlatformCollision == 3) {
         float fRelativeX;
         if (coldec == collision_overlap_left)
-            fRelativeX = object->fx + object->collisionWidth - fx + iHalfWidth - smw->ScreenWidth;
+            fRelativeX = object->fx + object->collisionWidth - fx + iHalfWidth - App::screenWidth;
         else if (coldec == collision_overlap_right)
-            fRelativeX = object->fx + object->collisionWidth - fx + iHalfWidth + smw->ScreenWidth;
+            fRelativeX = object->fx + object->collisionWidth - fx + iHalfWidth + App::screenWidth;
         else
             fRelativeX = object->fx + object->collisionWidth - fx + iHalfWidth;
 
@@ -1409,8 +1408,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
                     short iTestBackgroundY2 = ((short)object->fy + object->collisionHeight) / TILESIZE;
 
                     short iTestBackgroundX;
-                    if (object->fx + object->collisionWidth >= smw->ScreenWidth)
-                        iTestBackgroundX = ((short)object->fx + object->collisionWidth - smw->ScreenWidth) / TILESIZE;
+                    if (object->fx + object->collisionWidth >= App::screenWidth)
+                        iTestBackgroundX = ((short)object->fx + object->collisionWidth - App::screenWidth) / TILESIZE;
                     else
                         iTestBackgroundX = ((short)object->fx + object->collisionWidth) / TILESIZE;
 
@@ -1444,9 +1443,9 @@ void MovingPlatform::collide(IO_MovingObject * object)
     } else if (fColVelX < -0.01f || object->iHorizontalPlatformCollision == 1) {
         float fRelativeX;
         if (coldec == collision_overlap_left)
-            fRelativeX = object->fx - fx + iHalfWidth - smw->ScreenWidth;
+            fRelativeX = object->fx - fx + iHalfWidth - App::screenWidth;
         else if (coldec == collision_overlap_right)
-            fRelativeX = object->fx - fx + iHalfWidth + smw->ScreenWidth;
+            fRelativeX = object->fx - fx + iHalfWidth + App::screenWidth;
         else
             fRelativeX = object->fx - fx + iHalfWidth;
 
@@ -1516,11 +1515,11 @@ void MovingPlatform::collide(IO_MovingObject * object)
         fRelativeX1 = object->fx - fx + iHalfWidth;
         fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth;
     } else if (coldec == collision_overlap_left) {
-        fRelativeX1 = object->fx - fx + iHalfWidth - smw->ScreenWidth;
-        fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth - smw->ScreenWidth;
+        fRelativeX1 = object->fx - fx + iHalfWidth - App::screenWidth;
+        fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth - App::screenWidth;
     } else {
-        fRelativeX1 = object->fx - fx + iHalfWidth + smw->ScreenWidth;
-        fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth + smw->ScreenWidth;
+        fRelativeX1 = object->fx - fx + iHalfWidth + App::screenWidth;
+        fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth + App::screenWidth;
     }
 
     if (fColVelY < 0.0f) {
@@ -1641,12 +1640,12 @@ short MovingPlatform::coldec_object(IO_MovingObject * object)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
     if (object->fx + object->collisionWidth < fx - iHalfWidth) {
-        if (object->fx + smw->ScreenWidth >= fx + iHalfWidth || object->fx + object->collisionWidth + smw->ScreenWidth < fx - iHalfWidth || object->fPrecalculatedY >= fy + iHalfHeight || object->fPrecalculatedY + object->collisionHeight < fy - iHalfHeight)
+        if (object->fx + App::screenWidth >= fx + iHalfWidth || object->fx + object->collisionWidth + App::screenWidth < fx - iHalfWidth || object->fPrecalculatedY >= fy + iHalfHeight || object->fPrecalculatedY + object->collisionHeight < fy - iHalfHeight)
             return collision_none;
         else
             return collision_overlap_right;
     } else if (fx + iHalfWidth < object->fx) {
-        if (object->fx >= fx + iHalfWidth + smw->ScreenWidth || object->fx + object->collisionWidth < fx - iHalfWidth + smw->ScreenWidth || object->fPrecalculatedY >= fy + iHalfHeight || object->fPrecalculatedY + object->collisionHeight < fy - iHalfHeight)
+        if (object->fx >= fx + iHalfWidth + App::screenWidth || object->fx + object->collisionWidth < fx - iHalfWidth + App::screenWidth || object->fPrecalculatedY >= fy + iHalfHeight || object->fPrecalculatedY + object->collisionHeight < fy - iHalfHeight)
             return collision_none;
         else
             return collision_overlap_left;
@@ -1676,9 +1675,9 @@ bool MovingPlatform::IsInNoSpawnZone(short iX, short iY, short w, short h)
 
     //Deal with screen side overlap
     if (iX + w < iLeft)
-    	iX += smw->ScreenWidth;
+    	iX += App::screenWidth;
     else if (iX >= iRight)
-    	iX -= smw->ScreenWidth;
+    	iX -= App::screenWidth;
 
     if (iX + w < iLeft || iX >= iRight)
         return false;

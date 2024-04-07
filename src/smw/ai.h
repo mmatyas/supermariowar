@@ -5,7 +5,6 @@
 #include <map>
 
 #include "Game.h"
-extern CGame *smw;
 
 class CObject;
 class CPlayer;
@@ -26,11 +25,11 @@ public:
         teammate = NULL;
         threat = NULL;
 
-        playerdistance = smw->ScreenWidth * 1000;
-        goaldistance = smw->ScreenWidth * 1000;
-        stompdistance = smw->ScreenWidth * 1000;
-        teammatedistance = smw->ScreenWidth * 1000;
-        threatdistance = smw->ScreenWidth * 1000;
+        playerdistance = App::screenWidth * 1000;
+        goaldistance = App::screenWidth * 1000;
+        stompdistance = App::screenWidth * 1000;
+        teammatedistance = App::screenWidth * 1000;
+        threatdistance = App::screenWidth * 1000;
 
         playerwrap = false;
         goalwrap = false;

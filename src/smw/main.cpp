@@ -176,7 +176,6 @@ void gameloop_frame()
 void create_globals()
 {
     // this instance will contain the other relevant objects
-    smw = new CGame();
     rm = new CResourceManager();
 #pragma warning ("delete these or use boost GC shared_ptr")
 
@@ -348,6 +347,7 @@ int main(int argc, char *argv[])
 
 void main_game()
 {
+    ensureSettingsDir();
     create_globals();
 
     printf("-------------------------------------------------------------------------------\n");
@@ -355,7 +355,7 @@ void main_game()
     printf("-------------------------------------------------------------------------------\n");
     printf("\n---------------- startup ----------------\n");
 
-	gfx_init(smw->ScreenWidth, smw->ScreenHeight, false);		//initialize the graphics (SDL)
+	gfx_init(App::screenWidth, App::screenHeight, false);		//initialize the graphics (SDL)
     blitdest = screen;
 
 #if	0
@@ -472,5 +472,4 @@ void main_game()
 
 	// release all resources
 	delete rm;
-    delete smw;
 }
