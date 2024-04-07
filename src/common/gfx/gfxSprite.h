@@ -28,7 +28,7 @@ public:
     int getHeight();
 
     void setSurface(SDL_Surface * surface);
-    SDL_Surface *getSurface();
+    SDL_Surface *getSurface() const;
 
     bool GetWrap();
     void SetWrap(bool wrap);

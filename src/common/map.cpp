@@ -264,7 +264,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
                 SDL_Rect bltrect = {iDstX, iDstY, iTileSize, iTileSize};
                 if (tile->iID >= 0) {
-                    SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), g_tilesetmanager->GetRect(iSize, tile->iCol, tile->iRow), blitdest, &bltrect);
+                    SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->surface(iSize), g_tilesetmanager->GetRect(iSize, tile->iCol, tile->iRow), blitdest, &bltrect);
                 } else if (tile->iID == TILESETANIMATED) {
                     SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), g_tilesetmanager->GetRect(iSize, tile->iCol * 4, tile->iRow), blitdest, &bltrect);
                 } else if (tile->iID == TILESETUNKNOWN) {
@@ -288,7 +288,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                     bltrect.h = iTileSize;
 
                     if (tile->iID >= 0)
-                        SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), g_tilesetmanager->GetRect(iSize, tile->iCol, tile->iRow), blitdest, &bltrect);
+                        SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->surface(iSize), g_tilesetmanager->GetRect(iSize, tile->iCol, tile->iRow), blitdest, &bltrect);
                     else if (tile->iID == TILESETANIMATED)
                         SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), g_tilesetmanager->GetRect(iSize, tile->iCol * 4, tile->iRow), blitdest, &bltrect);
                     else if (tile->iID == TILESETUNKNOWN)
@@ -919,7 +919,7 @@ void CMap::saveMap(const std::string& file)
             mapfile.write_i32(iTileset);
 
             //Tileset Name
-            mapfile.write_string_long(g_tilesetmanager->GetTileset(iTileset)->GetName());
+            mapfile.write_string_long(g_tilesetmanager->GetTileset(iTileset)->name().c_str());
         }
     }
 
@@ -936,10 +936,10 @@ void CMap::saveMap(const std::string& file)
 
                 //Make sure the tile's col and row are within the tileset
                 if (tile->iID >= 0) {
-                    if (tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->GetWidth())
+                    if (tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->width())
                         tile->iCol = 0;
 
-                    if (tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->GetHeight())
+                    if (tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->height())
                         tile->iRow = 0;
                 }
 
@@ -974,10 +974,10 @@ void CMap::saveMap(const std::string& file)
 
                 //Make sure the tile's col and row are within the tileset
                 if (tile->iID >= 0) {
-                    if (tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->GetWidth())
+                    if (tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->width())
                         tile->iCol = 0;
 
-                    if (tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->GetHeight())
+                    if (tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->height())
                         tile->iRow = 0;
                 }
 
@@ -2076,7 +2076,7 @@ void CMap::SetupAnimatedTiles()
                     for (short iLayer = 0; iLayer < iAnimatedBackgroundLayers; iLayer++) {
                         TilesetTile * tilesetTile = &tile->layers[iLayer];
                         if (tilesetTile->iID >= 0) {
-                            SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+                            SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->surface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
                         } else if (tilesetTile->iID == TILESETANIMATED) {
                             SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
@@ -2112,7 +2112,7 @@ void CMap::SetupAnimatedTiles()
                     for (short iLayer = 2; iLayer < 4; iLayer++) {
                         TilesetTile * tilesetTile = &tile->layers[iLayer];
                         if (tilesetTile->iID >= 0) {
-                            SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+                            SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->surface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
                         } else if (tilesetTile->iID == TILESETANIMATED) {
                             SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
@@ -2525,7 +2525,7 @@ void CMap::optimize()
         for (int i = 0; i < MAPWIDTH; i++) {
             for (int m = 1; m < MAPLAYERS; m++) {
                 TilesetTile * tile = &mapdata[i][j][m];
-                TileType type = g_tilesetmanager->GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
+                TileType type = g_tilesetmanager->GetTileset(tile->iID)->tileType(tile->iCol, tile->iRow);
                 if (type != tile_nonsolid && type != tile_gap && type != tile_solid_on_top) {
                     for (int k = m - 1; k >= 0; k--) {
                         TilesetTile * compareTile = &mapdata[i][j][k];

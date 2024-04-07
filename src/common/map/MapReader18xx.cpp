@@ -84,8 +84,8 @@ void MapReader1800::read_tileset(BinaryFile& mapfile)
             tilesetwidths[iID] = 1;
             tilesetheights[iID] = 1;
         } else {
-            tilesetwidths[iID] = g_tilesetmanager->GetTileset(translationid[iID])->GetWidth();
-            tilesetheights[iID] = g_tilesetmanager->GetTileset(translationid[iID])->GetHeight();
+            tilesetwidths[iID] = g_tilesetmanager->GetTileset(translationid[iID])->width();
+            tilesetheights[iID] = g_tilesetmanager->GetTileset(translationid[iID])->height();
         }
     }
 

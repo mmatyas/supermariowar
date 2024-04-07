@@ -5,50 +5,36 @@
 #include "gfx/gfxSprite.h"
 #include "map.h"
 
-#include "SDL.h"
+#include <array>
 #include <vector>
 
-class CTileset
-{
-	public:
-		CTileset(const char * szdir);
-		~CTileset();
+class CTileset {
+public:
+    CTileset(const std::string& dir);
 
-		bool ReadTileTypeFile(char * szFile);
-    char * GetName() {
-        return szName;
-    }
+    void SaveTileset();
 
-		TileType GetTileType(short iTileCol, short iTileRow);
-		void SetTileType(short iTileCol, short iTileRow, TileType type);
-		TileType IncrementTileType(short iTileCol, short iTileRow);
-		TileType DecrementTileType(short iTileCol, short iTileRow);
+    TileType tileType(size_t iTileCol, size_t iTileRow) const;
+    void setTileType(size_t iTileCol, size_t iTileRow, TileType type);
+    TileType incrementTileType(size_t iTileCol, size_t iTileRow);
+    TileType decrementTileType(size_t iTileCol, size_t iTileRow);
 
-		void Draw(SDL_Surface * dstSurface, short iTileSize, SDL_Rect * srcRect, SDL_Rect * dstRect);
+    void Draw(SDL_Surface* dstSurface, short tileSize, SDL_Rect* srcRect, SDL_Rect* dstRect) const;
 
-    short GetHeight() {
-        return iHeight;
-    }
-    short GetWidth() {
-        return iWidth;
-    }
+    const std::string& name() const { return m_name; }
+    short height() const { return m_height; }
+    short width() const { return m_width; }
+    SDL_Surface* surface(size_t index) const;
 
-		void SaveTileset();
+private:
+    std::string m_name;
+    std::string m_tilesetPath;
 
-    SDL_Surface * GetSurface(short iIndex) {
-        if (iIndex < 0 || iIndex > 2) return NULL;
-        return sSurfaces[iIndex];
-    }
+    std::array<gfxSprite, 3> m_sprites;
 
-	private:
-		char szName[256];
-		char szTilesetPath[1024];
-
-		SDL_Surface * sSurfaces[3];
-		gfxSprite sSprites[3];
-
-		short iWidth, iHeight;
-		std::vector<TileType> tiletypes;
+    short m_width = 0;
+    short m_height = 0;
+    std::vector<TileType> m_tiletypes;
 };
 
 

@@ -286,7 +286,7 @@ void MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile,
                 tile->iCol = iTile % TILESETWIDTH;
                 tile->iRow = iTile / TILESETWIDTH;
 
-                type = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+                type = g_tilesetmanager->GetClassicTileset()->tileType(tile->iCol, tile->iRow);
             }
 
             if (type >= 0 && type < NUMTILETYPES) {

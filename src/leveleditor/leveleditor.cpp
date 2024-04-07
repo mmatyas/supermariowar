@@ -245,7 +245,7 @@ class MapPlatform
 
 					SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
                 if (tile->iID >= 0) {
-						SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(2), g_tilesetmanager->GetRect(2, tile->iCol, tile->iRow), preview, &bltrect);
+                                            SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->surface(2), g_tilesetmanager->GetRect(2, tile->iCol, tile->iRow), preview, &bltrect);
                 } else if (tile->iID == TILESETANIMATED) {
 						SDL_BlitSurface(rm->spr_tileanimation[2].getSurface(), g_tilesetmanager->GetRect(2, tile->iCol * 4, tile->iRow), preview, &bltrect);
                 } else if (tile->iID == TILESETUNKNOWN) {
@@ -739,7 +739,7 @@ TileType CalculateTileType(short x, short y)
 
 		TileType iTileType = tile_nonsolid;
 		if (tile->iID >= 0)
-			iTileType = g_tilesetmanager->GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
+                        iTileType = g_tilesetmanager->GetTileset(tile->iID)->tileType(tile->iCol, tile->iRow);
 		else if (tile->iID == TILESETANIMATED)
 			iTileType = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
 
@@ -2624,7 +2624,7 @@ int editor_platforms()
                                     if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
 											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-											g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
+                                                                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->GetTileset(tile->iID)->tileType(tile->iCol, tile->iRow);
 										}
 									}
 								}
@@ -2702,7 +2702,7 @@ int editor_platforms()
 
                                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState) {
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-											g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
+                                                                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->GetTileset(tile->iID)->tileType(tile->iCol, tile->iRow);
                                     } else {
 											SetTilesetTile(tile, TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
 											g_Platforms[iEditPlatform].types[ix + i][iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
@@ -3608,7 +3608,7 @@ int editor_tiles()
 								view_tileset_repeat_timer = 30;
 							}
                     } else if (event.key.keysym.sym == SDLK_DOWN) {
-                        if (view_tileset_y < g_tilesetmanager->GetTileset(set_tile_tileset)->GetHeight() - 15) {
+                        if (view_tileset_y < g_tilesetmanager->GetTileset(set_tile_tileset)->height() - 15) {
 								view_tileset_y++;
 								view_tileset_repeat_direction = 1;
 								view_tileset_repeat_timer = 30;
@@ -3620,7 +3620,7 @@ int editor_tiles()
 								view_tileset_repeat_timer = 30;
 							}
                     } else if (event.key.keysym.sym == SDLK_RIGHT) {
-                        if (view_tileset_x < g_tilesetmanager->GetTileset(set_tile_tileset)->GetWidth() - 20) {
+                        if (view_tileset_x < g_tilesetmanager->GetTileset(set_tile_tileset)->width() - 20) {
 								view_tileset_x++;
 								view_tileset_repeat_direction = 3;
 								view_tileset_repeat_timer = 30;
@@ -3653,7 +3653,7 @@ int editor_tiles()
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						CTileset * tileset = g_tilesetmanager->GetTileset(set_tile_tileset);
 
-                    if (iCol < tileset->GetWidth() && iRow < tileset->GetHeight()) {
+                    if (iCol < tileset->width() && iRow < tileset->height()) {
 							set_tile_start_x = iCol;
 							set_tile_start_y = iRow;
 							set_tile_end_x = set_tile_start_x;
@@ -3662,9 +3662,9 @@ int editor_tiles()
 							set_tile_drag = true;
 						}
                 } else if (event.button.button == SDL_BUTTON_RIGHT) {
-					set_type = tileset->IncrementTileType(iCol, iRow);
+                    set_type = tileset->incrementTileType(iCol, iRow);
 				} else if (event.button.button == SDL_BUTTON_MIDDLE) {
-					set_type = tileset->DecrementTileType(iCol, iRow);
+                    set_type = tileset->decrementTileType(iCol, iRow);
 				}
 
 				break;
@@ -3675,7 +3675,7 @@ int editor_tiles()
 					short iRow = event.button.y / TILESIZE + view_tileset_y;
 
                 if (event.button.button == SDL_BUTTON_LEFT) {
-                    if (iCol < tileset->GetWidth() && iRow < tileset->GetHeight()) {
+                    if (iCol < tileset->width() && iRow < tileset->height()) {
 							set_tile_cols = set_tile_end_x - set_tile_start_x + 1;
 							set_tile_rows = set_tile_end_y - set_tile_start_y + 1;
 
@@ -3695,7 +3695,7 @@ int editor_tiles()
 					short iCol = bound_to_window_w(event.motion.x) / TILESIZE + view_tileset_x;
 					short iRow = bound_to_window_h(event.motion.y) / TILESIZE + view_tileset_y;
 
-                if (iCol < tileset->GetWidth() && iRow < tileset->GetHeight()) {
+                if (iCol < tileset->width() && iRow < tileset->height()) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
 							if (iCol < set_tile_start_x)
 								set_tile_start_x = iCol;
@@ -3709,7 +3709,7 @@ int editor_tiles()
 							if (iRow > set_tile_end_y)
 								set_tile_end_y = iRow;
                     } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT) || event.motion.state == SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
-						tileset->SetTileType(iCol, iRow, set_type);
+                        tileset->setTileType(iCol, iRow, set_type);
 					}
 				}
 
@@ -3729,11 +3729,11 @@ int editor_tiles()
 
                 if (view_tileset_repeat_direction == 0 && view_tileset_y > 0) {
 					view_tileset_y--;
-                } else if (view_tileset_repeat_direction == 1 && view_tileset_y < g_tilesetmanager->GetTileset(set_tile_tileset)->GetHeight() - 15) {
+                } else if (view_tileset_repeat_direction == 1 && view_tileset_y < g_tilesetmanager->GetTileset(set_tile_tileset)->height() - 15) {
 					view_tileset_y++;
                 } else if (view_tileset_repeat_direction == 2 && view_tileset_x > 0) {
 					view_tileset_x--;
-                } else if (view_tileset_repeat_direction == 3 && view_tileset_x < g_tilesetmanager->GetTileset(set_tile_tileset)->GetWidth() - 20) {
+                } else if (view_tileset_repeat_direction == 3 && view_tileset_x < g_tilesetmanager->GetTileset(set_tile_tileset)->width() - 20) {
 					view_tileset_x++;
 				}
 			}
@@ -3747,22 +3747,22 @@ int editor_tiles()
 		SDL_Rect rectSrc;
 		rectSrc.x = view_tileset_x << 5;
 		rectSrc.y = view_tileset_y << 5;
-		rectSrc.w = tileset->GetWidth() > 20 ? 640 : tileset->GetWidth() << 5;
-		rectSrc.h = tileset->GetHeight() > 15 ? 480 : tileset->GetHeight() << 5;
+                rectSrc.w = tileset->width() > 20 ? 640 : tileset->width() << 5;
+                rectSrc.h = tileset->height() > 15 ? 480 : tileset->height() << 5;
 
         r.x = 0;
         r.y = 0;
         r.w = 640;
         r.h = 480;
-
-		SDL_BlitSurface(g_tilesetmanager->GetTileset(set_tile_tileset)->GetSurface(0), &rectSrc, screen, &r);
+        
+        SDL_BlitSurface(g_tilesetmanager->GetTileset(set_tile_tileset)->surface(0), &rectSrc, screen, &r);
 		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
-		rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), tileset->GetName());
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), tileset->name());
 
         int i, j;
-        for (i = view_tileset_x; i < view_tileset_x + 20 && i < tileset->GetWidth(); i++) {
-            for (j = view_tileset_y; j < view_tileset_y + 15 && j < tileset->GetHeight(); j++) {
-				TileType t = tileset->GetTileType(i, j);
+        for (i = view_tileset_x; i < view_tileset_x + 20 && i < tileset->width(); i++) {
+            for (j = view_tileset_y; j < view_tileset_y + 15 && j < tileset->height(); j++) {
+                                TileType t = tileset->tileType(i, j);
 				if (t != tile_nonsolid)
 					rm->spr_tiletypes.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5, (t-1) << 3, 0, 8, 8);
 			}

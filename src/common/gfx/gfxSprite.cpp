@@ -336,7 +336,7 @@ int gfxSprite::getHeight()
     return m_picture->h;
 }
 
-SDL_Surface* gfxSprite::getSurface()
+SDL_Surface* gfxSprite::getSurface() const
 {
     return m_picture;
 }

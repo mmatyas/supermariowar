@@ -61,7 +61,7 @@ void MapReader1500::read_tiles(CMap& map, BinaryFile& mapfile)
             tile->iCol = iTileID % 32;
             tile->iRow = iTileID / 32;
 
-            TileType iType = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+            TileType iType = g_tilesetmanager->GetClassicTileset()->tileType(tile->iCol, tile->iRow);
 
             if (iType >= 0 && iType < NUMTILETYPES) {
                 map.mapdatatop[i][j].iType = iType;
