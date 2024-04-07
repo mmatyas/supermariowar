@@ -58,9 +58,7 @@ bool ValidSkinSurface(SDL_Surface* skin)
  * Makes skin surface frame from a loaded sprite strip
  * @param  skin         sprite strip surface
  * @param  spriteindex  frame index [0-5]
- * @param  r            transparent color red value
- * @param  g            transparent color green value
- * @param  b            transparent color blue value
+ * @param  colorkey     transparent color
  * @param  colorScheme  player color [0-3]
  * @param  expand       wide frame?
  * @param  reverse
@@ -69,7 +67,7 @@ bool ValidSkinSurface(SDL_Surface* skin)
 SDL_Surface * gfx_createskinsurface(
     SDL_Surface * skin,
     short spriteindex,
-    Uint8 r, Uint8 g, Uint8 b,
+    RGB colorkey,
     unsigned short colorScheme,
     bool expand, bool reverse)
 {
@@ -147,7 +145,7 @@ SDL_Surface * gfx_createskinsurface(
     SDL_UnlockSurface(skin);
     SDL_UnlockSurface(temp);
 
-    if ( SDL_SETCOLORKEY(temp, SDL_TRUE, SDL_MapRGB(temp->format, r, g, b)) < 0 ) {
+    if ( SDL_SETCOLORKEY(temp, SDL_TRUE, SDL_MapRGB(temp->format, colorkey.r, colorkey.g, colorkey.b)) < 0 ) {
         printf("\n ERROR: Couldn't set ColorKey + RLE for new skin surface: %s\n", SDL_GetError());
         return NULL;
     }
@@ -168,11 +166,10 @@ SDL_Surface * gfx_createskinsurface(
 }
 
 
-bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme, bool fLoadBothDirections)
+bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections)
 {
     // Load the BMP file into a surface
     SDL_Surface * skin = IMG_Load(filename.c_str());
-
     if (!skin) {
         cout << endl << " ERROR: Couldn't load " << filename << ": "
              << SDL_GetError() << endl;
@@ -183,7 +180,7 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r
         return false;
 
     for (short iSprite = 0; iSprite < 2; iSprite++) {
-        SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, r, g, b, colorScheme, true, false);
+        SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, colorkey, colorScheme, true, false);
 
         if (skinSurface == NULL) {
             cout << endl << " ERROR: Couldn't create menu skin from " << filename
@@ -197,7 +194,7 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r
 
     if (fLoadBothDirections) {
         for (short iSprite = 0; iSprite < 2; iSprite++) {
-            SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, r, g, b, colorScheme, true, true);
+            SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, colorkey, colorScheme, true, true);
 
             if (skinSurface == NULL) {
                 cout << endl << " ERROR: Couldn't create menu skin from " << filename
@@ -216,7 +213,7 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r
 }
 
 
-bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme)
+bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const RGB& colorkey, short colorScheme)
 {
     // Load the BMP file into a surface
     SDL_Surface * skin = IMG_Load(filename.c_str());
@@ -232,7 +229,7 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 
 
     for (short k = 0; k < 4; k++) {
         for (short j = 0; j < 2; j++) {
-            SDL_Surface * skinSurface = gfx_createskinsurface(skin, k, r, g, b, colorScheme, true, j != 0);
+            SDL_Surface * skinSurface = gfx_createskinsurface(skin, k, colorkey, colorScheme, true, j != 0);
 
             if (skinSurface == NULL) {
                 cout << endl << " ERROR: Couldn't create menu skin from "
@@ -246,7 +243,7 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 
     }
 
     //Dead Flying Sprite
-    SDL_Surface * skinSurface = gfx_createskinsurface(skin, 4, r, g, b, colorScheme, true, false);
+    SDL_Surface * skinSurface = gfx_createskinsurface(skin, 4, colorkey, colorScheme, true, false);
 
     if (skinSurface == NULL) {
         cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
@@ -257,7 +254,7 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 
     gSprites[8]->setSurface(skinSurface);
 
     //Dead Stomped Sprite
-    skinSurface = gfx_createskinsurface(skin, 5, r, g, b, colorScheme, true, false);
+    skinSurface = gfx_createskinsurface(skin, 5, colorkey, colorScheme, true, false);
 
     if (skinSurface == NULL) {
         cout << endl << " ERROR: Couldn't create menu skin from "
