@@ -18,19 +18,24 @@ extern CGameValues game_values;
 extern void _load_drawmsg(const std::string& f);
 extern void _load_waitforkey();
 
+namespace {
+constexpr RGB MAGENTA { 255, 0, 255 };
+} // namespace
+
+
 bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
-    return gfx_loadmenuskin(spr_player[playerID], skinlist->GetIndex(skinID), 255, 0, 255, colorID, fLoadBothDirections);
+    return gfx_loadmenuskin(spr_player[playerID], skinlist->GetIndex(skinID), MAGENTA, colorID, fLoadBothDirections);
 }
 
 bool CResourceManager::LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections)
 {
-    return gfx_loadmenuskin(spr_player[playerID], filename, 255, 0, 255, colorID, fLoadBothDirections);
+    return gfx_loadmenuskin(spr_player[playerID], filename, MAGENTA, colorID, fLoadBothDirections);
 }
 
 bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, const std::string& filename, short colorID)
 {
-    return gfx_loadfullskin(sprites, filename, 255, 0, 255, colorID);
+    return gfx_loadfullskin(sprites, filename, MAGENTA, colorID);
 }
 
 bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID)

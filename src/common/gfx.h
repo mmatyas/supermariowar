@@ -27,6 +27,13 @@
 #include "gfx/gfxSprite.h"
 #include "gfx/gfxFont.h"
 
+/// Represents a solid RGB color.
+struct RGB {
+    Uint8 r;
+    Uint8 g;
+    Uint8 b;
+};
+
 bool gfx_init(int w, int h, bool fullscreen);
 void gfx_changefullscreen(bool fullscreen);
 void gfx_flipscreen();
@@ -44,8 +51,8 @@ void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, shor
 bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHiddenDirection, short iHiddenValue);
 void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, short srcY, short iw, short ih, short clipX, short clipY, short clipW, short clipH, bool wrap, short hiddenDirection = -1, short hiddenPlane = -1);
 
-bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme);
-bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme, bool fLoadBothDirections);
+bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const RGB& colorkey, short colorScheme);
+bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);
 
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fVertical, bool fWrap);
 //Load image into an array of 4 gfxSprites, each with it's own team color
