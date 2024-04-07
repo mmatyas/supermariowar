@@ -10,12 +10,12 @@
 #include "player.h"
 #include "ResourceManager.h"
 
-#include "objects/carriable/Egg.h"
-#include "objects/carriable/Flag.h"
-#include "objects/carriable/PhantoKey.h"
-#include "objects/carriable/Star.h"
-#include "objects/carriable/ThrowBox.h"
-#include "objects/moving/Coin.h"
+#include "objects/carriable/CO_Egg.h"
+#include "objects/carriable/CO_Flag.h"
+#include "objects/carriable/CO_PhantoKey.h"
+#include "objects/carriable/CO_Star.h"
+#include "objects/carriable/CO_ThrowBox.h"
+#include "objects/moving/MO_Coin.h"
 
 extern CGameValues game_values;
 extern CResourceManager* rm;

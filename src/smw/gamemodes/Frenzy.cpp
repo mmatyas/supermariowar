@@ -5,7 +5,7 @@
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "objects/moving/FrenzyCard.h"
+#include "objects/moving/MO_FrenzyCard.h"
 
 extern short list_players_cnt;
 extern CObjectContainer objectcontainer[3];

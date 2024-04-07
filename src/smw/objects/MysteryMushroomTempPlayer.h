@@ -1,6 +1,9 @@
 #ifndef SMW_GAMEOBJECT_BLOCK_MysteryMushroomTempPlayer_H
 #define SMW_GAMEOBJECT_BLOCK_MysteryMushroomTempPlayer_H
 
+class CPlayer;
+class MovingPlatform;
+
 class MysteryMushroomTempPlayer
 {
 	public:

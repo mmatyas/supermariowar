@@ -6,7 +6,7 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
-#include "objects/moving/Coin.h"
+#include "objects/moving/MO_Coin.h"
 
 #include <cmath>
 

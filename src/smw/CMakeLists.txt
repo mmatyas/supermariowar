@@ -179,6 +179,7 @@ target_sources(smw PRIVATE
 )
 
 add_subdirectory(gamemodes)
+add_subdirectory(objects)
 add_subdirectory(ui)
 
 target_compile_features(smw PUBLIC cxx_std_14)

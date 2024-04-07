@@ -2,7 +2,7 @@
 
 #include "ObjectContainer.h"
 #include "ResourceManager.h"
-#include "objects/overmap/KingOfTheHillZone.h"
+#include "objects/overmap/WO_KingOfTheHillZone.h"
 
 extern CObjectContainer objectcontainer[3];
 extern CResourceManager* rm;

@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_CO_SPIKE_H
 #define SMW_GAMEOBJECT_CO_SPIKE_H
 
-#include "Spring.h"
+#include "CO_Spring.h"
 
 class CO_Spike : public CO_Spring
 {

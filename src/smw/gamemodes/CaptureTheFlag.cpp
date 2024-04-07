@@ -3,8 +3,8 @@
 #include "GameValues.h"
 #include "ObjectContainer.h"
 #include "player.h"
-#include "objects/carriable/Flag.h"
-#include "objects/moving/FlagBase.h"
+#include "objects/carriable/CO_Flag.h"
+#include "objects/moving/MO_FlagBase.h"
 #include "ResourceManager.h"
 
 extern CObjectContainer objectcontainer[3];

@@ -8,9 +8,9 @@
 #include "ResourceManager.h"
 #include "objects/moving/MovingObject.h"
 #include "objects/moving/WalkingEnemy.h"
-#include "objects/carriable/Shell.h"
-#include "objects/carriable/ThrowBlock.h"
-#include "objects/carriable/ThrowBox.h"
+#include "objects/carriable/CO_Shell.h"
+#include "objects/carriable/CO_ThrowBlock.h"
+#include "objects/carriable/CO_ThrowBox.h"
 
 extern CMap* g_map;
 extern CObjectContainer objectcontainer[3];

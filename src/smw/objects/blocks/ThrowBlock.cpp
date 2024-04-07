@@ -7,7 +7,7 @@
 #include "player.h"
 #include "ResourceManager.h"
 
-#include "objects/carriable/ThrowBlock.h"
+#include "objects/carriable/CO_ThrowBlock.h"
 
 extern CMap* g_map;
 extern CGameValues game_values;

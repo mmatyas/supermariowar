@@ -3,8 +3,8 @@
 #include "GameValues.h"
 #include "ObjectContainer.h"
 #include "ResourceManager.h"
-#include "objects/carriable/Egg.h"
-#include "objects/moving/Yoshi.h"
+#include "objects/carriable/CO_Egg.h"
+#include "objects/moving/MO_Yoshi.h"
 
 extern CObjectContainer objectcontainer[3];
 extern CResourceManager* rm;

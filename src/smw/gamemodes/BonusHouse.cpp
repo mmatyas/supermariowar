@@ -4,7 +4,7 @@
 #include "ObjectContainer.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "objects/moving/BonusHouseChest.h"
+#include "objects/moving/MO_BonusHouseChest.h"
 
 extern CObjectContainer objectcontainer[3];
 extern CPlayer* list_players[4];

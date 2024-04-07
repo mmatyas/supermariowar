@@ -5,8 +5,8 @@
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "objects/overmap/PipeBonus.h"
-#include "objects/overmap/PipeCoin.h"
+#include "objects/overmap/WO_PipeBonus.h"
+#include "objects/overmap/WO_PipeCoin.h"
 
 
 extern short score_cnt;

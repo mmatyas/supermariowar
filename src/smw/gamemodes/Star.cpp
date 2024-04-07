@@ -7,7 +7,7 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
-#include "objects/carriable/Star.h"
+#include "objects/carriable/CO_Star.h"
 
 extern CScore *score[4];
 extern short score_cnt;

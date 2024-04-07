@@ -5,7 +5,7 @@
 #include "player.h"
 #include "ResourceManager.h"
 #include "Score.h"
-#include "objects/overmap/Area.h"
+#include "objects/overmap/WO_Area.h"
 
 extern CScore *score[4];
 extern short score_cnt;

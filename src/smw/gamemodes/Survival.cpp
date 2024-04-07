@@ -4,9 +4,9 @@
 #include "ObjectContainer.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "objects/moving/Podobo.h"
-#include "objects/overmap/BowserFire.h"
-#include "objects/overmap/Thwomp.h"
+#include "objects/moving/MO_Podobo.h"
+#include "objects/overmap/WO_BowserFire.h"
+#include "objects/overmap/WO_Thwomp.h"
 
 extern CObjectContainer objectcontainer[3];
 extern CResourceManager* rm;

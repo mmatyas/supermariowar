@@ -9,11 +9,11 @@
 #include "ResourceManager.h"
 
 #include "objects/moving/MovingObject.h"
-#include "objects/moving/AttackZone.h"
-#include "objects/moving/Fireball.h"
-#include "objects/carriable/Shell.h"
-#include "objects/carriable/ThrowBlock.h"
-#include "objects/carriable/ThrowBox.h"
+#include "objects/moving/MO_AttackZone.h"
+#include "objects/moving/MO_Fireball.h"
+#include "objects/carriable/CO_Shell.h"
+#include "objects/carriable/CO_ThrowBlock.h"
+#include "objects/carriable/CO_ThrowBox.h"
 
 extern CMap* g_map;
 extern CResourceManager* rm;

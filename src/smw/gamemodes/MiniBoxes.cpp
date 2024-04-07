@@ -5,7 +5,7 @@
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "objects/moving/Coin.h"
+#include "objects/moving/MO_Coin.h"
 
 #include <cmath>
 

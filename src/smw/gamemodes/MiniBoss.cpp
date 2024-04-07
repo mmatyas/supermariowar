@@ -5,10 +5,10 @@
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "objects/moving/FrenzyCard.h"
-#include "objects/moving/Koopa.h"
-#include "objects/moving/Podobo.h"
-#include "objects/moving/SledgeBrother.h"
+#include "objects/moving/MO_FrenzyCard.h"
+#include "objects/moving/MO_Koopa.h"
+#include "objects/moving/MO_Podobo.h"
+#include "objects/moving/MO_SledgeBrother.h"
 
 extern short list_players_cnt;
 extern short score_cnt;

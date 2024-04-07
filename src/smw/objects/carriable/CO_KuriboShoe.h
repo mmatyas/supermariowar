@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_CO_KURIBOSHOE_H
 #define SMW_GAMEOBJECT_CO_KURIBOSHOE_H
 
-#include "Spring.h"
+#include "CO_Spring.h"
 
 class CO_KuriboShoe : public CO_Spring
 {

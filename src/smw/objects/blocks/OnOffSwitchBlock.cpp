@@ -9,7 +9,7 @@
 
 #include "SwitchBlock.h"
 #include "objects/moving/MovingObject.h"
-#include "objects/carriable/ThrowBox.h"
+#include "objects/carriable/CO_ThrowBox.h"
 
 #include <math.h>
 

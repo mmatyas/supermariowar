@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_CO_PHANTOKEY_H
 #define SMW_GAMEOBJECT_CO_PHANTOKEY_H
 
-#include "objects/moving/CarriedObject.h"
+#include "objects/moving/MO_CarriedObject.h"
 
 class CPlayer;
 class gfxSprite;

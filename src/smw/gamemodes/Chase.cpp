@@ -5,8 +5,8 @@
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "objects/carriable/PhantoKey.h"
-#include "objects/overmap/Phanto.h"
+#include "objects/carriable/CO_PhantoKey.h"
+#include "objects/overmap/WO_Phanto.h"
 
 extern CObjectContainer objectcontainer[3];
 extern CGameValues game_values;

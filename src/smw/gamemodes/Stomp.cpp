@@ -6,11 +6,11 @@
 #include "ObjectContainer.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "objects/moving/BuzzyBeetle.h"
-#include "objects/moving/CheepCheep.h"
-#include "objects/moving/Goomba.h"
-#include "objects/moving/Koopa.h"
-#include "objects/moving/Spiny.h"
+#include "objects/moving/MO_BuzzyBeetle.h"
+#include "objects/moving/MO_CheepCheep.h"
+#include "objects/moving/MO_Goomba.h"
+#include "objects/moving/MO_Koopa.h"
+#include "objects/moving/MO_Spiny.h"
 
 
 extern CObjectContainer objectcontainer[3];
