@@ -49,12 +49,9 @@ bool gfx_loadpalette(const std::string& palette_path) {
     return gfx.getPalette().load(palette_path.c_str());
 }
 
-bool ValidSkinSurface(SDL_Surface * skin)
+bool ValidSkinSurface(SDL_Surface* skin)
 {
-    if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 24)
-        return true;
-
-    return false;
+    return skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 24;
 }
 
 /**
