@@ -1,10 +1,13 @@
 #pragma once
 
-class CGame {
-public:
-    CGame();
 
-    const int ScreenWidth = 640;
-    const int ScreenHeight = 480;
-    const int MenuTransparency = 72;
+/// Creates the user-writable settings directory, if it doesn't exist yet.
+void ensureSettingsDir();
+
+
+class App {
+public:
+    static constexpr int screenWidth = 640;
+    static constexpr int screenHeight = 480;
+    static constexpr int menuTransparency = 72;
 };

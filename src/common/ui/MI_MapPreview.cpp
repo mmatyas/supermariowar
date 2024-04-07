@@ -34,15 +34,15 @@ MI_MapPreview::MI_MapPreview(gfxSprite * nspr, short x, short y, short width, sh
     , iIndent(indent)
     , iSlideListOut(0)
 {
-    surfaceMapBackground = SDL_CreateRGBSurface(0, smw->ScreenWidth/2, smw->ScreenHeight/2, 16, 0, 0, 0, 0);
-    surfaceMapBlockLayer = SDL_CreateRGBSurface(0, smw->ScreenWidth/2, smw->ScreenHeight/2, 16, 0, 0, 0, 0);
-    surfaceMapForeground = SDL_CreateRGBSurface(0, smw->ScreenWidth/2, smw->ScreenHeight/2, 16, 0, 0, 0, 0);
+    surfaceMapBackground = SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0);
+    surfaceMapBlockLayer = SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0);
+    surfaceMapForeground = SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0);
     LoadCurrentMap();
 
     rectDst.x = x + 16;
     rectDst.y = y + 44;
-    rectDst.w = smw->ScreenWidth/2;
-    rectDst.h = smw->ScreenHeight/2;
+    rectDst.w = App::screenWidth/2;
+    rectDst.h = App::screenHeight/2;
 
     memset(szMapName, 0, sizeof(szMapName));
 }

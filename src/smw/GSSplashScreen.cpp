@@ -22,7 +22,6 @@ extern GraphicsList *menugraphicspacklist;
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-extern CGame* smw;
 
 extern void _load_drawmsg(const std::string& f);
 extern void _load_waitforkey();
@@ -201,7 +200,7 @@ void SplashScreenState::update()
             //else
             {
                 blitdest = rm->menu_backdrop.getSurface();
-                rm->menu_shade.setalpha(smw->MenuTransparency);
+                rm->menu_shade.setalpha(App::menuTransparency);
                 rm->menu_shade.draw(0, 0);
                 blitdest = screen;
 
@@ -273,13 +272,13 @@ void SplashScreenState::update()
         rm->menu_backdrop.draw(0, 0);
 
         rm->menu_smw.setalpha((Uint8)alpha);
-        rm->menu_smw.draw(smw->ScreenWidth/2 - ((short)rm->menu_smw.getWidth() >> 1), 30);  //smw logo
+        rm->menu_smw.draw(App::screenWidth/2 - ((short)rm->menu_smw.getWidth() >> 1), 30);  //smw logo
 
         rm->menu_version.setalpha((Uint8)alpha);
         rm->menu_version.draw(628 - rm->menu_version.getWidth(), 10); //smw logo
 
         rm->menu_font_large.setalpha((Uint8)alpha);
-        //rm->menu_font_large.drawRightJustified(smw->ScreenWidth * 0.98f, 45, "WIP");
+        //rm->menu_font_large.drawRightJustified(App::screenWidth * 0.98f, 45, "WIP");
 
         menu_credits->setalpha((Uint8)alpha);
         menu_credits->draw(227, 200);
@@ -287,10 +286,10 @@ void SplashScreenState::update()
 
     if (state == 7) {
 //            _load_drawmsg("Loading...");
-        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Loading...");
+        rm->menu_font_large.drawCentered(App::screenWidth/2, App::screenHeight * 0.875f, "Loading...");
     } else if (state == 8) {
 //            _load_drawmsg("Press Any Key To Continue");
-        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Press Any Key To Continue");
+        rm->menu_font_large.drawCentered(App::screenWidth/2, App::screenHeight * 0.875f, "Press Any Key To Continue");
 
         eyecandy[2].cleandeadobjects();
         eyecandy[2].update();
@@ -300,7 +299,7 @@ void SplashScreenState::update()
                     static int index = 0;
                     if (++timer >= 60)
                     {
-                        eyecandy[2].add(new EC_GravText(&rm->menu_font_large, smw->ScreenWidth/2, smw->ScreenHeight, contributors[contributorOrder[index]], -8.2f));
+                        eyecandy[2].add(new EC_GravText(&rm->menu_font_large, App::screenWidth/2, App::screenHeight, contributors[contributorOrder[index]], -8.2f));
                         timer = 0;
 
                         if (++index >= NUM_CONTRIBUTORS)

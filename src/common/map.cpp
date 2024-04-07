@@ -58,7 +58,6 @@ extern CGameValues game_values;
 extern CMap* g_map;
 extern CTilesetManager* g_tilesetmanager;
 extern CResourceManager* rm;
-extern CGame* smw;
 
 extern GraphicsList* gamegraphicspacklist;
 
@@ -107,18 +106,18 @@ float dBulletBillFrequency[3] = {10.0f, 5.0f, 2.5f};
 namespace {
 int GetScreenWidth(int iSize) {
     switch (iSize) {
-        case 0: return smw->ScreenWidth;
-        case 1: return smw->ScreenWidth / 2;
-        case 2: return smw->ScreenWidth / 4;
+        case 0: return App::screenWidth;
+        case 1: return App::screenWidth / 2;
+        case 2: return App::screenWidth / 4;
         default: throw "invalid iSize for width";
     }
 }
 
 int GetScreenHeight(int iSize) {
     switch (iSize) {
-        case 0: return smw->ScreenHeight;
-        case 1: return smw->ScreenHeight / 2;
-        case 2: return smw->ScreenHeight / 4;
+        case 0: return App::screenHeight;
+        case 1: return App::screenHeight / 2;
+        case 2: return App::screenHeight / 4;
         default: throw "invalid iSize for height";
     }
 }
@@ -1374,7 +1373,7 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
     SDL_FreeSurface(temp);
 #endif
 
-	SDL_Rect srcRectBackground = {0, 0, smw->ScreenWidth, smw->ScreenHeight};
+	SDL_Rect srcRectBackground = {0, 0, App::screenWidth, App::screenHeight};
     SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
     if (SDL_SCALEBLIT(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {
@@ -1686,8 +1685,8 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 
     bltrect.x = 0;
     bltrect.y = 0;
-	bltrect.w = smw->ScreenWidth;
-    bltrect.h = smw->ScreenHeight;
+	bltrect.w = App::screenWidth;
+    bltrect.h = App::screenHeight;
 }
 
 void CMap::addPlatformAnimatedTiles()
@@ -1837,8 +1836,8 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
     SDL_Rect srcrect;
     srcrect.x = 0;
     srcrect.y = 0;
-	srcrect.w = smw->ScreenWidth;
-    srcrect.h = smw->ScreenHeight;
+	srcrect.w = App::screenWidth;
+    srcrect.h = App::screenHeight;
 
     SDL_Rect dstrect;
     dstrect.x = 0;
@@ -1848,8 +1847,8 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
         dstrect.w = 160;
         dstrect.h = 120;
     } else {
-		dstrect.w = smw->ScreenWidth/2;
-        dstrect.h = smw->ScreenHeight/2;
+		dstrect.w = App::screenWidth/2;
+        dstrect.h = App::screenHeight/2;
     }
 
     if (SDL_SCALEBLIT(background->getSurface(), &srcrect, targetSurface, &dstrect) < 0) {
@@ -1984,8 +1983,8 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
     SDL_Rect r;
     r.x = 0;
     r.y = 0;
-	r.w = smw->ScreenWidth;
-	r.h = smw->ScreenHeight;
+	r.w = App::screenWidth;
+	r.h = App::screenHeight;
 
     SDL_BlitSurface(background.getSurface(), NULL, mapspr.getSurface(), &r);
 
@@ -2385,8 +2384,8 @@ void CMap::update()
 bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned)
 {
     if (totalspawnsize[iType] <= 0) {
-		*x = RANDOM_INT(smw->ScreenWidth);
-		*y = RANDOM_INT(smw->ScreenHeight * 0.87f);
+		*x = RANDOM_INT(App::screenWidth);
+		*y = RANDOM_INT(App::screenHeight * 0.87f);
         return true;
     }
 

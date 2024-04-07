@@ -12,7 +12,6 @@
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-extern CGame* smw;
 extern WorldMap g_worldmap;
 extern WorldMusicList* worldmusiclist;
 
@@ -35,8 +34,8 @@ MI_World::MI_World()
 
     rectDstSurface.x = 0;
     rectDstSurface.y = 0;
-    rectDstSurface.w = smw->ScreenWidth;
-    rectDstSurface.h = smw->ScreenHeight;
+    rectDstSurface.w = App::screenWidth;
+    rectDstSurface.h = App::screenHeight;
 }
 
 MI_World::~MI_World()
@@ -102,8 +101,8 @@ void MI_World::Init()
     iPressSelectTimer = 0;
     pressSelectKeys = NULL;
 
-    iDrawWidth = g_worldmap.iWidth < 20 ? g_worldmap.iWidth << 5 : smw->ScreenWidth;
-    iDrawHeight = g_worldmap.iHeight < 15 ? g_worldmap.iHeight << 5 : smw->ScreenHeight;
+    iDrawWidth = g_worldmap.iWidth < 20 ? g_worldmap.iWidth << 5 : App::screenWidth;
+    iDrawHeight = g_worldmap.iHeight < 15 ? g_worldmap.iHeight << 5 : App::screenHeight;
 
     iSrcOffsetX = 0;
     iSrcOffsetY = 0;
@@ -231,16 +230,16 @@ void MI_World::Update()
 
            //Player is moving from one tile to the next (up)
     if (iPlayerState == 1) {
-        if (g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerY < (g_worldmap.iHeight << 5) - (smw->ScreenHeight * 0.53f))
+        if (g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerY < (g_worldmap.iHeight << 5) - (App::screenHeight * 0.53f))
             iMapOffsetY += 2;
     } else if (iPlayerState == 2) { //down
-        if (g_worldmap.iHeight > 15 && iMapOffsetY > smw->ScreenHeight - (g_worldmap.iHeight << 5) && iPlayerY > (smw->ScreenHeight * 0.47f))
+        if (g_worldmap.iHeight > 15 && iMapOffsetY > App::screenHeight - (g_worldmap.iHeight << 5) && iPlayerY > (App::screenHeight * 0.47f))
             iMapOffsetY -= 2;
     } else if (iPlayerState == 3) { //left
-        if (g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < (g_worldmap.iWidth << 5) - (smw->ScreenWidth * 0.525f))
+        if (g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < (g_worldmap.iWidth << 5) - (App::screenWidth * 0.525f))
             iMapOffsetX += 2;
     } else if (iPlayerState == 4) { //right
-        if (g_worldmap.iWidth > 20 && iMapOffsetX > smw->ScreenWidth - (g_worldmap.iWidth << 5) && iPlayerX > (smw->ScreenWidth * 0.475f))
+        if (g_worldmap.iWidth > 20 && iMapOffsetX > App::screenWidth - (g_worldmap.iWidth << 5) && iPlayerX > (App::screenWidth * 0.475f))
             iMapOffsetX -= 2;
     }
 
@@ -370,9 +369,9 @@ void MI_World::SetMapOffset()
         else if (iPlayerX <= 304)
             iMapOffsetX = 0;
         else
-            iMapOffsetX = smw->ScreenWidth - (g_worldmap.iWidth << 5);
+            iMapOffsetX = App::screenWidth - (g_worldmap.iWidth << 5);
     } else {
-        iMapOffsetX = (smw->ScreenWidth - (g_worldmap.iWidth << 5)) >> 1;
+        iMapOffsetX = (App::screenWidth - (g_worldmap.iWidth << 5)) >> 1;
     }
 
     if (g_worldmap.iHeight > 15) {
@@ -381,9 +380,9 @@ void MI_World::SetMapOffset()
         else if (iPlayerY <= 224)
             iMapOffsetY = 0;
         else
-            iMapOffsetY = smw->ScreenHeight - (g_worldmap.iHeight << 5);
+            iMapOffsetY = App::screenHeight - (g_worldmap.iHeight << 5);
     } else {
-        iMapOffsetY = (smw->ScreenHeight - (g_worldmap.iHeight << 5)) >> 1;
+        iMapOffsetY = (App::screenHeight - (g_worldmap.iHeight << 5)) >> 1;
     }
 }
 

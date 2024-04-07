@@ -281,7 +281,7 @@ void MI_MapField::SetDimensions(short width, short indent)
 
     if (fShowtags) {
         //iSlideListOut = (iWidth - 352) >> 1;
-        iSlideListOut = ((int)(iWidth - smw->ScreenWidth * 0.55)) >> 1;
+        iSlideListOut = ((int)(iWidth - App::screenWidth * 0.55)) >> 1;
         iSlideListOutGoal = iSlideListOut;
     }
 }

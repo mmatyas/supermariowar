@@ -808,7 +808,7 @@ void CPlayer::triggerPowerup()
     case 22: { //golden podobo
         short numPodobos = RANDOM_INT(6) + 10;
         for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-            objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
+            objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
         }
         ifSoundOnPlay(rm->sfx_thunder);
         break;
@@ -896,8 +896,8 @@ void CPlayer::tryFallingThroughPlatform(short movement_direction)
             left_tile_x -= MAPWIDTH;
 
         short right_tile_x;
-        if (rightX() >= smw->ScreenWidth)
-            right_tile_x = (rightX() - smw->ScreenWidth) / TILESIZE;
+        if (rightX() >= App::screenWidth)
+            right_tile_x = (rightX() - App::screenWidth) / TILESIZE;
         else
             right_tile_x = rightX() / TILESIZE;
 
@@ -2215,9 +2215,9 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
     }
     else {
         //moving right
-        if (fx + PW >= smw->ScreenWidth) {
-            tx = (short)(fx + PW - smw->ScreenWidth) / TILESIZE;
-            fOldX -= smw->ScreenWidth;
+        if (fx + PW >= App::screenWidth) {
+            tx = (short)(fx + PW - App::screenWidth) / TILESIZE;
+            fOldX -= App::screenWidth;
         } else
             tx = ((short)fx + PW) / TILESIZE;
     }
@@ -2675,15 +2675,15 @@ void CPlayer::collision_detection_map()
     short iPlayerL = ix, iPlayerC = ix + HALFPW, iPlayerR = ix + PW;
 
     if (iPlayerL < 0)
-        iPlayerL += smw->ScreenWidth;
-    else if (iPlayerL >= smw->ScreenWidth)
-        iPlayerL -= smw->ScreenWidth;
+        iPlayerL += App::screenWidth;
+    else if (iPlayerL >= App::screenWidth)
+        iPlayerL -= App::screenWidth;
 
-    if (iPlayerC >= smw->ScreenWidth)
-        iPlayerC -= smw->ScreenWidth;
+    if (iPlayerC >= App::screenWidth)
+        iPlayerC -= App::screenWidth;
 
-    if (iPlayerR >= smw->ScreenWidth)
-        iPlayerR -= smw->ScreenWidth;
+    if (iPlayerR >= App::screenWidth)
+        iPlayerR -= App::screenWidth;
 
     txl = iPlayerL / TILESIZE;
     txc = iPlayerC / TILESIZE;

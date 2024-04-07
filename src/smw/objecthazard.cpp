@@ -29,7 +29,6 @@ extern CEyecandyContainer eyecandy[3];
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-extern CGame* smw;
 
 
 void LoadMapHazards(bool fPreview)
@@ -133,14 +132,14 @@ void OMO_StraightPathHazard::update()
 {
     IO_OverMapObject::update();
 
-    if (iy + ih < 0 || iy >= smw->ScreenHeight)
+    if (iy + ih < 0 || iy >= App::screenHeight)
         dead = true;
 
     //Wrap hazard if it is off the edge of the screen
     if (ix < 0)
-        ix += smw->ScreenWidth;
-    else if (ix + iw >= smw->ScreenWidth)
-        ix -= smw->ScreenWidth;
+        ix += App::screenWidth;
+    else if (ix + iw >= App::screenWidth)
+        ix -= App::screenWidth;
 }
 
 bool OMO_StraightPathHazard::collide(CPlayer * player)
@@ -195,7 +194,7 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
         }
     } else {
         if (velx < 0.0f)
-            setXi(smw->ScreenWidth + iw);
+            setXi(App::screenWidth + iw);
         else
             setXi(-iw);
 
@@ -217,7 +216,7 @@ void MO_BulletBill::update()
 
     animate();
 
-    if ((velx < 0.0f && ix < -iw) || (velx > 0.0f && ix > smw->ScreenWidth))
+    if ((velx < 0.0f && ix < -iw) || (velx > 0.0f && ix > App::screenWidth))
         dead = true;
 }
 
@@ -244,8 +243,8 @@ bool MO_BulletBill::collide(CPlayer * player)
         return false;
 
     //if the bullet bill is off the screen, don't wrap it to collide
-    if ((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < smw->ScreenWidth) ||
-            (ix + iw >= smw->ScreenWidth && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
+    if ((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < App::screenWidth) ||
+            (ix + iw >= App::screenWidth && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
         return false;
     }
 
@@ -313,9 +312,9 @@ void MO_BulletBill::collide(IO_MovingObject * object)
 
         short iOffsetX = 0;
         if (ix + iw < bulletbill->ix)
-            iOffsetX = smw->ScreenWidth;
+            iOffsetX = App::screenWidth;
         else if (bulletbill->ix + bulletbill->iw < ix)
-            iOffsetX = -smw->ScreenWidth;
+            iOffsetX = -App::screenWidth;
 
         short iCenterX = ((ix + iOffsetX - bulletbill->ix) >> 1) + (bulletbill->ix + (bulletbill->iw >> 1));
         short iCenterY = ((iy - bulletbill->iy) >> 1) + (bulletbill->iy + (bulletbill->ih >> 1));
@@ -424,9 +423,9 @@ void MO_Explosion::update()
             short iTestX = ix;
 
             if (iTestX < 0)
-                iTestX += smw->ScreenWidth;
+                iTestX += App::screenWidth;
 
-            if (iTestY >= 0 && iTestY < smw->ScreenHeight) {
+            if (iTestY >= 0 && iTestY < App::screenHeight) {
                 short iTestRow = iTestY / TILESIZE;
                 for (short iCol = 0; iCol < 7; iCol++) {
                     IO_Block * block = g_map->block(iTestX / TILESIZE, iTestRow);
@@ -439,15 +438,15 @@ void MO_Explosion::update()
 
                     iTestX += TILESIZE;
 
-                    if (iTestX >= smw->ScreenWidth)
-                        iTestX -= smw->ScreenWidth;
+                    if (iTestX >= App::screenWidth)
+                        iTestX -= App::screenWidth;
                 }
             }
 
 
             iTestY += TILESIZE;
 
-            if (iTestY >= smw->ScreenHeight)
+            if (iTestY >= App::screenHeight)
                 break;
         }
     }
@@ -696,7 +695,7 @@ void MO_PirhanaPlant::update()
     if (iType == 1) { //face the plant towards the nearest player
         //Don't do this every frame, just once every 8 frames
         if (state > 0 && ++iActionTimer >= 8) {
-            int distance_to_player = smw->ScreenWidth * 1000;
+            int distance_to_player = App::screenWidth * 1000;
             short iDiffX = 1, iDiffY = 1;
 
             short iPlantX = ix + 16;

@@ -234,7 +234,7 @@ void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
 
         short iSwapSides = 0;
         if (player->fOldX >= iposx + TILESIZE)
-            iSwapSides = -smw->ScreenWidth;
+            iSwapSides = -App::screenWidth;
 
         if (player->fOldX + PW + iSwapSides >= iposx && player->fOldX + iSwapSides < iposx + TILESIZE &&
                 player->fOldY + PH >= iposy && player->fOldY < iposy + TILESIZE) {
@@ -260,7 +260,7 @@ void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
 
             short iSwapSides = 0;
             if (movingobject->fOldX >= iposx + TILESIZE)
-                iSwapSides = -smw->ScreenWidth;
+                iSwapSides = -App::screenWidth;
 
             if (movingobject->fOldX + PW + iSwapSides >= iposx && movingobject->fOldX + iSwapSides < iposx + TILESIZE &&
                     movingobject->fOldY + PH >= iposy && movingobject->fOldY < iposy + TILESIZE) {

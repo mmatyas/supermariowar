@@ -293,7 +293,7 @@ void CheckSecret(short id)
             game_values.unlocksecretunlocked[0] = true;
             ifSoundOnPlay(rm->sfx_transform);
 
-            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
+            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, RANDOM_INT(App::screenWidth), RANDOM_INT(App::screenHeight), true, false);
 
             if (object)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -303,7 +303,7 @@ void CheckSecret(short id)
             game_values.unlocksecretunlocked[1] = true;
             ifSoundOnPlay(rm->sfx_transform);
 
-            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
+            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, RANDOM_INT(App::screenWidth), RANDOM_INT(App::screenHeight), true, false);
 
             if (object)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -315,7 +315,7 @@ void CheckSecret(short id)
                 game_values.unlocksecretunlocked[2] = true;
                 ifSoundOnPlay(rm->sfx_transform);
 
-                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
+                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, RANDOM_INT(App::screenWidth), RANDOM_INT(App::screenHeight), true, false);
 
                 if (object)
                     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -325,7 +325,7 @@ void CheckSecret(short id)
         game_values.unlocksecretunlocked[3] = true;
         ifSoundOnPlay(rm->sfx_transform);
 
-        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, RANDOM_INT(smw->ScreenWidth), RANDOM_INT(smw->ScreenHeight), true, false);
+        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, RANDOM_INT(App::screenWidth), RANDOM_INT(App::screenHeight), true, false);
 
         if (object)
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -594,7 +594,7 @@ void PU_IceWandPowerup::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 }
@@ -673,7 +673,7 @@ void PU_SecretPowerup::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 }
@@ -692,7 +692,7 @@ bool PU_SecretPowerup::collide (CPlayer *player)
         game_values.windaffectsplayers = true;
 
         for (short i = 0; i < 15; i++)
-            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(RANDOM_INT(smw->ScreenWidth)), (float)RANDOM_INT(smw->ScreenHeight), RANDOM_INT(4) + 1));
+            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), RANDOM_INT(4) + 1));
     } else if (itemtype == 1) {
         game_values.spinscreen = true;
     } else if (itemtype == 2) {
@@ -751,7 +751,7 @@ void PU_TreasureChestBonus::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 
@@ -1084,7 +1084,7 @@ void PU_FeatherPowerup::update()
         setXf(64.0f * cos(dFloatAngle) + dFloatCenterX);
         setYf(64.0f * sin(dFloatAngle) + dFloatCenterY);
 
-        if (fy >= smw->ScreenHeight)
+        if (fy >= App::screenHeight)
             dead = true;
     }
 }
@@ -1216,7 +1216,7 @@ void PU_CoinPowerup::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 }
@@ -1372,12 +1372,12 @@ void MO_SuperFireball::update()
     setYf(fy + vely);
 
     if (ix < 0) {
-        setXi(ix + smw->ScreenWidth);
-    } else if (ix > smw->ScreenWidth - 1) {
-        setXi(ix - smw->ScreenWidth);
+        setXi(ix + App::screenWidth);
+    } else if (ix > App::screenWidth - 1) {
+        setXi(ix - App::screenWidth);
     }
 
-	if (iy > smw->ScreenHeight|| iy < -ih || --ttl <= 0)
+	if (iy > App::screenHeight|| iy < -ih || --ttl <= 0)
         removeifprojectile(this, false, true);
 }
 
@@ -1456,11 +1456,11 @@ void MO_Hammer::update()
         vely += GRAVITATION;
 
     if (ix < 0)
-        setXi(ix + smw->ScreenWidth);
-    else if (ix > smw->ScreenWidth - 1)
-        setXi(ix - smw->ScreenWidth);
+        setXi(ix + App::screenWidth);
+    else if (ix > App::screenWidth - 1)
+        setXi(ix - App::screenWidth);
 
-    if (iy > smw->ScreenHeight || --ttl <= 0 || (fSuper && iy < -ih)) {
+    if (iy > App::screenHeight || --ttl <= 0 || (fSuper && iy < -ih)) {
         removeifprojectile(this, false, true);
     } else if (game_values.spotlights) {
         if (!sSpotlight) {
@@ -1556,11 +1556,11 @@ void MO_SledgeHammer::update()
     vely += GRAVITATION;
 
     if (ix < 0)
-        setXi(ix + smw->ScreenWidth);
-    else if (ix > smw->ScreenWidth - 1)
-        setXi(ix - smw->ScreenWidth);
+        setXi(ix + App::screenWidth);
+    else if (ix > App::screenWidth - 1)
+        setXi(ix - App::screenWidth);
 
-    if (iy >= smw->ScreenHeight)
+    if (iy >= App::screenHeight)
         dead = true;
 }
 
@@ -1715,10 +1715,10 @@ MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, boo
     fFlipped = false;
 
     //Don't let boomerang start off the screen or it won't rebound correctly
-    if (moveToRight && fx + iw >= smw->ScreenWidth)
-        setXf(fx - smw->ScreenWidth);
+    if (moveToRight && fx + iw >= App::screenWidth)
+        setXf(fx - App::screenWidth);
     else if (!moveToRight && fx < 0.0f)
-        setXf(fx + smw->ScreenWidth);
+        setXf(fx + App::screenWidth);
 
     iStateTimer = 0;
 
@@ -1757,12 +1757,12 @@ void MO_Boomerang::update()
         fOldX = fx;
         setXf(fx + velx);
 
-        if (fMoveToRight && fx + iw >= smw->ScreenWidth && fOldX + iw < smw->ScreenWidth) {
+        if (fMoveToRight && fx + iw >= App::screenWidth && fOldX + iw < App::screenWidth) {
             if (fFlipped) {
                 forcedead();
                 return;
             } else {
-                setXf(smw->ScreenWidth - iw);
+                setXf(App::screenWidth - iw);
                 fFlipped = true;
                 fMoveToRight = false;
                 velx = -velx;
@@ -1786,9 +1786,9 @@ void MO_Boomerang::update()
         setXf(fx + velx);
 
         if (fx < 0.0f)
-            setXf(fx + smw->ScreenWidth);
-        else if (fx + iw >= smw->ScreenWidth)
-            setXf(fx - smw->ScreenWidth);
+            setXf(fx + App::screenWidth);
+        else if (fx + iw >= App::screenWidth)
+            setXf(fx - App::screenWidth);
 
         if (state == 1) {
             fOldY = fy;
@@ -1830,7 +1830,7 @@ void MO_Boomerang::update()
         } else if (state == 4) {
             if (iStateTimer >= 46) {
                 if ((fMoveToRight && fx < 0.0f && fOldX >= 0.0f) ||
-                        (!fMoveToRight && fx + iw >= smw->ScreenWidth && fOldX + iw < smw->ScreenWidth)) {
+                        (!fMoveToRight && fx + iw >= App::screenWidth && fOldX + iw < App::screenWidth)) {
                     forcedead();
                     return;
                 }
@@ -1843,9 +1843,9 @@ void MO_Boomerang::update()
         setXf(fx + velx);
 
         if (fx < 0.0f)
-            setXf(fx + smw->ScreenWidth);
-        else if (fx + iw >= smw->ScreenWidth)
-            setXf(fx - smw->ScreenWidth);
+            setXf(fx + App::screenWidth);
+        else if (fx + iw >= App::screenWidth)
+            setXf(fx - App::screenWidth);
 
         if (iStateTimer > game_values.boomeranglife) {
             forcedead();
@@ -1924,7 +1924,7 @@ void MO_Boomerang::update()
                 	velx = -5.0f;
 
                 if ((fx < 0.0f && fOldX >= 0.0f) ||
-                	(fx + iw >= smw->ScreenWidth && fOldX + iw < smw->ScreenWidth))
+                	(fx + iw >= App::screenWidth && fOldX + iw < App::screenWidth))
                 {
                 	forcedead();
                 	return;
@@ -2159,7 +2159,7 @@ void MO_Coin::update()
         if (++sparkleanimationtimer >= 4) {
             sparkleanimationtimer = 0;
             sparkledrawframe += 32;
-            if (sparkledrawframe >= smw->ScreenHeight)
+            if (sparkledrawframe >= App::screenHeight)
                 sparkledrawframe = 0;
         }
 
@@ -2218,7 +2218,7 @@ void OMO_Thwomp::update()
 {
     IO_OverMapObject::update();
 
-	if (iy > smw->ScreenHeight - 1)
+	if (iy > App::screenHeight - 1)
         dead = true;
 }
 
@@ -2264,7 +2264,7 @@ void MO_Podobo::update()
 
     animate();
 
-	if (iy > smw->ScreenHeight - 1 && vely > 0.0f)
+	if (iy > App::screenHeight - 1 && vely > 0.0f)
         dead = true;
 }
 
@@ -2332,7 +2332,7 @@ void OMO_BowserFire::update()
 {
     IO_OverMapObject::update();
 
-    if ((velx < 0 && ix < -iw) || (velx > 0 && ix > smw->ScreenWidth)) {
+    if ((velx < 0 && ix < -iw) || (velx > 0 && ix > App::screenWidth)) {
     	CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
 
     	if (player != NULL)
@@ -2350,8 +2350,8 @@ void OMO_BowserFire::draw()
 bool OMO_BowserFire::collide(CPlayer * player)
 {
     //if the fire is off the screen, don't wrap it to collide
-    if ((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < smw->ScreenWidth) ||
-            (ix + iw >= smw->ScreenWidth && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
+    if ((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < App::screenWidth) ||
+            (ix + iw >= App::screenWidth && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
         return false;
     }
 
@@ -2511,7 +2511,7 @@ void CO_Egg::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 
@@ -2664,7 +2664,7 @@ void CO_Star::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 }
@@ -2786,9 +2786,9 @@ void MO_FlagBase::update()
             fx = (float)ix;
 
             angle = atan2(velx, vely);
-		} else if (ix + collisionWidth >= smw->ScreenWidth) {
+		} else if (ix + collisionWidth >= App::screenWidth) {
             velx = -velx;
-			ix = smw->ScreenWidth - 1 - collisionWidth;
+			ix = App::screenWidth - 1 - collisionWidth;
             fx = (float)ix;
 
             angle = atan2(velx, vely);
@@ -2800,9 +2800,9 @@ void MO_FlagBase::update()
             fy = (float)iy;
 
             angle = atan2(velx, vely);
-		} else if (iy + collisionHeight >= smw->ScreenHeight) {
+		} else if (iy + collisionHeight >= App::screenHeight) {
             vely = -vely;
-			iy = smw->ScreenHeight - 1 - collisionHeight;
+			iy = App::screenHeight - 1 - collisionHeight;
             fy = (float)iy;
 
             angle = atan2(velx, vely);
@@ -3066,8 +3066,8 @@ void MO_Yoshi::placeYoshi()
     timer = 0;
 
     for (short tries = 0; tries < 64; tries++) {
-		ix = (short)RANDOM_INT(smw->ScreenWidth - iw);
-        iy = (short)RANDOM_INT(smw->ScreenHeight - ih - TILESIZE);	//don't spawn too low
+		ix = (short)RANDOM_INT(App::screenWidth - iw);
+        iy = (short)RANDOM_INT(App::screenHeight - ih - TILESIZE);	//don't spawn too low
 
         short ixl = ix / TILESIZE;
         short ixr = (ix + iw) / TILESIZE;
@@ -3568,9 +3568,9 @@ void OMO_RaceGoal::update()
         fx = (float)ix;
 
         angle = atan2(velx, vely);
-    } else if (ix + collisionWidth >= smw->ScreenWidth) {
+    } else if (ix + collisionWidth >= App::screenWidth) {
         velx = -velx;
-        ix = smw->ScreenWidth - 1 - collisionWidth;
+        ix = App::screenWidth - 1 - collisionWidth;
         fx = (float)ix;
 
         angle = atan2(velx, vely);
@@ -3582,9 +3582,9 @@ void OMO_RaceGoal::update()
         fy = (float)iy;
 
         angle = atan2(velx, vely);
-	} else if (iy + collisionHeight >= smw->ScreenHeight) {
+	} else if (iy + collisionHeight >= App::screenHeight) {
         vely = -vely;
-		iy = smw->ScreenHeight - 1 - collisionHeight;
+		iy = App::screenHeight - 1 - collisionHeight;
         fy = (float)iy;
 
         angle = atan2(velx, vely);
@@ -3604,8 +3604,8 @@ void OMO_RaceGoal::placeRaceGoal()
             if (++tries > 32)
                 break;
 
-            x = (short)RANDOM_INT(smw->ScreenWidth - collisionWidth);
-            y = (short)RANDOM_INT(smw->ScreenHeight - collisionHeight);
+            x = (short)RANDOM_INT(App::screenWidth - collisionWidth);
+            y = (short)RANDOM_INT(App::screenHeight - collisionHeight);
         } while (objectcontainer[2].getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
     }
 
@@ -3679,7 +3679,7 @@ void MO_FrenzyCard::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 
@@ -3792,7 +3792,7 @@ void MO_CollectionCard::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 
@@ -3954,19 +3954,19 @@ void MO_WalkingEnemy::update()
                 velx = -velx;
             }
         } else {
-            if (probeFrontX >= smw->ScreenWidth) {
-                probeFrontX -= smw->ScreenWidth;
+            if (probeFrontX >= App::screenWidth) {
+                probeFrontX -= App::screenWidth;
             } else if (probeFrontX < 0) {
-                probeFrontX += smw->ScreenWidth;
+                probeFrontX += App::screenWidth;
             }
 
-            if (probeCenterX >= smw->ScreenWidth) {
-                probeCenterX -= smw->ScreenWidth;
+            if (probeCenterX >= App::screenWidth) {
+                probeCenterX -= App::screenWidth;
             } else if (probeCenterX < 0) {
-                probeCenterX += smw->ScreenWidth;
+                probeCenterX += App::screenWidth;
             }
 
-            if (probeFrontX >= 0 && probeFrontX < smw->ScreenWidth && probeCenterX >= 0 && probeCenterX < smw->ScreenWidth && probeY >= 0 && probeY < smw->ScreenHeight) {
+            if (probeFrontX >= 0 && probeFrontX < App::screenWidth && probeCenterX >= 0 && probeCenterX < App::screenWidth && probeY >= 0 && probeY < App::screenHeight) {
                 probeFrontX /= TILESIZE;
                 probeCenterX /= TILESIZE;
                 probeY /= TILESIZE;
@@ -4445,7 +4445,7 @@ void MO_Spiny::DropShell(bool fBounce, bool fFlip)
 // class cheep cheep
 //------------------------------------------------------------------------------
 MO_CheepCheep::MO_CheepCheep(gfxSprite *nspr) :
-    IO_MovingObject(nspr, 0, smw->ScreenHeight, 2, 8, 30, 28, 1, 3)
+    IO_MovingObject(nspr, 0, App::screenHeight, 2, 8, 30, 28, 1, 3)
 {
     ih = 32;
     setXi((short)(RANDOM_INT(608)));
@@ -4483,7 +4483,7 @@ void MO_CheepCheep::update()
     animate();
 
     //Remove if cheep cheep has fallen below bottom of screen
-    if (vely > 0.0f && iy > smw->ScreenHeight)
+    if (vely > 0.0f && iy > App::screenHeight)
         dead = true;
 }
 
@@ -4767,7 +4767,7 @@ void MO_SledgeBrother::update()
                 short numPodobos = RANDOM_INT(5) + 8;
 
                 for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)(RANDOM_INT(608)), smw->ScreenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
+                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)(RANDOM_INT(608)), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 }
             }
         }
@@ -5170,9 +5170,9 @@ bool CO_Shell::collide(CPlayer * player)
                 short flipx = 0;
 
                 if (player->ix + PW < 320 && ix > 320)
-                    flipx = smw->ScreenWidth;
+                    flipx = App::screenWidth;
                 else if (ix + iw < 320 && player->ix > 320)
-                    flipx = -smw->ScreenWidth;
+                    flipx = -App::screenWidth;
 
                 if ((player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f) || (player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f)) {
                     Die();
@@ -5250,9 +5250,9 @@ bool CO_Shell::HitOther(CPlayer * player)
                 short flipx = 0;
 
                 if (player->ix + PW < 320 && ix > 320)
-                    flipx = smw->ScreenWidth;
+                    flipx = App::screenWidth;
                 else if (ix + iw < 320 && player->ix > 320)
-                    flipx = -smw->ScreenWidth;
+                    flipx = -App::screenWidth;
 
                 owner = player;
                 Kick();
@@ -5266,9 +5266,9 @@ bool CO_Shell::HitOther(CPlayer * player)
         short flipx = 0;
 
         if (player->ix + PW < 320 && ix > 320)
-            flipx = smw->ScreenWidth;
+            flipx = App::screenWidth;
         else if (ix + iw < 320 && player->ix > 320)
-            flipx = -smw->ScreenWidth;
+            flipx = -App::screenWidth;
 
         if (iNoOwnerKillTime == 0 || player->globalID != iPlayerID || (player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f) || (player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f))
             return KillPlayer(player);
@@ -5717,9 +5717,9 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
         short flipx = 0;
 
         if (player->ix + PW < 320 && ix > 320)
-            flipx = smw->ScreenWidth;
+            flipx = App::screenWidth;
         else if (ix + iw < 320 && player->ix > 320)
-            flipx = -smw->ScreenWidth;
+            flipx = -App::screenWidth;
 
         if (iNoOwnerKillTime == 0 || player->globalID != iPlayerID || (player->ix + flipx > ix + (iw >> 1) && velx > 0.0f) || (player->ix + flipx <= ix - (iw >> 1) && velx < 0.0f)) {
             return KillPlayer(player);
@@ -6542,7 +6542,7 @@ void MO_SpinAttack::update()
 
         short iLeft;
         if (ix < 0)
-            iLeft = (ix + smw->ScreenWidth) / TILESIZE;
+            iLeft = (ix + App::screenWidth) / TILESIZE;
         else
             iLeft = ix / TILESIZE;
 
@@ -6704,7 +6704,7 @@ void OMO_PipeCoin::update()
     if (iTeamID == -1)
         animate();
 
-    if (iy >= smw->ScreenHeight)
+    if (iy >= App::screenHeight)
         dead = true;
 
     if (pipegamemode->IsSlowdown())
@@ -6715,7 +6715,7 @@ void OMO_PipeCoin::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 
@@ -6792,7 +6792,7 @@ void OMO_PipeBonus::update()
 {
     IO_OverMapObject::update();
 
-    if (iy >= smw->ScreenHeight)
+    if (iy >= App::screenHeight)
         dead = true;
 
     if (pipegamemode->IsSlowdown())
@@ -6838,9 +6838,9 @@ void OMO_Phanto::update()
     setYf(fy + vely);
 
     if (fx < 0.0f)
-        setXf(fx + smw->ScreenWidth);
-    else if (fx + iw >= smw->ScreenWidth)
-        setXf(fx - smw->ScreenWidth);
+        setXf(fx + App::screenWidth);
+    else if (fx + iw >= App::screenWidth)
+        setXf(fx - App::screenWidth);
 
     if (++iSpeedTimer > 62) {
         iSpeedTimer = 0;
@@ -6895,13 +6895,13 @@ void OMO_Phanto::update()
                     vely = -dMaxSpeedY;
             }
 
-			if (iy >= smw->ScreenHeight || iy + ih < -CRUNCHMAX) {
+			if (iy >= App::screenHeight || iy + ih < -CRUNCHMAX) {
                 vely = 0.0f;
                 velx = 0.0f;
 
                 //Randomly position phanto off screen
-                setXi(RANDOM_INT(smw->ScreenWidth));
-				setYi(RANDOM_BOOL() ? -ih - CRUNCHMAX: smw->ScreenHeight);
+                setXi(RANDOM_INT(App::screenWidth));
+				setYi(RANDOM_BOOL() ? -ih - CRUNCHMAX: App::screenHeight);
             }
         }
     }
@@ -6909,7 +6909,7 @@ void OMO_Phanto::update()
 
 bool OMO_Phanto::collide(CPlayer * player)
 {
-    if (iy <= -ih || iy >= smw->ScreenHeight)
+    if (iy <= -ih || iy >= App::screenHeight)
         return false;
 
     //If the player is holding the key, kill him
@@ -6992,7 +6992,7 @@ void CO_PhantoKey::update()
     if (++sparkleanimationtimer >= 4) {
         sparkleanimationtimer = 0;
         sparkledrawframe += 32;
-        if (sparkledrawframe >= smw->ScreenHeight)
+        if (sparkledrawframe >= App::screenHeight)
             sparkledrawframe = 0;
     }
 }

@@ -29,7 +29,7 @@ void CGM_Chase::init()
     //Add phantos based on settings
     for (short iPhanto = 0; iPhanto < 3; iPhanto++) {
         for (short iNumPhantos = 0; iNumPhantos < game_values.gamemodesettings.chase.phantoquantity[iPhanto]; iNumPhantos++)
-            objectcontainer[1].add(new OMO_Phanto(&rm->spr_phanto, RANDOM_INT(smw->ScreenWidth), RANDOM_BOOL() ? -32 - CRUNCHMAX : smw->ScreenHeight, 0.0f, 0.0f, iPhanto));
+            objectcontainer[1].add(new OMO_Phanto(&rm->spr_phanto, RANDOM_INT(App::screenWidth), RANDOM_BOOL() ? -32 - CRUNCHMAX : App::screenHeight, 0.0f, 0.0f, iPhanto));
     }
 
     //Add a key

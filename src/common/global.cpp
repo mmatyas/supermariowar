@@ -27,7 +27,6 @@ std::string RootDataDirectory = GetHomeDirectory() + "data";
 std::string RootDataDirectory = GetRootDirectory() + "data";
 #endif
 
-CGame *smw;
 CResourceManager *rm;
 
 bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)

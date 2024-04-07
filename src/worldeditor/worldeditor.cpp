@@ -223,7 +223,6 @@ extern CMap* g_map;
 extern CTilesetManager* g_tilesetmanager;
 
 extern CResourceManager* rm;
-extern CGame* smw;
 extern std::string RootDataDirectory;
 
 gfxSprite		spr_overlay, spr_overlayhole;
@@ -453,7 +452,8 @@ int main(int argc, char *argv[])
     if (!cmd.data_root.empty())
         RootDataDirectory = cmd.data_root;
 
-    smw = new CGame();
+    ensureSettingsDir();
+
     rm = new CResourceManager();
 
 	g_map = new CMap();

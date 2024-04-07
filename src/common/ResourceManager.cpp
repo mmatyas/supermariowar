@@ -15,8 +15,6 @@ extern CTilesetManager  *g_tilesetmanager;
 
 extern CGameValues game_values;
 
-extern CGame* smw;
-
 extern void _load_drawmsg(const std::string& f);
 extern void _load_waitforkey();
 
@@ -270,7 +268,7 @@ bool CResourceManager::LoadMenuGraphics()
     const char * graphicspack = menugraphicspacklist->current_name();
 
     gfx_loadimagenocolorkey(&menu_shade, convertPath("gfx/packs/menu/menu_shade.png", graphicspack));
-    menu_shade.setalpha(smw->MenuTransparency);
+    menu_shade.setalpha(App::menuTransparency);
 
     gfx_loadimage(&spr_scoreboard, convertPath("gfx/packs/menu/scoreboard.png", graphicspack), false);
     gfx_loadimage(&menu_slider_bar, convertPath("gfx/packs/menu/menu_slider_bar.png", graphicspack), false);

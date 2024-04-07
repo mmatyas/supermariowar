@@ -14,7 +14,6 @@
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-extern CGame* smw;
 
 
 MI_BonusWheel::MI_BonusWheel(short x, short y)
@@ -213,7 +212,7 @@ void MI_BonusWheel::Draw()
     miContinueButton->Draw();
 
     if (iState == 1 && !fPressedSelect)
-        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, iy + 390, "Press a Button To Stop The Wheel");
+        rm->menu_font_large.drawCentered(App::screenWidth/2, iy + 390, "Press a Button To Stop The Wheel");
 }
 
 void MI_BonusWheel::Reset(bool fTournament)

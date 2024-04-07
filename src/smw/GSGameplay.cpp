@@ -289,7 +289,7 @@ void GameplayState::initScoreDisplayPosition()
 
     for (i = 0; i < score_cnt; i++) {
         if (game_values.scoreboardstyle == ScoreboardStyle::Top || game_values.scoreboardstyle == ScoreboardStyle::Bottom) {
-            score[i]->x = ((smw->ScreenWidth - totalspace) >> 1);
+            score[i]->x = ((App::screenWidth - totalspace) >> 1);
 
             for (short k = 0; k < i; k++)
                 score[i]->x += 76 + game_values.teamcounts[k] * 34;
@@ -340,7 +340,7 @@ void GameplayState::initEyeCandy()
                 velx = velx < 0.5f && velx > -0.5f ? 1 : velx;  //no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_clouds, (float)(RANDOM_INT(smw->ScreenWidth)), (float)(RANDOM_INT(100)), velx, 0, srcy, w, h));
+                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_clouds, (float)(RANDOM_INT(App::screenWidth)), (float)(RANDOM_INT(100)), velx, 0, srcy, w, h));
             }
         }
 
@@ -353,20 +353,20 @@ void GameplayState::initEyeCandy()
                 velx = velx < 0.5f && velx > -0.5f ? (RANDOM_INT(1) ? 1.0f : -1.0f) : velx; //no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(RANDOM_INT(smw->ScreenWidth)), (float)RANDOM_INT(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
+                eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
             }
         }
 
         //Leaves
         if (g_map->eyecandy[iEyeCandyLayer] & 4) {
             for (i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(RANDOM_INT(smw->ScreenWidth)), (float)RANDOM_INT(smw->ScreenHeight)));
+                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight)));
         }
 
         //Snow
         if (g_map->eyecandy[iEyeCandyLayer] & 8) {
             for (i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RANDOM_INT(smw->ScreenWidth)), (float)RANDOM_INT(smw->ScreenHeight), 0));
+                eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), 0));
         }
 
         //Fish
@@ -395,22 +395,22 @@ void GameplayState::initEyeCandy()
                 }
 
                 //add cloud to eyecandy array
-                short iPossibleY = (smw->ScreenHeight - h) / 10;
+                short iPossibleY = (App::screenHeight - h) / 10;
                 float dDestY = (float)(RANDOM_INT(iPossibleY) + iPossibleY * i);
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_fish, (float)(RANDOM_INT(smw->ScreenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
+                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_fish, (float)(RANDOM_INT(App::screenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
             }
         }
 
         //Rain
         if (g_map->eyecandy[iEyeCandyLayer] & 32) {
             for (i = 0; i < 20; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Rain(&rm->spr_rain, (float)(RANDOM_INT(smw->ScreenWidth)), RANDOM_INT(smw->ScreenHeight)));
+                eyecandy[iEyeCandyLayer].add(new EC_Rain(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight)));
         }
 
         //Bubbles
         if (g_map->eyecandy[iEyeCandyLayer] & 64) {
             for (i = 0; i < 10; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(RANDOM_INT(smw->ScreenWidth)), RANDOM_INT(smw->ScreenHeight)));
+                eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight)));
         }
     }
 }
@@ -745,11 +745,11 @@ void GameplayState::spinScreen()
         spinangle += TWO_PI;
     }
 
-    float shakey = spinspeed * smw->ScreenWidth * sin(spinangle);
+    float shakey = spinspeed * App::screenWidth * sin(spinangle);
     if (shakey < 0.0f)
         shakey -= 1.0f;
 
-    x_shake = (short)(spinspeed * smw->ScreenWidth * cos(spinangle));
+    x_shake = (short)(spinspeed * App::screenWidth * cos(spinangle));
     y_shake = (short)(shakey);
 }
 
@@ -902,7 +902,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                 sprintf(gameovertext, "Tie Game");
             }
 
-            rm->game_font_large.drawCentered(smw->ScreenWidth/2, 90, gameovertext);
+            rm->game_font_large.drawCentered(App::screenWidth/2, 90, gameovertext);
 
         }
 
@@ -963,7 +963,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
                         //Display tanooki powerup if player has it
                         if (player->tanookisuit.isOn())
-                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, smw->ScreenWidth/2, 0, 16, 16);
+                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, App::screenWidth/2, 0, 16, 16);
                     } else {
                         rm->spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
                     }
@@ -1078,18 +1078,18 @@ void GameplayState::drawScreenShakeBackground()
 {
     //Draw black "behind" the game if we are shaking/moving the screen
     if (y_shake > 0) {
-        SDL_Rect rect = {0, 0, smw->ScreenWidth, y_shake};
+        SDL_Rect rect = {0, 0, App::screenWidth, y_shake};
         SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
     } else if (y_shake < 0) {
-        SDL_Rect rect = {0, smw->ScreenHeight + y_shake, smw->ScreenWidth, smw->ScreenHeight};
+        SDL_Rect rect = {0, App::screenHeight + y_shake, App::screenWidth, App::screenHeight};
         SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
     }
 
     if (x_shake > 0) {
-        SDL_Rect rect = {0, 0, x_shake, smw->ScreenHeight};
+        SDL_Rect rect = {0, 0, x_shake, App::screenHeight};
         SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
     } else if (x_shake < 0) {
-        SDL_Rect rect = {smw->ScreenWidth + x_shake, 0, smw->ScreenWidth, smw->ScreenHeight};
+        SDL_Rect rect = {App::screenWidth + x_shake, 0, App::screenWidth, App::screenHeight};
         SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
     }
 }
@@ -1199,7 +1199,7 @@ void GameplayState::drawWindMeter()
     if (game_values.windaffectsplayers) {
         short iDisplayWindMeterY = game_values.scoreboardstyle == ScoreboardStyle::Bottom ? 8 : 440;
         rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
-        rm->spr_windmeter.draw((short)(game_values.flags.gamewindx * 20.0f) + smw->ScreenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
+        rm->spr_windmeter.draw((short)(game_values.flags.gamewindx * 20.0f) + App::screenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
     }
 }
 
@@ -1245,9 +1245,9 @@ void drawExitPauseDialog()
 {
     if (game_values.flags.pausegame) {
         rm->spr_dialog.draw(224, 176);
-        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 194, "Pause");
+        rm->menu_font_large.drawCentered(App::screenWidth/2, 194, "Pause");
 
-        //menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight/2, game_values.gamemode->GetModeName());
+        //menu_font_large.drawCentered(App::screenWidth/2, App::screenHeight/2, game_values.gamemode->GetModeName());
         short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
         rm->menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
@@ -1259,18 +1259,18 @@ void drawExitPauseDialog()
         else
             szGoal += std::to_string(game_values.gamemode->goal);
 
-        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 264, szGoal.c_str());
+        rm->menu_font_large.drawCentered(App::screenWidth/2, 264, szGoal.c_str());
     }
 
     if (game_values.flags.exitinggame) {
-        rm->spr_dialog.draw(smw->ScreenWidth * 0.35f, smw->ScreenHeight*0.37f);
-        rm->menu_font_large.drawCentered(smw->ScreenWidth * 0.5f, smw->ScreenHeight*0.46f - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
+        rm->spr_dialog.draw(App::screenWidth * 0.35f, App::screenHeight*0.37f);
+        rm->menu_font_large.drawCentered(App::screenWidth * 0.5f, App::screenHeight*0.46f - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
 
-        rm->spr_dialogbutton.draw(smw->ScreenWidth * 0.37f, smw->ScreenHeight*0.52f, 0, (game_values.flags.exityes ? 34 : 0), 80, 34);
-        rm->spr_dialogbutton.draw(smw->ScreenWidth * 0.51f, smw->ScreenHeight*0.52f, 0, (game_values.flags.exityes ? 0 : 34), 80, 34);
+        rm->spr_dialogbutton.draw(App::screenWidth * 0.37f, App::screenHeight*0.52f, 0, (game_values.flags.exityes ? 34 : 0), 80, 34);
+        rm->spr_dialogbutton.draw(App::screenWidth * 0.51f, App::screenHeight*0.52f, 0, (game_values.flags.exityes ? 0 : 34), 80, 34);
 
-        rm->menu_font_large.draw(smw->ScreenWidth * 0.43f - (rm->menu_font_large.getWidth("Yes") >> 1),  smw->ScreenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "Yes");
-        rm->menu_font_large.draw(smw->ScreenWidth * 0.57f - (rm->menu_font_large.getWidth("No") >> 1),  smw->ScreenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "No");
+        rm->menu_font_large.draw(App::screenWidth * 0.43f - (rm->menu_font_large.getWidth("Yes") >> 1),  App::screenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "Yes");
+        rm->menu_font_large.draw(App::screenWidth * 0.57f - (rm->menu_font_large.getWidth("No") >> 1),  App::screenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "No");
     }
 }
 
@@ -1630,7 +1630,7 @@ bool updateExitPauseDialog(short iCountDownState) // true on exit
                     game_values.flags.pausegame = !game_values.flags.pausegame;
 
                     if (game_values.flags.pausegame) {
-                        rm->menu_shade.setalpha(smw->MenuTransparency   );
+                        rm->menu_shade.setalpha(App::menuTransparency   );
                         rm->menu_shade.draw(0, 0);
 
                         //Stop the pwings sound if it is on
@@ -1659,7 +1659,7 @@ bool updateExitPauseDialog(short iCountDownState) // true on exit
                     return true;
                 } else {
                     if (!game_values.flags.pausegame && !game_values.flags.exitinggame) {
-                        rm->menu_shade.setalpha(smw->MenuTransparency   );
+                        rm->menu_shade.setalpha(App::menuTransparency   );
                         rm->menu_shade.draw(0, 0);
                         game_values.flags.exitinggame = true;
                         //ifsoundonpause(rm->sfx_invinciblemusic);
@@ -1870,8 +1870,8 @@ void debug_gameplay()
                 //Detect player is in center of tile only
                 short x = (list_players[k]->centerX()) / TILESIZE;
 
-                if (list_players[k]->centerX() >= smw->ScreenWidth)
-                    x = (list_players[k]->centerX() - smw->ScreenWidth) / TILESIZE;
+                if (list_players[k]->centerX() >= App::screenWidth)
+                    x = (list_players[k]->centerX() - App::screenWidth) / TILESIZE;
 
                 short y = (list_players[k]->centerY()) / TILESIZE;
 
@@ -1879,7 +1879,7 @@ void debug_gameplay()
                 IO_Block * block = NULL;
                 short blocktype = -1;
 
-                if (list_players[k]->centerY() >= 0 && list_players[k]->centerY() < smw->ScreenHeight) {
+                if (list_players[k]->centerY() >= 0 && list_players[k]->centerY() < App::screenHeight) {
                     tile = g_map->map(x, y);
                     block = g_map->block(x, y);
                     blocktype = g_map->blockat(x, y)->iType;
@@ -1898,12 +1898,12 @@ void debug_gameplay()
                 actualvalues[0][0] = list_players[k]->leftX();
 
                 if (actualvalues[0][0] < 0)
-                    actualvalues[0][0] += smw->ScreenWidth;
+                    actualvalues[0][0] += App::screenWidth;
 
                 actualvalues[0][1] = list_players[k]->rightX();
 
-                if (actualvalues[0][1] >= smw->ScreenWidth)
-                    actualvalues[0][1] -= smw->ScreenWidth;
+                if (actualvalues[0][1] >= App::screenWidth)
+                    actualvalues[0][1] -= App::screenWidth;
 
                 actualvalues[1][0] = list_players[k]->topY();
                 actualvalues[1][1] = list_players[k]->bottomY();
@@ -1912,12 +1912,12 @@ void debug_gameplay()
                 corners[0][0] = list_players[k]->leftX() / TILESIZE;
 
                 if (list_players[k]->leftX() < 0)
-                    corners[0][0] = (list_players[k]->leftX() + smw->ScreenWidth) / TILESIZE;
+                    corners[0][0] = (list_players[k]->leftX() + App::screenWidth) / TILESIZE;
 
                 corners[0][1] = (list_players[k]->rightX()) / TILESIZE;
 
-                if (list_players[k]->rightX() >= smw->ScreenWidth)
-                    corners[0][1] = (list_players[k]->rightX() - smw->ScreenWidth) / TILESIZE;
+                if (list_players[k]->rightX() >= App::screenWidth)
+                    corners[0][1] = (list_players[k]->rightX() - App::screenWidth) / TILESIZE;
 
                 corners[1][0] = list_players[k]->topY() / TILESIZE;
                 corners[1][1] = (list_players[k]->bottomY()) / TILESIZE;
@@ -1928,7 +1928,7 @@ void debug_gameplay()
                         IO_Block * block = NULL;
                         short blocktype = -1;
 
-                        if (actualvalues[0][j] >= 0 && actualvalues[0][j] < smw->ScreenWidth && actualvalues[1][i] > 0 && actualvalues[1][i] < smw->ScreenHeight) {
+                        if (actualvalues[0][j] >= 0 && actualvalues[0][j] < App::screenWidth && actualvalues[1][i] > 0 && actualvalues[1][i] < App::screenHeight) {
                             tile = g_map->map(corners[0][j], corners[1][i]);
                             block = g_map->block(corners[0][j], corners[1][i]);
                             blocktype = g_map->blockat(corners[0][j], corners[1][i])->iType;
@@ -2508,9 +2508,9 @@ bool coldec_player2player(CPlayer * o1, CPlayer * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
     if (o1->rightX() < o2->ix) {
-        return o1->ix + smw->ScreenWidth < o2->rightX() && o1->rightX() + smw->ScreenWidth >= o2->ix && o1->iy <= o2->bottomY() && o1->bottomY() >= o2->iy;
+        return o1->ix + App::screenWidth < o2->rightX() && o1->rightX() + App::screenWidth >= o2->ix && o1->iy <= o2->bottomY() && o1->bottomY() >= o2->iy;
     } else if (o2->rightX() < o1->ix) {
-        return o1->ix < o2->rightX() + smw->ScreenWidth && o1->rightX() >= o2->ix + smw->ScreenWidth && o1->iy <= o2->bottomY() && o1->bottomY() >= o2->iy;
+        return o1->ix < o2->rightX() + App::screenWidth && o1->rightX() >= o2->ix + App::screenWidth && o1->iy <= o2->bottomY() && o1->bottomY() >= o2->iy;
     } else { //Normal case where no overlap
         return o1->ix < o2->rightX() && o1->rightX() >= o2->ix && o1->iy <= o2->bottomY() && o1->bottomY() >= o2->iy;
     }
@@ -2520,9 +2520,9 @@ bool coldec_player2obj(CPlayer * o1, CObject * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
     if (o1->rightX() < o2->ix) {
-        return o1->ix + smw->ScreenWidth < o2->ix + o2->collisionWidth && o1->rightX() + smw->ScreenWidth >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o1->bottomY() >= o2->iy;
+        return o1->ix + App::screenWidth < o2->ix + o2->collisionWidth && o1->rightX() + App::screenWidth >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o1->bottomY() >= o2->iy;
     } else if (o2->ix + o2->collisionWidth < o1->ix) {
-        return o1->ix < o2->ix + o2->collisionWidth + smw->ScreenWidth && o1->rightX() >= o2->ix + smw->ScreenWidth && o1->iy < o2->iy + o2->collisionHeight && o1->bottomY() >= o2->iy;
+        return o1->ix < o2->ix + o2->collisionWidth + App::screenWidth && o1->rightX() >= o2->ix + App::screenWidth && o1->iy < o2->iy + o2->collisionHeight && o1->bottomY() >= o2->iy;
     } else { //Normal case where no overlap
         return o1->ix < o2->ix + o2->collisionWidth && o1->rightX() >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o2->iy <= o1->bottomY();
     }
@@ -2537,9 +2537,9 @@ bool coldec_obj2obj(CObject * o1, CObject * o2)
     short o2b = o2->iy + o2->collisionHeight;
 
     if (o1r < o2->ix) {
-        return o1->ix + smw->ScreenWidth < o2r && o1r + smw->ScreenWidth >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
+        return o1->ix + App::screenWidth < o2r && o1r + App::screenWidth >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
     } else if (o2r < o1->ix) {
-        return o1->ix < o2r + smw->ScreenWidth && o1r >= o2->ix + smw->ScreenWidth && o1->iy < o2b && o1b >= o2->iy;
+        return o1->ix < o2r + App::screenWidth && o1r >= o2->ix + App::screenWidth && o1->iy < o2b && o1b >= o2->iy;
     } else {
         return o1->ix < o2r && o1r >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
     }
@@ -2571,7 +2571,7 @@ bool SwapPlayers(short iUsingPlayerID)
             game_values.flags.swapplayersblink = false;
             game_values.flags.swapplayersblinkcount = 0;
         } else {
-            game_values.screenfade = smw->MenuTransparency;
+            game_values.screenfade = App::menuTransparency;
         }
     }
 

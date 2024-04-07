@@ -539,7 +539,7 @@ void PlayerCollisions::handle_p2p_pushback(CPlayer * o1, CPlayer * o2)
     if (/*(o1->velx == 0 && o2->iswarping() && o2->velx != 0) ||*/ o1->iswarping()) {
         if (overlapcollision) {
             //o2 reposition to the right side of o1, o1 stays
-            o2->setXi(o1->ix - PW + smw->ScreenWidth - 1);
+            o2->setXi(o1->ix - PW + App::screenWidth - 1);
             o2->collisions.checkleft(*o2);
         } else {
             o2->setXi(o1->ix + PW + 1);
@@ -550,7 +550,7 @@ void PlayerCollisions::handle_p2p_pushback(CPlayer * o1, CPlayer * o2)
     } else if (/*(o2->velx == 0 && o1->iswarping() && o1->velx != 0) ||*/ o2->iswarping()) {
         if (overlapcollision) {
             //o1 reposition to the left side of o2, o2 stays
-            o1->setXi(o2->ix + PW - smw->ScreenWidth - 1);
+            o1->setXi(o2->ix + PW - App::screenWidth - 1);
             o1->collisions.checkright(*o1);
         } else {
             o1->setXi(o2->ix - PW - 1);
@@ -562,9 +562,9 @@ void PlayerCollisions::handle_p2p_pushback(CPlayer * o1, CPlayer * o2)
         //both objects moving - calculate middle and set both objects
 
         if (overlapcollision) {
-            short middle = o2->ix - smw->ScreenWidth + ((o1->ix + PW) - o2->ix - smw->ScreenWidth) / 2;     //no ABS needed (o1->x < o2->x -> o1->x+w > o2->x !)
+            short middle = o2->ix - App::screenWidth + ((o1->ix + PW) - o2->ix - App::screenWidth) / 2;     //no ABS needed (o1->x < o2->x -> o1->x+w > o2->x !)
             o1->setXi(middle + 1);  //o1 is left
-            o2->setXi(middle - PW + smw->ScreenWidth - 1);      //o2 is right
+            o2->setXi(middle - PW + App::screenWidth - 1);      //o2 is right
 
             o1->collisions.checkright(*o1);
             o2->collisions.checkleft(*o2);
