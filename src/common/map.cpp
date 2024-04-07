@@ -132,7 +132,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
     SDL_Rect rDotSrc = {iPlatformPathDotOffset[iSize] + 22, 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rDotDst;
     SDL_Rect rPathSrc = {iStandardOffset[iSize], 12, iTileSize, iTileSize}, rPathDst;
 
-    gfx_setrect(&rPathDst, hazard->ix << (iSizeShift - 1), hazard->iy << (iSizeShift - 1), iTileSize, iTileSize);
+    rPathDst = {hazard->ix << (iSizeShift - 1), hazard->iy << (iSizeShift - 1), iTileSize, iTileSize};
 
     if (fDrawCenter) {
         if (hazard->itype <= 1) {
@@ -194,7 +194,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 
         short iBulletPathSpacing = (short)(hazard->dparam[0] * dBulletBillFrequency[iSize]);
         while (iBulletPathX >= 0 && iBulletPathX < GetScreenWidth(iSize)) {
-            gfx_setrect(&rDotDst, iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+            rDotDst = {iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
 
             iBulletPathX += hazard->iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
@@ -331,7 +331,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
         float dY = (float)(iStartY) - (float)(iPlatformPathDotSize[iSize] >> 1);
 
         for (short iSpot = 0; iSpot < iNumSpots + 1; iSpot++) {
-            gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+            rPathDst = {(short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
             dX += dIncrementX;
@@ -354,7 +354,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
         float dY = (float)(iStartY) - (float)(iPlatformPathDotSize[iSize] >> 1);
 
         for (short iSpot = 0; iSpot < 50; iSpot++) {
-            gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+            rPathDst = {(short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
             short iWrapX = (short)dX;
@@ -377,7 +377,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             }
 
             if (fNeedWrap) {
-                gfx_setrect(&rPathDst, iWrapX, iWrapY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+                rPathDst = {iWrapX, iWrapY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
                 SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             }
 
@@ -403,14 +403,14 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             short iX = (short)(fRadiusX * cos(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartX;
             short iY = (short)(fRadiusY * sin(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartY;
 
-            gfx_setrect(&rPathDst, iX, iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+            rPathDst = {iX, iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
             if (iX + iPlatformPathDotSize[iSize] >= GetScreenWidth(iSize)) {
-                gfx_setrect(&rPathDst, iX - GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+                rPathDst = {iX - GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
                 SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             } else if (iX < 0) {
-                gfx_setrect(&rPathDst, iX + GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+                rPathDst = {iX + GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
                 SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             }
 
@@ -1656,10 +1656,10 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
                         toTile->iRow = layerTile->iRow;
 
                         if (layerTile->iID >= 0) { //If it is part of a tileset
-                            gfx_setrect(&(animatedtile->rSrc[iLayer][0]), layerTile->iCol << 5, layerTile->iRow << 5, TILESIZE, TILESIZE);
+                            (animatedtile->rSrc[iLayer][0]) = {layerTile->iCol << 5, layerTile->iRow << 5, TILESIZE, TILESIZE};
                         } else if (layerTile->iID == TILESETANIMATED) {
                             for (short iRect = 0; iRect < 4; iRect++) {
-                                gfx_setrect(&(animatedtile->rSrc[iLayer][iRect]), (iRect + (layerTile->iCol << 2)) << 5, layerTile->iRow << 5, TILESIZE, TILESIZE);
+                                (animatedtile->rSrc[iLayer][iRect]) = {(iRect + (layerTile->iCol << 2)) << 5, layerTile->iRow << 5, TILESIZE, TILESIZE};
                             }
 
                             //Background is animated if it is a background layer or if it is a foreground layer and we are not displaying the foreground
@@ -1672,7 +1672,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
                         }
                     }
 
-                    gfx_setrect(&(animatedtile->rDest), bltrect.x, bltrect.y, TILESIZE, TILESIZE);
+                    (animatedtile->rDest) = {bltrect.x, bltrect.y, TILESIZE, TILESIZE};
                     animatedtiles.push_back(animatedtile);
                 }
             } else if (tile->iID == TILESETUNKNOWN) { //Draw red X where tile should be
@@ -1719,10 +1719,10 @@ void CMap::addPlatformAnimatedTiles()
                     toTile->iRow = tile->iRow;
 
                     for (short iRect = 0; iRect < 4; iRect++) {
-                        gfx_setrect(&(animatedtile->rSrc[0][iRect]), (iRect + (tile->iCol << 2)) << 5, tile->iRow << 5, TILESIZE, TILESIZE);
+                        (animatedtile->rSrc[0][iRect]) = {(iRect + (tile->iCol << 2)) << 5, tile->iRow << 5, TILESIZE, TILESIZE};
                     }
 
-                    gfx_setrect(&(animatedtile->rDest), iDestX, iDestY, TILESIZE, TILESIZE);
+                    (animatedtile->rDest) = {iDestX, iDestY, TILESIZE, TILESIZE};
                     animatedtiles.push_back(animatedtile);
 
                 }
@@ -2069,7 +2069,7 @@ void CMap::SetupAnimatedTiles()
             //drawn to this tile during the gameplay (gfx optimization by only drawing from animatedTilesSurface)
             if (tile->fBackgroundAnimated) {
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
-                    gfx_setrect(&tile->rAnimationSrc[0][sTileAnimationFrame], &rDst);
+                    tile->rAnimationSrc[0][sTileAnimationFrame] = rDst;
 
                     SDL_BlitSurface(backgroundSurface, rSrc, animatedTilesSurface, &rDst);
 
@@ -2105,7 +2105,7 @@ void CMap::SetupAnimatedTiles()
 
             if (tile->fForegroundAnimated) {
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
-                    gfx_setrect(&tile->rAnimationSrc[1][sTileAnimationFrame], &rDst);
+                    tile->rAnimationSrc[1][sTileAnimationFrame] = rDst;
 
                     SDL_FillRect(animatedTilesSurface, &rDst, iTransparentColor);
 
@@ -2140,7 +2140,7 @@ void CMap::SetupAnimatedTiles()
 
             if (tile->pPlatform) {
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
-                    gfx_setrect(&tile->rAnimationSrc[0][sTileAnimationFrame], &rDst);
+                    tile->rAnimationSrc[0][sTileAnimationFrame] = rDst;
 
                     SDL_FillRect(animatedTilesSurface, &rDst, iTransparentColor);
 

@@ -263,8 +263,8 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
 
     if (fWrap) {
         if (x + w >= iWrapSize) {
-            gfx_setrect(&m_srcrect, srcx, srcy, w, h);
-            gfx_setrect(&m_bltrect, x - iWrapSize + x_shake, y + y_shake, w, h);
+            m_srcrect = {srcx, srcy, w, h};
+            m_bltrect = {x - iWrapSize + x_shake, y + y_shake, w, h};
 
             if (sHiddenDirection > -1) {
                 if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
@@ -276,8 +276,8 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
                 return false;
             }
         } else if (x < 0) {
-            gfx_setrect(&m_srcrect, srcx, srcy, w, h);
-            gfx_setrect(&m_bltrect, x + iWrapSize + x_shake, y + y_shake, w, h);
+            m_srcrect = {srcx, srcy, w, h};
+            m_bltrect = {x + iWrapSize + x_shake, y + y_shake, w, h};
 
             if (sHiddenDirection > -1) {
                 if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
