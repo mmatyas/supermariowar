@@ -1,6 +1,9 @@
+#include "linfunc.h"
+
 #include <algorithm>
 #include <string>
 #include <ctype.h>
+#include <sstream>
 
 //_DEBUG
 #if 0
@@ -62,4 +65,15 @@ bool cstr_ci_equals(const char* const a, const char* const b)
     }
 
     return true;
+}
+
+std::list<std::string> tokenize(const std::string& text, char delim)
+{
+    std::list<std::string> tokens;
+
+    std::istringstream stream(text);
+    for (std::string part; std::getline(stream, part, delim);)
+        tokens.emplace_back(part);
+
+    return tokens;
 }

@@ -4,8 +4,10 @@
 #include "GlobalConstants.h"
 #include "linfunc.h"
 
-#include <cstring>
 #include <algorithm>
+#include <fstream>
+#include <list>
+#include <cstring>
 
 extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 extern short g_iDefaultMusicCategory[MAXMUSICCATEGORY];
@@ -21,102 +23,86 @@ struct WorldMusicOverride {
     std::string song;
 };
 
-std::vector<MapMusicOverride*> mapmusicoverrides;
-std::vector<WorldMusicOverride*> worldmusicoverrides;
+std::vector<MapMusicOverride> mapmusicoverrides;
+std::vector<WorldMusicOverride> worldmusicoverrides;
 
 extern MusicList* musiclist;
 extern WorldMusicList* worldmusiclist;
 
 void UpdateMusicWithOverrides()
 {
-    FILE * file = fopen(convertPath("music/Overrides.txt").c_str(), "r");
+    enum class Category : unsigned char {
+        None,
+        Maps,
+        Worlds,
+    };
 
+    std::ifstream file(convertPath("music/Overrides.txt"));
     if (!file)
         return;
 
-    short iAddToCategory = 0;
-    char szBuffer[1024];
-    while (fgets(szBuffer, 1024, file)) {
+    Category currentCategory = Category::None;
+    std::string line;
+    while (std::getline(file, line)) {
         //Ignore comment lines
-        if (szBuffer[0] == '#' || szBuffer[0] == '\n' || szBuffer[0] == '\r' || szBuffer[0] == ' ' || szBuffer[0] == '\t')
+        if (line.empty() || line[0] == '#' || line[0] == '\n' || line[0] == '\r' || line[0] == ' ' || line[0] == '\t')
             continue;
 
         //Chop off line ending
-        int stringLength = strlen(szBuffer);
-        for (short k = 0; k < stringLength; k++) {
-            if (szBuffer[k] == '\r' || szBuffer[k] == '\n') {
-                szBuffer[k] = '\0';
-                break;
-            }
-        }
+        line = line.substr(0, line.find('\r'));
+        line = line.substr(0, line.find('\n'));
 
         //If we found a category header
-        if (szBuffer[0] == '[') {
-            if (cstr_ci_equals(szBuffer, "[maps]"))
-                iAddToCategory = 1;
-            else if (cstr_ci_equals(szBuffer, "[worlds]"))
-                iAddToCategory = 2;
+        if (line[0] == '[') {
+            std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+
+            if (line == "[maps]")
+                currentCategory = Category::Maps;
+            else if (line == "[worlds]")
+                currentCategory = Category::Worlds;
 
             continue;
         }
 
         //If we're not in a category, ignore this line
-        if (iAddToCategory == 0)
+        if (currentCategory == Category::None)
             continue;
 
-        char * pszName = strtok(szBuffer, ",\n");
-
-        if (!pszName)
+        std::list<std::string> tokens = tokenize(line, ',');
+        if (tokens.empty())
             continue;
 
-        if (iAddToCategory == 1) {
-            MapMusicOverride * override = new MapMusicOverride();
+        if (currentCategory == Category::Maps) {
+            MapMusicOverride override;
 
-            override->mapname = pszName;
+            override.mapname = std::move(tokens.front());
+            tokens.pop_front();
 
-            char * pszMusic = strtok(NULL, ",\n");
-            while (pszMusic) {
-                std::string sPath = convertPath(pszMusic);
-
-                if (File_Exists(sPath.c_str())) {
-                    override->songs.push_back(sPath);
-                }
-
-                pszMusic = strtok(NULL, ",\n");
+            for (const std::string& token : tokens) {
+                std::string path = convertPath(token);
+                if (File_Exists(path))
+                    override.songs.emplace_back(std::move(path));
             }
-
             //Don't add overrides that have no songs
-            if (override->songs.size() == 0) {
-                delete override;
-                continue;
+            if (!override.songs.empty())
+                mapmusicoverrides.emplace_back(std::move(override));
+        }
+        else if (currentCategory == Category::Worlds) {
+            WorldMusicOverride override;
+
+            override.worldname = std::move(tokens.front());
+            tokens.pop_front();
+
+            std::string path = convertPath(tokens.front());
+            if (File_Exists(path)) {
+                override.song = std::move(path);
+                worldmusicoverrides.emplace_back(std::move(override));
             }
-
-            mapmusicoverrides.push_back(override);
-        } else if (iAddToCategory == 2) {
-            WorldMusicOverride * override = new WorldMusicOverride();
-
-            override->worldname = pszName;
-
-            char * pszMusic = strtok(NULL, ",\n");
-            if (pszMusic) {
-                std::string sPath = convertPath(pszMusic);
-
-                if (File_Exists(sPath.c_str())) {
-                    override->song = sPath;
-                    worldmusicoverrides.push_back(override);
-                }
-                else
-                    delete override;
-            }
-            else
-                delete override;
         }
     }
 
     musiclist->UpdateEntriesWithOverrides();
     worldmusiclist->UpdateEntriesWithOverrides();
-
-    fclose(file);
 }
 
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -705,18 +691,16 @@ void MusicEntry::UpdateWithOverrides()
 {
     short iNumFile = songFileNames.size();
 
-    if (mapmusicoverrides.size() > 0)
+    if (!mapmusicoverrides.empty())
         fUsesMapOverrides = true;
 
-    for (unsigned short i = 0; i < mapmusicoverrides.size(); i++) {
-        MapMusicOverride * override = mapmusicoverrides[i];
+    for (const MapMusicOverride& override : mapmusicoverrides) {
+        if (mapoverride.find(override.mapname) == mapoverride.end())
+            mapoverride[override.mapname] = new MusicOverride();
 
-        if (mapoverride.find(override->mapname) == mapoverride.end())
-            mapoverride[override->mapname] = new MusicOverride();
-
-        for (unsigned short j = 0; j < override->songs.size(); j++) {
-            songFileNames.push_back(override->songs[j]);
-            mapoverride[override->mapname]->songs.push_back(iNumFile);
+        for (unsigned short j = 0; j < override.songs.size(); j++) {
+            songFileNames.push_back(override.songs[j]);
+            mapoverride[override.mapname]->songs.push_back(iNumFile);
             iNumFile++;
         }
     }
@@ -899,11 +883,10 @@ std::string WorldMusicEntry::GetMusic(unsigned int musicID, const char * szWorld
 
 void WorldMusicEntry::UpdateWithOverrides()
 {
-    if (worldmusicoverrides.size() > 0)
+    if (!worldmusicoverrides.empty())
         fUsesWorldOverrides = true;
 
-    for (unsigned short i = 0; i < worldmusicoverrides.size(); i++) {
-        WorldMusicOverride * override = worldmusicoverrides[i];
-        worldoverride[override->worldname] = override->song;
+    for (const WorldMusicOverride& override : worldmusicoverrides) {
+        worldoverride[override.worldname] = override.song;
     }
 }
