@@ -15,7 +15,6 @@ environment:
   SDL2_IDIR: c:\mylibs\include\SDL2
   LIBDIR: c:\mylibs\lib
   matrix:
-    - SDL_VER: 1
     - SDL_VER: 2
 
 
