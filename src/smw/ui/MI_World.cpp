@@ -426,8 +426,8 @@ void MI_World::Draw()
     if (g_worldmap.iHeight > 15)
         iSrcOffsetY = -iMapOffsetY - (iMapDrawOffsetRow << 5);
 
-    gfx_setrect(&rectSrcSurface, iSrcOffsetX, iSrcOffsetY, iDrawWidth, iDrawHeight);
-    gfx_setrect(&rectDstSurface, iDstOffsetX, iDstOffsetY, iDrawWidth, iDrawHeight);
+    rectSrcSurface = {iSrcOffsetX, iSrcOffsetY, iDrawWidth, iDrawHeight};
+    rectDstSurface = {iDstOffsetX, iDstOffsetY, iDrawWidth, iDrawHeight};
 
     SDL_BlitSurface(sMapSurface[iCurrentSurfaceIndex], &rectSrcSurface, blitdest, &rectDstSurface);
 

@@ -528,15 +528,15 @@ EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char 
 
     ix = App::screenWidth/2 - iHalfWidth;
 
-    gfx_setrect(&rDstRect[0], ix, iy, iHalfWidth, 32);
-    gfx_setrect(&rDstRect[1], ix + iHalfWidth, iy, iHalfWidth, 32);
-    gfx_setrect(&rDstRect[2], ix, iy + 32, iHalfWidth, 32);
-    gfx_setrect(&rDstRect[3], ix + iHalfWidth, iy + 32, iHalfWidth, 32);
+    rDstRect[0] = {ix, iy, iHalfWidth, 32};
+    rDstRect[1] = {ix + iHalfWidth, iy, iHalfWidth, 32};
+    rDstRect[2] = {ix, iy + 32, iHalfWidth, 32};
+    rDstRect[3] = {ix + iHalfWidth, iy + 32, iHalfWidth, 32};
 
-    gfx_setrect(&rSrcRect[0], 0, 0, iHalfWidth, 32);
-    gfx_setrect(&rSrcRect[1], App::screenWidth * 0.8f - iHalfWidth, 0, iHalfWidth, 32);
-    gfx_setrect(&rSrcRect[2], 0, App::screenHeight * 0.93f, iHalfWidth, 32);
-    gfx_setrect(&rSrcRect[3], App::screenWidth * 0.8f - iHalfWidth, App::screenHeight * 0.93f, iHalfWidth, 32);
+    rSrcRect[0] = {0, 0, iHalfWidth, 32};
+    rSrcRect[1] = {static_cast<int>(App::screenWidth * 0.8f - iHalfWidth), 0, iHalfWidth, 32};
+    rSrcRect[2] = {0, static_cast<int>(App::screenHeight * 0.93f), iHalfWidth, 32};
+    rSrcRect[3] = {static_cast<int>(App::screenWidth * 0.8f - iHalfWidth), static_cast<int>(App::screenHeight * 0.93f), iHalfWidth, 32};
 }
 
 

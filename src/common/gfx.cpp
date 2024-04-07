@@ -436,22 +436,6 @@ bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename,
     return true;
 }
 
-void gfx_setrect(SDL_Rect * rect, short x, short y, short w, short h)
-{
-    rect->x = x;
-    rect->y = y;
-    rect->w = w;
-    rect->h = h;
-}
-
-void gfx_setrect(SDL_Rect * rect, SDL_Rect * copyrect)
-{
-    rect->x = copyrect->x;
-    rect->y = copyrect->y;
-    rect->w = copyrect->w;
-    rect->h = copyrect->h;
-}
-
 void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h)
 {
     if (dstRect->x >= x + w || dstRect->x + dstRect->w < x || dstRect->y >= y + h || dstRect->y + dstRect->h < y) {

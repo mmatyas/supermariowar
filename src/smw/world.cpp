@@ -217,7 +217,7 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
     }
 
     for (short iRect = 0; iRect < 5; iRect++)
-        gfx_setrect(&srcRects[iRect], iRect * tilesize + iRectOffsetX, iRectOffsetY, tilesize, tilesize);
+        srcRects[iRect] = {iRect * tilesize + iRectOffsetX, iRectOffsetY, tilesize, tilesize};
 
     iNumMoves = 0;
     iActionId = iAction;
