@@ -60,4 +60,3 @@ bool PU_ClockPowerup::collide(CPlayer * player)
 
     return false;
 }
-

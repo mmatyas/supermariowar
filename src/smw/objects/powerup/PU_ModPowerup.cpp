@@ -60,4 +60,3 @@ bool PU_ModPowerup::collide(CPlayer * player)
 
     return false;
 }
-

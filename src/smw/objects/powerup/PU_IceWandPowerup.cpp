@@ -84,4 +84,3 @@ bool PU_IceWandPowerup::collide(CPlayer * player)
 
     return false;
 }
-

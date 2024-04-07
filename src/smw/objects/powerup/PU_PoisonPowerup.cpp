@@ -74,4 +74,3 @@ bool PU_PoisonPowerup::collide(CPlayer * player)
 
     return false;
 }
-

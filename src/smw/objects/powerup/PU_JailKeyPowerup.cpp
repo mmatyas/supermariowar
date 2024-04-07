@@ -60,4 +60,3 @@ bool PU_JailKeyPowerup::collide(CPlayer * player)
 
     return false;
 }
-

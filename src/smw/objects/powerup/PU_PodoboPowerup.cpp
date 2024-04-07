@@ -60,4 +60,3 @@ bool PU_PodoboPowerup::collide(CPlayer * player)
 
     return false;
 }
-

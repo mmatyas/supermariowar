@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_PU_Tanooki_H
-#define SMW_GAMEOBJECT_BLOCK_PU_Tanooki_H
+#pragma once
+
+#include "objects/moving/Powerup.h"
+
+class CPlayer;
+class gfxSprite;
+
 
 class PU_Tanooki : public MO_Powerup
 {
@@ -7,5 +12,3 @@ class PU_Tanooki : public MO_Powerup
         PU_Tanooki(short x, short y);
         bool collide(CPlayer *player);
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_PU_Tanooki_H

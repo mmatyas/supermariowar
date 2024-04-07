@@ -34,7 +34,7 @@
 #include "objects/moving/MO_IceBlast.h"
 #include "objects/moving/MO_Koopa.h"
 #include "objects/moving/MO_Podobo.h"
-#include "objects/moving/MO_Powerup.h"
+#include "objects/moving/Powerup.h"
 #include "objects/moving/MO_SledgeBrother.h"
 #include "objects/moving/MO_SledgeHammer.h"
 #include "objects/moving/MO_SpinAttack.h"

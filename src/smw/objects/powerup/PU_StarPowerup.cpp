@@ -70,4 +70,3 @@ bool PU_StarPowerup::collide(CPlayer * player)
 
     return false;
 }
-

@@ -69,4 +69,3 @@ bool PU_ExtraGuyPowerup::collide(CPlayer * player)
 
     return false;
 }
-

@@ -96,5 +96,3 @@ bool PU_CoinPowerup::collide(CPlayer * player)
 
     return false;
 }
-
-

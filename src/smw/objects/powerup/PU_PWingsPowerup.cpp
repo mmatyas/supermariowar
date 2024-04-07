@@ -55,5 +55,3 @@ bool PU_PWingsPowerup::collide (CPlayer *player)
     dead = true;
     return false;
 }
-
-

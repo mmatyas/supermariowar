@@ -58,4 +58,3 @@ bool PU_LeafPowerup::collide(CPlayer * player)
 
     return false;
 }
-

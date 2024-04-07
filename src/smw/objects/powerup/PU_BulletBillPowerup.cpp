@@ -60,4 +60,3 @@ bool PU_BulletBillPowerup::collide(CPlayer * player)
 
     return false;
 }
-

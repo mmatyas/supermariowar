@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_PU_ExtraGuyPowerup_H
-#define SMW_GAMEOBJECT_BLOCK_PU_ExtraGuyPowerup_H
+#pragma once
+
+#include "objects/moving/Powerup.h"
+
+class CPlayer;
+class gfxSprite;
+
 
 class PU_ExtraGuyPowerup : public MO_Powerup
 {
@@ -12,5 +17,3 @@ class PU_ExtraGuyPowerup : public MO_Powerup
 	private:
 		short iType;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_PU_ExtraGuyPowerup_H

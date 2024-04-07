@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_PU_StarPowerup_H
-#define SMW_GAMEOBJECT_BLOCK_PU_StarPowerup_H
+#pragma once
+
+#include "objects/moving/Powerup.h"
+
+class CPlayer;
+class gfxSprite;
+
 
 class PU_StarPowerup : public MO_Powerup
 {
@@ -10,5 +15,3 @@ class PU_StarPowerup : public MO_Powerup
 		bool collide(CPlayer * player) override;
 
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_PU_StarPowerup_H

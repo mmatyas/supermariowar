@@ -60,4 +60,3 @@ bool PU_BombPowerup::collide(CPlayer * player)
 
     return false;
 }
-

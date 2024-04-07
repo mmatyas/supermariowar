@@ -134,4 +134,3 @@ void PU_FeatherPowerup::nospawn(short y)
     desty = y;
     setYi(y + TILESIZE - collisionHeight);
 }
-

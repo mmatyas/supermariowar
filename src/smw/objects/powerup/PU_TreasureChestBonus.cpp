@@ -147,5 +147,3 @@ float PU_TreasureChestBonus::BottomBounce()
 
     return bounce;
 }
-
-

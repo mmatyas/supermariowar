@@ -65,5 +65,3 @@ bool PU_ExtraTimePowerup::collide(CPlayer * player)
 
     return false;
 }
-
-

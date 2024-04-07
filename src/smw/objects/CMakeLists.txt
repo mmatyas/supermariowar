@@ -81,8 +81,6 @@ target_sources(smw PRIVATE
 	moving/MO_Koopa.h
 	moving/MO_Podobo.cpp
 	moving/MO_Podobo.h
-	moving/MO_Powerup.cpp
-	moving/MO_Powerup.h
 	moving/MO_SledgeBrother.cpp
 	moving/MO_SledgeBrother.h
 	moving/MO_SledgeHammer.cpp
@@ -97,6 +95,8 @@ target_sources(smw PRIVATE
 	moving/MO_Yoshi.h
 	moving/MovingObject.cpp
 	moving/MovingObject.h
+	moving/Powerup.cpp
+	moving/Powerup.h
 	moving/WalkingEnemy.cpp
 	moving/WalkingEnemy.h
 

@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_PU_LeafPowerup_H
-#define SMW_GAMEOBJECT_BLOCK_PU_LeafPowerup_H
+#pragma once
+
+#include "objects/moving/Powerup.h"
+
+class CPlayer;
+class gfxSprite;
+
 
 class PU_LeafPowerup : public PU_FeatherPowerup
 {
@@ -9,5 +14,3 @@ class PU_LeafPowerup : public PU_FeatherPowerup
 
 		bool collide(CPlayer * player) override;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_PU_LeafPowerup_H

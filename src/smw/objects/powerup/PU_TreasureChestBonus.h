@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_PU_TreasureChestBonus_H
-#define SMW_GAMEOBJECT_BLOCK_PU_TreasureChestBonus_H
+#pragma once
+
+#include "objects/moving/Powerup.h"
+
+class CPlayer;
+class gfxSprite;
+
 
 class PU_TreasureChestBonus : public MO_Powerup
 {
@@ -20,5 +25,3 @@ class PU_TreasureChestBonus : public MO_Powerup
 		short drawbonusitemx, drawbonusitemy;
 		short drawbonusitemtimer;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_PU_TreasureChestBonus_H

@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_PU_FeatherPowerup_H
-#define SMW_GAMEOBJECT_BLOCK_PU_FeatherPowerup_H
+#pragma once
+
+#include "objects/moving/Powerup.h"
+
+class CPlayer;
+class gfxSprite;
+
 
 class PU_FeatherPowerup : public IO_MovingObject
 {
@@ -19,5 +24,3 @@ class PU_FeatherPowerup : public IO_MovingObject
 		float desty;
 		float dFloatCenterX, dFloatCenterY;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_PU_FeatherPowerup_H

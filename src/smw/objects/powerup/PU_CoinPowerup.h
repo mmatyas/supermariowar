@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_PU_CoinPowerup_H
-#define SMW_GAMEOBJECT_BLOCK_PU_CoinPowerup_H
+#pragma once
+
+#include "objects/moving/Powerup.h"
+
+class CPlayer;
+class gfxSprite;
+
 
 class PU_CoinPowerup : public MO_Powerup
 {
@@ -18,5 +23,3 @@ class PU_CoinPowerup : public MO_Powerup
 		short sparkleanimationtimer;
 		short sparkledrawframe;
 };
-
-#endif // SMW_GAMEOBJECT_BLOCK_PU_CoinPowerup_H

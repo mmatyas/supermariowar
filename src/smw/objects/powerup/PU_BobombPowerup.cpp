@@ -60,4 +60,3 @@ bool PU_BobombPowerup::collide(CPlayer * player)
 
     return false;
 }
-

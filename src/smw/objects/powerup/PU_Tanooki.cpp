@@ -59,4 +59,3 @@ bool PU_Tanooki :: collide (CPlayer * player)
 
     return false;
 }
-

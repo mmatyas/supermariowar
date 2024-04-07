@@ -101,5 +101,3 @@ void PU_SecretPowerup::place()
     fx = (float)ix;
     fy = (float)iy;
 }
-
-

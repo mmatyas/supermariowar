@@ -60,4 +60,3 @@ bool PU_HammerPowerup::collide(CPlayer * player)
 
     return false;
 }
-

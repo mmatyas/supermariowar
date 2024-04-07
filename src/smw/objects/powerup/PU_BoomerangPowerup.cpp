@@ -60,5 +60,3 @@ bool PU_BoomerangPowerup::collide(CPlayer * player)
 
     return false;
 }
-
-

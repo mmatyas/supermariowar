@@ -67,4 +67,3 @@ bool PU_MysteryMushroomPowerup::collide(CPlayer * player)
 
     return false;
 }
-

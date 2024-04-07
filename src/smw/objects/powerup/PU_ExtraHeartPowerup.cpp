@@ -68,4 +68,3 @@ bool PU_ExtraHeartPowerup::collide(CPlayer * player)
 
     return false;
 }
-
