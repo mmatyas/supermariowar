@@ -16,13 +16,12 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 PU_ExtraGuyPowerup::PU_ExtraGuyPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short type)
     : MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+    , iType(type)
 {
     if (moveToRight)
         velx = 1.0f + (float)type;
     else
         velx = -1.0f - (float)type;
-
-    iType = type;
 }
 
 bool PU_ExtraGuyPowerup::collide(CPlayer* player)

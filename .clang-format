@@ -1,6 +1,7 @@
 ---
 BasedOnStyle: WebKit
 MaxEmptyLinesToKeep: 2
+SpacesBeforeTrailingComments: 2
 
 SortIncludes: CaseInsensitive
 IncludeCategories:

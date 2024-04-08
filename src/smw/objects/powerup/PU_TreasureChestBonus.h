@@ -9,7 +9,6 @@ class gfxSprite;
 class PU_TreasureChestBonus : public MO_Powerup {
 public:
     PU_TreasureChestBonus(gfxSprite* nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem);
-    ~PU_TreasureChestBonus() {};
 
     void update() override;
     void draw() override;
@@ -17,10 +16,11 @@ public:
     float BottomBounce() override;
 
 private:
-    short sparkleanimationtimer;
-    short sparkledrawframe;
-    short numbounces;
-    short bonusitem;
-    short drawbonusitemx, drawbonusitemy;
-    short drawbonusitemtimer;
+    const short bonusitem;
+    short numbounces = 5;
+    short sparkleanimationtimer = 0;
+    short sparkledrawframe = 0;
+    short drawbonusitemx = 0;
+    short drawbonusitemy = 0;
+    short drawbonusitemtimer = 0;
 };

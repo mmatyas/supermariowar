@@ -18,8 +18,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 PU_SecretPowerup::PU_SecretPowerup(gfxSprite* nspr, short x, short y, short type)
     : MO_Powerup(nspr, x, y, 4, 8, 30, 30, 1, 1)
+    , itemtype(type)
 {
-    itemtype = type;
     place();
 }
 

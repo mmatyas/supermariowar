@@ -17,25 +17,17 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite* nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem)
     : MO_Powerup(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+    , bonusitem(iBonusItem)
 {
     velx = 0.0f;
-
-    sparkleanimationtimer = 0;
-    sparkledrawframe = 0;
     bounce = -VELPOWERUPBOUNCE * 2;
-    numbounces = 5;
     state = 2;
-    bonusitem = iBonusItem;
 
     short iAttempts = 10;
     while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0)
         ;
     fx = (float)ix;
     fy = (float)iy;
-
-    drawbonusitemx = 0;
-    drawbonusitemy = 0;
-    drawbonusitemtimer = 0;
 
     fObjectDiesOnSuperDeathTiles = false;
 }

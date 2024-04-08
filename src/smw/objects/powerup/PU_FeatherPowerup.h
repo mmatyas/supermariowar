@@ -1,6 +1,7 @@
 #pragma once
 
-#include "objects/moving/Powerup.h"
+#include "GlobalConstants.h"
+#include "objects/moving/MovingObject.h"
 
 class CPlayer;
 class gfxSprite;
@@ -9,7 +10,6 @@ class gfxSprite;
 class PU_FeatherPowerup : public IO_MovingObject {
 public:
     PU_FeatherPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
-    ~PU_FeatherPowerup() {};
 
     void update() override;
     void draw() override;
@@ -18,8 +18,9 @@ public:
     void nospawn(short y);
 
 private:
-    bool fFloatDirectionRight;
-    float dFloatAngle;
+    bool fFloatDirectionRight = true;
+    float dFloatAngle = HALF_PI;
+    float dFloatCenterX = 0.f;
+    float dFloatCenterY = 0.f;
     float desty;
-    float dFloatCenterX, dFloatCenterY;
 };

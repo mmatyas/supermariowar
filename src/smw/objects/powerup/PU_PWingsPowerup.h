@@ -9,5 +9,6 @@ class gfxSprite;
 class PU_PWingsPowerup : public MO_Powerup {
 public:
     PU_PWingsPowerup(gfxSprite* nspr, short x, short y);
-    bool collide(CPlayer* player);
+
+    bool collide(CPlayer* player) override;
 };

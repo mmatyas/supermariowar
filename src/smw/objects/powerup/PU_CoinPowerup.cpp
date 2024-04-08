@@ -14,10 +14,10 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 PU_CoinPowerup::PU_CoinPowerup(gfxSprite* nspr, short x, short y, short color, short value)
     : MO_Powerup(nspr, x, y, 4, 8, 30, 30, 1, 1)
+    , iColorOffsetY(color * 32)
+    , iValue(value)
 {
     velx = 0.0f;
-    iColorOffsetY = color << 5;
-    iValue = value;
 
     sparkleanimationtimer = 0;
     sparkledrawframe = 0;

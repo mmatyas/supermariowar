@@ -16,15 +16,12 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
     : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+    , desty(fy - collisionHeight)
 {
-    desty = fy - collisionHeight;
     movingObjectType = movingobject_powerup;
 
     iw = (short)nspr->getWidth() >> 1;
-
     velx = 0.0f;
-    fFloatDirectionRight = true;
-    dFloatAngle = HALF_PI;
 
     fObjectCollidesWithMap = false;
 }

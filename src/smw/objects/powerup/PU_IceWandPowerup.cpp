@@ -13,9 +13,6 @@ PU_IceWandPowerup::PU_IceWandPowerup(gfxSprite* nspr, short x, short y, short iN
     : MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
     velx = 0.0f;
-
-    sparkleanimationtimer = 0;
-    sparkledrawframe = 0;
 }
 
 void PU_IceWandPowerup::update()
