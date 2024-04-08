@@ -16,7 +16,7 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // secret powerup
 //------------------------------------------------------------------------------
-PU_SecretPowerup::PU_SecretPowerup(gfxSprite * nspr, short x, short y, short type)
+PU_SecretPowerup::PU_SecretPowerup(gfxSprite* nspr, short x, short y, short type)
     : MO_Powerup(nspr, x, y, 4, 8, 30, 30, 1, 1)
 {
     itemtype = type;
@@ -39,11 +39,11 @@ void PU_SecretPowerup::draw()
 {
     MO_Powerup::draw();
 
-    //Draw sparkles
+    // Draw sparkles
     rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 }
 
-bool PU_SecretPowerup::collide (CPlayer *player)
+bool PU_SecretPowerup::collide(CPlayer* player)
 {
     if (itemtype == 0) {
         game_values.windaffectsplayers = true;
@@ -67,7 +67,8 @@ bool PU_SecretPowerup::collide (CPlayer *player)
 void PU_SecretPowerup::place()
 {
     short iAttempts = 10;
-    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0)
+        ;
 
     fx = (float)ix;
     fy = (float)iy;

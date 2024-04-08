@@ -15,8 +15,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class treasure chest powerup
 //------------------------------------------------------------------------------
-PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem) :
-    MO_Powerup(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite* nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem)
+    : MO_Powerup(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
     velx = 0.0f;
 
@@ -28,7 +28,8 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
     bonusitem = iBonusItem;
 
     short iAttempts = 10;
-    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0)
+        ;
     fx = (float)ix;
     fy = (float)iy;
 
@@ -50,7 +51,7 @@ void PU_TreasureChestBonus::update()
             sparkledrawframe = 0;
     }
 
-    //Draw rising powerup from chest
+    // Draw rising powerup from chest
     if (state == 3) {
         drawbonusitemy -= 2;
 
@@ -67,7 +68,7 @@ void PU_TreasureChestBonus::draw()
     if (state < 3) {
         MO_Powerup::draw();
 
-        //Draw sparkles
+        // Draw sparkles
         rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
     } else {
         if (bonusitem >= NUM_POWERUPS)
@@ -77,13 +78,13 @@ void PU_TreasureChestBonus::draw()
     }
 }
 
-bool PU_TreasureChestBonus::collide(CPlayer * player)
+bool PU_TreasureChestBonus::collide(CPlayer* player)
 {
     if (state == 1) {
         ifSoundOnPlay(rm->sfx_treasurechest);
-        //if (game_values.worldpowerupcount[player->teamID] < 32)
-        //    game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
-        //else
+        // if (game_values.worldpowerupcount[player->teamID] < 32)
+        //     game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
+        // else
         //	game_values.worldpowerups[player->teamID][31] = bonusitem;
 
         state = 3;

@@ -13,7 +13,7 @@ PU_Tanooki::PU_Tanooki(short x, short y)
 {
 }
 
-bool PU_Tanooki :: collide (CPlayer * player)
+bool PU_Tanooki ::collide(CPlayer* player)
 {
     if (state > 0) {
         player->SetPowerup(9);

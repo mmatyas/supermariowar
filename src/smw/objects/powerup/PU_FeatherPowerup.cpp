@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class feather powerup
 //------------------------------------------------------------------------------
-PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
-    IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
+    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
     desty = fy - collisionHeight;
     movingObjectType = movingobject_powerup;
@@ -42,7 +42,7 @@ void PU_FeatherPowerup::draw()
 
 void PU_FeatherPowerup::update()
 {
-    //Have the powerup grow out of the powerup block
+    // Have the powerup grow out of the powerup block
     if (state == 0) {
         setYf(fy - 4.0f);
 
@@ -87,7 +87,7 @@ void PU_FeatherPowerup::update()
     }
 }
 
-bool PU_FeatherPowerup::collide(CPlayer * player)
+bool PU_FeatherPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
         player->SetPowerup(3);

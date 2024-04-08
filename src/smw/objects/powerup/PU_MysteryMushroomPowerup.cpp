@@ -13,8 +13,8 @@ extern bool SwapPlayers(short iUsingPlayerID);
 //------------------------------------------------------------------------------
 // class mystery mushroom powerup
 //------------------------------------------------------------------------------
-PU_MysteryMushroomPowerup::PU_MysteryMushroomPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
-    MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_MysteryMushroomPowerup::PU_MysteryMushroomPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
+    : MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
     if (moveToRight)
         velx = 2.0f;
@@ -22,13 +22,13 @@ PU_MysteryMushroomPowerup::PU_MysteryMushroomPowerup(gfxSprite *nspr, short x, s
         velx = -2.0f;
 }
 
-bool PU_MysteryMushroomPowerup::collide(CPlayer * player)
+bool PU_MysteryMushroomPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
         dead = true;
 
         if (!SwapPlayers(player->localID)) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW)-16, player->iy + (HALFPH)-16, 3, 8));
             ifSoundOnPlay(rm->sfx_spit);
         }
     }

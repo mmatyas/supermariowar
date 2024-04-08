@@ -6,11 +6,10 @@ class CPlayer;
 class gfxSprite;
 
 
-class PU_ExtraTimePowerup : public MO_Powerup
-{
-	public:
-		PU_ExtraTimePowerup(gfxSprite *nspr, short x, short y);
-		~PU_ExtraTimePowerup(){};
+class PU_ExtraTimePowerup : public MO_Powerup {
+public:
+    PU_ExtraTimePowerup(gfxSprite* nspr, short x, short y);
+    ~PU_ExtraTimePowerup() {};
 
-		bool collide(CPlayer * player) override;
+    bool collide(CPlayer* player) override;
 };

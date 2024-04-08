@@ -5,8 +5,8 @@
 //------------------------------------------------------------------------------
 // class poison powerup
 //------------------------------------------------------------------------------
-PU_PoisonPowerup::PU_PoisonPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
-    MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_PoisonPowerup::PU_PoisonPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
+    : MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
     if (moveToRight)
         velx = 2.0f;
@@ -16,7 +16,7 @@ PU_PoisonPowerup::PU_PoisonPowerup(gfxSprite *nspr, short x, short y, short iNum
     movingObjectType = movingobject_poisonpowerup;
 }
 
-bool PU_PoisonPowerup::collide(CPlayer * player)
+bool PU_PoisonPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
         if (player->isInvincible() || player->shyguy) {

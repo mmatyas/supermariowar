@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class 1up powerup
 //------------------------------------------------------------------------------
-PU_ExtraGuyPowerup::PU_ExtraGuyPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short type) :
-    MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_ExtraGuyPowerup::PU_ExtraGuyPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short type)
+    : MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
     if (moveToRight)
         velx = 1.0f + (float)type;
@@ -25,7 +25,7 @@ PU_ExtraGuyPowerup::PU_ExtraGuyPowerup(gfxSprite *nspr, short x, short y, short 
     iType = type;
 }
 
-bool PU_ExtraGuyPowerup::collide(CPlayer * player)
+bool PU_ExtraGuyPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
         game_values.gamemode->playerextraguy(*player, iType);

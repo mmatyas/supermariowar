@@ -6,11 +6,10 @@ class CPlayer;
 class gfxSprite;
 
 
-class PU_BoomerangPowerup : public MO_Powerup
-{
-	public:
-		PU_BoomerangPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
-		~PU_BoomerangPowerup(){};
+class PU_BoomerangPowerup : public MO_Powerup {
+public:
+    PU_BoomerangPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+    ~PU_BoomerangPowerup() {};
 
-		bool collide(CPlayer * player) override;
+    bool collide(CPlayer* player) override;
 };

@@ -9,8 +9,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class ice wand powerup
 //------------------------------------------------------------------------------
-PU_IceWandPowerup::PU_IceWandPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
-    MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_IceWandPowerup::PU_IceWandPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
+    : MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
     velx = 0.0f;
 
@@ -34,12 +34,12 @@ void PU_IceWandPowerup::draw()
 {
     MO_Powerup::draw();
 
-    //Draw sparkles
+    // Draw sparkles
     if (state == 1)
         rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 }
 
-bool PU_IceWandPowerup::collide(CPlayer * player)
+bool PU_IceWandPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
         player->SetPowerup(5);
