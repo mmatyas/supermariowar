@@ -347,7 +347,7 @@ bool CResourceManager::LoadGameGraphics()
 {
     const char * graphicspack = gamegraphicspacklist->current_name();
 
-    g_tilesetmanager->Init(graphicspack);
+    g_tilesetmanager->init(graphicspack);
 
     bool loadok = true;
     loadok &= game_font_small.init(convertPath("gfx/packs/fonts/font_small.png", graphicspack));

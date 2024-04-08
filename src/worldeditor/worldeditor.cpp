@@ -501,7 +501,7 @@ int main(int argc, char *argv[])
 
 	gfx_init(640,480, g_fFullScreen);
 	blitdest = screen;
-	g_tilesetmanager->Init(convertPath("gfx/Classic/tilesets").c_str());
+	g_tilesetmanager->init(convertPath("gfx/Classic/tilesets").c_str());
 
 	gfx_settitle(MAPTITLESTRING);
 

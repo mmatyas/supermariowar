@@ -80,7 +80,7 @@ void MapReader1600::read_tiles(CMap& map, BinaryFile& mapfile)
                     short iTileID = g_iTileConversion[iTile];
 
                     TilesetTile * tile = &map.mapdata[i][j][k];
-                    tile->iID = g_tilesetmanager->GetClassicTilesetIndex();
+                    tile->iID = g_tilesetmanager->classicTilesetIndex();
                     tile->iCol = iTileID % 32;
                     tile->iRow = iTileID / 32;
                 }
@@ -91,7 +91,7 @@ void MapReader1600::read_tiles(CMap& map, BinaryFile& mapfile)
 
             for (short k = MAPLAYERS - 1; k >= 0; k--) {
                 TilesetTile * tile = &map.mapdata[i][j][k];
-                TileType type = g_tilesetmanager->GetClassicTileset()->tileType(tile->iCol, tile->iRow);
+                TileType type = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
                 if (type != tile_nonsolid) {
                     if (type >= 0 && type < NUMTILETYPES) {
                         map.mapdatatop[i][j].iType = type;

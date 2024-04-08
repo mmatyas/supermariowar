@@ -383,9 +383,9 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
                 if (tile->iID >= 0) {
                     g_tilesetmanager->Draw(sSurface[iSurface], tile->iID, iTileSizeIndex, tile->iCol, tile->iRow, iCol, iRow);
                 } else if (tile->iID == TILESETANIMATED) {
-                    SDL_BlitSurface(rm->spr_tileanimation[iTileSizeIndex].getSurface(), g_tilesetmanager->GetRect(iTileSizeIndex, tile->iCol * 4, tile->iRow), sSurface[iSurface], g_tilesetmanager->GetRect(iTileSizeIndex, iCol, iRow));
+                    SDL_BlitSurface(rm->spr_tileanimation[iTileSizeIndex].getSurface(), g_tilesetmanager->rect(iTileSizeIndex, tile->iCol * 4, tile->iRow), sSurface[iSurface], g_tilesetmanager->rect(iTileSizeIndex, iCol, iRow));
                 } else if (tile->iID == TILESETUNKNOWN) {
-                    SDL_BlitSurface(rm->spr_unknowntile[iTileSizeIndex].getSurface(), g_tilesetmanager->GetRect(iTileSizeIndex, 0, 0), sSurface[iSurface], g_tilesetmanager->GetRect(iTileSizeIndex, iCol, iRow));
+                    SDL_BlitSurface(rm->spr_unknowntile[iTileSizeIndex].getSurface(), g_tilesetmanager->rect(iTileSizeIndex, 0, 0), sSurface[iSurface], g_tilesetmanager->rect(iTileSizeIndex, iCol, iRow));
                 }
             }
         }

@@ -60,11 +60,11 @@ void MapReader1500::read_tiles(CMap& map, BinaryFile& mapfile)
             short iTileID = (short)mapfile.read_i32();
 
             TilesetTile * tile = &map.mapdata[i][j][1];
-            tile->iID = g_tilesetmanager->GetClassicTilesetIndex();
+            tile->iID = g_tilesetmanager->classicTilesetIndex();
             tile->iCol = iTileID % 32;
             tile->iRow = iTileID / 32;
 
-            TileType iType = g_tilesetmanager->GetClassicTileset()->tileType(tile->iCol, tile->iRow);
+            TileType iType = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
 
             if (iType >= 0 && iType < NUMTILETYPES) {
                 map.mapdatatop[i][j].iType = iType;

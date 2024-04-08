@@ -245,12 +245,12 @@ class MapPlatform
 
 					SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
                 if (tile->iID >= 0) {
-                                            SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->surface(2), g_tilesetmanager->GetRect(2, tile->iCol, tile->iRow), preview, &bltrect);
+                                            SDL_BlitSurface(g_tilesetmanager->tileset(tile->iID)->surface(2), g_tilesetmanager->rect(2, tile->iCol, tile->iRow), preview, &bltrect);
                 } else if (tile->iID == TILESETANIMATED) {
-						SDL_BlitSurface(rm->spr_tileanimation[2].getSurface(), g_tilesetmanager->GetRect(2, tile->iCol * 4, tile->iRow), preview, &bltrect);
+                    SDL_BlitSurface(rm->spr_tileanimation[2].getSurface(), g_tilesetmanager->rect(2, tile->iCol * 4, tile->iRow), preview, &bltrect);
                 } else if (tile->iID == TILESETUNKNOWN) {
 						//Draw unknown tile
-						SDL_BlitSurface(rm->spr_unknowntile[2].getSurface(), g_tilesetmanager->GetRect(2, 0, 0), preview, &bltrect);
+                    SDL_BlitSurface(rm->spr_unknowntile[2].getSurface(), g_tilesetmanager->rect(2, 0, 0), preview, &bltrect);
 					}
 				}
 			}
@@ -450,7 +450,7 @@ int main(int argc, char *argv[])
 
 	gfx_init(640,480, g_fFullScreen);
 	blitdest = screen;
-	g_tilesetmanager->Init(convertPath("gfx/Classic/tilesets").c_str());
+        g_tilesetmanager->init(convertPath("gfx/Classic/tilesets").c_str());
 
 	//Add all of the maps that are world only so we can edit them
 	maplist->addWorldMaps();
@@ -724,7 +724,7 @@ void gameloop_frame()
     }
 
 	WriteAnimatedTileTypeFile(convertPath("gfx/packs/Classic/tilesets/tile_animation_tileset.tls").c_str());
-	g_tilesetmanager->SaveTilesets();
+    g_tilesetmanager->saveTilesets();
 
 	printf("\n---------------- shutdown ----------------\n");
 	return 0;
@@ -739,7 +739,7 @@ TileType CalculateTileType(short x, short y)
 
 		TileType iTileType = tile_nonsolid;
 		if (tile->iID >= 0)
-                        iTileType = g_tilesetmanager->GetTileset(tile->iID)->tileType(tile->iCol, tile->iRow);
+                    iTileType = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
 		else if (tile->iID == TILESETANIMATED)
 			iTileType = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
 
@@ -1719,9 +1719,9 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 					iSrcRow = 0;
 				}
 
-				SDL_BlitSurface(rm->spr_tileanimation[iTilesetIndex].getSurface(), g_tilesetmanager->GetRect(iTilesetIndex, iSrcCol, iSrcRow), screen, g_tilesetmanager->GetRect(iTilesetIndex, i, j));
+                SDL_BlitSurface(rm->spr_tileanimation[iTilesetIndex].getSurface(), g_tilesetmanager->rect(iTilesetIndex, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(iTilesetIndex, i, j));
             } else if (tile->iID == TILESETUNKNOWN) {
-				SDL_BlitSurface(rm->spr_unknowntile[iTilesetIndex].getSurface(), g_tilesetmanager->GetRect(iTilesetIndex, 0, 0), screen, g_tilesetmanager->GetRect(iTilesetIndex, i, j));
+                SDL_BlitSurface(rm->spr_unknowntile[iTilesetIndex].getSurface(), g_tilesetmanager->rect(iTilesetIndex, 0, 0), screen, g_tilesetmanager->rect(iTilesetIndex, i, j));
 			}
 		}
 	}
@@ -1809,7 +1809,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 						rSrc.y = iBlockSize << 1;
 					}
 
-					SDL_BlitSurface(rm->spr_blocks[iTilesizeIndex].getSurface(), &rSrc, screen, g_tilesetmanager->GetRect(iTilesizeIndex, i, j));
+                    SDL_BlitSurface(rm->spr_blocks[iTilesizeIndex].getSurface(), &rSrc, screen, g_tilesetmanager->rect(iTilesizeIndex, i, j));
 				}
 			}
 		}
@@ -2624,7 +2624,7 @@ int editor_platforms()
                                     if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
 											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-                                                                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->GetTileset(tile->iID)->tileType(tile->iCol, tile->iRow);
+                                                                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
 										}
 									}
 								}
@@ -2702,7 +2702,7 @@ int editor_platforms()
 
                                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState) {
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-                                                                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->GetTileset(tile->iID)->tileType(tile->iCol, tile->iRow);
+                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
                                     } else {
 											SetTilesetTile(tile, TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
 											g_Platforms[iEditPlatform].types[ix + i][iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
@@ -3030,9 +3030,9 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 					iSrcRow = 0;
 				}
 
-				SDL_BlitSurface(rm->spr_tileanimation[0].getSurface(), g_tilesetmanager->GetRect(0, iSrcCol, iSrcRow), screen, g_tilesetmanager->GetRect(0, iCol, iRow));
+                SDL_BlitSurface(rm->spr_tileanimation[0].getSurface(), g_tilesetmanager->rect(0, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(0, iCol, iRow));
             } else if (tile->iID == TILESETUNKNOWN) {
-				SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->GetRect(0, 0, 0), screen, g_tilesetmanager->GetRect(0, iCol, iRow));
+                SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->rect(0, 0, 0), screen, g_tilesetmanager->rect(0, iCol, iRow));
 			}
 
             if (fDrawTileTypes) {
@@ -3557,7 +3557,7 @@ void init_editor_tiles()
     set_tile_drag = false;
     view_tileset_repeat_direction = -1;
     view_tileset_repeat_timer = 0;
-    tileset = g_tilesetmanager->GetTileset(set_tile_tileset);
+    tileset = g_tilesetmanager->tileset(set_tile_tileset);
 
     editor_tiles_initialized = true;
 }
@@ -3584,20 +3584,20 @@ int editor_tiles()
                 if (!set_tile_drag) {
                     if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9 && event.key.keysym.sym < SDLK_1 + g_tilesetmanager->GetCount()) {
 							set_tile_tileset = event.key.keysym.sym - SDLK_1;
-							tileset = g_tilesetmanager->GetTileset(set_tile_tileset);
+                        tileset = g_tilesetmanager->tileset(set_tile_tileset);
 							view_tileset_x = 0;
 							view_tileset_y = 0;
                     } else if (event.key.keysym.sym == SDLK_PAGEUP) {
                         if (set_tile_tileset > 0) {
 								set_tile_tileset--;
-								tileset = g_tilesetmanager->GetTileset(set_tile_tileset);
+                            tileset = g_tilesetmanager->tileset(set_tile_tileset);
 								view_tileset_x = 0;
 								view_tileset_y = 0;
 							}
                     } else if (event.key.keysym.sym == SDLK_PAGEDOWN) {
                         if (set_tile_tileset < g_tilesetmanager->GetCount() - 1) {
 								set_tile_tileset++;
-								tileset = g_tilesetmanager->GetTileset(set_tile_tileset);
+                            tileset = g_tilesetmanager->tileset(set_tile_tileset);
 								view_tileset_x = 0;
 								view_tileset_y = 0;
 							}
@@ -3608,7 +3608,7 @@ int editor_tiles()
 								view_tileset_repeat_timer = 30;
 							}
                     } else if (event.key.keysym.sym == SDLK_DOWN) {
-                        if (view_tileset_y < g_tilesetmanager->GetTileset(set_tile_tileset)->height() - 15) {
+                        if (view_tileset_y < g_tilesetmanager->tileset(set_tile_tileset)->height() - 15) {
 								view_tileset_y++;
 								view_tileset_repeat_direction = 1;
 								view_tileset_repeat_timer = 30;
@@ -3620,7 +3620,7 @@ int editor_tiles()
 								view_tileset_repeat_timer = 30;
 							}
                     } else if (event.key.keysym.sym == SDLK_RIGHT) {
-                        if (view_tileset_x < g_tilesetmanager->GetTileset(set_tile_tileset)->width() - 20) {
+                        if (view_tileset_x < g_tilesetmanager->tileset(set_tile_tileset)->width() - 20) {
 								view_tileset_x++;
 								view_tileset_repeat_direction = 3;
 								view_tileset_repeat_timer = 30;
@@ -3651,7 +3651,7 @@ int editor_tiles()
 					short iRow = event.button.y / TILESIZE + view_tileset_y;
 
                 if (event.button.button == SDL_BUTTON_LEFT) {
-						CTileset * tileset = g_tilesetmanager->GetTileset(set_tile_tileset);
+                                            CTileset * tileset = g_tilesetmanager->tileset(set_tile_tileset);
 
                     if (iCol < tileset->width() && iRow < tileset->height()) {
 							set_tile_start_x = iCol;
@@ -3729,11 +3729,11 @@ int editor_tiles()
 
                 if (view_tileset_repeat_direction == 0 && view_tileset_y > 0) {
 					view_tileset_y--;
-                } else if (view_tileset_repeat_direction == 1 && view_tileset_y < g_tilesetmanager->GetTileset(set_tile_tileset)->height() - 15) {
+                } else if (view_tileset_repeat_direction == 1 && view_tileset_y < g_tilesetmanager->tileset(set_tile_tileset)->height() - 15) {
 					view_tileset_y++;
                 } else if (view_tileset_repeat_direction == 2 && view_tileset_x > 0) {
 					view_tileset_x--;
-                } else if (view_tileset_repeat_direction == 3 && view_tileset_x < g_tilesetmanager->GetTileset(set_tile_tileset)->width() - 20) {
+                } else if (view_tileset_repeat_direction == 3 && view_tileset_x < g_tilesetmanager->tileset(set_tile_tileset)->width() - 20) {
 					view_tileset_x++;
 				}
 			}
@@ -3754,8 +3754,8 @@ int editor_tiles()
         r.y = 0;
         r.w = 640;
         r.h = 480;
-        
-        SDL_BlitSurface(g_tilesetmanager->GetTileset(set_tile_tileset)->surface(0), &rectSrc, screen, &r);
+
+        SDL_BlitSurface(g_tilesetmanager->tileset(set_tile_tileset)->surface(0), &rectSrc, screen, &r);
 		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
                 rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), tileset->name());
 

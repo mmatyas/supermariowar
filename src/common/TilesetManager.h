@@ -1,18 +1,18 @@
-#ifndef TILESETMANAGER_H
-#define TILESETMANAGER_H
+#pragma once
 
 #include "FileList.h"
-#include "gfx/gfxSprite.h"
 #include "map.h"
 
 #include <array>
+#include <memory>
 #include <vector>
+
 
 class CTileset {
 public:
     CTileset(const std::string& dir);
 
-    void SaveTileset();
+    void saveTileset() const;
 
     TileType tileType(size_t iTileCol, size_t iTileRow) const;
     void setTileType(size_t iTileCol, size_t iTileRow, TileType type);
@@ -39,41 +39,37 @@ private:
 
 
 //it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
-class CTilesetManager : public SimpleDirectoryList
-{
-    public:
-		CTilesetManager();
-        virtual ~CTilesetManager();
-		void Init(const char * szGfxPack);
+class CTilesetManager : public SimpleDirectoryList {
+public:
+    CTilesetManager();
 
-		short GetIndexFromName(const char * szName);
+    void init(const std::string& gfxPack);
 
-		void Draw(SDL_Surface * dstSurface, short iTilesetID, short iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow);
+    size_t indexFromName(const std::string& name) const;
 
-		void SaveTilesets();
+    void Draw(SDL_Surface * dstSurface, short iTilesetID, short iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow);
 
-    CTileset * GetClassicTileset() {
-        return tClassicTileset;
+    void saveTilesets() const;
+
+    size_t classicTilesetIndex() const {
+        return m_classicTilesetIndex;
     }
-    short GetClassicTilesetIndex() {
-        return iClassicTilesetIndex;
+    const CTileset& classicTileset() const {
+        return *m_tilesetlist.at(classicTilesetIndex());
     }
 
-		CTileset * GetTileset(short iID);
-		SDL_Rect* GetRect(short size_id, short col, short row);
-		SDL_Rect* GetRect(short size_id, size_t idx);
+    CTileset* tileset(size_t index);
+    SDL_Rect* rect(short size_id, short col, short row);
+    SDL_Rect* rect(short size_id, size_t idx);
 
-    private:
-        std::vector<CTileset*> tilesetlist;
-		CTileset* tClassicTileset = nullptr;
-		short iClassicTilesetIndex;
+private:
+    std::vector<std::unique_ptr<CTileset>> m_tilesetlist;  // TODO: Store objects
+    size_t m_classicTilesetIndex = SIZE_MAX;
 
-		std::vector<SDL_Rect> rects_ingame;
-		std::vector<SDL_Rect> rects_preview;
-		std::vector<SDL_Rect> rects_thumb;
-		size_t max_tileset_cols = 0;
+    std::vector<SDL_Rect> m_rects_ingame;
+    std::vector<SDL_Rect> m_rects_preview;
+    std::vector<SDL_Rect> m_rects_thumb;
+    size_t m_max_tileset_cols = 0;
 
-		void InitTilesetRects();
+    void initTilesetRects();
 };
-
-#endif // TILESETMANAGER_H
