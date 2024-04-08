@@ -7,19 +7,18 @@ class OMO_Phanto : public IO_OverMapObject
 {
 	public:
 		OMO_Phanto(gfxSprite *nspr, short x, short y, float velx, float vely, short type);
-		~OMO_Phanto(){};
 
 		void update() override;
 		bool collide(CPlayer * player) override;
 
-    short GetType() {
+    short GetType() const {
         return iType;
     }
 
 	private:
-		short iType;
+		const short iType;
 
 		float dMaxSpeedX, dMaxSpeedY;
 		float dReactionSpeed, dSpeedRatio;
-		short iSpeedTimer;
+		short iSpeedTimer = 0;
 };

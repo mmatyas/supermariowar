@@ -7,7 +7,6 @@ class OMO_RaceGoal : public IO_OverMapObject
 {
 	public:
 		OMO_RaceGoal(gfxSprite *nspr, short id);
-		~OMO_RaceGoal(){};
 
 		void draw() override;
 		void update() override;
@@ -16,16 +15,16 @@ class OMO_RaceGoal : public IO_OverMapObject
     void reset(short teamID) {
         tagged[teamID] = -1;
     }
-    short isTagged(short teamID) {
+    short isTagged(short teamID) const {
         return tagged[teamID];
     }
-    short getGoalID() {
+    short getGoalID() const {
         return goalID;
     }
 
 	private:
+		const short goalID;
 		short tagged[4];
-		short goalID;
 		float angle;
 		float anglechange;
 		short anglechangetimer;
