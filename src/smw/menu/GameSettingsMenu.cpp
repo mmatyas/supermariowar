@@ -20,8 +20,23 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 extern FiltersList* filterslist;
 
-extern const char* g_szAutoFilterNames[NUM_AUTO_FILTERS];
-extern short g_iAutoFilterIcons[NUM_AUTO_FILTERS];
+namespace {
+const char* g_szAutoFilterNames[NUM_AUTO_FILTERS] {
+    "Death Tiles",
+    "Warps",
+    "Ice",
+    "Item Boxes",
+    "Breakable Blocks",
+    "Throwable Blocks",
+    "On/Off Blocks",
+    "Platforms",
+    "Hazards",
+    "Item Destroyable Blocks",
+    "Hidden Blocks",
+    "Map Items",
+};
+const short g_iAutoFilterIcons[NUM_AUTO_FILTERS] {37, 29, 33, 1, 0, 6, 40, 73, 19, 87, 17, 118};
+} // namespace
 
 
 UI_GameSettingsMenu::UI_GameSettingsMenu()

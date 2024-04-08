@@ -15,7 +15,10 @@
 extern CGameValues game_values;
 extern CResourceManager* rm;
 extern CScore* score[4];
-extern short iScoreboardPlayerOffsetsX[3][3];
+
+namespace {
+const short iScoreboardPlayerOffsetsX[3][3] = {{40, 0, 0}, {19, 59, 0}, {6, 40, 74}};
+} // namespace
 
 
 //Call with x = 70 and y == 80

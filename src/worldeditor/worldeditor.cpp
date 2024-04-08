@@ -325,7 +325,17 @@ bool ignoreclick = false;
 
 char findstring[FILEBUFSIZE] = "";
 
-extern const char * g_szWorldMusicCategoryNames[MAXWORLDMUSICCATEGORY];
+const char* g_szWorldMusicCategoryNames[MAXWORLDMUSICCATEGORY] {
+	"Grass",
+	"Desert",
+	"Water",
+	"Giant",
+	"Sky",
+	"Ice",
+	"Pipe",
+	"Dark",
+	"Space",
+};
 short g_musiccategorydisplaytimer = 0;
 
 short g_messagedisplaytimer = 0;

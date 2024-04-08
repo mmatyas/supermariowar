@@ -10,7 +10,13 @@
 #include <cstring>
 
 extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
-extern short g_iDefaultMusicCategory[MAXMUSICCATEGORY];
+
+extern MusicList* musiclist;
+extern WorldMusicList* worldmusiclist;
+
+namespace {
+const short g_iDefaultMusicCategory[MAXMUSICCATEGORY] {0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 0};
+}// namespace
 
 
 struct MapMusicOverride {
@@ -25,9 +31,6 @@ struct WorldMusicOverride {
 
 std::vector<MapMusicOverride> mapmusicoverrides;
 std::vector<WorldMusicOverride> worldmusicoverrides;
-
-extern MusicList* musiclist;
-extern WorldMusicList* worldmusiclist;
 
 void UpdateMusicWithOverrides()
 {

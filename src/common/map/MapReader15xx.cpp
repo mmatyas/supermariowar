@@ -7,7 +7,6 @@
 #include <cstring>
 
 extern CTilesetManager* g_tilesetmanager;
-extern short g_iMusicCategoryConversion[26];
 extern short g_iTileTypeConversion[NUMTILETYPES];
 extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
@@ -39,6 +38,10 @@ const char * g_szBackgroundConversion[26] = {
     "Land_GreenHillsAndClouds.png",
     "Platforms_BlueSpottedHills.png"
 };
+
+namespace {
+const short g_iMusicCategoryConversion[26] {0, 3, 8, 5, 1, 9, 3, 4, 10, 8, 1, 0, 9, 0, 0, 7, 4, 1, 1, 6, 4, 7, 6, 3, 0, 4};
+} // namespace
 
 void MapReader1500::read_autofilters(CMap& map, BinaryFile& mapfile)
 {
