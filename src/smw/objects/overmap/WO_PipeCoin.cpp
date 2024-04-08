@@ -1,12 +1,12 @@
 #include "WO_PipeCoin.h"
 
-#include "player.h"
 #include "eyecandy.h"
 #include "GameValues.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "gamemodes/MiniPipe.h"
 
-extern CGM_Pipe_MiniGame * pipegamemode;
+extern CGM_Pipe_MiniGame* pipegamemode;
 extern CEyecandyContainer eyecandy[3];
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class pipe coin (for coin pipe minigame)
 //------------------------------------------------------------------------------
-OMO_PipeCoin::OMO_PipeCoin(gfxSprite *nspr, float dvelx, float dvely, short iX, short iY, short teamid, short colorid, short uncollectabletime) :
-    IO_OverMapObject(nspr, iX, iY, 4, 8, 30, 30, 1, 1, 0, colorid << 5, 32, 32)
+OMO_PipeCoin::OMO_PipeCoin(gfxSprite* nspr, float dvelx, float dvely, short iX, short iY, short teamid, short colorid, short uncollectabletime)
+    : IO_OverMapObject(nspr, iX, iY, 4, 8, 30, 30, 1, 1, 0, colorid << 5, 32, 32)
     , iTeamID(teamid)
     , iColorID(colorid)
 {
@@ -32,7 +32,7 @@ OMO_PipeCoin::OMO_PipeCoin(gfxSprite *nspr, float dvelx, float dvely, short iX, 
     iUncollectableTime = uncollectabletime;
 }
 
-bool OMO_PipeCoin::collide(CPlayer * player)
+bool OMO_PipeCoin::collide(CPlayer* player)
 {
     if (iUncollectableTime > 0)
         return false;
@@ -97,16 +97,15 @@ void OMO_PipeCoin::draw()
     if (iUncollectableTime > 0) {
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih, 2, 256);
 
-        //Draw sparkles
+        // Draw sparkles
         if (iTeamID == -1)
             rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32, 2, 256);
 
     } else {
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
 
-        //Draw sparkles
+        // Draw sparkles
         if (iTeamID == -1)
             rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
     }
 }
-

@@ -18,13 +18,12 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class race goal (for Race mode)
 //------------------------------------------------------------------------------
-short flagpositions[3][4][2] = { { {18, 20}, {34, 20}, {0, 0}, {0, 0} },
-    { {18, 20}, {34, 20}, {26, 36}, {0, 0} },
-    { {18, 20}, {34, 20}, {18, 36}, {34, 36} }
-};
+short flagpositions[3][4][2] = { { { 18, 20 }, { 34, 20 }, { 0, 0 }, { 0, 0 } },
+    { { 18, 20 }, { 34, 20 }, { 26, 36 }, { 0, 0 } },
+    { { 18, 20 }, { 34, 20 }, { 18, 36 }, { 34, 36 } } };
 
-OMO_RaceGoal::OMO_RaceGoal(gfxSprite *nspr, short id) :
-    IO_OverMapObject(nspr, 0, 0, 2, 8)
+OMO_RaceGoal::OMO_RaceGoal(gfxSprite* nspr, short id)
+    : IO_OverMapObject(nspr, 0, 0, 2, 8)
     , goalID(id)
 {
     iw = (short)spr->getWidth() >> 1;
@@ -54,10 +53,10 @@ OMO_RaceGoal::OMO_RaceGoal(gfxSprite *nspr, short id) :
     isfinishline = goalID == quantity - 1;
 }
 
-bool OMO_RaceGoal::collide(CPlayer * player)
+bool OMO_RaceGoal::collide(CPlayer* player)
 {
     if (game_values.gamemode->getgamemode() == game_mode_race && player->tanookisuit.notStatue()) {
-        CGM_Race * gamemode = (CGM_Race*)game_values.gamemode;
+        CGM_Race* gamemode = (CGM_Race*)game_values.gamemode;
 
         if (tagged[player->teamID] != player->colorID && gamemode->getNextGoal(player->teamID) >= goalID) {
             tagged[player->teamID] = player->colorID;
@@ -127,9 +126,9 @@ void OMO_RaceGoal::update()
         fy = (float)iy;
 
         angle = atan2(velx, vely);
-	} else if (iy + collisionHeight >= App::screenHeight) {
+    } else if (iy + collisionHeight >= App::screenHeight) {
         vely = -vely;
-		iy = App::screenHeight - 1 - collisionHeight;
+        iy = App::screenHeight - 1 - collisionHeight;
         fy = (float)iy;
 
         angle = atan2(velx, vely);
@@ -157,4 +156,3 @@ void OMO_RaceGoal::placeRaceGoal()
     setXi(x);
     setYi(y);
 }
-

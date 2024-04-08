@@ -2,23 +2,20 @@
 
 #include "OverMapObject.h"
 
+class OMO_Phanto : public IO_OverMapObject {
+public:
+    OMO_Phanto(gfxSprite* nspr, short x, short y, float velx, float vely,
+        short type);
 
-class OMO_Phanto : public IO_OverMapObject
-{
-	public:
-		OMO_Phanto(gfxSprite *nspr, short x, short y, float velx, float vely, short type);
+    void update() override;
+    bool collide(CPlayer* player) override;
 
-		void update() override;
-		bool collide(CPlayer * player) override;
+    short GetType() const { return iType; }
 
-    short GetType() const {
-        return iType;
-    }
+private:
+    const short iType;
 
-	private:
-		const short iType;
-
-		float dMaxSpeedX, dMaxSpeedY;
-		float dReactionSpeed, dSpeedRatio;
-		short iSpeedTimer = 0;
+    float dMaxSpeedX, dMaxSpeedY;
+    float dReactionSpeed, dSpeedRatio;
+    short iSpeedTimer = 0;
 };

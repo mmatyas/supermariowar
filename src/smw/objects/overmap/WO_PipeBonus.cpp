@@ -1,12 +1,12 @@
 #include "WO_PipeBonus.h"
 
 #include "eyecandy.h"
-#include "player.h"
 #include "GameValues.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "gamemodes/MiniPipe.h"
 
-extern CGM_Pipe_MiniGame * pipegamemode;
+extern CGM_Pipe_MiniGame* pipegamemode;
 extern CEyecandyContainer eyecandy[3];
 
 extern CGameValues game_values;
@@ -15,8 +15,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class pipe powerup (for coin pipe minigame)
 //------------------------------------------------------------------------------
-OMO_PipeBonus::OMO_PipeBonus(gfxSprite *nspr, float dvelx, float dvely, short iX, short iY, short type, short duration, short uncollectabletime) :
-    IO_OverMapObject(nspr, iX, iY, 4, 8, 30, 30, 1, 1, 0, type << 5, 32, 32)
+OMO_PipeBonus::OMO_PipeBonus(gfxSprite* nspr, float dvelx, float dvely, short iX, short iY, short type, short duration, short uncollectabletime)
+    : IO_OverMapObject(nspr, iX, iY, 4, 8, 30, 30, 1, 1, 0, type << 5, 32, 32)
     , iType(type)
     , iDuration(duration)
 {
@@ -33,12 +33,12 @@ OMO_PipeBonus::OMO_PipeBonus(gfxSprite *nspr, float dvelx, float dvely, short iX
     iUncollectableTime = uncollectabletime;
 }
 
-bool OMO_PipeBonus::collide(CPlayer * player)
+bool OMO_PipeBonus::collide(CPlayer* player)
 {
     if (iUncollectableTime > 0)
         return false;
 
-    //fireball
+    // fireball
     if (iType == 5) {
         if (!player->isShielded()) {
             dead = true;
@@ -82,4 +82,3 @@ void OMO_PipeBonus::draw()
     else
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
 }
-

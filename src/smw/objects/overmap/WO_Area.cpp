@@ -15,8 +15,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class area (for Domination mode)
 //------------------------------------------------------------------------------
-OMO_Area::OMO_Area(gfxSprite *nspr, short iNumAreas) :
-    IO_OverMapObject(nspr, 1280, 960, 5, 0)
+OMO_Area::OMO_Area(gfxSprite* nspr, short iNumAreas)
+    : IO_OverMapObject(nspr, 1280, 960, 5, 0)
     , numareas(iNumAreas)
 {
     iw = (short)spr->getWidth() / 5;
@@ -27,7 +27,7 @@ OMO_Area::OMO_Area(gfxSprite *nspr, short iNumAreas) :
     placeArea();
 }
 
-bool OMO_Area::collide(CPlayer * player)
+bool OMO_Area::collide(CPlayer* player)
 {
     if (player->tanookisuit.notStatue() && !player->isdead()) {
         totalTouchingPlayers++;
@@ -76,9 +76,9 @@ void OMO_Area::placeArea()
 {
     short x = 0, y = 0;
     short iAttempts = 32;
-    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
-            objectcontainer[0].getClosestObject(x, y, object_area) <= (200.0f - ((numareas - 3) * 25.0f)))
-            && iAttempts-- > 0);
+    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) || objectcontainer[0].getClosestObject(x, y, object_area) <= (200.0f - ((numareas - 3) * 25.0f)))
+        && iAttempts-- > 0)
+        ;
 
     setXi(x);
     setYi(y);
@@ -94,7 +94,7 @@ void OMO_Area::reset()
     frame = 0;
 }
 
-void OMO_Area::setOwner(CPlayer * player)
+void OMO_Area::setOwner(CPlayer* player)
 {
     if (colorID != player->colorID) {
         iPlayerID = player->localID;
@@ -105,4 +105,3 @@ void OMO_Area::setOwner(CPlayer * player)
         ifSoundOnPlay(rm->sfx_areatag);
     }
 }
-

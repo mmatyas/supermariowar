@@ -17,8 +17,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class KingOfTheHillArea (for King of the Hill mode)
 //------------------------------------------------------------------------------
-OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite *nspr) :
-    IO_OverMapObject(nspr, 0, 0, 5, 0)
+OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite* nspr)
+    : IO_OverMapObject(nspr, 0, 0, 5, 0)
 {
     size = game_values.gamemodesettings.kingofthehill.areasize;
 
@@ -41,7 +41,7 @@ OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite *nspr) :
     placeArea();
 }
 
-bool OMO_KingOfTheHillZone::collide(CPlayer * player)
+bool OMO_KingOfTheHillZone::collide(CPlayer* player)
 {
     if (!player->IsTanookiStatue()) {
         playersTouching[player->getTeamID()] = player;
@@ -90,7 +90,7 @@ void OMO_KingOfTheHillZone::update()
         }
     }
 
-    if ((iMax << 1) > totalTouchingPlayers) { //If the max touching player team is greater than the rest of the touching players
+    if ((iMax << 1) > totalTouchingPlayers) {  // If the max touching player team is greater than the rest of the touching players
         colorID = playersTouching[iMaxTeam]->getColorID();
         iPlayerID = playersTouching[iMaxTeam]->localID;
         frame = ((colorID + 1) << 5) * 3;
@@ -101,7 +101,7 @@ void OMO_KingOfTheHillZone::update()
     }
 
     if (iPlayerID != -1 && !game_values.gamemode->gameover) {
-        scoretimer += (iMax << 1) - totalTouchingPlayers;  //Speed of point accumulation is proportional to how many players are in zone
+        scoretimer += (iMax << 1) - totalTouchingPlayers;  // Speed of point accumulation is proportional to how many players are in zone
 
         if (scoretimer >= game_values.pointspeed) {
             scoretimer = 0;
@@ -152,7 +152,7 @@ void OMO_KingOfTheHillZone::placeArea()
         x = (short)RANDOM_INT(MAPWIDTH - size + 1);
         y = (short)RANDOM_INT(MAPHEIGHT - size);
 
-        //First move the zone down so it is sitting on atleast 1 solid tile
+        // First move the zone down so it is sitting on atleast 1 solid tile
         short iFindY = y + size;
         short iOldFindY = iFindY;
         bool fTryAgain = false;
@@ -173,7 +173,7 @@ void OMO_KingOfTheHillZone::placeArea()
             if (++iFindY >= MAPHEIGHT)
                 iFindY = size;
 
-            if (iFindY == iOldFindY) { //If we didn't find solid ground in that loop, look for a new place for the zone
+            if (iFindY == iOldFindY) {  // If we didn't find solid ground in that loop, look for a new place for the zone
                 fTryAgain = true;
                 break;
             }
@@ -184,17 +184,16 @@ void OMO_KingOfTheHillZone::placeArea()
 
         y = iFindY - size;
 
-        //Now verify that the area is not completely covered with solid tiles
+        // Now verify that the area is not completely covered with solid tiles
         short iCountSolidTiles = 0;
         for (short iRow = 0; iRow < size; iRow++) {
             for (short iCol = 0; iCol < size; iCol++) {
-                //If there is a solid tile inside the zone
+                // If there is a solid tile inside the zone
                 if ((g_map->map(x + iCol, y + iRow) & tile_flag_solid) || !g_map->spawn(1, x + iCol, y + iRow) || g_map->block(x + iCol, y + iRow)) {
                     iCountSolidTiles++;
 
-                    //Be more picky in the first few loops, but allow solid tiles to be in
-                    if ((iLoop < 16 && iCountSolidTiles > iKingOfTheHillZoneLimits[size - 2][0]) || (iLoop < 32 && iCountSolidTiles > iKingOfTheHillZoneLimits[size - 2][1]) ||
-                            (iLoop < 48 && iCountSolidTiles > iKingOfTheHillZoneLimits[size - 2][2]) || (iLoop < 63 && iCountSolidTiles > iKingOfTheHillZoneLimits[size - 2][3])) {
+                    // Be more picky in the first few loops, but allow solid tiles to be in
+                    if ((iLoop < 16 && iCountSolidTiles > iKingOfTheHillZoneLimits[size - 2][0]) || (iLoop < 32 && iCountSolidTiles > iKingOfTheHillZoneLimits[size - 2][1]) || (iLoop < 48 && iCountSolidTiles > iKingOfTheHillZoneLimits[size - 2][2]) || (iLoop < 63 && iCountSolidTiles > iKingOfTheHillZoneLimits[size - 2][3])) {
                         fTryAgain = true;
                         break;
                     }
@@ -208,7 +207,7 @@ void OMO_KingOfTheHillZone::placeArea()
         if (fTryAgain)
             continue;
 
-        //Verify zone is not in a platform
+        // Verify zone is not in a platform
         if (g_map->IsInPlatformNoSpawnZone(x << 5, y << 5, size << 5, size << 5))
             continue;
 
@@ -226,4 +225,3 @@ void OMO_KingOfTheHillZone::reset()
     scoretimer = 0;
     frame = 0;
 }
-
