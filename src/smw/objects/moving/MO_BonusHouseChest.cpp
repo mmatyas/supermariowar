@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class treasure chest powerup
 //------------------------------------------------------------------------------
-MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite *nspr, short iX, short iY, short iBonusItem) :
-    IO_MovingObject(nspr, iX, iY, 1, 0, 64, 64, 0, 0)
+MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite* nspr, short iX, short iY, short iBonusItem)
+    : IO_MovingObject(nspr, iX, iY, 1, 0, 64, 64, 0, 0)
 {
     iw = 64;
     ih = 64;
@@ -33,7 +33,7 @@ MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite *nspr, short iX, short iY, shor
 
 void MO_BonusHouseChest::update()
 {
-    //Draw rising powerup from chest
+    // Draw rising powerup from chest
     if (state == 2) {
         drawbonusitemy -= 2;
 
@@ -53,14 +53,14 @@ void MO_BonusHouseChest::draw()
         spr->draw(ix, iy, 128, 0, iw, ih);
 
     if (state == 2) {
-        if (bonusitem >= NUM_POWERUPS + NUM_WORLD_POWERUPS) { //Score bonuses
+        if (bonusitem >= NUM_POWERUPS + NUM_WORLD_POWERUPS) {  // Score bonuses
             short iBonus = bonusitem - NUM_POWERUPS - NUM_WORLD_POWERUPS;
             short iBonusX = (iBonus % 10) << 5;
             short iBonusY = ((iBonus / 10) << 5) + 32;
             rm->spr_worlditems.draw(ix + 16, drawbonusitemy, iBonusX, iBonusY, 32, 32);
-        } else if (bonusitem >= NUM_POWERUPS) //World Item
+        } else if (bonusitem >= NUM_POWERUPS)  // World Item
             rm->spr_worlditems.draw(ix + 16, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
-        else //Normal Powerup
+        else  // Normal Powerup
             rm->spr_storedpoweruplarge.draw(ix + 16, drawbonusitemy, bonusitem << 5, 0, 32, 32);
     }
 
@@ -68,7 +68,7 @@ void MO_BonusHouseChest::draw()
         spr->draw(ix, iy, 64, 0, iw, ih);
 }
 
-bool MO_BonusHouseChest::collide(CPlayer * player)
+bool MO_BonusHouseChest::collide(CPlayer* player)
 {
     if (state == 1 && !game_values.gamemode->gameover && player->playerKeys->game_turbo.fPressed) {
         if (bonusitem < NUM_POWERUPS + NUM_WORLD_POWERUPS) {
@@ -102,5 +102,3 @@ bool MO_BonusHouseChest::collide(CPlayer * player)
 
     return false;
 }
-
-

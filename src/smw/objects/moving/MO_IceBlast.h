@@ -5,16 +5,15 @@
 class Spotlight;
 
 
-class MO_IceBlast : public IO_MovingObject
-{
-	public:
-		MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short iGlobalID, short iTeamID, short iColorID);
+class MO_IceBlast : public IO_MovingObject {
+public:
+    MO_IceBlast(gfxSprite* nspr, short x, short y, float fVelyX, short iGlobalID, short iTeamID, short iColorID);
 
-		void update() override;
-		bool collide(CPlayer * player) override;
-		void draw() override;
+    void update() override;
+    bool collide(CPlayer* player) override;
+    void draw() override;
 
-	private:
-		short ttl;
-		Spotlight * sSpotlight;
+private:
+    short ttl;
+    Spotlight* sSpotlight;
 };

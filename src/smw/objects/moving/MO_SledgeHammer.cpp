@@ -19,8 +19,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class sledge hammer
 //------------------------------------------------------------------------------
-MO_SledgeHammer::MO_SledgeHammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer) :
-    IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() / 5, 0, 0)
+MO_SledgeHammer::MO_SledgeHammer(gfxSprite* nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer)
+    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() / 5, 0, 0)
 {
     ih = collisionHeight;
 
@@ -70,7 +70,7 @@ void MO_SledgeHammer::update()
         dead = true;
 }
 
-bool MO_SledgeHammer::collide(CPlayer * player)
+bool MO_SledgeHammer::collide(CPlayer* player)
 {
     if (!player->isShielded()) {
         dead = true;
@@ -103,9 +103,9 @@ void MO_SledgeHammer::explode()
             objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, iCenterX, iCenterY, 6, dVelX, dVelY, 5, playerID, teamID, iColorID, true));
         }
 
-    	CPlayer * player = GetPlayerFromGlobalID(playerID);
+        CPlayer* player = GetPlayerFromGlobalID(playerID);
 
-   		player->increaseProjectilesCount(3);
+        player->increaseProjectilesCount(3);
 
         ifSoundOnPlay(rm->sfx_cannon);
     }
@@ -115,5 +115,3 @@ void MO_SledgeHammer::draw()
 {
     spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset, iw, ih);
 }
-
-

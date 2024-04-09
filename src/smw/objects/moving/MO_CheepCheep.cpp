@@ -1,16 +1,16 @@
 #include "MO_CheepCheep.h"
 
 #include "eyecandy.h"
-#include "player.h"
 #include "Game.h"
 #include "GameMode.h"
 #include "GameValues.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "objects/carriable/CO_Shell.h"
 #include "objects/carriable/CO_ThrowBox.h"
 
-extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
+extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
 extern CEyecandyContainer eyecandy[3];
 extern CGameValues game_values;
@@ -19,8 +19,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class cheep cheep
 //------------------------------------------------------------------------------
-MO_CheepCheep::MO_CheepCheep(gfxSprite *nspr) :
-    IO_MovingObject(nspr, 0, App::screenHeight, 2, 8, 30, 28, 1, 3)
+MO_CheepCheep::MO_CheepCheep(gfxSprite* nspr)
+    : IO_MovingObject(nspr, 0, App::screenHeight, 2, 8, 30, 28, 1, 3)
 {
     ih = 32;
     setXi((short)(RANDOM_INT(608)));
@@ -29,7 +29,7 @@ MO_CheepCheep::MO_CheepCheep(gfxSprite *nspr) :
     while (velx == 0.0f)
         velx = float(RANDOM_INT(19) - 9) / 2.0f;
 
-    //Cheep cheep up velocity is between 9.0 and 13.0 in 0.5 increments
+    // Cheep cheep up velocity is between 9.0 and 13.0 in 0.5 increments
     vely = -(float(RANDOM_INT(11)) / 2.0f) - 9.0f;
 
     movingObjectType = movingobject_cheepcheep;
@@ -52,12 +52,12 @@ void MO_CheepCheep::update()
     setXf(fx + velx);
     setYf(fy + vely);
 
-    //Cheep cheep gravitation
+    // Cheep cheep gravitation
     vely += 0.2f;
 
     animate();
 
-    //Remove if cheep cheep has fallen below bottom of screen
+    // Remove if cheep cheep has fallen below bottom of screen
     if (vely > 0.0f && iy > App::screenHeight)
         dead = true;
 }
@@ -71,7 +71,7 @@ void MO_CheepCheep::draw()
     }
 }
 
-bool MO_CheepCheep::collide(CPlayer * player)
+bool MO_CheepCheep::collide(CPlayer* player)
 {
     if (player->isInvincible() || frozen) {
         player->AddKillerAward(NULL, KillStyle::CheepCheep);
@@ -96,7 +96,7 @@ bool MO_CheepCheep::collide(CPlayer * player)
 }
 
 
-bool MO_CheepCheep::hittop(CPlayer * player)
+bool MO_CheepCheep::hittop(CPlayer* player)
 {
     player->setYi(iy - PH - 1);
     player->bouncejump();
@@ -115,7 +115,7 @@ bool MO_CheepCheep::hittop(CPlayer * player)
     return false;
 }
 
-bool MO_CheepCheep::hitother(CPlayer * player)
+bool MO_CheepCheep::hitother(CPlayer* player)
 {
     if (player->isShielded())
         return false;
@@ -123,7 +123,7 @@ bool MO_CheepCheep::hitother(CPlayer * player)
     return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;
 }
 
-void MO_CheepCheep::collide(IO_MovingObject * object)
+void MO_CheepCheep::collide(IO_MovingObject* object)
 {
     if (!object->isDead()) {
         removeifprojectile(object, false, false);
@@ -131,7 +131,7 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
         MovingObjectType type = object->getMovingObjectType();
 
         if (type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion || type == movingobject_sledgehammer) {
-            //Don't kill goombas with non-moving shells
+            // Don't kill goombas with non-moving shells
             if (type == movingobject_shell && object->state == 2)
                 return;
 
@@ -139,8 +139,8 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
                 return;
 
             if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover) {
-                //Find the player that shot this projectile so we can attribute a kill
-                CPlayer * killer = GetPlayerFromGlobalID(object->iPlayerID);
+                // Find the player that shot this projectile so we can attribute a kill
+                CPlayer* killer = GetPlayerFromGlobalID(object->iPlayerID);
 
                 if (killer) {
                     killer->AddKillerAward(NULL, KillStyle::CheepCheep);
@@ -202,4 +202,3 @@ void MO_CheepCheep::ShatterDie()
 extern bool fDebugShowBossSettings;
 #endif
 ///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////
-

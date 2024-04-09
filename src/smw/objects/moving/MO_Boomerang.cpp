@@ -7,7 +7,7 @@
 #include "ResourceManager.h"
 #include "objects/blocks/WeaponBreakableBlock.h"
 
-extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
+extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
 extern SpotlightManager spotlightManager;
 extern CEyecandyContainer eyecandy[3];
@@ -17,10 +17,10 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class boomerang
 //------------------------------------------------------------------------------
-MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short teamID, short iColorID) :
-    IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 3, 0, 0)
+MO_Boomerang::MO_Boomerang(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short teamID, short iColorID)
+    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 3, 0, 0)
 {
-    //boomerangs sprites have both right and left sprites in them
+    // boomerangs sprites have both right and left sprites in them
     ih = ih >> 3;
 
     iPlayerID = iGlobalID;
@@ -41,7 +41,7 @@ MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, boo
 
     fFlipped = false;
 
-    //Don't let boomerang start off the screen or it won't rebound correctly
+    // Don't let boomerang start off the screen or it won't rebound correctly
     if (moveToRight && fx + iw >= App::screenWidth)
         setXf(fx - App::screenWidth);
     else if (!moveToRight && fx < 0.0f)
@@ -66,12 +66,12 @@ void MO_Boomerang::update()
 
     animate();
 
-    //Detection collision with boomerang breakable blocks
-    IO_Block * blocks[4];
+    // Detection collision with boomerang breakable blocks
+    IO_Block* blocks[4];
     GetCollisionBlocks(blocks);
     for (short iBlock = 0; iBlock < 4; iBlock++) {
         if (blocks[iBlock] && blocks[iBlock]->getBlockType() == BlockType::WeaponBreakable) {
-            B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
+            B_WeaponBreakableBlock* weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
             if (weaponbreakableblock->iType == 4) {
                 weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
                 forcedead();
@@ -80,7 +80,7 @@ void MO_Boomerang::update()
         }
     }
 
-    if (iStyle == 0) { //Flat style
+    if (iStyle == 0) {  // Flat style
         fOldX = fx;
         setXf(fx + velx);
 
@@ -106,7 +106,7 @@ void MO_Boomerang::update()
             }
         }
     } else if (iStyle == 1) {
-        //Attempting to emulate the SMB3 boomerang behavior
+        // Attempting to emulate the SMB3 boomerang behavior
         iStateTimer++;
 
         fOldX = fx;
@@ -135,7 +135,7 @@ void MO_Boomerang::update()
             setYf(fy + 1.0f);
 
             if (fMoveToRight) {
-                //Add amount so that by time fy lowers by two tiles, we turn around the boomerang
+                // Add amount so that by time fy lowers by two tiles, we turn around the boomerang
                 velx -= 0.15625f;
 
                 if (velx <= -5.0f) {
@@ -156,14 +156,13 @@ void MO_Boomerang::update()
             iStateTimer = 0;
         } else if (state == 4) {
             if (iStateTimer >= 46) {
-                if ((fMoveToRight && fx < 0.0f && fOldX >= 0.0f) ||
-                        (!fMoveToRight && fx + iw >= App::screenWidth && fOldX + iw < App::screenWidth)) {
+                if ((fMoveToRight && fx < 0.0f && fOldX >= 0.0f) || (!fMoveToRight && fx + iw >= App::screenWidth && fOldX + iw < App::screenWidth)) {
                     forcedead();
                     return;
                 }
             }
         }
-    } else if (iStyle == 2) { //Zelda style boomerang
+    } else if (iStyle == 2) {  // Zelda style boomerang
         iStateTimer++;
 
         fOldX = fx;
@@ -191,30 +190,30 @@ void MO_Boomerang::update()
                 if (player)
                 {
                     if ((player->ix < ix && velx > 0) || (player->ix > ix && velx < 0))
-                		velx = -velx;
+                                velx = -velx;
                 }
                 else
                 {
-                	velx = -velx;
+                        velx = -velx;
                 }
                 */
 
-                velx = -velx;  //Wrap Boomerang
+                velx = -velx;  // Wrap Boomerang
             }
         } else if (state == 2) {
             fOldY = fy;
             setYf(fy + vely);
 
-            //Follow the player zelda style
-            CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
+            // Follow the player zelda style
+            CPlayer* player = GetPlayerFromGlobalID(iPlayerID);
 
             if (player) {
                 bool fWrap = false;
                 if (abs(player->ix - ix) > 320)
                     fWrap = true;
 
-                if ((player->ix < ix && !fWrap) || (player->ix > ix && fWrap))  //Wrap Boomerang
-                    //if (player->ix < ix)  //No Wrap Boomerang
+                if ((player->ix < ix && !fWrap) || (player->ix > ix && fWrap))  // Wrap Boomerang
+                                                                                // if (player->ix < ix)  //No Wrap Boomerang
                 {
                     velx -= 0.2f;
 
@@ -239,22 +238,22 @@ void MO_Boomerang::update()
                         vely = 3.0f;
                 }
             } else {
-                //Remove boomerang if player was removed from game
+                // Remove boomerang if player was removed from game
                 forcedead();
                 return;
 
                 /*
                 //Die at nearest edge if player was removed from game
                 if (velx > 0)
-                	velx = 5.0f;
+                        velx = 5.0f;
                 else
-                	velx = -5.0f;
+                        velx = -5.0f;
 
                 if ((fx < 0.0f && fOldX >= 0.0f) ||
-                	(fx + iw >= App::screenWidth && fOldX + iw < App::screenWidth))
+                        (fx + iw >= App::screenWidth && fOldX + iw < App::screenWidth))
                 {
-                	forcedead();
-                	return;
+                        forcedead();
+                        return;
                 }
                 */
             }
@@ -272,7 +271,7 @@ void MO_Boomerang::update()
     }
 }
 
-//Call to kill boomerang when it is not caught by player
+// Call to kill boomerang when it is not caught by player
 void MO_Boomerang::forcedead()
 {
     removeifprojectile(this, false, true);
@@ -281,8 +280,8 @@ void MO_Boomerang::forcedead()
     if (game_values.boomeranglimit == 0)
         return;
 
-    //Penalize player if they did not catch it
-    CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
+    // Penalize player if they did not catch it
+    CPlayer* player = GetPlayerFromGlobalID(iPlayerID);
 
     if (player) {
         if (player->projectilelimit > 0)
@@ -290,14 +289,14 @@ void MO_Boomerang::forcedead()
     }
 }
 
-bool MO_Boomerang::collide(CPlayer * player)
+bool MO_Boomerang::collide(CPlayer* player)
 {
-    if (iPlayerID != player->globalID && (game_values.teamcollision == TeamCollisionStyle::On|| iTeamID != player->teamID)) {
+    if (iPlayerID != player->globalID && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->teamID)) {
         if (!player->isShielded()) {
             removeifprojectile(this, false, false);
 
             if (!player->isInvincible() && !player->shyguy) {
-                //Find the player that shot this boomerang so we can attribute a kill
+                // Find the player that shot this boomerang so we can attribute a kill
                 PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Boomerang, false, false);
                 return true;
             }
@@ -313,4 +312,3 @@ void MO_Boomerang::draw()
 {
     spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset + (fMoveToRight ? 0 : 32), iw, ih);
 }
-

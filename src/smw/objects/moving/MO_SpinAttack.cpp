@@ -9,7 +9,7 @@
 #include "objects/carriable/CO_ThrowBlock.h"
 #include "objects/carriable/CO_ThrowBox.h"
 
-extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
+extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
 extern CMap* g_map;
 extern CResourceManager* rm;
@@ -17,8 +17,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class spin death (spinning cape or tail)
 //------------------------------------------------------------------------------
-MO_SpinAttack::MO_SpinAttack(short playerId, short teamId, KillStyle style, bool direction, short offsety) :
-    MO_AttackZone(playerId, teamId, 0, 0, 24, 12, 16, style, true)
+MO_SpinAttack::MO_SpinAttack(short playerId, short teamId, KillStyle style, bool direction, short offsety)
+    : MO_AttackZone(playerId, teamId, 0, 0, 24, 12, 16, style, true)
 {
     fDirection = direction;
     iOffsetY = offsety;
@@ -27,7 +27,7 @@ MO_SpinAttack::MO_SpinAttack(short playerId, short teamId, KillStyle style, bool
     objectType = object_moving;
 }
 
-bool MO_SpinAttack::collide(CPlayer * player)
+bool MO_SpinAttack::collide(CPlayer* player)
 {
     if (iTimer > 11)
         return false;
@@ -38,11 +38,11 @@ bool MO_SpinAttack::collide(CPlayer * player)
 /*
 void MO_SpinAttack::draw()
 {
-	if (iTimer <= 11 && !dead)
-	{
-		SDL_Rect r = {ix, iy, collisionWidth, collisionHeight};
-		SDL_FillRect(blitdest, &r, 0xff00);
-	}
+        if (iTimer <= 11 && !dead)
+        {
+                SDL_Rect r = {ix, iy, collisionWidth, collisionHeight};
+                SDL_FillRect(blitdest, &r, 0xff00);
+        }
 }
 */
 
@@ -53,17 +53,17 @@ void MO_SpinAttack::update()
     if (iTimer <= 11)
         state = 1;
 
-    CPlayer * owner = GetPlayerFromGlobalID(iPlayerID);
+    CPlayer* owner = GetPlayerFromGlobalID(iPlayerID);
 
     if (owner) {
-        //Move to the owner
+        // Move to the owner
         setXi(owner->ix - PWOFFSET + (fDirection ? 24 : -16));
         setYi(owner->iy + PH - iOffsetY);
 
         if (iTimer < 5 || iy + collisionHeight < 0)
             return;
 
-        //Check block collisions
+        // Check block collisions
         short iTop = iy / TILESIZE;
         short iBottom = (iy + collisionHeight) / TILESIZE;
 
@@ -87,10 +87,10 @@ void MO_SpinAttack::update()
         if (iRight >= 20)
             iRight -= 20;
 
-        IO_Block * topleftblock = NULL;
-        IO_Block * toprightblock = NULL;
-        IO_Block * bottomleftblock = NULL;
-        IO_Block * bottomrightblock = NULL;
+        IO_Block* topleftblock = NULL;
+        IO_Block* toprightblock = NULL;
+        IO_Block* bottomleftblock = NULL;
+        IO_Block* bottomrightblock = NULL;
 
         if (iTop >= 0 && iTop < 15) {
             topleftblock = g_map->block(iLeft, iTop);
@@ -122,7 +122,7 @@ void MO_SpinAttack::update()
     }
 }
 
-void MO_SpinAttack::collide(IO_MovingObject * object)
+void MO_SpinAttack::collide(IO_MovingObject* object)
 {
     if (dead || iTimer > 11)
         return;
@@ -131,7 +131,7 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
 
     if (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox) {
         if (type == movingobject_shell) {
-            CO_Shell * shell = (CO_Shell*)object;
+            CO_Shell* shell = (CO_Shell*)object;
 
             if (shell->frozen) {
                 shell->ShatterDie();
@@ -142,7 +142,7 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
 
             Die();
         } else if (type == movingobject_throwblock) {
-            CO_ThrowBlock * block = (CO_ThrowBlock*) object;
+            CO_ThrowBlock* block = (CO_ThrowBlock*)object;
 
             if (block->frozen) {
                 block->ShatterDie();
@@ -152,7 +152,7 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
                 Die();
             }
         } else if (type == movingobject_throwbox) {
-            CO_ThrowBox * box = (CO_ThrowBox*) object;
+            CO_ThrowBox* box = (CO_ThrowBox*)object;
 
             if (box->frozen) {
                 box->ShatterDie();
@@ -164,5 +164,3 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
         }
     }
 }
-
-

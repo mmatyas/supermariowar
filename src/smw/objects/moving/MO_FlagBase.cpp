@@ -18,8 +18,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class flag base (for CTF mode)
 //------------------------------------------------------------------------------
-MO_FlagBase::MO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
-    IO_MovingObject(nspr, 1280, 960, 5, 0)  //use 1280 and 960 so when placing base, it doesn't interfere (look in getClosestObject())
+MO_FlagBase::MO_FlagBase(gfxSprite* nspr, short iTeamID, short iColorID)
+    : IO_MovingObject(nspr, 1280, 960, 5, 0)  // use 1280 and 960 so when placing base, it doesn't interfere (look in getClosestObject())
 {
     state = 1;
     iw = 32;
@@ -50,10 +50,10 @@ MO_FlagBase::MO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
     fObjectCollidesWithMap = false;
 }
 
-bool MO_FlagBase::collide(CPlayer * player)
+bool MO_FlagBase::collide(CPlayer* player)
 {
     if (teamID == player->teamID && player->carriedItem && player->carriedItem->getMovingObjectType() == movingobject_flag) {
-        CO_Flag * flag = (CO_Flag*)player->carriedItem;
+        CO_Flag* flag = (CO_Flag*)player->carriedItem;
         scoreFlag(flag, player);
         timer = 0;
     }
@@ -89,9 +89,9 @@ void MO_FlagBase::update()
             fx = (float)ix;
 
             angle = atan2(velx, vely);
-		} else if (ix + collisionWidth >= App::screenWidth) {
+        } else if (ix + collisionWidth >= App::screenWidth) {
             velx = -velx;
-			ix = App::screenWidth - 1 - collisionWidth;
+            ix = App::screenWidth - 1 - collisionWidth;
             fx = (float)ix;
 
             angle = atan2(velx, vely);
@@ -103,9 +103,9 @@ void MO_FlagBase::update()
             fy = (float)iy;
 
             angle = atan2(velx, vely);
-		} else if (iy + collisionHeight >= App::screenHeight) {
+        } else if (iy + collisionHeight >= App::screenHeight) {
             vely = -vely;
-			iy = App::screenHeight - 1 - collisionHeight;
+            iy = App::screenHeight - 1 - collisionHeight;
             fy = (float)iy;
 
             angle = atan2(velx, vely);
@@ -126,20 +126,20 @@ void MO_FlagBase::placeFlagBase(bool fInit)
         y = g_map->flagbaselocations[teamID].y;
     } else {
         short iAttempts = 32;
-        while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
-                objectcontainer[1].getClosestMovingObject(x, y, movingobject_flagbase) < 200.0f)
-                && iAttempts-- > 0);
+        while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) || objectcontainer[1].getClosestMovingObject(x, y, movingobject_flagbase) < 200.0f)
+            && iAttempts-- > 0)
+            ;
     }
 
     setXi(x);
     setYi(y);
 }
 
-void MO_FlagBase::collide(IO_MovingObject * object)
+void MO_FlagBase::collide(IO_MovingObject* object)
 {
     if (object->getMovingObjectType() == movingobject_flag) {
-        CO_Flag * flag = (CO_Flag*)object;
-        CPlayer * player = flag->owner_throw;
+        CO_Flag* flag = (CO_Flag*)object;
+        CPlayer* player = flag->owner_throw;
 
         if (player) {
             if (teamID == player->teamID) {
@@ -149,7 +149,7 @@ void MO_FlagBase::collide(IO_MovingObject * object)
     }
 }
 
-void MO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
+void MO_FlagBase::scoreFlag(CO_Flag* flag, CPlayer* player)
 {
     if (flag->teamID == teamID) {
         flag->placeFlag();
@@ -164,11 +164,10 @@ void MO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
         ifSoundOnPlay(rm->sfx_racesound);
 
         if (game_values.gamemodesettings.flag.pointmove) {
-            //Set the values way outside the map so it will place the base correctly
+            // Set the values way outside the map so it will place the base correctly
             ix = 1280;
             iy = 960;
             placeFlagBase(false);
         }
     }
 }
-

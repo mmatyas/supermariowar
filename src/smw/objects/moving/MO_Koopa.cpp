@@ -15,8 +15,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class koopa
 //------------------------------------------------------------------------------
-MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing, bool bFallOffLedges) :
-    MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 25, 0, moveToRight ? 0 : 54, 54, 32, moveToRight, true, fBouncing, bFallOffLedges)
+MO_Koopa::MO_Koopa(gfxSprite* nspr, bool moveToRight, bool red, bool fBouncing, bool bFallOffLedges)
+    : MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 25, 0, moveToRight ? 0 : 54, 54, 32, moveToRight, true, fBouncing, bFallOffLedges)
 {
     fRed = red;
     movingObjectType = movingobject_koopa;
@@ -26,7 +26,7 @@ MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing, 
 
 void MO_Koopa::draw()
 {
-    //if frozen, just draw shell, not entire koopa
+    // if frozen, just draw shell, not entire koopa
     if (frozen) {
         rm->spr_shell.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, fRed ? 32 : 0, 32, 32);
         rm->spr_iceblock.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, 0, 32, 32);
@@ -45,7 +45,7 @@ void MO_Koopa::update()
     MO_WalkingEnemy::update();
 }
 
-bool MO_Koopa::hittop(CPlayer * player)
+bool MO_Koopa::hittop(CPlayer* player)
 {
     player->setYi(iy - PH - 1);
     player->bouncejump();
@@ -89,8 +89,8 @@ void MO_Koopa::Die()
 
 void MO_Koopa::DropShell(bool fBounce, bool fFlip)
 {
-    //Give the shell a state 2 so it is already spawned but sitting
-    CO_Shell * shell;
+    // Give the shell a state 2 so it is already spawned but sitting
+    CO_Shell* shell;
 
     if (fRed)
         shell = new CO_Shell(1, ix - 1, iy + 8, false, true, true, false);
@@ -104,4 +104,3 @@ void MO_Koopa::DropShell(bool fBounce, bool fFlip)
 
     objectcontainer[1].add(shell);
 }
-

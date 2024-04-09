@@ -10,8 +10,8 @@ extern CGameValues game_values;
 //------------------------------------------------------------------------------
 // class Ice Blast
 //------------------------------------------------------------------------------
-MO_IceBlast::MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short iGlobalID, short teamID, short iColorID) :
-    IO_MovingObject(nspr, x, y, 4, 8, 32, 32, 0, 0, 0, (iColorID + 1) << 5, 32, 32)
+MO_IceBlast::MO_IceBlast(gfxSprite* nspr, short x, short y, float fVelyX, short iGlobalID, short teamID, short iColorID)
+    : IO_MovingObject(nspr, x, y, 4, 8, 32, 32, 0, 0, 0, (iColorID + 1) << 5, 32, 32)
 {
     iPlayerID = iGlobalID;
     iTeamID = teamID;
@@ -66,7 +66,7 @@ void MO_IceBlast::update()
     }
 }
 
-bool MO_IceBlast::collide(CPlayer * player)
+bool MO_IceBlast::collide(CPlayer* player)
 {
     if (iPlayerID != player->globalID && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->teamID)) {
         if (!player->isShielded() && !player->isInvincible() && !player->shyguy) {
@@ -82,4 +82,3 @@ void MO_IceBlast::draw()
 {
     IO_MovingObject::draw();
 }
-

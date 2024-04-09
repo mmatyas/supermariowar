@@ -3,13 +3,12 @@
 #include "WalkingEnemy.h"
 
 
-class MO_Spiny : public MO_WalkingEnemy
-{
-	public:
-		MO_Spiny(gfxSprite *nspr, bool moveToRight);
+class MO_Spiny : public MO_WalkingEnemy {
+public:
+    MO_Spiny(gfxSprite* nspr, bool moveToRight);
 
-		void update() override;
-		bool hittop(CPlayer * player) override;
-		void Die() override;
-		void DropShell(bool fBounce, bool fFlip) override;
+    void update() override;
+    bool hittop(CPlayer* player) override;
+    void Die() override;
+    void DropShell(bool fBounce, bool fFlip) override;
 };

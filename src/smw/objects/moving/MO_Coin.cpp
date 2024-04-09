@@ -16,8 +16,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class coin (for coin mode)
 //------------------------------------------------------------------------------
-MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin) :
-    IO_MovingObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
+MO_Coin::MO_Coin(gfxSprite* nspr, float dvelx, float dvely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin)
+    : IO_MovingObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
 {
     state = 1;
     objectType = object_moving;
@@ -45,7 +45,7 @@ MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, 
     }
 }
 
-bool MO_Coin::collide(CPlayer * player)
+bool MO_Coin::collide(CPlayer* player)
 {
     if (iUncollectableTime > 0 || (iType == 1 && (!game_values.gamemodesettings.greed.owncoins && iTeam == player->getTeamID())))
         return false;
@@ -104,7 +104,7 @@ void MO_Coin::draw()
 {
     IO_MovingObject::draw();
 
-    //Draw sparkles
+    // Draw sparkles
     if (iType != 1)
         rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 }
@@ -115,12 +115,10 @@ void MO_Coin::placeCoin()
 
     short x = 0, y = 0;
     short iAttempts = 32;
-    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
-            objectcontainer[1].getClosestMovingObject(x, y, movingobject_coin) < 150.0f)
-            && iAttempts-- > 0);
+    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) || objectcontainer[1].getClosestMovingObject(x, y, movingobject_coin) < 150.0f)
+        && iAttempts-- > 0)
+        ;
 
     setXi(x);
     setYi(y);
 }
-
-

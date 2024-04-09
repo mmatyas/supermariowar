@@ -14,7 +14,7 @@
 #include "objects/moving/MO_SuperFireball.h"
 #include "objects/overmap/WO_Thwomp.h"
 
-extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
+extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
 extern CObjectContainer objectcontainer[3];
 extern CEyecandyContainer eyecandy[3];
@@ -26,31 +26,31 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 //{jump, throw, turn, wait, taunt} otherwise move
 short g_iSledgeBrotherActions[3][5][5] = {
-    {{0,50,65,75,85},{3,53,66,76,86},{5,55,70,78,83},{5,70,85,85,90},{5,75,90,90,90}},
-    {{0,30,60,80,85},{5,40,65,80,85},{5,50,65,75,85},{10,55,65,70,90},{10,55,65,65,90}},
-    {{0,50,65,75,85},{3,53,65,75,85},{5,60,72,80,88},{5,65,80,85,90},{5,75,90,90,90}}
+    { { 0, 50, 65, 75, 85 }, { 3, 53, 66, 76, 86 }, { 5, 55, 70, 78, 83 }, { 5, 70, 85, 85, 90 }, { 5, 75, 90, 90, 90 } },
+    { { 0, 30, 60, 80, 85 }, { 5, 40, 65, 80, 85 }, { 5, 50, 65, 75, 85 }, { 10, 55, 65, 70, 90 }, { 10, 55, 65, 65, 90 } },
+    { { 0, 50, 65, 75, 85 }, { 3, 53, 65, 75, 85 }, { 5, 60, 72, 80, 88 }, { 5, 65, 80, 85, 90 }, { 5, 75, 90, 90, 90 } }
 };
 
 short g_iSledgeBrotherNeedAction[3][5][6] = {
-    {{50,5,5,10,10,8},{30,4,5,10,10,8},{20,4,5,12,12,8},{12,4,5,15,15,10},{8,4,5,15,15,12}},
-    {{50,5,5,10,15,8},{30,4,5,10,12,8},{20,4,5,12,10,8},{15,4,5,15,8,10},{10,4,5,15,6,12}},
-    {{50,5,8,10,10,8},{30,5,8,12,12,10},{20,4,8,15,15,15},{15,4,8,15,15,15},{12,3,8,15,15,15}}
+    { { 50, 5, 5, 10, 10, 8 }, { 30, 4, 5, 10, 10, 8 }, { 20, 4, 5, 12, 12, 8 }, { 12, 4, 5, 15, 15, 10 }, { 8, 4, 5, 15, 15, 12 } },
+    { { 50, 5, 5, 10, 15, 8 }, { 30, 4, 5, 10, 12, 8 }, { 20, 4, 5, 12, 10, 8 }, { 15, 4, 5, 15, 8, 10 }, { 10, 4, 5, 15, 6, 12 } },
+    { { 50, 5, 8, 10, 10, 8 }, { 30, 5, 8, 12, 12, 10 }, { 20, 4, 8, 15, 15, 15 }, { 15, 4, 8, 15, 15, 15 }, { 12, 3, 8, 15, 15, 15 } }
 };
 
 short g_iSledgeBrotherMaxAction[3][5][5] = {
-    {{1,1,1,2,2},{1,2,1,2,2},{1,3,1,2,2},{1,3,1,1,1},{1,3,1,0,0}},
-    {{1,1,1,2,2},{1,2,1,2,2},{1,3,1,2,2},{1,3,1,1,1},{1,3,1,0,0}},
-    {{1,1,1,2,2},{1,2,1,2,2},{1,2,1,1,1},{1,3,1,1,1},{1,3,1,0,0}}
+    { { 1, 1, 1, 2, 2 }, { 1, 2, 1, 2, 2 }, { 1, 3, 1, 2, 2 }, { 1, 3, 1, 1, 1 }, { 1, 3, 1, 0, 0 } },
+    { { 1, 1, 1, 2, 2 }, { 1, 2, 1, 2, 2 }, { 1, 3, 1, 2, 2 }, { 1, 3, 1, 1, 1 }, { 1, 3, 1, 0, 0 } },
+    { { 1, 1, 1, 2, 2 }, { 1, 2, 1, 2, 2 }, { 1, 2, 1, 1, 1 }, { 1, 3, 1, 1, 1 }, { 1, 3, 1, 0, 0 } }
 };
 
 short g_iSledgeBrotherWaitTime[3][5][2] = {
-    {{30,50},{25,45},{20,40},{15,30},{10,20}},
-    {{30,50},{25,45},{20,40},{15,30},{10,20}},
-    {{30,50},{25,45},{20,40},{15,30},{10,20}}
+    { { 30, 50 }, { 25, 45 }, { 20, 40 }, { 15, 30 }, { 10, 20 } },
+    { { 30, 50 }, { 25, 45 }, { 20, 40 }, { 15, 30 }, { 10, 20 } },
+    { { 30, 50 }, { 25, 45 }, { 20, 40 }, { 15, 30 }, { 10, 20 } }
 };
 
-MO_SledgeBrother::MO_SledgeBrother(gfxSprite *nspr, short platformY, Boss type) :
-    IO_MovingObject(nspr, 0, 0, 8, 0, 32, 56, 8, 8)
+MO_SledgeBrother::MO_SledgeBrother(gfxSprite* nspr, short platformY, Boss type)
+    : IO_MovingObject(nspr, 0, 0, 8, 0, 32, 56, 8, 8)
 {
     iType = static_cast<short>(type);  // FIXME
     state = 1;
@@ -127,7 +127,7 @@ void MO_SledgeBrother::update()
             iActionState = 0;
 
             if (iType == 0) {
-                //Shake screen and kill players
+                // Shake screen and kill players
                 ifSoundOnPlay(rm->sfx_thunder);
                 game_values.flags.screenshaketimer = 20;
                 game_values.flags.screenshakeplayerid = -1;
@@ -135,26 +135,26 @@ void MO_SledgeBrother::update()
                 game_values.flags.screenshakekillinair = false;
                 game_values.flags.screenshakekillscount = 0;
             } else if (iType == 1) {
-                //Spawn thwomps
+                // Spawn thwomps
                 ifSoundOnPlay(rm->sfx_thunder);
 
                 short numThwomps = RANDOM_INT(5) + 6;
 
                 for (short iThwomp = 0; iThwomp < numThwomps; iThwomp++) {
-                    objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)(RANDOM_INT(591)), 2.0f + (float)(RANDOM_INT(20))/10.0f));
+                    objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)(RANDOM_INT(591)), 2.0f + (float)(RANDOM_INT(20)) / 10.0f));
                 }
 
-                //short numBombs = RANDOM_INT(5) + 6;
+                // short numBombs = RANDOM_INT(5) + 6;
 
-                //for (short iBomb = 0; iBomb < numBombs; iBomb++)
+                // for (short iBomb = 0; iBomb < numBombs; iBomb++)
                 //{
                 //	short iRandomX = RANDOM_INT(612);
                 //	short iRandomY = RANDOM_INT(442);
                 //	eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8));
                 //	objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, RANDOM_INT(30) + 30));
-                //}
+                // }
             } else if (iType == 2) {
-                //Spawn lots of podobos
+                // Spawn lots of podobos
                 ifSoundOnPlay(rm->sfx_thunder);
 
                 short numPodobos = RANDOM_INT(5) + 8;
@@ -171,7 +171,7 @@ void MO_SledgeBrother::update()
             arm_offset_x = 0;
         }
     } else if (iActionState == 4) {
-        //move towards destination
+        // move towards destination
         if (ix < iDestX) {
             ix += game_values.gamemodesettings.boss.difficulty >= 3 ? 2 : 1;
 
@@ -201,14 +201,14 @@ void MO_SledgeBrother::update()
                 leg_offset_x = 0;
         }
     } else if (iActionState == 5) {
-        //If we are done taunting, reset arm/legs back to normal state
+        // If we are done taunting, reset arm/legs back to normal state
         if (--taunt_timer <= 0) {
             iActionState = 0;
             arm_offset_x = 0;
             leg_offset_x = 0;
             arm_movement_timer = 0;
             leg_movement_timer = 0;
-        } else { //otherwise move them around
+        } else {  // otherwise move them around
             if (++arm_movement_timer == 8) {
                 arm_movement_timer = 0;
 
@@ -250,7 +250,7 @@ void MO_SledgeBrother::randomaction()
 {
     int randaction = RANDOM_INT(100);
 
-    //Force an action if it has been too long since the last action of that type
+    // Force an action if it has been too long since the last action of that type
     if (need_action[0] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][0])
         jump();
     else if (need_action[1] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][1])
@@ -263,21 +263,16 @@ void MO_SledgeBrother::randomaction()
         taunt();
     else if (need_action[5] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][5])
         move();
-    //then do action based on probability
-    else if ((last_action != 0 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][0]) &&
-            randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][0])
+    // then do action based on probability
+    else if ((last_action != 0 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][0]) && randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][0])
         jump();
-    else if ((last_action != 1 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][1]) &&
-            randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][1])
+    else if ((last_action != 1 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][1]) && randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][1])
         throwprojectile();
-    else if ((last_action != 2 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][2]) &&
-            randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][2])
+    else if ((last_action != 2 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][2]) && randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][2])
         turn();
-    else if ((last_action != 2 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][3]) &&
-            randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][3])
+    else if ((last_action != 2 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][3]) && randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][3])
         wait(g_iSledgeBrotherWaitTime[iType][game_values.gamemodesettings.boss.difficulty][0], g_iSledgeBrotherWaitTime[iType][game_values.gamemodesettings.boss.difficulty][1]);
-    else if ((last_action != 2 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][4]) &&
-            randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][4])
+    else if ((last_action != 2 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][4]) && randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][4])
         taunt();
     else
         move();
@@ -348,7 +343,7 @@ void MO_SledgeBrother::taunt()
 
     need_action[4] = 0;
 
-    //If this is a bomb brother, push bombs away when taunting
+    // If this is a bomb brother, push bombs away when taunting
     if (iType == 1) {
         objectcontainer[2].pushBombs(ix + 32, iy + 32);
     }
@@ -382,7 +377,7 @@ void MO_SledgeBrother::wait(short min, short max)
     need_action[3] = 0;
 }
 
-bool MO_SledgeBrother::collide(CPlayer * player)
+bool MO_SledgeBrother::collide(CPlayer* player)
 {
     if (iActionState == 0)
         return false;
@@ -401,7 +396,7 @@ bool MO_SledgeBrother::collide(CPlayer * player)
     return false;
 }
 
-bool MO_SledgeBrother::hit(CPlayer * player)
+bool MO_SledgeBrother::hit(CPlayer* player)
 {
     if (player->isShielded())
         return false;
@@ -409,14 +404,14 @@ bool MO_SledgeBrother::hit(CPlayer * player)
     return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;
 }
 
-void MO_SledgeBrother::collide(IO_MovingObject * object)
+void MO_SledgeBrother::collide(IO_MovingObject* object)
 {
     if (object->isDead())
         return;
 
     MovingObjectType type = object->getMovingObjectType();
 
-    //Ignore hammers and fireballs thrown from sledge brother
+    // Ignore hammers and fireballs thrown from sledge brother
     if (type == movingobject_sledgehammer || type == movingobject_superfireball) {
         if (object->iPlayerID == -1)
             return;
@@ -424,18 +419,18 @@ void MO_SledgeBrother::collide(IO_MovingObject * object)
 
     removeifprojectile(object, false, false);
 
-    //These types of attacks damage the boss
+    // These types of attacks damage the boss
     bool fDamageWeapon = type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_explosion;
 
-    //These don't damage him but still collide
+    // These don't damage him but still collide
     bool fNoDamageWeapon = type == movingobject_fireball || type == movingobject_bulletbill || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_attackzone;
 
     if (fDamageWeapon || fNoDamageWeapon) {
-        //If it is a shell but it is sitting, don't collide
+        // If it is a shell but it is sitting, don't collide
         if (type == movingobject_shell && object->GetState() == 2)
             return;
 
-        //If it is a throw box but is sitting, dont' collide
+        // If it is a throw box but is sitting, dont' collide
         if (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
             return;
 
@@ -466,8 +461,8 @@ void MO_SledgeBrother::Damage(short playerID)
     if (hit_timer != 0 || playerID == -1)
         return;
 
-    //Find the player that shot this projectile so we can attribute a kill
-    CPlayer * killer = GetPlayerFromGlobalID(playerID);
+    // Find the player that shot this projectile so we can attribute a kill
+    CPlayer* killer = GetPlayerFromGlobalID(playerID);
 
     if (killer) {
         if (--hit_points <= 0) {
@@ -492,4 +487,3 @@ void MO_SledgeBrother::SetLastAction(short type)
         last_action_count++;
     }
 }
-

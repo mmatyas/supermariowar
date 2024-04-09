@@ -16,15 +16,15 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class frenzycard (for fire frenzy mode)
 //------------------------------------------------------------------------------
-MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iType) :
-    IO_MovingObject(nspr, 0, 0, 12, 8, -1, -1, -1, -1, 0, iType * 32, 32, 32)
+MO_FrenzyCard::MO_FrenzyCard(gfxSprite* nspr, short iType)
+    : IO_MovingObject(nspr, 0, 0, 12, 8, -1, -1, -1, -1, 0, iType * 32, 32, 32)
 {
     state = 1;
     objectType = object_frenzycard;
     type = iType;
 
     if (type == NUMFRENZYCARDS - 1)
-        type = RANDOM_INT (NUMFRENZYCARDS - 1);
+        type = RANDOM_INT(NUMFRENZYCARDS - 1);
 
     sparkleanimationtimer = 0;
     sparkledrawframe = 0;
@@ -34,7 +34,7 @@ MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iType) :
     fObjectCollidesWithMap = false;
 }
 
-bool MO_FrenzyCard::collide(CPlayer * player)
+bool MO_FrenzyCard::collide(CPlayer* player)
 {
     if (type < 14 || type > 17 || game_values.gamemodesettings.frenzy.storedshells) {
         player->SetPowerup(type);
@@ -42,25 +42,25 @@ bool MO_FrenzyCard::collide(CPlayer * player)
     } else {
         switch (type) {
         case 14: {
-            CO_Shell * shell = new CO_Shell(0, 0, 0, true, true, true, false);
+            CO_Shell* shell = new CO_Shell(0, 0, 0, true, true, true, false);
             if (objectcontainer[1].add(shell))
                 shell->UsedAsStoredPowerup(player);
             break;
         }
         case 15: {
-            CO_Shell * shell = new CO_Shell(1, 0, 0, false, true, true, false);
+            CO_Shell* shell = new CO_Shell(1, 0, 0, false, true, true, false);
             if (objectcontainer[1].add(shell))
                 shell->UsedAsStoredPowerup(player);
             break;
         }
         case 16: {
-            CO_Shell * shell = new CO_Shell(2, 0, 0, false, false, true, true);
+            CO_Shell* shell = new CO_Shell(2, 0, 0, false, false, true, true);
             if (objectcontainer[1].add(shell))
                 shell->UsedAsStoredPowerup(player);
             break;
         }
         case 17: {
-            CO_Shell * shell = new CO_Shell(3, 0, 0, false, true, false, false);
+            CO_Shell* shell = new CO_Shell(3, 0, 0, false, true, false, false);
             if (objectcontainer[1].add(shell))
                 shell->UsedAsStoredPowerup(player);
             break;
@@ -91,7 +91,7 @@ void MO_FrenzyCard::draw()
 {
     IO_MovingObject::draw();
 
-    //Draw sparkles
+    // Draw sparkles
     rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 }
 
@@ -101,11 +101,10 @@ void MO_FrenzyCard::placeCard()
 
     short x = 0, y = 0;
     short iAttempts = 32;
-    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
-            objectcontainer[1].getClosestObject(x, y, object_frenzycard) <= 150.0f)
-            && iAttempts-- > 0);
+    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) || objectcontainer[1].getClosestObject(x, y, object_frenzycard) <= 150.0f)
+        && iAttempts-- > 0)
+        ;
 
     setXi(x);
     setYi(y);
 }
-

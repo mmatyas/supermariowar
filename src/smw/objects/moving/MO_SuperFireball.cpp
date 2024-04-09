@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class super fireball
 //------------------------------------------------------------------------------
-MO_SuperFireball::MO_SuperFireball(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short teamID, short iColorID) :
-    IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, nspr->getWidth() / iNumSpr, nspr->getHeight() / 10, 0, 0)
+MO_SuperFireball::MO_SuperFireball(gfxSprite* nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short teamID, short iColorID)
+    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, nspr->getWidth() / iNumSpr, nspr->getHeight() / 10, 0, 0)
 {
     ih /= 10;
 
@@ -48,11 +48,11 @@ void MO_SuperFireball::update()
         setXi(ix - App::screenWidth);
     }
 
-	if (iy > App::screenHeight|| iy < -ih || --ttl <= 0)
+    if (iy > App::screenHeight || iy < -ih || --ttl <= 0)
         removeifprojectile(this, false, true);
 }
 
-bool MO_SuperFireball::collide(CPlayer * player)
+bool MO_SuperFireball::collide(CPlayer* player)
 {
     if (!player->isShielded()) {
         dead = true;
@@ -71,4 +71,3 @@ void MO_SuperFireball::draw()
 {
     spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset + directionOffset, iw, ih);
 }
-

@@ -15,8 +15,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class spiny
 //------------------------------------------------------------------------------
-MO_Spiny::MO_Spiny(gfxSprite *nspr, bool moveToRight) :
-    MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, false, true)
+MO_Spiny::MO_Spiny(gfxSprite* nspr, bool moveToRight)
+    : MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, false, true)
 {
     movingObjectType = movingobject_spiny;
     iSpawnIconOffset = 176;
@@ -33,9 +33,9 @@ void MO_Spiny::update()
     MO_WalkingEnemy::update();
 }
 
-bool MO_Spiny::hittop(CPlayer * player)
+bool MO_Spiny::hittop(CPlayer* player)
 {
-    //Kill player here
+    // Kill player here
     if (player->isready() && !player->isShielded() && !player->isInvincible() && !player->kuriboshoe.is_on())
         return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;
 
@@ -73,8 +73,8 @@ void MO_Spiny::Die()
 
 void MO_Spiny::DropShell(bool fBounce, bool fFlip)
 {
-    //Give the shell a state 2 so it is already spawned but sitting
-    CO_Shell * shell = new CO_Shell(2, ix - 1, iy, false, true, false, false);
+    // Give the shell a state 2 so it is already spawned but sitting
+    CO_Shell* shell = new CO_Shell(2, ix - 1, iy, false, true, false, false);
     shell->nospawn(iy, fBounce);
 
     if (fFlip)
@@ -82,4 +82,3 @@ void MO_Spiny::DropShell(bool fBounce, bool fFlip)
 
     objectcontainer[1].add(shell);
 }
-

@@ -11,14 +11,14 @@ extern CGameValues game_values;
 //------------------------------------------------------------------------------
 // class hammer
 //------------------------------------------------------------------------------
-MO_Hammer::MO_Hammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short teamID, short iColorID, bool superHammer) :
-    IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 2, 0, 0)
+MO_Hammer::MO_Hammer(gfxSprite* nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short teamID, short iColorID, bool superHammer)
+    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 2, 0, 0)
 {
     ih = ih >> 2;
 
     iPlayerID = iGlobalID;
     iTeamID = teamID;
-	//RFC
+    // RFC
     colorOffset = iColorID * 28;
     movingObjectType = movingobject_hammer;
 
@@ -79,12 +79,12 @@ void MO_Hammer::update()
         }
     }
 
-    //Detection collision with hammer breakable blocks
-    IO_Block * blocks[4];
+    // Detection collision with hammer breakable blocks
+    IO_Block* blocks[4];
     GetCollisionBlocks(blocks);
     for (short iBlock = 0; iBlock < 4; iBlock++) {
         if (blocks[iBlock] && blocks[iBlock]->getBlockType() == BlockType::WeaponBreakable) {
-            B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
+            B_WeaponBreakableBlock* weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
             if (weaponbreakableblock->iType == 5) {
                 weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
                 removeifprojectile(this, false, false);
@@ -94,14 +94,14 @@ void MO_Hammer::update()
     }
 }
 
-bool MO_Hammer::collide(CPlayer * player)
+bool MO_Hammer::collide(CPlayer* player)
 {
     if (iPlayerID != player->globalID && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->teamID)) {
         if (!player->isShielded()) {
             removeifprojectile(this, false, false);
 
             if (!player->isInvincible() && !player->shyguy) {
-                //Find the player that shot this hammer so we can attribute a kill
+                // Find the player that shot this hammer so we can attribute a kill
                 PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Hammer, false, false);
                 return true;
             }
@@ -115,5 +115,3 @@ void MO_Hammer::draw()
 {
     spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset, iw, ih);
 }
-
-

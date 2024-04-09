@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class goomba
 //------------------------------------------------------------------------------
-MO_Goomba::MO_Goomba(gfxSprite *nspr, bool moveToRight, bool fBouncing) :
-    MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, fBouncing, true)
+MO_Goomba::MO_Goomba(gfxSprite* nspr, bool moveToRight, bool fBouncing)
+    : MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, fBouncing, true)
 {
     movingObjectType = movingobject_goomba;
     iSpawnIconOffset = 64;
@@ -35,7 +35,7 @@ MO_Goomba::MO_Goomba(gfxSprite *nspr, bool moveToRight, bool fBouncing) :
 
 void MO_Goomba::draw()
 {
-    //if frozen, just draw shell, not entire koopa
+    // if frozen, just draw shell, not entire koopa
     if (frozen) {
         rm->spr_goomba.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, 0, 32, 32);
         rm->spr_iceblock.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, 0, 32, 32);
@@ -54,7 +54,7 @@ void MO_Goomba::update()
     MO_WalkingEnemy::update();
 }
 
-bool MO_Goomba::hittop(CPlayer * player)
+bool MO_Goomba::hittop(CPlayer* player)
 {
     player->setYi(iy - PH - 1);
     player->bouncejump();
@@ -106,4 +106,3 @@ void MO_Goomba::Die()
     dead = true;
     eyecandy[2].add(new EC_FallingObject(&rm->spr_goombadeadflying, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, 0, 0, 0));
 }
-

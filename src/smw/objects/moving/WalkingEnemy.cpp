@@ -13,7 +13,7 @@
 #include "objects/carriable/CO_Shell.h"
 #include "objects/carriable/CO_ThrowBox.h"
 
-extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
+extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
 extern CMap* g_map;
 extern CEyecandyContainer eyecandy[3];
@@ -23,8 +23,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class walking enemy (base class for goomba and koopa)
 //------------------------------------------------------------------------------
-MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool bouncing, bool fallOffLedges) :
-    IO_MovingObject(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
+MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite* nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool bouncing, bool fallOffLedges)
+    : IO_MovingObject(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
 {
     if (moveToRight)
         velx = 1.0f;
@@ -110,7 +110,7 @@ void MO_WalkingEnemy::update()
         IO_MovingObject::update();
     }
 
-    //Deal with terminal burnup velocity
+    // Deal with terminal burnup velocity
     if (vely >= MAXVELY) {
         if (++burnuptimer > 20) {
             if (burnuptimer > 80)
@@ -122,8 +122,8 @@ void MO_WalkingEnemy::update()
         burnuptimer = 0;
     }
 
-    //If this enemy doesn't fall off of ledges, then take a look at the area in front of them
-    //to determine if they need to turn around
+    // If this enemy doesn't fall off of ledges, then take a look at the area in front of them
+    // to determine if they need to turn around
     if (!inair && !fFallOffLedges) {
         short probeCenterX = ix + (collisionWidth >> 1);
         short probeFrontX = ix + (velx > 0.0f ? collisionWidth + 1 : -1);
@@ -136,7 +136,7 @@ void MO_WalkingEnemy::update()
             bool fFrontGap = iFrontTileType == tile_flag_nonsolid || iFrontTileType == tile_flag_super_death_top;
             bool fCenterGap = iCenterTileType == tile_flag_nonsolid || iCenterTileType == tile_flag_super_death_top;
 
-            //If there is a hole or the type will kill the enemy, then turn around
+            // If there is a hole or the type will kill the enemy, then turn around
             if (fFrontGap && fCenterGap) {
                 velx = -velx;
             }
@@ -158,8 +158,8 @@ void MO_WalkingEnemy::update()
                 probeCenterX /= TILESIZE;
                 probeY /= TILESIZE;
 
-                IO_Block * frontBlock = g_map->block(probeFrontX, probeY);
-                IO_Block * centerBlock = g_map->block(probeCenterX, probeY);
+                IO_Block* frontBlock = g_map->block(probeFrontX, probeY);
+                IO_Block* centerBlock = g_map->block(probeCenterX, probeY);
 
                 bool fFoundFrontBlock = frontBlock && !frontBlock->isTransparent() && !frontBlock->isHidden();
                 bool fFoundCenterBlock = centerBlock && !centerBlock->isTransparent() && !centerBlock->isHidden();
@@ -181,7 +181,7 @@ void MO_WalkingEnemy::update()
 }
 
 
-bool MO_WalkingEnemy::collide(CPlayer * player)
+bool MO_WalkingEnemy::collide(CPlayer* player)
 {
     if (state == 0)
         return false;
@@ -208,7 +208,7 @@ bool MO_WalkingEnemy::collide(CPlayer * player)
     return false;
 }
 
-bool MO_WalkingEnemy::hitother(CPlayer * player)
+bool MO_WalkingEnemy::hitother(CPlayer* player)
 {
     if (player->isShielded())
         return false;
@@ -216,7 +216,7 @@ bool MO_WalkingEnemy::hitother(CPlayer * player)
     return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;
 }
 
-void MO_WalkingEnemy::collide(IO_MovingObject * object)
+void MO_WalkingEnemy::collide(IO_MovingObject* object)
 {
     if (state == 0)
         return;
@@ -227,17 +227,17 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
         MovingObjectType type = object->getMovingObjectType();
 
         if (((type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang) && (fKillOnWeakWeapon || frozen)) || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion || type == movingobject_sledgehammer) {
-            //Don't kill enemies with non-moving shells
+            // Don't kill enemies with non-moving shells
             if (type == movingobject_shell && object->state == 2)
                 return;
 
-            //Don't kill enemies with slow or non-moving boxes
+            // Don't kill enemies with slow or non-moving boxes
             if (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
                 return;
 
             if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover) {
-                //Find the player that shot this fireball so we can attribute a kill
-                CPlayer * killer = GetPlayerFromGlobalID(object->iPlayerID);
+                // Find the player that shot this fireball so we can attribute a kill
+                CPlayer* killer = GetPlayerFromGlobalID(object->iPlayerID);
 
                 if (killer) {
                     killer->AddKillerAward(NULL, killStyle);
@@ -283,7 +283,8 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 void MO_WalkingEnemy::place()
 {
     short iAttempts = 10;
-    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0)
+        ;
     fx = (float)ix;
     fy = (float)iy;
 }
@@ -301,5 +302,3 @@ void MO_WalkingEnemy::ShatterDie()
 
     game_values.unlocksecret2part2++;
 }
-
-

@@ -6,16 +6,15 @@
 class gfxSprite;
 class CPlayer;
 
-class MO_CarriedObject : public IO_MovingObject
-{
+class MO_CarriedObject : public IO_MovingObject {
 public:
-    MO_CarriedObject(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth);
-    MO_CarriedObject(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+    MO_CarriedObject(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth);
+    MO_CarriedObject(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
     ~MO_CarriedObject();
 
     virtual void update() {}
     virtual void draw();
-    virtual bool collide(CPlayer *) { return false; }
+    virtual bool collide(CPlayer*) { return false; }
 
     virtual void MoveToOwner();
 
@@ -26,10 +25,9 @@ public:
     bool IsCarriedByKuriboShoe() { return fCarriedByKuriboShoe; }
 
 protected:
-
     bool fCarriedByKuriboShoe;
 
-    CPlayer * owner;
+    CPlayer* owner;
     bool fSmoking;
 
     float dKickX, dKickY;
@@ -38,6 +36,6 @@ protected:
 private:
     void init();
 
-friend class B_ThrowBlock;
-friend class CPlayer;
+    friend class B_ThrowBlock;
+    friend class CPlayer;
 };
