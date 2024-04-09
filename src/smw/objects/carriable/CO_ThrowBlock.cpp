@@ -1,8 +1,8 @@
 #include "CO_ThrowBlock.h"
 
 #include "eyecandy.h"
-#include "player.h"
 #include "GameValues.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "objects/carriable/CO_ThrowBox.h"
 
@@ -14,10 +14,10 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class throwable block projectile
 //------------------------------------------------------------------------------
-//State 1: Moving
-//State 2: Holding
-CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
-    MO_CarriedObject(nspr, x, y, 4, 2, 30, 30, 1, 1)
+// State 1: Moving
+// State 2: Holding
+CO_ThrowBlock::CO_ThrowBlock(gfxSprite* nspr, short x, short y, short type)
+    : MO_CarriedObject(nspr, x, y, 4, 2, 30, 30, 1, 1)
 {
     state = 2;
     ih = 32;
@@ -46,7 +46,7 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
     sSpotlight = NULL;
 }
 
-bool CO_ThrowBlock::collide(CPlayer * player)
+bool CO_ThrowBlock::collide(CPlayer* player)
 {
     if (frozen) {
         ShatterDie();
@@ -59,14 +59,14 @@ bool CO_ThrowBlock::collide(CPlayer * player)
         return HitOther(player);
 }
 
-bool CO_ThrowBlock::HitTop(CPlayer * player)
+bool CO_ThrowBlock::HitTop(CPlayer* player)
 {
     if (player->isInvincible() || player->shyguy) {
         Die();
     } else {
-        if (state == 1) { //moving
+        if (state == 1) {  // moving
             return KillPlayer(player);
-        } else if (state == 2) { //Holding
+        } else if (state == 2) {  // Holding
             if (player != owner) {
                 if (owner)
                     owner->carriedItem = NULL;
@@ -84,9 +84,9 @@ bool CO_ThrowBlock::HitTop(CPlayer * player)
     return false;
 }
 
-bool CO_ThrowBlock::HitOther(CPlayer * player)
+bool CO_ThrowBlock::HitOther(CPlayer* player)
 {
-    if (state == 1) { //Moving
+    if (state == 1) {  // Moving
         short flipx = 0;
 
         if (player->ix + PW < 320 && ix > 320)
@@ -97,7 +97,7 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
         if (iNoOwnerKillTime == 0 || player->globalID != iPlayerID || (player->ix + flipx > ix + (iw >> 1) && velx > 0.0f) || (player->ix + flipx <= ix - (iw >> 1) && velx < 0.0f)) {
             return KillPlayer(player);
         }
-    } else if (state == 2) { //Holding
+    } else if (state == 2) {  // Holding
         if (player != owner) {
             iPlayerID = owner->globalID;
             iTeamID = owner->teamID;
@@ -108,7 +108,7 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
     return false;
 }
 
-bool CO_ThrowBlock::KillPlayer(CPlayer * player)
+bool CO_ThrowBlock::KillPlayer(CPlayer* player)
 {
     if (player->isInvincible() || player->shyguy) {
         Die();
@@ -120,12 +120,12 @@ bool CO_ThrowBlock::KillPlayer(CPlayer * player)
 
     CheckAndDie();
 
-    //Find the player that shot this shell so we can attribute a kill
+    // Find the player that shot this shell so we can attribute a kill
     PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::ThrowBlock, false, false);
     return true;
 }
 
-void CO_ThrowBlock::collide(IO_MovingObject * object)
+void CO_ThrowBlock::collide(IO_MovingObject* object)
 {
     if (object->isDead())
         return;
@@ -135,12 +135,12 @@ void CO_ThrowBlock::collide(IO_MovingObject * object)
     MovingObjectType type = object->getMovingObjectType();
 
     if (type == movingobject_throwblock) {
-        CO_ThrowBlock * block = (CO_ThrowBlock*)object;
+        CO_ThrowBlock* block = (CO_ThrowBlock*)object;
 
         Die();
         block->Die();
     } else if (type == movingobject_throwbox) {
-        CO_ThrowBox * box = (CO_ThrowBox*)object;
+        CO_ThrowBox* box = (CO_ThrowBox*)object;
 
         Die();
         box->Die();
@@ -235,9 +235,9 @@ void CO_ThrowBlock::Kick()
     /*
     if (superkick)
     {
-    	vel = 12.0f;
-    	fSmoking = true;
-    	ifSoundOnPlay(rm->sfx_cannon);
+        vel = 12.0f;
+        fSmoking = true;
+        ifSoundOnPlay(rm->sfx_cannon);
     }
     */
 
@@ -249,14 +249,14 @@ void CO_ThrowBlock::Kick()
         if (fPlayerBonusVel > 0.0f)
             fVel += fPlayerBonusVel;
 
-        //if (fVel >= 9.0f)
+        // if (fVel >= 9.0f)
         //	fSmoking = true;
     } else {
         fVel = -6.5f;
         if (fPlayerBonusVel < 0.0f)
             fVel += fPlayerBonusVel;
 
-        //if (fVel <= -9.0f)
+        // if (fVel <= -9.0f)
         //	fSmoking = true;
     }
 
@@ -336,8 +336,7 @@ void CO_ThrowBlock::SideBounce(bool fRightSide)
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4));
             ifSoundOnPlay(rm->sfx_bump);
 
-            iBounceCounter = 7; //Allow bounce stars to show on each bounce on a 2x wide pit
+            iBounceCounter = 7;  // Allow bounce stars to show on each bounce on a 2x wide pit
         }
     }
 }
-

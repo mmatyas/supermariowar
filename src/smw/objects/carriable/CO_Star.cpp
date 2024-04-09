@@ -1,7 +1,7 @@
 #include "CO_Star.h"
 
-#include "player.h"
 #include "GameValues.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "gamemodes/Star.h"
 
@@ -11,8 +11,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class star (for star mode)
 //------------------------------------------------------------------------------
-CO_Star::CO_Star(gfxSprite *nspr, short type, short id) :
-    MO_CarriedObject(nspr, 0, 0, 8, 8, 30, 30, 1, 1)
+CO_Star::CO_Star(gfxSprite* nspr, short type, short id)
+    : MO_CarriedObject(nspr, 0, 0, 8, 8, 30, 30, 1, 1)
 {
     iID = id;
 
@@ -40,12 +40,12 @@ CO_Star::CO_Star(gfxSprite *nspr, short type, short id) :
     iOwnerUpOffset = 32;
 }
 
-bool CO_Star::collide(CPlayer * player)
+bool CO_Star::collide(CPlayer* player)
 {
     if (game_values.gamemode->gamemode != game_mode_star)
         return false;
 
-    CGM_Star * starmode = (CGM_Star *)game_values.gamemode;
+    CGM_Star* starmode = (CGM_Star*)game_values.gamemode;
 
     timer = 0;
     if (owner == NULL && player->isready()) {
@@ -57,7 +57,7 @@ bool CO_Star::collide(CPlayer * player)
     if ((iType == 0 && player->isInvincible()) || player->isShielded() || starmode->isplayerstar(player) || game_values.gamemode->gameover)
         return false;
 
-    CPlayer * oldstar = starmode->swapplayer(iID, player);
+    CPlayer* oldstar = starmode->swapplayer(iID, player);
 
     if (owner == oldstar) {
         oldstar->throw_star = 30;
@@ -77,7 +77,7 @@ void CO_Star::update()
     } else {
         applyfriction();
 
-        //Collision detect map
+        // Collision detect map
         IO_MovingObject::update();
     }
 
@@ -98,7 +98,7 @@ void CO_Star::draw()
             spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, iw, ih);
     } else {
         if (velx != 0.0f)
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, iw, ih);  //keep the star still while it's moving
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, iw, ih);  // keep the star still while it's moving
         else
             spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iOffsetY, iw, ih);
     }
@@ -114,11 +114,11 @@ void CO_Star::placeStar()
     if (game_values.gamemode->gamemode != game_mode_star)
         return;
 
-    CGM_Star * starmode = (CGM_Star*)game_values.gamemode;
+    CGM_Star* starmode = (CGM_Star*)game_values.gamemode;
 
     timer = 0;
 
-    CPlayer * star = starmode->getstarplayer(iID);
+    CPlayer* star = starmode->getstarplayer(iID);
 
     if (star) {
         setXf(star->fx + HALFPW - 16.0f);
@@ -130,5 +130,3 @@ void CO_Star::placeStar()
 
     Drop();
 }
-
-

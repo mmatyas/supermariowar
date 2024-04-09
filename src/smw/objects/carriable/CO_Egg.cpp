@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class egg (for egg mode)
 //------------------------------------------------------------------------------
-CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
-    MO_CarriedObject(nspr, 0, 0, 2, 16, 28, 30, 2, 1, 0, iColor << 5, 32, 32)
+CO_Egg::CO_Egg(gfxSprite* nspr, short iColor)
+    : MO_CarriedObject(nspr, 0, 0, 2, 16, 28, 30, 2, 1, 0, iColor << 5, 32, 32)
 {
     state = 1;
     movingObjectType = movingobject_egg;
@@ -44,7 +44,7 @@ CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
     placeEgg();
 }
 
-bool CO_Egg::collide(CPlayer * player)
+bool CO_Egg::collide(CPlayer* player)
 {
     if (owner == NULL && player->isready()) {
         if (player->AcceptItem(this)) {
@@ -73,7 +73,7 @@ void CO_Egg::update()
 
         applyfriction();
 
-        //Collision detect map
+        // Collision detect map
         fOldX = fx;
         fOldY = fy;
 
@@ -87,7 +87,7 @@ void CO_Egg::update()
             sparkledrawframe = 0;
     }
 
-    //Explode
+    // Explode
     if (game_values.gamemodesettings.egg.explode > 0) {
         if (--explosiondrawtimer <= 0) {
             explosiondrawtimer = 62;
@@ -112,7 +112,7 @@ void CO_Egg::draw()
 {
     MO_CarriedObject::draw();
 
-    //Display explosion timer
+    // Display explosion timer
     if (game_values.gamemodesettings.egg.explode > 0 && explosiondrawframe < 5) {
         if (owner && owner->iswarping())
             rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32, owner->GetWarpState(), owner->GetWarpPlane());
@@ -138,9 +138,9 @@ void CO_Egg::placeEgg()
 
     short x = 0, y = 0;
     short iAttempts = 32;
-    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
-            objectcontainer[1].getClosestMovingObject(x, y, movingobject_yoshi) < 250.0f)
-            && iAttempts-- > 0);
+    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) || objectcontainer[1].getClosestMovingObject(x, y, movingobject_yoshi) < 250.0f)
+        && iAttempts-- > 0)
+        ;
 
     setXi(x);
     setYi(y);
@@ -159,4 +159,3 @@ void CO_Egg::Drop()
     MO_CarriedObject::Drop();
     owner_throw_timer = 62;
 }
-

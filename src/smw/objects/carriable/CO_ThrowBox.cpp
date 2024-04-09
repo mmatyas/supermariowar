@@ -5,7 +5,7 @@
 #include "player.h"
 #include "ResourceManager.h"
 
-extern IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn);
+extern IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool spawn);
 
 extern SpotlightManager spotlightManager;
 extern CEyecandyContainer eyecandy[3];
@@ -15,8 +15,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class throwable box - can be used as a shield, thrown at a player, or holds items
 //------------------------------------------------------------------------------
-CO_ThrowBox::CO_ThrowBox(gfxSprite * nspr, short x, short y, short item) :
-    MO_CarriedObject(nspr, x, y, 4, 8, 30, 30, 1, 1)
+CO_ThrowBox::CO_ThrowBox(gfxSprite* nspr, short x, short y, short item)
+    : MO_CarriedObject(nspr, x, y, 4, 8, 30, 30, 1, 1)
 {
     state = 1;
     ih = 32;
@@ -40,9 +40,9 @@ CO_ThrowBox::CO_ThrowBox(gfxSprite * nspr, short x, short y, short item) :
     sSpotlight = NULL;
 }
 
-bool CO_ThrowBox::collide(CPlayer * player)
+bool CO_ThrowBox::collide(CPlayer* player)
 {
-    //Kill the player if it is moving
+    // Kill the player if it is moving
 
     if (frozen) {
         ShatterDie();
@@ -57,14 +57,14 @@ bool CO_ThrowBox::collide(CPlayer * player)
     else
     {
         if (owner && player != owner && (game_values.teamcollision == TeamCollisionStyle::On || player->teamID != owner->teamID))
-    	{
-    		iPlayerID = owner->globalID;
-    		iTeamID = owner->teamID;
-    		return KillPlayer(player);
-    	}
+        {
+                iPlayerID = owner->globalID;
+                iTeamID = owner->teamID;
+                return KillPlayer(player);
+        }
     }*/
 
-    //Otherwise allow them to pick this box up
+    // Otherwise allow them to pick this box up
     if (owner == NULL && player->isready()) {
         if (player->AcceptItem(this)) {
             owner = player;
@@ -75,7 +75,7 @@ bool CO_ThrowBox::collide(CPlayer * player)
 }
 
 
-bool CO_ThrowBox::KillPlayer(CPlayer * player)
+bool CO_ThrowBox::KillPlayer(CPlayer* player)
 {
     if (player->isInvincible() || player->shyguy) {
         Die();
@@ -87,12 +87,12 @@ bool CO_ThrowBox::KillPlayer(CPlayer * player)
 
     Die();
 
-    //Find the player that shot this shell so we can attribute a kill
+    // Find the player that shot this shell so we can attribute a kill
     PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::ThrowBlock, false, false);
     return true;
 }
 
-void CO_ThrowBox::collide(IO_MovingObject * object)
+void CO_ThrowBox::collide(IO_MovingObject* object)
 {
     if (object->isDead())
         return;
@@ -102,7 +102,7 @@ void CO_ThrowBox::collide(IO_MovingObject * object)
     MovingObjectType type = object->getMovingObjectType();
 
     if (type == movingobject_throwbox) {
-        CO_ThrowBox * box = (CO_ThrowBox*)object;
+        CO_ThrowBox* box = (CO_ThrowBox*)object;
         if (frozen || box->frozen || HasKillVelocity() || box->HasKillVelocity()) {
             Die();
             box->Die();
@@ -238,7 +238,7 @@ void CO_ThrowBox::DieHelper()
         owner = NULL;
     }
 
-    //Check to see if we should spawn an item here
+    // Check to see if we should spawn an item here
     if (iItem != NO_POWERUP) {
         createpowerup(iItem, ix, iy, velx < 0.0f, false);
     }
@@ -276,4 +276,3 @@ bool CO_ThrowBox::HasKillVelocity()
 {
     return velx < -0.01f || velx > 0.01f || vely < -0.01f || vely > 2.0f;
 }
-

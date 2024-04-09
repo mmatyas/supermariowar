@@ -9,7 +9,7 @@
 #include "objects/carriable/CO_ThrowBlock.h"
 #include "objects/carriable/CO_ThrowBox.h"
 
-extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
+extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
 extern SpotlightManager spotlightManager;
 extern CMap* g_map;
@@ -20,12 +20,12 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class shell projectile
 //------------------------------------------------------------------------------
-//state 0: Shell is being spawned
-//state 1: Shell is moving
-//state 2: Shell is waiting to be picked up
-//state 3: Shell is being held
-CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer) :
-    MO_CarriedObject(&rm->spr_shell, x, y, 4, 4, 30, 20, 1, 11, 0, type * 32, 32, 32)
+// state 0: Shell is being spawned
+// state 1: Shell is moving
+// state 2: Shell is waiting to be picked up
+// state 3: Shell is being held
+CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer)
+    : MO_CarriedObject(&rm->spr_shell, x, y, 4, 4, 30, 20, 1, 11, 0, type * 32, 32, 32)
 {
     iShellType = type;
 
@@ -68,22 +68,22 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
     sSpotlight = NULL;
 }
 
-bool CO_Shell::collide(CPlayer * player)
+bool CO_Shell::collide(CPlayer* player)
 {
     if (player->isInvincible() || player->shyguy || frozen) {
         if (frozen) {
             ShatterDie();
             return false;
         } else {
-            if (state == 0 || state == 2) { //If sitting or spawning then just die
+            if (state == 0 || state == 2) {  // If sitting or spawning then just die
                 Die();
                 return false;
-            } else if (state == 3) { //if held, but not by us then die
+            } else if (state == 3) {  // if held, but not by us then die
                 if (owner != player) {
                     Die();
                     return false;
                 }
-            } else if (state == 1) { //If moving, see if it is actually hitting us before we kill it
+            } else if (state == 1) {  // If moving, see if it is actually hitting us before we kill it
                 short flipx = 0;
 
                 if (player->ix + PW < 320 && ix > 320)
@@ -109,7 +109,7 @@ bool CO_Shell::collide(CPlayer * player)
     return false;
 }
 
-bool CO_Shell::HitTop(CPlayer * player)
+bool CO_Shell::HitTop(CPlayer* player)
 {
     if (player->isInvincible() || player->kuriboshoe.is_on() || player->shyguy) {
         Die();
@@ -119,7 +119,7 @@ bool CO_Shell::HitTop(CPlayer * player)
 
     if (fKillBouncePlayer && !fFlipped) {
         KillPlayer(player);
-    } else if (state == 2) { //Sitting
+    } else if (state == 2) {  // Sitting
         owner = player;
         Kick();
         fSmoking = false;
@@ -129,15 +129,15 @@ bool CO_Shell::HitTop(CPlayer * player)
             velx = -5.0f;
 
         iIgnoreBounceTimer = 10;
-    } else if (state == 1 && iIgnoreBounceTimer == 0) { //Moving
+    } else if (state == 1 && iIgnoreBounceTimer == 0) {  // Moving
         Stop();
 
         player->setYi(iy - PH - 1);
         player->bouncejump();
         player->collisions.checktop(*player);
         player->platform = NULL;
-    } else if (state == 3) { //Holding
-        if (player != owner && (game_values.teamcollision == TeamCollisionStyle::On|| player->teamID != owner->teamID)) {
+    } else if (state == 3) {  // Holding
+        if (player != owner && (game_values.teamcollision == TeamCollisionStyle::On || player->teamID != owner->teamID)) {
             if (owner)
                 owner->carriedItem = NULL;
 
@@ -154,9 +154,9 @@ bool CO_Shell::HitTop(CPlayer * player)
     return false;
 }
 
-bool CO_Shell::HitOther(CPlayer * player)
+bool CO_Shell::HitOther(CPlayer* player)
 {
-    if (state == 2) { //Sitting
+    if (state == 2) {  // Sitting
         if (owner == NULL && player->isready()) {
             if (player->AcceptItem(this)) {
                 owner = player;
@@ -179,7 +179,7 @@ bool CO_Shell::HitOther(CPlayer * player)
                     velx = -5.0f;
             }
         }
-    } else if (state == 1) { //Moving
+    } else if (state == 1) {  // Moving
         short flipx = 0;
 
         if (player->ix + PW < 320 && ix > 320)
@@ -189,7 +189,7 @@ bool CO_Shell::HitOther(CPlayer * player)
 
         if (iNoOwnerKillTime == 0 || player->globalID != iPlayerID || (player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f) || (player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f))
             return KillPlayer(player);
-    } else if (state == 3) { //Holding
+    } else if (state == 3) {  // Holding
         if (player != owner && (game_values.teamcollision == TeamCollisionStyle::On || player->teamID != owner->teamID)) {
             iPlayerID = owner->globalID;
             iTeamID = owner->teamID;
@@ -200,7 +200,7 @@ bool CO_Shell::HitOther(CPlayer * player)
     return false;
 }
 
-void CO_Shell::UsedAsStoredPowerup(CPlayer * player)
+void CO_Shell::UsedAsStoredPowerup(CPlayer* player)
 {
     owner = player;
     MoveToOwner();
@@ -211,17 +211,17 @@ void CO_Shell::UsedAsStoredPowerup(CPlayer * player)
         Kick();
 }
 
-bool CO_Shell::KillPlayer(CPlayer * player)
+bool CO_Shell::KillPlayer(CPlayer* player)
 {
     if (player->isShielded() || player->isInvincible() || player->shyguy)
         return false;
 
     CheckAndDie();
 
-    //Find the player that shot this shell so we can attribute a kill
+    // Find the player that shot this shell so we can attribute a kill
     PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Shell, false, false);
 
-    CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
+    CPlayer* killer = GetPlayerFromGlobalID(iPlayerID);
     if (killer && iPlayerID != player->globalID) {
         AddMovingKill(killer);
     }
@@ -229,20 +229,20 @@ bool CO_Shell::KillPlayer(CPlayer * player)
     return true;
 }
 
-void CO_Shell::AddMovingKill(CPlayer * killer)
+void CO_Shell::AddMovingKill(CPlayer* killer)
 {
-    if (state == 1 && game_values.awardstyle != AwardStyle::None) { //If the shell is moving, the keep track of how many people we kill in a row with it
+    if (state == 1 && game_values.awardstyle != AwardStyle::None) {  // If the shell is moving, the keep track of how many people we kill in a row with it
         if (++iKillCounter > 1)
             killer->AddKillsInRowInAirAward();
     }
 }
 
-void CO_Shell::collide(IO_MovingObject * object)
+void CO_Shell::collide(IO_MovingObject* object)
 {
     if (object->isDead())
         return;
 
-    //Don't allow shells to die if they are warping
+    // Don't allow shells to die if they are warping
     if (owner && owner->iswarping())
         return;
 
@@ -251,10 +251,10 @@ void CO_Shell::collide(IO_MovingObject * object)
     MovingObjectType type = object->getMovingObjectType();
 
     if (type == movingobject_shell) {
-        CO_Shell * shell = (CO_Shell*)object;
+        CO_Shell* shell = (CO_Shell*)object;
 
-        //Green shells should die on collision, other shells should not,
-        //except if they also hit a non dead on collision shell
+        // Green shells should die on collision, other shells should not,
+        // except if they also hit a non dead on collision shell
 
         if (frozen || shell->frozen) {
             Die();
@@ -272,12 +272,12 @@ void CO_Shell::collide(IO_MovingObject * object)
                 shell->Die();
         }
     } else if (type == movingobject_throwblock) {
-        CO_ThrowBlock * block = (CO_ThrowBlock*)object;
+        CO_ThrowBlock* block = (CO_ThrowBlock*)object;
 
         Die();
         block->Die();
     } else if (type == movingobject_throwbox) {
-        CO_ThrowBox * box = (CO_ThrowBox*)object;
+        CO_ThrowBox* box = (CO_ThrowBox*)object;
 
         Die();
         box->Die();
@@ -332,7 +332,7 @@ void CO_Shell::update()
         }
     }
 
-    //Have the powerup grow out of the powerup block
+    // Have the powerup grow out of the powerup block
     if (state == 0) {
         setYf(fy - 2.0f);
 
@@ -400,12 +400,12 @@ void CO_Shell::Drop()
 {
     if (owner) {
         owner->carriedItem = NULL;
-        setXi(owner->ix + (owner->isFacingRight() ? PW + 1: -31));
+        setXi(owner->ix + (owner->isFacingRight() ? PW + 1 : -31));
     }
 
     if (collision_detection_checksides()) {
-        //Move back to where it was before checking sides, then kill it
-        setXi(owner->ix + (owner->isFacingRight() ? PW + 1: -31));
+        // Move back to where it was before checking sides, then kill it
+        setXi(owner->ix + (owner->isFacingRight() ? PW + 1 : -31));
         setYi(owner->iy + PH - 32 + collisionOffsetY);
         Die();
     } else {
@@ -419,9 +419,9 @@ void CO_Shell::Kick()
     /*
     if (superkick)
     {
-    	vel = 10.0f;
-    	fSmoking = true;
-    	ifSoundOnPlay(rm->sfx_cannon);
+        vel = 10.0f;
+        fSmoking = true;
+        ifSoundOnPlay(rm->sfx_cannon);
     }
     */
 
@@ -431,14 +431,14 @@ void CO_Shell::Kick()
         if (fPlayerBonusVel > 0.0f)
             fVel += fPlayerBonusVel;
 
-        //if (fVel >= 7.5f)
+        // if (fVel >= 7.5f)
         //	fSmoking = true;
     } else {
         fVel = -5.0f;
         if (fPlayerBonusVel < 0.0f)
             fVel += fPlayerBonusVel;
 
-        //if (fVel <= -7.5f)
+        // if (fVel <= -7.5f)
         //	fSmoking = true;
     }
 
@@ -461,7 +461,7 @@ void CO_Shell::Kick()
 
 void CO_Shell::CheckAndDie()
 {
-    if ((fDieOnMovingPlayerCollision && state == 1) || ((fDieOnHoldingPlayerCollision || fFlipped)&& state == 3))
+    if ((fDieOnMovingPlayerCollision && state == 1) || ((fDieOnHoldingPlayerCollision || fFlipped) && state == 3))
         Die();
     else if (!fDieOnHoldingPlayerCollision && state == 3 && (RANDOM_INT(5)) == 0)
         Die();
@@ -510,7 +510,7 @@ void CO_Shell::SideBounce(bool fRightSide)
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4));
             ifSoundOnPlay(rm->sfx_bump);
 
-            iBounceCounter = 7; //Allow bounce stars to show on each bounce on a 2x wide pit
+            iBounceCounter = 7;  // Allow bounce stars to show on each bounce on a 2x wide pit
         }
     }
 }
@@ -554,4 +554,3 @@ void CO_Shell::nospawn(short y, bool fBounce)
     if (fBounce)
         vely = -VELJUMP / 2.0;
 }
-

@@ -5,25 +5,21 @@
 class CPlayer;
 class gfxSprite;
 
-class CO_PhantoKey : public MO_CarriedObject
-{
-	public:
-		CO_PhantoKey(gfxSprite *nspr);
+class CO_PhantoKey : public MO_CarriedObject {
+public:
+    CO_PhantoKey(gfxSprite* nspr);
 
-		void update() override;
-		void draw() override;
-		bool collide(CPlayer * player) override;
+    void update() override;
+    void draw() override;
+    bool collide(CPlayer* player) override;
 
-		void placeKey();
+    void placeKey();
 
-	private:
-		short relocatetimer;
+private:
+    short relocatetimer;
 
-		short sparkleanimationtimer;
-		short sparkledrawframe;
+    short sparkleanimationtimer;
+    short sparkledrawframe;
 
-	friend class CGM_Chase;
+    friend class CGM_Chase;
 };
-
-
-

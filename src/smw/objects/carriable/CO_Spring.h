@@ -5,26 +5,22 @@
 class CPlayer;
 class gfxSprite;
 
-class CO_Spring : public MO_CarriedObject
-{
-	public:
-		CO_Spring(gfxSprite *nspr, short ix, short iy, bool fsuper);
+class CO_Spring : public MO_CarriedObject {
+public:
+    CO_Spring(gfxSprite* nspr, short ix, short iy, bool fsuper);
 
-		void update() override;
-		void draw() override;
-		bool collide(CPlayer * player) override;
+    void update() override;
+    void draw() override;
+    bool collide(CPlayer* player) override;
 
-		void place();
+    void place();
 
-	protected:
+protected:
+    virtual void hittop(CPlayer* player);
+    void hitother(CPlayer* player);
 
-		virtual void hittop(CPlayer * player);
-		void hitother(CPlayer * player);
+    bool fSuper;
+    short iOffsetY;
 
-		bool fSuper;
-		short iOffsetY;
-
-	friend class CPlayer;
+    friend class CPlayer;
 };
-
-

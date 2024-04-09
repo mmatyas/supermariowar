@@ -11,8 +11,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class spring
 //------------------------------------------------------------------------------
-CO_Spring::CO_Spring(gfxSprite *nspr, short iX, short iY, bool fsuper) :
-    MO_CarriedObject(nspr, iX, iY, 4, 4, 30, 31, 1, 0)
+CO_Spring::CO_Spring(gfxSprite* nspr, short iX, short iY, bool fsuper)
+    : MO_CarriedObject(nspr, iX, iY, 4, 4, 30, 31, 1, 0)
 {
     fSuper = fsuper;
     iOffsetY = fSuper ? 32 : 0;
@@ -25,7 +25,7 @@ CO_Spring::CO_Spring(gfxSprite *nspr, short iX, short iY, bool fsuper) :
     iOwnerUpOffset = 32;
 }
 
-bool CO_Spring::collide(CPlayer * player)
+bool CO_Spring::collide(CPlayer* player)
 {
     if (owner == NULL) {
         if (player->fOldY + PH <= fOldY && player->iy + PH >= iy)
@@ -37,7 +37,7 @@ bool CO_Spring::collide(CPlayer * player)
     return false;
 }
 
-void CO_Spring::hittop(CPlayer * player)
+void CO_Spring::hittop(CPlayer* player)
 {
     state = 2;
     drawframe += iw;
@@ -57,7 +57,7 @@ void CO_Spring::hittop(CPlayer * player)
     ifSoundOnPlay(rm->sfx_bump);
 }
 
-void CO_Spring::hitother(CPlayer * player)
+void CO_Spring::hitother(CPlayer* player)
 {
     if (owner == NULL && player->isready()) {
         if (player->AcceptItem(this)) {
@@ -73,7 +73,7 @@ void CO_Spring::update()
     } else {
         applyfriction();
 
-        //Collision detect map
+        // Collision detect map
         fOldX = fx;
         fOldY = fy;
 
@@ -108,11 +108,10 @@ void CO_Spring::draw()
 void CO_Spring::place()
 {
     short iAttempts = 10;
-    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0)
+        ;
     fx = (float)ix;
     fy = (float)iy;
 
     Drop();
 }
-
-

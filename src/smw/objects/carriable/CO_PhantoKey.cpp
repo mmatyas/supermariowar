@@ -10,8 +10,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class phanto key (for chase mode)
 //------------------------------------------------------------------------------
-CO_PhantoKey::CO_PhantoKey(gfxSprite *nspr) :
-    MO_CarriedObject(nspr, 0, 0, 1, 0, 30, 30, 1, 1, 0, 0, 32, 32)
+CO_PhantoKey::CO_PhantoKey(gfxSprite* nspr)
+    : MO_CarriedObject(nspr, 0, 0, 1, 0, 30, 30, 1, 1, 0, 0, 32, 32)
 {
     state = 1;
     movingObjectType = movingobject_phantokey;
@@ -28,7 +28,7 @@ CO_PhantoKey::CO_PhantoKey(gfxSprite *nspr) :
     placeKey();
 }
 
-bool CO_PhantoKey::collide(CPlayer * player)
+bool CO_PhantoKey::collide(CPlayer* player)
 {
     if (owner == NULL && player->isready()) {
         if (player->AcceptItem(this)) {
@@ -49,7 +49,7 @@ void CO_PhantoKey::update()
     } else {
         applyfriction();
 
-        //Collision detect map
+        // Collision detect map
         fOldX = fx;
         fOldY = fy;
 
@@ -77,7 +77,8 @@ void CO_PhantoKey::placeKey()
 
     short x = 0, y = 0;
     short iAttempts = 10;
-    while (!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) && iAttempts-- > 0)
+        ;
 
     setXi(x);
     setYi(y);

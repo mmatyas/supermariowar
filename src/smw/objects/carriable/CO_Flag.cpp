@@ -1,8 +1,8 @@
 #include "CO_Flag.h"
 
-#include "player.h"
 #include "GameValues.h"
 #include "map.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "objects/moving/MO_FlagBase.h"
 
@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class flag (for Capture the Flag mode)
 //------------------------------------------------------------------------------
-CO_Flag::CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColorID) :
-    MO_CarriedObject(nspr, 0, 0, 4, 8, 30, 30, 1, 1, 0, iColorID << 6, 32, 32)
+CO_Flag::CO_Flag(gfxSprite* nspr, MO_FlagBase* base, short iTeamID, short iColorID)
+    : MO_CarriedObject(nspr, 0, 0, 4, 8, 30, 30, 1, 1, 0, iColorID << 6, 32, 32)
 {
     state = 1;
     movingObjectType = movingobject_flag;
@@ -35,7 +35,7 @@ CO_Flag::CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColo
     placeFlag();
 }
 
-bool CO_Flag::collide(CPlayer * player)
+bool CO_Flag::collide(CPlayer* player)
 {
     if (owner == NULL && player->isready() && (!fInBase || teamID != player->teamID)) {
         if (game_values.gamemodesettings.flag.touchreturn && teamID == player->teamID) {
@@ -79,7 +79,7 @@ void CO_Flag::update()
 
         applyfriction();
 
-        //Collision detect map
+        // Collision detect map
         fOldX = fx;
         fOldY = fy;
 
@@ -127,7 +127,8 @@ void CO_Flag::placeFlag()
         fInBase = false;
 
         short iAttempts = 10;
-        while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+        while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0)
+            ;
         fx = (float)ix;
         fy = (float)iy;
 
@@ -154,4 +155,3 @@ void CO_Flag::Drop()
     MO_CarriedObject::Drop();
     owner_throw_timer = 62;
 }
-

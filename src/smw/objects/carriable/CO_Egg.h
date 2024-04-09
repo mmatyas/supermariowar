@@ -5,37 +5,34 @@
 class CPlayer;
 class gfxSprite;
 
-class CO_Egg : public MO_CarriedObject
-{
-	public:
-		CO_Egg(gfxSprite *nspr, short iColor);
+class CO_Egg : public MO_CarriedObject {
+public:
+    CO_Egg(gfxSprite* nspr, short iColor);
 
-		void update() override;
-		void draw() override;
-		bool collide(CPlayer * player) override;
+    void update() override;
+    void draw() override;
+    bool collide(CPlayer* player) override;
 
-		void placeEgg();
-		void Drop() override;
+    void placeEgg();
+    void Drop() override;
 
-		short getColor() const { return color; }
+    short getColor() const { return color; }
 
-	private:
-		short relocatetimer;
-		short explosiondrawframe, explosiondrawtimer;
+private:
+    short relocatetimer;
+    short explosiondrawframe, explosiondrawtimer;
 
-		CPlayer * owner_throw;
-		short owner_throw_timer;
+    CPlayer* owner_throw;
+    short owner_throw_timer;
 
-		short sparkleanimationtimer;
-		short sparkledrawframe;
+    short sparkleanimationtimer;
+    short sparkledrawframe;
 
-		short color;
+    short color;
 
-		short egganimationrates[6];
+    short egganimationrates[6];
 
-	friend class CPlayer;
-	friend class MO_Yoshi;
-	friend class CGM_Eggs;
+    friend class CPlayer;
+    friend class MO_Yoshi;
+    friend class CGM_Eggs;
 };
-
-

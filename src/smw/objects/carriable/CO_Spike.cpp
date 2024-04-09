@@ -5,8 +5,8 @@
 //------------------------------------------------------------------------------
 // class spike
 //------------------------------------------------------------------------------
-CO_Spike::CO_Spike(gfxSprite *nspr, short iX, short iY) :
-    CO_Spring(nspr, iX, iY, false)
+CO_Spike::CO_Spike(gfxSprite* nspr, short iX, short iY)
+    : CO_Spring(nspr, iX, iY, false)
 {
     iw = 32;
     ih = 32;
@@ -14,10 +14,8 @@ CO_Spike::CO_Spike(gfxSprite *nspr, short iX, short iY) :
     movingObjectType = movingobject_carried;
 }
 
-void CO_Spike::hittop(CPlayer * player)
+void CO_Spike::hittop(CPlayer* player)
 {
     if (player->isready() && !player->isShielded() && !player->isInvincible() && !player->kuriboshoe.is_on() && !player->shyguy)
         player->KillPlayerMapHazard(false, KillStyle::Environment, false);
 }
-
-
