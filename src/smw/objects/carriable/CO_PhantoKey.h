@@ -21,5 +21,5 @@ private:
     short sparkleanimationtimer;
     short sparkledrawframe;
 
-    friend class CGM_Chase;
+friend class CGM_Chase;
 };

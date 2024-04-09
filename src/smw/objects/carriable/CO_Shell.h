@@ -70,22 +70,9 @@ private:
 
     Spotlight* sSpotlight;
 
-    friend class CPlayer;
-    friend class MO_Explosion;
-    friend class MO_BulletBill;
-    friend class MO_Goomba;
-    friend class MO_Koopa;
-    friend class MO_BuzzyBeetle;
-    friend class MO_Spiny;
-    // friend class MO_SledgeBrother;
-    friend class MO_CheepCheep;
-    friend class MO_PirhanaPlant;
+friend class MO_AttackZone;
+friend class MO_SpinAttack;
 
-    friend class MO_AttackZone;
-    friend class MO_SpinAttack;
-
-    friend class B_WeaponBreakableBlock;
-
-    friend void RunGame();
-    friend void shakeScreen();
+friend void RunGame();
+friend void shakeScreen();
 };

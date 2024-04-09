@@ -32,7 +32,5 @@ private:
     short owner_throw_timer;
     bool centerflag;
 
-    friend class CPlayer;
-    friend class CGM_CTF;
-    friend class MO_FlagBase;
+friend class MO_FlagBase;
 };

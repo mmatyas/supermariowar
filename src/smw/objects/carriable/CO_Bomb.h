@@ -23,6 +23,4 @@ protected:
     short ttl;
 
     Spotlight* sSpotlight;
-
-    friend class CPlayer;
 };

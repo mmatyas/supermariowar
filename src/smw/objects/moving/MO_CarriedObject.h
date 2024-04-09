@@ -36,6 +36,5 @@ protected:
 private:
     void init();
 
-    friend class B_ThrowBlock;
-    friend class CPlayer;
+friend class CPlayer;
 };

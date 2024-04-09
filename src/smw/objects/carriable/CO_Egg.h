@@ -32,7 +32,6 @@ private:
 
     short egganimationrates[6];
 
-    friend class CPlayer;
-    friend class MO_Yoshi;
-    friend class CGM_Eggs;
+friend class MO_Yoshi;
+friend class CGM_Eggs;
 };

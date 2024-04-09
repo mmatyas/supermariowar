@@ -21,6 +21,4 @@ protected:
 
     bool fSuper;
     short iOffsetY;
-
-    friend class CPlayer;
 };

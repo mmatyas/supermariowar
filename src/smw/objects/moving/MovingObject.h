@@ -92,14 +92,11 @@ protected:
 
     friend class MO_BulletBill;
     friend class MO_WalkingEnemy;
-    friend class MO_Goomba;
     friend class MO_CheepCheep;
     friend class MO_PirhanaPlant;
 
     friend class MovingPlatform;
 
     friend void removeifprojectile(IO_MovingObject* object, bool playsound, bool forcedead);
-    friend void RunGame();
     friend void shakeScreen();
-    friend void handleP2ObjCollisions();
 };
