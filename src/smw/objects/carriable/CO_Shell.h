@@ -1,5 +1,4 @@
-#ifndef SMW_GAMEOBJECT_CO_SHELL_H
-#define SMW_GAMEOBJECT_CO_SHELL_H
+#pragma once
 
 #include "objects/moving/MO_CarriedObject.h"
 
@@ -11,7 +10,6 @@ class CO_Shell : public MO_CarriedObject
 {
 	public:
 		CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer);
-		~CO_Shell(){};
 
 		void update() override;
 		void draw() override;
@@ -34,7 +32,7 @@ class CO_Shell : public MO_CarriedObject
 		void SideBounce(bool fRightSide) override;
 		void AddMovingKill(CPlayer * killer);
 
-		bool IsThreat() {
+		bool IsThreat() const {
 			return state == 1 || state == 3;
 		}
 
@@ -92,4 +90,4 @@ class CO_Shell : public MO_CarriedObject
 		friend void shakeScreen();
 };
 
-#endif // SMW_GAMEOBJECT_CO_SHELL_H
+

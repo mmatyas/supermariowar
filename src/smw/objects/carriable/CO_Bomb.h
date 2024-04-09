@@ -1,5 +1,4 @@
-#ifndef SMW_GAMEOBJECT_CO_BOMB_H
-#define SMW_GAMEOBJECT_CO_BOMB_H
+#pragma once
 
 #include "objects/moving/MO_CarriedObject.h"
 
@@ -11,7 +10,6 @@ class CO_Bomb : public MO_CarriedObject
 {
 	public:
 		CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, short timetolive);
-		~CO_Bomb(){};
 
 		void update() override;
 		void draw() override;
@@ -32,4 +30,4 @@ class CO_Bomb : public MO_CarriedObject
 };
 
 
-#endif // SMW_GAMEOBJECT_CO_BOMB_H
+

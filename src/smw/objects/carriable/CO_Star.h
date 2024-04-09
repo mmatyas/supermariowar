@@ -1,5 +1,4 @@
-#ifndef SMW_GAMEOBJECT_CO_STAR_H
-#define SMW_GAMEOBJECT_CO_STAR_H
+#pragma once
 
 #include "objects/moving/MO_CarriedObject.h"
 
@@ -10,7 +9,6 @@ class CO_Star : public MO_CarriedObject
 {
 	public:
 		CO_Star(gfxSprite *nspr, short type, short id);
-		~CO_Star(){};
 
 		void update() override;
 		void draw() override;
@@ -18,7 +16,7 @@ class CO_Star : public MO_CarriedObject
 
 		void placeStar();
 
-		short getType() {
+		short getType() const {
 			return iType;
 		}
 		void setPlayerColor(short iColor) {
@@ -36,4 +34,4 @@ class CO_Star : public MO_CarriedObject
 	friend class CGM_Star;
 };
 
-#endif // SMW_GAMEOBJECT_CO_STAR_H
+

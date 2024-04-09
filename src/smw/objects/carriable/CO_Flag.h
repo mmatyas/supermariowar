@@ -1,5 +1,4 @@
-#ifndef SMW_GAMEOBJECT_CO_FLAG_H
-#define SMW_GAMEOBJECT_CO_FLAG_H
+#pragma once
 
 #include "objects/moving/MO_CarriedObject.h"
 
@@ -11,7 +10,6 @@ class CO_Flag : public MO_CarriedObject
 {
 	public:
 		CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColorID);
-		~CO_Flag(){};
 
 		void update() override;
 		void draw() override;
@@ -40,4 +38,4 @@ class CO_Flag : public MO_CarriedObject
 	friend class MO_FlagBase;
 };
 
-#endif // SMW_GAMEOBJECT_CO_FLAG_H
+

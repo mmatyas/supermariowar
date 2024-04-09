@@ -1,5 +1,4 @@
-#ifndef SMW_GAMEOBJECT_CO_THROWBOX_H
-#define SMW_GAMEOBJECT_CO_THROWBOX_H
+#pragma once
 
 #include "objects/moving/MO_CarriedObject.h"
 
@@ -11,7 +10,6 @@ class CO_ThrowBox : public MO_CarriedObject
 {
 	public:
 		CO_ThrowBox(gfxSprite * nspr, short x, short y, short item);
-		~CO_ThrowBox(){};
 
 		void update() override;
 		void draw() override;
@@ -58,4 +56,4 @@ class CO_ThrowBox : public MO_CarriedObject
 		friend void shakeScreen();
 };
 
-#endif // SMW_GAMEOBJECT_CO_THROWBOX_H
+

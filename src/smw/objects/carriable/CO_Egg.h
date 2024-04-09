@@ -1,5 +1,4 @@
-#ifndef SMW_GAMEOBJECT_CO_EGG_H
-#define SMW_GAMEOBJECT_CO_EGG_H
+#pragma once
 
 #include "objects/moving/MO_CarriedObject.h"
 
@@ -10,7 +9,6 @@ class CO_Egg : public MO_CarriedObject
 {
 	public:
 		CO_Egg(gfxSprite *nspr, short iColor);
-		~CO_Egg(){};
 
 		void update() override;
 		void draw() override;
@@ -19,7 +17,7 @@ class CO_Egg : public MO_CarriedObject
 		void placeEgg();
 		void Drop() override;
 
-		short getColor() { return color; }
+		short getColor() const { return color; }
 
 	private:
 		short relocatetimer;
@@ -40,4 +38,4 @@ class CO_Egg : public MO_CarriedObject
 	friend class CGM_Eggs;
 };
 
-#endif // SMW_GAMEOBJECT_CO_EGG_H
+
