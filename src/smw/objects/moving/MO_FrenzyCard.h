@@ -7,7 +7,6 @@ class MO_FrenzyCard : public IO_MovingObject
 {
 	public:
 		MO_FrenzyCard(gfxSprite *nspr, short iType);
-		~MO_FrenzyCard(){};
 
 		void update() override;
 		void draw() override;

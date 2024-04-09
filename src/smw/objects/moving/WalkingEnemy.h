@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MovingObject.h"
+#include "PlayerKillStyles.h"
 
 
 class MO_WalkingEnemy : public IO_MovingObject

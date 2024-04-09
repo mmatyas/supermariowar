@@ -9,7 +9,6 @@ class MO_FlagBase : public IO_MovingObject
 {
 	public:
 		MO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID);
-		~MO_FlagBase(){};
 
 		void draw() override;
 		void update() override;
@@ -21,7 +20,7 @@ class MO_FlagBase : public IO_MovingObject
         homeflag = flag;
     }
 
-    short GetTeamID() {
+    short GetTeamID() const {
         return teamID;
     }
 

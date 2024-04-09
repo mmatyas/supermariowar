@@ -1,11 +1,12 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_SpinAttack_H
-#define SMW_GAMEOBJECT_BLOCK_MO_SpinAttack_H
+#pragma once
+
+#include "MO_AttackZone.h"
+
 
 class MO_SpinAttack : public MO_AttackZone
 {
 	public:
 		MO_SpinAttack(short playerID, short teamID, KillStyle style, bool direction, short offsety);
-		~MO_SpinAttack(){};
 
 		void update() override;
 
@@ -17,6 +18,3 @@ class MO_SpinAttack : public MO_AttackZone
 		bool fDirection;
 		short iOffsetY;
 };
-
-
-#endif // SMW_GAMEOBJECT_BLOCK_MO_SpinAttack_H

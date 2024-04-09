@@ -7,7 +7,6 @@ class MO_BonusHouseChest : public IO_MovingObject
 {
 	public:
 		MO_BonusHouseChest(gfxSprite *nspr, short ix, short iy, short iBonusItem);
-		~MO_BonusHouseChest(){};
 
 		void update() override;
 		void draw() override;

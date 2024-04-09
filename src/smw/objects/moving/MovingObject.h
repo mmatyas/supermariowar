@@ -1,5 +1,4 @@
-#ifndef IO_MOVING_OBJECT
-#define IO_MOVING_OBJECT
+#pragma once
 
 #include "ObjectBase.h"
 #include "MovingObjectTypes.h"
@@ -19,7 +18,7 @@ class IO_MovingObject : public CObject
 		virtual bool collide(CPlayer * player);
 
 		void collide(IO_MovingObject *){}
-	    MovingObjectType getMovingObjectType() {
+	    MovingObjectType getMovingObjectType() const {
 	        return movingObjectType;
 	    }
 		void applyfriction();
@@ -40,7 +39,7 @@ class IO_MovingObject : public CObject
         dead = true;
     }
 
-    bool CollidesWithMap() {
+    bool CollidesWithMap() const {
         return fObjectCollidesWithMap;
     }
 
@@ -100,5 +99,3 @@ class IO_MovingObject : public CObject
 		friend void shakeScreen();
 		friend void handleP2ObjCollisions();
 };
-
-#endif // IO_MOVING_OBJECT

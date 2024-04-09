@@ -1,13 +1,13 @@
 #pragma once
 
 #include "MovingObject.h"
+#include "PlayerKillStyles.h"
 
 
 class MO_AttackZone : public IO_MovingObject
 {
 	public:
 		MO_AttackZone(short playerID, short teamID, short x, short y, short w, short h, short time, KillStyle style, bool dieoncollision);
-		~MO_AttackZone(){};
 
 		void update() override;
 		void draw() override {} //This is invisible

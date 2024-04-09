@@ -7,7 +7,6 @@ class MO_CheepCheep : public IO_MovingObject
 {
 	public:
 		MO_CheepCheep(gfxSprite *nspr);
-		~MO_CheepCheep(){};
 
 		void draw() override;
 		void update() override;

@@ -7,7 +7,6 @@ class MO_Koopa : public MO_WalkingEnemy
 {
 	public:
 		MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing, bool fFallOffLedges);
-		~MO_Koopa(){};
 
 		void draw() override;
 		void update() override;

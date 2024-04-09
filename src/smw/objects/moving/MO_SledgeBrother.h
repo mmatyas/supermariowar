@@ -8,7 +8,6 @@ class MO_SledgeBrother : public IO_MovingObject
 {
 	public:
 		MO_SledgeBrother(gfxSprite *nspr, short platformY, Boss type);
-		virtual ~MO_SledgeBrother(){};
 
 		void draw() override;
 		void update() override;

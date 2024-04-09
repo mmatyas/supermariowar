@@ -7,7 +7,6 @@ class MO_Yoshi : public IO_MovingObject
 {
 	public:
 		MO_Yoshi(gfxSprite *nspr, short iColor);
-		~MO_Yoshi(){};
 
 		void update() override;
 		bool collide(CPlayer * player) override;

@@ -10,7 +10,6 @@ class MO_Coin : public IO_MovingObject
 {
 	public:
 		MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin);
-		~MO_Coin() {};
 
 		void update() override;
 		void draw() override;
