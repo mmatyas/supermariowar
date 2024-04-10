@@ -6,8 +6,8 @@
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "objects/overmap/WO_StraightPathHazard.h"
 #include "objects/carriable/CO_ThrowBox.h"
+#include "objects/overmap/WO_StraightPathHazard.h"
 
 #include <cmath>
 
@@ -22,8 +22,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 extern SDL_Rect g_rPirhanaRects[4][4][4];
 
-MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short direction, bool preview) :
-    IO_MovingObject(NULL, x, y, 1, 0)
+MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short direction, bool preview)
+    : IO_MovingObject(NULL, x, y, 1, 0)
 {
     iType = type;
     iDirection = direction;
@@ -33,8 +33,8 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
 
     movingObjectType = movingobject_pirhanaplant;
 
-    //iHiddenPlane = y;
-    //iHiddenDirection = 2 - ((direction / 2) * 2);
+    // iHiddenPlane = y;
+    // iHiddenDirection = 2 - ((direction / 2) * 2);
 
     state = 0;
     SetNewTimer();
@@ -86,7 +86,7 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
     collisionOffsetY = 0;
 
     iAnimationTimer = 0;
-    //iAnimationX = 0;
+    // iAnimationX = 0;
 
     iActionTimer = RANDOM_INT(8);
     iFrame = 0;
@@ -96,16 +96,16 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
 
 void MO_PirhanaPlant::update()
 {
-    //Needed for collisions with player and kuribo's shoe to know
-    //if the plant hit the player from the top or not
+    // Needed for collisions with player and kuribo's shoe to know
+    // if the plant hit the player from the top or not
     fOldY = (float)iy;
 
-    if (state == 0) { //waiting to appear
+    if (state == 0) {  // waiting to appear
         if (--iTimer <= 0) {
             iTimer = 0;
             state = 1;
         }
-    } else if (state == 1) { //appearing
+    } else if (state == 1) {  // appearing
         if (iDirection <= 1)
             collisionHeight += 2;
         else
@@ -118,12 +118,12 @@ void MO_PirhanaPlant::update()
 
         if ((iDirection <= 1 && collisionHeight >= ih) || (iDirection >= 2 && collisionWidth >= iw))
             state = 2;
-    } else if (state == 2) { //extended
+    } else if (state == 2) {  // extended
         if (++iTimer > 60) {
             iTimer = 0;
             state = 3;
         }
-    } else if (state == 3) { //retreating
+    } else if (state == 3) {  // retreating
         if (iDirection <= 1)
             collisionHeight -= 2;
         else
@@ -141,8 +141,8 @@ void MO_PirhanaPlant::update()
     }
 
 
-    if (iType == 1) { //face the plant towards the nearest player
-        //Don't do this every frame, just once every 8 frames
+    if (iType == 1) {  // face the plant towards the nearest player
+        // Don't do this every frame, just once every 8 frames
         if (state > 0 && ++iActionTimer >= 8) {
             int distance_to_player = App::screenWidth * 1000;
             short iDiffX = 1, iDiffY = 1;
@@ -151,15 +151,15 @@ void MO_PirhanaPlant::update()
             short iPlantY = iy + (iDirection == 0 ? 16 : ih - 16);
 
             for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-                CPlayer * player = list_players[iPlayer];
+                CPlayer* player = list_players[iPlayer];
                 if (player->state != player_ready)
                     continue;
 
-                //Calculate normal screen distance
+                // Calculate normal screen distance
                 short tx = iPlantX - player->ix - PW;
                 short ty = iPlantY - player->iy - PH;
 
-                int distance_player_pow2 = tx*tx + ty*ty;
+                int distance_player_pow2 = tx * tx + ty * ty;
 
                 if (distance_player_pow2 < distance_to_player) {
                     distance_to_player = distance_player_pow2;
@@ -179,7 +179,7 @@ void MO_PirhanaPlant::update()
             else if (dAngle >= -PI && dAngle < -HALF_PI)
                 iFrame = 3;
         }
-    } else if (iType == 2 || iType == 3) { //Animate if these are animated plants
+    } else if (iType == 2 || iType == 3) {  // Animate if these are animated plants
         if (++iAnimationTimer >= 8) {
             iAnimationTimer = 0;
 
@@ -188,7 +188,7 @@ void MO_PirhanaPlant::update()
         }
     }
 
-    //Fire a fireball
+    // Fire a fireball
     if (iType <= 1 && state == 2 && iTimer == 30) {
         objectcontainer[1].add(new OMO_StraightPathHazard(&rm->spr_hazard_fireball[fPreview ? 1 : 0], iDirection != 3 ? ix + 7 : ix + iw - 23, iDirection != 1 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFrame <= 1 ? 18 : 0, 18, 18));
     }
@@ -197,7 +197,7 @@ void MO_PirhanaPlant::update()
 void MO_PirhanaPlant::draw()
 {
     if (state > 0) {
-        SDL_Rect * rect = &g_rPirhanaRects[iType][iDirection][iFrame];
+        SDL_Rect* rect = &g_rPirhanaRects[iType][iDirection][iFrame];
         if (iDirection == 0)
             rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y, 32, collisionHeight);
         else if (iDirection == 1)
@@ -207,16 +207,16 @@ void MO_PirhanaPlant::draw()
         else
             rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x + iw - collisionWidth, rect->y, collisionWidth, 32);
 
-        //SDL_Rect r = {ix, iy, collisionWidth, collisionHeight};
-        //SDL_FillRect(blitdest, &r, 0xf000);
+        // SDL_Rect r = {ix, iy, collisionWidth, collisionHeight};
+        // SDL_FillRect(blitdest, &r, 0xf000);
     }
 }
 
-//For preview drawing
+// For preview drawing
 void MO_PirhanaPlant::draw(short iOffsetX, short iOffsetY)
 {
     if (state > 0) {
-        SDL_Rect * rect = &g_rPirhanaRects[iType][iDirection][iFrame];
+        SDL_Rect* rect = &g_rPirhanaRects[iType][iDirection][iFrame];
         if (iDirection == 0)
             gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
         else if (iDirection == 1)
@@ -228,7 +228,7 @@ void MO_PirhanaPlant::draw(short iOffsetX, short iOffsetY)
     }
 }
 
-bool MO_PirhanaPlant::collide(CPlayer * player)
+bool MO_PirhanaPlant::collide(CPlayer* player)
 {
     if (state == 0)
         return false;
@@ -244,7 +244,7 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
     return false;
 }
 
-void MO_PirhanaPlant::collide(IO_MovingObject * object)
+void MO_PirhanaPlant::collide(IO_MovingObject* object)
 {
     if (state == 0)
         return;
@@ -254,11 +254,11 @@ void MO_PirhanaPlant::collide(IO_MovingObject * object)
     MovingObjectType type = object->getMovingObjectType();
 
     if (type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
-        //Don't kill things with shells that are sitting still
+        // Don't kill things with shells that are sitting still
         if (type == movingobject_shell && object->state == 2)
             return;
 
-        //Don't kill things with boxesx that aren't moving fast enough
+        // Don't kill things with boxesx that aren't moving fast enough
         if (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
             return;
 
@@ -276,9 +276,9 @@ void MO_PirhanaPlant::SetNewTimer()
 {
     iTimer = iFreq + RANDOM_INT(iFreq);
 
-    //Face the green fireball plant in a random direction
+    // Face the green fireball plant in a random direction
     if (iType == 0) {
-        //Only point flower towards directions that make sense
+        // Only point flower towards directions that make sense
         if ((ix >> 5) == 19)
             iFrame = RANDOM_INT(2);
         else if (ix == 0)

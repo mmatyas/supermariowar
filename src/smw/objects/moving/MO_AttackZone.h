@@ -22,5 +22,5 @@ protected:
     short iTimer;
     KillStyle iStyle;
 
-friend class B_WeaponBreakableBlock;
+    friend class B_WeaponBreakableBlock;
 };

@@ -70,9 +70,9 @@ private:
 
     Spotlight* sSpotlight;
 
-friend class MO_AttackZone;
-friend class MO_SpinAttack;
+    friend class MO_AttackZone;
+    friend class MO_SpinAttack;
 
-friend void RunGame();
-friend void shakeScreen();
+    friend void RunGame();
+    friend void shakeScreen();
 };

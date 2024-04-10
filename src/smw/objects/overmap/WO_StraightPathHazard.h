@@ -3,17 +3,14 @@
 #include "OverMapObject.h"
 
 
-class OMO_StraightPathHazard : public IO_OverMapObject
-{
-	public:
-		OMO_StraightPathHazard(gfxSprite *nspr, short x, short y, float angle, float vel, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth);
+class OMO_StraightPathHazard : public IO_OverMapObject {
+public:
+    OMO_StraightPathHazard(gfxSprite* nspr, short x, short y, float angle, float vel, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth);
 
-		void update() override;
+    void update() override;
 
-		bool collide(CPlayer *) override;
+    bool collide(CPlayer*) override;
 
-	private:
-
-		float dAngle, dVel;
+private:
+    float dAngle, dVel;
 };
-

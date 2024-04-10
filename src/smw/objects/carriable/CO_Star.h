@@ -31,5 +31,5 @@ private:
     short sparkledrawframe;
     short iID;
 
-friend class CGM_Star;
+    friend class CGM_Star;
 };

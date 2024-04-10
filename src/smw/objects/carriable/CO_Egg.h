@@ -32,6 +32,6 @@ private:
 
     short egganimationrates[6];
 
-friend class MO_Yoshi;
-friend class CGM_Eggs;
+    friend class MO_Yoshi;
+    friend class CGM_Eggs;
 };

@@ -46,10 +46,10 @@ private:
 
     Spotlight* sSpotlight;
 
-friend class MO_SpinAttack;
-friend class MO_AttackZone;
-friend class B_ThrowBlock;
+    friend class MO_SpinAttack;
+    friend class MO_AttackZone;
+    friend class B_ThrowBlock;
 
-friend void RunGame();
-friend void shakeScreen();
+    friend void RunGame();
+    friend void shakeScreen();
 };

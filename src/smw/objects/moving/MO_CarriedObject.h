@@ -36,5 +36,5 @@ protected:
 private:
     void init();
 
-friend class CPlayer;
+    friend class CPlayer;
 };

@@ -13,8 +13,8 @@ extern CGameValues game_values;
 //------------------------------------------------------------------------------
 // class explosion (for bob-omb mode)
 //------------------------------------------------------------------------------
-MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short playerid, short teamid, KillStyle style) :
-    IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed)
+MO_Explosion::MO_Explosion(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short playerid, short teamid, KillStyle style)
+    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed)
 {
     state = 1;
 
@@ -27,10 +27,10 @@ MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, sho
     fObjectCollidesWithMap = false;
 }
 
-bool MO_Explosion::collide(CPlayer * player)
+bool MO_Explosion::collide(CPlayer* player)
 {
     if (player->globalID != iPlayerID && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded() && !player->shyguy) {
-        //Find the player that made this explosion so we can attribute a kill
+        // Find the player that made this explosion so we can attribute a kill
         PlayerKilledPlayer(iPlayerID, player, death_style_jump, iStyle, false, false);
         return true;
     }
@@ -42,7 +42,7 @@ void MO_Explosion::update()
 {
     animate();
 
-    //If this is the first frame, look for blocks to kill
+    // If this is the first frame, look for blocks to kill
     if (timer == 0) {
         short iTestY = iy;
 
@@ -55,9 +55,9 @@ void MO_Explosion::update()
             if (iTestY >= 0 && iTestY < App::screenHeight) {
                 short iTestRow = iTestY / TILESIZE;
                 for (short iCol = 0; iCol < 7; iCol++) {
-                    IO_Block * block = g_map->block(iTestX / TILESIZE, iTestRow);
+                    IO_Block* block = g_map->block(iTestX / TILESIZE, iTestRow);
                     if (block && block->getBlockType() == BlockType::WeaponBreakable) {
-                        B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)block;
+                        B_WeaponBreakableBlock* weaponbreakableblock = (B_WeaponBreakableBlock*)block;
                         if (weaponbreakableblock->iType == 3) {
                             weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
                         }
@@ -78,7 +78,7 @@ void MO_Explosion::update()
         }
     }
 
-    //RFC: why 48?
+    // RFC: why 48?
     if (++timer >= 48)
         dead = true;
 }

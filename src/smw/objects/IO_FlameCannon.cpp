@@ -12,8 +12,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class IO_FlameCannon - shoots a flame
 //------------------------------------------------------------------------------
-IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, short direction) :
-    CObject(NULL, x, y)
+IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, short direction)
+    : CObject(NULL, x, y)
 {
     iFreq = freq;
     state = 0;
@@ -42,7 +42,7 @@ IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, short direction) :
 
 void IO_FlameCannon::update()
 {
-    if (state == 0) { //No flame, waiting
+    if (state == 0) {  // No flame, waiting
         if (--iTimer <= 0) {
             iTimer = 0;
             iCycle = 0;
@@ -51,7 +51,7 @@ void IO_FlameCannon::update()
             state = 1;
             ifSoundOnPlay(rm->sfx_flamecannon);
         }
-    } else if (state == 1 || state == 3) { //Start or end of flame but not deadly yet
+    } else if (state == 1 || state == 3) {  // Start or end of flame but not deadly yet
         if (++iTimer >= 4) {
             iTimer = 0;
 
@@ -71,7 +71,7 @@ void IO_FlameCannon::update()
                 }
             }
         }
-    } else if (state == 2) { //Full flame
+    } else if (state == 2) {  // Full flame
         if (++iTimer >= 4) {
             iTimer = 0;
 
@@ -91,21 +91,21 @@ void IO_FlameCannon::update()
 void IO_FlameCannon::draw()
 {
     if (state > 0) {
-        const SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
+        const SDL_Rect* rect = &g_rFlameRects[iDirection][iFrame];
         rm->spr_hazard_flame[0].draw(ix, iy, rect->x, rect->y, rect->w, rect->h);
     }
 }
 
-//For preview
+// For preview
 void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 {
     if (state > 0) {
-        const SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
+        const SDL_Rect* rect = &g_rFlameRects[iDirection][iFrame];
         gfx_drawpreview(rm->spr_hazard_flame[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, rect->w >> 1, rect->h >> 1, iOffsetX, iOffsetY, 320, 240, true);
     }
 }
 
-bool IO_FlameCannon::collide(CPlayer * player)
+bool IO_FlameCannon::collide(CPlayer* player)
 {
     if (state == 2 && !player->isInvincible() && !player->isShielded() && !player->shyguy)
         return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;

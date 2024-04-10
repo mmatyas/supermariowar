@@ -7,8 +7,8 @@
 #include "ObjectContainer.h"
 #include "player.h"
 #include "ResourceManager.h"
-#include "objects/moving/MO_Explosion.h"
 #include "objects/carriable/CO_ThrowBox.h"
+#include "objects/moving/MO_Explosion.h"
 
 extern CEyecandyContainer eyecandy[3];
 extern CObjectContainer objectcontainer[3];
@@ -21,8 +21,8 @@ extern short LookupTeamID(short id);
 //------------------------------------------------------------------------------
 // class bulletbill
 //------------------------------------------------------------------------------
-MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, short y, float nspeed, short playerID, bool isspawned) :
-    IO_MovingObject(nspr, x, y, 4, 8, 30, 28, 1, 2)
+MO_BulletBill::MO_BulletBill(gfxSprite* nspr, gfxSprite* nsprdead, short x, short y, float nspeed, short playerID, bool isspawned)
+    : IO_MovingObject(nspr, x, y, 4, 8, 30, 28, 1, 2)
 {
     spr_dead = nsprdead;
 
@@ -73,7 +73,7 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
 void MO_BulletBill::update()
 {
     setXf(fx + velx);
-    //setYf(fy + vely);
+    // setYf(fy + vely);
 
     animate();
 
@@ -89,7 +89,7 @@ void MO_BulletBill::draw()
         spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih);
 }
 
-//For preview drawing
+// For preview drawing
 void MO_BulletBill::draw(short iOffsetX, short iOffsetY)
 {
     if (fIsSpawned)
@@ -98,14 +98,13 @@ void MO_BulletBill::draw(short iOffsetX, short iOffsetY)
         gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false);
 }
 
-bool MO_BulletBill::collide(CPlayer * player)
+bool MO_BulletBill::collide(CPlayer* player)
 {
     if (dead)
         return false;
 
-    //if the bullet bill is off the screen, don't wrap it to collide
-    if ((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < App::screenWidth) ||
-            (ix + iw >= App::screenWidth && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
+    // if the bullet bill is off the screen, don't wrap it to collide
+    if ((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < App::screenWidth) || (ix + iw >= App::screenWidth && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
         return false;
     }
 
@@ -125,7 +124,7 @@ bool MO_BulletBill::collide(CPlayer * player)
 }
 
 
-bool MO_BulletBill::hittop(CPlayer * player)
+bool MO_BulletBill::hittop(CPlayer* player)
 {
     player->setYi(iy - PH - 1);
     player->bouncejump();
@@ -141,7 +140,7 @@ bool MO_BulletBill::hittop(CPlayer * player)
     return false;
 }
 
-bool MO_BulletBill::hitother(CPlayer * player)
+bool MO_BulletBill::hitother(CPlayer* player)
 {
     if (player->isShielded() || player->globalID == iPlayerID)
         return false;
@@ -149,22 +148,22 @@ bool MO_BulletBill::hitother(CPlayer * player)
     if (game_values.teamcollision != TeamCollisionStyle::On && iTeamID == player->teamID)
         return false;
 
-    //Find the player that owns this bullet bill so we can attribute a kill
+    // Find the player that owns this bullet bill so we can attribute a kill
     PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::BulletBill, false, false);
 
     return true;
 }
 
-void MO_BulletBill::collide(IO_MovingObject * object)
+void MO_BulletBill::collide(IO_MovingObject* object)
 {
     removeifprojectile(object, true, false);
 
     MovingObjectType type = object->getMovingObjectType();
 
     if (type == movingobject_bulletbill) {
-        MO_BulletBill * bulletbill = (MO_BulletBill*) object;
+        MO_BulletBill* bulletbill = (MO_BulletBill*)object;
 
-        //Same team bullet bills don't kill each other
+        // Same team bullet bills don't kill each other
         if (bulletbill->iTeamID == iTeamID)
             return;
 
@@ -183,11 +182,11 @@ void MO_BulletBill::collide(IO_MovingObject * object)
         objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, KillStyle::BulletBill));
         ifSoundOnPlay(rm->sfx_bobombsound);
     } else if (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
-        //Don't kill things with shells that are sitting still
+        // Don't kill things with shells that are sitting still
         if (type == movingobject_shell && object->state == 2)
             return;
 
-        //Don't kill things with boxesx that aren't moving fast enough
+        // Don't kill things with boxesx that aren't moving fast enough
         if (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
             return;
 

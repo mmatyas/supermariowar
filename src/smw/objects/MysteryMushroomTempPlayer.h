@@ -4,35 +4,34 @@
 class CPlayer;
 class MovingPlatform;
 
-class MysteryMushroomTempPlayer
-{
-	public:
-    MysteryMushroomTempPlayer() {
-			fUsed = false;
-		}
+class MysteryMushroomTempPlayer {
+public:
+    MysteryMushroomTempPlayer()
+    {
+        fUsed = false;
+    }
 
-		~MysteryMushroomTempPlayer() {}
+    ~MysteryMushroomTempPlayer() {}
 
-		void SetPlayer(CPlayer * player, short iPowerup);
-		void GetPlayer(CPlayer * player, short * iPowerup);
+    void SetPlayer(CPlayer* player, short iPowerup);
+    void GetPlayer(CPlayer* player, short* iPowerup);
 
-		bool fUsed;
+    bool fUsed;
 
-	private:
+private:
+    float fx, fy;
+    float fOldX, fOldY;
+    float velx, vely;
 
-		float fx, fy;
-		float fOldX, fOldY;
-		float velx, vely;
+    short burnupstarttimer, burnuptimer;
 
-		short burnupstarttimer, burnuptimer;
+    bool inair, onice;
 
-		bool inair, onice;
+    MovingPlatform* platform;
 
-		MovingPlatform * platform;
+    short gamepowerup;
 
-		short gamepowerup;
-
-		short iOldPowerupX, iOldPowerupY;
+    short iOldPowerupX, iOldPowerupY;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_MysteryMushroomTempPlayer_H
+#endif  // SMW_GAMEOBJECT_BLOCK_MysteryMushroomTempPlayer_H

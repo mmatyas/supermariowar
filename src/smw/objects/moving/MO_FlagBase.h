@@ -36,5 +36,5 @@ private:
 
     short timer;
 
-friend class CO_Flag;
+    friend class CO_Flag;
 };

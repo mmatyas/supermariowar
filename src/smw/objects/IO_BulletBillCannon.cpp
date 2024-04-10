@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 // class IO_BulletBillCannon - gets update calls and shoots bullet bills based on timer
 //------------------------------------------------------------------------------
 
-IO_BulletBillCannon::IO_BulletBillCannon(short x, short y, short freq, float vel, bool preview) :
-    CObject(NULL, x, y)
+IO_BulletBillCannon::IO_BulletBillCannon(short x, short y, short freq, float vel, bool preview)
+    : CObject(NULL, x, y)
 {
     iFreq = freq;
     dVel = vel;
