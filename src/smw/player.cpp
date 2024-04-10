@@ -638,7 +638,7 @@ void reference_code() {
 
 void CPlayer::update_waitingForRespawn()
 {
-    assert(state == player_wait);
+    assert(state == PlayerState::Waiting);
 
     //use 31 frames to do 0.5 second increments
     if (*respawncounter > 0 && ++waittimer >= 31) {
@@ -653,7 +653,7 @@ void CPlayer::update_waitingForRespawn()
             //Make sure spawn point isn't inside a tile
             collisions.checksides(*this);
 
-            state = player_spawning;
+            state = PlayerState::Spawning;
 
             if (game_values.spawnstyle == SpawnStyle::Instant) {
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
@@ -670,18 +670,18 @@ void CPlayer::update_respawning()
 
     switch (game_values.spawnstyle) {
         case SpawnStyle::Instant:
-            state = player_ready;
+            state = PlayerState::Ready;
             break;
         case SpawnStyle::Door:
             //Wait for door eyecandy to open to let mario out (20 frames for door to appear and 16 frames to open)
             if (++spawntimer > 36) {
                 spawntimer = 0;
-                state = player_ready;
+                state = PlayerState::Ready;
             }
             break;
         case SpawnStyle::Swirl:
             if (++spawntimer >= 50) {
-                state = player_ready;
+                state = PlayerState::Ready;
             } else if (spawntimer % 2) {
                 short swirlindex = spawntimer >> 1;
                 short ixoffset = ix - PWOFFSET;
@@ -1158,7 +1158,7 @@ void CPlayer::enableFreeFall()
 void CPlayer::move()
 {
     //Call the AI if cpu controlled
-    if (state == player_ready) {
+    if (state == PlayerState::Ready) {
         if (pPlayerAI) {
             //Calculate movement every 4th frame (speed up optimization)
             if (game_values.cputurn == globalID) {
@@ -1227,7 +1227,7 @@ void CPlayer::move()
     update_spriteColor();
 
     if (!isready()) {
-        if (state == player_wait) {
+        if (state == PlayerState::Waiting) {
             update_waitingForRespawn();
             return;
         }
@@ -1338,7 +1338,7 @@ void CPlayer::move()
         collision_detection_map();
 
         //If the player died or entered a warp, don't reset his velocity
-        if (game_values.windaffectsplayers && state == player_ready)
+        if (game_values.windaffectsplayers && state == PlayerState::Ready)
             velx = oldvelx;
     }
 
@@ -1460,7 +1460,7 @@ void CPlayer::updateSprite()
     if (shouldUpdateSprite()) {
         //if player is warping from below, set them in the air
         if (iswarping()) {
-            if (state == player_exiting_warp_down || state == player_entering_warp_up)
+            if (state == PlayerState::LeavingWarpDown || state == PlayerState::EnteringWarpUp)
                 inair = true;
             else
                 inair = false;
@@ -1469,7 +1469,7 @@ void CPlayer::updateSprite()
         //lockjump is true when we are in the air (even if we fell of an edge)
         if (spin.isSpinInProgress()) {
             sprite_state = spin.toSpriteID();
-        } else if (state == player_spawning) {
+        } else if (state == PlayerState::Spawning) {
             if (!(sprite_state & 0x1))
                 sprite_state = PGFX_JUMPING_R + iReverseSprite;
             else
@@ -1484,7 +1484,7 @@ void CPlayer::updateSprite()
                 sprite_state = PGFX_JUMPING_L;
         } else {
             if (velx > 0.0f) {
-                if (playerKeys->game_left.fDown && !playerKeys->game_right.fDown && state == player_ready) {
+                if (playerKeys->game_left.fDown && !playerKeys->game_right.fDown && state == PlayerState::Ready) {
                     sprite_state = PGFX_STOPPING_R + iReverseSprite;
 
                     if (++frictionslidetimer > 3) {
@@ -1523,7 +1523,7 @@ void CPlayer::updateSprite()
                     }
                 }
             } else if (velx < 0.0f) {
-                if (playerKeys->game_right.fDown && !playerKeys->game_left.fDown && state == player_ready) {
+                if (playerKeys->game_right.fDown && !playerKeys->game_left.fDown && state == PlayerState::Ready) {
                     sprite_state = PGFX_STOPPING_L - iReverseSprite;
 
                     if (++frictionslidetimer > 3) {
@@ -1625,7 +1625,7 @@ void CPlayer::die(PlayerDeathStyle deathStyle, bool fTeamRemoved, bool fKillCarr
 {
     //Only show the death gfx if the player is alive when he died
     //If he is spawning or already dead, then don't show anything
-    if (state >= player_dead) {
+    if (state >= PlayerState::Dead) {
         short iDeathSprite = deathStyle == PlayerDeathStyle::Jump ? PGFX_DEADFLYING : PGFX_DEAD;
 
         gfxSprite * corpseSprite = sprites[iDeathSprite];
@@ -1746,7 +1746,7 @@ void CPlayer::SetupNewPlayer()
     spawntimer = 0;
     waittimer = 0;
     *respawncounter = game_values.respawn;
-    state = player_wait;
+    state = PlayerState::Waiting;
 
     fallthrough = false;
     diedas = 0;
@@ -1866,7 +1866,7 @@ PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, PlayerDeathStyle deathsty
     CPlayer * killer = this;
 
     //If this player is already dead, then don't kill him again
-    if (killed->state != player_ready)
+    if (killed->state != PlayerState::Ready)
         return PlayerKillType::None;
 
     if (game_values.gamemode->chicken == killer && style != KillStyle::Pow)
@@ -1954,7 +1954,7 @@ void CPlayer::BounceAssistPlayer(CPlayer* o2)
 {
     CPlayer * o1 = this;
 
-    if (o1->state == player_ready && o1->fOldY + PH <= o2->fOldY && o1->iy + PH >= o2->iy && o1->playerKeys->game_jump.fDown) {
+    if (o1->state == PlayerState::Ready && o1->fOldY + PH <= o2->fOldY && o1->iy + PH >= o2->iy && o1->playerKeys->game_jump.fDown) {
         o1->setYi(o2->iy - PH);		//set new position to top of other player
         o1->collisions.checktop(*o1);
         o1->platform = NULL;
@@ -1968,7 +1968,7 @@ void CPlayer::BounceAssistPlayer(CPlayer* o2)
 
 void CPlayer::draw_spotlight()
 {
-    if (game_values.spotlights && state != player_dead) {
+    if (game_values.spotlights && state != PlayerState::Dead) {
         if (!sSpotlight) {
             sSpotlight = spotlightManager.AddSpotlight(ix + HALFPW, iy + HALFPH, 7);
         }
@@ -2013,12 +2013,12 @@ void CPlayer::draw_winnerCrown()
 void CPlayer::draw()
 {
     //Don't draw a player that is waiting to respawn
-    if (state == player_wait)
+    if (state == PlayerState::Waiting)
         return;
 
     draw_spotlight();
 
-    if (state == player_spawning)
+    if (state == PlayerState::Spawning)
         return;
 
     //Draw player
@@ -2040,7 +2040,7 @@ void CPlayer::draw()
         pScoreboardSprite = rm->spr_bobomb[colorID];
 
         //Add smoke to the top of the bomb
-        if (++bobombsmoketimer > 2 && (velx != 0.0f || vely != GRAVITATION) && state == player_ready) {
+        if (++bobombsmoketimer > 2 && (velx != 0.0f || vely != GRAVITATION) && state == PlayerState::Ready) {
             bobombsmoketimer = 0;
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
         }
@@ -2088,7 +2088,7 @@ void CPlayer::draw()
     //Draw the crown on the player
     draw_winnerCrown();
 
-    if (state < player_ready)
+    if (state < PlayerState::Ready)
         return;
 
     if (frozen) {
@@ -2116,7 +2116,7 @@ void CPlayer::drawOutOfScreenIndicators()
 
 void CPlayer::updateswap()
 {
-    if (state != player_ready)
+    if (state != PlayerState::Ready)
         return;
 
     if (game_values.swapstyle == 1) {
@@ -2133,7 +2133,7 @@ void CPlayer::updateswap()
 
 void CPlayer::drawswap()
 {
-    if (state != player_ready) {
+    if (state != PlayerState::Ready) {
         draw();
         return;
     }
@@ -2501,7 +2501,7 @@ void CPlayer::mapcolldet_moveDownward(short txl, short txc, short txr,
                 netplay.client.local_gamehost.sendMapCollisionEvent();
 
             //If player was bumped and killed then return
-            if (state != player_ready)
+            if (state != PlayerState::Ready)
                 return;
         }
 
@@ -2514,7 +2514,7 @@ void CPlayer::mapcolldet_moveDownward(short txl, short txc, short txr,
                 netplay.client.local_gamehost.sendMapCollisionEvent();
 
             //If player was bumped and killed then return
-            if (state != player_ready)
+            if (state != PlayerState::Ready)
                 return;
         }
 
@@ -2653,7 +2653,7 @@ void CPlayer::collision_detection_map()
 
     g_map->movingPlatformCollision(this);
 
-    if (state != player_ready)
+    if (state != PlayerState::Ready)
         return;
 
     fy = fTempY;
@@ -2814,7 +2814,7 @@ bool CPlayer::isFacingRight() const
             return fRight;
     }
 
-    if (state == player_ready) {
+    if (state == PlayerState::Ready) {
         if (playerKeys->game_left.fDown && playerKeys->game_right.fDown && velx != 0.0f) {
             if (velx > 0.0f)
                 return fRight;

@@ -32,19 +32,19 @@ namespace NetPkgs {
     struct P2PCollision;
 }
 
-enum PlayerState {
-    player_wait,
-    player_spawning,
-    player_dead,
-    player_ready,
-    player_entering_warp_up,
-    player_entering_warp_right,
-    player_entering_warp_down,
-    player_entering_warp_left,
-    player_exiting_warp_down,
-    player_exiting_warp_left,
-    player_exiting_warp_up,
-    player_exiting_warp_right
+enum class PlayerState : unsigned char {
+    Waiting,
+    Spawning,
+    Dead,
+    Ready,
+    EnteringWarpUp,
+    EnteringWarpRight,
+    EnteringWarpDown,
+    EnteringWarpLeft,
+    LeavingWarpDown,
+    LeavingWarpLeft,
+    LeavingWarpUp,
+    LeavingWarpRight,
 };
 
 enum PlayerAction {
@@ -102,16 +102,16 @@ public:
     float getVelX() const { return velx; }
     float getVelY() const { return vely; }
 
-    bool isready() const { return state == player_ready; }
-    bool isspawning() const { return state == player_spawning; }
-    bool iswarping() const { return state > player_ready; }
-    bool isdead() const { return state == player_dead; }
+    bool isready() const { return state == PlayerState::Ready; }
+    bool isspawning() const { return state == PlayerState::Spawning; }
+    bool iswarping() const { return state > PlayerState::Ready; }
+    bool isdead() const { return state == PlayerState::Dead; }
 
     bool isInvincible() const;
     bool isShielded() const;
     bool isFrozen() const { return frozen; }
     short GetWarpPlane() const { return warpstatus.getWarpPlane(); }
-    short GetWarpState() const { return state % 4; }
+    short GetWarpState() const { return static_cast<short>(state) % 4; }  // FIXME
     bool IsInvincibleOnBottom() const;
     bool IsSuperStomping() const;
     bool IsBobomb() const { return bobomb; }

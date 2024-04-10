@@ -526,7 +526,7 @@ void GameplayState::CleanDeadPlayers()
     bool fCheckForGameOver = false;
 
     for (short i = 0; i < list_players_cnt; i++) {
-        if (list_players[i]->state == player_dead) {
+        if (list_players[i]->state == PlayerState::Dead) {
             fCheckForGameOver = true;
 
             if (respawnCount[list_players[i]->globalID] <= 0)
@@ -800,11 +800,11 @@ void handleP2PCollisions()
     for (i = 0; i < list_players_cnt; i++) {
         CPlayer* player1 = list_players[i];
         assert(player1);
-        if (player1->state > player_dead) {
+        if (player1->state > PlayerState::Dead) {
             for (j = i + 1; j < list_players_cnt; j++) {
                 CPlayer* player2 = list_players[j];
                 assert(player2);
-                if (player2->state > player_dead) {
+                if (player2->state > PlayerState::Dead) {
                     if (coldec_player2player(player1, player2)) {
                         if (netplay.active)
                             netplay.client.local_gamehost.sendP2PCollisionEvent(*player1, *player2);
@@ -812,7 +812,7 @@ void handleP2PCollisions()
                         player1->collidesWith(player2);
 
                         //if player was killed by another player, continue with next player for collision detection
-                        if (player1->state <= player_dead)
+                        if (player1->state <= PlayerState::Dead)
                             break;
                     }
                 }
@@ -826,7 +826,7 @@ void handleP2ObjCollisions()
     //Collide player with objects
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         CPlayer * player = list_players[iPlayer];
-        if (player->state != player_ready)
+        if (player->state != PlayerState::Ready)
             continue;
 
         //Collide with objects
@@ -841,7 +841,7 @@ void handleP2ObjCollisions()
             }
 
             //if the object killed the player, then continue with the other players
-            if (player->state != player_ready)
+            if (player->state != PlayerState::Ready)
                 break;
 
             //If player collided with a swap mushroom, the break from colliding with everything else

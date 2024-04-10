@@ -27,7 +27,7 @@ void RemovePlayersButTeam(short teamid)
 {
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if (list_players[iPlayer]->getTeamID() != teamid) {
-            list_players[iPlayer]->state = player_dead;
+            list_players[iPlayer]->state = PlayerState::Dead;
         }
     }
 }
@@ -45,7 +45,7 @@ void RemovePlayersButHighestScoring()
     //Remove all players that don't have that max score
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if (list_players[iPlayer]->Score().score < iMaxScore) {
-            list_players[iPlayer]->state = player_dead;
+            list_players[iPlayer]->state = PlayerState::Dead;
         }
     }
 }
@@ -149,7 +149,7 @@ bool RemoveTeam(short teamid)
             if (iAnnouncementColor == -1)
                 iAnnouncementColor = list_players[iPlayer]->getColorID();
 
-            list_players[iPlayer]->state = player_dead;
+            list_players[iPlayer]->state = PlayerState::Dead;
         }
     }
 

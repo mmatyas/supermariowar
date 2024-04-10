@@ -601,13 +601,13 @@ void PlayerCollisions::handle_p2p_pushback(CPlayer * o1, CPlayer * o2)
         absv2 = ( o2->velx < 0 ? o2->velx : -1.0f ) * dPlayer1Pushback; //o2 right (only negative velx counts)
     }
 
-    if (o1->state == player_ready) {
+    if (o1->state == PlayerState::Ready) {
         o1->velx = CapSideVelocity(absv2);
         o1->iSuicideCreditPlayerID = o2->globalID;
         o1->iSuicideCreditTimer = 62;
     }
 
-    if (o2->state == player_ready) {
+    if (o2->state == PlayerState::Ready) {
         o2->velx = CapSideVelocity(absv1);
         o2->iSuicideCreditPlayerID = o1->globalID;
         o2->iSuicideCreditTimer = 62;

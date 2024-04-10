@@ -1026,7 +1026,7 @@ void CPlayerAI::GetNearestObjects()
 
     //Figure out where the other players are
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (iPlayer == pPlayer->localID || list_players[iPlayer]->state != player_ready)
+        if (iPlayer == pPlayer->localID || list_players[iPlayer]->state != PlayerState::Ready)
             continue;
 
         //Find players in jail on own team to tag
@@ -1036,7 +1036,7 @@ void CPlayerAI::GetNearestObjects()
             }
         }
 
-        if (list_players[iPlayer]->teamID == iTeamID || list_players[iPlayer]->state != player_ready)
+        if (list_players[iPlayer]->teamID == iTeamID || list_players[iPlayer]->state != PlayerState::Ready)
             continue;
 
         //If there is a chicken, only focus on stomping him

@@ -152,7 +152,7 @@ void MO_PirhanaPlant::update()
 
             for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
                 CPlayer* player = list_players[iPlayer];
-                if (player->state != player_ready)
+                if (player->state != PlayerState::Ready)
                     continue;
 
                 // Calculate normal screen distance
