@@ -1057,35 +1057,35 @@ void CPlayer::useSpecialPowerup()
 
     if (!lockfire) {
         if (bobomb) { //If we're a bob-omb, explode
-            action = player_action_bobomb;
+            action = PlayerAction::Bobomb;
         } else {
             if (powerup == 1 && projectiles < 2) {
                 if (game_values.fireballlimit == 0 || projectilelimit > 0) {
-                    action = player_action_fireball;
+                    action = PlayerAction::Fireball;
                 }
             } else if (powerup == 2 && projectiles < 2 && hammertimer == 0) {
                 if (game_values.hammerlimit == 0 || projectilelimit > 0) {
-                    action = player_action_hammer;
+                    action = PlayerAction::Hammer;
                 }
             } else if (powerup == 3 && !spin.isSpinInProgress() && !kuriboshoe.is_on()) {
                 if (game_values.featherlimit == 0 || projectilelimit > 0) {
-                    action = player_action_spincape;
+                    action = PlayerAction::SpinCape;
                 }
             } else if (powerup == 4 && projectiles < 1) { //only allow one boomerang
                 if (game_values.boomeranglimit == 0 || projectilelimit > 0) {
-                    action = player_action_boomerang;
+                    action = PlayerAction::Boomerang;
                 }
             } else if (powerup == 5 && projectiles < 1) {
                 if (game_values.wandlimit == 0 || projectilelimit > 0) {
-                    action = player_action_iceblast;
+                    action = PlayerAction::Iceblast;
                 }
             } else if (powerup == 6 && projectiles < 2 && hammertimer == 0) {
                 if (game_values.bombslimit == 0 || projectilelimit > 0) {
-                    action = player_action_bomb;
+                    action = PlayerAction::Bomb;
                 }
             } else if (powerup == 7 && !spin.isSpinInProgress() && !kuriboshoe.is_on()) { //Racoon tail spin
                 if (game_values.leaflimit == 0 || projectilelimit > 0) {
-                    action = player_action_spintail;
+                    action = PlayerAction::SpinTail;
                 }
             }
         }
@@ -1368,11 +1368,11 @@ void CPlayer::move()
 
 void CPlayer::CommitAction()
 {
-    if (player_action_bobomb == action) {
+    if (PlayerAction::Bobomb == action) {
         bobomb = false;
         objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, KillStyle::Bobomb));
         ifSoundOnPlay(rm->sfx_bobombsound);
-    } else if (player_action_fireball == action) {
+    } else if (PlayerAction::Fireball == action) {
         objectcontainer[0].add(new MO_Fireball(&rm->spr_fireball, ix + 6, iy, 4, isFacingRight(), 5, globalID, teamID, colorID));
         ifSoundOnPlay(rm->sfx_fireball);
 
@@ -1380,7 +1380,7 @@ void CPlayer::CommitAction()
 
         if (game_values.fireballlimit > 0)
             DecreaseProjectileLimit();
-    } else if (player_action_hammer == action) {
+    } else if (PlayerAction::Hammer == action) {
         if (isFacingRight())
             objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, ix + 8, iy, 6, (game_values.reversewalk ? -velx : velx) + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
         else
@@ -1393,13 +1393,13 @@ void CPlayer::CommitAction()
 
         if (game_values.hammerlimit > 0)
             DecreaseProjectileLimit();
-    } else if (player_action_boomerang == action) {
+    } else if (PlayerAction::Boomerang == action) {
         objectcontainer[2].add(new MO_Boomerang(&rm->spr_boomerang, ix, iy + HALFPH - 16, 4, isFacingRight(), 5, globalID, teamID, colorID));
         projectiles++;
 
         if (game_values.boomeranglimit > 0)
             DecreaseProjectileLimit();
-    } else if (player_action_iceblast == action) {
+    } else if (PlayerAction::Iceblast == action) {
         if (isFacingRight())
             objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, ix + HALFPW - 2, iy + HALFPH - 16, 5.0f, globalID, teamID, colorID));
         else
@@ -1411,7 +1411,7 @@ void CPlayer::CommitAction()
 
         if (game_values.wandlimit > 0)
             DecreaseProjectileLimit();
-    } else if (player_action_bomb == action) {
+    } else if (PlayerAction::Bomb == action) {
         CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, ix + HALFPW - 14, iy - 8, isFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, RANDOM_INT(120) + 120);
 
         if (AcceptItem(bomb)) {
@@ -1428,20 +1428,20 @@ void CPlayer::CommitAction()
 
         if (game_values.bombslimit > 0)
             DecreaseProjectileLimit();
-    } else if (player_action_spincape == action) {
+    } else if (PlayerAction::SpinCape == action) {
         cape.spin(*this);
-    } else if (player_action_spintail == action) {
+    } else if (PlayerAction::SpinTail == action) {
         tail.spin(*this);
     }
 
-    if (action == player_action_fireball) {
+    if (action == PlayerAction::Fireball) {
         game_values.unlocksecret3part1[globalID]++;
         CheckSecret(2);
-    } else if (action != player_action_none) {
+    } else if (action != PlayerAction::None) {
         game_values.unlocksecret3part1[globalID] = 0;
     }
 
-    action = player_action_none;
+    action = PlayerAction::None;
 }
 
 bool shouldUpdateSprite()
@@ -1701,7 +1701,7 @@ void CPlayer::SetKuriboShoe(KuriboShoeType type)
 void CPlayer::SetupNewPlayer()
 {
     pScoreboardSprite = sprites;
-    action = player_action_none;
+    action = PlayerAction::None;
 
     velx = 0.0f;
     oldvelx = velx;
@@ -2841,7 +2841,7 @@ bool CPlayer::isFacingRight() const
 bool CPlayer::AcceptItem(MO_CarriedObject * item)
 {
     if (fAcceptingItem && tanookisuit.notStatue() && (!kuriboshoe.is_on() || item->IsCarriedByKuriboShoe())) {
-        action = player_action_none;
+        action = PlayerAction::None;
 
         carriedItem = item;
         item->owner = this;

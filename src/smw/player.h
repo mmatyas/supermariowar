@@ -32,6 +32,12 @@ namespace NetPkgs {
     struct P2PCollision;
 }
 
+class CObject;
+class MO_CarriedObject;
+class MovingPlatform;
+class Spotlight;
+struct Warp;
+
 enum class PlayerState : unsigned char {
     Waiting,
     Spawning,
@@ -47,23 +53,17 @@ enum class PlayerState : unsigned char {
     LeavingWarpRight,
 };
 
-enum PlayerAction {
-    player_action_none,
-    player_action_bobomb,
-    player_action_fireball,
-    player_action_hammer,
-    player_action_boomerang,
-    player_action_iceblast,
-    player_action_bomb,
-    player_action_spincape,
-    player_action_spintail
+enum class PlayerAction : unsigned char {
+    None,
+    Bobomb,
+    Fireball,
+    Hammer,
+    Boomerang,
+    Iceblast,
+    Bomb,
+    SpinCape,
+    SpinTail,
 };
-
-class CObject;
-class MO_CarriedObject;
-class MovingPlatform;
-class Spotlight;
-struct Warp;
 
 enum class PlayerDeathStyle : unsigned char {
     Jump,
@@ -335,7 +335,7 @@ private:
 		PlayerOutOfArenaTimer outofarena;
 		PlayerSuicideTimer suicidetimer;
 
-		short action;
+		PlayerAction action;
 
 		short powerup;
 		short projectilelimit;
