@@ -2,20 +2,17 @@
 
 #include "eyecandy.h"
 #include "GameValues.h"
-#include "gfx.h"
 #include "map.h"
-#include "object.h"
-#include "objectgame.h" // TODO: refactor CO_ThrowBox and remove this
+#include "objectgame.h"
 #include "player.h"
 #include "PlayerKillTypes.h"
 #include "ResourceManager.h"
+#include "objects/carriable/CO_ThrowBox.h"
 
 extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 extern CEyecandyContainer eyecandy[3];
-
-extern void CheckSecret(short id);
 
 //------------------------------------------------------------------------------
 // class breakable block

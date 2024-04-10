@@ -25,7 +25,6 @@
 #include "MapList.h"
 #include "menu/ModeOptionsMenu.h"
 #include "ObjectContainer.h"
-#include "objectgame.h"
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"
@@ -35,6 +34,17 @@
 #include "ui/MI_ImageSelectField.h"
 #include "ui/MI_Text.h"
 #include "ui/MI_TextField.h"
+#include "objects/blocks/WeaponBreakableBlock.h"
+#include "objects/carriable/CO_Flag.h"
+#include "objects/carriable/CO_Spring.h"
+#include "objects/carriable/CO_Bomb.h"
+#include "objects/carriable/CO_Egg.h"
+#include "objects/carriable/CO_PhantoKey.h"
+#include "objects/carriable/CO_Shell.h"
+#include "objects/carriable/CO_Star.h"
+#include "objects/carriable/CO_ThrowBox.h"
+#include "objects/moving/MO_Coin.h"
+#include "objects/overmap/WO_Area.h"
 #include "world.h"
 
 #ifdef PNG_SAVE_FORMAT
@@ -243,7 +253,7 @@ short LookupTeamID(short id)
 gfxSprite		spr_scoretext;
 gfxSprite		spr_poof;
 
-IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)
+IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool spawn)
 {
     return NULL;
 }

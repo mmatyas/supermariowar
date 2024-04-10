@@ -2,19 +2,17 @@
 
 #include "GameValues.h"
 #include "GlobalConstants.h"
-#include "gfx.h"
 #include "map.h"
-#include "object.h"
+#include "objectgame.h"
 #include "player.h"
 #include "ResourceManager.h"
+#include"objects/moving/MovingObject.h"
 
 #include <math.h>
 
 extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
-
-extern void CheckSecret(short id);
 
 B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type, bool fHidden) :
     IO_Block(nspr, x, y)

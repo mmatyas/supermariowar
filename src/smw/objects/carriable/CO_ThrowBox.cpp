@@ -2,10 +2,9 @@
 
 #include "eyecandy.h"
 #include "GameValues.h"
+#include "objectgame.h"
 #include "player.h"
 #include "ResourceManager.h"
-
-extern IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool spawn);
 
 extern SpotlightManager spotlightManager;
 extern CEyecandyContainer eyecandy[3];

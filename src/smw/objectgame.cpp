@@ -6,39 +6,42 @@
 #include "map.h"
 #include "movingplatform.h"
 #include "ObjectContainer.h"
-#include "objecthazard.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "gamemodes/BonusHouse.h"
-#include "gamemodes/Chase.h"
-#include "gamemodes/Race.h"
-#include "gamemodes/Star.h"
-#include "gamemodes/MiniBoss.h"
-#include "gamemodes/MiniBoxes.h"
-#include "gamemodes/MiniPipe.h"
+#include "objects/moving/MO_Coin.h"
+#include "objects/moving/MO_Podobo.h"
+#include "objects/carriable/CO_Shell.h"
+#include "objects/powerup/PU_BobombPowerup.h"
+#include "objects/powerup/PU_BombPowerup.h"
+#include "objects/powerup/PU_BoomerangPowerup.h"
+#include "objects/powerup/PU_BulletBillPowerup.h"
+#include "objects/powerup/PU_ClockPowerup.h"
+#include "objects/powerup/PU_CoinPowerup.h"
+#include "objects/powerup/PU_ExtraGuyPowerup.h"
+#include "objects/powerup/PU_ExtraHeartPowerup.h"
+#include "objects/powerup/PU_ExtraTimePowerup.h"
+#include "objects/powerup/PU_FeatherPowerup.h"
+#include "objects/powerup/PU_FirePowerup.h"
+#include "objects/powerup/PU_HammerPowerup.h"
+#include "objects/powerup/PU_IceWandPowerup.h"
+#include "objects/powerup/PU_JailKeyPowerup.h"
+#include "objects/powerup/PU_LeafPowerup.h"
+#include "objects/powerup/PU_ModPowerup.h"
+#include "objects/powerup/PU_MysteryMushroomPowerup.h"
+#include "objects/powerup/PU_PodoboPowerup.h"
+#include "objects/powerup/PU_PoisonPowerup.h"
+#include "objects/powerup/PU_PowPowerup.h"
+#include "objects/powerup/PU_PWingsPowerup.h"
+#include "objects/powerup/PU_SecretPowerup.h"
+#include "objects/powerup/PU_StarPowerup.h"
+#include "objects/powerup/PU_Tanooki.h"
+#include "objects/powerup/PU_TreasureChestBonus.h"
+#include "objects/MysteryMushroomTempPlayer.h"
 
-#include <cstdlib> // abs()
-#include <cmath>
+extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
-extern short iKingOfTheHillZoneLimits[4][4];
-extern void PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, short KillStyle, bool fForce, bool fKillCarriedItem);
-extern void PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, short KillStyle, bool fForce, bool fKillCarriedItem);
-extern bool SwapPlayers(short iUsingPlayerID);
-extern short scorepowerupoffsets[3][3];
-
-extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
-extern void CheckSecret(short id);
-extern SpotlightManager spotlightManager;
 extern CObjectContainer objectcontainer[3];
-
-extern CGM_Pipe_MiniGame * pipegamemode;
-
-extern CPlayer* list_players[4];
-extern short score_cnt;
-
-extern CMap* g_map;
 extern CEyecandyContainer eyecandy[3];
-
 extern CGameValues game_values;
 extern CResourceManager* rm;
 

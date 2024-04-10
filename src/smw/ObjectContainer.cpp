@@ -1,9 +1,10 @@
 #include "ObjectContainer.h"
 
 #include "GameValues.h"
-#include "object.h" // MovingObject
-#include "objectgame.h"
 #include "RandomNumberGenerator.h"
+#include "objects/carriable/CO_Bomb.h"
+#include "objects/overmap/WO_Area.h"
+#include "objects/overmap/WO_RaceGoal.h"
 
 #include <cmath>
 

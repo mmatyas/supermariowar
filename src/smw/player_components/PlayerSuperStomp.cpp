@@ -3,9 +3,9 @@
 #include "GameValues.h"
 #include "eyecandy.h"
 #include "ObjectContainer.h"
-#include "objectgame.h"
 #include "player.h"
 #include "ResourceManager.h"
+#include "objects/moving/MO_AttackZone.h"
 
 #include <cassert>
 

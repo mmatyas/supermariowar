@@ -5,14 +5,22 @@
 #include "map.h"
 #include "movingplatform.h"
 #include "net.h"
-#include "object.h"
 #include "ObjectContainer.h"
 #include "objectgame.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "gamemodes/ShyGuyTag.h"
 #include "gamemodes/Star.h"
+#include "IO_Block.h"
+#include "objects/carriable/CO_Bomb.h"
+#include "objects/carriable/CO_Shell.h"
+#include "objects/carriable/CO_KuriboShoe.h"
+#include "objects/moving/MO_Boomerang.h"
 #include "objects/moving/MO_Explosion.h"
+#include "objects/moving/MO_Fireball.h"
+#include "objects/moving/MO_Hammer.h"
+#include "objects/moving/MO_IceBlast.h"
+#include "objects/moving/MO_Podobo.h"
 
 #include <cassert>
 #include <cmath>
@@ -21,7 +29,6 @@ extern bool SwapPlayers(short iUsingPlayerID);
 extern void EnterBossMode(short bossType);
 extern short g_iWinningPlayer;
 extern short g_iSwirlSpawnLocations[4][2][25];
-extern void CheckSecret(short id);
 extern SpotlightManager spotlightManager;
 
 extern CObjectContainer noncolcontainer;

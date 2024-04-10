@@ -199,7 +199,7 @@ short			list_players_cnt = 0;
 
 void SDLCALL musicfinished(){}
 
-IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)
+IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool spawn)
 {
     return NULL;
 }

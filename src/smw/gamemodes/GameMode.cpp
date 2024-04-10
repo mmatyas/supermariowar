@@ -4,10 +4,10 @@
 #include "GameValues.h"
 #include "net.h"
 #include "ObjectContainer.h"
-#include "objectgame.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
+#include "objects/powerup/PU_TreasureChestBonus.h"
 
 extern CScore *score[4];
 extern short score_cnt;

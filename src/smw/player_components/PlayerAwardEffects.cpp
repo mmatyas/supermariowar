@@ -2,18 +2,16 @@
 
 #include "eyecandy.h"
 #include "GameValues.h"
+#include "objectgame.h"
 #include "player.h"
 #include "ResourceManager.h"
 
-#include <cassert>
 #include <cmath>
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
 extern CEyecandyContainer eyecandy[3];
-
-extern void CheckSecret(short id);
 
 struct STextAward {
     const char *name;

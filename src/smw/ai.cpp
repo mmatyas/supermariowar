@@ -4,16 +4,67 @@
 #include "input.h"
 #include "map.h"
 #include "movingplatform.h"
-#include "object.h"
 #include "ObjectContainer.h"
-#include "objectgame.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "gamemodes/Race.h"
 #include "gamemodes/Star.h"
 #include "objects/IO_FlameCannon.h"
+
+#include "objects/moving/MO_Boomerang.h"
+#include "objects/moving/MO_CarriedObject.h"
+#include "objects/moving/MO_Coin.h"
+#include "objects/moving/MO_CollectionCard.h"
 #include "objects/moving/MO_Explosion.h"
+#include "objects/moving/MO_Fireball.h"
+#include "objects/moving/MO_FlagBase.h"
+#include "objects/moving/MO_Hammer.h"
+#include "objects/moving/MO_IceBlast.h"
 #include "objects/moving/MO_PirhanaPlant.h"
+#include "objects/moving/MO_Podobo.h"
+#include "objects/moving/MO_Yoshi.h"
+
+#include "objects/carriable/CO_Flag.h"
+#include "objects/carriable/CO_Spring.h"
+#include "objects/carriable/CO_Bomb.h"
+#include "objects/carriable/CO_Egg.h"
+#include "objects/carriable/CO_PhantoKey.h"
+#include "objects/carriable/CO_Shell.h"
+#include "objects/carriable/CO_Star.h"
+#include "objects/carriable/CO_ThrowBlock.h"
+#include "objects/carriable/CO_ThrowBox.h"
+
+#include "objects/overmap/WO_Area.h"
+#include "objects/overmap/WO_Phanto.h"
+#include "objects/overmap/WO_PipeBonus.h"
+#include "objects/overmap/WO_PipeCoin.h"
+#include "objects/overmap/WO_RaceGoal.h"
+
+#include "objects/powerup/PU_BobombPowerup.h"
+#include "objects/powerup/PU_BombPowerup.h"
+#include "objects/powerup/PU_BoomerangPowerup.h"
+#include "objects/powerup/PU_BulletBillPowerup.h"
+#include "objects/powerup/PU_ClockPowerup.h"
+#include "objects/powerup/PU_CoinPowerup.h"
+#include "objects/powerup/PU_ExtraGuyPowerup.h"
+#include "objects/powerup/PU_ExtraHeartPowerup.h"
+#include "objects/powerup/PU_ExtraTimePowerup.h"
+#include "objects/powerup/PU_FeatherPowerup.h"
+#include "objects/powerup/PU_FirePowerup.h"
+#include "objects/powerup/PU_HammerPowerup.h"
+#include "objects/powerup/PU_IceWandPowerup.h"
+#include "objects/powerup/PU_JailKeyPowerup.h"
+#include "objects/powerup/PU_LeafPowerup.h"
+#include "objects/powerup/PU_ModPowerup.h"
+#include "objects/powerup/PU_MysteryMushroomPowerup.h"
+#include "objects/powerup/PU_PodoboPowerup.h"
+#include "objects/powerup/PU_PoisonPowerup.h"
+#include "objects/powerup/PU_PowPowerup.h"
+#include "objects/powerup/PU_PWingsPowerup.h"
+#include "objects/powerup/PU_SecretPowerup.h"
+#include "objects/powerup/PU_StarPowerup.h"
+#include "objects/powerup/PU_Tanooki.h"
+#include "objects/powerup/PU_TreasureChestBonus.h"
 
 #include <cstdlib> // abs()
 
@@ -569,7 +620,7 @@ ExitDeathCheck:
         int ttLeftTile = g_map->map(iDeathX1, iDeathY);
         int ttRightTile = g_map->map(iDeathX2, iDeathY);
 
-        if (heightlimit == 2 && (ttLeftTile & tile_flag_solid || ttRightTile & tile_flag_solid) && 
+        if (heightlimit == 2 && (ttLeftTile & tile_flag_solid || ttRightTile & tile_flag_solid) &&
             !g_map->checkforwarp(iDeathX1, iDeathX2, iDeathY, 2)) //Avoid jumping wildly in 1 tile high gaps
             playerKeys->game_jump.fDown = false;
 

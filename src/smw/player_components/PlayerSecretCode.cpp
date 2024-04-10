@@ -1,9 +1,7 @@
 #include "PlayerSecretCode.h"
 
-//#include "objectgame.h" // for CheckSecret(), FIXME
+#include "objectgame.h"
 #include "player.h"
-
-extern void CheckSecret(short id);
 
 static const uint8_t SECRET_CODE[18] = {4, 8, 4, 8, 1, 1, 4, 8, 4, 8, 1, 1, 4, 8, 4, 8, 1, 1};
 static const unsigned short SECRET_CODE_TIME_MAX = 186;

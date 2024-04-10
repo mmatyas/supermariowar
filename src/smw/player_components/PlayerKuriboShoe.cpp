@@ -5,8 +5,8 @@
 #include "eyecandy.h"
 #include "GameValues.h"
 #include "ObjectContainer.h"
-#include "objectgame.h"
 #include "ResourceManager.h"
+#include "objects/carriable/CO_KuriboShoe.h"
 
 extern CGameValues game_values;
 extern CResourceManager* rm;

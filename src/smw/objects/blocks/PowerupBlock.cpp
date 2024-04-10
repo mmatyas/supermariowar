@@ -2,21 +2,19 @@
 
 #include "GameValues.h"
 #include "GameMode.h"
-#include "gfx.h"
 #include "map.h"
-#include "object.h"
+#include "objectgame.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
+#include "objects/moving/MovingObject.h"
+#include "objects/carriable/CO_ThrowBox.h"
 
 #include <cmath>
 
 extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
-
-#include "objectgame.h" // TODO: refactor CO_ThrowBox and remove this
-extern IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool spawn);
 
 //------------------------------------------------------------------------------
 // class powerup block
