@@ -2204,7 +2204,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                 }
 
                 if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.classic.scoring);
+                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.classic.scoring));
                     strcat(buffer, szTemp);
                 }
             } else if (ts->iMode == game_mode_frag) { //frag
@@ -2214,7 +2214,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                 }
 
                 if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.frag.scoring);
+                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.frag.scoring));
                     strcat(buffer, szTemp);
                 }
             } else if (ts->iMode == game_mode_timelimit) { //time
@@ -2224,7 +2224,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                 }
 
                 if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.time.scoring);
+                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.time.scoring));
                     strcat(buffer, szTemp);
                 }
 

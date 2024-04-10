@@ -27,9 +27,9 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miClassicModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.classic.style);
     miClassicModeStyleField->setCurrentValue(game_values.gamemodemenusettings.classic.style);
 
-    miClassicModeScoringField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 240, "Scoring", 400, 180);
-    miClassicModeScoringField->add("All Kills", 0);
-    miClassicModeScoringField->add("Push Kills Only", 1, false);
+    miClassicModeScoringField = new MI_SelectField<ScoringStyle>(&rm->spr_selectfield, 120, 240, "Scoring", 400, 180);
+    miClassicModeScoringField->add("All Kills", ScoringStyle::AllKills);
+    miClassicModeScoringField->add("Push Kills Only", ScoringStyle::PushOnly, false);
     miClassicModeScoringField->setOutputPtr(&game_values.gamemodemenusettings.classic.scoring);
     miClassicModeScoringField->setCurrentValue(game_values.gamemodemenusettings.classic.scoring);
 
@@ -62,9 +62,9 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miFragModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.frag.style);
     miFragModeStyleField->setCurrentValue(game_values.gamemodemenusettings.frag.style);
 
-    miFragModeScoringField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 240, "Scoring", 400, 180);
-    miFragModeScoringField->add("All Kills", 0);
-    miFragModeScoringField->add("Push Kills Only", 1, false);
+    miFragModeScoringField = new MI_SelectField<ScoringStyle>(&rm->spr_selectfield, 120, 240, "Scoring", 400, 180);
+    miFragModeScoringField->add("All Kills", ScoringStyle::AllKills);
+    miFragModeScoringField->add("Push Kills Only", ScoringStyle::PushOnly, false);
     miFragModeScoringField->setOutputPtr(&game_values.gamemodemenusettings.frag.scoring);
     miFragModeScoringField->setCurrentValue(game_values.gamemodemenusettings.frag.scoring);
 
@@ -97,9 +97,9 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miTimeLimitModeStyleField->setOutputPtr(&game_values.gamemodemenusettings.time.style);
     miTimeLimitModeStyleField->setCurrentValue(game_values.gamemodemenusettings.time.style);
 
-    miTimeLimitModeScoringField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 220, "Scoring", 400, 150);
-    miTimeLimitModeScoringField->add("All Kills", 0);
-    miTimeLimitModeScoringField->add("Push Kills Only", 1, false);
+    miTimeLimitModeScoringField = new MI_SelectField<ScoringStyle>(&rm->spr_selectfield, 120, 220, "Scoring", 400, 150);
+    miTimeLimitModeScoringField->add("All Kills", ScoringStyle::AllKills);
+    miTimeLimitModeScoringField->add("Push Kills Only", ScoringStyle::PushOnly, false);
     miTimeLimitModeScoringField->setOutputPtr(&game_values.gamemodemenusettings.time.scoring);
     miTimeLimitModeScoringField->setCurrentValue(game_values.gamemodemenusettings.time.scoring);
 

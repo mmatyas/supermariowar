@@ -41,7 +41,7 @@ PlayerKillType CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &othe
         return PlayerKillType::Normal;
 
     //If we are playing classic "sumo" mode, then only score hazard kills
-    if (game_values.gamemode->gamemode != game_mode_classic || game_values.gamemodesettings.classic.scoring == 0 || style == KillStyle::Push) {
+    if (game_values.gamemode->gamemode != game_mode_classic || game_values.gamemodesettings.classic.scoring == ScoringStyle::AllKills || style == KillStyle::Push) {
         if (fReverseScoring) {
             other.Score().AdjustScore(1);
         } else {

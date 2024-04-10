@@ -26,6 +26,12 @@ enum class DeathStyle : unsigned char {
 };
 
 
+enum class ScoringStyle : unsigned char {
+    AllKills,
+    PushOnly,
+};
+
+
 enum class JailStyle : unsigned char {
     Classic,
     Owned,

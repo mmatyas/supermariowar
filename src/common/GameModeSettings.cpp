@@ -2,17 +2,17 @@
 
 ClassicGameModeSettings::ClassicGameModeSettings()
     : style(DeathStyle::Respawn)  //Respawn on death
-    , scoring(0)        	//All kills will score
+    , scoring(ScoringStyle::AllKills)  //All kills will score
 {}
 
 FragGameModeSettings::FragGameModeSettings()
     : style(DeathStyle::Respawn)  //Respawn on death
-    , scoring(0)        	//All kills will score
+    , scoring(ScoringStyle::AllKills)  //All kills will score
 {}
 
 TimeGameModeSettings::TimeGameModeSettings()
     : style(DeathStyle::Respawn)  //Respawn on death
-    , scoring(0)            //All kills will score
+    , scoring(ScoringStyle::AllKills)  //All kills will score
     , percentextratime(10)  //10% chance of a heart spawning
 {}
 
@@ -102,18 +102,11 @@ FrenzyGameModeSettings::FrenzyGameModeSettings() {
     quantity = 6; 			//#players - 1
     rate = 186; 			//3 seconds
     storedshells = true; 	//Shells are stored by default
-    powerupweight[0] = 0;
-    powerupweight[1] = 1;  	// turn on flowers and hammers by default
+
+    // turn on flowers and hammers by default
+    powerupweight.fill(0);
+    powerupweight[1] = 1;
     powerupweight[2] = 1;
-    powerupweight[3] = 0;
-    powerupweight[4] = 0;
-    powerupweight[5] = 0;
-    powerupweight[6] = 0;
-    powerupweight[7] = 0;
-    powerupweight[8] = 0;
-    powerupweight[9] = 0;
-    powerupweight[10] = 0;
-    powerupweight[11] = 0;
 }
 
 SurvivalGameModeSettings::SurvivalGameModeSettings() {

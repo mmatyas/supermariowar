@@ -57,7 +57,7 @@ void CGM_TimeLimit::think()
 PlayerKillType CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
     if (!gameover) {
-        if (game_values.gamemode->gamemode != game_mode_timelimit || game_values.gamemodesettings.time.scoring == 0 || style == KillStyle::Push) {
+        if (game_values.gamemode->gamemode != game_mode_timelimit || game_values.gamemodesettings.time.scoring == ScoringStyle::AllKills || style == KillStyle::Push) {
             //Penalize killing your team mates
             if (inflictor.getTeamID() == other.getTeamID())
                 inflictor.Score().AdjustScore(-1);

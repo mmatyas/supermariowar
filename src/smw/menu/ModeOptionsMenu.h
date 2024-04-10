@@ -40,7 +40,7 @@ private:
 
     // Classic
     MI_SelectField<DeathStyle>* miClassicModeStyleField;
-    MI_SelectField<short>* miClassicModeScoringField;
+    MI_SelectField<ScoringStyle>* miClassicModeScoringField;
     MI_Button* miClassicModeBackButton;
 
     MI_Image* miClassicModeLeftHeaderBar;
@@ -49,7 +49,7 @@ private:
 
     // Frag
     MI_SelectField<DeathStyle>* miFragModeStyleField;
-    MI_SelectField<short>* miFragModeScoringField;
+    MI_SelectField<ScoringStyle>* miFragModeScoringField;
     MI_Button* miFragModeBackButton;
 
     MI_Image* miFragModeLeftHeaderBar;
@@ -58,7 +58,7 @@ private:
 
     // Time Limit
     MI_SelectField<DeathStyle>* miTimeLimitModeStyleField;
-    MI_SelectField<short>* miTimeLimitModeScoringField;
+    MI_SelectField<ScoringStyle>* miTimeLimitModeScoringField;
     MI_SliderField* miTimeLimitModePercentExtraTime;
     MI_Button* miTimeLimitModeBackButton;
 

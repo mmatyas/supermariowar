@@ -24,7 +24,7 @@ PlayerKillType CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
         return PlayerKillType::Normal;
 
     //Don't score if "sumo" style scoring is turned on
-    if (game_values.gamemode->gamemode != game_mode_frag || game_values.gamemodesettings.frag.scoring == 0 || style == KillStyle::Push) {
+    if (game_values.gamemode->gamemode != game_mode_frag || game_values.gamemodesettings.frag.scoring == ScoringStyle::AllKills || style == KillStyle::Push) {
         //Penalize killing your team mates
         if (inflictor.getTeamID() == other.getTeamID())
             inflictor.Score().AdjustScore(-1);

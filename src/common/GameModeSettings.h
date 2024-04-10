@@ -5,23 +5,25 @@
 #include "GlobalConstants.h"
 #include "MatchTypes.h"
 
+#include <array>
+
 struct ClassicGameModeSettings {
     DeathStyle style;		//on kill, either respawn the player or shield them and let them keep playing
-    short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
+    ScoringStyle scoring;	//When to credit a score, all kills or push kills only (sumo mode)
 
     ClassicGameModeSettings();
 };
 
 struct FragGameModeSettings {
     DeathStyle style;		//on kill, either respawn the player or shield them and let them keep playing
-    short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
+    ScoringStyle scoring;	//When to credit a score, all kills or push kills only (sumo mode)
 
     FragGameModeSettings();
 };
 
 struct TimeGameModeSettings {
     DeathStyle style;		//on kill, either respawn the player or shield them and let them keep playing
-    short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
+    ScoringStyle scoring;	//When to credit a score, all kills or push kills only (sumo mode)
     short percentextratime; //percent chance a stopwatch with extra game time will spawn
 
     TimeGameModeSettings();
@@ -46,14 +48,14 @@ struct CoinGameModeSettings {
 
 struct StompGameModeSettings {
     short rate;				//How fast they spawn
-    short enemyweight[NUMSTOMPENEMIES];	//What ratio the enemies are chosen
+    std::array<short, NUMSTOMPENEMIES> enemyweight;	//What ratio the enemies are chosen
 
     StompGameModeSettings();
 };
 
 struct EggGameModeSettings {
-    short eggs[4];			//Number of eggs of each color in game
-    short yoshis[4];		//Nunber of yoshis of each color in game
+    std::array<short, 4> eggs;			//Number of eggs of each color in game
+    std::array<short, 4> yoshis;		//Nunber of yoshis of each color in game
     short explode;			//Time until eggs explode
 
     EggGameModeSettings();
@@ -121,13 +123,13 @@ struct FrenzyGameModeSettings {
     short quantity;			//How many powerups spawn
     short rate;				//How fast they spawn
     bool storedshells;		//Shells become stored instead of active
-    short powerupweight[NUMFRENZYCARDS];	//What ratio the powerups are chosen
+    std::array<short, NUMFRENZYCARDS> powerupweight;	//What ratio the powerups are chosen
 
     FrenzyGameModeSettings();
 };
 
 struct SurvivalGameModeSettings {
-    short enemyweight[NUMSURVIVALENEMIES];       //The weighting of thwomps vs. podobos
+    std::array<short, NUMSURVIVALENEMIES> enemyweight;       //The weighting of thwomps vs. podobos
     short density;				//Number of thwomps on screen
     short speed;				//How fast thwomps go
     bool shield;				//Players are shielded when spawning
@@ -163,7 +165,7 @@ struct CollectionGameModeSettings {
 
 struct ChaseGameModeSettings {
     short phantospeed;			//How fast the phantos move
-    short phantoquantity[3];	//How many phantos there are
+    std::array<short, 3> phantoquantity;	//How many phantos there are
 
     ChaseGameModeSettings();
 };

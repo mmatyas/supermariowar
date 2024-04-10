@@ -382,6 +382,7 @@ template class MI_SelectField<SpawnStyle>;
 template class MI_SelectField<TeamCollisionStyle>;
 template class MI_SelectField<TournamentControlStyle>;
 template class MI_SelectField<DeathStyle>;
+template class MI_SelectField<ScoringStyle>;
 template class MI_SelectField<JailStyle>;
 template class MI_SelectField<ShieldStyle>;
 template class MI_SelectField<StarStyle>;
