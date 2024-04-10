@@ -13,6 +13,8 @@
 #include "objects/carriable/CO_Shell.h"
 #include "objects/carriable/CO_ThrowBox.h"
 
+#include <cmath>
+
 extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
 extern CMap* g_map;

@@ -5,6 +5,8 @@
 #include "player.h"
 #include "ResourceManager.h"
 
+#include <cmath>
+
 extern CEyecandyContainer eyecandy[3];
 extern CResourceManager* rm;
 

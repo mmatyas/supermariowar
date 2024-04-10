@@ -3,6 +3,8 @@
 #include "player.h"
 #include "ResourceManager.h"
 
+#include <cmath>
+
 extern CResourceManager* rm;
 
 
