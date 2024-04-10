@@ -1,6 +1,6 @@
 #pragma once
 
-#include "object.h"
+#include "ObjectBase.h"
 
 
 class IO_FlameCannon : public CObject {

@@ -4,11 +4,11 @@
 #include "Game.h"
 #include "GameValues.h"
 #include "map.h"
-#include "object.h"
 #include "player.h"
 #include "PlayerKillTypes.h"
 #include "ResourceManager.h"
 #include "TilesetManager.h"
+#include "objects/moving/MovingObject.h"
 
 #include "sdl12wrapper.h"
 

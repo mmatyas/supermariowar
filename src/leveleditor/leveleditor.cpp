@@ -39,7 +39,7 @@
 
 // Included only for movingplatform
 // TODO: Remove and fix linker errors
-#include "object.h"
+#include "objects/moving/MovingObject.h"
 #include "player.h"
 void CPlayer::flipsidesifneeded() {}
 bool CPlayer::isInvincible() const { return false; }
