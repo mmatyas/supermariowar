@@ -9,14 +9,16 @@
 #include "MapList.h"
 #include "object.h"
 #include "objectgame.h"
-#include "objecthazard.h"
 #include "ObjectContainer.h"
+#include "objecthazard.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
 #include "sfx.h"
 #include "gamemodes/MiniBoss.h"
+#include "objects/moving/MO_BulletBill.h"
+#include "objects/moving/MO_PirhanaPlant.h"
 
 #include <algorithm>
 #include <cmath>
@@ -92,7 +94,6 @@ GameplayState& GameplayState::instance() {
 
 extern void SetupScoreBoard(bool fOrderMatters);
 extern void ShowScoreBoard();
-extern void LoadMapHazards(bool fPreview);
 
 constexpr SDL_Rect iCountDownNumbers[4][4][2] =
     {   {{{0, 0, 64, 64},{288, 208, 64, 64}},

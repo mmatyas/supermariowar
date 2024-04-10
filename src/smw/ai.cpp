@@ -7,11 +7,13 @@
 #include "object.h"
 #include "ObjectContainer.h"
 #include "objectgame.h"
-#include "objecthazard.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "gamemodes/Race.h"
 #include "gamemodes/Star.h"
+#include "objects/IO_FlameCannon.h"
+#include "objects/moving/MO_Explosion.h"
+#include "objects/moving/MO_PirhanaPlant.h"
 
 #include <cstdlib> // abs()
 

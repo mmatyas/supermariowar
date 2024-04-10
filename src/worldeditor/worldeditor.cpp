@@ -406,8 +406,6 @@ SDL_Surface * sMapThumbnail = NULL;
 short iOldStageId = -1;
 
 //Sets up default mode options
-extern void LoadMapHazards(bool fPreview);
-
 struct StageModeOption {
 	char szName[64];
 	short iValue;

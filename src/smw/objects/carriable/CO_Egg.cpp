@@ -3,8 +3,8 @@
 #include "GameValues.h"
 #include "map.h"
 #include "ObjectContainer.h"
-#include "objecthazard.h"
 #include "ResourceManager.h"
+#include "objects/moving/MO_Explosion.h"
 
 extern CObjectContainer objectcontainer[3];
 extern CMap* g_map;

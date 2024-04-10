@@ -6,6 +6,11 @@
 #include "ObjectContainer.h"
 #include "objecthazard.h"
 #include "ResourceManager.h"
+#include "objects/IO_FlameCannon.h"
+#include "objects/moving/MO_BulletBill.h"
+#include "objects/moving/MO_PirhanaPlant.h"
+#include "objects/overmap/WO_OrbitHazard.h"
+#include "objects/overmap/WO_StraightPathHazard.h"
 
 #include <cstring>
 
@@ -19,7 +24,6 @@ extern SDL_Surface* blitdest;
 extern CObjectContainer noncolcontainer;
 extern CObjectContainer objectcontainer[3];
 extern void LoadCurrentMapBackground();
-extern void LoadMapHazards(bool fPreview);
 
 #ifndef __EMSCRIPTEN__
     inline void smallDelay() { SDL_Delay(10); }

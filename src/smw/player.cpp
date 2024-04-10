@@ -8,11 +8,11 @@
 #include "object.h"
 #include "ObjectContainer.h"
 #include "objectgame.h"
-#include "objecthazard.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "gamemodes/ShyGuyTag.h"
 #include "gamemodes/Star.h"
+#include "objects/moving/MO_Explosion.h"
 
 #include <cassert>
 #include <cmath>

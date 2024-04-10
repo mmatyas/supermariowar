@@ -3,6 +3,10 @@
 #include "map.h"
 #include "ObjectContainer.h"
 #include "ResourceManager.h"
+#include "objects/IO_BulletBillCannon.h"
+#include "objects/IO_FlameCannon.h"
+#include "objects/moving/MO_PirhanaPlant.h"
+#include "objects/overmap/WO_OrbitHazard.h"
 
 extern CObjectContainer noncolcontainer;
 extern CObjectContainer objectcontainer[3];

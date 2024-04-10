@@ -3,8 +3,8 @@
 #include "eyecandy.h"
 #include "GameValues.h"
 #include "ObjectContainer.h"
-#include "objecthazard.h"
 #include "ResourceManager.h"
+#include "objects/moving/MO_Explosion.h"
 
 extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 extern SpotlightManager spotlightManager;
