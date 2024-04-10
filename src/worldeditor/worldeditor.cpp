@@ -187,7 +187,7 @@ bool CO_ThrowBox::HasKillVelocity()
     return false;
 }
 
-PlayerKillType PlayerKilledPlayer(short id, CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem)
+PlayerKillType PlayerKilledPlayer(short id, CPlayer * killed, PlayerDeathStyle deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem)
 {
     return PlayerKillType::None;
 }

@@ -65,10 +65,10 @@ class MovingPlatform;
 class Spotlight;
 struct Warp;
 
-enum deathstyle {
-    death_style_jump = 0,
-    death_style_squish = 1,
-    death_style_shatter = 2
+enum class PlayerDeathStyle : unsigned char {
+    Jump,
+    Squish,
+    Shatter,
 };
 
 //the player class - a lot of optimization can be done here
@@ -138,7 +138,7 @@ public:
     void collidesWith(CPlayer*);
     bool collidesWith(CObject*);
 
-    void die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem);
+    void die(PlayerDeathStyle deathStyle, bool fTeamRemoved, bool fKillCarriedItem);
     void SetCorpseType(short); // see diedas
     short CorpseType(short) const { return diedas; }
 
@@ -399,8 +399,8 @@ private:
 		friend bool coldec_player2obj(CPlayer * o1, CObject * o2);
 		friend bool collisionhandler_p2o(CPlayer * o1, CObject * o2);
 
-		friend PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem);
-		PlayerKillType KilledPlayer(CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem);
+		friend PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, PlayerDeathStyle deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem);
+		PlayerKillType KilledPlayer(CPlayer * killed, PlayerDeathStyle deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem);
 
 		friend void RemovePlayersButHighestScoring();
 		friend void RemovePlayersButTeam(short teamID);

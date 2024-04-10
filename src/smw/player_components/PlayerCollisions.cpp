@@ -384,7 +384,7 @@ bool PlayerCollisions::is_stomping(CPlayer& player, CPlayer& other)
             else if (player.extrajumps > 0)
                 style = KillStyle::Feather;
 
-            player.KilledPlayer(&other, death_style_squish, style, false, false);
+            player.KilledPlayer(&other, PlayerDeathStyle::Squish, style, false, false);
         } else {
             if (game_values.gamemode->gamemode == game_mode_tag)
                 player.TransferTag(&other);
@@ -459,12 +459,12 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
     //--- 1. kill frozen players ---
     bool fFrozenDeath = false;
     if (o1->frozen && !o1->isShielded() && !o1->isInvincible()) {
-        o2->KilledPlayer(o1, death_style_shatter, KillStyle::IceBlast, true, false);
+        o2->KilledPlayer(o1, PlayerDeathStyle::Shatter, KillStyle::IceBlast, true, false);
         fFrozenDeath = true;
     }
 
     if (o2->frozen && !o2->isShielded() && !o2->isInvincible()) {
-        o1->KilledPlayer(o2, death_style_shatter, KillStyle::IceBlast, true, false);
+        o1->KilledPlayer(o2, PlayerDeathStyle::Shatter, KillStyle::IceBlast, true, false);
         fFrozenDeath = true;
     }
 
@@ -473,12 +473,12 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
 
     //--- 2. is player invincible? ---
     if (o1->isInvincible() && !o2->isShielded() && !o2->isInvincible()) {
-        o1->KilledPlayer(o2, death_style_jump, KillStyle::Star, false, false);
+        o1->KilledPlayer(o2, PlayerDeathStyle::Jump, KillStyle::Star, false, false);
         return;
     }
 
     if (o2->isInvincible() && !o1->isShielded() && !o1->isInvincible()) {
-        o2->KilledPlayer(o1, death_style_jump, KillStyle::Star, false, false);
+        o2->KilledPlayer(o1, PlayerDeathStyle::Jump, KillStyle::Star, false, false);
         return;
     }
 

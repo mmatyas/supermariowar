@@ -87,7 +87,7 @@ bool CO_ThrowBox::KillPlayer(CPlayer* player)
     Die();
 
     // Find the player that shot this shell so we can attribute a kill
-    PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::ThrowBlock, false, false);
+    PlayerKilledPlayer(iPlayerID, player, PlayerDeathStyle::Jump, KillStyle::ThrowBlock, false, false);
     return true;
 }
 

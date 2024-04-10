@@ -530,7 +530,7 @@ void GameplayState::CleanDeadPlayers()
             fCheckForGameOver = true;
 
             if (respawnCount[list_players[i]->globalID] <= 0)
-                list_players[i]->die(0, true, false);
+                list_players[i]->die(PlayerDeathStyle::Jump, true, false);
 
             //Set this to zero so we don't display a spawn egg when player is removed from game
             respawnCount[list_players[i]->globalID] = 0;
@@ -677,7 +677,7 @@ void shakeScreen()
     if (iNumKillPlayers > 0) {
         short iRandPlayer = RANDOM_INT( iNumKillPlayers);
         for (short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
-            PlayerKilledPlayer(game_values.flags.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, KillStyle::Pow, false, false);
+            PlayerKilledPlayer(game_values.flags.screenshakeplayerid, pKillPlayers[iRandPlayer], PlayerDeathStyle::Jump, KillStyle::Pow, false, false);
 
             if (++iRandPlayer >= iNumKillPlayers)
                 iRandPlayer = 0;
@@ -1894,7 +1894,7 @@ void debugAutoKillEveryone()
             list_players[k]->DeathAwards();
 
             if (game_values.gamemode->playerkilledself(*(list_players[k]), KillStyle::Environment) != PlayerKillType::None)
-                list_players[k]->die(0, false, false);
+                list_players[k]->die(PlayerDeathStyle::Jump, false, false);
         }
     }
 }
@@ -2112,7 +2112,7 @@ void GameplayState::handleInput()
                     list_players[k]->DeathAwards();
 
                     if (game_values.gamemode->playerkilledself(*(list_players[k]), KillStyle::Environment) == PlayerKillType::Normal)
-                        list_players[k]->die(0, false, false);
+                        list_players[k]->die(PlayerDeathStyle::Jump, false, false);
                 }
             } else if (event.key.keysym.sym == SDLK_x) {
                 short iplayer = RANDOM_INT(list_players_cnt);

@@ -1621,12 +1621,12 @@ void CPlayer::cpu_think()
     pPlayerAI->Think(playerKeys);
 }
 
-void CPlayer::die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem)
+void CPlayer::die(PlayerDeathStyle deathStyle, bool fTeamRemoved, bool fKillCarriedItem)
 {
     //Only show the death gfx if the player is alive when he died
     //If he is spawning or already dead, then don't show anything
     if (state >= player_dead) {
-        short iDeathSprite = deathStyle == death_style_jump ? PGFX_DEADFLYING : PGFX_DEAD;
+        short iDeathSprite = deathStyle == PlayerDeathStyle::Jump ? PGFX_DEADFLYING : PGFX_DEAD;
 
         gfxSprite * corpseSprite = sprites[iDeathSprite];
 
@@ -1639,16 +1639,16 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem)
             corpseSprite = rm->spr_shyguy[colorID][iDeathSprite];
 
         //Add eyecandy for the dead player
-        if (deathStyle == death_style_shatter || frozen) {
+        if (deathStyle == PlayerDeathStyle::Shatter || frozen) {
             eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
             eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
             eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
             eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
 
             game_values.unlocksecret2part2++;
-        } else if (deathStyle == death_style_jump) {
+        } else if (deathStyle == PlayerDeathStyle::Jump) {
             eyecandy[2].add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
-        } else if (deathStyle == death_style_squish) {
+        } else if (deathStyle == PlayerDeathStyle::Squish) {
             eyecandy[1].add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
         }
     }
@@ -1836,7 +1836,7 @@ void CPlayer::AddKillsInRowInAirAward() {
     awardeffects.addKillsInRowInAirAward(*this);
 }
 
-PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem)
+PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, PlayerDeathStyle deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem)
 {
     CPlayer * killer = GetPlayerFromGlobalID(iKiller);
 
@@ -1848,10 +1848,10 @@ PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathst
         PlayerKillType iKillType = game_values.gamemode->playerkilledself(*killed, style);
 
         if (PlayerKillType::Normal == iKillType || (fForce && PlayerKillType::NonKill == iKillType))
-            killed->die(death_style_jump, false, fKillCarriedItem);
+            killed->die(PlayerDeathStyle::Jump, false, fKillCarriedItem);
 
         if (PlayerKillType::NonKill != iKillType) {
-            if (deathstyle == death_style_shatter)
+            if (deathstyle == PlayerDeathStyle::Shatter)
                 ifSoundOnPlay(rm->sfx_breakblock);
             else
                 ifSoundOnPlay(rm->sfx_deathsound);
@@ -1861,7 +1861,7 @@ PlayerKillType PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathst
     }
 }
 
-PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem)
+PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, PlayerDeathStyle deathstyle, KillStyle style, bool fForce, bool fKillCarriedItem)
 {
     CPlayer * killer = this;
 
@@ -1873,7 +1873,7 @@ PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, KillSty
         ifSoundOnPlay(rm->sfx_chicken);
 
     if (killed->frozen)
-        deathstyle = death_style_shatter;
+        deathstyle = PlayerDeathStyle::Shatter;
 
     if (killer->teamID != killed->teamID)
         killer->AddKillerAward(killed, style);
@@ -1890,11 +1890,11 @@ PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, KillSty
             killer->SetPowerup(0);
         }
 
-        if (deathstyle == death_style_jump)
+        if (deathstyle == PlayerDeathStyle::Jump)
             ifSoundOnPlay(rm->sfx_deathsound);
-        else if (deathstyle == death_style_squish)
+        else if (deathstyle == PlayerDeathStyle::Squish)
             ifSoundOnPlay(rm->sfx_mip);
-        else if (deathstyle == death_style_shatter)
+        else if (deathstyle == PlayerDeathStyle::Shatter)
             ifSoundOnPlay(rm->sfx_breakblock);
     }
 
@@ -2741,13 +2741,13 @@ void CPlayer::collision_detection_map()
 PlayerKillType CPlayer::KillPlayerMapHazard(bool fForce, KillStyle style, bool fKillCarriedItem, short iPlayerIdCredit)
 {
     if (iPlayerIdCredit >= 0 || iSuicideCreditPlayerID >= 0) {
-        return PlayerKilledPlayer(iPlayerIdCredit >= 0 ? iPlayerIdCredit : iSuicideCreditPlayerID, this, death_style_jump, KillStyle::Push, fForce, fKillCarriedItem);
+        return PlayerKilledPlayer(iPlayerIdCredit >= 0 ? iPlayerIdCredit : iSuicideCreditPlayerID, this, PlayerDeathStyle::Jump, KillStyle::Push, fForce, fKillCarriedItem);
     } else {
         DeathAwards();
 
         PlayerKillType iKillType = game_values.gamemode->playerkilledself(*this, style);
         if (PlayerKillType::Normal == iKillType || (PlayerKillType::NonKill == iKillType && fForce))
-            die(death_style_jump, false, fKillCarriedItem);
+            die(PlayerDeathStyle::Jump, false, fKillCarriedItem);
 
         ifSoundOnPlay(rm->sfx_deathsound);
 

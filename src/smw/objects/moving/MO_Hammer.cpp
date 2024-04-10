@@ -102,7 +102,7 @@ bool MO_Hammer::collide(CPlayer* player)
 
             if (!player->isInvincible() && !player->shyguy) {
                 // Find the player that shot this hammer so we can attribute a kill
-                PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Hammer, false, false);
+                PlayerKilledPlayer(iPlayerID, player, PlayerDeathStyle::Jump, KillStyle::Hammer, false, false);
                 return true;
             }
         }

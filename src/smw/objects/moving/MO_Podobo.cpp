@@ -59,7 +59,7 @@ bool MO_Podobo::collide(CPlayer* player)
 {
     if (player->globalID != iPlayerID && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded() && !player->shyguy) {
         // Find the player that made this explosion so we can attribute a kill
-        PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Podobo, false, false);
+        PlayerKilledPlayer(iPlayerID, player, PlayerDeathStyle::Jump, KillStyle::Podobo, false, false);
         return true;
     }
 

@@ -46,7 +46,7 @@ bool MO_AttackZone::collide(CPlayer* player)
     if (killer && killer->globalID == player->globalID)
         return false;
 
-    PlayerKilledPlayer(iPlayerID, player, death_style_jump, iStyle, false, false);
+    PlayerKilledPlayer(iPlayerID, player, PlayerDeathStyle::Jump, iStyle, false, false);
 
     Die();
 

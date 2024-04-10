@@ -219,7 +219,7 @@ bool CO_Shell::KillPlayer(CPlayer* player)
     CheckAndDie();
 
     // Find the player that shot this shell so we can attribute a kill
-    PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Shell, false, false);
+    PlayerKilledPlayer(iPlayerID, player, PlayerDeathStyle::Jump, KillStyle::Shell, false, false);
 
     CPlayer* killer = GetPlayerFromGlobalID(iPlayerID);
     if (killer && iPlayerID != player->globalID) {

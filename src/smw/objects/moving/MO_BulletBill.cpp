@@ -149,7 +149,7 @@ bool MO_BulletBill::hitother(CPlayer* player)
         return false;
 
     // Find the player that owns this bullet bill so we can attribute a kill
-    PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::BulletBill, false, false);
+    PlayerKilledPlayer(iPlayerID, player, PlayerDeathStyle::Jump, KillStyle::BulletBill, false, false);
 
     return true;
 }

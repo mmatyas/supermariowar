@@ -297,7 +297,7 @@ bool MO_Boomerang::collide(CPlayer* player)
 
             if (!player->isInvincible() && !player->shyguy) {
                 // Find the player that shot this boomerang so we can attribute a kill
-                PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Boomerang, false, false);
+                PlayerKilledPlayer(iPlayerID, player, PlayerDeathStyle::Jump, KillStyle::Boomerang, false, false);
                 return true;
             }
         }

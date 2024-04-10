@@ -52,7 +52,7 @@ bool OMO_BowserFire::collide(CPlayer* player)
 
     if (player->globalID != iPlayerID && (game_values.teamcollision == TeamCollisionStyle::On || iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded()) {
         // Find the player that made this explosion so we can attribute a kill
-        PlayerKilledPlayer(iPlayerID, player, death_style_jump, KillStyle::Fireball, false, false);
+        PlayerKilledPlayer(iPlayerID, player, PlayerDeathStyle::Jump, KillStyle::Fireball, false, false);
         return true;
     }
 
