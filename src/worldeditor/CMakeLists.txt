@@ -3,10 +3,24 @@ add_executable(smw-worldedit WIN32
 	../common/movingplatform.h
 	../smw/world.cpp
 	../smw/world.h
+	../smw/objects/IO_BulletBillCannon.cpp
+	../smw/objects/IO_BulletBillCannon.h
+	../smw/objects/IO_FlameCannon.cpp
+	../smw/objects/IO_FlameCannon.h
 	../smw/objects/moving/MovingObject.cpp
 	../smw/objects/moving/MovingObject.h
+	../smw/objects/moving/MO_BulletBill.cpp
+	../smw/objects/moving/MO_BulletBill.h
+	../smw/objects/moving/MO_Explosion.cpp
+	../smw/objects/moving/MO_Explosion.h
+	../smw/objects/moving/MO_PirhanaPlant.cpp
+	../smw/objects/moving/MO_PirhanaPlant.h
 	../smw/objects/overmap/OverMapObject.cpp
 	../smw/objects/overmap/OverMapObject.h
+	../smw/objects/overmap/WO_OrbitHazard.cpp
+	../smw/objects/overmap/WO_OrbitHazard.h
+	../smw/objects/overmap/WO_StraightPathHazard.cpp
+	../smw/objects/overmap/WO_StraightPathHazard.h
 	../smw/ObjectContainer.cpp
 	../smw/ObjectContainer.h
 	../smw/objecthazard.cpp

@@ -1,4 +1,8 @@
 target_sources(smw PRIVATE
+	IO_BulletBillCannon.cpp
+	IO_BulletBillCannon.h
+	IO_FlameCannon.cpp
+	IO_FlameCannon.h
 	MysteryMushroomTempPlayer.h
 	MysteryMushroomTempPlayer.cpp
 
@@ -55,6 +59,8 @@ target_sources(smw PRIVATE
 	moving/MO_BonusHouseChest.h
 	moving/MO_Boomerang.cpp
 	moving/MO_Boomerang.h
+	moving/MO_BulletBill.cpp
+	moving/MO_BulletBill.h
 	moving/MO_BuzzyBeetle.cpp
 	moving/MO_BuzzyBeetle.h
 	moving/MO_CarriedObject.cpp
@@ -65,6 +71,8 @@ target_sources(smw PRIVATE
 	moving/MO_Coin.h
 	moving/MO_CollectionCard.cpp
 	moving/MO_CollectionCard.h
+	moving/MO_Explosion.cpp
+	moving/MO_Explosion.h
 	moving/MO_Fireball.cpp
 	moving/MO_Fireball.h
 	moving/MO_FlagBase.cpp
@@ -79,6 +87,8 @@ target_sources(smw PRIVATE
 	moving/MO_IceBlast.h
 	moving/MO_Koopa.cpp
 	moving/MO_Koopa.h
+	moving/MO_PirhanaPlant.cpp
+	moving/MO_PirhanaPlant.h
 	moving/MO_Podobo.cpp
 	moving/MO_Podobo.h
 	moving/MO_SledgeBrother.cpp
@@ -108,6 +118,8 @@ target_sources(smw PRIVATE
 	overmap/WO_BowserFire.h
 	overmap/WO_KingOfTheHillZone.cpp
 	overmap/WO_KingOfTheHillZone.h
+	overmap/WO_OrbitHazard.cpp
+	overmap/WO_OrbitHazard.h
 	overmap/WO_Phanto.cpp
 	overmap/WO_Phanto.h
 	overmap/WO_PipeBonus.cpp
@@ -116,6 +128,8 @@ target_sources(smw PRIVATE
 	overmap/WO_PipeCoin.h
 	overmap/WO_RaceGoal.cpp
 	overmap/WO_RaceGoal.h
+	overmap/WO_StraightPathHazard.cpp
+	overmap/WO_StraightPathHazard.h
 	overmap/WO_Thwomp.cpp
 	overmap/WO_Thwomp.h
 
