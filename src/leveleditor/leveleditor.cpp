@@ -464,11 +464,11 @@ int main(int argc, char *argv[])
 	rm->spr_backgroundlevel.init(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), 255, 0, 255, true);
 	rm->spr_tilesetlevel.init(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png"), 255, 0, 255, true);
 
-	rm->spr_eyecandy.init(convertPathC("gfx/leveleditor/leveleditor_eyecandy.png"), 255, 0, 255, true);
+        rm->spr_eyecandy.init(convertPath("gfx/leveleditor/leveleditor_eyecandy.png"), 255, 0, 255, true);
 
-	s_platform = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_platform.png"));
-	s_platformpathbuttons = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_pathtype_buttons.png"));
-	s_maphazardbuttons = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_maphazard_buttons.png"));
+        s_platform = IMG_Load(convertPath("gfx/leveleditor/leveleditor_platform.png").c_str());
+        s_platformpathbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_pathtype_buttons.png").c_str());
+        s_maphazardbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_maphazard_buttons.png").c_str());
 
 	rm->spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), 255, 0, 255, true);
 	rm->spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), 255, 0, 255, true);
@@ -1005,7 +1005,7 @@ int editor_edit()
                         backgroundlist->next();
 
                         rm->spr_background.init(backgroundlist->currentPath());
-                        strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->currentPath()).c_str());
+                        strcpy(g_map->szBackgroundFile, getFilenameFromPath(backgroundlist->currentPath()).c_str());
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
 								//Set music to background default
@@ -4235,7 +4235,7 @@ int editor_backgrounds()
                                 backgroundlist->setCurrentIndex(iPage * 16 + iBackground);
 
                                 rm->spr_background.init(backgroundlist->currentPath());
-                                strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->currentPath()).c_str());
+                                strcpy(g_map->szBackgroundFile, getFilenameFromPath(backgroundlist->currentPath()).c_str());
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
 									//Set music to background default
@@ -4838,7 +4838,7 @@ void loadcurrentmap()
 	std::string path = convertPath(filename);
     backgroundlist->setCurrentPath(filename);
 
-    if (!File_Exists(path)) {
+    if (!FileExists(path)) {
 		path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
         backgroundlist->setCurrentPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
@@ -5348,7 +5348,7 @@ void takescreenshot()
 bool ReadAnimatedTileTypeFile(const char * szFile)
 {
 	//Detect if the tiletype file already exists, if not create it
-    if (File_Exists(szFile)) {
+    if (FileExists(szFile)) {
 		BinaryFile tsf(szFile, "rb");
         if (!tsf.is_open()) {
 			printf("ERROR: couldn't open tileset file: %s\n", szFile);

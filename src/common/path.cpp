@@ -19,10 +19,10 @@
 
 extern std::string RootDataDirectory;
 
-using namespace std;
 std::string SMW_Root_Data_Dir;
 
-const std::string GetHomeDirectory()
+
+std::string GetHomeDirectory()
 {
 #ifdef __APPLE__
     std::string result("/Library/Preferences/.smw/");
@@ -53,7 +53,7 @@ const std::string GetHomeDirectory()
 #endif
 }
 
-const std::string GetRootDirectory()
+std::string GetRootDirectory()
 {
 #if !defined(_WIN32) && defined(USE_SDL2)
     // TODO: SDL_GetBasePath returns an UTF-8 string, which needs
@@ -69,12 +69,11 @@ const std::string GetRootDirectory()
     return "./";
 }
 
-bool File_Exists (const std::string fileName)
+bool FileExists(const std::string path)
 {
-	struct stat buffer;
-	int i = stat(fileName.c_str(), &buffer);
-
-	return (i == 0);
+    struct stat buffer;
+    int i = stat(path.c_str(), &buffer);
+    return i == 0;
 }
 
 /*********************************************************************
@@ -97,7 +96,7 @@ void Initialize_Paths()
     CFURLRef dirURL;
     mainBundle = CFBundleGetMainBundle();
     if (!mainBundle) {
-        cout << "Not running from an .app bundle" << endl;
+        printf("Not running from an .app bundle\n");
         return;
     }
 
@@ -105,7 +104,7 @@ void Initialize_Paths()
 
     if (!CFURLGetFileSystemRepresentation(dirURL, TRUE, temp,
         PATH_MAX)) {
-        cout << "Could not get file system representation" << endl;
+        printf("Could not get file system representation\n");
         return;
     }
 
@@ -115,14 +114,14 @@ void Initialize_Paths()
 #else
 	SMW_Root_Data_Dir = "./";
 #endif
-	cout << "Located data folder at: " << SMW_Root_Data_Dir << endl;
+	printf("Located data folder at: %s\n", SMW_Root_Data_Dir.c_str());
 }
 #endif
 
 /*********************************************************************
   All filenames should go through this                      *********/
 
-const string convertPath(const string& source)
+std::string convertPath(const std::string& source)
 {
     static bool are_paths_initialized = false;
 
@@ -145,15 +144,15 @@ const string convertPath(const string& source)
     return SMW_Root_Data_Dir + source;
 }
 
-const string convertPath(const string& source, const string& pack)
+std::string convertPath(const std::string& source, const std::string& pack)
 {
     if (source.find("gfx/packs/") == 0) {
-		string trailingdir = source.substr(9);
+                std::string trailingdir = source.substr(9);
 
-		const string s = pack + trailingdir;
+                const std::string s = pack + trailingdir;
 
 		//If the file exists, return the path to it
-		if (File_Exists(s))
+                if (FileExists(s))
 			return s;
 
 		//If not, use the classic file
@@ -161,12 +160,12 @@ const string convertPath(const string& source, const string& pack)
 	}
 
     if (source.find("sfx/packs/") == 0) {
-		string trailingdir = source.substr(9);
+                std::string trailingdir = source.substr(9);
 
-		const string s = pack + trailingdir;
+                const std::string s = pack + trailingdir;
 
 		//If the file exists, return the path to it
-		if (File_Exists(s))
+                if (FileExists(s))
 			return s;
 
 		//If not, use the classic file
@@ -176,18 +175,16 @@ const string convertPath(const string& source, const string& pack)
 	return convertPath(source);
 }
 
-const string getFileFromPath(const string &path)
+std::string getFilenameFromPath(const std::string& path)
 {
-	short iPos = path.find_last_of(getDirectorySeperator());
-
-	if (iPos > 0)
-		return path.substr(iPos + 1);
-
-	return path;
+    size_t pos = path.find_last_of(dirSeparator());
+    return pos != std::string::npos
+        ? path.substr(pos + 1)
+        : path;
 }
 
 // Takes a path to a file and gives you back the file name (with or without author) as a char *
-std::string GetNameFromFileName(const std::string& path, bool strip_author)
+std::string GetNameFromFileName(const std::string& path, bool stripAuthor)
 {
     constexpr char PATH_SEPARATOR = '/';
 
@@ -198,7 +195,7 @@ std::string GetNameFromFileName(const std::string& path, bool strip_author)
     if (sep_pos != std::string::npos)
         left_pos = sep_pos + 1;
 
-    if (strip_author) {
+    if (stripAuthor) {
         const size_t underscore_pos = path.find_first_of('_', left_pos);
         if (underscore_pos != std::string::npos)
             left_pos = underscore_pos + 1;
@@ -214,7 +211,7 @@ std::string GetNameFromFileName(const std::string& path, bool strip_author)
 
 //Takes a file name and gives you back just the name of the file with no author or file extention
 //and the first letter of the name will come back capitalized
-std::string stripCreatorAndDotMap(const std::string &filename)
+std::string stripCreatorAndExt(const std::string& filename)
 {
     size_t firstUnderscore = filename.find("_");    //find first _
     if (firstUnderscore == std::string::npos)   //if not found start with first character
@@ -224,21 +221,20 @@ std::string stripCreatorAndDotMap(const std::string &filename)
 
     std::string withoutPrefix = filename.substr(firstUnderscore);   //substring without bla_ and .map (length-4)
     withoutPrefix = withoutPrefix.substr(0, withoutPrefix.length() - 4);        //i have no idea why this doesn't work if i do it like this: (leaves .map if the map starts with an underscore)
-    //                                                              return filename.substr(firstUnderscore, filename.length()-4);
 
     //Capitalize the first letter so the hash table sorting works correctly
-    if (withoutPrefix[0] >= 97 && withoutPrefix[0] <= 122)
-        withoutPrefix[0] -= 32;
+    if (!withoutPrefix.empty())
+        withoutPrefix[0] = static_cast<char>(::toupper(withoutPrefix[0]));
 
     return withoutPrefix;
 }
 
 //Takes a path to a file and gives you back just the name of the file with no author or file extention
-std::string stripPathAndExtension(const std::string &path)
+std::string stripPathAndExtension(const std::string& path)
 {
     size_t chopHere = path.find("_");   //find first _
     if (chopHere == std::string::npos) {    //if not found, then find the beginning of the filename
-        chopHere = path.find_last_of(getDirectorySeperator());  //find last /
+        chopHere = path.find_last_of(dirSeparator());  //find last /
         if (chopHere == std::string::npos)  //if not found, start with first character
             chopHere = 0;
         else

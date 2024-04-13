@@ -26,7 +26,7 @@ std::vector<TileType> readTileTypeFile(const std::string& path)
     constexpr int MAX_TILES = MAX_TILES_PER_AXIS * MAX_TILES_PER_AXIS;
 
     //Detect if the tiletype file already exists, if not create it
-    if (!File_Exists(path))
+    if (!FileExists(path))
         return {};
 
     BinaryFile tsf(path.c_str(), "rb");
@@ -55,7 +55,7 @@ std::vector<TileType> readTileTypeFile(const std::string& path)
 *  CTileset
 *********************************/
 CTileset::CTileset(const std::string& dir)
-    : m_name(getFileFromPath(dir))
+    : m_name(getFilenameFromPath(dir))
     , m_tilesetPath(dir + "/tileset.tls")
     , m_tiletypes(readTileTypeFile(m_tilesetPath))
 {
@@ -149,7 +149,7 @@ void CTilesetManager::init(const std::string& gfxPack)
     m_tilesetlist.clear();
 
     //Add in tilesets from the new gfxpack (if the gfxpack isn't "Classic")
-    if (getFileFromPath(gfxPack) != "Classic") {
+    if (getFilenameFromPath(gfxPack) != "Classic") {
         std::string s = convertPath("gfx/packs/tilesets", gfxPack) + '/';
         SimpleDirectoryList dirlist(s);
 
@@ -167,7 +167,7 @@ void CTilesetManager::init(const std::string& gfxPack)
 
     //Add in tilesets from the classic tileset to fill the gaps
     for (size_t i = 0; i < m_filelist.size(); i++) {
-        const std::string tilesetName = getFileFromPath(m_filelist[i]);
+        const std::string tilesetName = getFilenameFromPath(m_filelist[i]);
 
         //See if the new tileset already exists and if it does, skip it
         bool fFound = false;

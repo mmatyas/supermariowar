@@ -101,7 +101,7 @@ void UI_NetRoomMenu::Refresh()
             printf("  player %d -> local\n", p);
             rm->LoadMenuSkin(p, game_values.skinids[0], p, false);
         }
-        else if (File_Exists(path.str())) {
+        else if (FileExists(path.str())) {
             printf("  player %d -> %s\n", p, path.str().c_str());
             if (!rm->LoadMenuSkin(p, path.str(), p, false))
                 rm->LoadMenuSkin(p, game_values.skinids[p], p, false);

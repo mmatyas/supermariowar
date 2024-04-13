@@ -28,7 +28,7 @@ MapListNode::MapListNode(std::string fullName)
 
     fReadFromCache = false;
 
-    iShortNameLength = strlen(stripCreatorAndDotMap(fullName).c_str());
+    iShortNameLength = strlen(stripCreatorAndExt(fullName).c_str());
 
     fValid = true;
 }
@@ -48,20 +48,20 @@ MapList::MapList(bool fWorldEditor)
 
     while (d(curname)) {
         MapListNode * node = new MapListNode(d.fullName(curname));
-        maps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+        maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
     }
 
 #ifdef _DEBUG
     DirectoryListing debugMapDir(convertPath("maps/test/"), ".map");
     while (debugMapDir(curname)) {
         MapListNode * node = new MapListNode(debugMapDir.fullName(curname));
-        maps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+        maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
     }
 
     DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
     while (specialDebugMapDir(curname)) {
         MapListNode * node = new MapListNode(specialDebugMapDir.fullName(curname));
-        maps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+        maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
     }
 #endif
 
@@ -72,7 +72,7 @@ MapList::MapList(bool fWorldEditor)
 
         while (tourMapDir(curname)) {
             MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
-            maps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+            maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
         }
 
         SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
@@ -85,7 +85,7 @@ MapList::MapList(bool fWorldEditor)
 
             while (worldMapDir(curname)) {
                 MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
-                maps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+                maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
             }
 
             worldeditormapdirs.next();
@@ -95,7 +95,7 @@ MapList::MapList(bool fWorldEditor)
         DirectoryListing specialEditorMapDir(convertPath("maps/special/"), ".map");
         while (specialEditorMapDir(curname)) {
             MapListNode * node = new MapListNode(specialEditorMapDir.fullName(curname));
-            maps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+            maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
         }
 #endif
 
@@ -129,7 +129,7 @@ MapList::MapList(bool fWorldEditor)
 
     while (tourMapDir(curname)) {
         MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
-        worldmaps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+        worldmaps.insert(std::make_pair(stripCreatorAndExt(curname), node));
     }
 
     //Read all world map directories and load them into the world/tour only list
@@ -143,7 +143,7 @@ MapList::MapList(bool fWorldEditor)
 
         while (worldMapDir(curname)) {
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
-            worldmaps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+            worldmaps.insert(std::make_pair(stripCreatorAndExt(curname), node));
         }
 
         worldmapdirs.next();
@@ -152,7 +152,7 @@ MapList::MapList(bool fWorldEditor)
     DirectoryListing specialMapDir(convertPath("maps/special/"), ".map");
     while (specialMapDir(curname)) {
         MapListNode * node = new MapListNode(specialMapDir.fullName(curname));
-        worldmaps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+        worldmaps.insert(std::make_pair(stripCreatorAndExt(curname), node));
     }
 }
 
@@ -199,7 +199,7 @@ void MapList::addWorldMaps()
         std::string curname;
         while (worldMapDir(curname)) {
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
-            maps.insert(std::make_pair(stripCreatorAndDotMap(curname), node));
+            maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
         }
 
         worldmapdirs.next();
@@ -211,7 +211,7 @@ void MapList::add(const char * name)
     std::string fullName = convertPath("maps/") + name;
 
     MapListNode * node = new MapListNode(fullName);
-    maps.insert(std::make_pair(stripCreatorAndDotMap(name), node));
+    maps.insert(std::make_pair(stripCreatorAndExt(name), node));
 }
 
 bool MapList::find(const char * name)

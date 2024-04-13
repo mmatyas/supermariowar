@@ -212,7 +212,7 @@ void LoadCurrentMapBackground()
     path = convertPath(path, gamegraphicspacklist->currentPath());
 
     //if the background file doesn't exist, use the classic background
-    if (!File_Exists(path))
+    if (!FileExists(path))
         path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath());
 
     gfx_loadimagenocolorkey(&rm->spr_background, path);

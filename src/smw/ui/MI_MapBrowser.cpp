@@ -279,7 +279,7 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 
         std::string sConvertedPath = convertPath(szThumbnail);
 
-        if (!File_Exists(sConvertedPath)) {
+        if (!FileExists(sConvertedPath)) {
             g_map->loadMap((*itr).second->filename, read_type_preview);
             smallDelay();  //Sleeps to help the music from skipping
             g_map->saveThumbnail(sConvertedPath, false);

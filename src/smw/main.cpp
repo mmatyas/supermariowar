@@ -416,7 +416,7 @@ void main_game()
     init_spawnlocations();
 
     //Load the gfx color palette
-    gfx_loadpalette(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
+    gfx_loadpalette(convertPath("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
 
     srand((unsigned int)time(NULL));
 /*

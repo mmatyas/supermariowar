@@ -982,7 +982,7 @@ void MenuState::update()
         } else if (MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED == code) {
             rm->LoadWorldGraphics();
         } else if (MENU_CODE_GAME_GRAPHICS_PACK_CHANGED == code) {
-            gfx_loadpalette(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
+            gfx_loadpalette(convertPath("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
             rm->LoadGameGraphics();
         } else if (MENU_CODE_SOUND_PACK_CHANGED == code) {
             rm->LoadGameSounds();

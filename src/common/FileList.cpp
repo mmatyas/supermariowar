@@ -83,7 +83,7 @@ void UpdateMusicWithOverrides()
 
             for (const std::string& token : tokens) {
                 std::string path = convertPath(token);
-                if (File_Exists(path))
+                if (FileExists(path))
                     override.songs.emplace_back(std::move(path));
             }
             //Don't add overrides that have no songs
@@ -97,7 +97,7 @@ void UpdateMusicWithOverrides()
             tokens.pop_front();
 
             std::string path = convertPath(tokens.front());
-            if (File_Exists(path)) {
+            if (FileExists(path)) {
                 override.song = std::move(path);
                 worldmusicoverrides.emplace_back(std::move(override));
             }
@@ -232,7 +232,7 @@ SkinList::SkinList()
             continue;
 
         SkinListNode node {
-            stripCreatorAndDotMap(curname),
+            stripCreatorAndExt(curname),
             dir.fullName(curname),
         };
 
@@ -364,7 +364,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
     for (k = 0; k < MAXMUSICCATEGORY; k++)
         numsongsforcategory[k] = 0;
 
-    size_t separator_pos = musicdirectory.rfind(getDirectorySeperator());
+    size_t separator_pos = musicdirectory.rfind(dirSeparator());
     if (separator_pos != std::string::npos)
         name = musicdirectory.substr(separator_pos + 1);
     else
@@ -372,7 +372,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
     name = name.substr(0, name.rfind("."));
 
-    std::string musicfile = musicdirectory + getDirectorySeperator() + std::string("Music.txt");
+    std::string musicfile = musicdirectory + dirSeparator() + std::string("Music.txt");
     FILE * in = fopen(musicfile.c_str(), "r");
     if (!in) {
         printf("Error: Could not open: %s\n", musicfile.c_str());
@@ -466,9 +466,9 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
                 char * pszMusic = strtok(NULL, ",\n");
                 while (pszMusic) {
-                    std::string sPath = musicdirectory + getDirectorySeperator() + pszMusic;
+                    std::string sPath = musicdirectory + dirSeparator() + pszMusic;
 
-                    if (File_Exists(sPath.c_str())) {
+                    if (FileExists(sPath.c_str())) {
                         songFileNames.push_back(sPath);
 
                         if (iAddToCategory == MAXMUSICCATEGORY) {
@@ -484,9 +484,9 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
                     pszMusic = strtok(NULL, ",\n");
                 }
             } else {
-                std::string sPath = musicdirectory + getDirectorySeperator() + szBuffer;
+                std::string sPath = musicdirectory + dirSeparator() + szBuffer;
 
-                if (File_Exists(sPath.c_str())) {
+                if (FileExists(sPath.c_str())) {
                     songFileNames.push_back(sPath);
 
                     //Don't add to category lists if this is one of the four special music tracks
@@ -505,9 +505,9 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
     //Now read labeled subdirectories like "Land", "Underground", "Castle", etc for more songs
 
     for (short iMusicCategory = 0; iMusicCategory < MAXMUSICCATEGORY; iMusicCategory++) {
-        std::string musicPath = musicdirectory + getDirectorySeperator() + std::string(g_szMusicCategoryNames[iMusicCategory]);
-        if (File_Exists(musicPath)) {
-            SimpleFileList musList(musicPath + getDirectorySeperator(), ".ogg");
+        std::string musicPath = musicdirectory + dirSeparator() + std::string(g_szMusicCategoryNames[iMusicCategory]);
+        if (FileExists(musicPath)) {
+            SimpleFileList musList(musicPath + dirSeparator(), ".ogg");
 
             short iCount = musList.count();
 
@@ -726,7 +726,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
     fError = false;
     fUsesWorldOverrides = false;
 
-    size_t separator_pos = musicdirectory.rfind(getDirectorySeperator());
+    size_t separator_pos = musicdirectory.rfind(dirSeparator());
     if (separator_pos != std::string::npos)
         name = musicdirectory.substr(separator_pos + 1);
     else
@@ -734,7 +734,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 
     name = name.substr(0, name.rfind("."));
 
-    std::string musicfile = musicdirectory + getDirectorySeperator() + std::string("Music.txt");
+    std::string musicfile = musicdirectory + dirSeparator() + std::string("Music.txt");
     FILE * in = fopen(musicfile.c_str(), "r");
     if (!in) {
         printf("Error: Could not open: %s\n", musicfile.c_str());
@@ -789,9 +789,9 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
         }
 
         if (iAddToCategory > -1 && iAddToCategory <= WORLDMUSICSLEEP) {
-            std::string sPath = musicdirectory + getDirectorySeperator() + szBuffer;
+            std::string sPath = musicdirectory + dirSeparator() + szBuffer;
 
-            if (File_Exists(sPath.c_str()))
+            if (FileExists(sPath.c_str()))
                 songFileNames[iAddToCategory] = sPath;
         } else if (iAddToCategory == WORLDMUSICWORLDS) {
             char * pszName = strtok(szBuffer, ",\n");
@@ -804,9 +804,9 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
             if (!pszMusic)
                 continue;
 
-            std::string sPath = musicdirectory + getDirectorySeperator() + pszMusic;
+            std::string sPath = musicdirectory + dirSeparator() + pszMusic;
 
-            if (!File_Exists(sPath.c_str()))
+            if (!FileExists(sPath.c_str()))
                 continue;
 
             fUsesWorldOverrides = true;
