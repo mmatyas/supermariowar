@@ -1,5 +1,6 @@
 #include "MI_MapPreview.h"
 
+#include "Game.h"
 #include "GameValues.h"
 #include "map.h"
 #include "MapList.h"
@@ -88,18 +89,17 @@ void MI_MapPreview::Draw()
     g_map->drawPlatforms(rectDst.x, rectDst.y, 1);
 
     //Draw map hazards
-    for (short i = 0; i < objectcontainer[1].list_end; i++) {
-        CObject * object = objectcontainer[1].list[i];
-        ObjectType type = object->getObjectType();
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+        ObjectType type = obj->getObjectType();
 
         if (type == object_orbithazard) {
-            ((OMO_OrbitHazard*)object)->draw(rectDst.x, rectDst.y);
+            ((OMO_OrbitHazard*)obj.get())->draw(rectDst.x, rectDst.y);
         } else if (type == object_pathhazard) {
-            ((OMO_StraightPathHazard*)object)->draw(rectDst.x, rectDst.y);
+            ((OMO_StraightPathHazard*)obj.get())->draw(rectDst.x, rectDst.y);
         } else if (type == object_flamecannon) {
-            ((IO_FlameCannon*)object)->draw(rectDst.x, rectDst.y);
+            ((IO_FlameCannon*)obj.get())->draw(rectDst.x, rectDst.y);
         } else if (type == object_moving) {
-            IO_MovingObject * movingobject = (IO_MovingObject *) object;
+            IO_MovingObject * movingobject = (IO_MovingObject *) obj.get();
 
             if (movingobject->getMovingObjectType() == movingobject_bulletbill) {
                 ((MO_BulletBill*)movingobject)->draw(rectDst.x, rectDst.y);

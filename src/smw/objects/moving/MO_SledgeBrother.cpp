@@ -1,9 +1,11 @@
 #include "MO_SledgeBrother.h"
 
 #include "eyecandy.h"
+#include "Game.h"
 #include "GameMode.h"
 #include "GameValues.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "gamemodes/MiniBoss.h"

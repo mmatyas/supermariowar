@@ -246,14 +246,11 @@ void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
 
     //Loop through objects
     for (short iLayer = 0; iLayer < 3; iLayer++) {
-        short iContainerEnd = objectcontainer[iLayer].list_end;
-        for (short iObject = 0; iObject < iContainerEnd; iObject++) {
-            CObject * object = objectcontainer[iLayer].list[iObject];
-
-            if (object->getObjectType() != object_moving)
+        for (const std::unique_ptr<CObject>& obj : objectcontainer[iLayer].list) {
+            if (obj->getObjectType() != object_moving)
                 continue;
 
-            IO_MovingObject * movingobject = (IO_MovingObject*)object;
+            IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
 
             if (!movingobject->CollidesWithMap())
                 continue;

@@ -1,6 +1,7 @@
 #include "KingOfTheHill.h"
 
 #include "ObjectContainer.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "objects/overmap/WO_KingOfTheHillZone.h"
 

@@ -685,10 +685,9 @@ void shakeScreen()
     }
 
     //Kill goombas and koopas
-    for (short k = 0; k < objectcontainer[0].list_end; k++) {
-        CObject * object = objectcontainer[0].list[k];
-        if (object->getObjectType() == object_moving) {
-            IO_MovingObject * movingobject = (IO_MovingObject *)object;
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list) {
+        if (obj->getObjectType() == object_moving) {
+            IO_MovingObject * movingobject = (IO_MovingObject *)obj.get();
             MovingObjectType type = movingobject->getMovingObjectType();
 
             if ((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
@@ -712,10 +711,9 @@ void shakeScreen()
     }
 
     //Destroy throw blocks and flip shells over
-    for (short k = 0; k < objectcontainer[1].list_end; k++) {
-        CObject * object = objectcontainer[1].list[k];
-        if (object->getObjectType() == object_moving) {
-            IO_MovingObject * movingobject = (IO_MovingObject *)object;
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+        if (obj->getObjectType() == object_moving) {
+            IO_MovingObject * movingobject = (IO_MovingObject *)obj.get();
 
             if (game_values.flags.screenshakekillinair == movingobject->inair) {
                 if (movingobject->getMovingObjectType() == movingobject_shell) {
@@ -833,12 +831,10 @@ void handleP2ObjCollisions()
 
         //Collide with objects
         for (short iLayer = 0; iLayer < 3; iLayer++) {
-            for (short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++) {
-                CObject * object = objectcontainer[iLayer].list[iObject];
-
-                if (!object->isDead()) {
-                    if (coldec_player2obj(player, object)) {
-                        if (player->collidesWith(object))
+            for (const std::unique_ptr<CObject>& obj : objectcontainer[iLayer].list) {
+                if (!obj->isDead()) {
+                    if (coldec_player2obj(player, obj.get())) {
+                        if (player->collidesWith(obj.get()))
                             break;
                     }
                 }
@@ -857,20 +853,20 @@ void handleP2ObjCollisions()
 
 void handleObj2ObjCollisions()
 {
-    for (short iLayer1 = 0; iLayer1 < 3; iLayer1++) {
-        short iContainerEnd1 = objectcontainer[iLayer1].list_end;
-        for (short iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
-            CObject * object1 = objectcontainer[iLayer1].list[iObject1];
+    for (size_t iLayer1 = 0; iLayer1 < 3; iLayer1++) {
+        size_t iContainerEnd1 = objectcontainer[iLayer1].list.size();
+        for (size_t iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
+            CObject * object1 = objectcontainer[iLayer1].list[iObject1].get();
 
             if (object1->getObjectType() != object_moving)
                 continue;
 
             IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
 
-            for (short iLayer2 = iLayer1; iLayer2 < 3; iLayer2++) {
-                short iContainerEnd2 = objectcontainer[iLayer2].list_end;
-                for (short iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
-                    CObject * object2 = objectcontainer[iLayer2].list[iObject2];
+            for (size_t iLayer2 = iLayer1; iLayer2 < 3; iLayer2++) {
+                size_t iContainerEnd2 = objectcontainer[iLayer2].list.size();
+                for (size_t iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
+                    CObject * object2 = objectcontainer[iLayer2].list[iObject2].get();
 
                     if (object2->getObjectType() != object_moving)
                         continue;

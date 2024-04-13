@@ -86,8 +86,6 @@ class CObject
 		short state;
 		bool dead;
 
-		short index;
-
 	friend class CObjectContainer;
 	friend class CPlayer;
 	friend void RunGame();

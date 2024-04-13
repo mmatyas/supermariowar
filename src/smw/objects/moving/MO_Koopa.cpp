@@ -4,6 +4,7 @@
 #include "GameMode.h"
 #include "GameValues.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "objects/carriable/CO_Shell.h"
 

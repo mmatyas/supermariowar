@@ -3,6 +3,7 @@
 #include "GameValues.h"
 #include "map.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "objects/moving/MO_Explosion.h"
 

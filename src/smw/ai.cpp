@@ -66,6 +66,7 @@
 #include "objects/powerup/PU_Tanooki.h"
 #include "objects/powerup/PU_TreasureChestBonus.h"
 
+#include <memory>
 #include <cstdlib> // abs()
 
 // see docs/development/HowAIWorks.txt for more information
@@ -104,11 +105,9 @@ void CPlayerAI::Init()
     if (game_values.gamemode->gamemode == game_mode_eggs) {
         bool fYoshi[4] = {false, false, false, false};
         //Scan Yoshis to see which ones are present
-        for (short i = 0; i < objectcontainer[1].list_end; i++) {
-            CObject * object = objectcontainer[1].list[i];
-
-            if (object_moving == object->getObjectType()) {
-                IO_MovingObject * movingobject = (IO_MovingObject*)object;
+        for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+            if (object_moving == obj->getObjectType()) {
+                IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
 
                 if (movingobject_yoshi == movingobject->getMovingObjectType()) {
                     MO_Yoshi * yoshi = (MO_Yoshi*)movingobject;
@@ -118,11 +117,9 @@ void CPlayerAI::Init()
         }
 
         //Now scan eggs and ignore any egg that doesn't have a yoshi
-        for (short i = 0; i < objectcontainer[1].list_end; i++) {
-            CObject * object = objectcontainer[1].list[i];
-
-            if (object_moving == object->getObjectType()) {
-                IO_MovingObject * movingobject = (IO_MovingObject*)object;
+        for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+            if (object_moving == obj->getObjectType()) {
+                IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
 
                 if (movingobject_egg == movingobject->getMovingObjectType()) {
                     CO_Egg * egg = (CO_Egg*)movingobject;
@@ -682,19 +679,17 @@ void CPlayerAI::GetNearestObjects()
 
     std::map<int, AttentionObject*>::iterator lim = attentionObjects.end();
 
-    for (short i = 0; i < objectcontainer[1].list_end; i++) {
-        CObject * object = objectcontainer[1].list[i];
-
-        if (attentionObjects.find(object->iNetworkID) != lim) {
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+        if (attentionObjects.find(obj->iNetworkID) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
         }
 
-        ObjectType type = object->getObjectType();
+        ObjectType type = obj->getObjectType();
 
         switch (type) {
         case object_moving: {
-            IO_MovingObject * movingobject = (IO_MovingObject*)object;
+            IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
             MovingObjectType movingtype = movingobject->getMovingObjectType();
 
             if (carriedItem == movingobject)
@@ -818,12 +813,12 @@ void CPlayerAI::GetNearestObjects()
             break;
         }
         case object_frenzycard: {
-            DistanceToObject(object, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+            DistanceToObject(obj.get(), &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
             break;
         }
 
         case object_pipe_coin: {
-            OMO_PipeCoin * coin = (OMO_PipeCoin*)object;
+            OMO_PipeCoin * coin = (OMO_PipeCoin*)obj.get();
 
             if (coin->GetColor() != 0) {
                 if (coin->GetTeam() == -1 || coin->GetTeam() == pPlayer->teamID)
@@ -836,7 +831,7 @@ void CPlayerAI::GetNearestObjects()
         }
 
         case object_pipe_bonus: {
-            OMO_PipeBonus * bonus = (OMO_PipeBonus*)object;
+            OMO_PipeBonus * bonus = (OMO_PipeBonus*)obj.get();
 
             if (bonus->GetType() != 5) {
                 DistanceToObject(bonus, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
@@ -849,22 +844,22 @@ void CPlayerAI::GetNearestObjects()
 
         case object_pathhazard:
         case object_orbithazard: {
-            DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+            DistanceToObject(obj.get(), &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             break;
         }
 
         case object_phanto: {
-            OMO_Phanto * phanto = (OMO_Phanto*)object;
+            OMO_Phanto * phanto = (OMO_Phanto*)obj.get();
 
             if (phanto->GetType() == 2 || (carriedItem && carriedItem->getMovingObjectType() == movingobject_phantokey)) {
-                DistanceToObjectCenter(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+                DistanceToObjectCenter(obj.get(), &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             }
 
             break;
         }
 
         case object_flamecannon: {
-            IO_FlameCannon * cannon = (IO_FlameCannon *)object;
+            IO_FlameCannon * cannon = (IO_FlameCannon *)obj.get();
 
             if (cannon->state > 0)
                 DistanceToObject(cannon, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
@@ -873,25 +868,23 @@ void CPlayerAI::GetNearestObjects()
         }
 
         default: {
-            DistanceToObject(object, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+            DistanceToObject(obj.get(), &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
             break;
         }
         }
     }
 
-    for (short i = 0; i < objectcontainer[0].list_end; i++) {
-        CObject * object = objectcontainer[0].list[i];
-
-        if (attentionObjects.find(object->iNetworkID) != lim) {
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list) {
+        if (attentionObjects.find(obj->iNetworkID) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
         }
 
-        ObjectType type = object->getObjectType();
+        ObjectType type = obj->getObjectType();
 
         switch (type) {
         case object_moving: {
-            IO_MovingObject * movingobject = (IO_MovingObject*)object;
+            IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
             MovingObjectType movingtype = movingobject->getMovingObjectType();
 
             if (carriedItem == movingobject)
@@ -925,38 +918,36 @@ void CPlayerAI::GetNearestObjects()
         }
 
         case object_area: {
-            if (((OMO_Area*)object)->getColorID() == pPlayer->colorID)
+            if (((OMO_Area*)obj.get())->getColorID() == pPlayer->colorID)
                 continue;
 
-            DistanceToObject(object, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+            DistanceToObject(obj.get(), &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
             break;
         }
 
         case object_kingofthehill_area: {
-            DistanceToObjectCenter(object, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+            DistanceToObjectCenter(obj.get(), &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
             break;
         }
 
         default: {
-            DistanceToObject(object, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+            DistanceToObject(obj.get(), &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
             break;
         }
         }
     }
 
-    for (short i = 0; i < objectcontainer[2].list_end; i++) {
-        CObject * object = objectcontainer[2].list[i];
-
-        if (attentionObjects.find(object->iNetworkID) != lim) {
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[2].list) {
+        if (attentionObjects.find(obj->iNetworkID) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
         }
 
-        ObjectType type = object->getObjectType();
+        ObjectType type = obj->getObjectType();
 
         switch (type) {
         case object_moving: {
-            IO_MovingObject * movingobject = (IO_MovingObject*)object;
+            IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
             MovingObjectType movingtype = movingobject->getMovingObjectType();
 
             if (carriedItem == movingobject)
@@ -1009,14 +1000,14 @@ void CPlayerAI::GetNearestObjects()
             if (fInvincible)
                 continue;
 
-            DistanceToObjectCenter(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+            DistanceToObjectCenter(obj.get(), &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             break;
         }
         case object_race_goal: {
             if (game_values.gamemode->gamemode != game_mode_race)
                 continue;
 
-            OMO_RaceGoal * racegoal = (OMO_RaceGoal*)object;
+            OMO_RaceGoal * racegoal = (OMO_RaceGoal*)obj.get();
 
             if (racegoal->getGoalID() != ((CGM_Race*)game_values.gamemode)->getNextGoal(iTeamID))
                 continue;
@@ -1027,7 +1018,7 @@ void CPlayerAI::GetNearestObjects()
 
 
         default: {
-            DistanceToObject(object, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+            DistanceToObject(obj.get(), &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
             break;
         }
         }

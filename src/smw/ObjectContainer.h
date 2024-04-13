@@ -1,39 +1,38 @@
-#ifndef OBJECTCONTAINER_H
-#define OBJECTCONTAINER_H
+#pragma once
 
 #include "MovingObjectTypes.h"
 #include "ObjectBase.h"
-#include "player.h"
+
+#include <memory>
+#include <vector>
+
+class CPlayer;
+
 
 //object container
-class CObjectContainer
-{
-    public:
-        CObjectContainer();
-        ~CObjectContainer();
+class CObjectContainer {
+public:
+    CObjectContainer();
 
-        bool add(CObject* cio);
-        void update();
-        void draw();
-        void clean();
+    bool add(CObject* cio);
+    void update() const;
+    void draw() const;
 
-        bool isBlockAt(short x, short y);
+    void clean();
+    void cleandeadobjects();
 
-        void cleandeadobjects();
+    bool isBlockAt(short x, short y) const;
+    float getClosestObject(short x, short y, ObjectType objectType) const;
+    float getClosestMovingObject(short x, short y, MovingObjectType movingObjectType) const;
+    size_t countTypes(ObjectType type) const;
+    size_t countMovingTypes(MovingObjectType type) const;
 
-        float getClosestObject(short x, short y, short objectType);
-        float getClosestMovingObject(short x, short y, short movingObjectType);
-        short countTypes(ObjectType type);
-        short countMovingTypes(MovingObjectType type);
-        void adjustPlayerAreas(CPlayer * player, CPlayer * other);
-        void removePlayerRaceGoals(short id, short iGoal);
-        void pushBombs(short x, short y);
+    void adjustPlayerAreas(CPlayer* player, CPlayer* other) const;
+    void removePlayerRaceGoals(short id, short iGoal) const;
+    void pushBombs(short x, short y) const;
 
-        CObject * getRandomObject();
+    CObject* getRandomObject() const;
 
-    public:
-        CObject *list[MAXOBJECTS];
-        short        list_end;
+public:
+    std::vector<std::unique_ptr<CObject>> list;
 };
-
-#endif // OBJECTCONTAINER_H

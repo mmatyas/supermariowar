@@ -1,5 +1,6 @@
 #include "MI_MapField.h"
 
+#include "Game.h"
 #include "input.h"
 #include "MapList.h"
 #include "ObjectContainer.h"

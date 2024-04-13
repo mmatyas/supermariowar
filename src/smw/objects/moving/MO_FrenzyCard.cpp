@@ -1,9 +1,11 @@
 #include "MO_FrenzyCard.h"
 
 #include "GameMode.h"
+#include "Game.h"
 #include "GameValues.h"
 #include "map.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "objects/carriable/CO_Shell.h"

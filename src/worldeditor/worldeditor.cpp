@@ -25,6 +25,7 @@
 #include "MapList.h"
 #include "menu/ModeOptionsMenu.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"

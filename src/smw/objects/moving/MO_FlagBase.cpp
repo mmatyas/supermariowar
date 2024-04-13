@@ -4,6 +4,7 @@
 #include "GameValues.h"
 #include "map.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "objects/carriable/CO_Flag.h"

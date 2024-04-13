@@ -2,6 +2,7 @@
 
 #include "GameValues.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "ResourceManager.h"
 #include "objects/moving/MO_Coin.h"
 

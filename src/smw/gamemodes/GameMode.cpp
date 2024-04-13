@@ -4,6 +4,7 @@
 #include "GameValues.h"
 #include "net.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"

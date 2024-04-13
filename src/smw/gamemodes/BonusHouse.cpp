@@ -1,7 +1,9 @@
 #include "BonusHouse.h"
 
+#include "Game.h"
 #include "GameValues.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "objects/moving/MO_BonusHouseChest.h"

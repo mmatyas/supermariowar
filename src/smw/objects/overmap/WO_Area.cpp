@@ -4,6 +4,7 @@
 #include "GameValues.h"
 #include "map.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "ResourceManager.h"
 
 extern CObjectContainer objectcontainer[3];

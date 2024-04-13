@@ -1,11 +1,13 @@
 #include "objectgame.h"
 
 #include "eyecandy.h"
+#include "Game.h"
 #include "GameMode.h"
 #include "GameValues.h"
 #include "map.h"
 #include "movingplatform.h"
 #include "ObjectContainer.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "objects/moving/MO_Coin.h"

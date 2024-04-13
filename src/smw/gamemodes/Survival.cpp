@@ -1,5 +1,6 @@
 #include "Survival.h"
 
+#include "Game.h"
 #include "GameValues.h"
 #include "ObjectContainer.h"
 #include "RandomNumberGenerator.h"

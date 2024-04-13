@@ -1,11 +1,14 @@
 #include "ObjectContainer.h"
 
+#include "Game.h"
 #include "GameValues.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
 #include "objects/carriable/CO_Bomb.h"
 #include "objects/overmap/WO_Area.h"
 #include "objects/overmap/WO_RaceGoal.h"
 
+#include <algorithm>
 #include <cmath>
 
 extern CGameValues game_values;
@@ -15,111 +18,92 @@ extern CGameValues game_values;
 //------------------------------------------------------------------------------
 CObjectContainer::CObjectContainer()
 {
-    for (short i = 0; i < MAXOBJECTS; i++)
-        list[i] = NULL;
-
-    list_end = 0;
-}
-
-CObjectContainer::~CObjectContainer()
-{
-    clean();
+    list.reserve(MAXOBJECTS);
 }
 
 void CObjectContainer::clean()
 {
-    for (short i = 0; i < list_end; i++) {
-        delete list[i];
-        list[i] = NULL;
-    }
-    list_end = 0;
+    list.clear();
 }
 
-bool CObjectContainer::add(CObject* ec)
+bool CObjectContainer::add(CObject* ptr)
 {
-    if (list_end >= MAXOBJECTS) {
+    if (list.size() + 1 >= list.capacity()) {
         //printf("eyecandy list full!\n");
-        delete ec;	// otherwise memory leak!
+        delete ptr;	// otherwise memory leak!
         return false;
     }
-
-    list[list_end] = ec;
-    ec->index = list_end;	// save index for removing
-    list_end++;
+    list.emplace_back(ptr);
     return true;
 }
 
-void CObjectContainer::update()
+void CObjectContainer::update() const
 {
-    for (short i = 0; i < list_end; i++)
-        list[i]->update();
+    for (const std::unique_ptr<CObject>& obj : list)
+        obj->update();
 }
 
-void CObjectContainer::draw()
+void CObjectContainer::draw() const
 {
-    for (short i = list_end - 1; i >= 0; i--)
-        list[i]->draw();
+    for (const std::unique_ptr<CObject>& obj : list)
+        obj->draw();
 }
 
-bool CObjectContainer::isBlockAt(short x, short y)
+bool CObjectContainer::isBlockAt(short x, short y) const
 {
-    for (short i = 0; i < list_end; i++) {
-        if (x >= list[i]->ix && x < list[i]->ix + list[i]->iw &&
-                y >= list[i]->iy && y < list[i]->iy + list[i]->ih &&
-                list[i]->getObjectType() == object_block) {
+    for (const std::unique_ptr<CObject>& obj : list) {
+        const bool hitX = obj->ix <= x && x < obj->ix + obj->iw;
+        const bool hitY = obj->iy <= y && y < obj->iy + obj->ih;
+        if (hitX && hitY && obj->getObjectType() == object_block)
             return true;
-        }
     }
-
     return false;
 }
 
-float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
+float CObjectContainer::getClosestObject(short ix, short iy, ObjectType objectType) const
 {
-    int dist = App::screenWidth * 1000;  //Longest distance from corner to corner squared
+    float minDist = App::screenWidth * 1000;  //Longest distance from corner to corner squared
 
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() != objectType)
+    for (const std::unique_ptr<CObject>& obj : list) {
+        if (obj->getObjectType() != objectType)
             continue;
 
-        short x = list[i]->ix - ix;
-        short y = list[i]->iy - iy;
+        short x = obj->ix - ix;
+        short y = obj->iy - iy;
 
-        int calcdist = x * x + y * y;
-
-        if (calcdist < dist)
-            dist = calcdist;
+        float dist = x * x + y * y;
+        if (dist < minDist)
+            minDist = dist;
     }
 
-    return (float)sqrt((double)dist);
+    return ::sqrtf(minDist);
 }
 
-float CObjectContainer::getClosestMovingObject(short ix, short iy, short movingObjectType)
+float CObjectContainer::getClosestMovingObject(short ix, short iy, MovingObjectType movingObjectType) const
 {
-    int dist = App::screenWidth * 1000;  //Longest distance from corner to corner squared
+    float minDist = App::screenWidth * 1000;  //Longest distance from corner to corner squared
 
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() != object_moving || ((IO_MovingObject*)list[i])->getMovingObjectType() != movingObjectType)
+    for (const std::unique_ptr<CObject>& obj : list) {
+        if (obj->getObjectType() != object_moving || ((IO_MovingObject*)obj.get())->getMovingObjectType() != movingObjectType)
             continue;
 
-        short x = list[i]->ix - ix;
-        short y = list[i]->iy - iy;
+        short x = obj->ix - ix;
+        short y = obj->iy - iy;
 
-        int calcdist = x * x + y * y;
-
-        if (calcdist < dist)
-            dist = calcdist;
+        float dist = x * x + y * y;
+        if (dist < minDist)
+            minDist = dist;
     }
 
-    return (float)sqrt((double)dist);
+    return ::sqrtf(minDist);
 }
 
-short CObjectContainer::countTypes(ObjectType type)
+size_t CObjectContainer::countTypes(ObjectType type) const
 {
-    short count = 0;
+    size_t count = 0;
 
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() == type) {
+    for (const std::unique_ptr<CObject>& obj : list) {
+        if (obj->getObjectType() == type) {
             count++;
         }
     }
@@ -127,12 +111,12 @@ short CObjectContainer::countTypes(ObjectType type)
     return count;
 }
 
-short CObjectContainer::countMovingTypes(MovingObjectType type)
+size_t CObjectContainer::countMovingTypes(MovingObjectType type) const
 {
-    short count = 0;
+    size_t count = 0;
 
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() == object_moving && ((IO_MovingObject*)list[i])->getMovingObjectType() == type) {
+    for (const std::unique_ptr<CObject>& obj : list) {
+        if (obj->getObjectType() == object_moving && ((IO_MovingObject*)obj.get())->getMovingObjectType() == type) {
             count++;
         }
     }
@@ -140,55 +124,53 @@ short CObjectContainer::countMovingTypes(MovingObjectType type)
     return count;
 }
 
-void CObjectContainer::adjustPlayerAreas(CPlayer * player, CPlayer * other)
+void CObjectContainer::adjustPlayerAreas(CPlayer* player, CPlayer* other) const
 {
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() == object_area) {
-            OMO_Area * area = (OMO_Area*)list[i];
+    for (const std::unique_ptr<CObject>& obj : list) {
+        if (obj->getObjectType() != object_area)
+            continue;
 
-            if (area->colorID == other->colorID) {
-                if (game_values.gamemodesettings.domination.relocateondeath)
-                    area->placeArea();
+        auto* area = static_cast<OMO_Area*>(obj.get());
+        if (area->colorID == other->colorID) {
+            if (game_values.gamemodesettings.domination.relocateondeath)
+                area->placeArea();
 
-                if (game_values.gamemodesettings.domination.stealondeath && player)
-                    area->setOwner(player);
-                else if (game_values.gamemodesettings.domination.loseondeath)
-                    area->reset();
-            }
+            if (game_values.gamemodesettings.domination.stealondeath && player)
+                area->setOwner(player);
+            else if (game_values.gamemodesettings.domination.loseondeath)
+                area->reset();
         }
     }
 }
 
-void CObjectContainer::removePlayerRaceGoals(short id, short iGoal)
+void CObjectContainer::removePlayerRaceGoals(short id, short iGoal) const
 {
     if (game_values.gamemodesettings.race.penalty == 0 && iGoal != -1)
         return;
 
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() == object_race_goal) {
-            OMO_RaceGoal * goal = (OMO_RaceGoal*)list[i];
+    for (const std::unique_ptr<CObject>& obj : list) {
+        if (obj->getObjectType() != object_race_goal)
+            continue;
 
-            if (iGoal == -1 || 2 == game_values.gamemodesettings.race.penalty ||
-                    (1 == game_values.gamemodesettings.race.penalty && goal->getGoalID() == iGoal)) {
-                goal->reset(id);
-            }
+        auto* goal = static_cast<OMO_RaceGoal*>(obj.get());
+        if (iGoal == -1 || 2 == game_values.gamemodesettings.race.penalty ||
+                (1 == game_values.gamemodesettings.race.penalty && goal->getGoalID() == iGoal)) {
+            goal->reset(id);
         }
     }
 }
 
-void CObjectContainer::pushBombs(short x, short y)
+void CObjectContainer::pushBombs(short x, short y) const
 {
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() != object_moving)
+    for (const std::unique_ptr<CObject>& obj : list) {
+        if (obj->getObjectType() != object_moving)
             continue;
 
-        IO_MovingObject * mo = (IO_MovingObject*)list[i];
-
+        auto* mo = static_cast<IO_MovingObject*>(obj.get());
         if (mo->getMovingObjectType() != movingobject_bomb)
             continue;
 
-        CO_Bomb * bomb = (CO_Bomb*)list[i];
-
+        auto* bomb = static_cast<CO_Bomb*>(obj.get());
         if (bomb->HasOwner())
             continue;
 
@@ -210,24 +192,14 @@ void CObjectContainer::pushBombs(short x, short y)
 
 void CObjectContainer::cleandeadobjects()
 {
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->dead) {
-            delete list[i];
-            list_end--;
-
-            if (i != list_end) {
-                list[i] = list[list_end];
-            }
-
-            i--;
-        }
-    }
+    auto erase_from = std::remove_if(list.begin(), list.end(),
+        [](const std::unique_ptr<CObject>& obj) { return obj->dead; });
+    list.erase(erase_from, list.end());
 }
 
-CObject * CObjectContainer::getRandomObject()
+CObject* CObjectContainer::getRandomObject() const
 {
-    if (list_end == 0)
-        return NULL;
-
-    return list[RANDOM_INT( list_end)];
+    return list.empty()
+        ? nullptr
+        : list[RANDOM_INT(list.size())].get();
 }
