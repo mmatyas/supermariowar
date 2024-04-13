@@ -209,11 +209,11 @@ const char * g_szMusicCategoryNames[MAXMUSICCATEGORY] = {"Land", "Underground", 
 void LoadCurrentMapBackground()
 {
     std::string path = concat("gfx/packs/backgrounds/", g_map->szBackgroundFile);
-    path = convertPath(path, gamegraphicspacklist->current_name());
+    path = convertPath(path, gamegraphicspacklist->currentPath());
 
     //if the background file doesn't exist, use the classic background
     if (!File_Exists(path))
-        path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name());
+        path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath());
 
     gfx_loadimagenocolorkey(&rm->spr_background, path);
 }

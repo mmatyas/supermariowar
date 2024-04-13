@@ -615,7 +615,7 @@ int main(int argc, char *argv[])
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
     worldlist->find(findstring);
-    game_values.worldindex = worldlist->GetCurrentIndex();
+    game_values.worldindex = worldlist->currentIndex();
 	loadcurrentworld();
 	findstring[0] = 0;  //clear out the find string so that pressing "f" will give you the find dialog
 
@@ -1064,7 +1064,7 @@ int main(int argc, char *argv[])
             editor_settings.write_i32(draw_offset_col);
             editor_settings.write_i32(draw_offset_row);
             editor_settings.write_bool(g_fFullScreen);
-            editor_settings.write_string_long(worldlist->current_name());
+            editor_settings.write_string_long(worldlist->currentPath().c_str());
         }
     }
 
@@ -1318,7 +1318,7 @@ int editor_edit()
 
                     if (event.key.keysym.sym == SDLK_PAGEUP) {
 							if (--game_values.worldindex < 0)
-                            game_values.worldindex = worldlist->GetCount() - 1;
+                            game_values.worldindex = worldlist->count() - 1;
 
                         worldlist->prev();
 
@@ -1328,7 +1328,7 @@ int editor_edit()
 						}
 
                     if (event.key.keysym.sym == SDLK_PAGEDOWN) {
-                        if (++game_values.worldindex >= worldlist->GetCount())
+                        if (++game_values.worldindex >= worldlist->count())
 								game_values.worldindex = 0;
 
                         worldlist->next();
@@ -1882,7 +1882,7 @@ int editor_edit()
 			if (fAutoPaint)
 				rm->menu_font_small.draw(0, 16, "Auto Paint");
 
-            rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 
 
             if (--g_musiccategorydisplaytimer > 0) {
@@ -2569,7 +2569,7 @@ int editor_warp()
 
 		spr_warps[0].draw(0, 0, 0, 0, 320, 32);
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2697,7 +2697,7 @@ int editor_start_items()
 				rm->spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
 		}
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2769,7 +2769,7 @@ int editor_boundary()
 
 		rm->spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2843,7 +2843,7 @@ int editor_type()
 
 		rm->spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3405,7 +3405,7 @@ int editor_vehicles()
 		mCurrentMenu->Update();
 		mCurrentMenu->Draw();
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -4344,7 +4344,7 @@ int editor_stage()
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[LMB] Select Items, [LMB] Remove Items");
 		}
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -4506,7 +4506,7 @@ int save_as()
     if (dialog("Save As", "Enter name:", fileName, 64)) {
         worldlist->add(strcat(mapLocation, strcat(fileName, ".txt")));
         worldlist->find(fileName);
-        game_values.worldindex = worldlist->GetCurrentIndex();
+        game_values.worldindex = worldlist->currentIndex();
 		savecurrentworld();
 		loadcurrentworld();
 	}
@@ -4523,7 +4523,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 	spr_dialog.draw(224, 176, 0, 0, 192, 128);
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
-    rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+    rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 	gfx_flipscreen();
 
     while (true) {
@@ -4552,7 +4552,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 							gfx_flipscreen();
 
 							currentChar--;
@@ -4608,7 +4608,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->current_name());
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 							gfx_flipscreen();
 						}
 					}
@@ -4640,7 +4640,7 @@ int find()
 		strcpy(findstring, fileName);
 
         if (worldlist->find(findstring)) {
-            game_values.worldindex = worldlist->GetCurrentIndex();
+            game_values.worldindex = worldlist->currentIndex();
 			loadcurrentworld();
 		}
 	}
@@ -4659,7 +4659,7 @@ int clear_world()
 
 void loadcurrentworld()
 {
-	game_values.worldindex = worldlist->GetCurrentIndex();
+	game_values.worldindex = worldlist->currentIndex();
 	g_worldmap.Load(TILESIZE);
 	ReadVehiclesIntoEditor();
 	ReadWarpsIntoEditor();
@@ -4724,7 +4724,7 @@ int findcurrentstring()
 {
     if (findstring[0] != '\0') {
         if (worldlist->find(findstring)) {
-            game_values.worldindex = worldlist->GetCurrentIndex();
+            game_values.worldindex = worldlist->currentIndex();
 			loadcurrentworld();
 		}
 	}
@@ -4769,7 +4769,7 @@ int new_world()
 		g_worldmap.New(iWidth, iHeight);
         worldlist->add(convertPath(strcat(worldLocation, strcat(fileName, ".txt"))).c_str());
         worldlist->find(fileName);
-        game_values.worldindex = worldlist->GetCurrentIndex();
+        game_values.worldindex = worldlist->currentIndex();
 		savecurrentworld();
 		loadcurrentworld();
 	}
@@ -4868,7 +4868,7 @@ void takescreenshot()
 
 		//Save the screenshot with the same name as the map file
 		std::string szSaveFile("worlds/screenshots/");
-		szSaveFile += GetNameFromFileName(worldlist->current_name());
+		szSaveFile += GetNameFromFileName(worldlist->currentPath());
 
 		if (iTileSize == PREVIEWTILESIZE)
 			szSaveFile += "_preview";

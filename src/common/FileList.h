@@ -13,125 +13,94 @@
 #define MAXCATEGORYTRACKS       64
 
 //it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
-class SimpleFileList
-{
+class SimpleFileList {
 public:
-    SimpleFileList();
-    SimpleFileList(const std::string &path, const std::string &extension, bool fAlphabetize = false);
-    virtual ~SimpleFileList();
-    const char * GetIndex(unsigned int index);
-    int GetCount() {
-        return filelist.size();
-    }
+    SimpleFileList() = default;
+    SimpleFileList(const std::string& dirpath, const std::string& extension, bool fAlphabetize = false);
+    virtual ~SimpleFileList() = default;
 
-    int GetCurrentIndex() {
-        return currentIndex;
-    };
-    void SetCurrent(unsigned int index);
+    std::string at(size_t index) const;
+    size_t count() const { return m_filelist.size(); }
+    size_t currentIndex() const { return m_index; }
+    std::string currentPath() const { return at(m_index); }
 
-    const char * current_name();
-    void SetCurrentName(const std::string &name);
+    void setCurrentIndex(size_t index);
+    void setCurrentPath(const std::string& path);
 
     void next();
     void prev();
     void random();
 
-    void add(const char * name);
-    bool find(const char * name);
+    void add(std::string path);
+    bool find(const std::string& name);
 
 protected:
-    std::vector<std::string> filelist;
-    int currentIndex;
+    std::vector<std::string> m_filelist;
+    size_t m_index = -1;
 };
 
-class SimpleDirectoryList : public SimpleFileList
-{
+
+class SimpleDirectoryList : public SimpleFileList {
 public:
-    SimpleDirectoryList(const std::string &path);
-    virtual ~SimpleDirectoryList() {
-        ;
-    };
+    SimpleDirectoryList(const std::string& dirpath);
+    virtual ~SimpleDirectoryList() = default;
 };
 
-class SkinListNode
-{
+
+class AnnouncerList : public SimpleFileList {
 public:
-    SkinListNode(std::string skinName, std::string skinPath);
-    ~SkinListNode() {}
-
-    std::string sSkinName;
-    std::string sSkinPath;
+    AnnouncerList(): SimpleFileList(convertPath("sfx/announcer/"), ".txt") {}
 };
 
-class SkinList
-{
+class GraphicsList : public SimpleDirectoryList {
+public:
+    GraphicsList(): SimpleDirectoryList(convertPath("gfx/packs/")) {}
+};
+
+class SoundsList : public SimpleDirectoryList {
+public:
+    SoundsList(): SimpleDirectoryList(convertPath("sfx/packs/")) {}
+};
+
+class TourList : public SimpleFileList {
+public:
+    TourList() : SimpleFileList(convertPath("tours/"), ".txt") {}
+};
+
+class WorldList : public SimpleFileList {
+public:
+    WorldList() : SimpleFileList(convertPath("worlds/"), ".txt", true) {}
+};
+
+class BackgroundList : public SimpleFileList {
+public:
+    BackgroundList() : SimpleFileList(convertPath("gfx/packs/Classic/backgrounds/"), ".png") {}
+};
+
+class FiltersList : public SimpleFileList {
+public:
+    FiltersList() : SimpleFileList(convertPath("filters/"), ".txt") {}
+};
+
+
+struct SkinListNode {
+    std::string name;
+    std::string path;
+};
+
+class SkinList {
 public:
     SkinList();
-    int GetCount() {
-        return skins.size();
-    }
-    const char * GetIndex(unsigned int index);
-    const char * GetSkinName(unsigned int index);
+
+    size_t count() const { return m_skins.size(); }
+
+    std::string getPath(size_t index) const;
+    std::string getName(size_t index) const;
 
 private:
-    std::vector<SkinListNode*> skins;
+    std::vector<SkinListNode> m_skins;
 };
 
-class AnnouncerList : public SimpleFileList
-{
-public:
-    AnnouncerList() : SimpleFileList(convertPath("sfx/announcer/"), ".txt") {
-        ;
-    };
-};
-
-class GraphicsList : public SimpleDirectoryList
-{
-public:
-    GraphicsList() : SimpleDirectoryList(convertPath("gfx/packs/")) {
-        ;
-    };
-};
-
-class SoundsList : public SimpleDirectoryList
-{
-public:
-    SoundsList() : SimpleDirectoryList(convertPath("sfx/packs/")) {
-        ;
-    };
-};
-
-class TourList : public SimpleFileList
-{
-public:
-    TourList() : SimpleFileList(convertPath("tours/"), ".txt") {
-        ;
-    };
-};
-
-class WorldList : public SimpleFileList
-{
-public:
-    WorldList() : SimpleFileList(convertPath("worlds/"), ".txt", true) {
-        ;
-    };
-};
-
-class BackgroundList : public SimpleFileList
-{
-public:
-    BackgroundList() : SimpleFileList(convertPath("gfx/packs/Classic/backgrounds/"), ".png") {
-        ;
-    };
-};
-
-class FiltersList : public SimpleFileList
-{
-public:
-    FiltersList() : SimpleFileList(convertPath("filters/"), ".txt") {
-        ;
-    };
-};
 
 class MusicOverride
 {

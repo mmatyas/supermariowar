@@ -982,7 +982,7 @@ void MenuState::update()
         } else if (MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED == code) {
             rm->LoadWorldGraphics();
         } else if (MENU_CODE_GAME_GRAPHICS_PACK_CHANGED == code) {
-            gfx_loadpalette(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->current_name()));
+            gfx_loadpalette(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
             rm->LoadGameGraphics();
         } else if (MENU_CODE_SOUND_PACK_CHANGED == code) {
             rm->LoadGameSounds();
@@ -1464,7 +1464,7 @@ bool MenuState::ReadTourFile()
 {
     ResetTourStops();
 
-    FILE * fp = fopen(tourlist->GetIndex(game_values.tourindex), "r");
+    FILE * fp = fopen(tourlist->at(game_values.tourindex).c_str(), "r");
     const char* const ignorable_leads = " #\n\r\t";
 
     char buffer[256];
@@ -1551,7 +1551,7 @@ void MenuState::StartGame()
             }
             else if (game_values.randomskin[k]) {
                 do {
-                    game_values.skinids[k] = RANDOM_INT( skinlist->GetCount());
+                    game_values.skinids[k] = RANDOM_INT( skinlist->count());
                 } while (!rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]));
             }
             else {
@@ -1561,14 +1561,14 @@ void MenuState::StartGame()
     }
 
     //Load announcer sounds if changed
-    if (game_values.loadedannouncer != announcerlist->GetCurrentIndex()) {
-        game_values.loadedannouncer = (short)announcerlist->GetCurrentIndex();
+    if (game_values.loadedannouncer != announcerlist->currentIndex()) {
+        game_values.loadedannouncer = announcerlist->currentIndex();
 
         //Delete the old sounds
         for (int k = 0; k < PANNOUNCER_SOUND_LAST; k++)
             rm->sfx_announcer[k].reset();
 
-        FILE * announcerfile = fopen(announcerlist->current_name(), "r");
+        FILE * announcerfile = fopen(announcerlist->currentPath().c_str(), "r");
 
         char szBuffer[256];
 

@@ -86,7 +86,7 @@ void MI_TeamSelect::Draw()
             rm->spr_player_select_ready.draw(iTeam * 160 + 16, 368, 0, 0, 128, 96);
 
             rm->spr_menu_boxed_numbers.draw(iTeam * 160 + 32, 388, iTeam * 16, game_values.colorids[iTeam] * 16, 16, 16);
-            rm->menu_font_small.drawChopRight(iTeam * 160 + 52, 404 - rm->menu_font_small.getHeight(), 80, game_values.randomskin[iTeam] ? "Random" : skinlist->GetSkinName(game_values.skinids[iTeam]));
+            rm->menu_font_small.drawChopRight(iTeam * 160 + 52, 404 - rm->menu_font_small.getHeight(), 80, game_values.randomskin[iTeam] ? "Random" : skinlist->getName(game_values.skinids[iTeam]).c_str());
 
             rm->spr_player_select_ready.draw(iTeam * 160 + 64, 408, 128, (!fReady[iTeam] ? 0 : (game_values.playercontrol[iTeam] == 1 ? 32 : 64)), 34, 32);
         }
@@ -124,10 +124,10 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                 if (playerKeys->menu_up.fPressed) {
                     do {
                         if (playerKeys->menu_down.fDown) {
-                            game_values.skinids[iPlayer] = RANDOM_INT(skinlist->GetCount());
+                            game_values.skinids[iPlayer] = RANDOM_INT(skinlist->count());
                         } else {
                             if (--game_values.skinids[iPlayer] < 0)
-                                game_values.skinids[iPlayer] = (short)skinlist->GetCount() - 1;
+                                game_values.skinids[iPlayer] = (short)skinlist->count() - 1;
                         }
                     } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
                 } else if (playerKeys->menu_up.fDown) {
@@ -139,7 +139,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                         if (++iFastScrollTimer[iPlayer] > 5) {
                             do {
                                 if (--game_values.skinids[iPlayer] < 0)
-                                    game_values.skinids[iPlayer] = (short)skinlist->GetCount() - 1;
+                                    game_values.skinids[iPlayer] = (short)skinlist->count() - 1;
                             } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
 
                             iFastScrollTimer[iPlayer] = 0;
@@ -150,9 +150,9 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                 if (playerKeys->menu_down.fPressed) {
                     do {
                         if (playerKeys->menu_up.fDown) {
-                            game_values.skinids[iPlayer] = RANDOM_INT( skinlist->GetCount());
+                            game_values.skinids[iPlayer] = RANDOM_INT( skinlist->count());
                         } else {
-                            if (++game_values.skinids[iPlayer] >= skinlist->GetCount())
+                            if (++game_values.skinids[iPlayer] >= skinlist->count())
                                 game_values.skinids[iPlayer] = 0;
                         }
                     } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
@@ -164,7 +164,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                     } else {
                         if (++iFastScrollTimer[iPlayer] > 5) {
                             do {
-                                if (++game_values.skinids[iPlayer] >= skinlist->GetCount())
+                                if (++game_values.skinids[iPlayer] >= skinlist->count())
                                     game_values.skinids[iPlayer] = 0;
                             } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
 
@@ -188,7 +188,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                     game_values.randomskin[iPlayer] = !game_values.randomskin[iPlayer];
                 } else if (!game_values.randomskin[iPlayer]) {
                     do {
-                        game_values.skinids[iPlayer] = RANDOM_INT(skinlist->GetCount());
+                        game_values.skinids[iPlayer] = RANDOM_INT(skinlist->count());
                     } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
                 }
             }
@@ -281,7 +281,7 @@ void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
 
                     //Skip skins that are invalid
                     while (!rm->LoadMenuSkin(iPlayerID, game_values.skinids[iPlayerID], iNewTeam, false)) {
-                        if (++game_values.skinids[iPlayerID] >= skinlist->GetCount())
+                        if (++game_values.skinids[iPlayerID] >= skinlist->count())
                             game_values.skinids[iPlayerID] = 0;
                     }
                 }
@@ -398,7 +398,7 @@ void MI_TeamSelect::Reset()
         //Skip skins that are invalid
         //TODO: this loops forever in emscripten build
         while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false)) {
-            if (++game_values.skinids[iPlayer] >= skinlist->GetCount())
+            if (++game_values.skinids[iPlayer] >= skinlist->count())
                 game_values.skinids[iPlayer] = 0;
         }
     }

@@ -235,7 +235,7 @@ public:
     short		bulletbilltimer[4];
     short		bulletbillspawntimer[4];
 
-    short		loadedannouncer;
+    size_t		loadedannouncer;
     short		loadedmusic;
 
     short		cputurn;

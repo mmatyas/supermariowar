@@ -161,11 +161,11 @@ void CGameValues::init()
     tournamentcontrolstyle = TournamentControlStyle::All;
 
 
-    pfFilters     = new bool[NUM_AUTO_FILTERS + filterslist->GetCount()];
-    piFilterIcons   = new short[NUM_AUTO_FILTERS + filterslist->GetCount()];
+    pfFilters     = new bool[NUM_AUTO_FILTERS + filterslist->count()];
+    piFilterIcons   = new short[NUM_AUTO_FILTERS + filterslist->count()];
     fNeedWriteFilters = false;
 
-    for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
+    for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->count(); iFilter++) {
         pfFilters[iFilter] = false;
         piFilterIcons[iFilter] = 0;
     }
@@ -326,17 +326,17 @@ void CGameValues::ReadBinaryConfig() {
 
         //Load skin/team settings
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            if (skinids[iPlayer] >= skinlist->GetCount() || skinids[iPlayer] < 0)
+            if (skinids[iPlayer] >= skinlist->count() || skinids[iPlayer] < 0)
                 skinids[iPlayer] = 0;
         }
 
-        announcerlist->SetCurrent(options.read_u8());
+        announcerlist->setCurrentIndex(options.read_u8());
         musiclist->SetCurrent(options.read_u8());
         worldmusiclist->SetCurrent(options.read_u8());
-        soundpacklist->SetCurrent(options.read_u8());
-        menugraphicspacklist->SetCurrent(options.read_u8());
-        worldgraphicspacklist->SetCurrent(options.read_u8());
-        gamegraphicspacklist->SetCurrent(options.read_u8());
+        soundpacklist->setCurrentIndex(options.read_u8());
+        menugraphicspacklist->setCurrentIndex(options.read_u8());
+        worldgraphicspacklist->setCurrentIndex(options.read_u8());
+        gamegraphicspacklist->setCurrentIndex(options.read_u8());
 
         sfx_setmusicvolume(musicvolume);
         sfx_setsoundvolume(soundvolume);
@@ -466,13 +466,13 @@ void CGameValues::WriteConfig()
         options.write_raw(&randomskin, sizeof(bool) * 4);
         options.write_raw(&playercontrol, sizeof(short) * 4);
 
-        options.write_u8(announcerlist->GetCurrentIndex());
+        options.write_u8(announcerlist->currentIndex());
         options.write_u8(musiclist->GetCurrentIndex());
         options.write_u8(worldmusiclist->GetCurrentIndex());
-        options.write_u8(soundpacklist->GetCurrentIndex());
-        options.write_u8(menugraphicspacklist->GetCurrentIndex());
-        options.write_u8(worldgraphicspacklist->GetCurrentIndex());
-        options.write_u8(gamegraphicspacklist->GetCurrentIndex());
+        options.write_u8(soundpacklist->currentIndex());
+        options.write_u8(menugraphicspacklist->currentIndex());
+        options.write_u8(worldgraphicspacklist->currentIndex());
+        options.write_u8(gamegraphicspacklist->currentIndex());
     }
     catch (std::exception const& error)
     {

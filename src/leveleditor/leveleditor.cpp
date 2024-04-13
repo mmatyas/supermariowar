@@ -1004,8 +1004,8 @@ int editor_edit()
                     if (key == SDLK_g) {
                         backgroundlist->next();
 
-                        rm->spr_background.init(backgroundlist->current_name());
-                        strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->current_name()).c_str());
+                        rm->spr_background.init(backgroundlist->currentPath());
+                        strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->currentPath()).c_str());
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
 								//Set music to background default
@@ -3582,7 +3582,7 @@ int editor_tiles()
 
             case SDL_KEYDOWN: {
                 if (!set_tile_drag) {
-                    if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9 && event.key.keysym.sym < SDLK_1 + g_tilesetmanager->GetCount()) {
+                    if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9 && event.key.keysym.sym < SDLK_1 + g_tilesetmanager->count()) {
 							set_tile_tileset = event.key.keysym.sym - SDLK_1;
                         tileset = g_tilesetmanager->tileset(set_tile_tileset);
 							view_tileset_x = 0;
@@ -3595,7 +3595,7 @@ int editor_tiles()
 								view_tileset_y = 0;
 							}
                     } else if (event.key.keysym.sym == SDLK_PAGEDOWN) {
-                        if (set_tile_tileset < g_tilesetmanager->GetCount() - 1) {
+                        if (set_tile_tileset < g_tilesetmanager->count() - 1) {
 								set_tile_tileset++;
                             tileset = g_tilesetmanager->tileset(set_tile_tileset);
 								view_tileset_x = 0;
@@ -4168,7 +4168,7 @@ void init_editor_backgrounds()
     if (editor_backgrounds_initialized)
         return;
 
-    iPage = backgroundlist->GetCurrentIndex() / 16;
+    iPage = backgroundlist->currentIndex() / 16;
 
     for (short iRectY = 0; iRectY < 4; iRectY++) {
         for (short iRectX = 0; iRectX < 4; iRectX++) {
@@ -4210,7 +4210,7 @@ int editor_backgrounds()
                     editor_backgrounds_initialized = false;
                     return EDITOR_EDIT;
                 } else if (event.key.keysym.sym == SDLK_PAGEDOWN || event.key.keysym.sym == SDLK_DOWN) {
-                    if ((iPage + 1) * 16 < backgroundlist->GetCount()) {
+                    if ((iPage + 1) * 16 < backgroundlist->count()) {
 							iPage++;
 							LoadBackgroundPage(sBackgrounds, iPage);
 						}
@@ -4226,16 +4226,16 @@ int editor_backgrounds()
 				case SDL_MOUSEBUTTONDOWN:
                 if (event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT) {
                     for (short iBackground = 0; iBackground < 16; iBackground++) {
-                        if (iPage * 16 + iBackground >= backgroundlist->GetCount())
+                        if (iPage * 16 + iBackground >= backgroundlist->count())
 								break;
 
 							if (event.button.x >= rDst[iBackground].x && event.button.x < rDst[iBackground].x + rDst[iBackground].w &&
                                 event.button.y >= rDst[iBackground].y && event.button.y < rDst[iBackground].y + rDst[iBackground].h)
                             {
-                                backgroundlist->SetCurrent(iPage * 16 + iBackground);
+                                backgroundlist->setCurrentIndex(iPage * 16 + iBackground);
 
-                                rm->spr_background.init(backgroundlist->current_name());
-                                strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->current_name()).c_str());
+                                rm->spr_background.init(backgroundlist->currentPath());
+                                strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->currentPath()).c_str());
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
 									//Set music to background default
@@ -4270,7 +4270,7 @@ int editor_backgrounds()
 		SDL_FillRect(screen, &rect, 0x0);
 
         for (short iBackground = 0; iBackground < 16; iBackground++) {
-            if (iPage * 16 + iBackground >= backgroundlist->GetCount())
+            if (iPage * 16 + iBackground >= backgroundlist->count())
 				break;
 
 			SDL_BlitSurface(sBackgrounds[iBackground], &rSrc, screen, &rDst[iBackground]);
@@ -4281,8 +4281,8 @@ int editor_backgrounds()
 
 		int iID = mouse_x / 160 + mouse_y / 120 * 4 + iPage * 16;
 
-        if (iID < backgroundlist->GetCount())
-            rm->menu_font_small.draw(0, 0, backgroundlist->GetIndex(iID));
+        if (iID < backgroundlist->count())
+            rm->menu_font_small.draw(0, 0, backgroundlist->at(iID));
 
 		DrawMessage();
 		return EDITOR_BACKGROUNDS;
@@ -4473,12 +4473,12 @@ void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
 	SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
     for (short iIndex = 0; iIndex < 16; iIndex++) {
-        const char * szFileName = backgroundlist->GetIndex(iPage * 16 + iIndex);
+            std::string szFileName = backgroundlist->at(iPage * 16 + iIndex);
 
-		if (!szFileName)
+            if (szFileName.empty())
 			return;
 
-		SDL_Surface * temp = IMG_Load(szFileName);
+            SDL_Surface * temp = IMG_Load(szFileName.c_str());
 
 #ifdef USE_SDL2
 		SDL_Surface * sBackground = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_ARGB8888, 0);
@@ -4836,11 +4836,11 @@ void loadcurrentmap()
 
 	std::string filename = concat("gfx/packs/Classic/backgrounds/", g_map->szBackgroundFile);
 	std::string path = convertPath(filename);
-    backgroundlist->SetCurrentName(filename);
+    backgroundlist->setCurrentPath(filename);
 
     if (!File_Exists(path)) {
 		path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
-        backgroundlist->SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
+        backgroundlist->setCurrentPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
 
 	rm->spr_background.init(path);

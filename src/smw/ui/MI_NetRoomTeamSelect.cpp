@@ -93,10 +93,10 @@ MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {
         if (playerKeys->menu_up.fPressed) {
             do {
                 if (playerKeys->menu_down.fDown) {
-                    game_values.skinids[owner_player] = RANDOM_INT(skinlist->GetCount());
+                    game_values.skinids[owner_player] = RANDOM_INT(skinlist->count());
                 } else {
                     if (--game_values.skinids[owner_player] < 0)
-                        game_values.skinids[owner_player] = (short)skinlist->GetCount() - 1;
+                        game_values.skinids[owner_player] = (short)skinlist->count() - 1;
                 }
             } while (!rm->LoadMenuSkin(owner_player, game_values.skinids[owner_player], game_values.colorids[owner_player], false));
         } else if (playerKeys->menu_up.fDown) {
@@ -108,7 +108,7 @@ MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {
                 if (++iFastScrollTimer > 5) {
                     do {
                         if (--game_values.skinids[owner_player] < 0)
-                            game_values.skinids[owner_player] = (short)skinlist->GetCount() - 1;
+                            game_values.skinids[owner_player] = (short)skinlist->count() - 1;
                     } while (!rm->LoadMenuSkin(owner_player, game_values.skinids[owner_player], game_values.colorids[owner_player], false));
 
                     iFastScrollTimer = 0;
@@ -119,9 +119,9 @@ MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {
         if (playerKeys->menu_down.fPressed) {
             do {
                 if (playerKeys->menu_up.fDown) {
-                    game_values.skinids[owner_player] = RANDOM_INT( skinlist->GetCount());
+                    game_values.skinids[owner_player] = RANDOM_INT( skinlist->count());
                 } else {
-                    if (++game_values.skinids[owner_player] >= skinlist->GetCount())
+                    if (++game_values.skinids[owner_player] >= skinlist->count())
                         game_values.skinids[owner_player] = 0;
                 }
             } while (!rm->LoadMenuSkin(owner_player, game_values.skinids[owner_player], game_values.colorids[owner_player], false));
@@ -133,7 +133,7 @@ MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {
             } else {
                 if (++iFastScrollTimer > 5) {
                     do {
-                        if (++game_values.skinids[owner_player] >= skinlist->GetCount())
+                        if (++game_values.skinids[owner_player] >= skinlist->count())
                             game_values.skinids[owner_player] = 0;
                     } while (!rm->LoadMenuSkin(owner_player, game_values.skinids[owner_player], game_values.colorids[owner_player], false));
 

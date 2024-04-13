@@ -109,165 +109,120 @@ void UpdateMusicWithOverrides()
 }
 
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SimpleFileList::SimpleFileList()
-    : currentIndex(-1)
-{}
-
-SimpleFileList::SimpleFileList(const std::string &path, const std::string &extension, bool fAlphabetize)
+SimpleFileList::SimpleFileList(const std::string& dirpath, const std::string& extension, bool fAlphabetize)
 {
-    DirectoryListing d(path, extension);
+    DirectoryListing dir(dirpath, extension);
     std::string curname;
-    while (d(curname)) {
-        filelist.insert(filelist.end(), d.fullName(curname));
+    while (dir(curname)) {
+        m_filelist.emplace_back(dir.fullName(curname));
     }
 
-    currentIndex = 0;
-
-    if (filelist.empty()) {
-#pragma warning "Print this line to log"
-        //printf("ERROR: Empty directory!\n");
-        currentIndex = -1;
+    if (m_filelist.empty()) {
+        printf("WARNING: The directory `%s` is empty\n", dirpath.c_str());
+        m_index = -1;
+        return;
     }
+
+    m_index = 0;
 
     //Alphabetize the list, ignoring author
     if (fAlphabetize) {
-        short iSize = filelist.size();
-        std::string * names = new std::string[iSize];
+        std::vector<std::string> names;
+        names.reserve(m_filelist.size());
 
         //Get only the names of the files, no author information
-        for (short i = 0; i < iSize; i++) {
-            names[i] = stripPathAndExtension(filelist[i]);
-            std::transform(names[i].begin(), names[i].end(), names[i].begin(), tolower);
+        for (const std::string& filepath : m_filelist) {
+            std::string name = stripPathAndExtension(filepath);
+            std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+            names.emplace_back(std::move(name));
         }
 
         //Now bubblesort them
         bool fDone = false;
         while (!fDone) {
             fDone = true;
-            for (short i = 0; i < iSize - 1; i++) {
+            for (size_t i = 0; i < m_filelist.size() - 1; i++) {
                 if (names[i].compare(names[i + 1]) > 0) {
                     fDone = false;
-                    std::string tempName = names[i];
-                    names[i] = names[i + 1];
-                    names[i + 1] = tempName;
-
-                    std::string tempFullName = filelist[i];
-                    filelist[i] = filelist[i + 1];
-                    filelist[i + 1] = tempFullName;
+                    std::swap(names[i], names[i + 1]);
+                    std::swap(m_filelist[i], m_filelist[i + 1]);
                 }
             }
         }
-
-        delete [] names;
     }
 }
 
-SimpleFileList::~SimpleFileList()
+void SimpleFileList::setCurrentIndex(size_t index)
 {
-    filelist.clear();
+    if (index < m_filelist.size())
+        m_index = index;
 }
 
-void SimpleFileList::SetCurrent(unsigned int index)
+void SimpleFileList::setCurrentPath(const std::string& name)
 {
-    if (filelist.empty())
-        return;
-
-    if (index < filelist.size())
-        currentIndex = index;
-    else
-        currentIndex = 0;
-};
-
-const char * SimpleFileList::current_name()
-{
-    if (currentIndex > -1)
-        return filelist[currentIndex].c_str();
-
-    return NULL;
-};
+    auto it = std::find(m_filelist.cbegin(), m_filelist.cend(), name);
+    if (it != m_filelist.cend())
+        m_index = it - m_filelist.cbegin();
+}
 
 void SimpleFileList::next()
 {
-    if (filelist.empty())
+    if (m_filelist.empty())
         return;
 
-    if (currentIndex + 1 == int(filelist.size()))
-        currentIndex = 0;
-    else
-        currentIndex++;
+    m_index++;
+    if (m_index >= m_filelist.size())
+        m_index = 0;
 }
 
 void SimpleFileList::prev()
 {
-    if (filelist.empty())
+    if (m_filelist.empty())
         return;
 
-    if (currentIndex == 0)
-        currentIndex = filelist.size() - 1;
-    else
-        currentIndex--;
+    m_index--;
+    if (m_index >= m_filelist.size())
+        m_index = m_filelist.size() - 1;
 }
 
 void SimpleFileList::random()
 {
-    if (!filelist.empty())
-        currentIndex = RANDOM_INT(filelist.size());
-};
-
-const char * SimpleFileList::GetIndex(unsigned int index)
-{
-    if (index < filelist.size())
-        return filelist[index].c_str();
-
-    return NULL;
+    if (!m_filelist.empty())
+        m_index = RANDOM_INT(m_filelist.size());
 }
 
-void SimpleFileList::SetCurrentName(const std::string &name)
+std::string SimpleFileList::at(size_t index) const
 {
-    if (filelist.empty())
-        return;
-
-    for (unsigned short i = 0; i < filelist.size(); i++) {
-        if (!strcmp(filelist[i].c_str(), name.c_str())) {
-            currentIndex = i;
-            break;
-        }
-    }
+    return index < m_filelist.size()
+        ? m_filelist[index]
+        : std::string();
 }
 
-void SimpleFileList::add(const char * name)
+void SimpleFileList::add(std::string path)
 {
-    filelist.push_back(name);
+    m_filelist.emplace_back(std::move(path));
 }
 
-bool SimpleFileList::find(const char * name)
+bool SimpleFileList::find(const std::string& name)
 {
     bool fFound = false;
-
-    int oldCurrent = currentIndex;
+    size_t oldCurrent = m_index;
     do {
         next(); //sets us to the beginning if we hit the end -> loop through the maps
-
-        if (strstr(filelist[currentIndex].c_str(), name))   //compare names after
+        if (strstr(m_filelist[m_index].c_str(), name.c_str()))   //compare names after
             fFound = true;
-    } while (currentIndex != oldCurrent && !fFound);
+    }
+    while (m_index != oldCurrent && !fFound);
 
     return fFound;
 }
 
 ///////////// SkinList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SkinListNode::SkinListNode(std::string skinName, std::string skinPath)
-{
-    sSkinName = skinName;
-    sSkinPath = skinPath;
-}
-
-
 SkinList::SkinList()
 {
-    DirectoryListing d(convertPath("gfx/skins/"));
+    DirectoryListing dir(convertPath("gfx/skins/"));
     std::string curname;
-    while (d(curname)) {
+    while (dir(curname)) {
         if (curname.length() < 5)
             continue;
 
@@ -276,40 +231,32 @@ SkinList::SkinList()
         if (file_ext != ".bmp" && file_ext != ".png") //Allow bmp and png skins
             continue;
 
-        std::string sShortSkinName = stripCreatorAndDotMap(curname);
-        SkinListNode * node = new SkinListNode(sShortSkinName, d.fullName(curname));
+        SkinListNode node {
+            stripCreatorAndDotMap(curname),
+            dir.fullName(curname),
+        };
 
-        if (skins.empty()) {
-            skins.push_back(node);
-        } else {
-            std::vector<SkinListNode*>::iterator itr = skins.begin(), lim = skins.end();
-
-            while (itr != lim) {
-                if (sShortSkinName.compare((*itr)->sSkinName) < 0)
-                    break;
-
-                itr++;
-            }
-
-            skins.insert(itr, node);
+        auto it = m_skins.begin();
+        for (; it != m_skins.end(); it++) {
+            if (node.name.compare(it->name) < 0)
+                break;
         }
+        m_skins.insert(it, std::move(node));
     }
 }
 
-const char * SkinList::GetIndex(unsigned int index)
+std::string SkinList::getPath(size_t index) const
 {
-    if (index < skins.size())
-        return skins[index]->sSkinPath.c_str();
-
-    return NULL;
+    return index < m_skins.size()
+        ? m_skins[index].path
+        : std::string();
 }
 
-const char * SkinList::GetSkinName(unsigned int index)
+std::string SkinList::getName(size_t index) const
 {
-    if (index < skins.size())
-        return skins[index]->sSkinName.c_str();
-
-    return NULL;
+    return index < m_skins.size()
+        ? m_skins[index].name
+        : std::string();
 }
 
 ///////////// SimpleDirectoryList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -318,14 +265,14 @@ SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
     DirectoryListing d(path);
     std::string curname;
     while (d.NextDirectory(curname)) {
-        filelist.insert(filelist.end(), d.fullName(curname));
+        m_filelist.insert(m_filelist.end(), d.fullName(curname));
     }
-    if (filelist.empty()) {
+    if (m_filelist.empty()) {
         printf("ERROR: Empty directory.  %s\n", path.c_str());
         //exit(0);
     }
 
-    currentIndex = 0;
+    m_index = 0;
 }
 
 
@@ -562,13 +509,13 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
         if (File_Exists(musicPath)) {
             SimpleFileList musList(musicPath + getDirectorySeperator(), ".ogg");
 
-            short iCount = musList.GetCount();
+            short iCount = musList.count();
 
             //printf("Found %d files in %s\n", iCount, musicPath.c_str());
 
             for (short iFile = 0; iFile < iCount; iFile++) {
                 if (numsongsforcategory[iMusicCategory] < MAXCATEGORYTRACKS) {
-                    songFileNames.push_back(musList.current_name());
+                    songFileNames.push_back(musList.currentPath());
                     songsforcategory[iMusicCategory][numsongsforcategory[iMusicCategory]] = iNumFile;
                     numsongsforcategory[iMusicCategory]++;
                     iNumFile++;

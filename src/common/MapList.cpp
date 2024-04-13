@@ -18,8 +18,8 @@ extern CGameValues game_values;
 
 MapListNode::MapListNode(std::string fullName)
 {
-    pfFilters = new bool[NUM_AUTO_FILTERS + filterslist->GetCount()];
-    for (short iFilter = 0; iFilter < filterslist->GetCount() + NUM_AUTO_FILTERS; iFilter++)
+    pfFilters = new bool[NUM_AUTO_FILTERS + filterslist->count()];
+    for (size_t iFilter = 0; iFilter < filterslist->count() + NUM_AUTO_FILTERS; iFilter++)
         pfFilters[iFilter] = false;
 
     fInCurrentFilterSet = true;
@@ -77,11 +77,11 @@ MapList::MapList(bool fWorldEditor)
 
         SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
 
-        short iEditorDirCount = worldeditormapdirs.GetCount();
+        short iEditorDirCount = worldeditormapdirs.count();
         for (short iDir = 0; iDir < iEditorDirCount; iDir++) {
-            const char * szName = worldeditormapdirs.current_name();
+            std::string szName = worldeditormapdirs.currentPath();
 
-            DirectoryListing worldMapDir(std::string(szName) + std::string("/"), ".map");
+            DirectoryListing worldMapDir(szName + '/', ".map");
 
             while (worldMapDir(curname)) {
                 MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
@@ -135,11 +135,11 @@ MapList::MapList(bool fWorldEditor)
     //Read all world map directories and load them into the world/tour only list
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
 
-    short iDirCount = worldmapdirs.GetCount();
+    short iDirCount = worldmapdirs.count();
     for (short iDir = 0; iDir < iDirCount; iDir++) {
-        const char * szName = worldmapdirs.current_name();
+        std::string szName = worldmapdirs.currentPath();
 
-        DirectoryListing worldMapDir(std::string(szName) + std::string("/"), ".map");
+        DirectoryListing worldMapDir(szName + '/', ".map");
 
         while (worldMapDir(curname)) {
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
@@ -188,11 +188,11 @@ void MapList::addWorldMaps()
 {
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
 
-    short iDirCount = worldmapdirs.GetCount();
+    short iDirCount = worldmapdirs.count();
     for (short iDir = 0; iDir < iDirCount; iDir++) {
-        const char * szName = worldmapdirs.current_name();
+        std::string szName = worldmapdirs.currentPath();
 
-        DirectoryListing worldMapDir(std::string(szName) + std::string("/"), ".map");
+        DirectoryListing worldMapDir(szName + '/', ".map");
 
         DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
 
@@ -426,8 +426,8 @@ void MapList::WriteFilters()
     if (game_values.fNeedWriteFilters) {
         game_values.fNeedWriteFilters = false;
 
-        for (short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
-            FILE * fp = fopen(filterslist->GetIndex(iFilter), "w");
+        for (size_t iFilter = 0; iFilter < filterslist->count(); iFilter++) {
+            FILE * fp = fopen(filterslist->at(iFilter).c_str(), "w");
 
             if (!fp)
                 continue;
@@ -452,7 +452,7 @@ void MapList::WriteFilters()
             fclose(fp);
 
 #if defined(__APPLE__)
-            chmod(filterslist->GetIndex(iFilter), S_IRWXU | S_IRWXG | S_IROTH);
+            chmod(filterslist->at(iFilter).c_str(), S_IRWXU | S_IRWXG | S_IROTH);
 #endif
         }
     }
@@ -475,7 +475,7 @@ void MapList::ReadFilters()
 
             if (maps.find(pszMapName) != maps.end()) {
                 bool fErrorReading = false;
-                for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
+                for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
                     char * psz = strtok(NULL, ",\n");
 
                     if (psz) {
@@ -506,8 +506,8 @@ void MapList::ReadFilters()
 
     current = maps.begin();
     //Get user defined filters from files in filters directory
-    for (short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
-        FILE * ffp = fopen(filterslist->GetIndex(iFilter), "r");
+    for (size_t iFilter = 0; iFilter < filterslist->count(); iFilter++) {
+        FILE * ffp = fopen(filterslist->at(iFilter).c_str(), "r");
 
         if (!ffp)
             continue;
@@ -568,7 +568,7 @@ void MapList::WriteMapSummaryCache()
     while (itr != lim) {
         fprintf(fp, "%s", itr->first.c_str());
 
-        for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
+        for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
             fprintf(fp, ",%d", itr->second->pfFilters[iFilter]);
 
         fprintf(fp, "\n");
@@ -593,7 +593,7 @@ void MapList::ApplyFilters(bool * pfFilters)
     short iTotalCount = 0;
     while (itr != lim) {
         bool fMatched = true;
-        for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
+        for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->count(); iFilter++) {
             if (pfFilters[iFilter]) {
                 if (!(*itr).second->pfFilters[iFilter]) {
                     fMatched = false;
@@ -616,7 +616,7 @@ void MapList::ApplyFilters(bool * pfFilters)
     }
 
     game_values.fFiltersOn = false;
-    for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
+    for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->count(); iFilter++) {
         if (pfFilters[iFilter]) {
             game_values.fFiltersOn = true;
             break;

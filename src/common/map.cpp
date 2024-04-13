@@ -877,7 +877,7 @@ void CMap::saveMap(const std::string& file)
 
     //Write tileset names and indexes for translation at load time
     //Number of tilesets used by this map
-    short iTilesetCount = g_tilesetmanager->GetCount();
+    short iTilesetCount = g_tilesetmanager->count();
     bool * fTilesetUsed = new bool[iTilesetCount];
     for (short iTileset = 0; iTileset < iTilesetCount; iTileset++)
         fTilesetUsed[iTileset] = false;
@@ -1348,11 +1348,11 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
             path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
     } else {
         localSzBackgroundFile = concat("gfx/packs/backgrounds/", g_map->szBackgroundFile);
-        path = convertPath(localSzBackgroundFile, gamegraphicspacklist->current_name());
+        path = convertPath(localSzBackgroundFile, gamegraphicspacklist->currentPath());
 
         //if the background file doesn't exist, use the classic background
         if (!File_Exists(path))
-            path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name());
+            path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath());
     }
 
     SDL_Surface * temp = IMG_Load(path.c_str());

@@ -164,7 +164,7 @@ class WorldMap
 
 		bool Load(short iTileSize);
 		bool Save();
-		bool Save(const char * szPath);
+                bool Save(const std::string& szPath);
 
 		void New(short iWidth, short iHeight);
 		void Resize(short iWidth, short iHeight);

@@ -12,14 +12,14 @@ MI_PacksField::MI_PacksField(gfxSprite* nspr, short x, short y, std::string name
 
 MenuCodeEnum MI_PacksField::SendInput(CPlayerInput* playerInput)
 {
-    int iLastIndex = list->GetCurrentIndex();
+    size_t iLastIndex = list->currentIndex();
     MenuCodeEnum code = MI_AnnouncerField::SendInput(playerInput);
 
     if (MENU_CODE_UNSELECT_ITEM == code)
         return code;
 
     MenuCodeEnum returnCode = MENU_CODE_NONE;
-    if (iLastIndex != list->GetCurrentIndex())
+    if (iLastIndex != list->currentIndex())
         returnCode = itemChangedCode;
 
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {

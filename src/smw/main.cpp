@@ -202,13 +202,13 @@ void create_globals()
     worldgraphicspacklist = new GraphicsList();
     gamegraphicspacklist = new GraphicsList();
 
-    announcerlist->SetCurrent(0);
+    announcerlist->setCurrentIndex(0);
     musiclist->SetCurrent(0);
     worldmusiclist->SetCurrent(0);
-    menugraphicspacklist->SetCurrent(0);
-    worldgraphicspacklist->SetCurrent(0);
-    gamegraphicspacklist->SetCurrent(0);
-    soundpacklist->SetCurrent(0);
+    menugraphicspacklist->setCurrentIndex(0);
+    worldgraphicspacklist->setCurrentIndex(0);
+    gamegraphicspacklist->setCurrentIndex(0);
+    soundpacklist->setCurrentIndex(0);
 }
 
 void init_joysticks()
@@ -416,7 +416,7 @@ void main_game()
     init_spawnlocations();
 
     //Load the gfx color palette
-    gfx_loadpalette(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->current_name()));
+    gfx_loadpalette(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
 
     srand((unsigned int)time(NULL));
 /*

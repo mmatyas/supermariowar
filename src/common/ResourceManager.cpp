@@ -25,7 +25,7 @@ constexpr RGB MAGENTA { 255, 0, 255 };
 
 bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
-    return gfx_loadmenuskin(spr_player[playerID], skinlist->GetIndex(skinID), MAGENTA, colorID, fLoadBothDirections);
+    return gfx_loadmenuskin(spr_player[playerID], skinlist->getPath(skinID), MAGENTA, colorID, fLoadBothDirections);
 }
 
 bool CResourceManager::LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections)
@@ -40,11 +40,11 @@ bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, const std::string& fil
 
 bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID)
 {
-    return LoadFullSkin(sprites, skinlist->GetIndex(skinID), colorID);
+    return LoadFullSkin(sprites, skinlist->getPath(skinID), colorID);
 }
 
 void CResourceManager::LoadAllSprites() {
-    const char * graphicspack = gamegraphicspacklist->current_name();
+    std::string graphicspack = gamegraphicspacklist->currentPath();
 
     //Just load menu skins for now (just standing right sprite)
     for (short k = 0; k < MAX_PLAYERS; k++) {
@@ -270,7 +270,7 @@ void CResourceManager::LoadAllSprites() {
 
 bool CResourceManager::LoadMenuGraphics()
 {
-    const char * graphicspack = menugraphicspacklist->current_name();
+    std::string graphicspack = menugraphicspacklist->currentPath();
 
     gfx_loadimagenocolorkey(&menu_shade, convertPath("gfx/packs/menu/menu_shade.png", graphicspack));
     menu_shade.setalpha(App::menuTransparency);
@@ -317,7 +317,7 @@ bool CResourceManager::LoadMenuGraphics()
 
 bool CResourceManager::LoadWorldGraphics()
 {
-    const char * graphicspack = worldgraphicspacklist->current_name();
+    std::string graphicspack = worldgraphicspacklist->currentPath();
 
     gfx_loadimage(&spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack), false, false);
     gfx_loadimage(&spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack), false, false);
@@ -345,7 +345,7 @@ bool CResourceManager::LoadWorldGraphics()
 
 bool CResourceManager::LoadGameGraphics()
 {
-    const char * graphicspack = gamegraphicspacklist->current_name();
+    std::string graphicspack = gamegraphicspacklist->currentPath();
 
     g_tilesetmanager->init(graphicspack);
 
@@ -391,12 +391,12 @@ void CResourceManager::LoadAllGraphics()
     LoadWorldGraphics();
     LoadGameGraphics();
 
-    gfx_loadimagenocolorkey(&spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
-    gfx_loadimagenocolorkey(&spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
-    gfx_loadimagenocolorkey(&spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
-    gfx_loadimagenocolorkey(&spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
+    gfx_loadimagenocolorkey(&spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
+    gfx_loadimagenocolorkey(&spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
+    gfx_loadimagenocolorkey(&spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
+    gfx_loadimagenocolorkey(&spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
 
-    gfx_loadimage(&spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist->current_name()), false, false);
+    gfx_loadimage(&spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist->currentPath()), false, false);
 }
 
 bool CResourceManager::LoadGameSounds()
@@ -411,7 +411,7 @@ bool CResourceManager::LoadGameSounds()
         return false;
 #endif
 
-    const char * soundpack = soundpacklist->current_name();
+    std::string soundpack = soundpacklist->currentPath();
 
     sfx_mip.init(convertPath("sfx/packs/mip.wav", soundpack));
     sfx_deathsound.init(convertPath("sfx/packs/death.wav", soundpack));

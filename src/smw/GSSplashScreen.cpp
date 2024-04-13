@@ -51,7 +51,7 @@ void SplashScreenState::onLeaveState()
 
 bool LoadStartGraphics()
 {
-    const char * graphicspack = menugraphicspacklist->current_name();
+    std::string graphicspack = menugraphicspacklist->currentPath();
 
     bool loadok = true;
 
@@ -87,7 +87,7 @@ bool SplashScreenState::init()
 //  gfx_loadimagenocolorkey(&rm->menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
 
     menu_credits = new gfxSprite();
-    gfx_loadimage(menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->current_name()), false);
+    gfx_loadimage(menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->currentPath()), false);
 
 //	const char * contributors[] = {
 //	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",

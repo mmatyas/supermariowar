@@ -72,7 +72,7 @@ MenuCodeEnum MI_AnnouncerField::SendInput(CPlayerInput* playerInput)
 
 void MI_AnnouncerField::UpdateName()
 {
-    szFieldName = GetNameFromFileName(list->current_name());
+    szFieldName = GetNameFromFileName(list->currentPath());
 }
 
 void MI_AnnouncerField::Update()

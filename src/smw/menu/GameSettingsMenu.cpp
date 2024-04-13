@@ -92,8 +92,8 @@ UI_GameSettingsMenu::UI_GameSettingsMenu()
     }
 
     // Add user defined filters
-    for (short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
-        std::string szTemp = GetNameFromFileName(filterslist->GetIndex(iFilter), true);
+    for (size_t iFilter = 0; iFilter < filterslist->count(); iFilter++) {
+        std::string szTemp = GetNameFromFileName(filterslist->at(iFilter), true);
         miMapFilterScroll->Add(std::move(szTemp), game_values.piFilterIcons[NUM_AUTO_FILTERS + iFilter]);
     }
 

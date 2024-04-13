@@ -183,7 +183,7 @@ void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY)
 void WorldPlayer::SetSprite(short iPlayer)
 {
     while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], true)) {
-        if (++game_values.skinids[iPlayer] >= skinlist->GetCount())
+        if (++game_values.skinids[iPlayer] >= skinlist->count())
             game_values.skinids[iPlayer] = 0;
     }
 
@@ -406,7 +406,7 @@ bool WorldMap::Load(short tilesize)
         iTileSheet = 2;
     }
 
-    const char * szPath = worldlist->GetIndex(game_values.worldindex);
+    const std::string szPath = worldlist->at(game_values.worldindex);
     worldName = stripPathAndExtension(szPath);
 
     std::ifstream file(szPath);
@@ -837,12 +837,12 @@ void WorldMap::SetTileConnections(short iCol, short iRow)
 //Saves world to file
 bool WorldMap::Save()
 {
-    return Save(worldlist->GetIndex(game_values.worldindex));
+    return Save(worldlist->at(game_values.worldindex));
 }
 
-bool WorldMap::Save(const char * szPath)
+bool WorldMap::Save(const std::string& szPath)
 {
-    FILE * file = fopen(szPath, "w");
+    FILE * file = fopen(szPath.c_str(), "w");
 
     if (!file)
         return false;
@@ -1020,7 +1020,7 @@ bool WorldMap::Save(const char * szPath)
     fclose(file);
 
 #if defined(__APPLE__)
-    chmod(szPath, S_IRWXU | S_IRWXG | S_IROTH);
+    chmod(szPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH);
 #endif
 
     return true;
