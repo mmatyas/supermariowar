@@ -276,9 +276,6 @@ class MapPlatform
 		SDL_Surface * preview;
 };
 
-extern TileType NextTileType(TileType type);
-extern TileType PrevTileType(TileType type);
-
 TileType * animatedtiletypes;
 bool ReadAnimatedTileTypeFile(const char * szFile);
 bool WriteAnimatedTileTypeFile(const char * szFile);

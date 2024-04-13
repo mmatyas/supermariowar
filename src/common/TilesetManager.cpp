@@ -13,9 +13,6 @@
 #include <sys/stat.h>
 #endif
 
-extern TileType NextTileType(TileType type);
-extern TileType PrevTileType(TileType type);
-
 
 // The map format supports tilesets with up to 128x128 tiles
 constexpr int MAX_TILES_PER_AXIS = 128;
