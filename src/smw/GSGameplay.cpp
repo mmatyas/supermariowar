@@ -1644,8 +1644,8 @@ void CleanUp()
 
     //Stop all game sounds
     sfx_stopallsounds();
-    rm->sfx_invinciblemusic.resetpause();
-    rm->sfx_slowdownmusic.resetpause();
+    rm->sfx_invinciblemusic.resetPause();
+    rm->sfx_slowdownmusic.resetPause();
 
     x_shake = 0;
     y_shake = 0;
@@ -1832,7 +1832,7 @@ void playMusic()
     }
 
     if (game_values.flags.playinvinciblesound && game_values.musicvolume > 0) {
-        if (!rm->sfx_invinciblemusic.isPlaying() && !rm->sfx_timewarning.isPlaying() && !rm->backgroundmusic[0].isplaying())
+        if (!rm->sfx_invinciblemusic.isPlaying() && !rm->sfx_timewarning.isPlaying() && !rm->backgroundmusic[0].isPlaying())
             ifSoundOnPlay(rm->sfx_invinciblemusic);
     } else {
         if (rm->sfx_invinciblemusic.isPlaying())
@@ -1840,7 +1840,7 @@ void playMusic()
     }
 
     //If no background music is playing, then play some
-    if (!rm->backgroundmusic[0].isplaying() && !rm->sfx_invinciblemusic.isPlaying() && !rm->sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
+    if (!rm->backgroundmusic[0].isPlaying() && !rm->sfx_invinciblemusic.isPlaying() && !rm->sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
         if (game_values.playnextmusic) {
             musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
             rm->backgroundmusic[0].load(musiclist->GetCurrentMusic());

@@ -1431,7 +1431,7 @@ void MenuState::update()
 
     if (fGenerateMapThumbs) {
         fGenerateMapThumbs = false;
-        rm->backgroundmusic[2].sfx_pause();
+        rm->backgroundmusic[2].togglePause();
 
         //Reload map auto filters from live map files (don't use the cache)
         maplist->ReloadMapAutoFilters();
@@ -1456,7 +1456,7 @@ void MenuState::update()
             itr++;
         }
 
-        rm->backgroundmusic[2].sfx_pause();
+        rm->backgroundmusic[2].togglePause();
     }
 }
 

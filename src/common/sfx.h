@@ -8,11 +8,13 @@
 
 #include <string>
 
+
 bool sfx_init();
 void sfx_close();
 void sfx_stopallsounds();
 void sfx_setmusicvolume(int volume);
 void sfx_setsoundvolume(int volume);
+bool sfx_canPlayAudio();
 
 
 class sfxSound {
@@ -22,20 +24,19 @@ public:
     bool init(const std::string& filename);
 
     int play();
-    int playloop(int iLoop);
+    int playLoop(int iLoop);
     void stop();
-    void sfx_pause();
 
-    void resetpause() {
+    void togglePause();
+    void resetPause() {
         paused = false;
     }
 
     void reset();
-    void clearchannel();
+    void clearChannel();
 
-    bool isready() { return ready; }
+    bool isReady() const { return ready; }
     bool isPlaying() const;
-
 
 private:
     Mix_Chunk* sfx = nullptr;
@@ -46,6 +47,7 @@ private:
     short instances = 0;
 };
 
+
 class sfxMusic {
 public:
     ~sfxMusic();
@@ -54,15 +56,12 @@ public:
 
     void play(bool fPlayonce, bool fResume);
     void stop();
-    void sfx_pause();
 
-    void resetpause() {
-        paused = false;
-    }
+    void togglePause();
 
     void reset();
-    bool isplaying() const;
-    bool isready() const { return ready; }
+    bool isPlaying() const;
+    bool isReady() const { return ready; }
 
 private:
     Mix_Music* music = nullptr;

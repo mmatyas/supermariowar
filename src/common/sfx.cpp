@@ -9,8 +9,6 @@
 
 #define NUM_SOUND_CHANNELS 16
 
-using namespace std;
-
 
 bool fResumeMusic = true;
 extern void SDLCALL musicfinished();
@@ -23,7 +21,7 @@ void SDLCALL soundfinished(int channel)
     if (!g_PlayingSoundChannels[channel])
         printf("Error: SoundFinished() tried to clear a channel that was already cleared!\n");
     else {
-        g_PlayingSoundChannels[channel]->clearchannel();
+        g_PlayingSoundChannels[channel]->clearChannel();
         g_PlayingSoundChannels[channel] = NULL;
     }
 }
@@ -73,21 +71,32 @@ void sfx_setsoundvolume(int volume)
     Mix_Volume(-1, volume);
 }
 
+bool sfx_canPlayAudio()
+{
+#ifdef __EMSCRIPTEN__  // emscripten has sound capabilities
+    return true;
+#else
+    int frequency, channels;
+    Uint16 format;
+    return Mix_QuerySpec(&frequency, &format, &channels) != 0 /* error */;
+#endif
+}
+
 sfxSound::~sfxSound()
 {
     reset();
 }
 
-bool sfxSound::init(const string& filename)
+bool sfxSound::init(const std::string& filename)
 {
     if (sfx)
         reset();
 
-    cout << "load " << filename << "..." << endl;
-    sfx = Mix_LoadWAV(filename.c_str());
+    printf("loading %s ...\n", filename.c_str());
 
-    if (sfx == NULL) {
-        printf(" failed loading %s\n", filename.c_str());
+    sfx = Mix_LoadWAV(filename.c_str());
+    if (!sfx) {
+        printf("  failed: %s\n", Mix_GetError());
         return false;
     }
 
@@ -123,7 +132,7 @@ int sfxSound::play()
     return channel;
 }
 
-int sfxSound::playloop(int iLoop)
+int sfxSound::playLoop(int iLoop)
 {
     instances++;
     channel = Mix_PlayChannel(-1, sfx, iLoop);
@@ -145,7 +154,7 @@ void sfxSound::stop()
     }
 }
 
-void sfxSound::sfx_pause()
+void sfxSound::togglePause()
 {
     paused = !paused;
 
@@ -155,7 +164,7 @@ void sfxSound::sfx_pause()
         Mix_Resume(channel);
 }
 
-void sfxSound::clearchannel()
+void sfxSound::clearChannel()
 {
     if (--instances <= 0) {
         instances = 0;
@@ -189,16 +198,16 @@ sfxMusic::~sfxMusic()
     reset();
 }
 
-bool sfxMusic::load(const string& filename)
+bool sfxMusic::load(const std::string& filename)
 {
     if (music)
         reset();
 
-    cout << "load " << filename << "..." << endl;
-    music = Mix_LoadMUS(filename.c_str());
+    printf("loading %s ...\n", filename.c_str());
 
+    music = Mix_LoadMUS(filename.c_str());
     if (!music) {
-        printf("Error Loading Music: %s\n", Mix_GetError());
+        printf("  failed: %s\n", Mix_GetError());
         return false;
     }
 
@@ -220,7 +229,7 @@ void sfxMusic::stop()
     Mix_HaltMusic();
 }
 
-void sfxMusic::sfx_pause()
+void sfxMusic::togglePause()
 {
     paused = !paused;
 
@@ -237,7 +246,7 @@ void sfxMusic::reset()
     ready = false;
 }
 
-bool sfxMusic::isplaying() const
+bool sfxMusic::isPlaying() const
 {
     return Mix_PlayingMusic();
 }

@@ -12,10 +12,10 @@
 class sfxSound;
 
 void ifSoundOnPlay(sfxSound&);
-#define ifsoundonandreadyplay(x) (x.isready() && game_values.sound ? x.play() : -1)
-#define ifSoundOnPlayLoop(x,y) (game_values.sound ? x.playloop(y) : -1)
+#define ifsoundonandreadyplay(x) (x.isReady() && game_values.sound ? x.play() : -1)
+#define ifSoundOnPlayLoop(x,y) (game_values.sound ? x.playLoop(y) : -1)
 #define ifsoundonstop(x) (game_values.sound ? x.stop() : void(NULL))
-#define ifsoundonpause(x) (game_values.sound ? x.sfx_pause() : void(NULL))
+#define ifsoundonpause(x) (game_values.sound ? x.togglePause() : void(NULL))
 #define ifmusiconplay(x) (game_values.music ? x.play() : -1)
 
 class CGameMode;

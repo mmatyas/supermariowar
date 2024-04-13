@@ -403,13 +403,8 @@ bool CResourceManager::LoadGameSounds()
 {
     game_values.soundcapable = false;
 
-#ifndef __EMSCRIPTEN__  // emscripten has sound capabilities
-    int frequency, channels;
-    Uint16 format;
-
-    if (0 == Mix_QuerySpec(&frequency, &format, &channels))
+    if (!sfx_canPlayAudio())
         return false;
-#endif
 
     std::string soundpack = soundpacklist->currentPath();
 
