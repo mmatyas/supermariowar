@@ -12,8 +12,6 @@
 extern SDL_Surface* screen;
 extern SDL_Surface* blitdest;
 
-extern bool g_fLoadMessages;
-
 extern CEyecandyContainer eyecandy[3];
 
 extern MapList *maplist;
@@ -23,8 +21,43 @@ extern GraphicsList *menugraphicspacklist;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-extern void _load_drawmsg(const std::string& f);
-extern void _load_waitforkey();
+namespace {
+bool g_fLoadMessages = true;
+
+void _load_drawmsg(const std::string& f)
+{
+    if (g_fLoadMessages) {
+        /*
+        static SDL_Rect r;
+        r.x = 0;
+        r.y = 0;
+        r.w = 500;
+        r.h = (Uint16)menu_font_small.getHeight();
+        Uint32 col = SDL_MapRGB(screen->format, 189, 251, 255);
+        SDL_FillRect(screen, &r, col);      //fill empty area
+        */
+
+        rm->menu_font_small.draw(0, 0, f.c_str());
+    }
+}
+
+void _load_waitforkey()
+{
+#ifndef __EMSCRIPTEN__
+    SDL_Event event;
+    while (true) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_KEYDOWN)
+                return;
+            if (event.type == SDL_JOYBUTTONDOWN)
+                return;
+        }
+
+        SDL_Delay(10);
+    }
+#endif
+}
+} // namespace
 
 //-----------------------------------------------------------------------------
 // THE LOAD UP SEQUENCE + SPLASH SCREEN

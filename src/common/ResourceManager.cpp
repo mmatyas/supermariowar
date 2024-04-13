@@ -15,9 +15,6 @@ extern CTilesetManager  *g_tilesetmanager;
 
 extern CGameValues game_values;
 
-extern void _load_drawmsg(const std::string& f);
-extern void _load_waitforkey();
-
 namespace {
 constexpr RGB MAGENTA { 255, 0, 255 };
 } // namespace
@@ -354,8 +351,7 @@ bool CResourceManager::LoadGameGraphics()
     loadok &= game_font_large.init(convertPath("gfx/packs/fonts/font_large.png", graphicspack));
 
     if (!loadok) {
-        _load_drawmsg("ERROR: error loading the fonts!\n");
-        _load_waitforkey();
+        gfx_show_error("ERROR: error loading the fonts!");
         return false;
     }
 

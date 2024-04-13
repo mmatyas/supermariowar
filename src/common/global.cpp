@@ -96,9 +96,6 @@ WorldList *worldlist;
 CMap      *g_map;
 CTilesetManager *g_tilesetmanager;
 
-
-bool g_fLoadMessages = true;
-
 //Joystick-Init
 SDL_Joystick **joysticks = NULL;
 short joystickcount = 0;
@@ -162,42 +159,6 @@ short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS] = {
 //0,10,0,1,0,10,6,0,0,0,2,0,8,4,2,4,0,10,0,5,2,0,0
 
 short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
-
-
-
-void _load_drawmsg(const std::string& f)
-{
-    if (g_fLoadMessages) {
-        /*
-        static SDL_Rect r;
-        r.x = 0;
-        r.y = 0;
-        r.w = 500;
-        r.h = (Uint16)menu_font_small.getHeight();
-        Uint32 col = SDL_MapRGB(screen->format, 189, 251, 255);
-        SDL_FillRect(screen, &r, col);      //fill empty area
-        */
-
-        rm->menu_font_small.draw(0, 0, f.c_str());
-    }
-}
-
-void _load_waitforkey()
-{
-#ifndef __EMSCRIPTEN__
-    SDL_Event event;
-    while (true) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_KEYDOWN)
-                return;
-            if (event.type == SDL_JOYBUTTONDOWN)
-                return;
-        }
-
-        SDL_Delay(10);
-    }
-#endif
-}
 
 
 //Conversion from backgrounds to music categories created by NMcCoy
