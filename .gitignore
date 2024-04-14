@@ -1,1 +1,11 @@
 build/
+CMakeCache.txt
+*.cmake
+*.a
+*.desktop
+CMakeFiles/
+/smw
+/smw-leveledit
+/smw-server
+/smw-worldedit
+Makefile
