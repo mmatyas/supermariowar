@@ -2,6 +2,7 @@
 
 #include "GlobalConstants.h"
 #include "map.h"
+#include "gfx/gfxSprite.h"
 
 extern CMap* g_map;
 
@@ -77,4 +78,9 @@ std::array<IO_Block*, 4> CObject::GetCollisionBlocks() const
     }
 
     return blocks;
+}
+
+bool CObject::GetWrap() const
+{
+    return spr ? spr->GetWrap() : true;
 }

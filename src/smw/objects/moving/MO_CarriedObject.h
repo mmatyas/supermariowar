@@ -21,7 +21,7 @@ public:
     virtual void Drop();
     virtual void Kick();
 
-    bool HasOwner() { return owner != NULL; }
+    bool HasOwner() { return owner != nullptr; }
     bool IsCarriedByKuriboShoe() { return fCarriedByKuriboShoe; }
 
 protected:

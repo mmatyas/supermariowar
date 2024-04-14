@@ -29,7 +29,7 @@ void CObjectContainer::clean()
 void CObjectContainer::cleanDeadObjects()
 {
     auto erase_from = std::remove_if(m_list.begin(), m_list.end(),
-        [](const std::unique_ptr<CObject>& obj) { return obj->dead; });
+        [](const std::unique_ptr<CObject>& obj) { return obj->isDead(); });
     m_list.erase(erase_from, m_list.end());
 }
 

@@ -1,6 +1,7 @@
 #include "Powerup.h"
 
 #include "GlobalConstants.h"
+#include "gfx/gfxSprite.h"
 
 //------------------------------------------------------------------------------
 // class powerup

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "gfx/gfxSprite.h"
-
 #include <array>
 
+class gfxSprite;
 class CPlayer;
 class IO_Block;
 class IO_MovingObject;
@@ -61,23 +60,19 @@ public:
         fy = static_cast<float>(iy);
     }
 
-    int iNetworkID;
     short ix, iy;
+    short iw = 0, ih = 0;
+    float velx = 0.f, vely = 0.f;
+    int iNetworkID;
 
     short collisionWidth;
     short collisionHeight;
     short collisionOffsetX = 0;
     short collisionOffsetY = 0;
 
-    short GetState() const {
-        return state;
-    }
-    bool isDead() const {
-        return dead;
-    }
-    bool GetWrap() const {
-        return spr ? spr->GetWrap() : true;
-    }
+    short GetState() const { return state; }
+    bool isDead() const { return dead; }
+    bool GetWrap() const;
 
     /// Returns the blocks touching each of the four corners,
     std::array<IO_Block*, 4> GetCollisionBlocks() const;
@@ -85,20 +80,9 @@ public:
 protected:
     ObjectType objectType = object_none;
 
-    short iw = 0, ih = 0;
     float fx = 0.f, fy = 0.f;
-    float velx = 0.f, vely = 0.f;
 
     gfxSprite* spr = nullptr;
     short state = 0;
     bool dead = false;
-
-    friend class CObjectContainer;
-    friend class CPlayer;
-    friend void RunGame();
-    friend void shakeScreen();
-    friend void handleP2ObjCollisions();
-    friend class CO_Shell;
-    friend class B_BreakableBlock;
-    friend class B_WeaponBreakableBlock;
 };
