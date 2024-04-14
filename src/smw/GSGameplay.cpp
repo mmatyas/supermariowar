@@ -588,14 +588,14 @@ void checkWindEvent(short& iWindTimer, float& dNextWind)
 
 void cleanDeadNonPlayerObjects()
 {
-    eyecandy[0].cleandeadobjects();
-    eyecandy[1].cleandeadobjects();
-    eyecandy[2].cleandeadobjects();
+    eyecandy[0].cleanDeadObjects();
+    eyecandy[1].cleanDeadObjects();
+    eyecandy[2].cleanDeadObjects();
 
-    objectcontainer[2].cleandeadobjects();
-    objectcontainer[1].cleandeadobjects();
-    objectcontainer[0].cleandeadobjects();
-    noncolcontainer.cleandeadobjects();
+    objectcontainer[2].cleanDeadObjects();
+    objectcontainer[1].cleanDeadObjects();
+    objectcontainer[0].cleanDeadObjects();
+    noncolcontainer.cleanDeadObjects();
 }
 
 void animateDuringCountdown()
@@ -685,7 +685,7 @@ void shakeScreen()
     }
 
     //Kill goombas and koopas
-    for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list) {
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list()) {
         if (obj->getObjectType() == object_moving) {
             IO_MovingObject * movingobject = (IO_MovingObject *)obj.get();
             MovingObjectType type = movingobject->getMovingObjectType();
@@ -711,7 +711,7 @@ void shakeScreen()
     }
 
     //Destroy throw blocks and flip shells over
-    for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
         if (obj->getObjectType() == object_moving) {
             IO_MovingObject * movingobject = (IO_MovingObject *)obj.get();
 
@@ -831,7 +831,7 @@ void handleP2ObjCollisions()
 
         //Collide with objects
         for (short iLayer = 0; iLayer < 3; iLayer++) {
-            for (const std::unique_ptr<CObject>& obj : objectcontainer[iLayer].list) {
+            for (const std::unique_ptr<CObject>& obj : objectcontainer[iLayer].list()) {
                 if (!obj->isDead()) {
                     if (coldec_player2obj(player, obj.get())) {
                         if (player->collidesWith(obj.get()))
@@ -854,9 +854,9 @@ void handleP2ObjCollisions()
 void handleObj2ObjCollisions()
 {
     for (size_t iLayer1 = 0; iLayer1 < 3; iLayer1++) {
-        size_t iContainerEnd1 = objectcontainer[iLayer1].list.size();
+        size_t iContainerEnd1 = objectcontainer[iLayer1].list().size();
         for (size_t iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
-            CObject * object1 = objectcontainer[iLayer1].list[iObject1].get();
+            CObject * object1 = objectcontainer[iLayer1].list()[iObject1].get();
 
             if (object1->getObjectType() != object_moving)
                 continue;
@@ -864,9 +864,9 @@ void handleObj2ObjCollisions()
             IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
 
             for (size_t iLayer2 = iLayer1; iLayer2 < 3; iLayer2++) {
-                size_t iContainerEnd2 = objectcontainer[iLayer2].list.size();
+                size_t iContainerEnd2 = objectcontainer[iLayer2].list().size();
                 for (size_t iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
-                    CObject * object2 = objectcontainer[iLayer2].list[iObject2].get();
+                    CObject * object2 = objectcontainer[iLayer2].list()[iObject2].get();
 
                     if (object2->getObjectType() != object_moving)
                         continue;
@@ -2656,7 +2656,7 @@ bool SwapPlayers(short iUsingPlayerID)
     }
 
     //Clean the dead mystery mushroom
-    objectcontainer[0].cleandeadobjects();
+    objectcontainer[0].cleanDeadObjects();
 
     return true;
 }

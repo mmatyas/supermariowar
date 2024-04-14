@@ -1173,7 +1173,7 @@ void CEyecandyContainer::remove(short i)
     }
 }
 
-void CEyecandyContainer::cleandeadobjects()
+void CEyecandyContainer::cleanDeadObjects()
 {
     for (short i = 0; i < list_end; i++) {
         if (list[i]->dead) {

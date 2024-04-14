@@ -19,7 +19,7 @@ public:
     void draw() const;
 
     void clean();
-    void cleandeadobjects();
+    void cleanDeadObjects();
 
     bool isBlockAt(short x, short y) const;
     float getClosestObject(short x, short y, ObjectType objectType) const;
@@ -33,6 +33,8 @@ public:
 
     CObject* getRandomObject() const;
 
-public:
-    std::vector<std::unique_ptr<CObject>> list;
+    const std::vector<std::unique_ptr<CObject>>& list() const { return m_list; }
+
+private:
+    std::vector<std::unique_ptr<CObject>> m_list;
 };

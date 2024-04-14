@@ -246,7 +246,7 @@ void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
 
     //Loop through objects
     for (short iLayer = 0; iLayer < 3; iLayer++) {
-        for (const std::unique_ptr<CObject>& obj : objectcontainer[iLayer].list) {
+        for (const std::unique_ptr<CObject>& obj : objectcontainer[iLayer].list()) {
             if (obj->getObjectType() != object_moving)
                 continue;
 

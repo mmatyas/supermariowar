@@ -18,40 +18,47 @@ extern CGameValues game_values;
 //------------------------------------------------------------------------------
 CObjectContainer::CObjectContainer()
 {
-    list.reserve(MAXOBJECTS);
+    m_list.reserve(MAXOBJECTS);
 }
 
 void CObjectContainer::clean()
 {
-    list.clear();
+    m_list.clear();
+}
+
+void CObjectContainer::cleanDeadObjects()
+{
+    auto erase_from = std::remove_if(m_list.begin(), m_list.end(),
+        [](const std::unique_ptr<CObject>& obj) { return obj->dead; });
+    m_list.erase(erase_from, m_list.end());
 }
 
 bool CObjectContainer::add(CObject* ptr)
 {
-    if (list.size() + 1 >= list.capacity()) {
+    if (m_list.size() + 1 >= m_list.capacity()) {
         //printf("eyecandy list full!\n");
         delete ptr;	// otherwise memory leak!
         return false;
     }
-    list.emplace_back(ptr);
+    m_list.emplace_back(ptr);
     return true;
 }
 
 void CObjectContainer::update() const
 {
-    for (const std::unique_ptr<CObject>& obj : list)
+    for (const std::unique_ptr<CObject>& obj : m_list)
         obj->update();
 }
 
 void CObjectContainer::draw() const
 {
-    for (const std::unique_ptr<CObject>& obj : list)
+    for (const std::unique_ptr<CObject>& obj : m_list)
         obj->draw();
 }
 
 bool CObjectContainer::isBlockAt(short x, short y) const
 {
-    for (const std::unique_ptr<CObject>& obj : list) {
+    for (const std::unique_ptr<CObject>& obj : m_list) {
         const bool hitX = obj->ix <= x && x < obj->ix + obj->iw;
         const bool hitY = obj->iy <= y && y < obj->iy + obj->ih;
         if (hitX && hitY && obj->getObjectType() == object_block)
@@ -64,7 +71,7 @@ float CObjectContainer::getClosestObject(short ix, short iy, ObjectType objectTy
 {
     float minDist = App::screenWidth * 1000;  //Longest distance from corner to corner squared
 
-    for (const std::unique_ptr<CObject>& obj : list) {
+    for (const std::unique_ptr<CObject>& obj : m_list) {
         if (obj->getObjectType() != objectType)
             continue;
 
@@ -83,7 +90,7 @@ float CObjectContainer::getClosestMovingObject(short ix, short iy, MovingObjectT
 {
     float minDist = App::screenWidth * 1000;  //Longest distance from corner to corner squared
 
-    for (const std::unique_ptr<CObject>& obj : list) {
+    for (const std::unique_ptr<CObject>& obj : m_list) {
         if (obj->getObjectType() != object_moving || ((IO_MovingObject*)obj.get())->getMovingObjectType() != movingObjectType)
             continue;
 
@@ -102,7 +109,7 @@ size_t CObjectContainer::countTypes(ObjectType type) const
 {
     size_t count = 0;
 
-    for (const std::unique_ptr<CObject>& obj : list) {
+    for (const std::unique_ptr<CObject>& obj : m_list) {
         if (obj->getObjectType() == type) {
             count++;
         }
@@ -115,7 +122,7 @@ size_t CObjectContainer::countMovingTypes(MovingObjectType type) const
 {
     size_t count = 0;
 
-    for (const std::unique_ptr<CObject>& obj : list) {
+    for (const std::unique_ptr<CObject>& obj : m_list) {
         if (obj->getObjectType() == object_moving && ((IO_MovingObject*)obj.get())->getMovingObjectType() == type) {
             count++;
         }
@@ -126,7 +133,7 @@ size_t CObjectContainer::countMovingTypes(MovingObjectType type) const
 
 void CObjectContainer::adjustPlayerAreas(CPlayer* player, CPlayer* other) const
 {
-    for (const std::unique_ptr<CObject>& obj : list) {
+    for (const std::unique_ptr<CObject>& obj : m_list) {
         if (obj->getObjectType() != object_area)
             continue;
 
@@ -148,7 +155,7 @@ void CObjectContainer::removePlayerRaceGoals(short id, short iGoal) const
     if (game_values.gamemodesettings.race.penalty == 0 && iGoal != -1)
         return;
 
-    for (const std::unique_ptr<CObject>& obj : list) {
+    for (const std::unique_ptr<CObject>& obj : m_list) {
         if (obj->getObjectType() != object_race_goal)
             continue;
 
@@ -162,7 +169,7 @@ void CObjectContainer::removePlayerRaceGoals(short id, short iGoal) const
 
 void CObjectContainer::pushBombs(short x, short y) const
 {
-    for (const std::unique_ptr<CObject>& obj : list) {
+    for (const std::unique_ptr<CObject>& obj : m_list) {
         if (obj->getObjectType() != object_moving)
             continue;
 
@@ -190,16 +197,9 @@ void CObjectContainer::pushBombs(short x, short y) const
     }
 }
 
-void CObjectContainer::cleandeadobjects()
-{
-    auto erase_from = std::remove_if(list.begin(), list.end(),
-        [](const std::unique_ptr<CObject>& obj) { return obj->dead; });
-    list.erase(erase_from, list.end());
-}
-
 CObject* CObjectContainer::getRandomObject() const
 {
-    return list.empty()
+    return m_list.empty()
         ? nullptr
-        : list[RANDOM_INT(list.size())].get();
+        : m_list[RANDOM_INT(m_list.size())].get();
 }

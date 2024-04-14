@@ -434,7 +434,7 @@ public:
 
     void clean();
 
-    void cleandeadobjects();
+    void cleanDeadObjects();
 
 public:
     CEyecandy *list[MAXEYECANDY];

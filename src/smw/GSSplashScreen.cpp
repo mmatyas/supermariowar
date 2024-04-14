@@ -324,7 +324,7 @@ void SplashScreenState::update()
 //            _load_drawmsg("Press Any Key To Continue");
         rm->menu_font_large.drawCentered(App::screenWidth/2, App::screenHeight * 0.875f, "Press Any Key To Continue");
 
-        eyecandy[2].cleandeadobjects();
+        eyecandy[2].cleanDeadObjects();
         eyecandy[2].update();
         eyecandy[2].draw();
 

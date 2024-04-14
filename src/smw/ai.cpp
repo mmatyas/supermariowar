@@ -105,7 +105,7 @@ void CPlayerAI::Init()
     if (game_values.gamemode->gamemode == game_mode_eggs) {
         bool fYoshi[4] = {false, false, false, false};
         //Scan Yoshis to see which ones are present
-        for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+        for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
             if (object_moving == obj->getObjectType()) {
                 IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
 
@@ -117,7 +117,7 @@ void CPlayerAI::Init()
         }
 
         //Now scan eggs and ignore any egg that doesn't have a yoshi
-        for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+        for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
             if (object_moving == obj->getObjectType()) {
                 IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
 
@@ -679,7 +679,7 @@ void CPlayerAI::GetNearestObjects()
 
     std::map<int, AttentionObject*>::iterator lim = attentionObjects.end();
 
-    for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
         if (attentionObjects.find(obj->iNetworkID) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
@@ -874,7 +874,7 @@ void CPlayerAI::GetNearestObjects()
         }
     }
 
-    for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list) {
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list()) {
         if (attentionObjects.find(obj->iNetworkID) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
@@ -937,7 +937,7 @@ void CPlayerAI::GetNearestObjects()
         }
     }
 
-    for (const std::unique_ptr<CObject>& obj : objectcontainer[2].list) {
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[2].list()) {
         if (attentionObjects.find(obj->iNetworkID) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;

@@ -51,7 +51,7 @@ void UI_Menu::Update()
         control->Update();
     }
 
-    eyeCandy.cleandeadobjects();
+    eyeCandy.cleanDeadObjects();
     eyeCandy.update();
 }
 

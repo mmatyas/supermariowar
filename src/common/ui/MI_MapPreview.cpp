@@ -60,7 +60,7 @@ void MI_MapPreview::Update()
     noncolcontainer.update();
 
     objectcontainer[1].update();
-    objectcontainer[1].cleandeadobjects();
+    objectcontainer[1].cleanDeadObjects();
 
     g_map->updatePlatforms();
 }
@@ -89,7 +89,7 @@ void MI_MapPreview::Draw()
     g_map->drawPlatforms(rectDst.x, rectDst.y, 1);
 
     //Draw map hazards
-    for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list) {
+    for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
         ObjectType type = obj->getObjectType();
 
         if (type == object_orbithazard) {
