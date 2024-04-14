@@ -1509,7 +1509,7 @@ void LoadMapObjects(bool fPreview)
                 g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 1);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if (iType >= 20 && iType <= 29) {
-                g_map->blockdata[x][y] = new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, x << 5, y << 5, iType - 20);
+                g_map->blockdata[x][y] = new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, x << 5, y << 5, static_cast<WeaponDamageType>(iType - 20));
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else {
                 g_map->blockdata[x][y] = NULL;

@@ -20,14 +20,13 @@ extern CResourceManager* rm;
 extern CGameValues game_values;
 extern CEyecandyContainer eyecandy[3];
 
-B_WeaponBreakableBlock::B_WeaponBreakableBlock(gfxSprite *nspr, short x, short y, short type) :
-    IO_Block(nspr, x, y)
+B_WeaponBreakableBlock::B_WeaponBreakableBlock(gfxSprite *nspr, short x, short y, WeaponDamageType type)
+    : IO_Block(nspr, x, y)
+    , iType(type)
+    , iDrawOffsetX(static_cast<short>(type) * 32)
 {
-    iType = type;
     iw = TILESIZE;
     ih = TILESIZE;
-
-    iDrawOffsetX = type << 5;
 }
 
 void B_WeaponBreakableBlock::draw()
@@ -66,10 +65,10 @@ bool B_WeaponBreakableBlock::hittop(CPlayer * player, bool useBehavior)
         player->vely = GRAVITATION;
 
         //Save this for when we create a super stomp destroyable block
-        if (iType == 6 && player->IsSuperStomping() && state == 0) {
+        if (iType == WeaponDamageType::KuriboShoe && player->IsSuperStomping() && state == 0) {
             triggerBehavior(player->globalID, player->teamID);
             return false;
-        } else if (iType == 8 && player->isInvincible()) {
+        } else if (iType == WeaponDamageType::Star && player->isInvincible()) {
             triggerBehavior(player->globalID, player->teamID);
             return false;
         }
@@ -83,11 +82,11 @@ bool B_WeaponBreakableBlock::hitbottom(CPlayer * player, bool useBehavior)
     if (useBehavior && state == 0) {
         //If the player has a cape and they used it for a feather destroyable block, then kill it
         bool fTriggerBlock = false;
-        if (iType == 1 && player->powerup == 3 && player->extrajumps > 0) {
+        if (iType == WeaponDamageType::Feather && player->powerup == 3 && player->extrajumps > 0) {
             fTriggerBlock = true;
-        } else if (iType == 7 && player->powerup == 8 && player->flying) {
+        } else if (iType == WeaponDamageType::PWings && player->powerup == 8 && player->flying) {
             fTriggerBlock = true;
-        } else if (iType == 8 && player->isInvincible()) {
+        } else if (iType == WeaponDamageType::Star && player->isInvincible()) {
             fTriggerBlock = true;
         }
 
@@ -103,7 +102,7 @@ bool B_WeaponBreakableBlock::hitbottom(CPlayer * player, bool useBehavior)
 bool B_WeaponBreakableBlock::hitleft(CPlayer * player, bool useBehavior)
 {
     if (useBehavior && state == 0) {
-        if (iType == 8 && player->isInvincible())
+        if (iType == WeaponDamageType::Star && player->isInvincible())
             triggerBehavior(player->globalID, player->teamID);
 
         return IO_Block::hitleft(player, useBehavior);
@@ -115,7 +114,7 @@ bool B_WeaponBreakableBlock::hitleft(CPlayer * player, bool useBehavior)
 bool B_WeaponBreakableBlock::hitright(CPlayer * player, bool useBehavior)
 {
     if (useBehavior && state == 0) {
-        if (iType == 8 && player->isInvincible())
+        if (iType == WeaponDamageType::Star && player->isInvincible())
             triggerBehavior(player->globalID, player->teamID);
 
         return IO_Block::hitright(player, useBehavior);
@@ -138,7 +137,7 @@ bool B_WeaponBreakableBlock::hittop(IO_MovingObject * object)
 
     MovingObjectType type = object->getMovingObjectType();
 
-    if (iType == 0 && type == movingobject_fireball) {
+    if (iType == WeaponDamageType::Fireball && type == movingobject_fireball) {
         triggerBehavior(object->iPlayerID, object->iTeamID);
         removeifprojectile(object, false, true);
         return false;
@@ -156,7 +155,7 @@ bool B_WeaponBreakableBlock::hitbottom(IO_MovingObject * object)
 
     MovingObjectType type = object->getMovingObjectType();
 
-    if (iType == 0 && type == movingobject_fireball) {
+    if (iType == WeaponDamageType::Fireball && type == movingobject_fireball) {
         triggerBehavior(object->iPlayerID, object->iTeamID);
         removeifprojectile(object, false, true);
         return false;
@@ -205,7 +204,7 @@ bool B_WeaponBreakableBlock::objecthitside(IO_MovingObject * object)
 {
     MovingObjectType type = object->getMovingObjectType();
 
-    if (iType == 2 && ((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity()))) {
+    if (iType == WeaponDamageType::Shell && ((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity()))) {
         short iPlayerID = -1;
         short iTeamID = -1;
         if (type == movingobject_shell) {
@@ -224,7 +223,7 @@ bool B_WeaponBreakableBlock::objecthitside(IO_MovingObject * object)
 
         triggerBehavior(iPlayerID, iTeamID);
         return false;
-    } else if (iType == 0 && type == movingobject_fireball) {
+    } else if (iType == WeaponDamageType::Fireball && type == movingobject_fireball) {
         MO_Fireball * fireball = (MO_Fireball*)object;
         triggerBehavior(fireball->iPlayerID, fireball->iTeamID);
         removeifprojectile(object, false, true);
@@ -232,7 +231,7 @@ bool B_WeaponBreakableBlock::objecthitside(IO_MovingObject * object)
     } else if (type == movingobject_attackzone) {
         MO_AttackZone * zone = (MO_AttackZone*)object;
 
-        if ((zone->iStyle == KillStyle::Leaf && iType == 9) || (zone->iStyle == KillStyle::Feather && iType == 1)) {
+        if ((zone->iStyle == KillStyle::Leaf && iType == WeaponDamageType::Leaf) || (zone->iStyle == KillStyle::Feather && iType == WeaponDamageType::Feather)) {
             triggerBehavior(zone->iPlayerID, zone->iTeamID);
             zone->Die();
             return false;

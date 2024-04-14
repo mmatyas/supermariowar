@@ -58,7 +58,7 @@ void MO_Explosion::update()
                     IO_Block* block = g_map->block(iTestX / TILESIZE, iTestRow);
                     if (block && block->getBlockType() == BlockType::WeaponBreakable) {
                         B_WeaponBreakableBlock* weaponbreakableblock = (B_WeaponBreakableBlock*)block;
-                        if (weaponbreakableblock->iType == 3) {
+                        if (weaponbreakableblock->type() == WeaponDamageType::Bomb) {
                             weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
                         }
                     }

@@ -84,7 +84,7 @@ void MO_Hammer::update()
     for (short iBlock = 0; iBlock < 4; iBlock++) {
         if (blocks[iBlock] && blocks[iBlock]->getBlockType() == BlockType::WeaponBreakable) {
             B_WeaponBreakableBlock* weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
-            if (weaponbreakableblock->iType == 5) {
+            if (weaponbreakableblock->type() == WeaponDamageType::Hammer) {
                 weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
                 removeifprojectile(this, false, false);
                 return;

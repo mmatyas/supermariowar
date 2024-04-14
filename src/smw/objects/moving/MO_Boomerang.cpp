@@ -71,7 +71,7 @@ void MO_Boomerang::update()
     for (short iBlock = 0; iBlock < 4; iBlock++) {
         if (blocks[iBlock] && blocks[iBlock]->getBlockType() == BlockType::WeaponBreakable) {
             B_WeaponBreakableBlock* weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
-            if (weaponbreakableblock->iType == 4) {
+            if (weaponbreakableblock->type() == WeaponDamageType::Boomerang) {
                 weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
                 forcedead();
                 return;
