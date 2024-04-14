@@ -1,7 +1,8 @@
-#ifndef OBJECT_BASE_H
-#define OBJECT_BASE_H
+#pragma once
 
 #include "gfx/gfxSprite.h"
+
+#include <array>
 
 class CPlayer;
 class IO_Block;
@@ -31,69 +32,73 @@ float CapFallingVelocity(float vel);
 float CapSideVelocity(float vel);
 
 //object base class
-class CObject
-{
-	public:
+class CObject {
+public:
+    CObject(gfxSprite* nspr, short x, short y);
+    virtual ~CObject() = default;
 
-		CObject(gfxSprite *nspr, short x, short y);
-		virtual ~CObject(){};
+    virtual void draw(){};
+    virtual void update() = 0;
+    virtual bool collide(CPlayer*){ return false; }
+    virtual void collide(IO_MovingObject*){}
 
-		virtual void draw(){};
-		virtual void update() = 0;
-		virtual bool collide(CPlayer *){return false;}
-		virtual void collide(IO_MovingObject *){}
+    virtual ObjectType getObjectType(){ return objectType; }
 
-		virtual ObjectType getObjectType(){return objectType;}
+    void setXf(float xf) {
+        fx = xf;
+        ix = static_cast<short>(fx);
+    }
+    void setXi(short xi) {
+        ix = xi;
+        fx = static_cast<float>(ix);
+    }
+    void setYf(float yf) {
+        fy = yf;
+        iy = static_cast<short>((fy < 0.0f) ? (fy - 1.0f) : fy);
+    }
+    void setYi(short yi) {
+        iy = yi;
+        fy = static_cast<float>(iy);
+    }
 
-		void setXf(float xf){fx = xf; ix = (short)fx;};
- 		void setXi(short xi){ix = xi; fx = (float)ix;};
-		void setYf(float yf){fy = yf; if (fy < 0.0f) iy = (short)(fy - 1.0f); else iy = (short)fy;};
-		void setYi(short yi){iy = yi; fy = (float)iy;};
+    int iNetworkID;
+    short ix, iy;
 
-		int iNetworkID;
-		short ix, iy;
+    short collisionWidth;
+    short collisionHeight;
+    short collisionOffsetX = 0;
+    short collisionOffsetY = 0;
 
-		short collisionWidth;
-		short collisionHeight;
-		short collisionOffsetX;
-		short collisionOffsetY;
-
-    short GetState() {
+    short GetState() const {
         return state;
     }
-    bool isDead() {
+    bool isDead() const {
         return dead;
     }
-
-    bool GetWrap() {
-        if (spr) return spr->GetWrap();
-        return true;
+    bool GetWrap() const {
+        return spr ? spr->GetWrap() : true;
     }
 
-		void GetCollisionBlocks(IO_Block * blocks[4]);
+    /// Returns the blocks touching each of the four corners,
+    std::array<IO_Block*, 4> GetCollisionBlocks() const;
 
-		//virtual short writeNetworkUpdate(char * pData);
-		//virtual void readNetworkUpdate(short size, char * pData);
+protected:
+    ObjectType objectType = object_none;
 
-	protected:
-		ObjectType objectType;
+    short iw = 0, ih = 0;
+    float fx = 0.f, fy = 0.f;
+    float velx = 0.f, vely = 0.f;
 
-		short iw, ih;
-		float fx, fy;
-		float velx, vely;
+    gfxSprite* spr = nullptr;
+    short state = 0;
+    bool dead = false;
 
-		gfxSprite *spr;
-		short state;
-		bool dead;
-
-	friend class CObjectContainer;
-	friend class CPlayer;
-	friend void RunGame();
-		friend void shakeScreen();
-		friend void handleP2ObjCollisions();
-	friend class CO_Shell;
-	friend class B_BreakableBlock;
-	friend class B_WeaponBreakableBlock;
+    friend class CObjectContainer;
+    friend class CPlayer;
+    friend void RunGame();
+    friend void shakeScreen();
+    friend void handleP2ObjCollisions();
+    friend class CO_Shell;
+    friend class B_BreakableBlock;
+    friend class B_WeaponBreakableBlock;
 };
-
-#endif // OBJECT_BASE_H

@@ -31,11 +31,7 @@ float CapSideVelocity(float vel)
 // class Object base class
 //------------------------------------------------------------------------------
 CObject::CObject(gfxSprite *nspr1, short x, short y)
-    : iw(0), ih(0)
-    , velx(0.0f), vely(0.0f)
-    , spr(nspr1)
-    , state(0)
-    , dead(false)
+    : spr(nspr1)
 {
     setXi(x);
     setYi(y);
@@ -51,31 +47,7 @@ CObject::CObject(gfxSprite *nspr1, short x, short y)
     collisionOffsetY = 0;
 }
 
-/*
-short CObject::writeNetworkUpdate(char * pData)
-{
-	//To send different messages from the same object
-	//put in a message type ID that tells it to write and
-	//read the message differently
-	WriteIntToBuffer(&pData[0], iNetworkID);
-	WriteShortToBuffer(&pData[4], ix);
-	WriteShortToBuffer(&pData[6], iy);
-	WriteFloatToBuffer(&pData[8], velx);
-	WriteFloatToBuffer(&pData[12], vely);
-	return 16;
-}
-
-void CObject::readNetworkUpdate(short size, char * pData)
-{
-	//ReadIntFromBuffer(&iNetworkID, &pData[0]);
-	ReadShortFromBuffer(&ix, &pData[4]);
-	ReadShortFromBuffer(&iy, &pData[6]);
-	ReadFloatFromBuffer(&velx, &pData[8]);
-	ReadFloatFromBuffer(&vely, &pData[12]);
-}*/
-
-//returns the blocks touching each of the four corners
-void CObject::GetCollisionBlocks(IO_Block * blocks[4])
+std::array<IO_Block*, 4> CObject::GetCollisionBlocks() const
 {
     short xl = 0;
     if (ix < 0)
@@ -89,23 +61,20 @@ void CObject::GetCollisionBlocks(IO_Block * blocks[4])
     else
         xr = (ix + iw) / TILESIZE;
 
-    blocks[0] = NULL;
-    blocks[1] = NULL;
+    std::array<IO_Block*, 4> blocks;
+    blocks.fill(nullptr);
 
     if (iy >= 0 && iy < 480) {
         short yt = iy / TILESIZE;
-
         blocks[0] = g_map->block(xl, yt);
         blocks[1] = g_map->block(xr, yt);
     }
 
-    blocks[2] = NULL;
-    blocks[3] = NULL;
-
-	if (iy + ih >= 0 && iy + ih < 480) {
+    if (iy + ih >= 0 && iy + ih < 480) {
         short yb = (iy + ih) / TILESIZE;
-
         blocks[2] = g_map->block(xl, yb);
         blocks[3] = g_map->block(xr, yb);
     }
+
+    return blocks;
 }

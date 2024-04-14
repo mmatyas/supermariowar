@@ -80,8 +80,7 @@ void MO_Hammer::update()
     }
 
     // Detection collision with hammer breakable blocks
-    IO_Block* blocks[4];
-    GetCollisionBlocks(blocks);
+    const std::array<IO_Block*, 4> blocks = GetCollisionBlocks();
     for (short iBlock = 0; iBlock < 4; iBlock++) {
         if (blocks[iBlock] && blocks[iBlock]->getBlockType() == BlockType::WeaponBreakable) {
             B_WeaponBreakableBlock* weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
