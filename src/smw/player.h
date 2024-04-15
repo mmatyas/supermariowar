@@ -90,6 +90,7 @@ public:
     short getGlobalID() const { return globalID; }
     short getTeamID() const   { return teamID;   }
     short getColorID() const  { return colorID;  }
+    PlayerPalette getPlayerPalette();
 
     short leftX() const { return ix; }
     short rightX() const { return ix + PW; }
@@ -189,7 +190,6 @@ private:
 		void update_waitingForRespawn();
 		void update_respawning();
 		void update_usePowerup();
-		void update_spriteColor();
 		void updateFrozenStatus(int keymask);
 
 		void tryFallingThroughPlatform(short);

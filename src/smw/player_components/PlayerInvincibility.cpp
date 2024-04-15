@@ -47,8 +47,8 @@ void PlayerInvincibility::update(CPlayer& player)
         if ((player.animationtimer > 3 && timer < 480) || player.animationtimer > 6) {
             player.animationtimer = 0;
 
-            player.animationstate += 32;
-            if (player.animationstate > 96)
+            player.animationstate++;
+            if (player.animationstate > 3)
                 player.animationstate = 0;
         }
 

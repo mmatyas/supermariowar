@@ -858,33 +858,28 @@ void CPlayer::update_usePowerup()
         triggerPowerup();
 }
 
-void CPlayer::update_spriteColor()
+PlayerPalette CPlayer::getPlayerPalette()
 {
-    iSrcOffsetX = 0;
-
-    bool fColorChosen = false;
     if (isInvincible()) {
-        iSrcOffsetX = animationstate;
-        fColorChosen = true;
-    } else {
-        if (game_values.gamemode->gamemode == game_mode_star) {
-            CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
-            StarStyle starmodetype = starmode->getcurrentmodetype();
-            if (starmodetype != StarStyle::Multi && starmode->isplayerstar(this)) {
-                iSrcOffsetX = (starmodetype == StarStyle::Ztar) ? 192 : 224;
-                fColorChosen = true;
-            }
+        return static_cast<PlayerPalette>(animationstate);
+    }
+    if (game_values.gamemode->gamemode == game_mode_star) {
+        CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
+        StarStyle starmodetype = starmode->getcurrentmodetype();
+        if (starmodetype != StarStyle::Multi && starmode->isplayerstar(this)) {
+            return (starmodetype == StarStyle::Ztar) ? PlayerPalette::ztarred : PlayerPalette::got_shine;
         }
     }
-
-    if (!fColorChosen) {
-        if (game_values.gamemode->tagged == this)
-            iSrcOffsetX = 160;
-        else if (frozen)
-            iSrcOffsetX = 256;
-        else if (isShielded())
-            iSrcOffsetX = 128;
+    if (game_values.gamemode->tagged == this) {
+        return PlayerPalette::tagged;
     }
+    if (frozen) {
+        return PlayerPalette::frozen;
+    }
+    if (isShielded()) {
+        return PlayerPalette::shielded;
+    }
+    return PlayerPalette::normal;
 }
 
 void CPlayer::tryFallingThroughPlatform(short movement_direction)
@@ -1224,7 +1219,7 @@ void CPlayer::move()
         }
     }
 
-    update_spriteColor();
+    iSrcOffsetX = 32 * getPlayerPalette();
 
     if (!isready()) {
         if (state == PlayerState::Waiting) {
