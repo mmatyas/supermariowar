@@ -90,7 +90,7 @@ public:
     short getGlobalID() const { return globalID; }
     short getTeamID() const   { return teamID;   }
     short getColorID() const  { return colorID;  }
-    PlayerPalette getPlayerPalette();
+    PlayerPalette getPlayerPalette() const;
 
     short leftX() const { return ix; }
     short rightX() const { return ix + PW; }
@@ -314,8 +314,6 @@ private:
 		CPlayerAI * pPlayerAI;
 
 		gfxSprite *sprites[PGFX_LAST];
-		short animationstate;
-		short animationtimer;
 
 		uint8_t sprite_state;
 		short sprswitch;

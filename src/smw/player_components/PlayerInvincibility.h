@@ -1,6 +1,8 @@
 #ifndef PLAYER_INVINCIBILITY
 #define PLAYER_INVINCIBILITY
 
+#include "gfx.h"
+
 class CPlayer;
 
 class PlayerInvincibility
@@ -10,6 +12,7 @@ public:
     void update(CPlayer& player);
 
     bool is_on() const;
+    PlayerPalette getPlayerPalette() const;
     void turn_on(CPlayer& player);
 
 private:

@@ -18,8 +18,6 @@ void PlayerInvincibility::turn_on(CPlayer& player)
 {
     invincible = true;
     timer = 0;
-    player.animationstate = 0;
-    player.animationtimer = 0;
     player.shield.abort();
 
     //Stop the invincible music if a player is already invincible
@@ -42,21 +40,19 @@ bool PlayerInvincibility::is_on() const
 void PlayerInvincibility::update(CPlayer& player)
 {
     if (invincible) {
-        player.animationtimer++;
-
-        if ((player.animationtimer > 3 && timer < 480) || player.animationtimer > 6) {
-            player.animationtimer = 0;
-
-            player.animationstate++;
-            if (player.animationstate > 3)
-                player.animationstate = 0;
-        }
-
         if (++timer > 580) {
-            player.animationstate = 0;
-            player.animationtimer = 0;
             timer = 0;
             invincible = false;
         }
+    }
+}
+
+PlayerPalette PlayerInvincibility::getPlayerPalette() const
+{
+    PlayerPalette invincibility_animation_states[4] = {normal, invincibility_1, invincibility_2, invincibility_3};
+    if (timer < 480) {
+        return invincibility_animation_states[(timer / 4) % 4];
+    } else {
+        return invincibility_animation_states[((timer - 4) / 7) % 4];
     }
 }

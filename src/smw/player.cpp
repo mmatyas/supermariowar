@@ -858,10 +858,10 @@ void CPlayer::update_usePowerup()
         triggerPowerup();
 }
 
-PlayerPalette CPlayer::getPlayerPalette()
+PlayerPalette CPlayer::getPlayerPalette() const
 {
     if (isInvincible()) {
-        return static_cast<PlayerPalette>(animationstate);
+        return invincibility.getPlayerPalette();
     }
     if (game_values.gamemode->gamemode == game_mode_star) {
         CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
@@ -1719,9 +1719,6 @@ void CPlayer::SetupNewPlayer()
 
     frozen = false;
     frozentimer = 0;
-
-    animationstate = 0;
-    animationtimer = 0;
 
     killsinrow = 0;
     killsinrowinair = 0;
