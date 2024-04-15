@@ -36,10 +36,6 @@ void gfxSprite::clearSurface()
     m_bltrect.h = 0;
     m_picture = NULL;
 
-    fHiddenPlane = false;
-    iHiddenDirection = 0;
-    iHiddenValue = 0;
-
     fWrap = false;
 }
 
@@ -191,11 +187,6 @@ bool gfxSprite::init(const std::string& filename)
     m_bltrect.w = (Uint16)m_picture->w;
     m_bltrect.h = (Uint16)m_picture->h;
 
-    m_srcrect.x = 0;
-    m_srcrect.y = 0;
-    m_srcrect.w = (Uint16)m_picture->w;
-    m_srcrect.h = (Uint16)m_picture->h;
-
     cout << "done" << endl;
     return true;
 }
@@ -245,46 +236,48 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
     m_bltrect.w = w;
     m_bltrect.h = h;
 
-    m_srcrect.x = srcx;
-    m_srcrect.y = srcy;
-    m_srcrect.w = w;
-    m_srcrect.h = h;
+    SDL_Rect srcrect {
+        srcx,
+        srcy,
+        w,
+        h,
+    };
 
     if (sHiddenDirection > -1) {
-        if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
+        if (gfx_adjusthiddenrects(&srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
             return true;
     }
 
     // Blit onto the screen surface
-    if (SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
+    if (SDL_BlitSurface(m_picture, &srcrect, blitdest, &m_bltrect) < 0) {
         fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
         return false;
     }
 
     if (fWrap) {
         if (x + w >= iWrapSize) {
-            m_srcrect = {srcx, srcy, w, h};
+            srcrect = {srcx, srcy, w, h};
             m_bltrect = {x - iWrapSize + x_shake, y + y_shake, w, h};
 
             if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
+                if (gfx_adjusthiddenrects(&srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
                     return true;
             }
 
-            if (SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture, &srcrect, blitdest, &m_bltrect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
         } else if (x < 0) {
-            m_srcrect = {srcx, srcy, w, h};
+            srcrect = {srcx, srcy, w, h};
             m_bltrect = {x + iWrapSize + x_shake, y + y_shake, w, h};
 
             if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
+                if (gfx_adjusthiddenrects(&srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
                     return true;
             }
 
-            if (SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture, &srcrect, blitdest, &m_bltrect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
@@ -303,14 +296,16 @@ bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, shor
     m_bltrect.w = w;
     m_bltrect.h = h;
 
-    m_srcrect.x = srcx;
-    m_srcrect.y = srcy;
-    m_srcrect.w = srcw;
-    m_srcrect.h = srch;
+    SDL_Rect srcrect {
+        srcx,
+        srcy,
+        srcw,
+        srch,
+    };
 
     // Looks like SoftStretch doesn't respect transparent colors
     // I need to look into the actual SDL code to see if I can fix this
-    if (SDL_SCALEBLIT(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
+    if (SDL_SCALEBLIT(m_picture, &srcrect, blitdest, &m_bltrect) < 0) {
         fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
         return false;
     }
@@ -334,11 +329,6 @@ int gfxSprite::getWidth()
 int gfxSprite::getHeight()
 {
     return m_picture->h;
-}
-
-SDL_Surface* gfxSprite::getSurface() const
-{
-    return m_picture;
 }
 
 void gfxSprite::setSurface(SDL_Surface * surface)

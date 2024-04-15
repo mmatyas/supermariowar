@@ -28,8 +28,8 @@ public:
     int getWidth();
     int getHeight();
 
-    void setSurface(SDL_Surface * surface);
-    SDL_Surface *getSurface() const;
+    void setSurface(SDL_Surface* surface);
+    SDL_Surface* getSurface() const { return m_picture; }
 
     bool GetWrap();
     void SetWrap(bool wrap);
@@ -38,11 +38,6 @@ public:
 private:
     SDL_Surface *m_picture;
     SDL_Rect m_bltrect;
-    SDL_Rect m_srcrect;
-
-    bool fHiddenPlane;
-    short iHiddenDirection;
-    short iHiddenValue;
 
     bool fWrap;
     short iWrapSize;
