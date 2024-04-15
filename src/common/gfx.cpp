@@ -269,7 +269,7 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const 
     return true;
 }
 
-SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, const RGBA& rgba)
 {
     SDL_Surface * sTempImage = SDL_CreateRGBSurface(sImage->flags, iColor == -2 ? sImage->w << 2 : sImage->w, iColor == -1 ? sImage->h << 2 : sImage->h, sImage->format->BitsPerPixel, sImage->format->Rmask, sImage->format->Gmask, sImage->format->Bmask, sImage->format->Amask);
 
@@ -355,13 +355,13 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     SDL_UnlockSurface(sImage);
     SDL_UnlockSurface(sTempImage);
 
-    if ( SDL_SETCOLORKEY(sTempImage, SDL_TRUE, SDL_MapRGB(sTempImage->format, r, g, b)) < 0 ) {
+    if ( SDL_SETCOLORKEY(sTempImage, SDL_TRUE, SDL_MapRGB(sTempImage->format, rgba.r, rgba.g, rgba.b)) < 0 ) {
         printf("\n ERROR: Couldn't set ColorKey + RLE for new team colored surface: %s\n", SDL_GetError());
         return NULL;
     }
 
-    if (a < 255) {
-        if (SDL_SETALPHABYTE(sTempImage, SDL_TRUE, a) < 0) {
+    if (rgba.a < 255) {
+        if (SDL_SETALPHABYTE(sTempImage, SDL_TRUE, rgba.a) < 0) {
             cout << endl << " ERROR: Couldn't set per-surface alpha: " << SDL_GetError() << endl;
             return NULL;
         }
@@ -381,7 +381,7 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     return sFinalImage;
 }
 
-bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fWrap)
+bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename, const RGB& rgb, Uint8 a, bool fWrap)
 {
     //Load the image into a surface
     SDL_Surface * sImage = IMG_Load(filename.c_str());
@@ -392,7 +392,7 @@ bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename
     }
 
     for (short k = 0; k < 4; k++) {
-        SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, k, r, g, b, a);
+        SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, k, rgb.withAlpha(a));
 
         if (sTeamColoredSurface == NULL) {
             cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
@@ -410,7 +410,7 @@ bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename
     return true;
 }
 
-bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fVertical, bool fWrap)
+bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, const RGBA& rgba, bool fVertical, bool fWrap)
 {
     //Load the image into a surface
     SDL_Surface * sImage = IMG_Load(filename.c_str());
@@ -420,7 +420,7 @@ bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename,
         return false;
     }
 
-    SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, fVertical ? -1 : -2, r, g, b, a);
+    SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, fVertical ? -1 : -2, rgba);
 
     if (sTeamColoredSurface == NULL) {
         cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
@@ -579,12 +579,12 @@ void gfx_drawpreview(
 
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, bool fVertical, bool fWrap)
 {
-    return gfx_loadteamcoloredimage(gSprites, filename, 255, 0, 255, 255, fVertical, fWrap);
+    return gfx_loadteamcoloredimage(gSprites, filename, RGBA {255, 0, 255, 255}, fVertical, fWrap);
 }
 
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, Uint8 a, bool fVertical, bool fWrap)
 {
-    return gfx_loadteamcoloredimage(gSprites, filename, 255, 0, 255, a, fVertical, fWrap);
+    return gfx_loadteamcoloredimage(gSprites, filename, RGBA {255, 0, 255, a}, fVertical, fWrap);
 }
 
 bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f)
@@ -594,12 +594,12 @@ bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f)
 
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap, bool fUseAccel)
 {
-    return gfx_loadimage(gSprite, f, 255, 0, 255, fWrap, fUseAccel);
+    return gfx_loadimage(gSprite, f, RGB {255, 0, 255}, fWrap, fUseAccel);
 }
 
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap, bool fUseAccel)
 {
-    bool fRet = gSprite->init(f, 255, 0, 255, alpha, fUseAccel);
+    bool fRet = gSprite->init(f, RGBA {255, 0, 255, alpha}, fUseAccel);
 
     if (fRet)
         gSprite->SetWrap(fWrap);
@@ -607,9 +607,9 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool 
     return fRet;
 }
 
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, Uint8 b, bool fWrap, bool fUseAccel)
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, const RGB& rgb, bool fWrap, bool fUseAccel)
 {
-    bool fRet = gSprite->init(f, r, g, b, fUseAccel);
+    bool fRet = gSprite->init(f, rgb, fUseAccel);
 
     if (fRet)
         gSprite->SetWrap(fWrap);

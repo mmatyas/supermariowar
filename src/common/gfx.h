@@ -24,15 +24,9 @@
 #include "SDL.h"
 #include <string>
 
+#include "gfx/Color.h"
 #include "gfx/gfxSprite.h"
 #include "gfx/gfxFont.h"
-
-/// Represents a solid RGB color.
-struct RGB {
-    Uint8 r;
-    Uint8 g;
-    Uint8 b;
-};
 
 enum PlayerPalette {
     normal,
@@ -64,9 +58,9 @@ void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, 
 bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const RGB& colorkey, short colorScheme);
 bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);
 
-bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fVertical, bool fWrap);
+bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, const RGBA& rgba, bool fVertical, bool fWrap);
 //Load image into an array of 4 gfxSprites, each with it's own team color
-bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fWrap);
+bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename, const RGB& rgb, Uint8 a, bool fWrap);
 
 //Load image into a single gfxSprite with 4 team colored sprites
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, bool fVertical, bool fWrap);
@@ -75,7 +69,7 @@ bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename,
 bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f);
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap = true, bool fUseAccel = true);
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap = true, bool fUseAccel = true);
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, Uint8 b, bool fWrap = true, bool fUseAccel = true);
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, const RGB& rgb, bool fWrap = true, bool fUseAccel = true);
 
 void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, float brightness);
 

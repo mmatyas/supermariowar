@@ -245,7 +245,7 @@ void CResourceManager::LoadAllSprites() {
     gfx_loadimage(&spr_extralife, convertPath("gfx/packs/eyecandy/extralife.png", graphicspack), true);
 
     gfx_loadimage(&spr_windmeter, convertPath("gfx/packs/eyecandy/wind_meter.png", graphicspack), 192, true, true);
-    gfx_loadimage(&spr_overlayhole, convertPath("gfx/packs/eyecandy/overlayholes.png", graphicspack), 0, 255, 0, true, true);
+    gfx_loadimage(&spr_overlayhole, convertPath("gfx/packs/eyecandy/overlayholes.png", graphicspack), {0, 255, 0}, true, true);
 
     gfx_loadimage(&spr_award, convertPath("gfx/packs/awards/killsinrow.png", graphicspack), 128, true, true);
     gfx_loadimage(&spr_awardsolid, convertPath("gfx/packs/awards/killsinrow.png", graphicspack), true);

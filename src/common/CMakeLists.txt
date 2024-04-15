@@ -19,6 +19,7 @@ add_library(CommonFiles STATIC
     GameValues.h
     gfx.cpp
     gfx.h
+    gfx/Color.h
     gfx/gfxFont.cpp
     gfx/gfxFont.h
     gfx/gfxPalette.cpp

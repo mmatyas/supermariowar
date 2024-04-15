@@ -1,6 +1,7 @@
 #ifndef GFX_SPRITE
 #define GFX_SPRITE
 
+#include "gfx/Color.h"
 #include "SDL.h"
 
 #include <string>
@@ -13,10 +14,10 @@ public:
     void freeSurface();
     void clearSurface();
 
-    bool init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, bool fUseAccel = true); //color keyed
-    bool init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fUseAccel = true); //color keyed + alpha
+    bool init(const std::string& filename, const RGB& rgb, bool fUseAccel = true); //color keyed
+    bool init(const std::string& filename, const RGBA& rgba, bool fUseAccel = true); //color keyed + alpha
     bool init(const std::string& filename); //non color keyed
-    bool initskin(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorscheme, bool expand);
+    bool initskin(const std::string& filename, const RGB& rgb, short colorscheme, bool expand);
 
     bool draw(short x, short y);
     bool draw(short x, short y, short srcx, short srcy, short w, short h, short iHiddenDirection = -1, short iHiddenValue = -1);
