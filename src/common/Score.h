@@ -1,77 +1,57 @@
-#ifndef SCORE_H
-#define SCORE_H
+#pragma once
 
-class CScore
-{
-	public:
-		CScore(short iPlace) {
-			place = iPlace;
-			displayorder = iPlace;
+#include <array>
 
-			score = 0;
 
-			for (short iSubScore = 0; iSubScore < 3; iSubScore++)
-				subscore[iSubScore] = 0;
+class CScore {
+public:
+    CScore(short iPlace)
+        : place(iPlace)
+        , displayorder(iPlace)
+    {
+        subscore.fill(0);
+    }
 
-			x = 0;
-			y = 0;
-			destx = 0;
-			desty = 0;
-			order = 0;
-			fromx = 0;
-			fromy = 0;
-			iDigitRight = 0;
-			iDigitMiddle = 0;
-			iDigitLeft = 0;
-		}
+    void AdjustScore(short iValue);
 
-		~CScore() {}
+    void SetScore(short iValue) {
+        score = iValue;
+        SetDigitCounters();
+    }
 
-		void AdjustScore(short iValue);
+    //keeps track of what the actual score value is
+    short score = 0;
 
-		void SetScore(short iValue) {
-			score = iValue;
-			SetDigitCounters();
-		}
+    //keeps track of other scoring elements for some games (health, collected cards, etc)
+    std::array<short, 3> subscore;
 
-		//keeps track of what the actual score value is
-		short score;
+    //Where to display score
+    short x = 0;
+    short y = 0;
 
-		//keeps track of other scoring elements for some games (health, collected cards, etc)
-		short subscore[3];
+    short destx = 0;
+    short desty = 0;
 
-		//Where to display score
-		short x;
-		short y;
+    short place = 0;
+    short displayorder = 0;
+    short order = 0;  //the order in which the team died
 
-		short destx;
-		short desty;
+    short fromx = 0;
+    short fromy = 0;
 
-		short place;
-		short displayorder;
-		short order;  //the order in which the team died
+    //One less array dereference doing vars like this
+    short iDigitRight = 0;
+    short iDigitMiddle = 0;
+    short iDigitLeft = 0;
 
-		short fromx;
-		short fromy;
+private:
+    void SetDigitCounters() {
+        short iDigits = score;
+        while (iDigits > 999)
+            iDigits -= 1000;
 
-		//One less array dereference doing vars like this
-		short iDigitRight;
-		short iDigitMiddle;
-		short iDigitLeft;
-
-	private:
-
-		void SetDigitCounters() {
-			short iDigits = score;
-			while (iDigits > 999)
-				iDigits -= 1000;
-
-			iDigitLeft = iDigits / 100 * 16;
-			iDigitMiddle = iDigits % 100 / 10 * 16;
-			iDigitRight = iDigits % 10 * 16;
-		}
-
-	//friend class CGM_Star;
+        iDigitLeft = iDigits / 100 * 16;
+        iDigitMiddle = iDigits % 100 / 10 * 16;
+        iDigitRight = iDigits % 10 * 16;
+    }
 };
-
-#endif // SCORE_H
