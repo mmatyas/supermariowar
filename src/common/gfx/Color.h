@@ -22,3 +22,9 @@ struct RGB {
         return RGBA { r, g, b, a };
     }
 };
+
+
+namespace colors {
+constexpr RGB BLACK { 0, 0, 0 };
+constexpr RGB MAGENTA { 255, 0, 255 };
+} // colors

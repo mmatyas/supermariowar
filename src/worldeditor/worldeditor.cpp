@@ -516,21 +516,19 @@ int main(int argc, char *argv[])
 
 	game_values.toplayer = true;
 
-	constexpr RGB MAGENTA {255, 0, 255};
-
 	printf("\n---------------- loading graphics ----------------\n");
 
-	spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), MAGENTA);
-	spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), MAGENTA);
-	spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), MAGENTA);
+	spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), colors::MAGENTA);
+	spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), colors::MAGENTA);
+	spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), colors::MAGENTA);
 
-	spr_path.init(convertPath("gfx/leveleditor/leveleditor_world_path.png"), MAGENTA);
+	spr_path.init(convertPath("gfx/leveleditor/leveleditor_world_path.png"), colors::MAGENTA);
 
 	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), {0, 0, 0, 128}, true);
 
-	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), MAGENTA.withAlpha(255), true);
-	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), MAGENTA.withAlpha(128), true);
-	spr_largedialog.init(convertPath("gfx/leveleditor/leveleditor_platform.png"), MAGENTA.withAlpha(255), true);
+	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA.withAlpha(255), true);
+	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA.withAlpha(128), true);
+	spr_largedialog.init(convertPath("gfx/leveleditor/leveleditor_platform.png"), colors::MAGENTA.withAlpha(255), true);
 
 	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
@@ -538,80 +536,80 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- load world ----------------\n");
 
-	rm->spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), MAGENTA, false);
-	rm->spr_worldbackground[1].init(convertPath("gfx/packs/Classic/world/preview/world_background.png"), MAGENTA);
-	rm->spr_worldbackground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_background.png"), MAGENTA);
+	rm->spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), colors::MAGENTA, false);
+	rm->spr_worldbackground[1].init(convertPath("gfx/packs/Classic/world/preview/world_background.png"), colors::MAGENTA);
+	rm->spr_worldbackground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_background.png"), colors::MAGENTA);
 
-	rm->spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), MAGENTA, false);
-	rm->spr_worldforeground[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground.png"), MAGENTA);
-	rm->spr_worldforeground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground.png"), MAGENTA);
+	rm->spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), colors::MAGENTA, false);
+	rm->spr_worldforeground[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground.png"), colors::MAGENTA);
+	rm->spr_worldforeground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground.png"), colors::MAGENTA);
 
-	rm->spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), MAGENTA, false);
-	rm->spr_worldforegroundspecial[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground_special.png"), MAGENTA);
-	rm->spr_worldforegroundspecial[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground_special.png"), MAGENTA);
+	rm->spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), colors::MAGENTA, false);
+	rm->spr_worldforegroundspecial[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground_special.png"), colors::MAGENTA);
+	rm->spr_worldforegroundspecial[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground_special.png"), colors::MAGENTA);
 
-	rm->spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), MAGENTA, false);
-	rm->spr_worldpaths[1].init(convertPath("gfx/packs/Classic/world/preview/world_paths.png"), MAGENTA);
-	rm->spr_worldpaths[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_paths.png"), MAGENTA);
+	rm->spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), colors::MAGENTA, false);
+	rm->spr_worldpaths[1].init(convertPath("gfx/packs/Classic/world/preview/world_paths.png"), colors::MAGENTA);
+	rm->spr_worldpaths[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_paths.png"), colors::MAGENTA);
 
-	rm->spr_worldvehicle[0].init(convertPath("gfx/packs/Classic/world/world_vehicles.png"), MAGENTA);
-	rm->spr_worldvehicle[1].init(convertPath("gfx/packs/Classic/world/preview/world_vehicles.png"), MAGENTA);
-	rm->spr_worldvehicle[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_vehicles.png"), MAGENTA);
+	rm->spr_worldvehicle[0].init(convertPath("gfx/packs/Classic/world/world_vehicles.png"), colors::MAGENTA);
+	rm->spr_worldvehicle[1].init(convertPath("gfx/packs/Classic/world/preview/world_vehicles.png"), colors::MAGENTA);
+	rm->spr_worldvehicle[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_vehicles.png"), colors::MAGENTA);
 
-	rm->spr_worlditems.init(convertPath("gfx/packs/Classic/world/world_powerups.png"), MAGENTA);
-	rm->spr_worlditempopup.init(convertPath("gfx/packs/Classic/world/world_item_popup.png"), MAGENTA);
+	rm->spr_worlditems.init(convertPath("gfx/packs/Classic/world/world_powerups.png"), colors::MAGENTA);
+	rm->spr_worlditempopup.init(convertPath("gfx/packs/Classic/world/world_item_popup.png"), colors::MAGENTA);
 
-	rm->spr_storedpowerupsmall.init(convertPath("gfx/packs/Classic/powerups/small.png"), MAGENTA);
-	rm->spr_worlditemssmall.init(convertPath("gfx/packs/Classic/world/world_powerupssmall.png"), MAGENTA);
-	rm->spr_worlditemsplace.init(convertPath("gfx/packs/Classic/world/world_bonusplace.png"), MAGENTA);
+	rm->spr_storedpowerupsmall.init(convertPath("gfx/packs/Classic/powerups/small.png"), colors::MAGENTA);
+	rm->spr_worlditemssmall.init(convertPath("gfx/packs/Classic/world/world_powerupssmall.png"), colors::MAGENTA);
+	rm->spr_worlditemsplace.init(convertPath("gfx/packs/Classic/world/world_bonusplace.png"), colors::MAGENTA);
 
-	rm->menu_dialog.init(convertPath("gfx/packs/Classic/menu/menu_dialog.png"), MAGENTA);
+	rm->menu_dialog.init(convertPath("gfx/packs/Classic/menu/menu_dialog.png"), colors::MAGENTA);
 
 	//Mode Options Menu Gfx
-	rm->menu_egg.init(convertPath("gfx/packs/Classic/modeobjects/menu_egg.png"), MAGENTA);
-	rm->menu_stomp.init(convertPath("gfx/packs/Classic/modeobjects/menu_stomp.png"), MAGENTA);
-	rm->menu_survival.init(convertPath("gfx/packs/Classic/modeobjects/menu_survival.png"), MAGENTA);
-	rm->spr_phanto.init(convertPath("gfx/packs/Classic/modeobjects/phanto.png"), MAGENTA);
-	rm->menu_plain_field.init(convertPath("gfx/leveleditor/menu_plain_field.png"), MAGENTA);
-	rm->menu_slider_bar.init(convertPath("gfx/packs/Classic/menu/menu_slider_bar.png"), MAGENTA);
-	rm->spr_selectfield.init(convertPath("gfx/leveleditor/menu_selectfield.png"), MAGENTA);
-	rm->menu_verticalarrows.init(convertPath("gfx/packs/Classic/menu/menu_vertical_arrows.png"), MAGENTA);
-	rm->spr_storedpoweruplarge.init(convertPath("gfx/packs/Classic/powerups/large.png"), MAGENTA);
+	rm->menu_egg.init(convertPath("gfx/packs/Classic/modeobjects/menu_egg.png"), colors::MAGENTA);
+	rm->menu_stomp.init(convertPath("gfx/packs/Classic/modeobjects/menu_stomp.png"), colors::MAGENTA);
+	rm->menu_survival.init(convertPath("gfx/packs/Classic/modeobjects/menu_survival.png"), colors::MAGENTA);
+	rm->spr_phanto.init(convertPath("gfx/packs/Classic/modeobjects/phanto.png"), colors::MAGENTA);
+	rm->menu_plain_field.init(convertPath("gfx/leveleditor/menu_plain_field.png"), colors::MAGENTA);
+	rm->menu_slider_bar.init(convertPath("gfx/packs/Classic/menu/menu_slider_bar.png"), colors::MAGENTA);
+	rm->spr_selectfield.init(convertPath("gfx/leveleditor/menu_selectfield.png"), colors::MAGENTA);
+	rm->menu_verticalarrows.init(convertPath("gfx/packs/Classic/menu/menu_vertical_arrows.png"), colors::MAGENTA);
+	rm->spr_storedpoweruplarge.init(convertPath("gfx/packs/Classic/powerups/large.png"), colors::MAGENTA);
 
-	rm->menu_mode_small.init(convertPath("gfx/packs/Classic/menu/menu_mode_small.png"), MAGENTA);
-	rm->menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_large.png"), MAGENTA);
+	rm->menu_mode_small.init(convertPath("gfx/packs/Classic/menu/menu_mode_small.png"), colors::MAGENTA);
+	rm->menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_large.png"), colors::MAGENTA);
 
-	spr_vehicleicons.init(convertPath("gfx/leveleditor/vehicle_icons.png"), MAGENTA);
+	spr_vehicleicons.init(convertPath("gfx/leveleditor/vehicle_icons.png"), colors::MAGENTA);
 
-	rm->spr_thumbnail_warps[0].init(convertPath("gfx/packs/Classic/menu/menu_warp_preview.png"), MAGENTA);
-	rm->spr_thumbnail_warps[1].init(convertPath("gfx/packs/Classic/menu/menu_warp_thumbnail.png"), MAGENTA);
+	rm->spr_thumbnail_warps[0].init(convertPath("gfx/packs/Classic/menu/menu_warp_preview.png"), colors::MAGENTA);
+	rm->spr_thumbnail_warps[1].init(convertPath("gfx/packs/Classic/menu/menu_warp_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_thumbnail_mapitems[0].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_preview.png"), MAGENTA);
-	rm->spr_thumbnail_mapitems[1].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_thumbnail.png"), MAGENTA);
+	rm->spr_thumbnail_mapitems[0].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_preview.png"), colors::MAGENTA);
+	rm->spr_thumbnail_mapitems[1].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), MAGENTA);
-	rm->spr_tileanimation[2].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), MAGENTA);
+	rm->spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), colors::MAGENTA);
+	rm->spr_tileanimation[2].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_blocks[1].init(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), MAGENTA);
-	rm->spr_blocks[2].init(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), MAGENTA);
+	rm->spr_blocks[1].init(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), colors::MAGENTA);
+	rm->spr_blocks[2].init(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), MAGENTA);
-	rm->spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), MAGENTA);
+	rm->spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), colors::MAGENTA);
+	rm->spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_hazard_fireball[1].init(convertPath("gfx/packs/Classic/hazards/fireball_preview.png"), MAGENTA);
-	rm->spr_hazard_fireball[2].init(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png"), MAGENTA);
+	rm->spr_hazard_fireball[1].init(convertPath("gfx/packs/Classic/hazards/fireball_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_fireball[2].init(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_hazard_rotodisc[1].init(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png"), MAGENTA);
-	rm->spr_hazard_rotodisc[2].init(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png"), MAGENTA);
+	rm->spr_hazard_rotodisc[1].init(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_rotodisc[2].init(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_hazard_bulletbill[1].init(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png"), MAGENTA);
-	rm->spr_hazard_bulletbill[2].init(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png"), MAGENTA);
+	rm->spr_hazard_bulletbill[1].init(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_bulletbill[2].init(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_hazard_flame[1].init(convertPath("gfx/packs/Classic/hazards/flame_preview.png"), MAGENTA);
-	rm->spr_hazard_flame[2].init(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png"), MAGENTA);
+	rm->spr_hazard_flame[1].init(convertPath("gfx/packs/Classic/hazards/flame_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_flame[2].init(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), MAGENTA);
-	rm->spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), MAGENTA);
+	rm->spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), colors::MAGENTA);
 
 	rm->LoadMenuGraphics();
 

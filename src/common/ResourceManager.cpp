@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "GameValues.h"
 #include "TilesetManager.h"
+#include "gfx/Color.h"
 
 extern SkinList *skinlist;
 extern GraphicsList *menugraphicspacklist;
@@ -15,24 +16,20 @@ extern CTilesetManager  *g_tilesetmanager;
 
 extern CGameValues game_values;
 
-namespace {
-constexpr RGB MAGENTA { 255, 0, 255 };
-} // namespace
-
 
 bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
-    return gfx_loadmenuskin(spr_player[playerID], skinlist->getPath(skinID), MAGENTA, colorID, fLoadBothDirections);
+    return gfx_loadmenuskin(spr_player[playerID], skinlist->getPath(skinID), colors::MAGENTA, colorID, fLoadBothDirections);
 }
 
 bool CResourceManager::LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections)
 {
-    return gfx_loadmenuskin(spr_player[playerID], filename, MAGENTA, colorID, fLoadBothDirections);
+    return gfx_loadmenuskin(spr_player[playerID], filename, colors::MAGENTA, colorID, fLoadBothDirections);
 }
 
 bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, const std::string& filename, short colorID)
 {
-    return gfx_loadfullskin(sprites, filename, MAGENTA, colorID);
+    return gfx_loadfullskin(sprites, filename, colors::MAGENTA, colorID);
 }
 
 bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID)

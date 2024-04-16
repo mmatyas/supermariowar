@@ -1,5 +1,6 @@
 #include "gfx.h"
 
+#include "gfx/Color.h"
 #include "gfx/gfxSDL.h"
 
 #include "SDL_image.h"
@@ -579,12 +580,12 @@ void gfx_drawpreview(
 
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, bool fVertical, bool fWrap)
 {
-    return gfx_loadteamcoloredimage(gSprites, filename, RGBA {255, 0, 255, 255}, fVertical, fWrap);
+    return gfx_loadteamcoloredimage(gSprites, filename, colors::MAGENTA.withAlpha(255), fVertical, fWrap);
 }
 
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, Uint8 a, bool fVertical, bool fWrap)
 {
-    return gfx_loadteamcoloredimage(gSprites, filename, RGBA {255, 0, 255, a}, fVertical, fWrap);
+    return gfx_loadteamcoloredimage(gSprites, filename, colors::MAGENTA.withAlpha(a), fVertical, fWrap);
 }
 
 bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f)
@@ -594,12 +595,12 @@ bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f)
 
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap, bool fUseAccel)
 {
-    return gfx_loadimage(gSprite, f, RGB {255, 0, 255}, fWrap, fUseAccel);
+    return gfx_loadimage(gSprite, f, colors::MAGENTA, fWrap, fUseAccel);
 }
 
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap, bool fUseAccel)
 {
-    bool fRet = gSprite->init(f, RGBA {255, 0, 255, alpha}, fUseAccel);
+    bool fRet = gSprite->init(f, colors::MAGENTA.withAlpha(alpha), fUseAccel);
 
     if (fRet)
         gSprite->SetWrap(fWrap);
