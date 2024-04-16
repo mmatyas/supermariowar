@@ -56,9 +56,9 @@ CTileset::CTileset(const std::string& dir)
     , m_tilesetPath(dir + "/tileset.tls")
     , m_tiletypes(readTileTypeFile(m_tilesetPath))
 {
-    gfx_loadimage(&m_sprites[0], dir + "/large.png", false);
-    gfx_loadimage(&m_sprites[1], dir + "/medium.png", false);
-    gfx_loadimage(&m_sprites[2], dir + "/small.png", false);
+    gfx_loadimage(m_sprites[0], dir + "/large.png", false);
+    gfx_loadimage(m_sprites[1], dir + "/medium.png", false);
+    gfx_loadimage(m_sprites[2], dir + "/small.png", false);
 
     m_width = std::min(m_sprites[0].getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
     m_height = std::min(m_sprites[0].getHeight() / TILESIZE, MAX_TILES_PER_AXIS);

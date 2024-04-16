@@ -67,9 +67,9 @@ bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename,
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, Uint8 a, bool fVertical, bool fWrap);
 
 bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f);
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap = true);
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap = true);
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, const RGB& rgb, bool fWrap = true);
+bool gfx_loadimage(gfxSprite& sprite, const std::string& path, bool fWrap = true);
+bool gfx_loadimage(gfxSprite& sprite, const std::string& path, Uint8 alpha, bool fWrap = true);
+bool gfx_loadimage(gfxSprite& sprite, const std::string& path, const RGB& rgb, bool fWrap = true);
 
 void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, float brightness);
 

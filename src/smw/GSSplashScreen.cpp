@@ -99,8 +99,8 @@ bool LoadStartGraphics()
 
     //load basic stuff
     loadok &= gfx_loadimagenocolorkey(&rm->menu_backdrop, convertPath("gfx/packs/menu/menu_background.png", graphicspack));
-    loadok &= gfx_loadimage(&rm->menu_smw, convertPath("gfx/packs/menu/menu_smw.png", graphicspack), false);
-    loadok &= gfx_loadimage(&rm->menu_version, convertPath("gfx/packs/menu/menu_version.png", graphicspack), false);
+    loadok &= gfx_loadimage(rm->menu_smw, convertPath("gfx/packs/menu/menu_smw.png", graphicspack), false);
+    loadok &= gfx_loadimage(rm->menu_version, convertPath("gfx/packs/menu/menu_version.png", graphicspack), false);
 
     if (!loadok) {
         _load_drawmsg("ERROR: error loading the start graphics!\n");
@@ -120,7 +120,7 @@ bool SplashScreenState::init()
 //  gfx_loadimagenocolorkey(&rm->menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
 
     menu_credits = new gfxSprite();
-    gfx_loadimage(menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->currentPath()), false);
+    gfx_loadimage(*menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->currentPath()), false);
 
 //	const char * contributors[] = {
 //	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",

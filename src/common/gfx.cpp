@@ -578,47 +578,47 @@ void gfx_drawpreview(
     }
 }
 
-bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, bool fVertical, bool fWrap)
+bool gfx_loadteamcoloredimage(gfxSprite* sprites, const std::string& path, bool fVertical, bool fWrap)
 {
-    return gfx_loadteamcoloredimage(gSprites, filename, colors::MAGENTA.withAlpha(255), fVertical, fWrap);
+    return gfx_loadteamcoloredimage(sprites, path, colors::MAGENTA.withAlpha(255), fVertical, fWrap);
 }
 
-bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, Uint8 a, bool fVertical, bool fWrap)
+bool gfx_loadteamcoloredimage(gfxSprite* sprites, const std::string& path, Uint8 a, bool fVertical, bool fWrap)
 {
-    return gfx_loadteamcoloredimage(gSprites, filename, colors::MAGENTA.withAlpha(a), fVertical, fWrap);
+    return gfx_loadteamcoloredimage(sprites, path, colors::MAGENTA.withAlpha(a), fVertical, fWrap);
 }
 
-bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f)
+bool gfx_loadimagenocolorkey(gfxSprite* sprite, const std::string& path)
 {
-    return gSprite->init(f);
+    return sprite->init(path);
 }
 
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap)
+bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, bool fWrap)
 {
-    return gfx_loadimage(gSprite, f, colors::MAGENTA, fWrap);
+    return gfx_loadimage(gSprite, path, colors::MAGENTA, fWrap);
 }
 
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap)
+bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, Uint8 alpha, bool fWrap)
 {
-    bool fRet = gSprite->init(f, colors::MAGENTA.withAlpha(alpha));
+    bool success = gSprite.init(path, colors::MAGENTA.withAlpha(alpha));
 
-    if (fRet)
-        gSprite->SetWrap(fWrap);
+    if (success)
+        gSprite.SetWrap(fWrap);
 
-    return fRet;
+    return success;
 }
 
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, const RGB& rgb, bool fWrap)
+bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, const RGB& rgb, bool fWrap)
 {
-    bool fRet = gSprite->init(f, rgb);
+    bool success = gSprite.init(path, rgb);
 
-    if (fRet)
-        gSprite->SetWrap(fWrap);
+    if (success)
+        gSprite.SetWrap(fWrap);
 
-    return fRet;
+    return success;
 }
 
-void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, float brightness)
+void gfx_setjoystickteamcolor(SDL_Joystick* joystick, unsigned short team, float brightness)
 {
 #if SDL_VERSION_ATLEAST(2, 0, 14)
     uint8_t r = 0, g = 0, b = 0;
