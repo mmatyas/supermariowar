@@ -14,10 +14,9 @@ public:
     void freeSurface();
     void clearSurface();
 
-    bool init(const std::string& filename, const RGB& rgb); //color keyed
-    bool init(const std::string& filename, const RGBA& rgba); //color keyed + alpha
     bool init(const std::string& filename); //non color keyed
-    bool initskin(const std::string& filename, const RGB& rgb, short colorscheme, bool expand);
+    bool init(const std::string& filename, const RGB& key); //color keyed
+    bool init(const std::string& filename, const RGB& key, Uint8 alpha); //color keyed + alpha
 
     bool draw(short x, short y);
     bool draw(short x, short y, short srcx, short srcy, short w, short h, short iHiddenDirection = -1, short iHiddenValue = -1);

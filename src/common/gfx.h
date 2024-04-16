@@ -58,7 +58,7 @@ void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, 
 bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const RGB& colorkey, short colorScheme);
 bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);
 
-bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, const RGBA& rgba, bool fVertical, bool fWrap);
+bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, const RGB& rgb, Uint8 a, bool fVertical, bool fWrap);
 //Load image into an array of 4 gfxSprites, each with it's own team color
 bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename, const RGB& rgb, Uint8 a, bool fWrap);
 

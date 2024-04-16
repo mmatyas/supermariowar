@@ -270,7 +270,7 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const 
     return true;
 }
 
-SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, const RGBA& rgba)
+SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, const RGB& key, Uint8 alpha)
 {
     SDL_Surface * sTempImage = SDL_CreateRGBSurface(sImage->flags, iColor == -2 ? sImage->w << 2 : sImage->w, iColor == -1 ? sImage->h << 2 : sImage->h, sImage->format->BitsPerPixel, sImage->format->Rmask, sImage->format->Gmask, sImage->format->Bmask, sImage->format->Amask);
 
@@ -356,13 +356,13 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, c
     SDL_UnlockSurface(sImage);
     SDL_UnlockSurface(sTempImage);
 
-    if ( SDL_SETCOLORKEY(sTempImage, SDL_TRUE, SDL_MapRGB(sTempImage->format, rgba.r, rgba.g, rgba.b)) < 0 ) {
+    if ( SDL_SETCOLORKEY(sTempImage, SDL_TRUE, SDL_MapRGB(sTempImage->format, key.r, key.g, key.b)) < 0 ) {
         printf("\n ERROR: Couldn't set ColorKey + RLE for new team colored surface: %s\n", SDL_GetError());
         return NULL;
     }
 
-    if (rgba.a < 255) {
-        if (SDL_SETALPHABYTE(sTempImage, SDL_TRUE, rgba.a) < 0) {
+    if (alpha < 255) {
+        if (SDL_SETALPHABYTE(sTempImage, SDL_TRUE, alpha) < 0) {
             cout << endl << " ERROR: Couldn't set per-surface alpha: " << SDL_GetError() << endl;
             return NULL;
         }
@@ -393,7 +393,7 @@ bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename
     }
 
     for (short k = 0; k < 4; k++) {
-        SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, k, rgb.withAlpha(a));
+        SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, k, rgb, a);
 
         if (sTeamColoredSurface == NULL) {
             cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
@@ -411,7 +411,7 @@ bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename
     return true;
 }
 
-bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, const RGBA& rgba, bool fVertical, bool fWrap)
+bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, const RGB& rgb, Uint8 a, bool fVertical, bool fWrap)
 {
     //Load the image into a surface
     SDL_Surface * sImage = IMG_Load(filename.c_str());
@@ -421,7 +421,7 @@ bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename,
         return false;
     }
 
-    SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, fVertical ? -1 : -2, rgba);
+    SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, fVertical ? -1 : -2, rgb, a);
 
     if (sTeamColoredSurface == NULL) {
         cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
@@ -580,12 +580,12 @@ void gfx_drawpreview(
 
 bool gfx_loadteamcoloredimage(gfxSprite* sprites, const std::string& path, bool fVertical, bool fWrap)
 {
-    return gfx_loadteamcoloredimage(sprites, path, colors::MAGENTA.withAlpha(255), fVertical, fWrap);
+    return gfx_loadteamcoloredimage(sprites, path, colors::MAGENTA, 255, fVertical, fWrap);
 }
 
 bool gfx_loadteamcoloredimage(gfxSprite* sprites, const std::string& path, Uint8 a, bool fVertical, bool fWrap)
 {
-    return gfx_loadteamcoloredimage(sprites, path, colors::MAGENTA.withAlpha(a), fVertical, fWrap);
+    return gfx_loadteamcoloredimage(sprites, path, colors::MAGENTA, a, fVertical, fWrap);
 }
 
 bool gfx_loadimagenocolorkey(gfxSprite* sprite, const std::string& path)
@@ -600,7 +600,7 @@ bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, bool fWrap)
 
 bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, Uint8 alpha, bool fWrap)
 {
-    bool success = gSprite.init(path, colors::MAGENTA.withAlpha(alpha));
+    bool success = gSprite.init(path, colors::MAGENTA, alpha);
 
     if (success)
         gSprite.SetWrap(fWrap);

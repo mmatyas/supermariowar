@@ -50,7 +50,7 @@ void gfxSprite::freeSurface()
 //
 // Color keyed without alpha
 //
-bool gfxSprite::init(const std::string& filename, const RGB& rgb)
+bool gfxSprite::init(const std::string& filename, const RGB& key)
 {
     cout << "loading sprite (mode 1) " << filename << "...";
 
@@ -66,7 +66,7 @@ bool gfxSprite::init(const std::string& filename, const RGB& rgb)
         return false;
     }
 
-    if ( SDL_SETCOLORKEY(m_picture, SDL_TRUE, SDL_MapRGB(m_picture->format, rgb.r, rgb.g, rgb.b)) < 0) {
+    if ( SDL_SETCOLORKEY(m_picture, SDL_TRUE, SDL_MapRGB(m_picture->format, key.r, key.g, key.b)) < 0) {
         cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
              << filename << ": " << SDL_GetError() << endl;
         return false;
@@ -98,7 +98,7 @@ bool gfxSprite::init(const std::string& filename, const RGB& rgb)
 //
 // Color keyed + alpha
 //
-bool gfxSprite::init(const std::string& filename, const RGBA& rgba)
+bool gfxSprite::init(const std::string& filename, const RGB& key, Uint8 alpha)
 {
     cout << "Loading sprite (mode 2) " << filename << " ...";
 
@@ -115,13 +115,13 @@ bool gfxSprite::init(const std::string& filename, const RGBA& rgba)
         return false;
     }
 
-    if ( SDL_SETCOLORKEY(m_picture, SDL_TRUE, SDL_MapRGB(m_picture->format, rgba.r, rgba.g, rgba.b)) < 0) {
+    if ( SDL_SETCOLORKEY(m_picture, SDL_TRUE, SDL_MapRGB(m_picture->format, key.r, key.g, key.b)) < 0) {
         cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
              << filename << ": " << SDL_GetError() << endl;
         return false;
     }
 
-    if ( (SDL_SETALPHABYTE(m_picture, SDL_TRUE, rgba.a)) < 0) {
+    if ( (SDL_SETALPHABYTE(m_picture, SDL_TRUE, alpha)) < 0) {
         cout << endl << " ERROR: Couldn't set per-surface alpha on "
              << filename << ": " << SDL_GetError() << endl;
         return false;

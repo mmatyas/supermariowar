@@ -456,7 +456,7 @@ int main(int argc, char *argv[])
 	printf("\n---------------- loading graphics ----------------\n");
 
 	rm->spr_tiletypes.init(convertPath("gfx/leveleditor/leveleditor_tile_types.png"));
-	rm->spr_transparenttiles.init(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png"), colors::MAGENTA.withAlpha(160));
+	rm->spr_transparenttiles.init(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png"), colors::MAGENTA, 160);
 
 	rm->spr_backgroundlevel.init(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), colors::MAGENTA);
 	rm->spr_tilesetlevel.init(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png"), colors::MAGENTA);
@@ -471,13 +471,13 @@ int main(int argc, char *argv[])
 	rm->spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), colors::MAGENTA);
 	rm->spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), colors::MAGENTA.withAlpha(128));
+	rm->spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), colors::MAGENTA, 128);
 
-	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK.withAlpha(128));
-	rm->spr_nospawntile.init(convertPath("gfx/leveleditor/leveleditor_nospawntile.png"), colors::BLACK.withAlpha(128));
-	rm->spr_noitemspawntile.init(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png"), colors::BLACK.withAlpha(128));
-	rm->spr_platformstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), colors::BLACK.withAlpha(64));
-	rm->spr_platformendtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK.withAlpha(64));
+	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 128);
+	rm->spr_nospawntile.init(convertPath("gfx/leveleditor/leveleditor_nospawntile.png"), colors::BLACK, 128);
+	rm->spr_noitemspawntile.init(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png"), colors::BLACK, 128);
+	rm->spr_platformstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), colors::BLACK, 64);
+	rm->spr_platformendtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 64);
 	rm->spr_platformstarttile.SetWrap(true);
 	rm->spr_platformendtile.SetWrap(true);
 
@@ -485,8 +485,8 @@ int main(int argc, char *argv[])
 	rm->spr_mapitems[1].init(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png"), colors::MAGENTA);
 	rm->spr_mapitems[2].init(convertPath("gfx/leveleditor/leveleditor_mapitems_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA.withAlpha(255));
-	rm->menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA.withAlpha(128));
+	rm->spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA, 255);
+	rm->menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA, 128);
 
 	rm->spr_tileanimation[0].init(convertPath("gfx/packs/Classic/tilesets/tile_animation.png"), colors::MAGENTA);
 	rm->spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), colors::MAGENTA);
@@ -501,7 +501,7 @@ int main(int argc, char *argv[])
 	rm->spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), colors::MAGENTA);
 
 	rm->spr_powerups.init(convertPath("gfx/packs/Classic/powerups/large.png"), colors::MAGENTA);
-	rm->spr_powerupselector.init(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), colors::MAGENTA.withAlpha(128));
+	rm->spr_powerupselector.init(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), colors::MAGENTA, 128);
 	rm->spr_hidden_marker.init(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png"), colors::MAGENTA);
 
 	rm->spr_flagbases.init(convertPath("gfx/packs/Classic/modeobjects/flagbases.png"), colors::MAGENTA);

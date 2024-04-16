@@ -524,11 +524,11 @@ int main(int argc, char *argv[])
 
 	spr_path.init(convertPath("gfx/leveleditor/leveleditor_world_path.png"), colors::MAGENTA);
 
-	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), {0, 0, 0, 128});
+	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 128);
 
-	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA.withAlpha(255));
-	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA.withAlpha(128));
-	spr_largedialog.init(convertPath("gfx/leveleditor/leveleditor_platform.png"), colors::MAGENTA.withAlpha(255));
+	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA, 255);
+	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA, 128);
+	spr_largedialog.init(convertPath("gfx/leveleditor/leveleditor_platform.png"), colors::MAGENTA, 255);
 
 	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
