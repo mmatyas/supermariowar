@@ -1,5 +1,6 @@
 #include "PlayerInvincibility.h"
 
+#include <array>
 #include "GameMode.h"
 #include "GameValues.h"
 #include "player.h"
@@ -7,6 +8,12 @@
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
+
+static const std::array<PlayerPalette, 4> INVINCIBILITY_ANIMATION_STATES = {normal, invincibility_1, invincibility_2, invincibility_3};
+static const short INVINCIBILITY_TIME = 580;
+static const short INVINCIBILITY_HURRYUP_TIME = 100;
+static const short INVINCIBILITY_ANIMATION_DELAY = 4;
+static const short INVINCIBILITY_HURRYUP_ANIMATION_DELAY = 7;
 
 void PlayerInvincibility::reset()
 {
@@ -40,7 +47,7 @@ bool PlayerInvincibility::is_on() const
 void PlayerInvincibility::update(CPlayer& player)
 {
     if (invincible) {
-        if (++timer > 580) {
+        if (++timer > INVINCIBILITY_TIME) {
             timer = 0;
             invincible = false;
         }
@@ -49,10 +56,9 @@ void PlayerInvincibility::update(CPlayer& player)
 
 PlayerPalette PlayerInvincibility::getPlayerPalette() const
 {
-    PlayerPalette invincibility_animation_states[4] = {normal, invincibility_1, invincibility_2, invincibility_3};
-    if (timer < 480) {
-        return invincibility_animation_states[(timer / 4) % 4];
+    if (timer < INVINCIBILITY_TIME - INVINCIBILITY_HURRYUP_TIME) {
+        return INVINCIBILITY_ANIMATION_STATES[(timer / INVINCIBILITY_ANIMATION_DELAY) % INVINCIBILITY_ANIMATION_STATES.size()];
     } else {
-        return invincibility_animation_states[((timer - 4) / 7) % 4];
+        return INVINCIBILITY_ANIMATION_STATES[((timer - (INVINCIBILITY_TIME - INVINCIBILITY_HURRYUP_TIME)) / INVINCIBILITY_HURRYUP_ANIMATION_DELAY) % INVINCIBILITY_ANIMATION_STATES.size()];
     }
 }
