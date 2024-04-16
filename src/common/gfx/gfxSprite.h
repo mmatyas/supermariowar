@@ -14,8 +14,8 @@ public:
     void freeSurface();
     void clearSurface();
 
-    bool init(const std::string& filename, const RGB& rgb, bool fUseAccel = true); //color keyed
-    bool init(const std::string& filename, const RGBA& rgba, bool fUseAccel = true); //color keyed + alpha
+    bool init(const std::string& filename, const RGB& rgb); //color keyed
+    bool init(const std::string& filename, const RGBA& rgba); //color keyed + alpha
     bool init(const std::string& filename); //non color keyed
     bool initskin(const std::string& filename, const RGB& rgb, short colorscheme, bool expand);
 

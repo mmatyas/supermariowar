@@ -593,14 +593,14 @@ bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f)
     return gSprite->init(f);
 }
 
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap, bool fUseAccel)
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap)
 {
-    return gfx_loadimage(gSprite, f, colors::MAGENTA, fWrap, fUseAccel);
+    return gfx_loadimage(gSprite, f, colors::MAGENTA, fWrap);
 }
 
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap, bool fUseAccel)
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap)
 {
-    bool fRet = gSprite->init(f, colors::MAGENTA.withAlpha(alpha), fUseAccel);
+    bool fRet = gSprite->init(f, colors::MAGENTA.withAlpha(alpha));
 
     if (fRet)
         gSprite->SetWrap(fWrap);
@@ -608,9 +608,9 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool 
     return fRet;
 }
 
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, const RGB& rgb, bool fWrap, bool fUseAccel)
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, const RGB& rgb, bool fWrap)
 {
-    bool fRet = gSprite->init(f, rgb, fUseAccel);
+    bool fRet = gSprite->init(f, rgb);
 
     if (fRet)
         gSprite->SetWrap(fWrap);

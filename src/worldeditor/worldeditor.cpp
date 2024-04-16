@@ -524,11 +524,11 @@ int main(int argc, char *argv[])
 
 	spr_path.init(convertPath("gfx/leveleditor/leveleditor_world_path.png"), colors::MAGENTA);
 
-	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), {0, 0, 0, 128}, true);
+	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), {0, 0, 0, 128});
 
-	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA.withAlpha(255), true);
-	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA.withAlpha(128), true);
-	spr_largedialog.init(convertPath("gfx/leveleditor/leveleditor_platform.png"), colors::MAGENTA.withAlpha(255), true);
+	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA.withAlpha(255));
+	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA.withAlpha(128));
+	spr_largedialog.init(convertPath("gfx/leveleditor/leveleditor_platform.png"), colors::MAGENTA.withAlpha(255));
 
 	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
@@ -536,19 +536,19 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- load world ----------------\n");
 
-	rm->spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), colors::MAGENTA, false);
+	rm->spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), colors::MAGENTA);
 	rm->spr_worldbackground[1].init(convertPath("gfx/packs/Classic/world/preview/world_background.png"), colors::MAGENTA);
 	rm->spr_worldbackground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_background.png"), colors::MAGENTA);
 
-	rm->spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), colors::MAGENTA, false);
+	rm->spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), colors::MAGENTA);
 	rm->spr_worldforeground[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground.png"), colors::MAGENTA);
 	rm->spr_worldforeground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground.png"), colors::MAGENTA);
 
-	rm->spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), colors::MAGENTA, false);
+	rm->spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), colors::MAGENTA);
 	rm->spr_worldforegroundspecial[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground_special.png"), colors::MAGENTA);
 	rm->spr_worldforegroundspecial[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground_special.png"), colors::MAGENTA);
 
-	rm->spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), colors::MAGENTA, false);
+	rm->spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), colors::MAGENTA);
 	rm->spr_worldpaths[1].init(convertPath("gfx/packs/Classic/world/preview/world_paths.png"), colors::MAGENTA);
 	rm->spr_worldpaths[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_paths.png"), colors::MAGENTA);
 
