@@ -203,7 +203,7 @@ bool net_startSession()
     netplay.frames_since_last_gamestate = 0;
     std::fill_n(netplay.player_disconnected, 4, false);
 
-    COutputControl nullinput = COutputControl {0}; // set every field to false
+    COutputControl nullinput;
     for (uint8_t p = 0; p < 4; p++) {
         // backup singleplayer settings
         backup_playercontrol[p] = game_values.playercontrol[p];

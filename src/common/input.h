@@ -70,13 +70,19 @@ struct CInputControl {
 struct COutputControl {
     union {
         struct {
-			CKeyState menu_up, menu_down, menu_left, menu_right, menu_select, menu_cancel, menu_random, menu_scrollfast;
-		};
+            CKeyState menu_up, menu_down, menu_left, menu_right, menu_select, menu_cancel, menu_random, menu_scrollfast;
+        };
         struct {
-			CKeyState game_left, game_right, game_jump, game_down, game_turbo, game_powerup, game_start, game_cancel;
-		};
-		CKeyState keys[NUM_KEYS];
-	};
+            CKeyState game_left, game_right, game_jump, game_down, game_turbo, game_powerup, game_start, game_cancel;
+        };
+        CKeyState keys[NUM_KEYS];
+    };
+
+    COutputControl() {
+        for (uint8_t k = 0; k < NUM_KEYS; k++) {
+            keys[k] = {false, false};
+        }
+    }
 
     void copyFrom(const COutputControl& other) {
         for (uint8_t k = 0; k < NUM_KEYS; k++) {
