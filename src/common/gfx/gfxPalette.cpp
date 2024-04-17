@@ -12,7 +12,7 @@ gfxPalette::gfxPalette()
         colorcodes[k] = NULL;
 
         for (int i = 0; i < 4; i++)
-            for (int j = 0; j < NUM_SCHEMES; j++)
+            for (int j = 0; j < PlayerPalette::NUM_PALETTES; j++)
                 colorschemes[i][j][k] = NULL;
     }
 }
@@ -29,7 +29,7 @@ void gfxPalette::clear()
         colorcodes[k] = NULL;
 
         for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < NUM_SCHEMES; j++) {
+            for (int j = 0; j < PlayerPalette::NUM_PALETTES; j++) {
                 delete [] colorschemes[i][j][k];
                 colorschemes[i][j][k] = NULL;
             }
@@ -69,7 +69,7 @@ bool gfxPalette::load(const char* palette_path)
         colorcodes[k] = new Uint8[numcolors];
 
         for (int i = 0; i < 4; i++)
-            for (int j = 0; j < NUM_SCHEMES; j++)
+            for (int j = 0; j < PlayerPalette::NUM_PALETTES; j++)
                 colorschemes[i][j][k] = new Uint8[numcolors];
     }
 
@@ -93,7 +93,7 @@ bool gfxPalette::load(const char* palette_path)
     counter += palette->pitch - palette->w * 3;
 
     for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < NUM_SCHEMES; j++) {
+        for (int j = 0; j < PlayerPalette::NUM_PALETTES; j++) {
             for (int m = 0; m < numcolors; m++) {
                 colorschemes[i][j][iRedIndex][m] = pixels[counter++];
                 colorschemes[i][j][iGreenIndex][m] = pixels[counter++];

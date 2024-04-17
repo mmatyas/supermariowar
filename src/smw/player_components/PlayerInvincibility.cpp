@@ -1,5 +1,6 @@
 #include "PlayerInvincibility.h"
 
+#include <array>
 #include "GameMode.h"
 #include "GameValues.h"
 #include "player.h"
@@ -7,6 +8,12 @@
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
+
+static const std::array<PlayerPalette, 4> INVINCIBILITY_ANIMATION_STATES = {normal, invincibility_1, invincibility_2, invincibility_3};
+static const short INVINCIBILITY_TIME = 580;
+static const short INVINCIBILITY_HURRYUP_TIME = 100;
+static const short INVINCIBILITY_ANIMATION_DELAY = 4;
+static const short INVINCIBILITY_HURRYUP_ANIMATION_DELAY = 7;
 
 void PlayerInvincibility::reset()
 {
@@ -18,8 +25,6 @@ void PlayerInvincibility::turn_on(CPlayer& player)
 {
     invincible = true;
     timer = 0;
-    player.animationstate = 0;
-    player.animationtimer = 0;
     player.shield.abort();
 
     //Stop the invincible music if a player is already invincible
@@ -42,21 +47,18 @@ bool PlayerInvincibility::is_on() const
 void PlayerInvincibility::update(CPlayer& player)
 {
     if (invincible) {
-        player.animationtimer++;
-
-        if ((player.animationtimer > 3 && timer < 480) || player.animationtimer > 6) {
-            player.animationtimer = 0;
-
-            player.animationstate += 32;
-            if (player.animationstate > 96)
-                player.animationstate = 0;
-        }
-
-        if (++timer > 580) {
-            player.animationstate = 0;
-            player.animationtimer = 0;
+        if (++timer > INVINCIBILITY_TIME) {
             timer = 0;
             invincible = false;
         }
+    }
+}
+
+PlayerPalette PlayerInvincibility::getPlayerPalette() const
+{
+    if (timer < INVINCIBILITY_TIME - INVINCIBILITY_HURRYUP_TIME) {
+        return INVINCIBILITY_ANIMATION_STATES[(timer / INVINCIBILITY_ANIMATION_DELAY) % INVINCIBILITY_ANIMATION_STATES.size()];
+    } else {
+        return INVINCIBILITY_ANIMATION_STATES[((timer - (INVINCIBILITY_TIME - INVINCIBILITY_HURRYUP_TIME)) / INVINCIBILITY_HURRYUP_ANIMATION_DELAY) % INVINCIBILITY_ANIMATION_STATES.size()];
     }
 }

@@ -34,6 +34,19 @@ struct RGB {
     Uint8 b;
 };
 
+enum PlayerPalette {
+    normal,
+    invincibility_1,
+    invincibility_2,
+    invincibility_3,
+    shielded,
+    tagged,
+    ztarred,
+    got_shine,
+    frozen,
+    NUM_PALETTES
+};
+
 bool gfx_init(int w, int h, bool fullscreen);
 void gfx_changefullscreen(bool fullscreen);
 void gfx_flipscreen();

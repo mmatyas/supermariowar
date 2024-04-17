@@ -73,12 +73,12 @@ SDL_Surface * gfx_createskinsurface(
 {
     int loops = 1;
     if (expand)
-        loops = NUM_SCHEMES;
+        loops = PlayerPalette::NUM_PALETTES;
 
     //Blit over loaded skin into player image set
     SDL_Surface * temp = SDL_CreateRGBSurface(skin->flags, 32 * loops, 32, skin->format->BitsPerPixel, skin->format->Rmask, skin->format->Gmask, skin->format->Bmask, skin->format->Amask);
 
-    //Take the loaded skin and colorize it for each state (normal, 3 frames of invincibiliy, shielded, tagged, ztarred. got shine)
+    //Take the loaded skin and colorize it for each state (normal, 3 frames of invincibility, shielded, tagged, ztarred, got shine, frozen)
     if (SDL_MUSTLOCK(temp))
         SDL_LockSurface(temp);
 

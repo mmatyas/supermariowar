@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define NUM_SCHEMES 9
+#include "gfx.h"
 
 class gfxPalette {
 public:
@@ -22,7 +22,7 @@ private:
     uint8_t* colorcodes[3]; //[colorcomponents][numcolors]
 
     //[numplayers][colorscheme][colorcomponents][numcolors]
-    uint8_t* colorschemes[4][NUM_SCHEMES][3];
+    uint8_t* colorschemes[4][PlayerPalette::NUM_PALETTES][3];
     unsigned short numcolors;
 };
 

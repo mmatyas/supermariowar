@@ -22,7 +22,7 @@ class CGM_Star : public CGM_TimeLimit
         PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
         void playerextraguy(CPlayer &player, short iType);
 
-        bool isplayerstar(CPlayer * player);
+        bool isplayerstar(const CPlayer * player);
         CPlayer * swapplayer(short id, CPlayer * player);
     CPlayer * getstarplayer(short id) {
         return starPlayer[id];
