@@ -1,6 +1,6 @@
 name: Build - Web
-
-on: [push, pull_request, workflow_dispatch]
+on:
+  workflow_call:
 
 jobs:
   emscripten:

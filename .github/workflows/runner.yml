@@ -1,0 +1,24 @@
+name: Build
+on: [push, pull_request, workflow_dispatch]
+
+
+jobs:
+  build-android:
+    name: Android
+    uses: ./.github/workflows/build_android.yml
+
+  build-emcc:
+    name: Web
+    uses: ./.github/workflows/build_emcc.yml
+
+  build-linux:
+    name: Linux
+    uses: ./.github/workflows/build_linux.yml
+
+  build-macos:
+    name: macOS
+    uses: ./.github/workflows/build_macos.yml
+
+  build-mingw:
+    name: Windows
+    uses: ./.github/workflows/build_mingw.yml
