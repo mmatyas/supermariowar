@@ -313,17 +313,17 @@ bool CResourceManager::LoadWorldGraphics()
 {
     std::string graphicspack = worldgraphicspacklist->currentPath();
 
-    gfx_loadimage(spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack), false, false);
-    gfx_loadimage(spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack), false, false);
+    gfx_loadimage(spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack), false);
+    gfx_loadimage(spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack), false);
 
-    gfx_loadimage(spr_worldforeground[0], convertPath("gfx/packs/world/world_foreground.png", graphicspack), false, false);
-    gfx_loadimage(spr_worldforeground[1], convertPath("gfx/packs/world/preview/world_foreground.png", graphicspack), false, false);
+    gfx_loadimage(spr_worldforeground[0], convertPath("gfx/packs/world/world_foreground.png", graphicspack), false);
+    gfx_loadimage(spr_worldforeground[1], convertPath("gfx/packs/world/preview/world_foreground.png", graphicspack), false);
 
-    gfx_loadimage(spr_worldforegroundspecial[0], convertPath("gfx/packs/world/world_foreground_special.png", graphicspack), false, false);
-    gfx_loadimage(spr_worldforegroundspecial[1], convertPath("gfx/packs/world/preview/world_foreground_special.png", graphicspack), false, false);
+    gfx_loadimage(spr_worldforegroundspecial[0], convertPath("gfx/packs/world/world_foreground_special.png", graphicspack), false);
+    gfx_loadimage(spr_worldforegroundspecial[1], convertPath("gfx/packs/world/preview/world_foreground_special.png", graphicspack), false);
 
-    gfx_loadimage(spr_worldpaths[0], convertPath("gfx/packs/world/world_paths.png", graphicspack), false, false);
-    gfx_loadimage(spr_worldpaths[1], convertPath("gfx/packs/world/preview/world_paths.png", graphicspack), false, false);
+    gfx_loadimage(spr_worldpaths[0], convertPath("gfx/packs/world/world_paths.png", graphicspack), false);
+    gfx_loadimage(spr_worldpaths[1], convertPath("gfx/packs/world/preview/world_paths.png", graphicspack), false);
 
     gfx_loadimage(spr_worldvehicle[0], convertPath("gfx/packs/world/world_vehicles.png", graphicspack), false);
     gfx_loadimage(spr_worldvehicle[1], convertPath("gfx/packs/world/preview/world_vehicles.png", graphicspack), false);
