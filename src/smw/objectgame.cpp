@@ -47,6 +47,74 @@ extern CEyecandyContainer eyecandy[3];
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
+
+namespace {
+IO_MovingObject* spawnRegularPowerup(PowerupType type, short spawnX, short spawnY, bool movesRight)
+{
+    switch (type) {
+        case PowerupType::PoisonMushroom: return new PU_PoisonPowerup(&rm->spr_poisonpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::ExtraLife1: return new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1, 1);
+        case PowerupType::ExtraLife2: return new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1, 2);
+        case PowerupType::ExtraLife3: return new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1, 3);
+        case PowerupType::ExtraLife5: return new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1, 5);
+        case PowerupType::Fire: return new PU_FirePowerup(&rm->spr_firepowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Star: return new PU_StarPowerup(&rm->spr_starpowerup, spawnX, spawnY, 4, movesRight, 2, 30, 30, 1, 1);
+        case PowerupType::Clock: return new PU_ClockPowerup(&rm->spr_clockpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Bobomb: return new PU_BobombPowerup(&rm->spr_bobombpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Pow: return new PU_PowPowerup(&rm->spr_powpowerup, spawnX, spawnY, 8, movesRight, 8, 30, 30, 1, 1);
+        case PowerupType::BulletBill: return new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Hammer: return new PU_HammerPowerup(&rm->spr_hammerpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::ShellGreen: return new CO_Shell(ShellType::Green, spawnX, spawnY, true, true, true, false);
+        case PowerupType::ShellRed: return new CO_Shell(ShellType::Red, spawnX, spawnY, false, true, true, false);
+        case PowerupType::ShellSpiny: return new CO_Shell(ShellType::Spiny, spawnX, spawnY, false, false, true, true);
+        case PowerupType::ShellBuzzy: return new CO_Shell(ShellType::Buzzy, spawnX, spawnY, false, true, false, false);
+        case PowerupType::Mod: return new PU_ModPowerup(&rm->spr_modpowerup, spawnX, spawnY, 8, movesRight, 8, 30, 30, 1, 1);
+        case PowerupType::Feather: return new PU_FeatherPowerup(&rm->spr_featherpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
+        case PowerupType::MysteryMushroom: return new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Boomerang: return new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 26, 1, 5);
+        case PowerupType::Tanooki: return new PU_Tanooki(spawnX, spawnY);
+        case PowerupType::IceWand: return new PU_IceWandPowerup(&rm->spr_icewandpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
+        case PowerupType::Podobo: return new PU_PodoboPowerup(&rm->spr_podobopowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
+        case PowerupType::Bomb: return new PU_BombPowerup(&rm->spr_bombpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
+        case PowerupType::Leaf: return new PU_LeafPowerup(&rm->spr_leafpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
+        case PowerupType::PWings: return new PU_PWingsPowerup(&rm->spr_pwingspowerup, spawnX, spawnY);
+    }
+    return nullptr;
+}
+
+IO_MovingObject* spawnSpecialPowerup(short type, short spawnX, short spawnY)
+{
+    switch (type) {
+        case HEALTH_POWERUP: return new PU_ExtraHeartPowerup(&rm->spr_extraheartpowerup, spawnX, spawnY);
+        case TIME_POWERUP: return new PU_ExtraTimePowerup(&rm->spr_extratimepowerup, spawnX, spawnY);
+        case JAIL_KEY_POWERUP: return new PU_JailKeyPowerup(&rm->spr_jailkeypowerup, spawnX, spawnY);
+        case COIN_POWERUP: {
+            short iRandCoin = RANDOM_INT(9);
+            short iCoin = 2;
+
+            if (iRandCoin == 8)
+                iCoin = 3;
+            else if (iRandCoin >= 6)
+                iCoin = 1;
+            else if (iRandCoin >= 3)
+                iCoin = 0;
+
+            static short iCoinValue[4] = {3, 5, 2, 10};
+            static short iGreedValue[4] = {10, 15, 5, 20};
+
+            return new PU_CoinPowerup(&rm->spr_coin, spawnX, spawnY, iCoin, game_values.gamemode->gamemode == game_mode_greed ? iGreedValue[iCoin] : iCoinValue[iCoin]);
+        }
+        case MINIGAME_COIN: return new MO_Coin(&rm->spr_coin, 0.0f, -VELJUMP / 2.0, spawnX, spawnY, 2, -1, 2, 0, false);
+        case SECRET1_POWERUP: return new PU_SecretPowerup(&rm->spr_secret1, spawnX, spawnY, 0);
+        case SECRET2_POWERUP: return new PU_SecretPowerup(&rm->spr_secret2, spawnX, spawnY, 1);
+        case SECRET3_POWERUP: return new PU_SecretPowerup(&rm->spr_secret3, spawnX, spawnY, 2);
+        case SECRET4_POWERUP: return new PU_SecretPowerup(&rm->spr_secret4, spawnX, spawnY, 3);
+        default: return nullptr;
+    }
+}
+} // namespace
+
+
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead)
 {
     if (object->dead)
@@ -76,173 +144,43 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
     }
 }
 
-IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)
+IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool spawn)
 {
-    MO_Powerup * powerup = NULL;
-    CO_Shell * shell = NULL;
-    PU_FeatherPowerup * feather = NULL;
-    MO_Coin * coin = NULL;
+    MO_Powerup* powerup = nullptr;
+    CO_Shell* shell = nullptr;
+    PU_FeatherPowerup* feather = nullptr;
+    MO_Coin* coin = nullptr;
 
-    short iSpawnX = ix + 1;
-    short iSpawnY = iy - 1;
+    const short spawnX = ix + 1;
+    const short spawnY = iy - 1;
 
-    switch (iType) {
-    case HEALTH_POWERUP: {
-        powerup = new PU_ExtraHeartPowerup(&rm->spr_extraheartpowerup, iSpawnX, iSpawnY);
-        break;
+    if (iType < 0) {
+        IO_MovingObject* object = spawnSpecialPowerup(iType, spawnX, spawnY);
+        if (iType == MINIGAME_COIN) {
+            coin = static_cast<MO_Coin*>(object);
+        } else {
+            powerup = static_cast<MO_Powerup*>(object);
+        }
     }
-    case TIME_POWERUP: {
-        powerup = new PU_ExtraTimePowerup(&rm->spr_extratimepowerup, iSpawnX, iSpawnY);
-        break;
-    }
-    case JAIL_KEY_POWERUP: {
-        powerup = new PU_JailKeyPowerup(&rm->spr_jailkeypowerup, iSpawnX, iSpawnY);
-        break;
-    }
-    case COIN_POWERUP: {
-        short iRandCoin = RANDOM_INT(9);
-        short iCoin = 2;
+    else if (iType < NUM_POWERUPS) {
+        const auto powerupType = static_cast<PowerupType>(iType);
+        IO_MovingObject* object = spawnRegularPowerup(powerupType, spawnX, spawnY, side);
 
-        if (iRandCoin == 8)
-            iCoin = 3;
-        else if (iRandCoin >= 6)
-            iCoin = 1;
-        else if (iRandCoin >= 3)
-            iCoin = 0;
-
-        static short iCoinValue[4] = {3, 5, 2, 10};
-        static short iGreedValue[4] = {10, 15, 5, 20};
-
-        powerup = new PU_CoinPowerup(&rm->spr_coin, iSpawnX, iSpawnY, iCoin, game_values.gamemode->gamemode == game_mode_greed ? iGreedValue[iCoin] : iCoinValue[iCoin]);
-        break;
-    }
-    case MINIGAME_COIN: {
-        coin = new MO_Coin(&rm->spr_coin, 0.0f, -VELJUMP / 2.0, iSpawnX, iSpawnY, 2, -1, 2, 0, false);
-        break;
-    }
-    case SECRET1_POWERUP: {
-        powerup = new PU_SecretPowerup(&rm->spr_secret1, iSpawnX, iSpawnY, 0);
-        break;
-    }
-    case SECRET2_POWERUP: {
-        powerup = new PU_SecretPowerup(&rm->spr_secret2, iSpawnX, iSpawnY, 1);
-        break;
-    }
-    case SECRET3_POWERUP: {
-        powerup = new PU_SecretPowerup(&rm->spr_secret3, iSpawnX, iSpawnY, 2);
-        break;
-    }
-    case SECRET4_POWERUP: {
-        powerup = new PU_SecretPowerup(&rm->spr_secret4, iSpawnX, iSpawnY, 3);
-        break;
-    }
-
-    #pragma warning ("Please use enums here")
-
-    case 0: {
-        powerup = new PU_PoisonPowerup(&rm->spr_poisonpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 1: {
-        powerup = new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1, 1);
-        break;
-    }
-    case 2: {
-        powerup = new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1, 2);
-        break;
-    }
-    case 3: {
-        powerup = new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1, 3);
-        break;
-    }
-    case 4: {
-        powerup = new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1, 5);
-        break;
-    }
-    case 5: {
-        powerup = new PU_FirePowerup(&rm->spr_firepowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 6: {
-        powerup = new PU_StarPowerup(&rm->spr_starpowerup, iSpawnX, iSpawnY, 4, side, 2, 30, 30, 1, 1);
-        break;
-    }
-    case 7: {
-        powerup = new PU_ClockPowerup(&rm->spr_clockpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 8: {
-        powerup = new PU_BobombPowerup(&rm->spr_bobombpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 9: {
-        powerup = new PU_PowPowerup(&rm->spr_powpowerup, iSpawnX, iSpawnY, 8, side, 8, 30, 30, 1, 1);
-        break;
-    }
-    case 10: {
-        powerup = new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 11: {
-        powerup = new PU_HammerPowerup(&rm->spr_hammerpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 12: {
-        shell = new CO_Shell(ShellType::Green, iSpawnX, iSpawnY, true, true, true, false);
-        break;
-    }
-    case 13: {
-        shell = new CO_Shell(ShellType::Red, iSpawnX, iSpawnY, false, true, true, false);
-        break;
-    }
-    case 14: {
-        shell = new CO_Shell(ShellType::Spiny, iSpawnX, iSpawnY, false, false, true, true);
-        break;
-    }
-    case 15: {
-        shell = new CO_Shell(ShellType::Buzzy, iSpawnX, iSpawnY, false, true, false, false);
-        break;
-    }
-    case 16: {
-        powerup = new PU_ModPowerup(&rm->spr_modpowerup, iSpawnX, iSpawnY, 8, side, 8, 30, 30, 1, 1);
-        break;
-    }
-    case 17: {
-        feather = new PU_FeatherPowerup(&rm->spr_featherpowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 18: {
-        powerup = new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 19: {
-        powerup = new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 26, 1, 5);
-        break;
-    }
-    case 20: {
-        powerup = new PU_Tanooki(iSpawnX, iSpawnY);
-        break;
-    }
-    case 21: {
-        powerup = new PU_IceWandPowerup(&rm->spr_icewandpowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 22: {
-        powerup = new PU_PodoboPowerup(&rm->spr_podobopowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 23: {
-        powerup = new PU_BombPowerup(&rm->spr_bombpowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 24: {
-        feather = new PU_LeafPowerup(&rm->spr_leafpowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
-        break;
-    }
-    case 25: {
-        powerup = new PU_PWingsPowerup(&rm->spr_pwingspowerup, iSpawnX, iSpawnY);
-        break;
-    }
+        switch (powerupType) {
+            case PowerupType::ShellGreen:
+            case PowerupType::ShellRed:
+            case PowerupType::ShellSpiny:
+            case PowerupType::ShellBuzzy:
+                shell = static_cast<CO_Shell*>(object);
+                break;
+            case PowerupType::Feather:
+            case PowerupType::Leaf:
+                feather = static_cast<PU_FeatherPowerup*>(object);
+                break;
+            default:
+                powerup = static_cast<MO_Powerup*>(object);
+                break;
+        }
     }
 
     if (coin) {
@@ -274,13 +212,14 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
 
             return feather;
         }
-    } else { //If no powerups were selected for this block, then fire out a podobo
+    } else {
+        //If no powerups were selected for this block, then fire out a podobo
         IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, ix + 2, iy, -(float(RANDOM_INT(5)) / 2.0f) - 6.0f, -1, -1, -1, true);
         objectcontainer[2].add(podobo);
         return podobo;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void CheckSecret(short id)
