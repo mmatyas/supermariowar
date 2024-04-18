@@ -75,7 +75,7 @@ void MO_Spiny::Die()
 void MO_Spiny::DropShell(bool fBounce, bool fFlip)
 {
     // Give the shell a state 2 so it is already spawned but sitting
-    CO_Shell* shell = new CO_Shell(2, ix - 1, iy, false, true, false, false);
+    CO_Shell* shell = new CO_Shell(ShellType::Spiny, ix - 1, iy, false, true, false, false);
     shell->nospawn(iy, fBounce);
 
     if (fFlip)

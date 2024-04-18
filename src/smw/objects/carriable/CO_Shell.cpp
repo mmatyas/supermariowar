@@ -24,8 +24,8 @@ extern CResourceManager* rm;
 // state 1: Shell is moving
 // state 2: Shell is waiting to be picked up
 // state 3: Shell is being held
-CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer)
-    : MO_CarriedObject(&rm->spr_shell, x, y, 4, 4, 30, 20, 1, 11, 0, type * 32, 32, 32)
+CO_Shell::CO_Shell(ShellType type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer)
+    : MO_CarriedObject(&rm->spr_shell, x, y, 4, 4, 30, 20, 1, 11, 0, static_cast<int>(type) * 32, 32, 32)
 {
     iShellType = type;
 
@@ -48,7 +48,7 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 
     iDestY = iy - collisionHeight;
     fy = iDestY + 32.0f;
-    iColorOffsetY = type * 32;
+    iColorOffsetY = static_cast<int>(type) * 32;
 
     iKillCounter = 0;
     iNoOwnerKillTime = 0;
@@ -474,7 +474,7 @@ void CO_Shell::Die()
         return;
     }
 
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_shelldead, ix, iy, -velx / 4.0f, -VELJUMP / 2.0f, 1, 0, iShellType * 32, 0, 32, 32));
+    eyecandy[2].add(new EC_FallingObject(&rm->spr_shelldead, ix, iy, -velx / 4.0f, -VELJUMP / 2.0f, 1, 0, static_cast<int>(iShellType) * 32, 0, 32, 32));
     dead = true;
     ifSoundOnPlay(rm->sfx_kicksound);
     iKillCounter = 0;

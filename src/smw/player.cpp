@@ -758,25 +758,25 @@ void CPlayer::triggerPowerup()
         break;
     }
     case 12: {
-        CO_Shell * shell = new CO_Shell(0, 0, 0, true, true, true, false);
+        CO_Shell * shell = new CO_Shell(ShellType::Green, 0, 0, true, true, true, false);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
     case 13: {
-        CO_Shell * shell = new CO_Shell(1, 0, 0, false, true, true, false);
+        CO_Shell * shell = new CO_Shell(ShellType::Red, 0, 0, false, true, true, false);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
     case 14: {
-        CO_Shell * shell = new CO_Shell(2, 0, 0, false, false, true, true);
+        CO_Shell * shell = new CO_Shell(ShellType::Spiny, 0, 0, false, false, true, true);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
     case 15: {
-        CO_Shell * shell = new CO_Shell(3, 0, 0, false, true, false, false);
+        CO_Shell * shell = new CO_Shell(ShellType::Buzzy, 0, 0, false, true, false, false);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;

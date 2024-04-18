@@ -6,9 +6,18 @@ class CPlayer;
 class gfxSprite;
 class Spotlight;
 
+
+enum class ShellType : unsigned char {
+    Green,
+    Red,
+    Spiny,
+    Buzzy,
+};
+
+
 class CO_Shell : public MO_CarriedObject {
 public:
-    CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer);
+    CO_Shell(ShellType type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer);
 
     void update() override;
     void draw() override;
@@ -43,7 +52,7 @@ public:
 private:
     void Stop();
 
-    short iShellType;
+    ShellType iShellType;
 
     short iIgnoreBounceTimer;
     short iDestY;

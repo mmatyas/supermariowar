@@ -94,9 +94,9 @@ void MO_Koopa::DropShell(bool fBounce, bool fFlip)
     CO_Shell* shell;
 
     if (fRed)
-        shell = new CO_Shell(1, ix - 1, iy + 8, false, true, true, false);
+        shell = new CO_Shell(ShellType::Red, ix - 1, iy + 8, false, true, true, false);
     else
-        shell = new CO_Shell(0, ix - 1, iy + 8, true, true, true, false);
+        shell = new CO_Shell(ShellType::Green, ix - 1, iy + 8, true, true, true, false);
 
     shell->nospawn(iy + 8, fBounce);
 

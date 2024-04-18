@@ -2146,28 +2146,28 @@ void GameplayState::handleInput()
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[0].add(new PU_Tanooki(list_players[0]->leftX() + 32, list_players[0]->topY()));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(0, list_players[0]->leftX() + 32, list_players[0]->topY(), true, true, true, false));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Green, list_players[0]->leftX() + 32, list_players[0]->topY(), true, true, true, false));
                 else
                     objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 3));
             } else if (event.key.keysym.sym == SDLK_5) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[0].add(new PU_PWingsPowerup(&rm->spr_pwingspowerup, list_players[0]->leftX() + 32, list_players[0]->topY()));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(1, list_players[0]->leftX() + 32, list_players[0]->topY(), false, true, true, false));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Red, list_players[0]->leftX() + 32, list_players[0]->topY(), false, true, true, false));
                 else
                     objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 5));
             } else if (event.key.keysym.sym == SDLK_6) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[1].add(new CO_Spring(&rm->spr_spring, list_players[0]->leftX() + 32, list_players[0]->topY(), true));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(2, list_players[0]->leftX() + 32, list_players[0]->topY(), false, false, true, true));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Spiny, list_players[0]->leftX() + 32, list_players[0]->topY(), false, false, true, true));
                 else
                     objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_7) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->leftX() + 32, list_players[0]->topY(), (RANDOM_INT(NUM_POWERUPS) + 3) - 3));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(3, list_players[0]->leftX() + 32, list_players[0]->topY(), false, true, false, false));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Buzzy, list_players[0]->leftX() + 32, list_players[0]->topY(), false, true, false, false));
                 else
                     objectcontainer[0].add(new PU_HammerPowerup(&rm->spr_hammerpowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_8) {

@@ -188,19 +188,19 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
         break;
     }
     case 12: {
-        shell = new CO_Shell(0, iSpawnX, iSpawnY, true, true, true, false);
+        shell = new CO_Shell(ShellType::Green, iSpawnX, iSpawnY, true, true, true, false);
         break;
     }
     case 13: {
-        shell = new CO_Shell(1, iSpawnX, iSpawnY, false, true, true, false);
+        shell = new CO_Shell(ShellType::Red, iSpawnX, iSpawnY, false, true, true, false);
         break;
     }
     case 14: {
-        shell = new CO_Shell(2, iSpawnX, iSpawnY, false, false, true, true);
+        shell = new CO_Shell(ShellType::Spiny, iSpawnX, iSpawnY, false, false, true, true);
         break;
     }
     case 15: {
-        shell = new CO_Shell(3, iSpawnX, iSpawnY, false, true, false, false);
+        shell = new CO_Shell(ShellType::Buzzy, iSpawnX, iSpawnY, false, true, false, false);
         break;
     }
     case 16: {
