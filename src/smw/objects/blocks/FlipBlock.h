@@ -7,10 +7,6 @@ public:
 	B_FlipBlock(gfxSprite *nspr, short x, short y, bool fHidden);
 	~B_FlipBlock(){};
 
-    BlockType getBlockType() const override {
-        return BlockType::Flip;
-    }
-
 	void draw() override;
 	void update() override;
 	void reset() override;

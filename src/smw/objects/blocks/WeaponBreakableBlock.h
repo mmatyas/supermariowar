@@ -21,10 +21,6 @@ class B_WeaponBreakableBlock : public IO_Block {
 public:
     B_WeaponBreakableBlock(gfxSprite *nspr, short x, short y, WeaponDamageType type);
 
-    BlockType getBlockType() const override {
-        return BlockType::WeaponBreakable;
-    }
-
     void draw() override;
     void update() override;
 

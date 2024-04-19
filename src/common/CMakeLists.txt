@@ -1,5 +1,4 @@
 add_library(CommonFiles STATIC
-    BlockTypes.h
     CmdArgs.cpp
     CmdArgs.h
     dirlist.cpp

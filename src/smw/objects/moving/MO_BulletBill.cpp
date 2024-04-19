@@ -156,6 +156,7 @@ bool MO_BulletBill::hitother(CPlayer* player)
 
 void MO_BulletBill::collide(IO_MovingObject* object)
 {
+#ifndef IS_WORLDEDIT
     removeifprojectile(object, true, false);
 
     MovingObjectType type = object->getMovingObjectType();
@@ -197,6 +198,7 @@ void MO_BulletBill::collide(IO_MovingObject* object)
         ifSoundOnPlay(rm->sfx_kicksound);
         Die();
     }
+#endif  // IS_WORLDEDIT
 }
 
 void MO_BulletBill::Die()

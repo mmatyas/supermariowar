@@ -14,10 +14,6 @@ public:
         short iNumSpr, short aniSpeed, bool fHidden, short * piSettings);
     virtual ~B_PowerupBlock();
 
-    BlockType getBlockType() const override {
-        return BlockType::Powerup;
-    }
-
     void draw() override;
     void update() override;
     void reset() override;

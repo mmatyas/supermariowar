@@ -8,10 +8,6 @@ public:
 	B_SwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short state);
 	~B_SwitchBlock(){};
 
-    BlockType getBlockType() const override {
-        return BlockType::OnOff;
-    }
-
 	void draw() override;
 	bool collide(CPlayer * player, short direction, bool useBehavior) override;
 

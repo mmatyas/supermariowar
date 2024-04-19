@@ -1,7 +1,6 @@
 #ifndef BLOCK_BASE_H
 #define BLOCK_BASE_H
 
-#include "BlockTypes.h"
 #include "ObjectBase.h"
 
 class IO_Block : public CObject
@@ -17,8 +16,6 @@ class IO_Block : public CObject
 		//Returns true if we should continue to check for collisions in this direction
 		virtual bool collide(CPlayer * player, short direction, bool useBehavior);
 		virtual bool collide(IO_MovingObject * object, short direction);
-
-		virtual BlockType getBlockType() const = 0;
 
     virtual bool isTransparent() {
         return false;

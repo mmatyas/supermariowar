@@ -8,10 +8,6 @@ public:
 	B_BounceBlock(gfxSprite *nspr, short x, short y, bool fHidden);
 	~B_BounceBlock(){};
 
-    BlockType getBlockType() const override {
-        return BlockType::Bounce;
-    }
-
 	void update() override;
 	void draw() override;
 	void reset() override;

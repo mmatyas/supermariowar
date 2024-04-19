@@ -8,10 +8,6 @@ public:
 	B_ViewBlock(gfxSprite *nspr, short x, short y, bool fHidden, short * piSettings);
 	~B_ViewBlock(){};
 
-    BlockType getBlockType() const override {
-        return BlockType::View;
-    }
-
 	void draw() override;
 	void update() override;
 	short SelectPowerup() override;

@@ -8,10 +8,6 @@ public:
 	B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type);
 	~B_ThrowBlock(){};
 
-    BlockType getBlockType() const override {
-        return BlockType::Throw;
-    }
-
 	void draw() override;
 	void update() override;
 

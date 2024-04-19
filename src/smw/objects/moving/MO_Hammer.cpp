@@ -82,8 +82,7 @@ void MO_Hammer::update()
     // Detection collision with hammer breakable blocks
     const std::array<IO_Block*, 4> blocks = GetCollisionBlocks();
     for (short iBlock = 0; iBlock < 4; iBlock++) {
-        if (blocks[iBlock] && blocks[iBlock]->getBlockType() == BlockType::WeaponBreakable) {
-            B_WeaponBreakableBlock* weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
+        if (auto* weaponbreakableblock = dynamic_cast<B_WeaponBreakableBlock*>(blocks[iBlock])) {
             if (weaponbreakableblock->type() == WeaponDamageType::Hammer) {
                 weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
                 removeifprojectile(this, false, false);

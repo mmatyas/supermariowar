@@ -12,10 +12,6 @@ public:
 	B_BreakableBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
 	~B_BreakableBlock(){};
 
-    BlockType getBlockType() const override {
-        return BlockType::Breakable;
-    }
-
 	void draw() override;
 	void update() override;
 

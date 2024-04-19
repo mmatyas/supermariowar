@@ -7,10 +7,6 @@ public:
 	B_DonutBlock(gfxSprite *nspr, short x, short y);
 	~B_DonutBlock(){};
 
-    BlockType getBlockType() const override {
-        return BlockType::Donut;
-    }
-
 	void draw() override;
 	void update() override;
 

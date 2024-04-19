@@ -11,8 +11,6 @@ add_executable(smw-worldedit WIN32
 	../smw/objects/moving/MovingObject.h
 	../smw/objects/moving/MO_BulletBill.cpp
 	../smw/objects/moving/MO_BulletBill.h
-	../smw/objects/moving/MO_Explosion.cpp
-	../smw/objects/moving/MO_Explosion.h
 	../smw/objects/moving/MO_PirhanaPlant.cpp
 	../smw/objects/moving/MO_PirhanaPlant.h
 	../smw/objects/overmap/OverMapObject.cpp
@@ -47,6 +45,7 @@ if (WIN32)
 endif()
 
 target_link_libraries(smw-worldedit CommonFiles)
+target_compile_definitions(smw-worldedit PRIVATE IS_WORLDEDIT)
 
 #
 # Installation

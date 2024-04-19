@@ -7,10 +7,6 @@ public:
 	B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type, bool fHidden);
 	~B_NoteBlock(){};
 
-    BlockType getBlockType() const override {
-        return BlockType::Note;
-    }
-
 	void draw() override;
 	void update() override;
 	void reset() override;

@@ -8,10 +8,6 @@ public:
 	B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short state);
 	~B_OnOffSwitchBlock(){};
 
-    BlockType getBlockType() const override {
-        return BlockType::OnOffSwitch;
-    }
-
 	void update() override;
 	void draw() override;
 
