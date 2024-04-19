@@ -86,19 +86,20 @@ IO_MovingObject* spawnSpecialPowerup(short type, short spawnX, short spawnY)
         case JAIL_KEY_POWERUP: return new PU_JailKeyPowerup(&rm->spr_jailkeypowerup, spawnX, spawnY);
         case COIN_POWERUP: {
             short iRandCoin = RANDOM_INT(9);
-            short iCoin = 2;
+            CoinColor color = CoinColor::Yellow;
 
             if (iRandCoin == 8)
-                iCoin = 3;
+                color = CoinColor::Blue;
             else if (iRandCoin >= 6)
-                iCoin = 1;
+                color = CoinColor::Green;
             else if (iRandCoin >= 3)
-                iCoin = 0;
+                color = CoinColor::Red;
 
             static short iCoinValue[4] = {3, 5, 2, 10};
             static short iGreedValue[4] = {10, 15, 5, 20};
+            const size_t colorIdx = static_cast<size_t>(color);
 
-            return new PU_CoinPowerup(&rm->spr_coin, spawnX, spawnY, iCoin, game_values.gamemode->gamemode == game_mode_greed ? iGreedValue[iCoin] : iCoinValue[iCoin]);
+            return new PU_CoinPowerup(&rm->spr_coin, spawnX, spawnY, color, game_values.gamemode->gamemode == game_mode_greed ? iGreedValue[colorIdx] : iCoinValue[colorIdx]);
         }
         case MINIGAME_COIN: return new MO_Coin(&rm->spr_coin, 0.0f, -VELJUMP / 2.0, spawnX, spawnY, 2, -1, 2, 0, false);
         case SECRET1_POWERUP: return new PU_SecretPowerup(&rm->spr_secret1, spawnX, spawnY, 0);
