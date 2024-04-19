@@ -4,8 +4,6 @@
 #include "Game.h"
 #include "GameMode.h"
 #include "GameValues.h"
-#include "map.h"
-#include "movingplatform.h"
 #include "ObjectContainer.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
@@ -37,8 +35,6 @@
 #include "objects/powerup/PU_SecretPowerup.h"
 #include "objects/powerup/PU_StarPowerup.h"
 #include "objects/powerup/PU_Tanooki.h"
-#include "objects/powerup/PU_TreasureChestBonus.h"
-#include "objects/MysteryMushroomTempPlayer.h"
 
 extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
