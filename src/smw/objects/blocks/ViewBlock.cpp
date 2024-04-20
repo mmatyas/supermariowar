@@ -5,7 +5,7 @@
 
 extern CResourceManager* rm;
 
-B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y, bool fHidden, short * piSettings) :
+B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y, bool fHidden, const short * piSettings) :
     B_PowerupBlock(nspr1, x, y, 1, 32000, fHidden, piSettings)
 {
     poweruptimer = 0;

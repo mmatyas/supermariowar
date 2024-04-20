@@ -1447,6 +1447,77 @@ void UpdateScoreBoard()
     }
 }
 
+/// NOTE: The elements are ordered!
+enum MapBlockType {
+    MapBlock_BrickYellow,
+    MapBlock_Powerup,
+    MapBlock_Donut,
+    MapBlock_Flip,
+    MapBlock_Bounce,
+    MapBlock_NoteGray,
+    MapBlock_BrickBlue,
+    MapBlock_SwitchToggleRed,
+    MapBlock_SwitchToggleGreen,
+    MapBlock_SwitchToggleYellow,
+    MapBlock_SwitchToggleBlue,
+    MapBlock_SwitchBlockRed,
+    MapBlock_SwitchBlockGreen,
+    MapBlock_SwitchBlockYellow,
+    MapBlock_SwitchBlockBlue,
+    MapBlock_View,
+    MapBlock_BrickRed,
+    MapBlock_NoteRed,
+    MapBlock_NoteBlue,
+    MapBlock_BrickGray,
+    MapBlock_WpnBreakFireball,
+    MapBlock_WpnBreakFeather,
+    MapBlock_WpnBreakShell,
+    MapBlock_WpnBreakBomb,
+    MapBlock_WpnBreakBoomerang,
+    MapBlock_WpnBreakHammer,
+    MapBlock_WpnBreakKuriboShoe,
+    MapBlock_WpnBreakPWings,
+    MapBlock_WpnBreakStar,
+    MapBlock_WpnBreakLeaf,
+};
+
+IO_Block* spawnMapBlock(short typeId, short drawX, short drawY, const MapBlock& objdata, const std::array<short, 4>& switchStates)
+{
+    switch (typeId) {
+        case MapBlock_BrickYellow: return new B_BreakableBlock(&rm->spr_breakableblock, drawX, drawY, 4, 10);
+        case MapBlock_Powerup: return new B_PowerupBlock(&rm->spr_powerupblock, drawX, drawY, 4, 10, objdata.fHidden, objdata.iSettings);
+        case MapBlock_Donut: return new B_DonutBlock(&rm->spr_donutblock, drawX, drawY);
+        case MapBlock_Flip: return new B_FlipBlock(&rm->spr_flipblock, drawX, drawY, objdata.fHidden);
+        case MapBlock_Bounce: return new B_BounceBlock(&rm->spr_bounceblock, drawX, drawY, objdata.fHidden);
+        case MapBlock_NoteGray: return new B_NoteBlock(&rm->spr_noteblock, drawX, drawY, 4, 10, NoteBlockType::Gray, objdata.fHidden);
+        case MapBlock_BrickBlue: return new B_ThrowBlock(&rm->spr_throwblock, drawX, drawY, 4, 10, ThrowBlockType::Blue);
+        case MapBlock_SwitchToggleRed: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Red, switchStates[0]);
+        case MapBlock_SwitchToggleGreen: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Green, switchStates[1]);
+        case MapBlock_SwitchToggleYellow: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Yellow, switchStates[2]);
+        case MapBlock_SwitchToggleBlue: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Blue, switchStates[3]);
+        case MapBlock_SwitchBlockRed: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Red, objdata.iSettings[0]);
+        case MapBlock_SwitchBlockGreen: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Green, objdata.iSettings[0]);
+        case MapBlock_SwitchBlockYellow: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Yellow, objdata.iSettings[0]);
+        case MapBlock_SwitchBlockBlue: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Blue, objdata.iSettings[0]);
+        case MapBlock_View: return new B_ViewBlock(&rm->spr_viewblock, drawX, drawY, objdata.fHidden, objdata.iSettings);
+        case MapBlock_BrickRed: return new B_ThrowBlock(&rm->spr_throwblock, drawX, drawY, 4, 10, ThrowBlockType::Red);
+        case MapBlock_NoteRed: return new B_NoteBlock(&rm->spr_noteblock, drawX, drawY, 4, 10, NoteBlockType::Red, objdata.fHidden);
+        case MapBlock_NoteBlue: return new B_NoteBlock(&rm->spr_noteblock, drawX, drawY, 4, 10, NoteBlockType::Blue, objdata.fHidden);
+        case MapBlock_BrickGray: return new B_ThrowBlock(&rm->spr_throwblock, drawX, drawY, 4, 10, ThrowBlockType::Gray);
+        case MapBlock_WpnBreakFireball: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Fireball);
+        case MapBlock_WpnBreakFeather: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Feather);
+        case MapBlock_WpnBreakShell: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Shell);
+        case MapBlock_WpnBreakBomb: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Bomb);
+        case MapBlock_WpnBreakBoomerang: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Boomerang);
+        case MapBlock_WpnBreakHammer: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Hammer);
+        case MapBlock_WpnBreakKuriboShoe: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::KuriboShoe);
+        case MapBlock_WpnBreakPWings: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::PWings);
+        case MapBlock_WpnBreakStar: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Star);
+        case MapBlock_WpnBreakLeaf: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Leaf);
+        default: return nullptr;
+    }
+}
+
 void LoadMapObjects(bool fPreview)
 {
     LoadMapHazards(fPreview);
@@ -1458,57 +1529,24 @@ void LoadMapObjects(bool fPreview)
     //Add blocks (breakable, note, switch, throwable, etc)
     for (short x = 0; x < MAPWIDTH; x++) {
         for (short y = 0; y < MAPHEIGHT; y++) {
-            short iType = g_map->objectdata[x][y].iType;
-            if (iType == 0) {
-                g_map->blockdata[x][y] = new B_BreakableBlock(&rm->spr_breakableblock, x << 5, y << 5, 4, 10);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType == 1) {
-                g_map->blockdata[x][y] = new B_PowerupBlock(&rm->spr_powerupblock, x << 5, y << 5, 4, 10, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType == 2) {
-                g_map->blockdata[x][y] = new B_DonutBlock(&rm->spr_donutblock, x << 5, y << 5);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType == 3) {
-                g_map->blockdata[x][y] = new B_FlipBlock(&rm->spr_flipblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType == 4) {
-                g_map->blockdata[x][y] = new B_BounceBlock(&rm->spr_bounceblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType == 5) {
-                g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, NoteBlockType::Gray, g_map->objectdata[x][y].fHidden);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType == 6) {
-                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, ThrowBlockType::Blue);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType >= 7 && iType <= 10) {
-                size_t colorIdx = iType - 7;
-                SwitchColor color = static_cast<SwitchColor>(colorIdx);
-                g_map->blockdata[x][y] = new B_OnOffSwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, color, g_map->iSwitches[colorIdx]);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-                g_map->switchBlocks[colorIdx].push_back(g_map->blockdata[x][y]);
-            } else if (iType >= 11 && iType <= 14) {
-                size_t colorIdx = iType - 11;
-                SwitchColor color = static_cast<SwitchColor>(colorIdx);
-                g_map->blockdata[x][y] = new B_SwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, color, g_map->objectdata[x][y].iSettings[0]);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-                g_map->switchBlocks[colorIdx + 4].push_back(g_map->blockdata[x][y]);
-            } else if (iType == 15) {
-                g_map->blockdata[x][y] = new B_ViewBlock(&rm->spr_viewblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType == 16) {
-                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, ThrowBlockType::Red);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType == 17 || iType == 18) {
-                g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, iType == 17 ? NoteBlockType::Red : NoteBlockType::Blue, g_map->objectdata[x][y].fHidden);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType == 19) {
-                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, ThrowBlockType::Gray);
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if (iType >= 20 && iType <= 29) {
-                g_map->blockdata[x][y] = new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, x << 5, y << 5, static_cast<WeaponDamageType>(iType - 20));
-                noncolcontainer.add(g_map->blockdata[x][y]);
-            } else {
-                g_map->blockdata[x][y] = NULL;
+            const short typeId = g_map->objectdata[x][y].iType;
+            IO_Block* block = spawnMapBlock(typeId, x * 32, y * 32, g_map->objectdata[x][y], g_map->iSwitches);
+            g_map->blockdata[x][y] = block;
+
+            if (block)
+                noncolcontainer.add(block);
+
+            switch (typeId) {
+                case MapBlock_SwitchToggleRed:
+                case MapBlock_SwitchToggleGreen:
+                case MapBlock_SwitchToggleYellow:
+                case MapBlock_SwitchToggleBlue:
+                case MapBlock_SwitchBlockRed:
+                case MapBlock_SwitchBlockGreen:
+                case MapBlock_SwitchBlockYellow:
+                case MapBlock_SwitchBlockBlue:
+                    g_map->switchBlocks[typeId - MapBlock_SwitchToggleRed].push_back(block);
+                    break;
             }
         }
     }

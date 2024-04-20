@@ -8,6 +8,7 @@
 
 #include "gfx.h"
 
+#include <array>
 #include <list>
 #include <string>
 #include <vector>
@@ -294,7 +295,7 @@ class CMap
 		SDL_Rect	drawareas[MAXDRAWAREAS];
 		short		numdrawareas = 0;
 
-		short		iSwitches[4];
+		std::array<short, 4> iSwitches;
 		std::list<IO_Block*> switchBlocks[8];
 
 		bool		fAutoFilter[NUM_AUTO_FILTERS];

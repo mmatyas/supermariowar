@@ -20,7 +20,7 @@ extern CResourceManager* rm;
 // class powerup block
 //------------------------------------------------------------------------------
 
-B_PowerupBlock::B_PowerupBlock(gfxSprite* nspr1, short x, short y, short iNumSpr, short aniSpeed, bool fHidden, short * piSettings)
+B_PowerupBlock::B_PowerupBlock(gfxSprite* nspr1, short x, short y, short iNumSpr, short aniSpeed, bool fHidden, const short * piSettings)
     : IO_Block(nspr1, x, y)
 {
     iw = (short)spr->getWidth() >> 2;
