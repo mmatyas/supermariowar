@@ -37,11 +37,11 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miFeatherJumpsField->setOutputPtr(&game_values.featherjumps);
     miFeatherJumpsField->setCurrentValue(game_values.featherjumps);
 
-    miBoomerangStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 10, 220, "Style", 305, 120);
-    miBoomerangStyleField->add("Flat", 0);
-    miBoomerangStyleField->add("SMB3", 1);
-    miBoomerangStyleField->add("Zelda", 2);
-    miBoomerangStyleField->add("Random", 3);
+    miBoomerangStyleField = new MI_SelectField<BoomerangStyle>(&rm->spr_selectfield, 10, 220, "Style", 305, 120);
+    miBoomerangStyleField->add("Flat", BoomerangStyle::Flat);
+    miBoomerangStyleField->add("SMB3", BoomerangStyle::SMB3);
+    miBoomerangStyleField->add("Zelda", BoomerangStyle::Zelda);
+    miBoomerangStyleField->add("Random", BoomerangStyle::Random);
     miBoomerangStyleField->setOutputPtr(&game_values.boomerangstyle);
     miBoomerangStyleField->setCurrentValue(game_values.boomerangstyle);
 

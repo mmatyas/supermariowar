@@ -131,7 +131,7 @@ void CGameValues::init()
     hammerpower     = true; //hammers die on first hit
     fireballlimit   = 0;  //Unlimited
     hammerlimit     = 0;  //Unlimited
-    boomerangstyle    = 1;  //SMB3 style
+    boomerangstyle = BoomerangStyle::SMB3;  //SMB3 style
     boomeranglife   = 248;  // 4 seconds of zelda boomerang
     boomeranglimit    = 0;  //Unlimited
     featherjumps    = 1;  //Allow one extra cape jump
@@ -287,7 +287,7 @@ void CGameValues::ReadBinaryConfig() {
         hammerttl = options.read_i16();
         hammerpower = options.read_i16();
         hammerlimit = options.read_i16();
-        boomerangstyle = options.read_i16();
+        boomerangstyle = static_cast<BoomerangStyle>(options.read_i16());
         boomeranglife = options.read_i16();
         boomeranglimit = options.read_i16();
         featherjumps = options.read_i16();
@@ -427,7 +427,7 @@ void CGameValues::WriteConfig()
         options.write_i16(hammerttl);
         options.write_i16(hammerpower);
         options.write_i16(hammerlimit);
-        options.write_i16(boomerangstyle);
+        options.write_i16(static_cast<short>(boomerangstyle));
         options.write_i16(boomeranglife);
         options.write_i16(boomeranglimit);
         options.write_i16(featherjumps);

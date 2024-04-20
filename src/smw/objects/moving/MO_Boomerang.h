@@ -3,6 +3,7 @@
 #include "MovingObject.h"
 
 class Spotlight;
+enum class BoomerangStyle : unsigned char;
 
 
 class MO_Boomerang : public IO_MovingObject {
@@ -22,6 +23,6 @@ private:
     bool fFlipped;
     short iStateTimer;
 
-    short iStyle;
+    BoomerangStyle iStyle;
     Spotlight* sSpotlight;
 };

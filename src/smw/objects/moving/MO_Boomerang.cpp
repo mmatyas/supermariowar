@@ -1,6 +1,7 @@
 #include "MO_Boomerang.h"
 
 #include "eyecandy.h"
+#include "GameplayStyles.h"
 #include "GameValues.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
@@ -49,8 +50,8 @@ MO_Boomerang::MO_Boomerang(gfxSprite* nspr, short x, short y, short iNumSpr, boo
 
     iStateTimer = 0;
 
-    if (game_values.boomerangstyle == 3)
-        iStyle = RANDOM_INT(3);
+    if (game_values.boomerangstyle == BoomerangStyle::Random)
+        iStyle = static_cast<BoomerangStyle>(RANDOM_INT(3));
     else
         iStyle = game_values.boomerangstyle;
 
@@ -78,7 +79,7 @@ void MO_Boomerang::update()
         }
     }
 
-    if (iStyle == 0) {  // Flat style
+    if (iStyle == BoomerangStyle::Flat) {  // Flat style
         fOldX = fx;
         setXf(fx + velx);
 
@@ -103,7 +104,7 @@ void MO_Boomerang::update()
                 velx = -velx;
             }
         }
-    } else if (iStyle == 1) {
+    } else if (iStyle == BoomerangStyle::SMB3) {
         // Attempting to emulate the SMB3 boomerang behavior
         iStateTimer++;
 
@@ -160,7 +161,7 @@ void MO_Boomerang::update()
                 }
             }
         }
-    } else if (iStyle == 2) {  // Zelda style boomerang
+    } else if (iStyle == BoomerangStyle::Zelda) {  // Zelda style boomerang
         iStateTimer++;
 
         fOldX = fx;

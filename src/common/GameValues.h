@@ -126,7 +126,7 @@ public:
     short		bonuswheel;
     short		fireballttl;
     short		fireballlimit;
-    short		boomerangstyle;
+    BoomerangStyle boomerangstyle;
     short		boomeranglife;
     short		boomeranglimit;
     short		cpudifficulty;

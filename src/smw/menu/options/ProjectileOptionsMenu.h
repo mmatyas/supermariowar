@@ -5,6 +5,7 @@
 class MI_Button;
 class MI_Image;
 class MI_Text;
+enum class BoomerangStyle : unsigned char;
 template<typename T> class MI_SelectField;
 
 
@@ -23,7 +24,7 @@ private:
     MI_SelectField<short>* miBlueBlockLifeField;
     MI_SelectField<short>* miGrayBlockLifeField;
     MI_SelectField<short>* miRedBlockLifeField;
-    MI_SelectField<short>* miBoomerangStyleField;
+    MI_SelectField<BoomerangStyle>* miBoomerangStyleField;
     MI_SelectField<short>* miBoomerangLifeField;
     MI_SelectField<short>* miFeatherJumpsField;
 

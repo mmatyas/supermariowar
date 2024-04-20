@@ -71,7 +71,6 @@ class CGameMode
         return true;
     }
 
-		void transferbobombifneeded(CPlayer &inflictor, CPlayer &other);
 		void displayplayertext();
 		void playwarningsound();
 

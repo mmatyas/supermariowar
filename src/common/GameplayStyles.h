@@ -62,3 +62,11 @@ enum class WarpLockStyle : unsigned char {
     EntireConnection,
     AllWarps,
 };
+
+
+enum class BoomerangStyle : unsigned char {
+    Flat,
+    SMB3,
+    Zelda,
+    Random,
+};
