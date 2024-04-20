@@ -40,6 +40,13 @@ void CGM_Tag::init()
         else
             score[iScore]->SetScore(goal);
     }
+
+    setTagged(nullptr);
+}
+
+void CGM_Tag::setTagged(CPlayer* player)
+{
+    m_tagged = player;
 }
 
 void CGM_Tag::think()
@@ -47,20 +54,20 @@ void CGM_Tag::think()
     if (gameover) {
         displayplayertext();
     } else {
-        if (!tagged) {
-            tagged = GetHighestScorePlayer(!fReverseScoring);
+        if (!m_tagged) {
+            m_tagged = GetHighestScorePlayer(!fReverseScoring);
         }
 
         static short counter = 0;
 
-        if (tagged->isready()) {
+        if (m_tagged->isready()) {
             if (++counter >= game_values.pointspeed) {
                 counter = 0;
 
                 if (fReverseScoring)
-                    tagged->Score().AdjustScore(1);
+                    m_tagged->Score().AdjustScore(1);
                 else
-                    tagged->Score().AdjustScore(-1);
+                    m_tagged->Score().AdjustScore(-1);
             }
         }
 
@@ -89,17 +96,17 @@ void CGM_Tag::think()
             playwarningsound();
         }
 
-        if (tagged->Score().score <= 0) {
-            RemoveTeam(tagged->getTeamID());
-            tagged = NULL;
+        if (m_tagged->Score().score <= 0) {
+            RemoveTeam(m_tagged->getTeamID());
+            m_tagged = NULL;
         }
     }
 }
 
 PlayerKillType CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
-    if (&inflictor == tagged) {
-        tagged = &other;
+    if (&inflictor == m_tagged) {
+        m_tagged = &other;
         inflictor.Shield().reset();
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, other.centerX(), other.bottomY(), "Tagged!", -VELJUMP*1.5));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, other.centerX() - 16, other.centerY() - 16, 3, 8));

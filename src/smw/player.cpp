@@ -12,6 +12,7 @@
 #include "gamemodes/Chicken.h"
 #include "gamemodes/ShyGuyTag.h"
 #include "gamemodes/Star.h"
+#include "gamemodes/Tag.h"
 #include "IO_Block.h"
 #include "objects/carriable/CO_Bomb.h"
 #include "objects/carriable/CO_Shell.h"
@@ -200,12 +201,14 @@ void CPlayer::accelerate(float direction)
 
     float maxVel = 0.0f;
     if (!frozen) {
+        auto* gmTag = dynamic_cast<CGM_Tag*>(game_values.gamemode);
+
         if ((game_values.flags.slowdownon != -1 && game_values.flags.slowdownon != teamID) || jail.isActive())
             maxVel = VELSLOWMOVING;
         else if (playerKeys->game_turbo.fDown)
-            maxVel = VELTURBOMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+            maxVel = VELTURBOMOVING + ((gmTag && gmTag->tagged() == this) ? TAGGEDBOOST : 0.0f);
         else
-            maxVel = VELMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+            maxVel = VELMOVING + ((gmTag && gmTag->tagged() == this) ? TAGGEDBOOST : 0.0f);
     }
     assert(maxVel >= 0.0);
 
@@ -871,8 +874,10 @@ PlayerPalette CPlayer::getPlayerPalette() const
             return (starmodetype == StarStyle::Ztar) ? PlayerPalette::ztarred : PlayerPalette::got_shine;
         }
     }
-    if (game_values.gamemode->tagged == this) {
-        return PlayerPalette::tagged;
+    if (auto* gmTag = dynamic_cast<CGM_Tag*>(game_values.gamemode)) {
+        if (gmTag->tagged() == this) {
+            return PlayerPalette::tagged;
+        }
     }
     if (frozen) {
         return PlayerPalette::frozen;
@@ -1907,23 +1912,24 @@ void CPlayer::TransferTag(CPlayer* o2)
 {
     CPlayer * o1 = this;
 
-    if (game_values.gamemode->gamemode != game_mode_tag)
+    auto* gmTag = dynamic_cast<CGM_Tag*>(game_values.gamemode);
+    if (!gmTag)
         return;
 
     if (!o1->isready() || !o2->isready())
         return;
 
-    if (game_values.gamemode->tagged == o1 && !o2->isShielded() && !o2->isInvincible()) {
-        game_values.gamemode->tagged = o2;
+    if (gmTag->tagged() == o1 && !o2->isShielded() && !o2->isInvincible()) {
+        gmTag->setTagged(o2);
         o1->shield.turn_on();
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8));
         ifSoundOnPlay(rm->sfx_transform);
-    } else if (game_values.gamemode->tagged == o2 && !o1->isShielded() && !o1->isInvincible()) {
-        game_values.gamemode->tagged = o1;
+    } else if (gmTag->tagged() == o2 && !o1->isShielded() && !o1->isInvincible()) {
+        gmTag->setTagged(o1);
         o2->shield.turn_on();
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8));
         ifSoundOnPlay(rm->sfx_transform);
     }
 }

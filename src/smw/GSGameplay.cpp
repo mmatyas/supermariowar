@@ -17,6 +17,7 @@
 #include "sfx.h"
 #include "gamemodes/Chicken.h"
 #include "gamemodes/MiniBoss.h"
+#include "gamemodes/Tag.h"
 #include "objects/MysteryMushroomTempPlayer.h"
 #include "objects/carriable/CO_KuriboShoe.h"
 #include "objects/carriable/CO_Shell.h"
@@ -523,6 +524,7 @@ void GameplayState::CleanDeadPlayers()
     bool fCheckForGameOver = false;
 
     auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
+    auto* gmTag = dynamic_cast<CGM_Tag*>(game_values.gamemode);
 
     for (short i = 0; i < list_players_cnt; i++) {
         if (list_players[i]->state == PlayerState::Dead) {
@@ -534,8 +536,8 @@ void GameplayState::CleanDeadPlayers()
             //Set this to zero so we don't display a spawn egg when player is removed from game
             respawnCount[list_players[i]->globalID] = 0;
 
-            if (game_values.gamemode->tagged == list_players[i])
-                game_values.gamemode->tagged = NULL;
+            if (gmTag && gmTag->tagged() == list_players[i])
+                gmTag->setTagged(nullptr);
 
             if (gmChicken && gmChicken->chicken() == list_players[i])
                 gmChicken->clearChicken();

@@ -181,7 +181,6 @@ void CGameMode::init()  //called once when the game is started
     if (goal == 1000)
         goal = 999; //Cap goal for 3 digit scoreboard
 
-    tagged = NULL;
     frenzyowner = NULL;
 
     winningteam = -1;

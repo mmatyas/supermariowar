@@ -10,6 +10,7 @@
 #include "gamemodes/Chicken.h"
 #include "gamemodes/Race.h"
 #include "gamemodes/Star.h"
+#include "gamemodes/Tag.h"
 #include "objects/IO_FlameCannon.h"
 
 #include "objects/moving/MO_Boomerang.h"
@@ -159,6 +160,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
         return;
 
     auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
+    auto* gmTag = dynamic_cast<CGM_Tag*>(game_values.gamemode);
 
     /***************************************************
     * 1. Figure out what objects are nearest to us
@@ -314,9 +316,9 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                         }
                     }
                 }
-            } else if (game_values.gamemode->tagged == player || player->isInvincible() || player->shyguy || (gmChicken && gmChicken->chicken() == pPlayer)) {
+            } else if ((gmTag && gmTag->tagged() == player) || player->isInvincible() || player->shyguy || (gmChicken && gmChicken->chicken() == pPlayer)) {
                 *moveAway = true;
-            } else if (pPlayer->isInvincible() || pPlayer->shyguy  || pPlayer->bobomb || game_values.gamemode->tagged == pPlayer) {
+            } else if (pPlayer->isInvincible() || pPlayer->shyguy  || pPlayer->bobomb || (gmTag && gmTag->tagged() == pPlayer)) {
                 *moveToward = true;
             } else if (player->iy >= iy && !player->isInvincible() && !player->bobomb) {
                 *moveToward = true;
