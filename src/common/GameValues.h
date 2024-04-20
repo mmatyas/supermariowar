@@ -169,16 +169,17 @@ public:
     short		wandlimit;
     TournamentControlStyle tournamentcontrolstyle;  //ID for the player selected control style
     short		wandfreezetime;
-    short		teamids[4][3];
     bool		toplayer;
     bool		teamcolors;
     bool		sound;
     bool		startgamecountdown;
     bool		startmodedisplay;
     short		storedpowerupdelay;
-    short		teamcounts[4];
     short		swapstyle;
     short		respawn;
+
+    void ReadBinaryConfig();
+    void WriteConfig() const;
 };
 
 // these are actually the program options
@@ -187,14 +188,10 @@ class CGameValues : public CGameConfig
 public:
     void init();
 
-    void ReadBinaryConfig();
-    void WriteConfig();
-
-    void SetupDefaultGameModeSettings();
     void resetGameplaySettings();
     void resetSecretCounters();
 
-    bool        showfps;
+    bool showfps;
     bool		frameadvance;
     bool		autokill;
 
@@ -207,6 +204,9 @@ public:
     short screenfadespeed = 0;
 
     MatchType matchtype;	//The currently selected match type: quick game, single, tournament, tour, world, minigame
+
+    short		teamids[4][3];
+    short		teamcounts[4];
 
     short		tournamentgames;	//How many games that are played in this tournament
     short		tournamentwinner;     //-2 for a tied tournament (for tours), -1 for no winner yet, 0 or greater for the team that has won the tournament

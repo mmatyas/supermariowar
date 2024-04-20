@@ -296,7 +296,7 @@ void CGameValues::resetSecretCounters()
 }
 
 // Read saved settings from disk
-void CGameValues::ReadBinaryConfig() {
+void CGameConfig::ReadBinaryConfig() {
     try {
         std::string options_path(GetHomeDirectory() + "options.bin");
         BinaryFile options(options_path.c_str(), "rb");
@@ -441,7 +441,7 @@ void CGameValues::ReadBinaryConfig() {
     }
 }
 
-void CGameValues::WriteConfig()
+void CGameConfig::WriteConfig() const
 {
     try {
         std::string options_path(GetHomeDirectory() + "options.bin");
