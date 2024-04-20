@@ -9,6 +9,7 @@
 #include "objectgame.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
+#include "gamemodes/Chicken.h"
 #include "gamemodes/ShyGuyTag.h"
 #include "gamemodes/Star.h"
 #include "IO_Block.h"
@@ -995,9 +996,12 @@ void CPlayer::tryShakingTail()
     if (kuriboshoe.is_on() || spin.isSpinInProgress())
         return;
 
-    bool isGlidingChicken = game_values.gamemode->chicken == this
-                            && game_values.gamemodesettings.chicken.glide
-                            && powerup == -1;
+    bool isGlidingChicken = false;
+    if (auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode)) {
+        isGlidingChicken = gmChicken->chicken() == this
+            && game_values.gamemodesettings.chicken.glide
+            && powerup == -1;
+    }
 
     if (powerup == 7 || isGlidingChicken) {
         if (game_values.leaflimit == 0 || projectilelimit > 0)
@@ -1624,9 +1628,10 @@ void CPlayer::die(PlayerDeathStyle deathStyle, bool fTeamRemoved, bool fKillCarr
         short iDeathSprite = deathStyle == PlayerDeathStyle::Jump ? PGFX_DEADFLYING : PGFX_DEAD;
 
         gfxSprite * corpseSprite = sprites[iDeathSprite];
+        auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
 
         //If the player was a bobomb or chicken, make sure their death sprite matches
-        if (diedas == 1 || game_values.gamemode->chicken == this)
+        if (diedas == 1 || (gmChicken && gmChicken->chicken() == this))
             corpseSprite = rm->spr_chocobo[colorID][iDeathSprite];
         else if (diedas == 2 || bobomb)
             corpseSprite = rm->spr_bobomb[colorID][iDeathSprite];
@@ -1861,7 +1866,8 @@ PlayerKillType CPlayer::KilledPlayer(CPlayer * killed, PlayerDeathStyle deathsty
     if (killed->state != PlayerState::Ready)
         return PlayerKillType::None;
 
-    if (game_values.gamemode->chicken == killer && style != KillStyle::Pow)
+    auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
+    if (gmChicken && gmChicken->chicken() == killer && style != KillStyle::Pow)
         ifSoundOnPlay(rm->sfx_chicken);
 
     if (killed->frozen)
@@ -2016,11 +2022,16 @@ void CPlayer::draw()
     //Draw player
     pScoreboardSprite = sprites;
 
+    CPlayer* chicken = nullptr;
+    if (auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode)) {
+        chicken = gmChicken->chicken();
+    }
+
     if (tanookisuit.isStatue()) {
         //Make sure the scoreboard still accurately represents the player
         if (bobomb)
             pScoreboardSprite = rm->spr_bobomb[colorID];
-        else if (game_values.gamemode->chicken == this)
+        else if (chicken == this)
             pScoreboardSprite = rm->spr_chocobo[colorID];
         else if (shyguy)
             pScoreboardSprite = rm->spr_shyguy[colorID];
@@ -2036,7 +2047,7 @@ void CPlayer::draw()
             bobombsmoketimer = 0;
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
         }
-    } else if (game_values.gamemode->chicken == this) { //draw him as chicken
+    } else if (chicken == this) { //draw him as chicken
         pScoreboardSprite = rm->spr_chocobo[colorID];
     } else if (shyguy) { //draw him as chicken
         pScoreboardSprite = rm->spr_shyguy[colorID];
@@ -2057,7 +2068,7 @@ void CPlayer::draw()
         else if (powerup == 8)
             wings.draw(*this);
         //This has to come last otherwise chickens with glide option won't be able to use cape or wings
-        else if (powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide))
+        else if (powerup == 7 || (powerup == -1 && chicken == this && game_values.gamemodesettings.chicken.glide))
             tail.draw(*this);
     }
 

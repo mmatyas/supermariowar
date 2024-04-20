@@ -7,6 +7,7 @@
 #include "ObjectContainer.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
+#include "gamemodes/Chicken.h"
 #include "gamemodes/Race.h"
 #include "gamemodes/Star.h"
 #include "objects/IO_FlameCannon.h"
@@ -156,6 +157,8 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
     if (pPlayer->isdead() || pPlayer->isspawning())
         return;
+
+    auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
 
     /***************************************************
     * 1. Figure out what objects are nearest to us
@@ -311,7 +314,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                         }
                     }
                 }
-            } else if (game_values.gamemode->tagged == player || player->isInvincible() || player->shyguy || game_values.gamemode->chicken == pPlayer) {
+            } else if (game_values.gamemode->tagged == player || player->isInvincible() || player->shyguy || (gmChicken && gmChicken->chicken() == pPlayer)) {
                 *moveAway = true;
             } else if (pPlayer->isInvincible() || pPlayer->shyguy  || pPlayer->bobomb || game_values.gamemode->tagged == pPlayer) {
                 *moveToward = true;
@@ -1024,6 +1027,8 @@ void CPlayerAI::GetNearestObjects()
         }
     }
 
+    auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
+
     //Figure out where the other players are
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if (iPlayer == pPlayer->localID || list_players[iPlayer]->state != PlayerState::Ready)
@@ -1040,8 +1045,8 @@ void CPlayerAI::GetNearestObjects()
             continue;
 
         //If there is a chicken, only focus on stomping him
-        if (game_values.gamemode->chicken) {
-            if (game_values.gamemode->chicken->teamID != iTeamID && game_values.gamemode->chicken != list_players[iPlayer])
+        if (gmChicken && gmChicken->chicken()) {
+            if (gmChicken->chicken()->teamID != iTeamID && gmChicken->chicken() != list_players[iPlayer])
                 continue;
         }
 

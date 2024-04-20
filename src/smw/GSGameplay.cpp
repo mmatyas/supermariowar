@@ -15,6 +15,7 @@
 #include "ResourceManager.h"
 #include "Score.h"
 #include "sfx.h"
+#include "gamemodes/Chicken.h"
 #include "gamemodes/MiniBoss.h"
 #include "objects/MysteryMushroomTempPlayer.h"
 #include "objects/carriable/CO_KuriboShoe.h"
@@ -521,6 +522,8 @@ void GameplayState::CleanDeadPlayers()
 {
     bool fCheckForGameOver = false;
 
+    auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
+
     for (short i = 0; i < list_players_cnt; i++) {
         if (list_players[i]->state == PlayerState::Dead) {
             fCheckForGameOver = true;
@@ -534,8 +537,8 @@ void GameplayState::CleanDeadPlayers()
             if (game_values.gamemode->tagged == list_players[i])
                 game_values.gamemode->tagged = NULL;
 
-            if (game_values.gamemode->chicken == list_players[i])
-                game_values.gamemode->chicken = NULL;
+            if (gmChicken && gmChicken->chicken() == list_players[i])
+                gmChicken->clearChicken();
 
             delete list_players[i];
 

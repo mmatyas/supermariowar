@@ -78,7 +78,6 @@ class CGameMode
 		short winningteam;
 		bool gameover;
 
-		CPlayer *chicken;
 		CPlayer *tagged;
 		CPlayer *frenzyowner;
 

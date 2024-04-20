@@ -22,6 +22,17 @@ CGM_Chicken::CGM_Chicken() : CGameMode()
     SetupModeStrings("Chicken", "Points", 50);
 }
 
+void CGM_Chicken::init()  //called once when the game is started
+{
+    CGameMode::init();
+    clearChicken();
+};
+
+void CGM_Chicken::clearChicken()
+{
+    m_chicken = nullptr;
+}
+
 void CGM_Chicken::think()
 {
     if (gameover) {
@@ -29,19 +40,19 @@ void CGM_Chicken::think()
         return;
     }
 
-    if (chicken) {
-        if ( chicken->getVelX() > VELMOVING_CHICKEN )
-            chicken->velx = VELMOVING_CHICKEN;
-        else if (chicken->getVelX() < -VELMOVING_CHICKEN)
-            chicken->velx = -VELMOVING_CHICKEN;
+    if (m_chicken) {
+        if ( m_chicken->getVelX() > VELMOVING_CHICKEN )
+            m_chicken->velx = VELMOVING_CHICKEN;
+        else if (m_chicken->getVelX() < -VELMOVING_CHICKEN)
+            m_chicken->velx = -VELMOVING_CHICKEN;
 
         static short counter = 0;
 
-        if (chicken->isready() && !chicken->IsTanookiStatue()) {
+        if (m_chicken->isready() && !m_chicken->IsTanookiStatue()) {
             if (++counter >= game_values.pointspeed) {
                 counter = 0;
-                chicken->Score().AdjustScore(1);
-                CheckWinner(chicken);
+                m_chicken->Score().AdjustScore(1);
+                CheckWinner(m_chicken);
             }
         }
     }
@@ -50,27 +61,27 @@ void CGM_Chicken::think()
 void CGM_Chicken::draw_foreground()
 {
     //Draw the chicken indicator around the chicken
-    if (game_values.gamemodesettings.chicken.usetarget && !gameover && chicken) {
-        if (chicken->iswarping())
-            rm->spr_chicken.draw(chicken->leftX() - PWOFFSET - 16, chicken->topY() - PHOFFSET - 16, 0, 0, 64, 64, chicken->GetWarpState(), chicken->GetWarpPlane());
-        else if (chicken->isready())
-            rm->spr_chicken.draw(chicken->centerX() - 32, chicken->centerY() - 32);
+    if (game_values.gamemodesettings.chicken.usetarget && !gameover && m_chicken) {
+        if (m_chicken->iswarping())
+            rm->spr_chicken.draw(m_chicken->leftX() - PWOFFSET - 16, m_chicken->topY() - PHOFFSET - 16, 0, 0, 64, 64, m_chicken->GetWarpState(), m_chicken->GetWarpPlane());
+        else if (m_chicken->isready())
+            rm->spr_chicken.draw(m_chicken->centerX() - 32, m_chicken->centerY() - 32);
     }
 }
 
 
 PlayerKillType CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style)
 {
-    if (!chicken || &other == chicken) {
-        chicken = &inflictor;
+    if (!m_chicken || &other == m_chicken) {
+        m_chicken = &inflictor;
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, inflictor.centerX(), inflictor.bottomY(), "Chicken!", -VELJUMP*1.5));
         //eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, inflictor.centerX() - 16, inflictor.centerY() - 16, 3, 8));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, inflictor.centerX() - 24, inflictor.centerY() - 24, 4, 5));
         ifSoundOnPlay(rm->sfx_transform);
 
-        if (&other == chicken)
+        if (&other == m_chicken)
             other.SetCorpseType(1); //flag to use chicken corpse sprite
-    } else if (&inflictor == chicken) {
+    } else if (&inflictor == m_chicken) {
         if (!gameover) {
             inflictor.Score().AdjustScore(5);
             return CheckWinner(&inflictor);
@@ -84,11 +95,11 @@ PlayerKillType CGM_Chicken::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
-    if (chicken == &player) {
+    if (m_chicken == &player) {
         player.SetCorpseType(1); //flag to use chocobo corpse sprite
 
         if (!gameover)
-            chicken = NULL;
+            m_chicken = NULL;
     }
 
     return PlayerKillType::Normal;
