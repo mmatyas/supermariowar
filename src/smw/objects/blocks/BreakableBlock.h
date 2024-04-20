@@ -10,7 +10,6 @@ class IO_MovingObject;
 class B_BreakableBlock : public IO_Block {
 public:
 	B_BreakableBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
-	~B_BreakableBlock(){};
 
 	void draw() override;
 	void update() override;

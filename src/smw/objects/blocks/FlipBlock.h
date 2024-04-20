@@ -5,7 +5,6 @@
 class B_FlipBlock : public IO_Block {
 public:
 	B_FlipBlock(gfxSprite *nspr, short x, short y, bool fHidden);
-	~B_FlipBlock(){};
 
 	void draw() override;
 	void update() override;

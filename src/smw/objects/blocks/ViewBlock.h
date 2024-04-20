@@ -6,7 +6,6 @@
 class B_ViewBlock : public B_PowerupBlock {
 public:
 	B_ViewBlock(gfxSprite *nspr, short x, short y, bool fHidden, const short * piSettings);
-	~B_ViewBlock(){};
 
 	void draw() override;
 	void update() override;

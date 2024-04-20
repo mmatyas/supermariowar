@@ -7,7 +7,6 @@
 class B_ThrowBlock : public IO_Block {
 public:
 	B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, ThrowBlockType type);
-	~B_ThrowBlock(){};
 
 	void draw() override;
 	void update() override;

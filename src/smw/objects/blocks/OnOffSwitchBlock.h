@@ -7,7 +7,6 @@
 class B_OnOffSwitchBlock : public IO_Block {
 public:
 	B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor color, short state);
-	~B_OnOffSwitchBlock(){};
 
 	void update() override;
 	void draw() override;

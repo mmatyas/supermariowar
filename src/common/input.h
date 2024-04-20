@@ -107,7 +107,6 @@ class CPlayerInput
 	public:
 
 		CPlayerInput();
-		~CPlayerInput(){}
 
 		//Clears key pressed states
 		void ClearPressedKeys(short iGameState);
