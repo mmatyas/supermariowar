@@ -93,9 +93,6 @@ extern CTilesetManager* g_tilesetmanager;
 extern FiltersList *filterslist;
 extern MapList *maplist;
 
-extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
-extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
-
 extern CResourceManager* rm;
 extern std::string RootDataDirectory;
 
@@ -1227,7 +1224,7 @@ int editor_edit()
 
                             if (set_block == 1 || set_block == 15) {
 									for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-										g_map->objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
+										g_map->objectdata[iClickX][iClickY].iSettings[iSetting] = defaultPowerupSetting(0, iSetting);
                             } else if (set_block >= 11 && set_block <= 14) {
 									g_map->objectdata[iClickX][iClickY].iSettings[0] = set_block_switch_on;
 								}
@@ -1387,7 +1384,7 @@ int editor_edit()
 
                             if (set_block == 1 || set_block == 15) {
 									for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-										g_map->objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
+										g_map->objectdata[iClickX][iClickY].iSettings[iSetting] = defaultPowerupSetting(0, iSetting);
                             } else if (set_block >= 11 && set_block <= 14) {
 									g_map->objectdata[iClickX][iClickY].iSettings[0] = set_block_switch_on;
 								}
@@ -2092,7 +2089,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 						else if (event.key.keysym.sym == SDLK_BACKQUOTE)
 							iValue = 0;
 						else if (event.key.keysym.sym == SDLK_d)
-							iValue = g_iDefaultPowerupPresets[0][iSettingIndex];
+							iValue = defaultPowerupSetting(0, iSettingIndex);
 
                     #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                         const Uint8 * keystate = SDL_GetKeyboardState(NULL);
@@ -2102,7 +2099,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
                     if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
                         for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++) {
 								if (event.key.keysym.sym == SDLK_d)
-									iValue = g_iDefaultPowerupPresets[0][iSetting];
+                                iValue = defaultPowerupSetting(0, iSetting);
 
 								g_map->objectdata[iBlockCol][iBlockRow].iSettings[iSetting] = iValue;
 							}
@@ -2123,7 +2120,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 
 							if ((event.button.button == SDL_BUTTON_RIGHT && (iMouseState & SDL_BUTTON_LMASK)) ||
                                 (event.button.button == SDL_BUTTON_LEFT && (iMouseState & SDL_BUTTON_RMASK))) {
-								*piSetting = g_iDefaultPowerupPresets[0][iSettingIndex];
+                                                            *piSetting = defaultPowerupSetting(0, iSettingIndex);
                         } else if (event.button.button == SDL_BUTTON_LEFT) {
 								if (*piSetting < 10)
 									(*piSetting)++;
@@ -2150,7 +2147,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 								if (g_map->objectdata[iBlockCol][iBlockRow].iSettings[0] >= 0)
 									g_map->objectdata[iBlockCol][iBlockRow].iSettings[0] = -1;
 								else
-									g_map->objectdata[iBlockCol][iBlockRow].iSettings[0] = g_iDefaultPowerupPresets[0][0];
+                                                                    g_map->objectdata[iBlockCol][iBlockRow].iSettings[0] = defaultPowerupSetting(0, 0);
 							}
 						}
 					}

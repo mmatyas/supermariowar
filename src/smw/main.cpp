@@ -114,9 +114,6 @@ extern void UpdateMusicWithOverrides();
 extern SDL_Joystick     **joysticks;
 extern short            joystickcount;
 
-extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
-extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
-
 extern CMap* g_map;
 extern CTilesetManager* g_tilesetmanager;
 
@@ -390,13 +387,6 @@ void main_game()
 
     game_values.init();
 
-    //Set the default powerup weights for bonus wheel and [?] boxes
-    for (short iPreset = 0; iPreset < NUM_POWERUP_PRESETS; iPreset++) {
-        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
-            g_iCurrentPowerupPresets[iPreset][iPowerup] = g_iDefaultPowerupPresets[iPreset][iPowerup];
-        }
-    }
-
     UpdateMusicWithOverrides();
 
     create_gamemodes();
@@ -405,7 +395,7 @@ void main_game()
 
     //Assign the powerup weights to the selected preset
     for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
-        game_values.powerupweights[iPowerup] = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup];
+        game_values.powerupweights[iPowerup] = game_values.allPowerupPresets[game_values.poweruppreset][iPowerup];
     }
 
     if (game_values.fullscreen) {

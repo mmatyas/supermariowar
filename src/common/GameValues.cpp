@@ -26,7 +26,6 @@ extern GraphicsList *gamegraphicspacklist;
 extern SoundsList *soundpacklist;
 
 extern short joystickcount;
-extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 extern int32_t g_iVersion[];
 extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
@@ -62,11 +61,67 @@ SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_
     }
 };
 
+namespace {
+/*
+0 == poison mushroom
+1 == 1up
+2 == 2up
+3 == 3up
+4 == 5up
+5 == flower
+6 == star
+7 == clock
+8 == bobomb
+9 == pow
+10 == bulletbill
+11 == hammer
+12 == green shell
+13 == red shell
+14 == spike shell
+15 == buzzy shell
+16 == mod
+17 == feather
+18 == mystery mushroom
+19 == boomerang
+20 == tanooki
+21 == ice wand
+22 == podoboo
+23 == bombs
+24 == leaf
+25 == pwings
+*/
+constexpr short DEFAULT_POWERUP_PRESETS[NUM_POWERUP_PRESETS][NUM_POWERUPS] {
+//   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+    {5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 1
+    {5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 2
+    {5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 3
+    {5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 4
+    {5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 5
+    {5,10, 5, 3, 1,10, 2, 3, 4, 3, 3, 4, 9, 6, 2, 4, 4, 7, 5, 6, 6, 3, 2, 2, 5, 5}, //Balanced
+    {5, 0, 0, 0, 0,10, 0, 0, 0, 0, 0, 7, 9, 6, 3, 4, 0, 0, 0, 4, 0, 2, 0, 2, 0, 0}, //Weapons Only
+    {0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0}, //Koopa Bros Weapons
+    {5,10, 7, 5, 2, 0, 6, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 5, 0, 3, 0, 0, 0, 8, 6}, //Support Items
+    {3, 3, 1, 0, 0, 0, 0, 0, 4, 2, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 3, 3, 0, 0}, //Booms and Shakes
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 2, 0, 0, 0, 8, 3}, //Fly and Glide
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 4, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //Shells
+    {5, 8, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0}, //Mushrooms Only
+    {3, 5, 0, 0, 0, 5, 2, 0, 0, 0, 3, 0, 6, 4, 1, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}, //Super Mario Bros 1
+    {0, 5, 0, 0, 0, 0, 2, 4, 3, 2, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0}, //Super Mario Bros 2
+    {0, 3, 0, 0, 0, 8, 4, 0, 0, 0, 5, 2,10, 9, 4, 5, 0, 0, 0, 4, 3, 0, 4, 0, 8, 5}, //Super Mario Bros 3
+    {0,10, 0, 0, 0,10, 6, 0, 0, 0, 2, 0, 8, 4, 2, 4, 0, 4, 0, 0, 0, 0, 5, 0, 0, 0}, //Super Mario World
+};
+} // namespace
+
 extern CGameValues game_values;
 void ifSoundOnPlay(sfxSound& sfx)
 {
     if (game_values.sound)
         sfx.play();
+}
+
+short defaultPowerupSetting(size_t presetIdx, size_t powerupIdx)
+{
+    return DEFAULT_POWERUP_PRESETS[presetIdx][powerupIdx];
 }
 
 void CGameValues::init()
@@ -197,6 +252,13 @@ void CGameValues::init()
         //Set the players input to the default configuration (will be overwritten by options.bin settings)
         playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][0];
     }
+
+    //Set the default powerup weights for bonus wheel and [?] boxes
+    for (short iPreset = 0; iPreset < NUM_POWERUP_PRESETS; iPreset++) {
+        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+            allPowerupPresets[iPreset][iPowerup] = defaultPowerupSetting(iPreset, iPowerup);
+        }
+    }
 }
 
 void CGameValues::resetGameplaySettings()
@@ -308,7 +370,7 @@ void CGameValues::ReadBinaryConfig() {
         suicidetime = options.read_i16();
 
         poweruppreset = options.read_i16();
-        options.read_i16_array((int16_t *)g_iCurrentPowerupPresets, NUM_POWERUP_PRESETS * NUM_POWERUPS);
+        options.read_i16_array((int16_t *)allPowerupPresets, NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
         fullscreen = options.read_bool();
 
@@ -448,7 +510,7 @@ void CGameValues::WriteConfig()
         options.write_i16(suicidetime);
 
         options.write_i16(poweruppreset);
-        options.write_raw(&g_iCurrentPowerupPresets, sizeof(short) * NUM_POWERUP_PRESETS * NUM_POWERUPS);
+        options.write_raw(&allPowerupPresets, sizeof(short) * NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
         options.write_bool(fullscreen);
 

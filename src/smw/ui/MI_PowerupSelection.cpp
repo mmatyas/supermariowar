@@ -11,8 +11,6 @@
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
-extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
-extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 namespace {
 //Rearrange display of powerups
@@ -255,7 +253,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
         return MENU_CODE_UNSELECT_ITEM;
     } else if (MENU_CODE_POWERUP_PRESET_CHANGED == ret) {
         for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
-            short iCurrentValue = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]];
+            short iCurrentValue = game_values.allPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]];
             miPowerupSlider[iPowerup]->setCurrentValue(iCurrentValue);
             game_values.powerupweights[iPowerupPositionMap[iPowerup]] = iCurrentValue;
         }
@@ -264,8 +262,9 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
         //EnablePowerupFields(game_values.poweruppreset >= 1 && game_values.poweruppreset <= 3);
     } else if (MENU_CODE_POWERUP_SETTING_CHANGED == ret) {
         //Update the custom presets
-        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-            g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]] = game_values.powerupweights[iPowerupPositionMap[iPowerup]];
+        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+            game_values.allPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]] = game_values.powerupweights[iPowerupPositionMap[iPowerup]];
+        }
     } else if (MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS == ret || MENU_CODE_CLEAR_POWERUP_WEIGHTS == ret) {
         miDialogImage->Show(true);
         miDialogAreYouText->Show(true);
@@ -299,11 +298,11 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
         if (MENU_CODE_POWERUP_RESET_YES == ret) {
             //restore default powerup weights for powerup selection menu
             for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
-                short iDefaultValue = g_iDefaultPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]];
+                short iDefaultValue = defaultPowerupSetting(game_values.poweruppreset, iPowerupPositionMap[iPowerup]);
                 miPowerupSlider[iPowerup]->setCurrentValue(iDefaultValue);
                 game_values.powerupweights[iPowerupPositionMap[iPowerup]] = iDefaultValue;
 
-                g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]] = iDefaultValue;
+                game_values.allPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]] = iDefaultValue;
             }
         } else if (MENU_CODE_POWERUP_CLEAR_YES == ret) {
             //restore default powerup weights for powerup selection menu
@@ -311,7 +310,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
                 miPowerupSlider[iPowerup]->setCurrentValue(0);
                 game_values.powerupweights[iPowerup] = 0;
 
-                g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup] = 0;
+                game_values.allPowerupPresets[game_values.poweruppreset][iPowerup] = 0;
             }
         }
     } else if (MENU_CODE_NEIGHBOR_UP == ret) {

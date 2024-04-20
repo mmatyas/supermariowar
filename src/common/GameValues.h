@@ -10,6 +10,7 @@
 #include <vector>
 
 class sfxSound;
+class CGameMode;
 
 void ifSoundOnPlay(sfxSound&);
 #define ifsoundonandreadyplay(x) (x.isReady() && game_values.sound ? x.play() : -1)
@@ -18,7 +19,7 @@ void ifSoundOnPlay(sfxSound&);
 #define ifsoundonpause(x) (game_values.sound ? x.togglePause() : void(NULL))
 #define ifmusiconplay(x) (game_values.music ? x.play() : -1)
 
-class CGameMode;
+short defaultPowerupSetting(size_t presetIdx, size_t powerupIdx);
 
 enum class AppState: unsigned char {
     Splash,
@@ -111,7 +112,6 @@ struct GameplayFlags {
 // the real configuration class
 class CGameConfig {
 public:
-    bool		showfps;
     short		soundvolume;
     short		musicvolume;
     bool		fullscreen;
@@ -157,7 +157,8 @@ public:
     GameModeSettings gamemodemenusettings;
     bool		music;
     short		pointspeed;
-    short		poweruppreset;
+    short poweruppreset;
+    short allPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
     bool		randomskin[4];
     ScoreboardStyle scoreboardstyle;
     bool		screencrunch;
@@ -193,6 +194,7 @@ public:
     void resetGameplaySettings();
     void resetSecretCounters();
 
+    bool        showfps;
     bool		frameadvance;
     bool		autokill;
 

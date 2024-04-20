@@ -1,5 +1,6 @@
 #include "MapReader.h"
 
+#include "GameValues.h"
 #include "map.h"
 #include "FileIO.h"
 #include "TilesetManager.h"
@@ -8,7 +9,6 @@
 
 extern CTilesetManager* g_tilesetmanager;
 extern short g_iTileTypeConversion[NUMTILETYPES];
-extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 const char * g_szBackgroundConversion[26] = {
     "Land_Classic.png",
@@ -91,7 +91,7 @@ void MapReader1500::read_tiles(CMap& map, BinaryFile& mapfile)
 
             if (map.objectdata[i][j].iType == 1) {
                 for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-                    map.objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
+                    map.objectdata[i][j].iSettings[iSetting] = defaultPowerupSetting(0, iSetting);
             }
         }
     }
