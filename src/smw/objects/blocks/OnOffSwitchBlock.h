@@ -1,11 +1,12 @@
 #pragma once
 
 #include "IO_Block.h"
+#include "objects/SwitchColor.h"
 
 
 class B_OnOffSwitchBlock : public IO_Block {
 public:
-	B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short state);
+	B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor color, short state);
 	~B_OnOffSwitchBlock(){};
 
 	void update() override;
@@ -25,6 +26,6 @@ public:
 	void triggerBehavior(short playerID);
 
 private:
-	short iColorID;
+	SwitchColor m_color;
 	short iSrcX;
 };

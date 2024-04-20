@@ -6,7 +6,7 @@
 
 extern CMap* g_map;
 
-B_SwitchBlock::B_SwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short iState) :
+B_SwitchBlock::B_SwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor color, short iState) :
     IO_Block(nspr, x, y)
 {
     iw = (short)spr->getWidth() >> 2;
@@ -15,7 +15,7 @@ B_SwitchBlock::B_SwitchBlock(gfxSprite *nspr, short x, short y, short colorID, s
     collisionHeight = ih;
 
     state = 1 - iState;
-    iSrcX = colorID * 32;
+    iSrcX = static_cast<int>(color) * 32;
 }
 
 void B_SwitchBlock::draw()

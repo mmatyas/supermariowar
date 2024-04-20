@@ -2,10 +2,18 @@
 
 #include "IO_Block.h"
 
+
+/// NOTE: The elements are ordered!
+enum class NoteBlockType : unsigned char {
+	Blue,
+	Gray,
+	Red,
+};
+
+
 class B_NoteBlock : public IO_Block {
 public:
-	B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type, bool fHidden);
-	~B_NoteBlock(){};
+	B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, NoteBlockType type, bool fHidden);
 
 	void draw() override;
 	void update() override;
@@ -27,6 +35,6 @@ private:
 	short drawFrame;
 	short animationTimer;
 	short animationWidth;
-	short iType;
+	NoteBlockType iType;
 	short iTypeOffsetY;
 };

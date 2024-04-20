@@ -1,5 +1,6 @@
 #pragma once
 
+#include "objects/ThrowBlockType.h"
 #include "objects/moving/MO_CarriedObject.h"
 
 class CPlayer;
@@ -8,7 +9,7 @@ class Spotlight;
 
 class CO_ThrowBlock : public MO_CarriedObject {
 public:
-    CO_ThrowBlock(gfxSprite* nspr, short x, short y, short type);
+    CO_ThrowBlock(gfxSprite* nspr, short x, short y, ThrowBlockType type);
 
     void update() override;
     void draw() override;
@@ -31,7 +32,7 @@ public:
 private:
     void DieHelper();
 
-    short iType;
+    ThrowBlockType iType;
 
     short iDeathTime;
     bool fDieOnBounce;

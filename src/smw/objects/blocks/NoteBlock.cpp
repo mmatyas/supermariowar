@@ -14,7 +14,7 @@ extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type, bool fHidden) :
+B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, NoteBlockType type, bool fHidden) :
     IO_Block(nspr, x, y)
 {
     iw = (short)nspr->getWidth() >> 2;
@@ -28,7 +28,7 @@ B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short
     hidden = ishiddentype = fHidden;
 
     iType = type;
-    iTypeOffsetY = iType << 5;
+    iTypeOffsetY = static_cast<short>(iType) * 32;
 }
 
 void B_NoteBlock::draw()
@@ -98,7 +98,7 @@ bool B_NoteBlock::hittop(CPlayer * player, bool useBehavior)
 
     if (useBehavior) {
         player->superjumptimer = 4;
-        player->superjumptype = iType;
+        player->superjumptype = static_cast<short>(iType);
         player->vely = -VELNOTEBLOCKREPEL;
 
         if (state == 0) {

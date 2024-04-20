@@ -16,7 +16,7 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // State 1: Moving
 // State 2: Holding
-CO_ThrowBlock::CO_ThrowBlock(gfxSprite* nspr, short x, short y, short type)
+CO_ThrowBlock::CO_ThrowBlock(gfxSprite* nspr, short x, short y, ThrowBlockType type)
     : MO_CarriedObject(nspr, x, y, 4, 2, 30, 30, 1, 1)
 {
     state = 2;
@@ -25,8 +25,8 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite* nspr, short x, short y, short type)
     iPlayerID = -1;
     iTeamID = -1;
 
-    fDieOnBounce = type != 2;
-    fDieOnPlayerCollision = type == 0;
+    fDieOnBounce = type != ThrowBlockType::Red;
+    fDieOnPlayerCollision = type == ThrowBlockType::Blue;
 
     iType = type;
 
@@ -213,10 +213,11 @@ void CO_ThrowBlock::update()
 
 void CO_ThrowBlock::draw()
 {
+    const int srcY = static_cast<int>(iType) * 32;
     if (owner && owner->iswarping())
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iType << 5, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, srcY, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
     else
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iType << 5, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, srcY, iw, ih);
 
     if (frozen) {
         rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
@@ -293,10 +294,11 @@ void CO_ThrowBlock::Die()
     if (dead)
         return;
 
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
+    const int srcY = static_cast<int>(iType) * 16;
+    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, srcY, 16, 16));
+    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, srcY, 16, 16));
+    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, srcY, 16, 16));
+    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, srcY, 16, 16));
 
     DieHelper();
 }

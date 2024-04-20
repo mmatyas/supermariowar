@@ -5,6 +5,8 @@ target_sources(smw PRIVATE
 	IO_FlameCannon.h
 	MysteryMushroomTempPlayer.h
 	MysteryMushroomTempPlayer.cpp
+	SwitchColor.h
+	ThrowBlockType.h
 
 	blocks/BounceBlock.cpp
 	blocks/BounceBlock.h

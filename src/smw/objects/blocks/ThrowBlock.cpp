@@ -6,7 +6,6 @@
 #include "ObjectContainer.h"
 #include "player.h"
 #include "ResourceManager.h"
-
 #include "objects/carriable/CO_ThrowBlock.h"
 
 extern CMap* g_map;
@@ -15,7 +14,7 @@ extern CResourceManager* rm;
 extern CEyecandyContainer eyecandy[3];
 extern CObjectContainer objectcontainer[3];
 
-B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type) :
+B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, ThrowBlockType type) :
     IO_Block(nspr, x, y)
 {
     iw = 32;
@@ -30,7 +29,7 @@ B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 
 void B_ThrowBlock::draw()
 {
-    spr->draw(ix, iy, drawFrame, iType << 5, iw, ih);
+    spr->draw(ix, iy, drawFrame, static_cast<short>(iType) * 32, iw, ih);
 }
 
 void B_ThrowBlock::update()
@@ -135,10 +134,11 @@ void B_ThrowBlock::triggerBehavior()
     g_map->blockdata[col][row] = NULL;
     g_map->UpdateTileGap(col, row);
 
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
+    const int srcY = static_cast<int>(iType) * 16;
+    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, srcY, 16, 16));
+    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, srcY, 16, 16));
+    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, srcY, 16, 16));
+    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, srcY, 16, 16));
 
     ifSoundOnPlay(rm->sfx_breakblock);
 }

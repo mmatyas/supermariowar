@@ -1,11 +1,12 @@
 #pragma once
 
 #include "IO_Block.h"
+#include "objects/SwitchColor.h"
 
 
 class B_SwitchBlock : public IO_Block {
 public:
-	B_SwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short state);
+	B_SwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor color, short state);
 	~B_SwitchBlock(){};
 
 	void draw() override;

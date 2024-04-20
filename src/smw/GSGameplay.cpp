@@ -1475,34 +1475,34 @@ void LoadMapObjects(bool fPreview)
                 g_map->blockdata[x][y] = new B_BounceBlock(&rm->spr_bounceblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if (iType == 5) {
-                g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, 1, g_map->objectdata[x][y].fHidden);
+                g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, NoteBlockType::Gray, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if (iType == 6) {
-                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 0);
+                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, ThrowBlockType::Blue);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if (iType >= 7 && iType <= 10) {
-                short iSwitchType = iType - 7;
-                g_map->blockdata[x][y] = new B_OnOffSwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
+                size_t colorIdx = iType - 7;
+                SwitchColor color = static_cast<SwitchColor>(colorIdx);
+                g_map->blockdata[x][y] = new B_OnOffSwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, color, g_map->iSwitches[colorIdx]);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-                g_map->switchBlocks[iSwitchType].push_back(g_map->blockdata[x][y]);
+                g_map->switchBlocks[colorIdx].push_back(g_map->blockdata[x][y]);
             } else if (iType >= 11 && iType <= 14) {
-                short iSwitchType = iType - 11;
-
-                //g_map->blockdata[x][y] = new B_SwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
-                g_map->blockdata[x][y] = new B_SwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->objectdata[x][y].iSettings[0]);
+                size_t colorIdx = iType - 11;
+                SwitchColor color = static_cast<SwitchColor>(colorIdx);
+                g_map->blockdata[x][y] = new B_SwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, color, g_map->objectdata[x][y].iSettings[0]);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-                g_map->switchBlocks[iSwitchType + 4].push_back(g_map->blockdata[x][y]);
+                g_map->switchBlocks[colorIdx + 4].push_back(g_map->blockdata[x][y]);
             } else if (iType == 15) {
                 g_map->blockdata[x][y] = new B_ViewBlock(&rm->spr_viewblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if (iType == 16) {
-                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 2);
+                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, ThrowBlockType::Red);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if (iType == 17 || iType == 18) {
-                g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, iType == 17 ? 2 : 0, g_map->objectdata[x][y].fHidden);
+                g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, iType == 17 ? NoteBlockType::Red : NoteBlockType::Blue, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if (iType == 19) {
-                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 1);
+                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, ThrowBlockType::Gray);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if (iType >= 20 && iType <= 29) {
                 g_map->blockdata[x][y] = new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, x << 5, y << 5, static_cast<WeaponDamageType>(iType - 20));

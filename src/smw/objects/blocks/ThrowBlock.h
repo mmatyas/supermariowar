@@ -1,11 +1,12 @@
 #pragma once
 
 #include "IO_Block.h"
+#include "objects/ThrowBlockType.h"
 
 
 class B_ThrowBlock : public IO_Block {
 public:
-	B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type);
+	B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, ThrowBlockType type);
 	~B_ThrowBlock(){};
 
 	void draw() override;
@@ -24,5 +25,5 @@ private:
 	short drawFrame;
 	short animationTimer;
 	short animationWidth;
-	short iType;
+	ThrowBlockType iType;
 };

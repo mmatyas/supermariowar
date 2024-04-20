@@ -17,7 +17,7 @@ extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-B_OnOffSwitchBlock::B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short iState) :
+B_OnOffSwitchBlock::B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor color, short iState) :
     IO_Block(nspr, x, y)
 {
     iw = (short)spr->getWidth() >> 2;
@@ -25,8 +25,8 @@ B_OnOffSwitchBlock::B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, short 
     ih = (short)spr->getHeight() >> 2;
     collisionHeight = ih;
 
-    iColorID = colorID;
-    iSrcX = colorID * 32;
+    m_color = color;
+    iSrcX = static_cast<short>(m_color) * 32;
 
     state = (iState == 0 ? 3 : 0);
 }
@@ -191,18 +191,20 @@ void B_OnOffSwitchBlock::triggerBehavior(short playerID)
 
         state++;
 
-        //Switch all the switch blocks and all the on/off blocks of the same color
-        std::list<IO_Block*>::iterator iterateSwitches = g_map->switchBlocks[iColorID].begin();
+        const size_t colorIdx = static_cast<size_t>(m_color);
 
-        while (iterateSwitches != g_map->switchBlocks[iColorID].end()) {
+        //Switch all the switch blocks and all the on/off blocks of the same color
+        std::list<IO_Block*>::iterator iterateSwitches = g_map->switchBlocks[colorIdx].begin();
+
+        while (iterateSwitches != g_map->switchBlocks[colorIdx].end()) {
             ((B_OnOffSwitchBlock*)(*iterateSwitches))->FlipState();
             iterateSwitches++;
         }
 
         //Switch all the switch blocks
-        iterateSwitches = g_map->switchBlocks[iColorID + 4].begin();
+        iterateSwitches = g_map->switchBlocks[colorIdx + 4].begin();
 
-        while (iterateSwitches != g_map->switchBlocks[iColorID + 4].end()) {
+        while (iterateSwitches != g_map->switchBlocks[colorIdx + 4].end()) {
             ((B_SwitchBlock*)(*iterateSwitches))->FlipState(playerID);
             iterateSwitches++;
         }
