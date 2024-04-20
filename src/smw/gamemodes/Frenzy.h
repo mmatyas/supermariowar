@@ -13,8 +13,11 @@ class CGM_Frenzy : public CGM_Frag
         void think();
         char *getMenuString(char *buffer64);
 
+        void setFrenzyOwner(CPlayer* palyer);
+
     private:
         short timer;
         short iSelectedPowerup;
         short iItemWeightCount;
+        CPlayer* m_frenzyowner = nullptr;
 };

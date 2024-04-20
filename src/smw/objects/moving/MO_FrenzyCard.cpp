@@ -8,6 +8,7 @@
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
+#include "gamemodes/Frenzy.h"
 #include "objects/carriable/CO_Shell.h"
 
 extern CObjectContainer objectcontainer[3];
@@ -40,7 +41,7 @@ bool MO_FrenzyCard::collide(CPlayer* player)
 {
     if (type < 14 || type > 17 || game_values.gamemodesettings.frenzy.storedshells) {
         player->SetPowerup(type);
-        game_values.gamemode->frenzyowner = player;
+        static_cast<CGM_Frenzy*>(game_values.gamemode)->setFrenzyOwner(player);
     } else {
         switch (type) {
         case 14: {

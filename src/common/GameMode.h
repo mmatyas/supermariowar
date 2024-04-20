@@ -78,8 +78,6 @@ class CGameMode
 		short winningteam;
 		bool gameover;
 
-		CPlayer *frenzyowner;
-
     GameModeType getgamemode() {
         return gamemode;
     }

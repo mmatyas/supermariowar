@@ -29,8 +29,14 @@ void CGM_Frenzy::init()
     iItemWeightCount = 0;
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
         iItemWeightCount += game_values.gamemodesettings.frenzy.powerupweight[iPowerup];
+
+    setFrenzyOwner(nullptr);
 }
 
+void CGM_Frenzy::setFrenzyOwner(CPlayer* player)
+{
+    m_frenzyowner = player;
+}
 
 void CGM_Frenzy::think()
 {
@@ -39,7 +45,7 @@ void CGM_Frenzy::think()
     } else {
         short iPowerupQuantity = game_values.gamemodesettings.frenzy.quantity;
 
-        if ((iPowerupQuantity != 0 && ++timer >= game_values.gamemodesettings.frenzy.rate) || (iPowerupQuantity == 0 && !frenzyowner)) {
+        if ((iPowerupQuantity != 0 && ++timer >= game_values.gamemodesettings.frenzy.rate) || (iPowerupQuantity == 0 && !m_frenzyowner)) {
             timer = 0;
 
             if (0 == iPowerupQuantity)
@@ -66,22 +72,22 @@ void CGM_Frenzy::think()
         }
     }
 
-    if (frenzyowner) {
+    if (m_frenzyowner) {
         if (0 == iSelectedPowerup) {
-            if (!frenzyowner->IsBobomb())
-                frenzyowner = NULL;
+            if (!m_frenzyowner->IsBobomb())
+                m_frenzyowner = NULL;
         } else if (5 > iSelectedPowerup) {
-            if (frenzyowner->powerup != iSelectedPowerup)
-                frenzyowner = NULL;
+            if (m_frenzyowner->powerup != iSelectedPowerup)
+                m_frenzyowner = NULL;
         } else if (5 == iSelectedPowerup) {
-            if (game_values.gamepowerups[frenzyowner->getGlobalID()] != 9)
-                frenzyowner = NULL;
+            if (game_values.gamepowerups[m_frenzyowner->getGlobalID()] != 9)
+                m_frenzyowner = NULL;
         } else if (6 == iSelectedPowerup) {
-            if (game_values.gamepowerups[frenzyowner->getGlobalID()] != 16)
-                frenzyowner = NULL;
+            if (game_values.gamepowerups[m_frenzyowner->getGlobalID()] != 16)
+                m_frenzyowner = NULL;
         } else if (7 == iSelectedPowerup) {
-            if (game_values.gamepowerups[frenzyowner->getGlobalID()] != 10)
-                frenzyowner = NULL;
+            if (game_values.gamepowerups[m_frenzyowner->getGlobalID()] != 10)
+                m_frenzyowner = NULL;
         }
     }
 }
