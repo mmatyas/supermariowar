@@ -16,8 +16,7 @@ extern short score_cnt;
 extern CObjectContainer objectcontainer[3];
 extern CEyecandyContainer eyecandy[3];
 
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
@@ -25,9 +24,9 @@ extern CGameValues game_values;
 
 void RemovePlayersButTeam(short teamid)
 {
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (list_players[iPlayer]->getTeamID() != teamid) {
-            list_players[iPlayer]->state = PlayerState::Dead;
+    for (CPlayer* player : players) {
+        if (player->getTeamID() != teamid) {
+            player->state = PlayerState::Dead;
         }
     }
 }
@@ -43,9 +42,9 @@ void RemovePlayersButHighestScoring()
     }
 
     //Remove all players that don't have that max score
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (list_players[iPlayer]->Score().score < iMaxScore) {
-            list_players[iPlayer]->state = PlayerState::Dead;
+    for (CPlayer* player : players) {
+        if (player->Score().score < iMaxScore) {
+            player->state = PlayerState::Dead;
         }
     }
 }
@@ -144,12 +143,12 @@ bool RemoveTeam(short teamid)
 
     //kill all players on the dead team
     short iAnnouncementColor = -1;
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (list_players[iPlayer]->getTeamID() == teamid) {
+    for (CPlayer* player : players) {
+        if (player->getTeamID() == teamid) {
             if (iAnnouncementColor == -1)
-                iAnnouncementColor = list_players[iPlayer]->getColorID();
+                iAnnouncementColor = player->getColorID();
 
-            list_players[iPlayer]->state = PlayerState::Dead;
+            player->state = PlayerState::Dead;
         }
     }
 
@@ -193,9 +192,9 @@ void CGameMode::init()  //called once when the game is started
 void CGameMode::think()
 {
     if (netplay.active) {
-        for (short k = 0; k < list_players_cnt; k++) {
+        for (size_t k = 0; k < players.size(); k++) {
             if (netplay.player_disconnected[k])
-                list_players[k]->spawnText("Disconnected!");
+                players[k]->spawnText("Disconnected!");
         }
     }
 
@@ -206,9 +205,9 @@ void CGameMode::think()
 void CGameMode::displayplayertext()
 {
     if (winningteam > -1) {
-        for (short k = 0; k < list_players_cnt; k++) {
-            if (list_players[k]->getTeamID() == winningteam)
-                list_players[k]->spawnText("Winner!");
+        for (CPlayer* player : players) {
+            if (player->getTeamID() == winningteam)
+                player->spawnText("Winner!");
         }
     }
 }
@@ -272,14 +271,14 @@ void CGameMode::playerextraguy(CPlayer &player, short iType)
 
 CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
 {
-    short i, j;
+    size_t i, j;
     short count = 1;
     short tiedplayers[4];
     tiedplayers[0] = 0;
 
     //Find the first non-dead player and use them for the first player to compare to
-    for (j = 0; j < list_players_cnt; j++) {
-        if (!list_players[j]->isdead()) {
+    for (j = 0; j < players.size(); j++) {
+        if (!players[j]->isdead()) {
             count = 1;
             tiedplayers[0] = j;
             break;
@@ -287,32 +286,32 @@ CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
     }
 
     //Loop through all players, comparing scores to find the highest/lowest
-    for (i = j + 1; i < list_players_cnt; i++) {
-        if (!list_players[i]->isdead()) {
-            if ((!fGetHighest && list_players[i]->Score().score < list_players[tiedplayers[0]]->Score().score) ||
-                    (fGetHighest && list_players[i]->Score().score > list_players[tiedplayers[0]]->Score().score)) {
+    for (i = j + 1; i < players.size(); i++) {
+        if (!players[i]->isdead()) {
+            if ((!fGetHighest && players[i]->Score().score < players[tiedplayers[0]]->Score().score) ||
+                    (fGetHighest && players[i]->Score().score > players[tiedplayers[0]]->Score().score)) {
                 count = 1;
                 tiedplayers[0] = i;
-            } else if (list_players[i]->Score().score == list_players[tiedplayers[0]]->Score().score) {
+            } else if (players[i]->Score().score == players[tiedplayers[0]]->Score().score) {
                 tiedplayers[count] = i;
                 count++;
             }
         }
     }
 
-    return list_players[tiedplayers[RANDOM_INT(count)]];
+    return players[tiedplayers[RANDOM_INT(count)]];
 }
 
 //Returns number of players in list
-short CGameMode::GetScoreRankedPlayerList(CPlayer * players[4], bool fGetHighest)
+short CGameMode::GetScoreRankedPlayerList(CPlayer * outPlayers[4], bool fGetHighest)
 {
     short iNumPlayersInList = 0;
 
-    for (short iIndex = 0; iIndex < list_players_cnt; iIndex++) {
-        if (list_players[iIndex]->isdead())
+    for (CPlayer* player : players) {
+        if (player->isdead())
             continue;
 
-        players[iNumPlayersInList++] = list_players[iIndex];
+        outPlayers[iNumPlayersInList++] = player;
     }
 
     //Bubble sort players in to score order

@@ -13,8 +13,7 @@
 extern CScore *score[4];
 extern short score_cnt;
 extern CObjectContainer objectcontainer[3];
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
@@ -48,7 +47,7 @@ void CGM_Collection::think()
         short iPowerupQuantity = game_values.gamemodemenusettings.collection.quantity;
 
         if (5 < iPowerupQuantity)
-            iPowerupQuantity = list_players_cnt + iPowerupQuantity - 7;
+            iPowerupQuantity = players.size() + iPowerupQuantity - 7;
 
         if (objectcontainer[1].countMovingTypes(movingobject_collectioncard) < iPowerupQuantity) {
             short iRandom = RANDOM_INT(5);
@@ -89,8 +88,8 @@ void CGM_Collection::think()
         }
     }
 
-    for (short i = 0; i < list_players_cnt; i++) {
-        CheckWinner(list_players[i]);
+    for (CPlayer* player : players) {
+        CheckWinner(player);
     }
 }
 

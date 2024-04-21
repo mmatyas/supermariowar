@@ -191,8 +191,7 @@ int bound_to_window_h(int y) {
 
 CEyecandyContainer eyecandy[3];
 CGameMode		*gamemodes[GAMEMODE_LAST];
-CPlayer			*list_players[4];
-short			list_players_cnt = 0;
+std::vector<CPlayer*> players;
 
 void SDLCALL musicfinished(){}
 

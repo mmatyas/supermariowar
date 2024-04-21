@@ -39,8 +39,7 @@ extern CObjectContainer objectcontainer[3];
 extern CMap* g_map;
 extern CEyecandyContainer eyecandy[3];
 
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -86,9 +85,9 @@ void CMap::movingPlatformCollision(CPlayer * player)
 
 CPlayer * GetPlayerFromGlobalID(short iGlobalID)
 {
-    for (short i = 0; i < list_players_cnt; i++) {
-        if (list_players[i]->globalID == iGlobalID)
-            return list_players[i];
+    for (CPlayer* player : players) {
+        if (player->globalID == iGlobalID)
+            return player;
     }
 
     return NULL;

@@ -9,7 +9,7 @@
 #include "objects/moving/MO_BonusHouseChest.h"
 
 extern CObjectContainer objectcontainer[3];
-extern CPlayer* list_players[4];
+extern std::vector<CPlayer*> players;
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
@@ -74,7 +74,7 @@ void CGM_Bonus::init()
 void CGM_Bonus::draw_background()
 {
     //Draw Toad
-    rm->spr_worldbonushouse.draw(544, 256, list_players[0]->leftX() > 544 ? 224 : 192, 0, 32, 64);
+    rm->spr_worldbonushouse.draw(544, 256, players[0]->leftX() > 544 ? 224 : 192, 0, 32, 64);
 
     //Draw Bonus House Title
     rm->menu_plain_field.draw(0, 0, 0, 0, App::screenWidth/2, 32);

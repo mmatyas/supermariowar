@@ -7,7 +7,7 @@
 #include "ResourceManager.h"
 #include "objects/moving/MO_FrenzyCard.h"
 
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 extern CObjectContainer objectcontainer[3];
 extern CResourceManager* rm;
 extern CGameValues game_values;
@@ -51,7 +51,7 @@ void CGM_Frenzy::think()
             if (0 == iPowerupQuantity)
                 iPowerupQuantity = 1;
             if (5 < iPowerupQuantity)
-                iPowerupQuantity = list_players_cnt + iPowerupQuantity - 7;
+                iPowerupQuantity = players.size() + iPowerupQuantity - 7;
 
             if (objectcontainer[1].countTypes(object_frenzycard) < iPowerupQuantity) {
                 if (iItemWeightCount == 0) {

@@ -13,8 +13,7 @@
 
 extern CEyecandyContainer eyecandy[3];
 extern CObjectContainer objectcontainer[3];
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 extern CResourceManager* rm;
 
 //------------------------------------------------------------------------------
@@ -150,8 +149,7 @@ void MO_PirhanaPlant::update()
             short iPlantX = ix + 16;
             short iPlantY = iy + (iDirection == 0 ? 16 : ih - 16);
 
-            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-                CPlayer* player = list_players[iPlayer];
+            for (CPlayer* player : players) {
                 if (player->state != PlayerState::Ready)
                     continue;
 

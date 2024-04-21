@@ -18,8 +18,6 @@
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
-extern short LookupTeamID(short id);
-
 
 UI_NetRoomMenu::UI_NetRoomMenu()
     : UI_Menu()

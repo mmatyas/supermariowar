@@ -243,8 +243,7 @@ void SDLCALL musicfinished(){}
 CEyecandyContainer eyecandy[3];
 gfxSprite		spr_frontmap[2];
 
-CPlayer			*list_players[4];
-short			list_players_cnt = 0;
+std::vector<CPlayer*> players;
 
 
 short LookupTeamID(short id)
@@ -254,10 +253,6 @@ short LookupTeamID(short id)
 gfxSprite		spr_scoretext;
 gfxSprite		spr_poof;
 
-IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool spawn)
-{
-    return NULL;
-}
 void CScore::AdjustScore(short iValue) {}
 ///////
 

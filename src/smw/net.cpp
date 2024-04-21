@@ -34,8 +34,7 @@ NetworkHandler networkHandler;
 Networking netplay;
 
 extern CGameValues game_values;
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 // used for setting netplay player skins
 extern SkinList *skinlist;
@@ -849,8 +848,8 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
     if (pkg.player_id > 3)
         return;
 
-    assert(list_players[pkg.player_id]);
-    if (!list_players[pkg.player_id])
+    assert(players[pkg.player_id]);
+    if (!players[pkg.player_id])
         return;
 
     unsigned missed_frames = pkg.delay;
@@ -860,14 +859,14 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
 
     // TODO: make this nicer
     // TODO: this might be overriden by a late packet, in tryReleasingPowerup()
-    list_players[pkg.player_id]->powerupused = pkg.powerup_id;
-    list_players[pkg.player_id]->powerupradius = 100.0f;
+    players[pkg.player_id]->powerupused = pkg.powerup_id;
+    players[pkg.player_id]->powerupradius = 100.0f;
     for (; missed_frames > 0; missed_frames--) {
-        list_players[pkg.player_id]->powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
+        players[pkg.player_id]->powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
     }
 
     // TODO: replace this eventually with the powerup trigger package
-    list_players[pkg.player_id]->net_waitingForPowerupTrigger = false;
+    players[pkg.player_id]->net_waitingForPowerupTrigger = false;
     printf("[net] P%d used powerup %d\n", pkg.player_id, pkg.powerup_id);
 }
 
@@ -880,14 +879,14 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
     if (pkg.player_id > 3)
         return;
 
-    float temp_px = list_players[pkg.player_id]->fx;
-    float temp_py = list_players[pkg.player_id]->fy;
-    list_players[pkg.player_id]->powerupused = pkg.powerup_id;
-    list_players[pkg.player_id]->setXf(pkg.player_x);
-    list_players[pkg.player_id]->setYf(pkg.player_y);
-    list_players[pkg.player_id]->triggerPowerup();
-    list_players[pkg.player_id]->setXf(temp_px);
-    list_players[pkg.player_id]->setYf(temp_py);
+    float temp_px = players[pkg.player_id]->fx;
+    float temp_py = players[pkg.player_id]->fy;
+    players[pkg.player_id]->powerupused = pkg.powerup_id;
+    players[pkg.player_id]->setXf(pkg.player_x);
+    players[pkg.player_id]->setYf(pkg.player_y);
+    players[pkg.player_id]->triggerPowerup();
+    players[pkg.player_id]->setXf(temp_px);
+    players[pkg.player_id]->setYf(temp_py);
 }*/
 
 void NetClient::handleMapCollision(const uint8_t* data, size_t dataLength)
@@ -899,31 +898,31 @@ void NetClient::handleMapCollision(const uint8_t* data, size_t dataLength)
     if (pkg.player_id > 3)
         return;
 
-    assert(list_players[pkg.player_id]);
-    if (!list_players[pkg.player_id])
+    assert(players[pkg.player_id]);
+    if (!players[pkg.player_id])
         return;
 
     //printf("[net] Map collision triggered for P%d.\n", pkg.player_id);
-    float temp_px = list_players[pkg.player_id]->fx;
-    float temp_py = list_players[pkg.player_id]->fy;
-    float temp_velx = list_players[pkg.player_id]->velx;
-    float temp_vely = list_players[pkg.player_id]->vely;
-    list_players[pkg.player_id]->setXf(pkg.player_x);
-    list_players[pkg.player_id]->setYf(pkg.player_y);
-    list_players[pkg.player_id]->velx = pkg.player_xvel;
-    list_players[pkg.player_id]->vely = pkg.player_yvel;
+    float temp_px = players[pkg.player_id]->fx;
+    float temp_py = players[pkg.player_id]->fy;
+    float temp_velx = players[pkg.player_id]->velx;
+    float temp_vely = players[pkg.player_id]->vely;
+    players[pkg.player_id]->setXf(pkg.player_x);
+    players[pkg.player_id]->setYf(pkg.player_y);
+    players[pkg.player_id]->velx = pkg.player_xvel;
+    players[pkg.player_id]->vely = pkg.player_yvel;
 
     netplay.allowMapCollisionEvent = true;
-    list_players[pkg.player_id]->collision_detection_map();
+    players[pkg.player_id]->collision_detection_map();
     netplay.allowMapCollisionEvent = false;
 
-    if (list_players[pkg.player_id]->isdead())
+    if (players[pkg.player_id]->isdead())
         return;
 
-    list_players[pkg.player_id]->setXf(temp_px);
-    list_players[pkg.player_id]->setYf(temp_py);
-    list_players[pkg.player_id]->velx = temp_velx;
-    list_players[pkg.player_id]->vely = temp_vely;
+    players[pkg.player_id]->setXf(temp_px);
+    players[pkg.player_id]->setYf(temp_py);
+    players[pkg.player_id]->velx = temp_velx;
+    players[pkg.player_id]->vely = temp_vely;
 
     printf("[net] Map block collision!\n");
 }
@@ -938,13 +937,13 @@ void NetClient::handleP2PCollision(const uint8_t * data, size_t dataLength)
     if (pkg.player_id[0] > 3 || pkg.player_id[1] > 3)
         return;
 
-    assert(list_players[pkg.player_id[0]]);
-    assert(list_players[pkg.player_id[1]]);
-    if (!list_players[pkg.player_id[0]] || !list_players[pkg.player_id[1]])
+    assert(players[pkg.player_id[0]]);
+    assert(players[pkg.player_id[1]]);
+    if (!players[pkg.player_id[0]] || !players[pkg.player_id[1]])
         return;
 
-    CPlayer* player1 = list_players[pkg.player_id[0]];
-    CPlayer* player2 = list_players[pkg.player_id[1]];
+    CPlayer* player1 = players[pkg.player_id[0]];
+    CPlayer* player2 = players[pkg.player_id[1]];
 
     // float temp_p1x = player1.fx;
     // float temp_p1y = player1.fy;
@@ -980,7 +979,7 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
 
     netplay.previous_playerdata = netplay.latest_playerdata;
 
-    for (uint8_t p = 0; p < list_players_cnt; p++) {
+    for (uint8_t p = 0; p < players.size(); p++) {
         pkg.getPlayerCoord(p, netplay.latest_playerdata.player[p].x, netplay.latest_playerdata.player[p].y);
         pkg.getPlayerVel(p, netplay.latest_playerdata.player[p].xvel, netplay.latest_playerdata.player[p].yvel);
     }
@@ -1585,9 +1584,9 @@ void NetGameHost::sendCurrentGameStateNow()
 {
     NetPkgs::GameState pkg;
 
-    for (uint8_t p = 0; p < list_players_cnt; p++) {
-        pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
-        pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
+    for (uint8_t p = 0; p < players.size(); p++) {
+        pkg.setPlayerCoord(p, players[p]->fx, players[p]->fy);
+        pkg.setPlayerVel(p, players[p]->velx, players[p]->vely);
     }
 
     for (unsigned short c = 0; c < expected_client_count; c++) {
@@ -1673,13 +1672,13 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
 void NetGameHost::sendPowerupStartByGH()
 {
     assert(netplay.theHostIsMe);
-    assert(list_players[netplay.remotePlayerNumber]->powerupused >= 0);
+    assert(players[netplay.remotePlayerNumber]->powerupused >= 0);
 
     NetPkgs::StartPowerup pkg(netplay.remotePlayerNumber,
-        list_players[netplay.remotePlayerNumber]->powerupused, 0);
+        players[netplay.remotePlayerNumber]->powerupused, 0);
     sendMessageToMyPeers(&pkg, sizeof(NetPkgs::StartPowerup));
 
-    list_players[netplay.remotePlayerNumber]->net_waitingForPowerupTrigger = false;
+    players[netplay.remotePlayerNumber]->net_waitingForPowerupTrigger = false;
     printf("[net] P%d (host) used powerup %d\n", pkg.player_id, pkg.powerup_id);
 }
 
@@ -1700,10 +1699,10 @@ void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* dat
     }
 
     assert(playerID < 4);
-    assert(list_players[playerID]);
+    assert(players[playerID]);
     if (playerID == 0xFF)
         return;
-    if (!list_players[playerID])
+    if (!players[playerID])
         return;
 
     // TODO: this was copied from player.cpp

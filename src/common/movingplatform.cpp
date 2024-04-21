@@ -25,8 +25,7 @@ extern short g_iCurrentDrawIndex;
 extern CMap* g_map;
 extern CTilesetManager* g_tilesetmanager;
 
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -298,10 +297,10 @@ bool FallingPath::Move(short type)
 
     if (pPlatform->fy - pPlatform->iHalfHeight >= App::screenHeight) {
         //If a player is standing on this platform, clear him off
-        for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-            if (list_players[iPlayer]->platform == pPlatform) {
-                list_players[iPlayer]->platform = NULL;
-                list_players[iPlayer]->vely = dVelY[type];
+        for (CPlayer* player : players) {
+            if (player->platform == pPlatform) {
+                player->platform = NULL;
+                player->vely = dVelY[type];
             }
         }
 

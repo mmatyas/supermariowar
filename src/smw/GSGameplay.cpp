@@ -78,8 +78,7 @@ extern short currentgamemode;
 
 extern CMap* g_map;
 
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 extern CScore* score[4];
 extern short score_cnt;
 
@@ -298,8 +297,7 @@ void GameplayState::createPlayers()
                 if (game_values.playercontrol[iPlayer] == 2)
                     ai = new CPlayerAI();
 
-                list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], rm->spr_player[iPlayer], score[teamid], &(respawnCount[iPlayer]), ai);
-                list_players_cnt++;
+                players.emplace_back(new CPlayer(iPlayer, players.size(), teamid, subteamid, game_values.colorids[iPlayer], rm->spr_player[iPlayer], score[teamid], &(respawnCount[iPlayer]), ai));
             } else if (!game_values.keeppowerup) {
                 //Reset off player's stored powerups if they are not playing
                 game_values.storedpowerups[iPlayer] = -1;
@@ -483,8 +481,8 @@ void GameplayState::initRunGame()
     game_values.flags.gamewindx = (float)((RANDOM_INT(41)) - 20) / 4.0f;
 
     //Initialize players after game init has finished
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
-        list_players[iPlayer]->Init();
+    for (CPlayer* player : players)
+        player->Init();
 }
 
 //
@@ -496,9 +494,9 @@ short CountAliveTeams(short * lastteam)
     short findlastteam = 0;
 
     bool teamalive[4] = {false, false, false, false};
-    for (short k = 0; k < list_players_cnt; k++) {
-        if (!list_players[k]->isdead())
-            teamalive[list_players[k]->teamID] = true;
+    for (CPlayer* player : players) {
+        if (!player->isdead())
+            teamalive[player->teamID] = true;
     }
 
     short numteams = 0;
@@ -526,31 +524,30 @@ void GameplayState::CleanDeadPlayers()
     auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
     auto* gmTag = dynamic_cast<CGM_Tag*>(game_values.gamemode);
 
-    for (short i = 0; i < list_players_cnt; i++) {
-        if (list_players[i]->state == PlayerState::Dead) {
+    for (size_t i = 0; i < players.size(); i++) {
+        if (players[i]->state == PlayerState::Dead) {
             fCheckForGameOver = true;
 
-            if (respawnCount[list_players[i]->globalID] <= 0)
-                list_players[i]->die(PlayerDeathStyle::Jump, true, false);
+            if (respawnCount[players[i]->globalID] <= 0)
+                players[i]->die(PlayerDeathStyle::Jump, true, false);
 
             //Set this to zero so we don't display a spawn egg when player is removed from game
-            respawnCount[list_players[i]->globalID] = 0;
+            respawnCount[players[i]->globalID] = 0;
 
-            if (gmTag && gmTag->tagged() == list_players[i])
+            if (gmTag && gmTag->tagged() == players[i])
                 gmTag->setTagged(nullptr);
 
-            if (gmChicken && gmChicken->chicken() == list_players[i])
+            if (gmChicken && gmChicken->chicken() == players[i])
                 gmChicken->clearChicken();
 
-            delete list_players[i];
+            delete players[i];
 
-            for (short j = i; j < list_players_cnt - 1; j++) {
-                list_players[j] = list_players[j + 1];
-                list_players[j]->localID = j;
+            for (size_t j = i; j < players.size() - 1; j++) {
+                players[j] = players[j + 1];
+                players[j]->localID = j;
             }
 
-            list_players_cnt--;
-            list_players[list_players_cnt] = NULL;
+            players.pop_back();
         }
     }
 
@@ -648,9 +645,7 @@ void shakeScreen()
 
     CPlayer * killer1 = GetPlayerFromGlobalID(game_values.flags.screenshakeplayerid);
 
-    for (short k = 0; k < list_players_cnt; k++) {
-        CPlayer * player = list_players[k];
-
+    for (CPlayer* player : players) {
         //Don't kill the player that triggered the POW/MOd
         if (player->globalID == game_values.flags.screenshakeplayerid)
             continue;
@@ -797,13 +792,13 @@ void GameplayState::spinScreen()
 void handleP2PCollisions()
 {
     //Player to player collisions
-    short i, j;
-    for (i = 0; i < list_players_cnt; i++) {
-        CPlayer* player1 = list_players[i];
+    size_t i, j;
+    for (i = 0; i < players.size(); i++) {
+        CPlayer* player1 = players[i];
         assert(player1);
         if (player1->state > PlayerState::Dead) {
-            for (j = i + 1; j < list_players_cnt; j++) {
-                CPlayer* player2 = list_players[j];
+            for (j = i + 1; j < players.size(); j++) {
+                CPlayer* player2 = players[j];
                 assert(player2);
                 if (player2->state > PlayerState::Dead) {
                     if (coldec_player2player(player1, player2)) {
@@ -825,8 +820,7 @@ void handleP2PCollisions()
 void handleP2ObjCollisions()
 {
     //Collide player with objects
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        CPlayer * player = list_players[iPlayer];
+    for (CPlayer* player : players) {
         if (player->state != PlayerState::Ready)
             continue;
 
@@ -1135,22 +1129,21 @@ void GameplayState::drawScreenShakeBackground()
 
 void GameplayState::drawPlayerSwap()
 {
-    short i;
     if (game_values.flags.swapplayers) {
-        for (i = 0; i < list_players_cnt; i++) {
-            list_players[i]->drawswap();
+        for (CPlayer* player : players) {
+            player->drawswap();
 
-            short storedpowerupid = game_values.gamepowerups[list_players[i]->getGlobalID()];
+            short storedpowerupid = game_values.gamepowerups[player->getGlobalID()];
 
             if (storedpowerupid != -1) {
                 short iPowerupX, iPowerupY;
 
                 if (game_values.swapstyle == 1) {
-                    iPowerupX = game_values.flags.swapplayersblink ? list_players[i]->iOldPowerupX : list_players[i]->iNewPowerupX;
-                    iPowerupY = game_values.flags.swapplayersblink ? list_players[i]->iOldPowerupY : list_players[i]->iNewPowerupY;
+                    iPowerupX = game_values.flags.swapplayersblink ? player->iOldPowerupX : player->iNewPowerupX;
+                    iPowerupY = game_values.flags.swapplayersblink ? player->iOldPowerupY : player->iNewPowerupY;
                 } else {
-                    iPowerupX = (short)((float)(list_players[i]->iNewPowerupX - list_players[i]->iOldPowerupX) * game_values.flags.swapplayersposition) + list_players[i]->iOldPowerupX;
-                    iPowerupY = (short)((float)(list_players[i]->iNewPowerupY - list_players[i]->iOldPowerupY) * game_values.flags.swapplayersposition) + list_players[i]->iOldPowerupY;
+                    iPowerupX = (short)((float)(player->iNewPowerupX - player->iOldPowerupX) * game_values.flags.swapplayersposition) + player->iOldPowerupX;
+                    iPowerupY = (short)((float)(player->iNewPowerupY - player->iOldPowerupY) * game_values.flags.swapplayersposition) + player->iOldPowerupY;
                 }
 
                 rm->spr_storedpowerupsmall.draw(iPowerupX, iPowerupY, storedpowerupid * 16, 0, 16, 16);
@@ -1179,8 +1172,8 @@ void GameplayState::drawPlayerSwap()
             ifSoundOnPlay(rm->sfx_transform);
 
             if (game_values.swapstyle == 1) {
-                for (i = 0; i < list_players_cnt; i++)
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, list_players[i]->leftX() + (HALFPW) - 16, list_players[i]->topY() + (HALFPH) - 16, 3, 8));
+                for (CPlayer* player : players)
+                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->leftX() + (HALFPW) - 16, player->topY() + (HALFPH) - 16, 3, 8));
             }
         }
     }
@@ -1206,8 +1199,8 @@ void GameplayState::drawMiddleLayer()
     g_map->drawPlatforms(1);
 
     if (!game_values.flags.swapplayers) {
-        for (short i = 0; i < list_players_cnt; i++)
-            list_players[i]->draw();
+        for (CPlayer* player : players)
+            player->draw();
     }
 
     eyecandy[1].draw();
@@ -1260,8 +1253,8 @@ void GameplayState::drawSpotlights()
 void GameplayState::drawOutOfScreenIndicators()
 {
     //draw arrows for being above the top of the screen
-    for (short i = 0; i < list_players_cnt; i++)
-        list_players[i]->drawOutOfScreenIndicators();
+    for (CPlayer* player : players)
+        player->drawOutOfScreenIndicators();
 }
 
 void GameplayState::drawEverything(short iCountDownState, short iScoreTextOffset[4])
@@ -1320,11 +1313,11 @@ bool IsPauseAllowed()
 
 bool IsExitAllowed()
 {
-    if (!game_values.flags.noexit || list_players_cnt == 0)
+    if (!game_values.flags.noexit || players.empty())
         return true;
 
-    for (int iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (game_values.playercontrol[list_players[iPlayer]->getGlobalID()] == 1)
+    for (CPlayer* player : players) {
+        if (game_values.playercontrol[player->getGlobalID()] == 1)
             return false;
     }
 
@@ -1657,10 +1650,10 @@ void CleanUp()
 {
     short i;
     //delete object list
-    for (i = 0; i < list_players_cnt; i++) {
-        delete list_players[i];
+    for (CPlayer* player : players) {
+        delete player;
     }
-    list_players_cnt = 0;
+    players.clear();
 
     eyecandy[0].clean();
     eyecandy[1].clean();
@@ -1929,11 +1922,11 @@ void secretBoss()
 void debugAutoKillEveryone()
 {
     if (game_values.autokill) {
-        for (short k = 0; k < list_players_cnt; k++) {
-            list_players[k]->DeathAwards();
+        for (CPlayer* player : players) {
+            player->DeathAwards();
 
-            if (game_values.gamemode->playerkilledself(*(list_players[k]), KillStyle::Environment) != PlayerKillType::None)
-                list_players[k]->die(PlayerDeathStyle::Jump, false, false);
+            if (game_values.gamemode->playerkilledself(*player, KillStyle::Environment) != PlayerKillType::None)
+                player->die(PlayerDeathStyle::Jump, false, false);
         }
     }
 }
@@ -1942,21 +1935,21 @@ void debug_gameplay()
 {
     static short endgametimer = (short)(RANDOM_INT(200));
     if (g_fAutoTest && !game_values.flags.swapplayers) {
-        for (short k = 0; k < list_players_cnt; k++) {
-            if (list_players[k]->isready()) {
+        for (CPlayer* player : players) {
+            if (player->isready()) {
                 //Detect player is in center of tile only
-                short x = (list_players[k]->centerX()) / TILESIZE;
+                short x = (player->centerX()) / TILESIZE;
 
-                if (list_players[k]->centerX() >= App::screenWidth)
-                    x = (list_players[k]->centerX() - App::screenWidth) / TILESIZE;
+                if (player->centerX() >= App::screenWidth)
+                    x = (player->centerX() - App::screenWidth) / TILESIZE;
 
-                short y = (list_players[k]->centerY()) / TILESIZE;
+                short y = (player->centerY()) / TILESIZE;
 
                 int tile = tile_flag_nonsolid;
                 IO_Block * block = NULL;
                 short blocktype = -1;
 
-                if (list_players[k]->centerY() >= 0 && list_players[k]->centerY() < App::screenHeight) {
+                if (player->centerY() >= 0 && player->centerY() < App::screenHeight) {
                     tile = g_map->map(x, y);
                     block = g_map->block(x, y);
                     blocktype = g_map->blockat(x, y)->iType;
@@ -1972,32 +1965,32 @@ void debug_gameplay()
 
                 //Detect if any corner of player is in a tile
                 short actualvalues[2][2];
-                actualvalues[0][0] = list_players[k]->leftX();
+                actualvalues[0][0] = player->leftX();
 
                 if (actualvalues[0][0] < 0)
                     actualvalues[0][0] += App::screenWidth;
 
-                actualvalues[0][1] = list_players[k]->rightX();
+                actualvalues[0][1] = player->rightX();
 
                 if (actualvalues[0][1] >= App::screenWidth)
                     actualvalues[0][1] -= App::screenWidth;
 
-                actualvalues[1][0] = list_players[k]->topY();
-                actualvalues[1][1] = list_players[k]->bottomY();
+                actualvalues[1][0] = player->topY();
+                actualvalues[1][1] = player->bottomY();
 
                 short corners[2][2];
-                corners[0][0] = list_players[k]->leftX() / TILESIZE;
+                corners[0][0] = player->leftX() / TILESIZE;
 
-                if (list_players[k]->leftX() < 0)
-                    corners[0][0] = (list_players[k]->leftX() + App::screenWidth) / TILESIZE;
+                if (player->leftX() < 0)
+                    corners[0][0] = (player->leftX() + App::screenWidth) / TILESIZE;
 
-                corners[0][1] = (list_players[k]->rightX()) / TILESIZE;
+                corners[0][1] = (player->rightX()) / TILESIZE;
 
-                if (list_players[k]->rightX() >= App::screenWidth)
-                    corners[0][1] = (list_players[k]->rightX() - App::screenWidth) / TILESIZE;
+                if (player->rightX() >= App::screenWidth)
+                    corners[0][1] = (player->rightX() - App::screenWidth) / TILESIZE;
 
-                corners[1][0] = list_players[k]->topY() / TILESIZE;
-                corners[1][1] = (list_players[k]->bottomY()) / TILESIZE;
+                corners[1][0] = player->topY() / TILESIZE;
+                corners[1][1] = (player->bottomY()) / TILESIZE;
 
                 for (short i = 0; i < 2; i++) {
                     for (short j = 0; j < 2; j++) {
@@ -2147,89 +2140,89 @@ void GameplayState::handleInput()
             } else if (event.key.keysym.sym == SDLK_F5) {
                 game_values.autokill = !game_values.autokill;
             } else if (event.key.keysym.sym == SDLK_z) {
-                for (short k = 0; k < list_players_cnt; k++) {
-                    list_players[k]->DeathAwards();
+                for (CPlayer* player : players) {
+                    player->DeathAwards();
 
-                    if (game_values.gamemode->playerkilledself(*(list_players[k]), KillStyle::Environment) == PlayerKillType::Normal)
-                        list_players[k]->die(PlayerDeathStyle::Jump, false, false);
+                    if (game_values.gamemode->playerkilledself(*player, KillStyle::Environment) == PlayerKillType::Normal)
+                        player->die(PlayerDeathStyle::Jump, false, false);
                 }
             } else if (event.key.keysym.sym == SDLK_x) {
-                short iplayer = RANDOM_INT(list_players_cnt);
-                list_players[iplayer]->makefrozen(300);
+                short iplayer = RANDOM_INT(players.size());
+                players[iplayer]->makefrozen(300);
             } else if (event.key.keysym.sym == SDLK_c) {
-                short iplayer = RANDOM_INT(list_players_cnt);
-                list_players[iplayer]->shield.type = (PlayerShieldType)(RANDOM_INT(3) + 1);
-                list_players[iplayer]->shield.timer = 620;
+                short iplayer = RANDOM_INT(players.size());
+                players[iplayer]->shield.type = (PlayerShieldType)(RANDOM_INT(3) + 1);
+                players[iplayer]->shield.timer = 620;
             } else if (event.key.keysym.sym == SDLK_1) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_IceWandPowerup(&rm->spr_icewandpowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_IceWandPowerup(&rm->spr_icewandpowerup, players[0]->leftX() + 32, players[0]->topY(), 1, 0, 30, 30, 1, 1));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_BobombPowerup(&rm->spr_bobombpowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_BobombPowerup(&rm->spr_bobombpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_StarPowerup(&rm->spr_starpowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 4, true, 2, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_StarPowerup(&rm->spr_starpowerup, players[0]->leftX() + 32, players[0]->topY(), 4, true, 2, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_2) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_BombPowerup(&rm->spr_bombpowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_BombPowerup(&rm->spr_bombpowerup, players[0]->leftX() + 32, players[0]->topY(), 1, 0, 30, 30, 1, 1));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_PowPowerup(&rm->spr_powpowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 8, true, 8, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_PowPowerup(&rm->spr_powpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 8, true, 8, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 1));
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 1));
             } else if (event.key.keysym.sym == SDLK_3) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_PodoboPowerup(&rm->spr_podobopowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_PodoboPowerup(&rm->spr_podobopowerup, players[0]->leftX() + 32, players[0]->topY(), 1, 0, 30, 30, 1, 1));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 2));
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 2));
             } else if (event.key.keysym.sym == SDLK_4) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_Tanooki(list_players[0]->leftX() + 32, list_players[0]->topY()));
+                    objectcontainer[0].add(new PU_Tanooki(players[0]->leftX() + 32, players[0]->topY()));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(ShellType::Green, list_players[0]->leftX() + 32, list_players[0]->topY(), true, true, true, false));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Green, players[0]->leftX() + 32, players[0]->topY(), true, true, true, false));
                 else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 3));
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 3));
             } else if (event.key.keysym.sym == SDLK_5) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_PWingsPowerup(&rm->spr_pwingspowerup, list_players[0]->leftX() + 32, list_players[0]->topY()));
+                    objectcontainer[0].add(new PU_PWingsPowerup(&rm->spr_pwingspowerup, players[0]->leftX() + 32, players[0]->topY()));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(ShellType::Red, list_players[0]->leftX() + 32, list_players[0]->topY(), false, true, true, false));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Red, players[0]->leftX() + 32, players[0]->topY(), false, true, true, false));
                 else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 5));
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 5));
             } else if (event.key.keysym.sym == SDLK_6) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_Spring(&rm->spr_spring, list_players[0]->leftX() + 32, list_players[0]->topY(), true));
+                    objectcontainer[1].add(new CO_Spring(&rm->spr_spring, players[0]->leftX() + 32, players[0]->topY(), true));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(ShellType::Spiny, list_players[0]->leftX() + 32, list_players[0]->topY(), false, false, true, true));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Spiny, players[0]->leftX() + 32, players[0]->topY(), false, false, true, true));
                 else
-                    objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_7) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->leftX() + 32, list_players[0]->topY(), (RANDOM_INT(NUM_POWERUPS) + 3) - 3));
+                    objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, players[0]->leftX() + 32, players[0]->topY(), (RANDOM_INT(NUM_POWERUPS) + 3) - 3));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(ShellType::Buzzy, list_players[0]->leftX() + 32, list_players[0]->topY(), false, true, false, false));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Buzzy, players[0]->leftX() + 32, players[0]->topY(), false, true, false, false));
                 else
-                    objectcontainer[0].add(new PU_HammerPowerup(&rm->spr_hammerpowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_HammerPowerup(&rm->spr_hammerpowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_8) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_Spike(&rm->spr_spike, list_players[0]->leftX() + 32, list_players[0]->topY()));
+                    objectcontainer[1].add(new CO_Spike(&rm->spr_spike, players[0]->leftX() + 32, players[0]->topY()));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_ModPowerup(&rm->spr_modpowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 8, true, 8, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_ModPowerup(&rm->spr_modpowerup, players[0]->leftX() + 32, players[0]->topY(), 8, true, 8, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_PoisonPowerup(&rm->spr_poisonpowerup, list_players[0]->leftX() + 32, list_players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_PoisonPowerup(&rm->spr_poisonpowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_9) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, list_players[0]->leftX() + 32, list_players[0]->topY(), true));
+                    objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, players[0]->leftX() + 32, players[0]->topY(), true));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_FeatherPowerup(&rm->spr_featherpowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_FeatherPowerup(&rm->spr_featherpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, 0, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_ClockPowerup(&rm->spr_clockpowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_ClockPowerup(&rm->spr_clockpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_0) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_LeafPowerup(&rm->spr_leafpowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_LeafPowerup(&rm->spr_leafpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, 0, 30, 30, 1, 1));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, list_players[0]->leftX() + 32, list_players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_F8) {
                 g_fAutoTest = !g_fAutoTest;
             }
@@ -2277,15 +2270,17 @@ void GameplayState::read_network()
     assert(0.99 < percent_old + percent_new && percent_old + percent_new <= 1.01);
 
     if (!netplay.theHostIsMe) {
-        for (unsigned short p = 0; p < list_players_cnt; p++) {
+        for (size_t p = 0; p < players.size(); p++) {
+            CPlayer* player = players[p];
+
             // if local player
             if (p == netplay.remotePlayerNumber) {
                 // save the player data that was cause by the input of the previous frame
                 Net_IndexedPlayerData pdata(netplay.current_input_counter);
-                pdata.x = list_players[p]->fx;
-                pdata.y = list_players[p]->fy;
-                pdata.xvel = list_players[p]->velx;
-                pdata.yvel = list_players[p]->vely;
+                pdata.x = player->fx;
+                pdata.y = player->fy;
+                pdata.xvel = player->velx;
+                pdata.yvel = player->vely;
                 netplay.local_playerdata_buffer.push_back(pdata);
                 netplay.local_playerdata_store_time[netplay.current_input_counter] = std::chrono::system_clock::now();
                 netplay.current_input_counter++;
@@ -2327,19 +2322,19 @@ void GameplayState::read_network()
                         netplay.local_playerdata_buffer.clear();
 
                         // set confirmed data
-                        list_players[p]->fx = netplay.latest_playerdata.player[p].x;
-                        list_players[p]->fy = netplay.latest_playerdata.player[p].y;
-                        list_players[p]->velx = netplay.latest_playerdata.player[p].xvel;
-                        list_players[p]->vely = netplay.latest_playerdata.player[p].yvel;
+                        player->fx = netplay.latest_playerdata.player[p].x;
+                        player->fy = netplay.latest_playerdata.player[p].y;
+                        player->velx = netplay.latest_playerdata.player[p].xvel;
+                        player->vely = netplay.latest_playerdata.player[p].yvel;
                     }
                 }
             }
             // for remote players, interpolate
             else {
-                list_players[p]->fx   = percent_old * netplay.previous_playerdata.player[p].x    + percent_new * netplay.latest_playerdata.player[p].x;
-                list_players[p]->fy   = percent_old * netplay.previous_playerdata.player[p].y    + percent_new * netplay.latest_playerdata.player[p].y;
-                list_players[p]->velx = percent_old * netplay.previous_playerdata.player[p].xvel + percent_new * netplay.latest_playerdata.player[p].xvel;
-                list_players[p]->vely = percent_old * netplay.previous_playerdata.player[p].yvel + percent_new * netplay.latest_playerdata.player[p].yvel;
+                player->fx   = percent_old * netplay.previous_playerdata.player[p].x    + percent_new * netplay.latest_playerdata.player[p].x;
+                player->fy   = percent_old * netplay.previous_playerdata.player[p].y    + percent_new * netplay.latest_playerdata.player[p].y;
+                player->velx = percent_old * netplay.previous_playerdata.player[p].xvel + percent_new * netplay.latest_playerdata.player[p].xvel;
+                player->vely = percent_old * netplay.previous_playerdata.player[p].yvel + percent_new * netplay.latest_playerdata.player[p].yvel;
             }
         }
 
@@ -2355,7 +2350,7 @@ void GameplayState::read_network()
     netplay.netPlayerInput.ClearGameActionKeys();
     if (netplay.theHostIsMe)
         netplay.client.local_gamehost.confirmCurrentInputs();
-    for (unsigned short p = 0; p < list_players_cnt; p++) {
+    for (size_t p = 0; p < players.size(); p++) {
         if (netplay.remote_input_buffer[p].size() > 0) {
             netplay.netPlayerInput.outputControls[p] = netplay.remote_input_buffer[p].front().second;
             netplay.remote_input_buffer[p].pop_front();
@@ -2429,8 +2424,8 @@ void GameplayState::update_countdown_timer()
 void update_playerswap()
 {
     if (game_values.flags.swapplayers) {
-        for (unsigned short i = 0; i < list_players_cnt; i++) {
-            list_players[i]->updateswap();
+        for (CPlayer* player : players) {
+            player->updateswap();
         }
     }
 }
@@ -2468,8 +2463,8 @@ void GameplayState::update_world()
     game_values.flags.playinvinciblesound = false;
     game_values.flags.playflyingsound = false;
 
-    for (unsigned short i = 0; i < list_players_cnt; i++)
-        list_players[i]->move();    //move all objects before doing object-object collision detection in
+    for (CPlayer* player : players)
+        player->move();    //move all objects before doing object-object collision detection in
     //->think(), so we test against the new position after object-map collision detection
 
     playSFX();
@@ -2489,8 +2484,8 @@ void GameplayState::update_world()
 
     //Commit all player actions at this point (after we have collided with any objects
     //that the player might have picked up)
-    for (unsigned short i = 0; i < list_players_cnt; i++)
-        list_players[i]->CommitAction();
+    for (CPlayer* player : players)
+        player->CommitAction();
 
     cleanDeadNonPlayerObjects();
     CleanDeadPlayers();
@@ -2626,14 +2621,14 @@ bool SwapPlayers(short iUsingPlayerID)
 {
     //Count available players to switch with
     short iNumAvailablePlayers = 0;
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (list_players[iPlayer]->isready()) {
+    for (CPlayer* player : players) {
+        if (player->isready()) {
             iNumAvailablePlayers++;
-            list_players[iPlayer]->fOldSwapX = list_players[iPlayer]->leftX();
-            list_players[iPlayer]->fOldSwapY = list_players[iPlayer]->topY();
+            player->fOldSwapX = player->leftX();
+            player->fOldSwapY = player->topY();
 
-            list_players[iPlayer]->iNewPowerupX = list_players[iPlayer]->score->x + scorepowerupoffsets[game_values.teamcounts[list_players[iPlayer]->teamID] - 1][list_players[iPlayer]->subTeamID];
-            list_players[iPlayer]->iNewPowerupY = list_players[iPlayer]->score->y + 25;
+            player->iNewPowerupX = player->score->x + scorepowerupoffsets[game_values.teamcounts[player->teamID] - 1][player->subTeamID];
+            player->iNewPowerupY = player->score->y + 25;
         }
     }
 
@@ -2655,42 +2650,46 @@ bool SwapPlayers(short iUsingPlayerID)
     short iIncrement = RANDOM_INT (iNumAvailablePlayers - 1);
 
     MysteryMushroomTempPlayer spots[4];
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (!list_players[iPlayer]->isready())
+    for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
+        CPlayer* player  = players[iPlayer];
+
+        if (!player->isready())
             continue;
 
         short iNewSpot = iPlayer + iIncrement;
 
         do {
-            if (++iNewSpot >= list_players_cnt)
+            if (++iNewSpot >= players.size())
                 iNewSpot = 0;
-        } while (spots[iNewSpot].fUsed || !list_players[iNewSpot]->isready());
+        } while (spots[iNewSpot].fUsed || !players[iNewSpot]->isready());
 
         spots[iNewSpot].fUsed = true;
-        spots[iPlayer].SetPlayer(list_players[iNewSpot], game_values.gamepowerups[list_players[iNewSpot]->getGlobalID()]);
+        spots[iPlayer].SetPlayer(players[iNewSpot], game_values.gamepowerups[players[iNewSpot]->getGlobalID()]);
 
         //Give credit for deaths to the player that used the mystery mushroom
         if (iUsingPlayerID == iNewSpot) {
-            list_players[iPlayer]->iSuicideCreditPlayerID = list_players[iNewSpot]->globalID;
-            list_players[iPlayer]->iSuicideCreditTimer = 62;
+            player->iSuicideCreditPlayerID = players[iNewSpot]->globalID;
+            player->iSuicideCreditTimer = 62;
         }
     }
 
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (!list_players[iPlayer]->isready())
+    for (short iPlayer = 0; iPlayer < players.size(); iPlayer++) {
+        CPlayer* player  = players[iPlayer];
+
+        if (!player->isready())
             continue;
 
-        spots[iPlayer].GetPlayer(list_players[iPlayer], &game_values.gamepowerups[list_players[iPlayer]->getGlobalID()]);
+        spots[iPlayer].GetPlayer(player, &game_values.gamepowerups[player->getGlobalID()]);
 
         if (game_values.swapstyle != 1)
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)list_players[iPlayer]->fNewSwapX + (HALFPW) - 16, (short)list_players[iPlayer]->fNewSwapY + (HALFPH) - 16, 3, 8));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)player->fNewSwapX + (HALFPW) - 16, (short)player->fNewSwapY + (HALFPH) - 16, 3, 8));
 
         if (game_values.swapstyle == 2) {
-            list_players[iPlayer]->setXf(list_players[iPlayer]->fNewSwapX);
-            list_players[iPlayer]->setYf(list_players[iPlayer]->fNewSwapY);
+            player->setXf(player->fNewSwapX);
+            player->setYf(player->fNewSwapY);
 
-            if (list_players[iPlayer]->carriedItem)
-                list_players[iPlayer]->carriedItem->MoveToOwner();
+            if (player->carriedItem)
+                player->carriedItem->MoveToOwner();
         }
     }
 

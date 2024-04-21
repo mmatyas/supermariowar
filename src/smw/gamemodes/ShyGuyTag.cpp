@@ -11,8 +11,7 @@ extern short score_cnt;
 
 extern CEyecandyContainer eyecandy[3];
 
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
@@ -46,8 +45,8 @@ void CGM_ShyGuyTag::init()
         score[iScore]->SetScore(0);
     }
 
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        list_players[iPlayer]->ownerColorOffsetX = list_players[iPlayer]->getColorID() * 48;
+    for (CPlayer* player : players) {
+        player->ownerColorOffsetX = player->getColorID() * 48;
     }
 }
 
@@ -63,7 +62,7 @@ void CGM_ShyGuyTag::think()
 
     //If we are not waiting to clear, check if we need to start waiting
     if (!fRunClock) {
-        if (shyguycount == list_players_cnt) {
+        if (shyguycount == players.size()) {
             if (game_values.gamemodesettings.shyguytag.freetime > 0) {
                 fRunClock = true;
                 gameClock.SetTime(game_values.gamemodesettings.shyguytag.freetime);
@@ -90,14 +89,14 @@ void CGM_ShyGuyTag::think()
 
             CPlayer * pCheckWinner = NULL;
             bool fAlreadyScored[4] = {false, false, false, false};
-            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-                if (!list_players[iPlayer]->shyguy) {
-                    short iTeam = list_players[iPlayer]->getTeamID();
+            for (CPlayer* player : players) {
+                if (!player->shyguy) {
+                    short iTeam = player->getTeamID();
                     if (!fAlreadyScored[iTeam]) {
                         fAlreadyScored[iTeam] = true;
-                        list_players[iPlayer]->Score().AdjustScore(shyguycount);
+                        player->Score().AdjustScore(shyguycount);
 
-                        pCheckWinner = list_players[iPlayer];
+                        pCheckWinner = player;
                     }
                 }
             }
@@ -149,9 +148,8 @@ void CGM_ShyGuyTag::playerextraguy(CPlayer &player, short iType)
 
 void CGM_ShyGuyTag::SetShyGuy(short iTeam)
 {
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (list_players[iPlayer]->getTeamID() == iTeam) {
-            CPlayer * player = list_players[iPlayer];
+    for (CPlayer* player : players) {
+        if (player->getTeamID() == iTeam) {
             player->shyguy = true;
             eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Shyguy!", -VELJUMP*1.5));
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
@@ -168,8 +166,7 @@ void CGM_ShyGuyTag::FreeShyGuys()
 {
     ifSoundOnPlay(rm->sfx_thunder);
 
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        CPlayer * player = list_players[iPlayer];
+    for (CPlayer* player : players) {
         player->shyguy = false;
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
     }
@@ -199,8 +196,8 @@ PlayerKillType CGM_ShyGuyTag::CheckWinner(CPlayer * player)
 short CGM_ShyGuyTag::CountShyGuys()
 {
     short shyguycount = 0;
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (list_players[iPlayer]->shyguy)
+    for (CPlayer* player : players) {
+        if (player->shyguy)
             shyguycount++;
     }
 

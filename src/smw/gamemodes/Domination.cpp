@@ -9,7 +9,7 @@
 
 extern CScore *score[4];
 extern CObjectContainer objectcontainer[3];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
@@ -36,9 +36,9 @@ void CGM_Domination::init()
         game_values.gamemodesettings.domination.quantity = iNumAreas = 1;
 
     if (iNumAreas > 18)
-        iNumAreas = 2 * list_players_cnt + iNumAreas - 22;
+        iNumAreas = 2 * players.size() + iNumAreas - 22;
     else if (iNumAreas > 10)
-        iNumAreas = list_players_cnt + iNumAreas - 12;
+        iNumAreas = players.size() + iNumAreas - 12;
 
     for (short k = 0; k < iNumAreas; k++)
         objectcontainer[0].add(new OMO_Area(&rm->spr_areas, iNumAreas));

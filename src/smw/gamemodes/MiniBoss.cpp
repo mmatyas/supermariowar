@@ -10,7 +10,7 @@
 #include "objects/moving/MO_Podobo.h"
 #include "objects/moving/MO_SledgeBrother.h"
 
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 extern short score_cnt;
 extern CScore *score[4];
 extern CObjectContainer objectcontainer[3];
@@ -44,7 +44,7 @@ void CGM_Boss_MiniGame::init()
 
 void CGM_Boss_MiniGame::think()
 {
-    if (!gameover && list_players_cnt == 0) {
+    if (!gameover && players.size() == 0) {
         gameover = true;
 
         if (game_values.music) {
@@ -78,7 +78,7 @@ void CGM_Boss_MiniGame::think()
             if (--poweruptimer <= 0) {
                 poweruptimer = (short)(RANDOM_INT(80) + 60);
 
-                if (objectcontainer[1].countTypes(object_frenzycard) < list_players_cnt) {
+                if (objectcontainer[1].countTypes(object_frenzycard) < players.size()) {
                     objectcontainer[1].add(new MO_FrenzyCard(&rm->spr_frenzycards, 0));
                 }
             }

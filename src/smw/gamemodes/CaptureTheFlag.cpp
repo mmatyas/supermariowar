@@ -8,8 +8,7 @@
 #include "ResourceManager.h"
 
 extern CObjectContainer objectcontainer[3];
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 extern CResourceManager* rm;
 extern CGameValues game_values;
 
@@ -31,12 +30,12 @@ void CGM_CaptureTheFlag::init()
 
     bool fTeamUsed[4] = {false, false, false, false};
 
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        short iTeamID = list_players[iPlayer]->getTeamID();
+    for (CPlayer* player : players) {
+        short iTeamID = player->getTeamID();
         if (!fTeamUsed[iTeamID]) {
             fTeamUsed[iTeamID] = true;
 
-            short iColorID = list_players[iPlayer]->getColorID();
+            short iColorID = player->getColorID();
             MO_FlagBase * base = new MO_FlagBase(&rm->spr_flagbases, iTeamID, iColorID);
             objectcontainer[0].add(base);
 

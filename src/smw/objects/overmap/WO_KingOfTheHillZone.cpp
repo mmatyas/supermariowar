@@ -7,7 +7,7 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 
-extern CPlayer* list_players[4];
+extern std::vector<CPlayer*> players;
 extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -107,8 +107,8 @@ void OMO_KingOfTheHillZone::update()
 
         if (scoretimer >= game_values.pointspeed) {
             scoretimer = 0;
-            list_players[iPlayerID]->Score().AdjustScore(multiplier);
-            game_values.gamemode->CheckWinner(list_players[iPlayerID]);
+            players[iPlayerID]->Score().AdjustScore(multiplier);
+            game_values.gamemode->CheckWinner(players[iPlayerID]);
 
             if (game_values.gamemodesettings.kingofthehill.maxmultiplier > 1 && ++multipliertimer >= 5) {
                 multipliertimer = 0;

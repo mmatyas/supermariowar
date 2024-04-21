@@ -18,8 +18,7 @@ extern CObjectContainer objectcontainer[3];
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 
@@ -226,9 +225,7 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
 {
     //Loop through players
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        CPlayer * player = list_players[iPlayer];
-
+    for (CPlayer* player : players) {
         if (!player->isready())
             continue;
 

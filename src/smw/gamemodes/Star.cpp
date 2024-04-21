@@ -15,8 +15,7 @@ extern short score_cnt;
 extern CObjectContainer objectcontainer[3];
 extern CEyecandyContainer eyecandy[3];
 
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
@@ -102,7 +101,7 @@ void CGM_Star::think()
 
     //Make sure there is a star player(s)
     if (iCurrentModeType == StarStyle::Multi) {
-        for (short iStar1 = 0; iStar1 < list_players_cnt - 1; iStar1++) {
+        for (size_t iStar1 = 0; iStar1 + 1 <= players.size(); iStar1++) {
             //If we're missing a star player, then reassign them all
             if (!starPlayer[iStar1]) {
                 CPlayer * players[4];
@@ -153,13 +152,13 @@ void CGM_Star::think()
             starPlayer[0] = GetHighestScorePlayer(!fReverseScoring);
             starItem[0]->placeStar();
         } else if (iCurrentModeType == StarStyle::Shine) {
-            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-                if (starPlayer[0]->getTeamID() == list_players[iPlayer]->getTeamID())
+            for (CPlayer* player : players) {
+                if (starPlayer[0]->getTeamID() == player->getTeamID())
                     continue;
 
                 //Let the cleanup function remove the player on the last kill
-                if (score[list_players[iPlayer]->getTeamID()]->score > 1 || fReverseScoring)
-                    list_players[iPlayer]->KillPlayerMapHazard(true, KillStyle::Environment, false);
+                if (score[player->getTeamID()]->score > 1 || fReverseScoring)
+                    player->KillPlayerMapHazard(true, KillStyle::Environment, false);
             }
 
             if (fReverseScoring) {
@@ -180,10 +179,10 @@ void CGM_Star::think()
             starPlayer[0] = GetHighestScorePlayer(false);
             starItem[0]->placeStar();
         } else if (iCurrentModeType == StarStyle::Multi) {
-            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+            for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
                 bool fFound = false;
-                for (short iStar = 0; iStar < list_players_cnt - 1; iStar++) {
-                    if (starPlayer[iStar] == list_players[iPlayer]) {
+                for (size_t iStar = 0; iStar + 1 <= players.size(); iStar++) {
+                    if (starPlayer[iStar] == players[iPlayer]) {
                         fFound = true;
                         break;
                     }
@@ -192,17 +191,17 @@ void CGM_Star::think()
                 if (fFound)
                     continue;
 
-                if (score[list_players[iPlayer]->getTeamID()]->score > 1 || fReverseScoring)
-                    list_players[iPlayer]->KillPlayerMapHazard(true, KillStyle::Environment, false);
+                if (score[players[iPlayer]->getTeamID()]->score > 1 || fReverseScoring)
+                    players[iPlayer]->KillPlayerMapHazard(true, KillStyle::Environment, false);
 
                 bool fNeedRebalance = true;
                 if (fReverseScoring) {
-                    list_players[iPlayer]->Score().AdjustScore(1);
+                    players[iPlayer]->Score().AdjustScore(1);
                 } else {
-                    list_players[iPlayer]->Score().AdjustScore(-1);
+                    players[iPlayer]->Score().AdjustScore(-1);
 
-                    if (list_players[iPlayer]->Score().score <= 0) {
-                        fDisplayTimer = !RemoveTeam(list_players[iPlayer]->getTeamID());
+                    if (players[iPlayer]->Score().score <= 0) {
+                        fDisplayTimer = !RemoveTeam(players[iPlayer]->getTeamID());
 
                         //Don't setup the mode if this is a random game because it will be setup below
                         if (game_values.gamemodesettings.star.shine != StarStyle::Random) {
@@ -288,7 +287,7 @@ void CGM_Star::playerextraguy(CPlayer &player, short iType)
 
 bool CGM_Star::isplayerstar(const CPlayer * player)
 {
-    for (short iPlayer = 0; iPlayer < list_players_cnt - 1; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < players.size() - 1; iPlayer++) {
         if (starPlayer[iPlayer] == player)
             return true;
     }

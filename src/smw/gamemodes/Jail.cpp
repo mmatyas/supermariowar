@@ -10,8 +10,7 @@
 extern CScore *score[4];
 extern short score_cnt;
 
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 extern CEyecandyContainer eyecandy[3];
 extern CResourceManager* rm;
@@ -48,9 +47,9 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
                     jailedteams[i] = game_values.teamcounts[i];
 
                 //Figure out which teams have been jailed
-                for (i = 0; i < list_players_cnt; i++) {
-                    if (list_players[i]->Jail().isActive()) {
-                        jailedteams[list_players[i]->getTeamID()]--;
+                for (CPlayer* player : players) {
+                    if (player->Jail().isActive()) {
+                        jailedteams[player->getTeamID()]--;
                     }
                 }
 
@@ -72,17 +71,17 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
                 if (iTeamPoint >= 0) {
                     short numjailedplayers = 0;
 
-                    for (short iP = 0; iP < list_players_cnt; iP++) {
+                    for (CPlayer* player : players) {
                         //If they weren't just the one killed and they were jailed, give them a transform cloud
-                        if (list_players[iP] != &other && list_players[iP]->Jail().isActive()) {
-                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[iP]->centerX() - 24, list_players[iP]->centerY() - 24, 4, 5));
+                        if (player != &other && player->Jail().isActive()) {
+                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player->centerX() - 24, player->centerY() - 24, 4, 5));
                             ifSoundOnPlay(rm->sfx_transform);
                         }
 
-                        if (list_players[iP]->Jail().isActive() && list_players[iP]->getTeamID() != iTeamPoint)
+                        if (player->Jail().isActive() && player->getTeamID() != iTeamPoint)
                             numjailedplayers++;
 
-                        list_players[iP]->Jail().timer = 0;
+                        player->Jail().timer = 0;
                     }
 
                     //Give extra bonus score for being on the non-jailed team
@@ -95,17 +94,17 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
                 short jailedteams[4] = {-1, -1, -1, -1};
 
                 //Figure out which teams have been jailed
-                for (short i = 0; i < list_players_cnt; i++) {
-                    short * piMarker = &jailedteams[list_players[i]->getTeamID()];
+                for (CPlayer* player : players) {
+                    short * piMarker = &jailedteams[player->getTeamID()];
 
                     if (*piMarker == -2)
                         continue;
 
-                    if (!list_players[i]->Jail().isActive())
+                    if (!player->Jail().isActive())
                         *piMarker = -2; //Flag that the team is not completely jailed
                     else if (*piMarker == -1)
-                        *piMarker = list_players[i]->Jail().owner_teamID;
-                    else if (*piMarker != list_players[i]->Jail().owner_teamID)
+                        *piMarker = player->Jail().owner_teamID;
+                    else if (*piMarker != player->Jail().owner_teamID)
                         *piMarker = -2; //Flag means team is not completely jailed or jailed by different teams
                 }
 
@@ -141,8 +140,8 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
                 if (iTeamPoint >= 0) {
                     short numjailedplayers = 0;
 
-                    for (short i = 0; i < list_players_cnt; i++) {
-                        if (list_players[i]->Jail().isActive() && list_players[i]->getTeamID() != iTeamPoint)
+                    for (CPlayer* player : players) {
+                        if (player->Jail().isActive() && player->getTeamID() != iTeamPoint)
                             numjailedplayers++;
                     }
 
@@ -151,18 +150,18 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
                         score[iTeamPoint]->AdjustScore(1);
 
                         //Release other teams if a bonus was awarded for locking them up
-                        for (short i = 0; i < list_players_cnt; i++) {
+                        for (CPlayer* player : players) {
                             //Don't release players that were not jailed by this team
-                            if (list_players[i]->Jail().owner_teamID != iTeamPoint)
+                            if (player->Jail().owner_teamID != iTeamPoint)
                                 continue;
 
                             //If they weren't just the one killed and they were jailed, give them a transform cloud
-                            if (list_players[i] != &other && list_players[i]->Jail().isActive()) {
-                                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[i]->centerX() - 24, list_players[i]->centerY() - 24, 4, 5));
+                            if (player != &other && player->Jail().isActive()) {
+                                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player->centerX() - 24, player->centerY() - 24, 4, 5));
                                 ifSoundOnPlay(rm->sfx_transform);
                             }
 
-                            list_players[i]->Jail().timer = 0;
+                            player->Jail().timer = 0;
                         }
                     }
                 }

@@ -6,8 +6,7 @@
 #include "Score.h"
 
 extern CScore *score[4];
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 extern CResourceManager* rm;
 extern CGameValues game_values;
@@ -33,26 +32,26 @@ void CGM_Owned::think()
         if (++counter >= game_values.pointspeed) {
             counter = 0;
 
-            for (short i = 0; i < list_players_cnt; i++) {
-                for (short k = 0; k < list_players_cnt; k++) {
+            for (size_t i = 0; i < players.size(); i++) {
+                for (size_t k = 0; k < players.size(); k++) {
                     if (i == k)
                         continue;
 
-                    if (list_players[k]->ownerPlayerID == list_players[i]->getGlobalID())
-                        list_players[i]->Score().AdjustScore(1);
+                    if (players[k]->ownerPlayerID == players[i]->getGlobalID())
+                        players[i]->Score().AdjustScore(1);
                 }
 
                 if (goal > -1) {
-                    if (list_players[i]->Score().score >= goal) {
-                        list_players[i]->Score().SetScore(goal);
+                    if (players[i]->Score().score >= goal) {
+                        players[i]->Score().SetScore(goal);
 
-                        winningteam = list_players[i]->getTeamID();
+                        winningteam = players[i]->getTeamID();
                         gameover = true;
 
                         RemovePlayersButTeam(winningteam);
                         SetupScoreBoard(false);
                         ShowScoreBoard();
-                    } else if (list_players[i]->Score().score >= goal * 0.8 && !playedwarningsound) {
+                    } else if (players[i]->Score().score >= goal * 0.8 && !playedwarningsound) {
                         playwarningsound();
                     }
                 }
@@ -69,9 +68,9 @@ PlayerKillType CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other,
             inflictor.Score().AdjustScore(5);
 
         //Release all players owned by the killed player
-        for (short i = 0; i < list_players_cnt; i++) {
-            if (list_players[i]->ownerPlayerID == other.getGlobalID()) {
-                list_players[i]->ownerPlayerID = -1;
+        for (CPlayer* player : players) {
+            if (player->ownerPlayerID == other.getGlobalID()) {
+                player->ownerPlayerID = -1;
             }
         }
 
@@ -91,9 +90,9 @@ PlayerKillType CGM_Owned::playerkilledself(CPlayer &player, KillStyle style)
 {
     CGameMode::playerkilledself(player, style);
 
-    for (short i = 0; i < list_players_cnt; i++) {
-        if (list_players[i]->ownerPlayerID == player.getGlobalID()) {
-            list_players[i]->ownerPlayerID = -1;
+    for (CPlayer* other : players) {
+        if (other->ownerPlayerID == player.getGlobalID()) {
+            other->ownerPlayerID = -1;
         }
     }
 

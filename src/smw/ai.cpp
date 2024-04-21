@@ -75,8 +75,7 @@
 
 extern CObjectContainer objectcontainer[3];
 
-extern CPlayer* list_players[4];
-extern short list_players_cnt;
+extern std::vector<CPlayer*> players;
 
 extern CMap* g_map;
 extern CGameValues game_values;
@@ -658,11 +657,11 @@ ExitDeathCheck:
             playerKeys->game_powerup.fDown = true;
         } else if (iStoredPowerup == 18) { //mystery mushroom
             //See if another player has a powerup
-            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-                if (iPlayer == pPlayer->localID || list_players[iPlayer]->teamID == iTeamID)
+            for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
+                if (iPlayer == pPlayer->localID || players[iPlayer]->teamID == iTeamID)
                     continue;
 
-                if (game_values.gamepowerups[list_players[iPlayer]->globalID] > 0) {
+                if (game_values.gamepowerups[players[iPlayer]->globalID] > 0) {
                     playerKeys->game_powerup.fDown = true;
                     break;
                 }
@@ -1032,27 +1031,27 @@ void CPlayerAI::GetNearestObjects()
     auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
 
     //Figure out where the other players are
-    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (iPlayer == pPlayer->localID || list_players[iPlayer]->state != PlayerState::Ready)
+    for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
+        if (iPlayer == pPlayer->localID || players[iPlayer]->state != PlayerState::Ready)
             continue;
 
         //Find players in jail on own team to tag
         if (game_values.gamemode->gamemode == game_mode_jail) {
-            if (list_players[iPlayer]->jail.isActive() && list_players[iPlayer]->teamID == iTeamID) {
-                DistanceToPlayer(list_players[iPlayer], &nearestObjects.teammate, &nearestObjects.teammatedistance, &nearestObjects.teammatewrap);
+            if (players[iPlayer]->jail.isActive() && players[iPlayer]->teamID == iTeamID) {
+                DistanceToPlayer(players[iPlayer], &nearestObjects.teammate, &nearestObjects.teammatedistance, &nearestObjects.teammatewrap);
             }
         }
 
-        if (list_players[iPlayer]->teamID == iTeamID || list_players[iPlayer]->state != PlayerState::Ready)
+        if (players[iPlayer]->teamID == iTeamID || players[iPlayer]->state != PlayerState::Ready)
             continue;
 
         //If there is a chicken, only focus on stomping him
         if (gmChicken && gmChicken->chicken()) {
-            if (gmChicken->chicken()->teamID != iTeamID && gmChicken->chicken() != list_players[iPlayer])
+            if (gmChicken->chicken()->teamID != iTeamID && gmChicken->chicken() != players[iPlayer])
                 continue;
         }
 
-        DistanceToPlayer(list_players[iPlayer], &nearestObjects.player, &nearestObjects.playerdistance, &nearestObjects.playerwrap);
+        DistanceToPlayer(players[iPlayer], &nearestObjects.player, &nearestObjects.playerdistance, &nearestObjects.playerwrap);
     }
 }
 

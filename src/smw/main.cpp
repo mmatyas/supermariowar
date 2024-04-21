@@ -88,8 +88,7 @@ short			y_shake = 0;
 
 
 //------ game relevant stuff ------
-CPlayer			*list_players[4];
-short			list_players_cnt = 0;
+std::vector<CPlayer*> players;
 
 CScore			*score[4];
 
@@ -206,6 +205,8 @@ void create_globals()
     worldgraphicspacklist->setCurrentIndex(0);
     gamegraphicspacklist->setCurrentIndex(0);
     soundpacklist->setCurrentIndex(0);
+
+    players.reserve(4);
 }
 
 void init_joysticks()

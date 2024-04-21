@@ -8,7 +8,7 @@
 #include "ResourceManager.h"
 
 extern CObjectContainer objectcontainer[3];
-extern CPlayer* list_players[4];
+extern std::vector<CPlayer*> players;
 extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -57,8 +57,8 @@ void OMO_Area::update()
     if (iPlayerID != -1 && !game_values.gamemode->gameover) {
         if (++scoretimer >= (game_values.pointspeed << 1)) {
             scoretimer = 0;
-            list_players[iPlayerID]->Score().AdjustScore(1);
-            game_values.gamemode->CheckWinner(list_players[iPlayerID]);
+            players[iPlayerID]->Score().AdjustScore(1);
+            game_values.gamemode->CheckWinner(players[iPlayerID]);
         }
     }
 
