@@ -45,10 +45,19 @@ std::string GetHomeDirectory()
     return result;
 
 #else // catch-all for Linux-based systems
-    std::string result(".smw/");
-    char* folder = getenv("HOME");
-    if (folder)
-        result = std::string(folder) + "/" + result;
+    std::string result;
+#ifdef USE_SDL2
+    char* prefPath = SDL_GetPrefPath(nullptr, "supermariowar");
+    if (prefPath) {
+        result = prefPath;
+        SDL_free(prefPath);
+    }
+#else
+    char* home = getenv("HOME");
+    if (home) {
+        result = std::string(home) + "/.smw/";
+    }
+#endif
     return result;
 #endif
 }
