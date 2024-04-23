@@ -65,4 +65,7 @@ bool gfx_loadimage(gfxSprite& sprite, const std::string& path, const RGB& rgb, b
 
 void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, float brightness);
 
+
+RGB getRgb(SDL_Surface* surf, int x, int y);
+
 #endif // GFX_H

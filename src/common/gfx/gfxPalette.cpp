@@ -2,43 +2,7 @@
 
 #include "SDL_image.h"
 
-#include <cassert>
 #include <cstdio>
-
-
-namespace {
-Uint32 getRawPixel(SDL_Surface* surf, int x, int y)
-{
-    assert(surf);
-    assert(0 <= x && x < surf->w);
-    assert(0 <= y && y < surf->h);
-
-    const Uint8 bpp = surf->format->BytesPerPixel;
-    const size_t idx = y * surf->pitch + x * bpp;
-    const auto* pixel8 = static_cast<Uint8*>(surf->pixels) + idx;
-
-    switch (bpp) {
-        case 1: return *pixel8;
-        case 2: return *reinterpret_cast<const Uint16*>(pixel8);
-        case 3: return (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            ? pixel8[0] << 16 | pixel8[1] << 8 | pixel8[2]
-            : pixel8[0] | pixel8[1] << 8 | pixel8[2] << 16;
-        case 4: return *reinterpret_cast<const Uint32*>(pixel8);
-    }
-    assert(false);
-    return 0x0;
-}
-
-
-RGB getRgb(SDL_Surface* surf, int x, int y)
-{
-    assert(surf);
-    const Uint32 rawPixel = getRawPixel(surf, x, y);
-    RGB color {};
-    SDL_GetRGB(rawPixel, surf->format, &color.r, &color.g, &color.b);
-    return color;
-}
-} // namespace
 
 
 void gfxPalette::clear()
@@ -53,21 +17,9 @@ void gfxPalette::clear()
 }
 
 
-bool gfxPalette::matchesColorAtID(size_t idx, uint8_t r, uint8_t g, uint8_t b) const
+const RGB& gfxPalette::colorScheme(size_t teamID, size_t schemeID, size_t colorID) const
 {
-    assert(idx < m_colorCount);
-    return r == m_colorCodes[idx].r && g == m_colorCodes[idx].g && b == m_colorCodes[idx].b;
-}
-
-
-void gfxPalette::copyColorSchemeTo(
-    size_t teamID, size_t schemeID, size_t colorID,
-    uint8_t& r, uint8_t& g, uint8_t& b) const
-{
-    const RGB& color = m_teamSchemes.at(teamID).at(schemeID).at(colorID);
-    r = color.r;
-    g = color.g;
-    b = color.b;
+    return m_teamSchemes.at(teamID).at(schemeID).at(colorID);
 }
 
 

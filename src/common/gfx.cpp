@@ -7,6 +7,7 @@
 #include "sdl12wrapper.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <iostream>
 #include <string>
@@ -20,6 +21,165 @@ extern short x_shake;
 extern short y_shake;
 
 GraphicsSDL gfx;
+
+
+namespace {
+Uint32 getRawPixel(SDL_Surface* surf, int x, int y)
+{
+    assert(surf);
+    assert(0 <= x && x < surf->w);
+    assert(0 <= y && y < surf->h);
+
+    const Uint8 bpp = surf->format->BytesPerPixel;
+    const size_t idx = y * surf->pitch + x * bpp;
+    const auto* pixel8 = static_cast<Uint8*>(surf->pixels) + idx;
+
+    switch (bpp) {
+        case 1: return *pixel8;
+        case 2: return *reinterpret_cast<const Uint16*>(pixel8);
+        case 3: return (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            ? pixel8[0] << 16 | pixel8[1] << 8 | pixel8[2]
+            : pixel8[0] | pixel8[1] << 8 | pixel8[2] << 16;
+        case 4: return *reinterpret_cast<const Uint32*>(pixel8);
+    }
+    assert(false);
+    return 0x0;
+}
+
+void setRawPixel(SDL_Surface* surf, int x, int y, Uint32 value)
+{
+    assert(surf);
+    assert(0 <= x && x < surf->w);
+    assert(0 <= y && y < surf->h);
+
+    const Uint8 bpp = surf->format->BytesPerPixel;
+    const size_t idx = y * surf->pitch + x * bpp;
+    auto* pixel8 = static_cast<Uint8*>(surf->pixels) + idx;
+
+    switch (bpp) {
+        case 1:
+            *pixel8 = value;
+            break;
+        case 2:
+            *reinterpret_cast<Uint16*>(pixel8) = value;
+            break;
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+                pixel8[0] = (value >> 16) & 0xFF;
+                pixel8[1] = (value >>  8) & 0xFF;
+                pixel8[2] = (value >>  0) & 0xFF;
+            } else {
+                pixel8[0] = (value >>  0) & 0xFF;
+                pixel8[1] = (value >>  8) & 0xFF;
+                pixel8[2] = (value >> 16) & 0xFF;
+            }
+            break;
+        case 4:
+            *reinterpret_cast<Uint32*>(pixel8) = value;
+            break;
+        default:
+            assert(false);
+            break;
+    }
+}
+
+void setRgb(SDL_Surface* surf, int x, int y, const RGB& color)
+{
+    assert(surf);
+    const Uint32 rawPixel = SDL_MapRGB(surf->format, color.r, color.g, color.b);
+    setRawPixel(surf, x, y, rawPixel);
+}
+
+/**
+ * Makes team-colored skin surface frame from a loaded sprite strip.
+ * @param  source       skin sprite strip surface
+ * @param  sourceFrame  frame index [0-5]
+ * @param  colorKey     transparent color
+ * @param  team         team index for color [0-3]
+ * @param  allStates    render all player states
+ * @param  mirrored     render horizontally mirrored
+ * @return              team-colored surface
+ */
+SDL_Surface* createSkinSurface(
+    SDL_Surface* source,
+    size_t sourceFrame,
+    const RGB& colorKey,
+    size_t team,
+    bool allStates,
+    bool mirrored)
+{
+    //Take the loaded skin and colorize it for each state (normal, 3 frames of invincibility, shielded, tagged, ztarred, got shine, frozen)
+    const size_t outFrameCount = allStates ? PlayerPalette::NUM_PALETTES : 1;
+
+    SDL_Surface* out = SDL_CreateRGBSurface(
+        screen->flags,
+        32 * outFrameCount,
+        32,
+        screen->format->BitsPerPixel,
+        screen->format->Rmask,
+        screen->format->Gmask,
+        screen->format->Bmask,
+        screen->format->Amask);
+#ifdef USE_SDL2
+    SDL_SetSurfaceBlendMode(out, SDL_BLENDMODE_NONE);
+#endif
+
+    if (SDL_MUSTLOCK(out))
+        SDL_LockSurface(out);
+
+    if (SDL_MUSTLOCK(source))
+        SDL_LockSurface(source);
+
+    const int startX = sourceFrame * 32;
+
+    for (int y = 0; y < 32; y++) {
+        for (int srcX = 0; srcX < 32; srcX++) {
+            const int dstX = mirrored ? (31 - srcX) : srcX;
+
+            const RGB pixelColor = getRgb(source, startX + srcX, y);
+
+            bool found = false;
+            for (size_t keyIdx = 0; keyIdx < gfx.getPalette().colorCodes().size() && !found; keyIdx++) {
+                const RGB& key = gfx.getPalette().colorCodes()[keyIdx];
+                if (key == pixelColor) {
+                    for (size_t outFrame = 0; outFrame < outFrameCount; outFrame++) {
+                        const RGB& paletteColor = gfx.getPalette().colorScheme(team, outFrame, keyIdx);
+                        setRgb(out, outFrame * 32 + dstX, y, paletteColor);
+                    }
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                for (size_t outFrame = 0; outFrame < outFrameCount; outFrame++) {
+                    setRgb(out, outFrame * 32 + dstX, y, pixelColor);
+                }
+            }
+        }
+    }
+
+    SDL_UnlockSurface(source);
+    SDL_UnlockSurface(out);
+
+    if ( SDL_SETCOLORKEY(out, SDL_TRUE, SDL_MapRGB(out->format, colorKey.r, colorKey.g, colorKey.b)) < 0 ) {
+        printf("\n ERROR: Couldn't set ColorKey + RLE for new skin surface: %s\n", SDL_GetError());
+        return NULL;
+    }
+
+    return out;
+}
+} // namespace
+
+
+RGB getRgb(SDL_Surface* surf, int x, int y)
+{
+    assert(surf);
+    const Uint32 rawPixel = getRawPixel(surf, x, y);
+    RGB color;
+    SDL_GetRGB(rawPixel, surf->format, &color.r, &color.g, &color.b);
+    return color;
+}
+
 
 bool gfx_init(int w, int h, bool fullscreen) {
     return gfx.Init(fullscreen);
@@ -52,124 +212,12 @@ bool gfx_loadpalette(const std::string& palette_path) {
 
 bool ValidSkinSurface(SDL_Surface* skin)
 {
-    return skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 24;
-}
-
-/**
- * Makes skin surface frame from a loaded sprite strip
- * @param  skin         sprite strip surface
- * @param  spriteindex  frame index [0-5]
- * @param  colorkey     transparent color
- * @param  colorScheme  player color [0-3]
- * @param  expand       wide frame?
- * @param  reverse
- * @return              skin frame surface
- */
-SDL_Surface * gfx_createskinsurface(
-    SDL_Surface * skin,
-    short spriteindex,
-    RGB colorkey,
-    unsigned short colorScheme,
-    bool expand, bool reverse)
-{
-    int loops = 1;
-    if (expand)
-        loops = PlayerPalette::NUM_PALETTES;
-
-    //Blit over loaded skin into player image set
-    SDL_Surface * temp = SDL_CreateRGBSurface(skin->flags, 32 * loops, 32, skin->format->BitsPerPixel, skin->format->Rmask, skin->format->Gmask, skin->format->Bmask, skin->format->Amask);
-
-    //Take the loaded skin and colorize it for each state (normal, 3 frames of invincibility, shielded, tagged, ztarred, got shine, frozen)
-    if (SDL_MUSTLOCK(temp))
-        SDL_LockSurface(temp);
-
-    if (SDL_MUSTLOCK(skin))
-        SDL_LockSurface(skin);
-
-    Uint8 byteperframe = 96;
-
-    int skincounter = spriteindex * byteperframe;
-    int tempcounter = 0;
-
-    int reverseoffset = 0;
-
-    Uint8 * pixels = (Uint8*)skin->pixels;
-    Uint8 * temppixels = (Uint8*)temp->pixels;
-
-    short iRedOffset = skin->format->Rshift >> 3;
-    short iGreenOffset = skin->format->Gshift >> 3;
-    short iBlueOffset = skin->format->Bshift >> 3;
-
-    for (int j = 0; j < 32; j++) {
-        for (int i = 0; i < 32; i++) {
-            if (reverse)
-                reverseoffset = (31 - (i * 2)) * 3;
-
-            Uint8 iColorByte1 = pixels[skincounter + iRedOffset];
-            Uint8 iColorByte2 = pixels[skincounter + iGreenOffset];
-            Uint8 iColorByte3 = pixels[skincounter + iBlueOffset];
-
-            bool fFoundColor = false;
-            for (unsigned short m = 0; m < gfx.getPalette().colorCount(); m++) {
-                if (gfx.getPalette().matchesColorAtID(m, iColorByte1, iColorByte2, iColorByte3)) {
-                    for (unsigned short k = 0; k < loops; k++) {
-                        unsigned short base = tempcounter + k * byteperframe + reverseoffset;
-                        gfx.getPalette().copyColorSchemeTo(
-                            colorScheme, k, m,
-                            temppixels[base + iRedOffset],
-                            temppixels[base + iGreenOffset],
-                            temppixels[base + iBlueOffset]);
-                    }
-
-                    fFoundColor = true;
-                    break;
-                }
-            }
-
-            if (!fFoundColor) {
-                for (int k = 0; k < loops; k++) {
-                    temppixels[tempcounter + k * byteperframe + reverseoffset + iRedOffset] = iColorByte1;
-                    temppixels[tempcounter + k * byteperframe + reverseoffset + iGreenOffset] = iColorByte2;
-                    temppixels[tempcounter + k * byteperframe + reverseoffset + iBlueOffset] = iColorByte3;
-                }
-            }
-
-            skincounter += 3;
-            tempcounter += 3;
-        }
-
-        // 5 * 96 shall be replaced by a better variable expression
-        skincounter += 5 * byteperframe + skin->pitch - (skin->w * 3);
-        tempcounter += byteperframe * (loops - 1) + temp->pitch - (temp->w * 3);
-    }
-
-    SDL_UnlockSurface(skin);
-    SDL_UnlockSurface(temp);
-
-    if ( SDL_SETCOLORKEY(temp, SDL_TRUE, SDL_MapRGB(temp->format, colorkey.r, colorkey.g, colorkey.b)) < 0 ) {
-        printf("\n ERROR: Couldn't set ColorKey + RLE for new skin surface: %s\n", SDL_GetError());
-        return NULL;
-    }
-
-#ifdef USE_SDL2
-    SDL_Surface * final = SDL_ConvertSurface(temp, screen->format, 0);
-#else
-    SDL_Surface * final = SDL_DisplayFormat(temp);
-#endif
-    if (!final) {
-        printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
-        return NULL;
-    }
-
-    SDL_FreeSurface(temp);
-
-    return final;
+    return skin->w == 192 && skin->h == 32;
 }
 
 
 bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections)
 {
-    // Load the BMP file into a surface
     SDL_Surface * skin = IMG_Load(filename.c_str());
     if (!skin) {
         cout << endl << " ERROR: Couldn't load " << filename << ": "
@@ -181,7 +229,7 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, const R
         return false;
 
     for (short iSprite = 0; iSprite < 2; iSprite++) {
-        SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, colorkey, colorScheme, true, false);
+        SDL_Surface * skinSurface = createSkinSurface(skin, iSprite, colorkey, colorScheme, true, false);
 
         if (skinSurface == NULL) {
             cout << endl << " ERROR: Couldn't create menu skin from " << filename
@@ -195,7 +243,7 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, const R
 
     if (fLoadBothDirections) {
         for (short iSprite = 0; iSprite < 2; iSprite++) {
-            SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, colorkey, colorScheme, true, true);
+            SDL_Surface * skinSurface = createSkinSurface(skin, iSprite, colorkey, colorScheme, true, true);
 
             if (skinSurface == NULL) {
                 cout << endl << " ERROR: Couldn't create menu skin from " << filename
@@ -230,7 +278,7 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const 
 
     for (short k = 0; k < 4; k++) {
         for (short j = 0; j < 2; j++) {
-            SDL_Surface * skinSurface = gfx_createskinsurface(skin, k, colorkey, colorScheme, true, j != 0);
+            SDL_Surface * skinSurface = createSkinSurface(skin, k, colorkey, colorScheme, true, j != 0);
 
             if (skinSurface == NULL) {
                 cout << endl << " ERROR: Couldn't create menu skin from "
@@ -244,7 +292,7 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const 
     }
 
     //Dead Flying Sprite
-    SDL_Surface * skinSurface = gfx_createskinsurface(skin, 4, colorkey, colorScheme, true, false);
+    SDL_Surface * skinSurface = createSkinSurface(skin, 4, colorkey, colorScheme, true, false);
 
     if (skinSurface == NULL) {
         cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
@@ -255,7 +303,7 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const 
     gSprites[8]->setSurface(skinSurface);
 
     //Dead Stomped Sprite
-    skinSurface = gfx_createskinsurface(skin, 5, colorkey, colorScheme, true, false);
+    skinSurface = createSkinSurface(skin, 5, colorkey, colorScheme, true, false);
 
     if (skinSurface == NULL) {
         cout << endl << " ERROR: Couldn't create menu skin from "
@@ -444,9 +492,8 @@ bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, const RGB& rgb, 
 void gfx_setjoystickteamcolor(SDL_Joystick* joystick, unsigned short team, float brightness)
 {
 #if SDL_VERSION_ATLEAST(2, 0, 14)
-    uint8_t r = 0, g = 0, b = 0;
     brightness = max(0.f, min(1.f, brightness));
-    gfx.getPalette().copyColorSchemeTo(team, 0, 5, r, g, b);
-    SDL_JoystickSetLED(joystick, (Uint8)(brightness * r), (Uint8)(brightness * g), (Uint8)(brightness * b));
+    const RGB& color = gfx.getPalette().colorScheme(team, 0, 5);
+    SDL_JoystickSetLED(joystick, (Uint8)(brightness * color.r), (Uint8)(brightness * color.g), (Uint8)(brightness * color.b));
 #endif
 }

@@ -13,10 +13,8 @@ public:
     void clear();
 
     size_t colorCount() const { return m_colorCount; }
-    bool matchesColorAtID(size_t idx, uint8_t r, uint8_t g, uint8_t b) const;
-    void copyColorSchemeTo(
-        size_t teamID, size_t schemeID, size_t colorID,
-        uint8_t& r, uint8_t& g, uint8_t& b) const;
+    const std::vector<RGB>& colorCodes() const { return m_colorCodes; }
+    const RGB& colorScheme(size_t teamID, size_t schemeID, size_t colorID) const;
 
 private:
     using ColorList = std::vector<RGB>;
