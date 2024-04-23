@@ -5,109 +5,102 @@
 #include <cassert>
 #include <cstdio>
 
-gfxPalette::gfxPalette()
-    : numcolors(0)
-{
-    for (int k = 0; k < 3; k++) {
-        colorcodes[k] = NULL;
 
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < PlayerPalette::NUM_PALETTES; j++)
-                colorschemes[i][j][k] = NULL;
+namespace {
+Uint32 getRawPixel(SDL_Surface* surf, int x, int y)
+{
+    assert(surf);
+
+    const Uint8 bpp = surf->format->BytesPerPixel;
+    const size_t idx = y * surf->pitch + x * bpp;
+    const auto* pixel8 = static_cast<Uint8*>(surf->pixels) + idx;
+
+    switch (bpp) {
+        case 1: return *pixel8;
+        case 2: return *pixel8;
+        case 3: return (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            ? pixel8[0] << 16 | pixel8[1] << 8 | pixel8[2]
+            : pixel8[0] | pixel8[1] << 8 | pixel8[2] << 16;
+        case 4: return *pixel8;
+        default: return 0x0;
     }
 }
 
-gfxPalette::~gfxPalette()
+
+RGB getRgb(SDL_Surface* surf, int x, int y)
 {
-    clear();
+    assert(surf);
+    const Uint32 rawPixel = getRawPixel(surf, x, y);
+    RGB color;
+    SDL_GetRGB(rawPixel, surf->format, &color.r, &color.g, &color.b);
+    return color;
 }
+} // namespace
+
 
 void gfxPalette::clear()
 {
-    for (int k = 0; k < 3; k++) {
-        delete [] colorcodes[k];
-        colorcodes[k] = NULL;
+    m_colorCodes.clear();
 
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < PlayerPalette::NUM_PALETTES; j++) {
-                delete [] colorschemes[i][j][k];
-                colorschemes[i][j][k] = NULL;
-            }
+    for (size_t team = 0; team < m_teamSchemes.size(); team++) {
+        for (size_t row = 0; row < PlayerPalette::NUM_PALETTES; row++) {
+            m_teamSchemes[team][row].clear();
         }
     }
 }
 
-bool gfxPalette::matchesColorAtID(unsigned short id, uint8_t r, uint8_t g, uint8_t b)
+
+bool gfxPalette::matchesColorAtID(size_t idx, uint8_t r, uint8_t g, uint8_t b) const
 {
-    assert(id < numcolors);
-    return r == colorcodes[0][id] && g == colorcodes[1][id] && b == colorcodes[2][id];
+    assert(idx < m_colorCount);
+    return r == m_colorCodes[idx].r && g == m_colorCodes[idx].g && b == m_colorCodes[idx].b;
 }
+
 
 void gfxPalette::copyColorSchemeTo(
-    unsigned short teamID, unsigned short schemeID, unsigned short colorID,
-    uint8_t& r, uint8_t& g, uint8_t& b)
+    size_t teamID, size_t schemeID, size_t colorID,
+    uint8_t& r, uint8_t& g, uint8_t& b) const
 {
-    r = colorschemes[teamID][schemeID][0][colorID];
-    g = colorschemes[teamID][schemeID][1][colorID];
-    b = colorschemes[teamID][schemeID][2][colorID];
+    const RGB& color = m_teamSchemes.at(teamID).at(schemeID).at(colorID);
+    r = color.r;
+    g = color.g;
+    b = color.b;
 }
 
-bool gfxPalette::load(const char* palette_path)
+
+bool gfxPalette::load(const std::string& palettePath)
 {
     clear();
 
-    SDL_Surface * palette = IMG_Load(palette_path);
-
-    if ( palette == NULL ) {
+    SDL_Surface* surf = IMG_Load(palettePath.c_str());
+    if (!surf) {
         printf("Couldn't load color palette: %s\n", SDL_GetError());
         return false;
     }
 
-    numcolors = (short)palette->w;
+    if (SDL_MUSTLOCK(surf))
+        SDL_LockSurface(surf);
 
-    for (int k = 0; k < 3; k++) {
-        colorcodes[k] = new Uint8[numcolors];
+    m_colorCount = surf->w;
 
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < PlayerPalette::NUM_PALETTES; j++)
-                colorschemes[i][j][k] = new Uint8[numcolors];
+    m_colorCodes.reserve(m_colorCount);
+    for (int x = 0; x < surf->w; x++) {
+        m_colorCodes.emplace_back(getRgb(surf, x, 0));
     }
 
-    if (SDL_MUSTLOCK(palette))
-        SDL_LockSurface(palette);
-
-    int counter = 0;
-
-    Uint8 * pixels = (Uint8*)palette->pixels;
-
-    short iRedIndex = palette->format->Rshift >> 3;
-    short iGreenIndex = palette->format->Gshift >> 3;
-    short iBlueIndex = palette->format->Bshift >> 3;
-
-    for (int k = 0; k < numcolors; k++) {
-        colorcodes[iRedIndex][k] = pixels[counter++];
-        colorcodes[iGreenIndex][k] = pixels[counter++];
-        colorcodes[iBlueIndex][k] = pixels[counter++];
-    }
-
-    counter += palette->pitch - palette->w * 3;
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < PlayerPalette::NUM_PALETTES; j++) {
-            for (int m = 0; m < numcolors; m++) {
-                colorschemes[i][j][iRedIndex][m] = pixels[counter++];
-                colorschemes[i][j][iGreenIndex][m] = pixels[counter++];
-                colorschemes[i][j][iBlueIndex][m] = pixels[counter++];
+    for (size_t team = 0; team < m_teamSchemes.size(); team++) {
+        for (size_t palette = 0; palette < PlayerPalette::NUM_PALETTES; palette++) {
+            m_teamSchemes[team][palette].reserve(m_colorCount);
+            for (int x = 0; x < surf->w; x++) {
+                const size_t y = 1 + team * PlayerPalette::NUM_PALETTES + palette;
+                m_teamSchemes[team][palette].emplace_back(getRgb(surf, x, y));
             }
-
-            counter += palette->pitch - palette->w * 3;
         }
     }
 
-    if (SDL_MUSTLOCK(palette))
-        SDL_UnlockSurface(palette);
+    if (SDL_MUSTLOCK(surf))
+        SDL_UnlockSurface(surf);
 
-    SDL_FreeSurface(palette);
-
+    SDL_FreeSurface(surf);
     return true;
 }

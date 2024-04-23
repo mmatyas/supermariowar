@@ -47,7 +47,7 @@ void gfx_take_screenshot() {
 
 void gfx_close() {}
 bool gfx_loadpalette(const std::string& palette_path) {
-    return gfx.getPalette().load(palette_path.c_str());
+    return gfx.getPalette().load(palette_path);
 }
 
 bool ValidSkinSurface(SDL_Surface* skin)

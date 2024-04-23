@@ -1,29 +1,28 @@
-#ifndef GFX_PALETTE
-#define GFX_PALETTE
-
-#include <stdint.h>
+#pragma once
 
 #include "gfx.h"
+#include "GlobalConstants.h"
+
+#include <array>
+#include <vector>
+
 
 class gfxPalette {
 public:
-    gfxPalette();
-    ~gfxPalette();
-
-    bool load(const char*);
+    bool load(const std::string& path);
     void clear();
-    unsigned short colorCount() { return numcolors; }
-    bool matchesColorAtID(unsigned short id, uint8_t r, uint8_t g, uint8_t b);
+
+    size_t colorCount() const { return m_colorCount; }
+    bool matchesColorAtID(size_t idx, uint8_t r, uint8_t g, uint8_t b) const;
     void copyColorSchemeTo(
-        unsigned short teamID, unsigned short schemeID, unsigned short colorID,
-        uint8_t& r, uint8_t& g, uint8_t& b);
+        size_t teamID, size_t schemeID, size_t colorID,
+        uint8_t& r, uint8_t& g, uint8_t& b) const;
 
 private:
-    uint8_t* colorcodes[3]; //[colorcomponents][numcolors]
+    using ColorList = std::vector<RGB>;
+    using SchemeList = std::array<ColorList, PlayerPalette::NUM_PALETTES>;
 
-    //[numplayers][colorscheme][colorcomponents][numcolors]
-    uint8_t* colorschemes[4][PlayerPalette::NUM_PALETTES][3];
-    unsigned short numcolors;
+    size_t m_colorCount = 0;
+    std::vector<RGB> m_colorCodes;
+    std::array<SchemeList, MAX_PLAYERS> m_teamSchemes;
 };
-
-#endif // GFX_PALETTE
