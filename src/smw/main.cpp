@@ -407,7 +407,10 @@ void main_game()
     init_spawnlocations();
 
     //Load the gfx color palette
-    gfx_loadpalette(convertPath("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
+    const bool pngPalette = gfx_loadpalette(convertPath("gfx/packs/palette.png", gamegraphicspacklist->currentPath()));
+    if (!pngPalette) {
+        gfx_loadpalette(convertPath("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
+    }
 
     srand((unsigned int)time(NULL));
 /*
