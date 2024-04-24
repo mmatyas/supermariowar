@@ -40,12 +40,23 @@ bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, short skinID, short co
 void CResourceManager::LoadAllSprites() {
     std::string graphicspack = gamegraphicspacklist->currentPath();
 
+    std::string shyguyPath = convertPath("gfx/packs/modeskins/shyguy.png", graphicspack);
+    if (!FileExists(shyguyPath))
+        shyguyPath = convertPath("gfx/packs/modeskins/shyguy.bmp", graphicspack);
+
+    std::string chickenPath = convertPath("gfx/packs/modeskins/chicken.png", graphicspack);
+    if (!FileExists(chickenPath))
+        chickenPath = convertPath("gfx/packs/modeskins/chicken.bmp", graphicspack);
+
+    std::string bobombPath = convertPath("gfx/packs/modeskins/bobomb.png", graphicspack);
+    if (!FileExists(bobombPath))
+        bobombPath = convertPath("gfx/packs/modeskins/bobomb.bmp", graphicspack);
+
     //Just load menu skins for now (just standing right sprite)
     for (short k = 0; k < MAX_PLAYERS; k++) {
-        //LoadMenuSkin(k, game_values.skinids[k], game_values.colorids[k], false);
-        LoadFullSkin(spr_shyguy[k], convertPath("gfx/packs/modeskins/shyguy.bmp", graphicspack), k);
-        LoadFullSkin(spr_chocobo[k], convertPath("gfx/packs/modeskins/chicken.bmp", graphicspack), k);
-        LoadFullSkin(spr_bobomb[k], convertPath("gfx/packs/modeskins/bobomb.bmp", graphicspack), k);
+        LoadFullSkin(spr_shyguy[k], shyguyPath, k);
+        LoadFullSkin(spr_chocobo[k], chickenPath, k);
+        LoadFullSkin(spr_bobomb[k], bobombPath, k);
     }
 
     gfx_loadimage(menu_survival, convertPath("gfx/packs/modeobjects/menu_survival.png", graphicspack), false);
