@@ -251,7 +251,6 @@ void CResourceManager::LoadAllSprites() {
 
     gfx_loadimage(spr_awardkillsinrow, convertPath("gfx/packs/awards/killsinrownumbers.png", graphicspack), true);
 
-    //gfx_loadteamcoloredimage(&spr_flagbases, convertPath("gfx/packs/modeobjects/flagbases.png", graphicspack), 255, 0, 255, 160, false, false);
     gfx_loadimage(spr_flagbases, convertPath("gfx/packs/modeobjects/flagbases.png", graphicspack), 160, true);
     gfx_loadimage(spr_ownedtags, convertPath("gfx/packs/modeobjects/ownedtags.png", graphicspack), 160, true);
 
