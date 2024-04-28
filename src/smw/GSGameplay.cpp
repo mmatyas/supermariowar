@@ -2693,8 +2693,5 @@ bool SwapPlayers(short iUsingPlayerID)
         }
     }
 
-    //Clean the dead mystery mushroom
-    objectcontainer[0].cleanDeadObjects();
-
     return true;
 }
