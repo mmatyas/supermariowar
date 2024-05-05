@@ -84,7 +84,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 #endif
 
 
-#define MAPTITLESTRING "SMW 2.0 Level Editor"
+#define MAPTITLESTRING "Level Editor"
 
 
 extern CMap* g_map;
@@ -403,7 +403,9 @@ int main(int argc, char *argv[])
         return 1;
     }
     if (cmd.show_help) {
-        cmd::print_help(MAPTITLESTRING, "");
+        char title[128];
+        sprintf(title, "%s %s", TITLESTRING, MAPTITLESTRING);
+        cmd::print_help(title, "");
         return 0;
     }
     if (cmd.debug) {
@@ -428,7 +430,7 @@ int main(int argc, char *argv[])
 	bool done;
 
 	printf("-------------------------------------------------------------------------------\n");
-	printf(" %s\n", MAPTITLESTRING);
+	printf(" %s %s\n", TITLESTRING, MAPTITLESTRING);
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\n---------------- startup ----------------\n");
 
@@ -447,7 +449,9 @@ int main(int argc, char *argv[])
 
 	//Add all of the maps that are world only so we can edit them
 	maplist->addWorldMaps();
-	gfx_settitle(MAPTITLESTRING);
+	char title[128];
+	sprintf(title, "%s %s", TITLESTRING, MAPTITLESTRING);
+	gfx_settitle(title);
 
 	printf("\n---------------- loading graphics ----------------\n");
 

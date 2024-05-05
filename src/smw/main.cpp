@@ -14,9 +14,6 @@
     along with SMW.  If not, see <http://www.gnu.org/licenses/>. */
 
 
-#define TITLESTRING "Super Mario War"
-#define VERSIONNUMBER "2.0"
-
 #include "CmdArgs.h"
 #include "FileList.h"
 #include "GameMode.h"
@@ -314,7 +311,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     if (cmd.show_help) {
-        cmd::print_help(TITLESTRING, VERSIONNUMBER);
+        cmd::print_help(TITLESTRING, GIT_REVISION);
         return 0;
     }
     if (cmd.debug) {
@@ -349,7 +346,7 @@ void main_game()
     create_globals();
 
     printf("-------------------------------------------------------------------------------\n");
-    printf(" %s %s\n", TITLESTRING, VERSIONNUMBER);
+    printf(" %s %s %s\n", TITLESTRING, GIT_REVISION, GIT_DATE);
     printf("-------------------------------------------------------------------------------\n");
     printf("\n---------------- startup ----------------\n");
 
@@ -377,7 +374,7 @@ void main_game()
     //currently this only sets the title, not the icon.
     //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
     char title[128];
-    sprintf(title, "%s %s %s %s", TITLESTRING, VERSIONNUMBER, GIT_REVISION, GIT_DATE);
+    sprintf(title, "%s %s %s", TITLESTRING, GIT_REVISION, GIT_DATE);
     gfx_settitle(title);
     SDL_ShowCursor(SDL_DISABLE);
 
