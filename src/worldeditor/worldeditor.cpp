@@ -79,7 +79,7 @@
 #define SDL_Delay(n) ;
 #endif
 
-#define MAPTITLESTRING " World Editor"
+#define MAPTITLESTRING "World Editor"
 
 enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_STAGEFOREGROUND, EDITOR_STRUCTUREFOREGROUND, EDITOR_BRIDGES, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY, EDITOR_START_ITEMS, EDITOR_STAGE};
 
@@ -458,7 +458,7 @@ int main(int argc, char *argv[])
     }
     if (cmd.show_help) {
         char title[128];
-        sprintf(title, "%s%s", TITLESTRING, MAPTITLESTRING);
+        sprintf(title, "%s %s", TITLESTRING, MAPTITLESTRING);
         cmd::print_help(title, "");
         return 0;
     }
@@ -489,7 +489,7 @@ int main(int argc, char *argv[])
 	bool done;
 
 	printf("-------------------------------------------------------------------------------\n");
-	printf(" %s%s\n", TITLESTRING, MAPTITLESTRING);
+	printf(" %s %s\n", TITLESTRING, MAPTITLESTRING);
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\n---------------- startup ----------------\n");
 
@@ -510,7 +510,7 @@ int main(int argc, char *argv[])
 	g_tilesetmanager->init(convertPath("gfx/Classic/tilesets").c_str());
 
 	char title[128];
-	sprintf(title, "%s%s", TITLESTRING, MAPTITLESTRING);
+	sprintf(title, "%s %s", TITLESTRING, MAPTITLESTRING);
 	gfx_settitle(title);
 
 	game_values.toplayer = true;
