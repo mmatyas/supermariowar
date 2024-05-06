@@ -20,7 +20,7 @@ CGM_Eggs::CGM_Eggs() : CGameMode()
     goal = 20;
     gamemode = game_mode_eggs;
 
-    SetupModeStrings("Yoshi's Eggs", "Eggs", 5);
+    SetupModeStrings("Bells & Kittens", "Bells", 5);
 };
 
 void CGM_Eggs::init()
