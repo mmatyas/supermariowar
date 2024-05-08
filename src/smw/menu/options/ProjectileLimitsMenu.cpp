@@ -181,6 +181,6 @@ UI_ProjectileLimitsMenu::UI_ProjectileLimitsMenu()
     AddNonControl(miProjectilesLimitsMenuRightHeaderBar);
     AddNonControl(miProjectilesLimitsMenuHeaderText);
 
-    SetHeadControl(miFireballLimitField);
+    setInitialFocus(miFireballLimitField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };

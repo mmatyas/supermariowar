@@ -452,7 +452,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
 
     mInputMenu->AddControl(miBackButton, miMenuInputControlFields[7], miDeviceSelectField, miDeviceSelectField, NULL);
 
-    mInputMenu->SetHeadControl(miDeviceSelectField);
+    mInputMenu->setInitialFocus(miDeviceSelectField);
 
     SetVisibleInputFields();
 }

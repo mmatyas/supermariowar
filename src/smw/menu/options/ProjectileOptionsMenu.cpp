@@ -236,6 +236,6 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     AddNonControl(miProjectileOptionsMenuRightHeaderBar);
     AddNonControl(miProjectileOptionsMenuHeaderText);
 
-    SetHeadControl(miFireballLifeField);
+    setInitialFocus(miFireballLifeField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };

@@ -203,7 +203,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
     mMenu->AddNonControl(miUpArrow);
     mMenu->AddNonControl(miDownArrow);
 
-    mMenu->SetHeadControl(miOverride);
+    mMenu->setInitialFocus(miOverride);
     mMenu->SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 }
 
@@ -274,7 +274,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
 
         mMenu->RememberCurrent();
 
-        mMenu->SetHeadControl(miDialogNoButton);
+        mMenu->setInitialFocus(miDialogNoButton);
         mMenu->SetCancelCode(MENU_CODE_POWERUP_RESET_NO);
         mMenu->ResetMenu();
 
@@ -290,7 +290,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
         miDialogYesButton->Show(false);
         miDialogNoButton->Show(false);
 
-        mMenu->SetHeadControl(miOverride);
+        mMenu->setInitialFocus(miOverride);
         mMenu->SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
         mMenu->RestoreCurrent();

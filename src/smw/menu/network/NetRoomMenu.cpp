@@ -78,7 +78,7 @@ UI_NetRoomMenu::UI_NetRoomMenu()
     AddNonControl(miNetRoomRightHeaderBar);
     AddNonControl(miNetRoomHeaderText);
 
-    SetHeadControl(miNetRoomMessageField);
+    setInitialFocus(miNetRoomMessageField);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 };
 
@@ -128,7 +128,7 @@ void UI_NetRoomMenu::StartInProgress()
         miNetRoomStartingDialogText->Show(true);
         RememberCurrent();
 
-        SetHeadControl(miNetRoomStartingDialogText);
+        setInitialFocus(miNetRoomStartingDialogText);
         // SetCancelCode(MENU_CODE_NET_START_ABORT);
         // SetCancelCode(MENU_CODE_NONE);
         SetCancelCode(MENU_CODE_TO_NET_ROOM_MENU);
@@ -145,7 +145,7 @@ void UI_NetRoomMenu::Restore()
     else
         miNetRoomStartButton->SetName("(waiting)");*/
 
-    SetHeadControl(miNetRoomMessageField);
+    setInitialFocus(miNetRoomMessageField);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 }
 

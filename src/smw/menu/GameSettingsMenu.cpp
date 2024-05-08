@@ -149,7 +149,7 @@ UI_GameSettingsMenu::UI_GameSettingsMenu()
     AddControl(miGameSettingsExitDialogYesButton, NULL, NULL, NULL, miGameSettingsExitDialogNoButton);
     AddControl(miGameSettingsExitDialogNoButton, NULL, NULL, miGameSettingsExitDialogYesButton, NULL);
 
-    SetHeadControl(miSettingsStartButton);
+    setInitialFocus(miSettingsStartButton);
 
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 }
@@ -170,7 +170,7 @@ void UI_GameSettingsMenu::OpenMapFilters()
     miMapFilterScroll->Show(true);
     RememberCurrent();
 
-    SetHeadControl(miMapFilterScroll);
+    setInitialFocus(miMapFilterScroll);
     SetCancelCode(MENU_CODE_NONE);
     ResetMenu();
 }
@@ -179,7 +179,7 @@ void UI_GameSettingsMenu::CloseMapFilters()
 {
     miMapFilterScroll->Show(false);
 
-    SetHeadControl(miSettingsStartButton);
+    setInitialFocus(miSettingsStartButton);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
     RestoreCurrent();
@@ -197,7 +197,7 @@ void UI_GameSettingsMenu::OpenExitDialog()
 
     RememberCurrent();
 
-    SetHeadControl(miGameSettingsExitDialogNoButton);
+    setInitialFocus(miGameSettingsExitDialogNoButton);
     SetCancelCode(MENU_CODE_NONE);
     ResetMenu();
 }
@@ -210,7 +210,7 @@ void UI_GameSettingsMenu::CloseExitDialog()
     miGameSettingsExitDialogYesButton->Show(false);
     miGameSettingsExitDialogNoButton->Show(false);
 
-    SetHeadControl(miSettingsStartButton);
+    setInitialFocus(miSettingsStartButton);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
     RestoreCurrent();
@@ -245,5 +245,5 @@ const char* UI_GameSettingsMenu::GetCurrentMapName()
 
 bool UI_GameSettingsMenu::IsOnStartBtn()
 {
-    return (GetHeadControl() == miSettingsStartButton);
+    return initialFocus() == miSettingsStartButton;
 }

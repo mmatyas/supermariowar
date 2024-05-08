@@ -84,7 +84,7 @@ UI_NetServersMenu::UI_NetServersMenu()
     // AddNonControl(miNetServersConnectingDialogImage);
     // AddControl(miNetServersConnectionDetector, NULL, NULL, NULL, NULL);
 
-    SetHeadControl(miNetServersSelectButton);
+    setInitialFocus(miNetServersSelectButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 };
 
@@ -122,7 +122,7 @@ void UI_NetServersMenu::ConnectInProgress()
     miNetServersConnectingDialogText->Show(true);
     RememberCurrent();
 
-    SetHeadControl(miNetServersConnectingDialogText);
+    setInitialFocus(miNetServersConnectingDialogText);
     SetCancelCode(MENU_CODE_NET_CONNECT_ABORT);
     ResetMenu();
 }
@@ -133,7 +133,7 @@ void UI_NetServersMenu::OpenServerList()
     miNetServersScroll->Show(true);
     RememberCurrent();
 
-    SetHeadControl(miNetServersScroll);
+    setInitialFocus(miNetServersScroll);
     SetCancelCode(MENU_CODE_NONE);
     ResetMenu();
 }
@@ -144,7 +144,7 @@ void UI_NetServersMenu::Restore()
     miNetServersConnectingDialogImage->Show(false);
     miNetServersConnectingDialogText->Show(false);
 
-    SetHeadControl(miNetServersSelectButton);
+    setInitialFocus(miNetServersSelectButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
     RestoreCurrent();
 }

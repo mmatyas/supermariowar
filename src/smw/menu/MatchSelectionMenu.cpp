@@ -98,7 +98,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
     AddControl(miMinigameField, miWorldField, miMatchSelectionStartButton, NULL, NULL);
     AddControl(miMatchSelectionStartButton, miMinigameField, miMatchSelectionField, NULL, NULL);
 
-    SetHeadControl(miMatchSelectionStartButton);
+    setInitialFocus(miMatchSelectionStartButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 };
 

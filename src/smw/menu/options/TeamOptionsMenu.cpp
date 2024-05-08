@@ -56,6 +56,6 @@ UI_TeamOptionsMenu::UI_TeamOptionsMenu()
     AddNonControl(miTeamOptionsMenuRightHeaderBar);
     AddNonControl(miTeamOptionsMenuHeaderText);
 
-    SetHeadControl(miTeamKillsField);
+    setInitialFocus(miTeamKillsField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };

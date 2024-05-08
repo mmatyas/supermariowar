@@ -49,7 +49,7 @@ UI_NetNewRoomMenu::UI_NetNewRoomMenu()
     AddNonControl(miNetNewRoomRightHeaderBar);
     AddNonControl(miNetNewRoomHeaderText);
 
-    SetHeadControl(miNetNewRoomNameField);
+    setInitialFocus(miNetNewRoomNameField);
     SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 };
 
@@ -63,7 +63,7 @@ void UI_NetNewRoomMenu::CreateInProgress()
         miNetNewRoomCreatingDialogText->Show(true);
 
         RememberCurrent();
-        SetHeadControl(miNetNewRoomCreatingDialogText);
+        setInitialFocus(miNetNewRoomCreatingDialogText);
         SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT);
         ResetMenu();
     }
@@ -81,6 +81,6 @@ void UI_NetNewRoomMenu::Restore()
 {
     miNetNewRoomCreatingDialogImage->Show(false);
     miNetNewRoomCreatingDialogText->Show(false);
-    SetHeadControl(miNetNewRoomNameField);
+    setInitialFocus(miNetNewRoomNameField);
     SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 }

@@ -45,7 +45,7 @@ UI_WorldMenu::UI_WorldMenu()
     AddControl(miWorldExitDialogYesButton, NULL, NULL, NULL, miWorldExitDialogNoButton);
     AddControl(miWorldExitDialogNoButton, NULL, NULL, miWorldExitDialogYesButton, NULL);
 
-    SetHeadControl(miWorld);
+    setInitialFocus(miWorld);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 };
 
@@ -56,7 +56,7 @@ void UI_WorldMenu::OpenStageStart()
 
     RememberCurrent();
 
-    SetHeadControl(miWorldStop);
+    setInitialFocus(miWorldStop);
     SetCancelCode(MENU_CODE_WORLD_STAGE_NO_START);
 
     ResetMenu();
@@ -66,7 +66,7 @@ void UI_WorldMenu::CloseStageStart()
 {
     miWorldStop->Show(false);
 
-    SetHeadControl(miWorld);
+    setInitialFocus(miWorld);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
     RestoreCurrent();
@@ -81,7 +81,7 @@ void UI_WorldMenu::OpenExitDialog()
 
     RememberCurrent();
 
-    SetHeadControl(miWorldExitDialogNoButton);
+    setInitialFocus(miWorldExitDialogNoButton);
     SetCancelCode(MENU_CODE_NONE);
     ResetMenu();
 }
@@ -93,7 +93,7 @@ void UI_WorldMenu::CloseExitDialog()
     miWorldExitDialogYesButton->Show(false);
     miWorldExitDialogNoButton->Show(false);
 
-    SetHeadControl(miWorld);
+    setInitialFocus(miWorld);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
     RestoreCurrent();

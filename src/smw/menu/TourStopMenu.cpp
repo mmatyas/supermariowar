@@ -36,7 +36,7 @@ UI_TourStopMenu::UI_TourStopMenu()
     AddControl(miTourStopExitDialogYesButton, NULL, NULL, NULL, miTourStopExitDialogNoButton);
     AddControl(miTourStopExitDialogNoButton, NULL, NULL, miTourStopExitDialogYesButton, NULL);
 
-    SetHeadControl(miTourStop);
+    setInitialFocus(miTourStop);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 };
 
@@ -49,7 +49,7 @@ void UI_TourStopMenu::OpenExitDialog()
 
     RememberCurrent();
 
-    SetHeadControl(miTourStopExitDialogNoButton);
+    setInitialFocus(miTourStopExitDialogNoButton);
     SetCancelCode(MENU_CODE_NONE);
     ResetMenu();
 }
@@ -61,7 +61,7 @@ void UI_TourStopMenu::CloseExitDialog()
     miTourStopExitDialogYesButton->Show(false);
     miTourStopExitDialogNoButton->Show(false);
 
-    SetHeadControl(miTourStop);
+    setInitialFocus(miTourStop);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
     RestoreCurrent();

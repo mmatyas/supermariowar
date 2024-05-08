@@ -20,6 +20,6 @@ UI_TournamentScoreboardMenu::UI_TournamentScoreboardMenu()
     AddNonControl(miTournamentScoreboard);
     AddNonControl(miTournamentScoreboardImage);
     AddControl(miTournamentScoreboardNextButton, NULL, NULL, NULL, NULL);
-    SetHeadControl(miTournamentScoreboardNextButton);
+    setInitialFocus(miTournamentScoreboardNextButton);
     SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU);
 };

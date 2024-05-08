@@ -141,7 +141,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 
     mMenu->AddControl(miBackButton, miPowerupSlider[NUMFRENZYCARDS - 1], NULL, miPowerupSlider[NUMFRENZYCARDS - 1], NULL);
 
-    mMenu->SetHeadControl(miQuantityField);
+    mMenu->setInitialFocus(miQuantityField);
     mMenu->SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 }
 
@@ -179,11 +179,11 @@ MenuCodeEnum MI_FrenzyModeOptions::Modify(bool modify)
 
 MenuCodeEnum MI_FrenzyModeOptions::SendInput(CPlayerInput * playerInput)
 {
-    UI_Control * prevControl = mMenu->GetCurrentControl();
+    UI_Control * prevControl = mMenu->currentFocus();
 
     MenuCodeEnum ret = mMenu->SendInput(playerInput);
 
-    UI_Control * nextControl = mMenu->GetCurrentControl();
+    UI_Control * nextControl = mMenu->currentFocus();
 
     if (MENU_CODE_CANCEL_INPUT == ret) {
         fModifying = false;
@@ -273,7 +273,7 @@ MenuCodeEnum MI_FrenzyModeOptions::MouseClick(short iMouseX, short iMouseY)
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
         MI_PowerupSlider * slider = miPowerupSlider[iPowerup];
 
-        if (slider == mMenu->GetCurrentControl()) {
+        if (slider == mMenu->currentFocus()) {
             iIndex = (iPowerup >> 1) + 3;
 
             if (iIndex <= iTopStop)

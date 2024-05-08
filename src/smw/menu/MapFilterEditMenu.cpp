@@ -10,6 +10,6 @@ UI_MapFilterEditMenu::UI_MapFilterEditMenu()
     miMapBrowser->SetAutoModify(true);
 
     AddControl(miMapBrowser, NULL, NULL, NULL, NULL);
-    SetHeadControl(miMapBrowser);
+    setInitialFocus(miMapBrowser);
     SetCancelCode(MENU_CODE_MAP_BROWSER_EXIT);
 };

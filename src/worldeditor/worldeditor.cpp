@@ -837,7 +837,7 @@ int main(int argc, char *argv[])
 	mStageSettingsMenu.AddControl(miDeleteStageDialogYesButton, NULL, NULL, NULL, miDeleteStageDialogNoButton);
 	mStageSettingsMenu.AddControl(miDeleteStageDialogNoButton, NULL, NULL, miDeleteStageDialogYesButton, NULL);
 
-	mStageSettingsMenu.SetHeadControl(miNameField);
+	mStageSettingsMenu.setInitialFocus(miNameField);
 	mStageSettingsMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);
 
 	mBonusItemPicker.SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -942,7 +942,7 @@ int main(int argc, char *argv[])
 	mVehicleMenu.AddControl(miVehicleBoundaryField, miVehicleDirectionField, miVehicleCreateButton, NULL, NULL);
 	mVehicleMenu.AddControl(miVehicleCreateButton, miVehicleBoundaryField, miVehicleSpriteField, NULL, NULL);
 
-	mVehicleMenu.SetHeadControl(miVehicleSpriteField);
+	mVehicleMenu.setInitialFocus(miVehicleSpriteField);
 	mVehicleMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);
 
 #ifndef USE_SDL2
@@ -4179,7 +4179,7 @@ int editor_stage()
 
 				mStageSettingsMenu.RememberCurrent();
 
-				mStageSettingsMenu.SetHeadControl(miDeleteStageDialogNoButton);
+				mStageSettingsMenu.setInitialFocus(miDeleteStageDialogNoButton);
 				mStageSettingsMenu.SetCancelCode(MENU_CODE_DELETE_STAGE_NO);
 				mStageSettingsMenu.ResetMenu();
             } else if (MENU_CODE_DELETE_STAGE_YES == code || MENU_CODE_DELETE_STAGE_NO == code) {
@@ -4189,7 +4189,7 @@ int editor_stage()
 				miDeleteStageDialogYesButton->Show(false);
 				miDeleteStageDialogNoButton->Show(false);
 
-				mStageSettingsMenu.SetHeadControl(miNameField);
+				mStageSettingsMenu.setInitialFocus(miNameField);
 				mStageSettingsMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);
 				mStageSettingsMenu.RestoreCurrent();
 

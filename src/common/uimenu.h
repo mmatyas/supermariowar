@@ -18,17 +18,20 @@ public:
     void AddControl(UI_Control* control, UI_Control* up, UI_Control* down, UI_Control* left, UI_Control* right);
     void AddNonControl(UI_Control* control);
 
-    UI_Control* GetHeadControl() const {
-        return headControl;
-    }
-
-    void SetHeadControl(UI_Control* control);
-    void ResetMenu();
+    /// Sets the initially focused element on opening/resetting the menu.
+    void setInitialFocus(UI_Control* control);
+    /// The initially focused element on opening/resetting the menu.
+    UI_Control* initialFocus() const { return m_initialFocus; }
+    /// The currently focused element of the menu.
+    UI_Control* currentFocus() const { return m_currentFocus; }
 
     void SetCancelCode(MenuCodeEnum code) {
         cancelCode = code;
     }
 
+    void ResetMenu();
+
+    MenuCodeEnum SendInput(CPlayerInput* playerInput);
     void Update();
     void Draw();
 
@@ -39,16 +42,8 @@ public:
         eyeCandy.clean();
     }
 
-    void ResetCurrentControl();
-    MenuCodeEnum SendInput(CPlayerInput* playerInput);
-
-
     void RememberCurrent();
     void RestoreCurrent();
-
-    UI_Control* GetCurrentControl() const {
-        return current;
-    }
 
     void SetControllingTeam(short teamid) {
         iControllingTeam = teamid;
@@ -70,13 +65,12 @@ protected:
 
     std::vector<std::unique_ptr<UI_Control>> controls;
 
-    UI_Control* current = nullptr;
-    UI_Control* savedCurrent = nullptr;
+    UI_Control* m_initialFocus = nullptr;
+    UI_Control* m_currentFocus = nullptr;
+    UI_Control* m_savedCurrent = nullptr;
 
     MenuCodeEnum cancelCode = MENU_CODE_NONE;
     bool fModifyingItem = false;
-
-    UI_Control* headControl = nullptr;
 
     CEyecandyContainer eyeCandy;
 

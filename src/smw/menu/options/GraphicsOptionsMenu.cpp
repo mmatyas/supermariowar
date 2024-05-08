@@ -89,6 +89,6 @@ UI_GraphicsOptionsMenu::UI_GraphicsOptionsMenu()
     AddNonControl(miGraphicsOptionsMenuRightHeaderBar);
     AddNonControl(miGraphicsOptionsMenuHeaderText);
 
-    SetHeadControl(miTopLayerField);
+    setInitialFocus(miTopLayerField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };

@@ -96,7 +96,7 @@ UI_SoundOptionsMenu::UI_SoundOptionsMenu()
     AddNonControl(miSoundOptionsMenuRightHeaderBar);
     AddNonControl(miSoundOptionsMenuHeaderText);
 
-    SetHeadControl(miSoundVolumeField);
+    setInitialFocus(miSoundVolumeField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };
 

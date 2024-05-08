@@ -48,7 +48,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[0].AddNonControl(miClassicModeRightHeaderBar);
     mModeSettingsMenu[0].AddNonControl(miClassicModeHeaderText);
 
-    mModeSettingsMenu[0].SetHeadControl(miClassicModeStyleField);
+    mModeSettingsMenu[0].setInitialFocus(miClassicModeStyleField);
     mModeSettingsMenu[0].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -83,7 +83,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[1].AddNonControl(miFragModeRightHeaderBar);
     mModeSettingsMenu[1].AddNonControl(miFragModeHeaderText);
 
-    mModeSettingsMenu[1].SetHeadControl(miFragModeStyleField);
+    mModeSettingsMenu[1].setInitialFocus(miFragModeStyleField);
     mModeSettingsMenu[1].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -145,7 +145,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[2].AddNonControl(miTimeLimitModeRightHeaderBar);
     mModeSettingsMenu[2].AddNonControl(miTimeLimitModeHeaderText);
 
-    mModeSettingsMenu[2].SetHeadControl(miTimeLimitModeStyleField);
+    mModeSettingsMenu[2].setInitialFocus(miTimeLimitModeStyleField);
     mModeSettingsMenu[2].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -227,7 +227,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[3].AddNonControl(miJailModeRightHeaderBar);
     mModeSettingsMenu[3].AddNonControl(miJailModeHeaderText);
 
-    mModeSettingsMenu[3].SetHeadControl(miJailModeStyleField);
+    mModeSettingsMenu[3].setInitialFocus(miJailModeStyleField);
     mModeSettingsMenu[3].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -298,7 +298,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[4].AddNonControl(miCoinModeRightHeaderBar);
     mModeSettingsMenu[4].AddNonControl(miCoinModeHeaderText);
 
-    mModeSettingsMenu[4].SetHeadControl(miCoinModePenaltyField);
+    mModeSettingsMenu[4].setInitialFocus(miCoinModePenaltyField);
     mModeSettingsMenu[4].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -361,7 +361,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[5].AddNonControl(miStompModeRightHeaderBar);
     mModeSettingsMenu[5].AddNonControl(miStompModeHeaderText);
 
-    mModeSettingsMenu[5].SetHeadControl(miStompModeRateField);
+    mModeSettingsMenu[5].setInitialFocus(miStompModeRateField);
     mModeSettingsMenu[5].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -429,7 +429,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[6].AddNonControl(miEggModeRightHeaderBar);
     mModeSettingsMenu[6].AddNonControl(miEggModeHeaderText);
 
-    mModeSettingsMenu[6].SetHeadControl(miEggModeEggQuantityField[0]);
+    mModeSettingsMenu[6].setInitialFocus(miEggModeEggQuantityField[0]);
     mModeSettingsMenu[6].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     //***********************
@@ -516,7 +516,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[7].AddNonControl(miFlagModeRightHeaderBar);
     mModeSettingsMenu[7].AddNonControl(miFlagModeHeaderText);
 
-    mModeSettingsMenu[7].SetHeadControl(miFlagModeSpeedField);
+    mModeSettingsMenu[7].setInitialFocus(miFlagModeSpeedField);
     mModeSettingsMenu[7].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -554,7 +554,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[8].AddNonControl(miChickenModeRightHeaderBar);
     mModeSettingsMenu[8].AddNonControl(miChickenModeHeaderText);
 
-    mModeSettingsMenu[8].SetHeadControl(miChickenModeShowTargetField);
+    mModeSettingsMenu[8].setInitialFocus(miChickenModeShowTargetField);
     mModeSettingsMenu[8].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -584,7 +584,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[9].AddNonControl(miTagModeRightHeaderBar);
     mModeSettingsMenu[9].AddNonControl(miTagModeHeaderText);
 
-    mModeSettingsMenu[9].SetHeadControl(miTagModeTagOnTouchField);
+    mModeSettingsMenu[9].setInitialFocus(miTagModeTagOnTouchField);
     mModeSettingsMenu[9].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -658,7 +658,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[10].AddNonControl(miStarModeRightHeaderBar);
     mModeSettingsMenu[10].AddNonControl(miStarModeHeaderText);
 
-    mModeSettingsMenu[10].SetHeadControl(miStarModeTimeField);
+    mModeSettingsMenu[10].setInitialFocus(miStarModeTimeField);
     mModeSettingsMenu[10].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -754,7 +754,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[11].AddNonControl(miDominationModeHeaderText);
     mModeSettingsMenu[11].AddNonControl(miDominationModeDeathText);
 
-    mModeSettingsMenu[11].SetHeadControl(miDominationModeQuantityField);
+    mModeSettingsMenu[11].setInitialFocus(miDominationModeQuantityField);
     mModeSettingsMenu[11].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -814,7 +814,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[12].AddNonControl(miKingOfTheHillModeRightHeaderBar);
     mModeSettingsMenu[12].AddNonControl(miKingOfTheHillModeHeaderText);
 
-    mModeSettingsMenu[12].SetHeadControl(miKingOfTheHillModeSizeField);
+    mModeSettingsMenu[12].setInitialFocus(miKingOfTheHillModeSizeField);
     mModeSettingsMenu[12].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -869,7 +869,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[13].AddNonControl(miRaceModeRightHeaderBar);
     mModeSettingsMenu[13].AddNonControl(miRaceModeHeaderText);
 
-    mModeSettingsMenu[13].SetHeadControl(miRaceModeQuantityField);
+    mModeSettingsMenu[13].setInitialFocus(miRaceModeQuantityField);
     mModeSettingsMenu[13].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -890,7 +890,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[15].AddNonControl(miFrenzyModeRightHeaderBar);
     mModeSettingsMenu[15].AddNonControl(miFrenzyModeHeaderText);
 
-    mModeSettingsMenu[15].SetHeadControl(miFrenzyModeOptions);
+    mModeSettingsMenu[15].setInitialFocus(miFrenzyModeOptions);
     mModeSettingsMenu[15].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -964,7 +964,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[16].AddNonControl(miSurvivalModeRightHeaderBar);
     mModeSettingsMenu[16].AddNonControl(miSurvivalModeHeaderText);
 
-    mModeSettingsMenu[16].SetHeadControl(miSurvivalModeEnemySlider[0]);
+    mModeSettingsMenu[16].setInitialFocus(miSurvivalModeEnemySlider[0]);
     mModeSettingsMenu[16].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -1052,7 +1052,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[17].AddNonControl(miGreedModeRightHeaderBar);
     mModeSettingsMenu[17].AddNonControl(miGreedModeHeaderText);
 
-    mModeSettingsMenu[17].SetHeadControl(miGreedModeCoinLife);
+    mModeSettingsMenu[17].setInitialFocus(miGreedModeCoinLife);
     mModeSettingsMenu[17].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -1131,7 +1131,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[18].AddNonControl(miHealthModeRightHeaderBar);
     mModeSettingsMenu[18].AddNonControl(miHealthModeHeaderText);
 
-    mModeSettingsMenu[18].SetHeadControl(miHealthModeStartLife);
+    mModeSettingsMenu[18].setInitialFocus(miHealthModeStartLife);
     mModeSettingsMenu[18].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -1219,7 +1219,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[19].AddNonControl(miCollectionModeRightHeaderBar);
     mModeSettingsMenu[19].AddNonControl(miCollectionModeHeaderText);
 
-    mModeSettingsMenu[19].SetHeadControl(miCollectionModeQuantityField);
+    mModeSettingsMenu[19].setInitialFocus(miCollectionModeQuantityField);
     mModeSettingsMenu[19].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
     //***********************
@@ -1269,7 +1269,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[20].AddNonControl(miChaseModeRightHeaderBar);
     mModeSettingsMenu[20].AddNonControl(miChaseModeHeaderText);
 
-    mModeSettingsMenu[20].SetHeadControl(miChaseModeSpeedField);
+    mModeSettingsMenu[20].setInitialFocus(miChaseModeSpeedField);
     mModeSettingsMenu[20].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -1322,7 +1322,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mModeSettingsMenu[21].AddNonControl(miShyGuyTagModeRightHeaderBar);
     mModeSettingsMenu[21].AddNonControl(miShyGuyTagModeHeaderText);
 
-    mModeSettingsMenu[21].SetHeadControl(miShyGuyTagModeTagOnSuicideField);
+    mModeSettingsMenu[21].setInitialFocus(miShyGuyTagModeTagOnSuicideField);
     mModeSettingsMenu[21].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -1386,7 +1386,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     mBossSettingsMenu.AddNonControl(miBossModeRightHeaderBar);
     mBossSettingsMenu.AddNonControl(miBossModeHeaderText);
 
-    mBossSettingsMenu.SetHeadControl(miBossModeTypeField);
+    mBossSettingsMenu.setInitialFocus(miBossModeTypeField);
     mBossSettingsMenu.SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 }
 

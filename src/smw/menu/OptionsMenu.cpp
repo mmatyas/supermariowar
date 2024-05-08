@@ -91,7 +91,7 @@ UI_OptionsMenu::UI_OptionsMenu()
     AddControl(miGenerateThumbsDialogYesButton, NULL, NULL, NULL, miGenerateThumbsDialogNoButton);
     AddControl(miGenerateThumbsDialogNoButton, NULL, NULL, miGenerateThumbsDialogYesButton, NULL);
 
-    SetHeadControl(miGameplayOptionsMenuButton);
+    setInitialFocus(miGameplayOptionsMenuButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 };
 
@@ -105,7 +105,7 @@ void UI_OptionsMenu::showThumbnailsPopup()
 
     RememberCurrent();
 
-    SetHeadControl(miGenerateThumbsDialogNoButton);
+    setInitialFocus(miGenerateThumbsDialogNoButton);
     SetCancelCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);
 }
 
@@ -117,7 +117,7 @@ void UI_OptionsMenu::hideThumbnailsPopup()
     miGenerateThumbsDialogYesButton->Show(false);
     miGenerateThumbsDialogNoButton->Show(false);
 
-    SetHeadControl(miGameplayOptionsMenuButton);
+    setInitialFocus(miGameplayOptionsMenuButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 
     RestoreCurrent();

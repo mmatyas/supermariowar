@@ -62,7 +62,7 @@ UI_NetLobbyMenu::UI_NetLobbyMenu()
     AddNonControl(miNetLobbyRightHeaderBar);
     AddNonControl(miNetLobbyHeaderText);
 
-    SetHeadControl(miNetLobbyNewRoomButton);
+    setInitialFocus(miNetLobbyNewRoomButton);
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 };
 
@@ -74,7 +74,7 @@ void UI_NetLobbyMenu::JoinInProgress()
     miNetLobbyJoiningDialogImage->Show(true);
     miNetLobbyJoiningDialogText->Show(true);
 
-    SetHeadControl(miNetLobbyJoiningDialogText);
+    setInitialFocus(miNetLobbyJoiningDialogText);
     SetCancelCode(MENU_CODE_NET_JOIN_ROOM_ABORT);
     ResetMenu();
 }
@@ -89,6 +89,6 @@ void UI_NetLobbyMenu::Restore()
 {
     miNetLobbyJoiningDialogImage->Show(false);
     miNetLobbyJoiningDialogText->Show(false);
-    SetHeadControl(miNetLobbyNewRoomButton);
+    setInitialFocus(miNetLobbyNewRoomButton);
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 }

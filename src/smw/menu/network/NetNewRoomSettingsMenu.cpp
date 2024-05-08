@@ -66,7 +66,7 @@ UI_NetNewRoomSettingsMenu::UI_NetNewRoomSettingsMenu(const UI_GameSettingsMenu* 
 
     //AddNonControl(miMapFiltersOnImage);
 
-    SetHeadControl(miContinueButton);
+    setInitialFocus(miContinueButton);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 }
 
