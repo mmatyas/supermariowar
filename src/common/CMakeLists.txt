@@ -55,31 +55,35 @@ add_library(CommonFiles STATIC
     ResourceManager.h
     sfx.cpp
     sfx.h
-    TileTypes.cpp
-    TileTypes.h
     TilesetManager.cpp
     TilesetManager.h
-    ui/MI_MapPreview.cpp
-    ui/MI_MapPreview.h
-    ui/MI_MapField.cpp
-    ui/MI_MapField.h
-    ui/MI_SelectField.cpp
-    ui/MI_SelectField.h
+    TileTypes.cpp
+    TileTypes.h
+    uicontrol.cpp
+    uicontrol.h
+    uimenu.cpp
+    uimenu.h
+    ui/MenuCode.h
+    ui/MI_Button.cpp
+    ui/MI_Button.h
+    ui/MI_Image.cpp
+    ui/MI_Image.h
     ui/MI_ImageSelectField.cpp
     ui/MI_ImageSelectField.h
+    ui/MI_MapField.cpp
+    ui/MI_MapField.h
+    ui/MI_MapPreview.cpp
+    ui/MI_MapPreview.h
+    ui/MI_ScoreText.cpp
+    ui/MI_ScoreText.h
+    ui/MI_SelectField.cpp
+    ui/MI_SelectField.h
     ui/MI_SliderField.cpp
     ui/MI_SliderField.h
-    ui/MI_TextField.h
-    ui/MI_TextField.cpp
-    ui/MI_Button.h
-    ui/MI_Button.cpp
-    ui/MI_Text.h
     ui/MI_Text.cpp
-    ui/MI_ScoreText.h
-    ui/MI_ScoreText.cpp
-    ui/MI_Image.h
-    ui/MI_Image.cpp
-    ui/MenuCode.h
+    ui/MI_Text.h
+    ui/MI_TextField.cpp
+    ui/MI_TextField.h
 )
 
 if (USE_PNG_SAVE AND NOT USE_SDL2_LIBS)

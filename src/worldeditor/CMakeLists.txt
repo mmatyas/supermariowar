@@ -35,8 +35,6 @@ add_executable(smw-worldedit WIN32
 	../smw/ui/MI_PowerupSlider.h
 	../smw/ui/MI_FrenzyModeOptions.cpp
 	../smw/ui/MI_FrenzyModeOptions.h
-	../common/uimenu.cpp
-	../common/uimenu.h
 	worldeditor.cpp
 )
 if (WIN32)

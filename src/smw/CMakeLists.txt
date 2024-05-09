@@ -30,10 +30,6 @@ add_executable(smw WIN32
 
 	../common/movingplatform.cpp
 	../common/movingplatform.h
-	../common/uicontrol.cpp
-	../common/uicontrol.h
-	../common/uimenu.cpp
-	../common/uimenu.h
 )
 
 #
