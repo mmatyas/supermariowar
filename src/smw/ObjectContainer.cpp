@@ -56,17 +56,6 @@ void CObjectContainer::draw() const
         obj->draw();
 }
 
-bool CObjectContainer::isBlockAt(short x, short y) const
-{
-    for (const std::unique_ptr<CObject>& obj : m_list) {
-        const bool hitX = obj->ix <= x && x < obj->ix + obj->iw;
-        const bool hitY = obj->iy <= y && y < obj->iy + obj->ih;
-        if (hitX && hitY && obj->getObjectType() == object_block)
-            return true;
-    }
-    return false;
-}
-
 float CObjectContainer::getClosestObject(short ix, short iy, ObjectType objectType) const
 {
     float minDist = App::screenWidth * 1000;  //Longest distance from corner to corner squared

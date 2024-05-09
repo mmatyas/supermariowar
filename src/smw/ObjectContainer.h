@@ -21,7 +21,6 @@ public:
     void clean();
     void cleanDeadObjects();
 
-    bool isBlockAt(short x, short y) const;
     float getClosestObject(short x, short y, ObjectType objectType) const;
     float getClosestMovingObject(short x, short y, MovingObjectType movingObjectType) const;
     size_t countTypes(ObjectType type) const;
