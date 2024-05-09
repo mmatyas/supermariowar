@@ -28,15 +28,8 @@ namespace {
 void pushBombs(CObjectContainer& container, short x, short y)
 {
     for (const std::unique_ptr<CObject>& obj : container.list()) {
-        if (obj->getObjectType() != object_moving)
-            continue;
-
-        auto* mo = static_cast<IO_MovingObject*>(obj.get());
-        if (mo->getMovingObjectType() != movingobject_bomb)
-            continue;
-
-        auto* bomb = static_cast<CO_Bomb*>(obj.get());
-        if (bomb->HasOwner())
+        auto* bomb = dynamic_cast<CO_Bomb*>(obj.get());
+        if (!bomb || bomb->HasOwner())
             continue;
 
         int bombx = bomb->ix + (bomb->iw >> 1) - x;

@@ -682,8 +682,7 @@ void shakeScreen()
 
     //Kill goombas and koopas
     for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list()) {
-        if (obj->getObjectType() == object_moving) {
-            IO_MovingObject * movingobject = (IO_MovingObject *)obj.get();
+        if (auto* movingobject = dynamic_cast<IO_MovingObject*>(obj.get())) {
             MovingObjectType type = movingobject->getMovingObjectType();
 
             if ((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
@@ -708,9 +707,7 @@ void shakeScreen()
 
     //Destroy throw blocks and flip shells over
     for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-        if (obj->getObjectType() == object_moving) {
-            IO_MovingObject * movingobject = (IO_MovingObject *)obj.get();
-
+        if (auto* movingobject = dynamic_cast<IO_MovingObject*>(obj.get())) {
             if (game_values.flags.screenshakekillinair == movingobject->inair) {
                 if (movingobject->getMovingObjectType() == movingobject_shell) {
                     CO_Shell * shell = (CO_Shell*)movingobject;
@@ -853,29 +850,27 @@ void handleObj2ObjCollisions()
         for (size_t iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
             CObject * object1 = objectcontainer[iLayer1].list()[iObject1].get();
 
-            if (object1->getObjectType() != object_moving)
+            auto* movingobject1 = dynamic_cast<IO_MovingObject*>(object1);
+            if (!movingobject1)
                 continue;
-
-            IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
 
             for (size_t iLayer2 = iLayer1; iLayer2 < 3; iLayer2++) {
                 size_t iContainerEnd2 = objectcontainer[iLayer2].list().size();
                 for (size_t iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
                     CObject * object2 = objectcontainer[iLayer2].list()[iObject2].get();
 
-                    if (object2->getObjectType() != object_moving)
+                    if (object2->isDead())
                         continue;
 
-                    IO_MovingObject * movingobject2 = (IO_MovingObject*)object2;
+                    auto* movingobject2 = dynamic_cast<IO_MovingObject*>(object2);
+                    if (!movingobject2)
+                        continue;
 
                     //if (g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()])
                     //  continue;
 
                     //if (iLayer1 == iLayer2 && iObject1 == iObject2)
                     //  continue;
-
-                    if (object2->isDead())
-                        continue;
 
                     MovingObjectType iType1 = movingobject1->getMovingObjectType();
                     MovingObjectType iType2 = movingobject2->getMovingObjectType();

@@ -90,22 +90,16 @@ void MI_MapPreview::Draw()
 
     //Draw map hazards
     for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-        ObjectType type = obj->getObjectType();
-
-        if (type == object_orbithazard) {
-            ((OMO_OrbitHazard*)obj.get())->draw(rectDst.x, rectDst.y);
-        } else if (type == object_pathhazard) {
-            ((OMO_StraightPathHazard*)obj.get())->draw(rectDst.x, rectDst.y);
-        } else if (type == object_flamecannon) {
-            ((IO_FlameCannon*)obj.get())->draw(rectDst.x, rectDst.y);
-        } else if (type == object_moving) {
-            IO_MovingObject * movingobject = (IO_MovingObject *) obj.get();
-
-            if (movingobject->getMovingObjectType() == movingobject_bulletbill) {
-                ((MO_BulletBill*)movingobject)->draw(rectDst.x, rectDst.y);
-            } else if (movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
-                ((MO_PirhanaPlant*)movingobject)->draw(rectDst.x, rectDst.y);
-            }
+        if (auto* hazard = dynamic_cast<OMO_OrbitHazard*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
+        } else if (auto* hazard = dynamic_cast<OMO_StraightPathHazard*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
+        } else if (auto* hazard = dynamic_cast<IO_FlameCannon*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
+        } else if (auto* hazard = dynamic_cast<MO_BulletBill*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
+        } else if (auto* hazard = dynamic_cast<MO_PirhanaPlant*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
         }
     }
 
