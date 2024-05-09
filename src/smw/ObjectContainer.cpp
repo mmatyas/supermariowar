@@ -1,7 +1,6 @@
 #include "ObjectContainer.h"
 
 #include "GlobalConstants.h"
-#include "RandomNumberGenerator.h"
 #include "objects/moving/MovingObject.h"
 
 #include <algorithm>
@@ -115,11 +114,4 @@ size_t CObjectContainer::countMovingTypes(MovingObjectType type) const
     }
 
     return count;
-}
-
-CObject* CObjectContainer::getRandomObject() const
-{
-    return m_list.empty()
-        ? nullptr
-        : m_list[RANDOM_INT(m_list.size())].get();
 }

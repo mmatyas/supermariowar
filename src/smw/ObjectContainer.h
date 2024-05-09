@@ -24,8 +24,6 @@ public:
     size_t countTypes(ObjectType type) const;
     size_t countMovingTypes(MovingObjectType type) const;
 
-    CObject* getRandomObject() const;
-
     const std::vector<std::unique_ptr<CObject>>& list() const { return m_list; }
 
 private:
