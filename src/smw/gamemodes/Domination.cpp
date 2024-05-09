@@ -14,6 +14,28 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 
 
+namespace {
+void adjustPlayerAreas(CObjectContainer& container, CPlayer* player, CPlayer* other)
+{
+    for (const std::unique_ptr<CObject>& obj : container.list()) {
+        auto* area = dynamic_cast<OMO_Area*>(obj.get());
+        if (!area)
+            continue;
+
+        if (area->getColorID() == other->getColorID()) {
+            if (game_values.gamemodesettings.domination.relocateondeath)
+                area->placeArea();
+
+            if (game_values.gamemodesettings.domination.stealondeath && player)
+                area->setOwner(player);
+            else if (game_values.gamemodesettings.domination.loseondeath)
+                area->reset();
+        }
+    }
+}
+} // namespace
+
+
 //Domination (capture the area blocks)
 //Touch all the dotted blocks to turn them your color
 //The more blocks you have, the faster you rack up points
@@ -47,7 +69,7 @@ void CGM_Domination::init()
 PlayerKillType CGM_Domination::playerkilledplayer(CPlayer &player, CPlayer &other, KillStyle style)
 {
     //Update areas the dead player owned
-    objectcontainer[0].adjustPlayerAreas(&player, &other);
+    adjustPlayerAreas(objectcontainer[0], &player, &other);
 
     return PlayerKillType::Normal;
 }
@@ -57,7 +79,7 @@ PlayerKillType CGM_Domination::playerkilledself(CPlayer &player, KillStyle style
     CGameMode::playerkilledself(player, style);
 
     //Update areas the dead player owned
-    objectcontainer[0].adjustPlayerAreas(NULL, &player);
+    adjustPlayerAreas(objectcontainer[0], nullptr, &player);
 
     return PlayerKillType::Normal;
 }

@@ -13,6 +13,26 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 
 
+namespace {
+void removePlayerRaceGoals(CObjectContainer& container, short id, short iGoal)
+{
+    if (game_values.gamemodesettings.race.penalty == 0 && iGoal != -1)
+        return;
+
+    for (const std::unique_ptr<CObject>& obj : container.list()) {
+        auto* goal = dynamic_cast<OMO_RaceGoal*>(obj.get());
+        if (!goal)
+            continue;
+
+        if (iGoal == -1 || 2 == game_values.gamemodesettings.race.penalty ||
+            (1 == game_values.gamemodesettings.race.penalty && goal->getGoalID() == iGoal)) {
+            goal->reset(id);
+        }
+    }
+}
+} // namespace
+
+
 //Race
 //Touch all the flying blocks in order
 //Each successful curcuit you complete (before getting killed)
@@ -88,7 +108,7 @@ void CGM_Race::setNextGoal(short teamID)
 {
     if (++nextGoal[teamID] >= quantity) {
         nextGoal[teamID] = 0;
-        objectcontainer[2].removePlayerRaceGoals(teamID, -1);
+        removePlayerRaceGoals(objectcontainer[2], teamID, -1);
 
         if (!gameover) {
             score[teamID]->AdjustScore(1);
@@ -116,7 +136,7 @@ void CGM_Race::setNextGoal(short teamID)
 //Player loses control of his areas
 void CGM_Race::PenalizeRaceGoals(CPlayer &player)
 {
-    objectcontainer[2].removePlayerRaceGoals(player.getTeamID(), nextGoal[player.getTeamID()] - 1);
+    removePlayerRaceGoals(objectcontainer[2], player.getTeamID(), nextGoal[player.getTeamID()] - 1);
 
     if (2 == penalty)
         nextGoal[player.getTeamID()] = 0;

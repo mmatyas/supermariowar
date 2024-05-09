@@ -23,6 +23,39 @@ extern CEyecandyContainer eyecandy[3];
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
+
+namespace {
+void pushBombs(CObjectContainer& container, short x, short y)
+{
+    for (const std::unique_ptr<CObject>& obj : container.list()) {
+        if (obj->getObjectType() != object_moving)
+            continue;
+
+        auto* mo = static_cast<IO_MovingObject*>(obj.get());
+        if (mo->getMovingObjectType() != movingobject_bomb)
+            continue;
+
+        auto* bomb = static_cast<CO_Bomb*>(obj.get());
+        if (bomb->HasOwner())
+            continue;
+
+        int bombx = bomb->ix + (bomb->iw >> 1) - x;
+        int bomby = bomb->iy + (bomb->ih >> 1) - y;
+
+        int dist = bombx * bombx + bomby * bomby;
+
+        if (dist < 10000) {
+            if (bombx > 0)
+                bomb->velx += ((float)(RANDOM_INT(30)) / 10.0f + 4.0f);
+            else
+                bomb->velx -= ((float)(RANDOM_INT(30)) / 10.0f + 4.0f);
+
+            bomb->vely -= (float)(RANDOM_INT(30)) / 10.0f + 6.0f;
+        }
+    }
+}
+} // namespace
+
 //------------------------------------------------------------------------------
 // class sledge brother
 //------------------------------------------------------------------------------
@@ -347,7 +380,7 @@ void MO_SledgeBrother::taunt()
 
     // If this is a bomb brother, push bombs away when taunting
     if (iType == 1) {
-        objectcontainer[2].pushBombs(ix + 32, iy + 32);
+        pushBombs(objectcontainer[2], ix + 32, iy + 32);
     }
 }
 
