@@ -117,7 +117,6 @@
 #define MAXCATEGORYTRACKS       64
 
 #define MAXEYECANDY 192
-#define MAXOBJECTS  300
 #define CORPSESTAY  200
 
 #define WAITTIME        16      //delay between frames (default:16)

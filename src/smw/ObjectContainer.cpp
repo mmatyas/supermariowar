@@ -1,11 +1,12 @@
 #include "ObjectContainer.h"
 
-#include "GlobalConstants.h"
 #include "objects/moving/MovingObject.h"
 
 #include <algorithm>
 #include <limits>
 #include <cmath>
+
+#define MAXOBJECTS  300
 
 //------------------------------------------------------------------------------
 // class object_container
