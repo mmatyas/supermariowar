@@ -30,6 +30,7 @@
 #include "map.h"
 #include "MapList.h"
 #include "movingplatform.h"
+#include "MovingPlatformPaths.h"
 #include "path.h"
 #include "FileIO.h"
 #include "ResourceManager.h"
@@ -4863,22 +4864,18 @@ void loadcurrentmap()
 		short iPathType = g_map->platforms[iPlatform]->pPath->GetType();
 		g_Platforms[iPlatform].iPathType = iPathType;
 
-        if (iPathType == 0) {
-			StraightPath * path = (StraightPath*)g_map->platforms[iPlatform]->pPath;
+        if (auto* path = dynamic_cast<StraightPath*>(g_map->platforms[iPlatform]->pPath)) {
 			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
 			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
 			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
 			g_Platforms[iPlatform].iEndX = (int)(path->dPathPointX[1]);
 			g_Platforms[iPlatform].iEndY = (int)(path->dPathPointY[1]);
-        } else if (iPathType == 1) {
-			StraightPathContinuous * path = (StraightPathContinuous*)g_map->platforms[iPlatform]->pPath;
+        } else if (auto* path = dynamic_cast<StraightPathContinuous*>(g_map->platforms[iPlatform]->pPath)) {
 			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
 			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
 			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
 			g_Platforms[iPlatform].fAngle = path->dAngle;
-        } else if (iPathType == 2) {
-			EllipsePath * path = (EllipsePath*)g_map->platforms[iPlatform]->pPath;
-
+        } else if (auto* path = dynamic_cast<EllipsePath*>(g_map->platforms[iPlatform]->pPath)) {
 			g_Platforms[iPlatform].iVelocity = (short)(path->dVelocity / 0.0030f);
 			g_Platforms[iPlatform].fRadiusX = path->dRadiusX;
 			g_Platforms[iPlatform].fRadiusY = path->dRadiusY;

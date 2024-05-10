@@ -2,6 +2,7 @@
 
 #include "map.h"
 #include "movingplatform.h"
+#include "MovingPlatformPaths.h"
 #include "player.h"
 #include "TilesetManager.h"
 

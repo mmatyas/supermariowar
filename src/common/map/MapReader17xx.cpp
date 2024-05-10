@@ -3,6 +3,7 @@
 #include "GameValues.h"
 #include "map.h"
 #include "movingplatform.h"
+#include "MovingPlatformPaths.h"
 #include "FileIO.h"
 #include "TilesetManager.h"
 
