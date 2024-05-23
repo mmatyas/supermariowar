@@ -45,6 +45,8 @@ add_library(CommonFiles STATIC
     MapList.cpp
     MapList.h
     MatchTypes.h
+    MovingPlatformPaths.h
+    MovingPlatformPaths.cpp
     ObjectBase.cpp
     ObjectBase.h
     path.cpp
