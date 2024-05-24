@@ -233,7 +233,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
     }
 }
 
-void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short startY, short endX, short endY, float angle, float radiusX, float radiusY, short iSize, short iPlatformWidth, short iPlatformHeight, bool fDrawPlatform, bool fDrawShadow)
+void DrawPlatform(PlatformPathType pathtype, TilesetTile ** tiles, short startX, short startY, short endX, short endY, float angle, float radiusX, float radiusY, short iSize, short iPlatformWidth, short iPlatformHeight, bool fDrawPlatform, bool fDrawShadow)
 {
     short iStartX = startX >> iSize;
     short iStartY = startY >> iSize;
@@ -254,7 +254,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                 int iDstX = 0;
                 int iDstY = 0;
 
-                if (pathtype == 2) {
+                if (pathtype == PlatformPathType::Ellipse) {
                     iDstX = iStartX + (iPlatformX << iSizeShift) + (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1));
                     iDstY = iStartY + (iPlatformY << iSizeShift) + (short)(fRadiusY * sin(angle)) - (iPlatformHeight << (iSizeShift - 1));
                 } else {
@@ -300,7 +300,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
     SDL_Rect rPathSrc = {iPlatformPathDotOffset[iSize], 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rPathDst;
 
-    if (pathtype == 0) { //line segment
+    if (pathtype == PlatformPathType::Straight) {
         if (fDrawShadow) {
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
@@ -337,7 +337,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             dX += dIncrementX;
             dY += dIncrementY;
         }
-    } else if (pathtype == 1) { //continuous straight path
+    } else if (pathtype == PlatformPathType::StraightContinuous) {
         if (fDrawShadow) {
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
@@ -384,7 +384,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             dX += dIncrementX;
             dY += dIncrementY;
         }
-    } else if (pathtype == 2) { //ellipse
+    } else if (pathtype == PlatformPathType::Ellipse) {
         //Calculate the starting position
         if (fDrawShadow) {
             short iEllipseStartX = (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1)) + iStartX;
@@ -991,30 +991,27 @@ void CMap::saveMap(const std::string& file)
 
         mapfile.write_i32(platforms[iPlatform]->iDrawLayer);
 
-        short iPathType = platforms[iPlatform]->pPath->iType;
+        short iPathType = static_cast<short>(platforms[iPlatform]->pPath->typeId());
         mapfile.write_i32(iPathType);
 
-        if (iPathType == 0) {
-            StraightPath * path = (StraightPath*)platforms[iPlatform]->pPath;
-            mapfile.write_float(path->dPathPointX[0]);
-            mapfile.write_float(path->dPathPointY[0]);
-            mapfile.write_float(path->dPathPointX[1]);
-            mapfile.write_float(path->dPathPointY[1]);
-            mapfile.write_float(path->dVelocity);
-        } else if (iPathType == 1) {
-            StraightPathContinuous * path = (StraightPathContinuous*)platforms[iPlatform]->pPath;
-            mapfile.write_float(path->dPathPointX[0]);
-            mapfile.write_float(path->dPathPointY[0]);
-            mapfile.write_float(path->dAngle);
-            mapfile.write_float(path->dVelocity);
-        } else if (iPathType == 2) { //elliptical path
-            EllipsePath * path = (EllipsePath*)platforms[iPlatform]->pPath;
-            mapfile.write_float(path->dRadiusX);
-            mapfile.write_float(path->dRadiusY);
-            mapfile.write_float(path->dPathPointX[0]);
-            mapfile.write_float(path->dPathPointY[0]);
-            mapfile.write_float(path->dAngle[0]);
-            mapfile.write_float(path->dVelocity);
+        if (auto* path = dynamic_cast<StraightPath*>(platforms[iPlatform]->pPath)) {
+            mapfile.write_float(path->m_startPos.x);
+            mapfile.write_float(path->m_startPos.y);
+            mapfile.write_float(path->m_endPos.x);
+            mapfile.write_float(path->m_endPos.y);
+            mapfile.write_float(path->m_speed);
+        } else if (auto* path = dynamic_cast<StraightPathContinuous*>(platforms[iPlatform]->pPath)) {
+            mapfile.write_float(path->m_startPos.x);
+            mapfile.write_float(path->m_startPos.y);
+            mapfile.write_float(path->m_angle);
+            mapfile.write_float(path->m_speed);
+        } else if (auto* path = dynamic_cast<EllipsePath*>(platforms[iPlatform]->pPath)) {
+            mapfile.write_float(path->m_radius.x);
+            mapfile.write_float(path->m_radius.y);
+            mapfile.write_float(path->m_startPos.x);
+            mapfile.write_float(path->m_startPos.y);
+            mapfile.write_float(path->m_angle[0]);
+            mapfile.write_float(path->m_speed);
         }
     }
 
@@ -1755,15 +1752,12 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
         MovingPlatform * platform = platforms[iPlatform];
         MovingPlatformPath * basepath = platform->pPath;
 
-        if (basepath->iType == 0) {
-            StraightPath * path = (StraightPath*) basepath;
-            DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, ((short)path->dPathPointX[1]) << 1, ((short)path->dPathPointY[1]) << 1, 0.0f, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
-        } else if (basepath->iType == 1) {
-            StraightPathContinuous * path = (StraightPathContinuous*) basepath;
-            DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, 0, 0, path->dAngle, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
-        } else if (basepath->iType == 2) {
-            EllipsePath * path = (EllipsePath*) basepath;
-            DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, 0, 0, path->dStartAngle, path->dRadiusX * 2, path->dRadiusY * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+        if (auto* path = dynamic_cast<StraightPath*>(basepath)) {
+            DrawPlatform(path->typeId(), platform->iTileData, path->m_startPos.x * 2.f, path->m_startPos.y * 2.f, path->m_endPos.x * 2.f, path->m_endPos.y * 2.f, 0.0f, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+        } else if (auto* path = dynamic_cast<StraightPathContinuous*>(basepath)) {
+            DrawPlatform(path->typeId(), platform->iTileData, path->m_startPos.x * 2.f, path->m_startPos.y * 2.f, 0, 0, path->m_angle, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+        } else if (auto* path = dynamic_cast<EllipsePath*>(basepath)) {
+            DrawPlatform(path->typeId(), platform->iTileData, path->m_startPos.x * 2.f, path->m_startPos.y * 2.f, 0, 0, path->m_startAngle, path->m_radius.x * 2, path->m_radius.y * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true);
         }
     }
 

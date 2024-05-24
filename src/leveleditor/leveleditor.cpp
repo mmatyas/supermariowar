@@ -260,7 +260,7 @@ class MapPlatform
 		short iEndX;
 		short iEndY;
 
-		short iPathType;
+		PlatformPathType iPathType;
 
 		float fAngle;
 		float fRadiusX;
@@ -2393,7 +2393,7 @@ int editor_platforms()
 							iEditPlatform = event.key.keysym.sym - SDLK_1;
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
                     } else if ((PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState) && event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_3) {
-							g_Platforms[iEditPlatform].iPathType = event.key.keysym.sym - SDLK_1;
+                        g_Platforms[iEditPlatform].iPathType = static_cast<PlatformPathType>(event.key.keysym.sym - SDLK_1);
 
                         if (PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState) {
 								iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
@@ -2517,7 +2517,7 @@ int editor_platforms()
 						}
                 } else if (event.key.keysym.sym == SDLK_KP_MINUS || event.key.keysym.sym == SDLK_MINUS) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-                        if (g_Platforms[iEditPlatform].iPathType == 2) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								if (g_Platforms[iEditPlatform].iVelocity > -10)
 									g_Platforms[iEditPlatform].iVelocity--;
 
@@ -2530,7 +2530,7 @@ int editor_platforms()
 						}
                 } else if (event.key.keysym.sym == SDLK_KP_PLUS || event.key.keysym.sym == SDLK_EQUALS) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-                        if (g_Platforms[iEditPlatform].iPathType == 2) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								if (g_Platforms[iEditPlatform].iVelocity < 10)
 									g_Platforms[iEditPlatform].iVelocity++;
 
@@ -2598,7 +2598,7 @@ int editor_platforms()
                                         iClickY >= rTypeButton[iType][1].y && iClickY < rTypeButton[iType][1].y + rTypeButton[iType][1].h) {
 										ignoreclick = true;
 
-										g_Platforms[iEditPlatform].iPathType = iType;
+                                                                            g_Platforms[iEditPlatform].iPathType = static_cast<PlatformPathType>(iType);
 
                                     if (PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState) {
 											iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
@@ -2654,7 +2654,7 @@ int editor_platforms()
                     #else
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 2 && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
 								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT), CheckKey(keystate, SDLK_z) != 0, CheckKey(keystate, SDLK_c) != 0);
                         } else {
 								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
@@ -2677,9 +2677,9 @@ int editor_platforms()
                     #else
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 0) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
-                        } else if (g_Platforms[iEditPlatform].iPathType == 1 || g_Platforms[iEditPlatform].iPathType == 2) {
+                        } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous || g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								UpdatePlatformPathAngle(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
 							}
 						}
@@ -2723,7 +2723,7 @@ int editor_platforms()
                     #else
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 2 && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
 								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT), CheckKey(keystate, SDLK_z) != 0, CheckKey(keystate, SDLK_c) != 0);
                         } else {
 								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
@@ -2734,9 +2734,9 @@ int editor_platforms()
                     #else
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 0) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
-                        } else if (g_Platforms[iEditPlatform].iPathType == 1 || g_Platforms[iEditPlatform].iPathType == 2) {
+                        } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous || g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								UpdatePlatformPathAngle(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
 							}
 						}
@@ -2816,7 +2816,7 @@ int editor_platforms()
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[+/-] Velocity  [y] Draw Layer");
 			draw_platform(iEditPlatform, PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState);
 
-            if (g_Platforms[iEditPlatform].iPathType == 2) {
+            if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 				short iVelMarkerX = 198 + (g_Platforms[iEditPlatform].iVelocity + 10) * 12;
 
 				SDL_Rect rVel[2] = {{0, 400, 244, 17},{198, 10, 244, 17}};
@@ -2843,19 +2843,19 @@ int editor_platforms()
 			rm->spr_number_icons.draw(619, 5, g_Platforms[iEditPlatform].iDrawLayer << 4, 48, 16, 16);
 
         } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-            if (g_Platforms[iEditPlatform].iPathType == 0) { //line segment path
+            if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) { //line segment path
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
 				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
 
 				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Edit Path");
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[esc] Exit  [LMB] Set Start Point  [RMB] Set End Point [t] Path Type");
-            } else if (g_Platforms[iEditPlatform].iPathType == 1) { //continuous path
+            } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous) { //continuous path
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
 				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
 
 				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Edit Path: [esc] Exit  [LMB] Set Start Point  [RMB] Set Angle");
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[SHIFT + LMB] Location Snap [SHIFT + RMB] Angle Snap [t] Path Type");
-            } else if (g_Platforms[iEditPlatform].iPathType == 2) { //ellipse path
+            } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) { //ellipse path
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
 				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
 
@@ -4857,35 +4857,28 @@ void loadcurrentmap()
 			}
 		}
 
-		short iDrawLayer = g_map->platforms[iPlatform]->iDrawLayer;
-		g_Platforms[iPlatform].iDrawLayer = iDrawLayer;
+		g_Platforms[iPlatform].iDrawLayer = g_map->platforms[iPlatform]->iDrawLayer;
+		g_Platforms[iPlatform].iPathType = g_map->platforms[iPlatform]->pPath->typeId();
 
-		short iPathType = g_map->platforms[iPlatform]->pPath->GetType();
-		g_Platforms[iPlatform].iPathType = iPathType;
-
-        if (iPathType == 0) {
-			StraightPath * path = (StraightPath*)g_map->platforms[iPlatform]->pPath;
-			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
-			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
-			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
-			g_Platforms[iPlatform].iEndX = (int)(path->dPathPointX[1]);
-			g_Platforms[iPlatform].iEndY = (int)(path->dPathPointY[1]);
-        } else if (iPathType == 1) {
-			StraightPathContinuous * path = (StraightPathContinuous*)g_map->platforms[iPlatform]->pPath;
-			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
-			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
-			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
-			g_Platforms[iPlatform].fAngle = path->dAngle;
-        } else if (iPathType == 2) {
-			EllipsePath * path = (EllipsePath*)g_map->platforms[iPlatform]->pPath;
-
-			g_Platforms[iPlatform].iVelocity = (short)(path->dVelocity / 0.0030f);
-			g_Platforms[iPlatform].fRadiusX = path->dRadiusX;
-			g_Platforms[iPlatform].fRadiusY = path->dRadiusY;
-			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
-			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
-			g_Platforms[iPlatform].fAngle = path->dStartAngle;
-		}
+                if (auto* path = dynamic_cast<StraightPath*>(g_map->platforms[iPlatform]->pPath)) {
+                    g_Platforms[iPlatform].iVelocity = (int)(path->m_speed * 4.0f);
+                    g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
+                    g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
+                    g_Platforms[iPlatform].iEndX = (int)(path->m_endPos.x);
+                    g_Platforms[iPlatform].iEndY = (int)(path->m_endPos.y);
+                } else if (auto* path = dynamic_cast<StraightPathContinuous*>(g_map->platforms[iPlatform]->pPath)) {
+                    g_Platforms[iPlatform].iVelocity = (int)(path->m_speed * 4.0f);
+                    g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
+                    g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
+                    g_Platforms[iPlatform].fAngle = path->m_angle;
+                } else if (auto* path = dynamic_cast<EllipsePath*>(g_map->platforms[iPlatform]->pPath)) {
+                    g_Platforms[iPlatform].iVelocity = (short)(path->m_speed / 0.0030f);
+                    g_Platforms[iPlatform].fRadiusX = path->m_radius.x;
+                    g_Platforms[iPlatform].fRadiusY = path->m_radius.y;
+                    g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
+                    g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
+                    g_Platforms[iPlatform].fAngle = path->m_startAngle;
+                }
 
 		g_Platforms[iPlatform].UpdatePreview();
 	}
@@ -4957,19 +4950,20 @@ void insert_platforms_into_map()
 
 		MovingPlatformPath * path = NULL;
 
-        if (g_Platforms[iPlatform].iPathType == 0) {
-			float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.26f;
-			float fEndX = (float)(g_Platforms[iPlatform].iEndX);
-			float fEndY = (float)(g_Platforms[iPlatform].iEndY);
-
-			path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, false);
-        } else if (g_Platforms[iPlatform].iPathType == 1) {
-			float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.26f;
-			path = new StraightPathContinuous(fVelocity, fStartX, fStartY, g_Platforms[iPlatform].fAngle, false);
-        } else if (g_Platforms[iPlatform].iPathType == 2) {
-			float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.0030f;
-			path = new EllipsePath(fVelocity, g_Platforms[iPlatform].fAngle, g_Platforms[iPlatform].fRadiusX, g_Platforms[iPlatform].fRadiusY, fStartX, fStartY, false);
-		}
+                if (g_Platforms[iPlatform].iPathType == PlatformPathType::Straight) {
+                    float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.26f;
+                    float fEndX = (float)(g_Platforms[iPlatform].iEndX);
+                    float fEndY = (float)(g_Platforms[iPlatform].iEndY);
+                    path = new StraightPath(fVelocity, {fStartX, fStartY}, {fEndX, fEndY}, false);
+                } else if (g_Platforms[iPlatform].iPathType == PlatformPathType::StraightContinuous) {
+                    float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.26f;
+                    path = new StraightPathContinuous(fVelocity, {fStartX, fStartY}, g_Platforms[iPlatform].fAngle, false);
+                } else if (g_Platforms[iPlatform].iPathType == PlatformPathType::Ellipse) {
+                    float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.0030f;
+                    float radiusX = g_Platforms[iPlatform].fRadiusX;
+                    float radiusY = g_Platforms[iPlatform].fRadiusY;
+                    path = new EllipsePath(fVelocity, g_Platforms[iPlatform].fAngle, {radiusX, radiusY}, {fStartX, fStartY}, false);
+                }
 
 		g_map->AddPermanentPlatform(new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, false));
 	}

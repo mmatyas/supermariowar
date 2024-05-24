@@ -65,6 +65,7 @@ add_library(CommonFiles STATIC
     uicontrol.h
     uimenu.cpp
     uimenu.h
+    math/Vec2.h
     ui/MenuCode.h
     ui/MI_Button.cpp
     ui/MI_Button.h
