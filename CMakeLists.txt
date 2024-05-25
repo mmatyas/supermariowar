@@ -23,6 +23,7 @@ option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet, ya
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" ON)
 option(SDL2_USE_MIXERX "(SDL2) Use SDL Mixer X instead of SDL Mixer" OFF)
 option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
+option(BUILD_TESTS "Build the unit tests" ON)
 
 set(SMW_INSTALL_PORTABLE_DEFAULT OFF)
 if(WIN32)
@@ -281,7 +282,7 @@ if(NOT NO_NETWORK)
 	add_subdirectory(src/server)
 endif()
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTS)
     include(CTest)
     include(dependencies/doctest/doctest.cmake)
     add_subdirectory(dependencies/doctest)

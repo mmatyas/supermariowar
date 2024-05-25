@@ -25,6 +25,7 @@ jobs:
           -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/mingw_toolchain.cmake
           -DUSE_PNG_SAVE=ON
           -DUSE_SDL2_LIBS=ON
+          -DBUILD_TESTS=OFF
           -DSDL2_USE_MIXERX=ON
           -DCMAKE_CXX_FLAGS=-fdiagnostics-color=always
       - name: Build
