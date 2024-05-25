@@ -18,8 +18,8 @@ extern std::vector<CPlayer*> players;
 MovingPlatformPath::MovingPlatformPath(float speed, Vec2f startPos, Vec2f endPos, bool preview)
     : m_startPos(std::move(startPos))
     , m_endPos(std::move(endPos))
+    , m_speed(speed)
 {
-    dVelocity = speed;
 
     for (short type = 0; type < 2; type++) {
         dVelX[type] = 0.0f;
@@ -29,10 +29,8 @@ MovingPlatformPath::MovingPlatformPath(float speed, Vec2f startPos, Vec2f endPos
     if (preview) {
         m_startPos /= 2.f;
         m_endPos /= 2.f;
-        dVelocity /= 2.0f;
+        m_speed /= 2.0f;
     }
-
-    m_platform = nullptr;
 }
 
 void MovingPlatformPath::Reset()
@@ -52,8 +50,8 @@ void MovingPlatformPath::Reset()
 // Straight Path
 //------------------------------------------------------------------------------
 
-StraightPath::StraightPath(float vel, float startX, float startY, float endX, float endY, bool preview)
-    : MovingPlatformPath(vel, Vec2f(startX, startY), Vec2f(endX, endY), preview)
+StraightPath::StraightPath(float vel, Vec2f startPos, Vec2f endPos, bool preview)
+    : MovingPlatformPath(vel, std::move(startPos), std::move(endPos), preview)
 {
     float dWidth = m_endPos.x - m_startPos.x;
     float dHeight = m_endPos.y - m_startPos.y;
@@ -79,7 +77,7 @@ StraightPath::StraightPath(float vel, float startX, float startY, float endX, fl
         dLength = sqrt(dHeight * dHeight + dWidth * dWidth);
     }
 
-    iSteps = (short)(dLength / dVelocity) + 1;
+    iSteps = (short)(dLength / m_speed) + 1;
 
     for (short type = 0; type < 2; type++)
         SetVelocity(type);
@@ -107,11 +105,11 @@ bool StraightPath::Move(short type)
 void StraightPath::SetVelocity(short type)
 {
     if (m_goalPoint[type] == &m_endPos) {
-        dVelX[type] = dVelocity * cos(dAngle);
-        dVelY[type] = dVelocity * sin(dAngle);
+        dVelX[type] = m_speed * cos(dAngle);
+        dVelY[type] = m_speed * sin(dAngle);
     } else {
-        dVelX[type] = -dVelocity * cos(dAngle);
-        dVelY[type] = -dVelocity * sin(dAngle);
+        dVelX[type] = -m_speed * cos(dAngle);
+        dVelY[type] = -m_speed * sin(dAngle);
     }
 
            //Fix rounding errors
@@ -142,8 +140,8 @@ void StraightPath::Reset()
 // Straight Path Continuous
 //------------------------------------------------------------------------------
 
-StraightPathContinuous::StraightPathContinuous(float vel, float startX, float startY, float angle, bool preview) :
-    StraightPath(vel, startX, startY, 0.f, 0.f, preview)
+StraightPathContinuous::StraightPathContinuous(float speed, Vec2f startPos, float angle, bool preview)
+    : StraightPath(speed, std::move(startPos), Vec2f::zero(), preview)
 {
     dAngle = angle;
 
@@ -193,18 +191,15 @@ void StraightPathContinuous::Reset()
 //------------------------------------------------------------------------------
 // Ellipse Path
 //------------------------------------------------------------------------------
-EllipsePath::EllipsePath(float vel, float angle, float radiusx, float radiusy, float centerx, float centery, bool preview) :
-    MovingPlatformPath(vel, Vec2f(centerx, centery), Vec2f::zero(), preview)
+EllipsePath::EllipsePath(float vel, float angle, Vec2f radius, Vec2f centerPos, bool preview)
+    : MovingPlatformPath(vel, std::move(centerPos), Vec2f::zero(), preview)
+    , m_radius(std::move(radius))
 {
     dStartAngle = angle;
 
     if (preview) {
-        dRadiusX = radiusx / 2.0f;
-        dRadiusY = radiusy / 2.0f;
-        dVelocity *= 2.0f;
-    } else {
-        dRadiusX = radiusx;
-        dRadiusY = radiusy;
+        m_radius /= 2.f;
+        m_speed *= 2.f;
     }
 
     for (short type = 0; type < 2; type++) {
@@ -218,9 +213,9 @@ bool EllipsePath::Move(short type)
     float dOldCurrentX = dCurrentX[type];
     float dOldCurrentY = dCurrentY[type];
 
-    dAngle[type] += dVelocity;
+    dAngle[type] += m_speed;
 
-    if (dVelocity < 0.0f) {
+    if (m_speed < 0.0f) {
         while (dAngle[type] < 0.0f)
             dAngle[type] += TWO_PI;
     } else {
@@ -238,8 +233,8 @@ bool EllipsePath::Move(short type)
 
 void EllipsePath::SetPosition(short type)
 {
-    dCurrentX[type] = dRadiusX * cos(dAngle[type]) + m_startPos.x;
-    dCurrentY[type] = dRadiusY * sin(dAngle[type]) + m_startPos.y;
+    dCurrentX[type] = m_radius.x * cos(dAngle[type]) + m_startPos.x;
+    dCurrentY[type] = m_radius.y * sin(dAngle[type]) + m_startPos.y;
 }
 
 void EllipsePath::Reset()
@@ -288,7 +283,7 @@ void FallingPath::Reset()
         dCurrentY[type] = m_startPos.y;
     }
 
-           //Skip correctly setting the path "shadow" as a perf optimization
-           //This does have the risk of a player spawning inside a falling donut block by accident
-           //MovingPlatformPath::Reset();
+    //Skip correctly setting the path "shadow" as a perf optimization
+    //This does have the risk of a player spawning inside a falling donut block by accident
+    //MovingPlatformPath::Reset();
 }
