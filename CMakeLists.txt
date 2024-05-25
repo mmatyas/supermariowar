@@ -281,6 +281,13 @@ if(NOT NO_NETWORK)
 	add_subdirectory(src/server)
 endif()
 
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    include(CTest)
+    include(dependencies/doctest/doctest.cmake)
+    add_subdirectory(dependencies/doctest)
+    add_subdirectory(tests)
+endif()
+
 #-----------------------------------------------------------------------------
 #
 # Packaging

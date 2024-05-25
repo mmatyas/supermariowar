@@ -42,6 +42,7 @@ add_library(CommonFiles STATIC
     map/MapReader16xx.cpp
     map/MapReader17xx.cpp
     map/MapReader18xx.cpp
+    math/Vec2.h
     MapList.cpp
     MapList.h
     MatchTypes.h

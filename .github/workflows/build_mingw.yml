@@ -20,7 +20,8 @@ jobs:
 
       - name: Configure
         run: cmake
-          -S . -B build -G Ninja
+          -B build
+          -G Ninja
           -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/mingw_toolchain.cmake
           -DUSE_PNG_SAVE=ON
           -DUSE_SDL2_LIBS=ON
