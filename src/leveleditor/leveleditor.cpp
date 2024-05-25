@@ -4870,14 +4870,14 @@ void loadcurrentmap()
 			g_Platforms[iPlatform].iVelocity = (int)(path->m_speed * 4.0f);
 			g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
 			g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
-			g_Platforms[iPlatform].fAngle = path->dAngle;
+			g_Platforms[iPlatform].fAngle = path->m_angle;
         } else if (auto* path = dynamic_cast<EllipsePath*>(g_map->platforms[iPlatform]->pPath)) {
 			g_Platforms[iPlatform].iVelocity = (short)(path->m_speed / 0.0030f);
 			g_Platforms[iPlatform].fRadiusX = path->m_radius.x;
 			g_Platforms[iPlatform].fRadiusY = path->m_radius.y;
 			g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
 			g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
-			g_Platforms[iPlatform].fAngle = path->dStartAngle;
+			g_Platforms[iPlatform].fAngle = path->m_startAngle;
 		}
 
 		g_Platforms[iPlatform].UpdatePreview();

@@ -60,7 +60,7 @@ protected:
     short iSteps;
     Vec2f* m_goalPoint[2] = {&m_startPos, &m_startPos};
 
-    float dAngle;
+    float m_angle;
 
     friend class MovingPlatform;
     friend class CMap;
@@ -78,7 +78,7 @@ public:
     void Reset() override;
 
 private:
-    float dEdgeX, dEdgeY;
+    Vec2f m_edge;
 
     friend class MovingPlatform;
     friend class CMap;
@@ -98,8 +98,8 @@ public:
 
 private:
     Vec2f m_radius;
-    float dAngle[2];
-    float dStartAngle;
+    float m_startAngle;
+    float m_angle[2];
 
     friend class MovingPlatform;
     friend class CMap;
@@ -110,7 +110,7 @@ private:
 
 class FallingPath : public MovingPlatformPath {
 public:
-    FallingPath(float startX, float startY);
+    FallingPath(Vec2f startPos);
 
     PlatformPathType typeId() const override { return PlatformPathType::Falling; }
     bool Move(short type) override;

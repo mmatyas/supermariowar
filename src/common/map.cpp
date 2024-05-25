@@ -1003,14 +1003,14 @@ void CMap::saveMap(const std::string& file)
         } else if (auto* path = dynamic_cast<StraightPathContinuous*>(platforms[iPlatform]->pPath)) {
             mapfile.write_float(path->m_startPos.x);
             mapfile.write_float(path->m_startPos.y);
-            mapfile.write_float(path->dAngle);
+            mapfile.write_float(path->m_angle);
             mapfile.write_float(path->m_speed);
         } else if (auto* path = dynamic_cast<EllipsePath*>(platforms[iPlatform]->pPath)) {
             mapfile.write_float(path->m_radius.x);
             mapfile.write_float(path->m_radius.y);
             mapfile.write_float(path->m_startPos.x);
             mapfile.write_float(path->m_startPos.y);
-            mapfile.write_float(path->dAngle[0]);
+            mapfile.write_float(path->m_angle[0]);
             mapfile.write_float(path->m_speed);
         }
     }
@@ -1755,9 +1755,9 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
         if (auto* path = dynamic_cast<StraightPath*>(basepath)) {
             DrawPlatform(path->typeId(), platform->iTileData, ((short)path->m_startPos.x) << 1, ((short)path->m_startPos.y) << 1, ((short)path->m_endPos.x) << 1, ((short)path->m_endPos.y) << 1, 0.0f, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
         } else if (auto* path = dynamic_cast<StraightPathContinuous*>(basepath)) {
-            DrawPlatform(path->typeId(), platform->iTileData, ((short)path->m_startPos.x) << 1, ((short)path->m_startPos.y) << 1, 0, 0, path->dAngle, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+            DrawPlatform(path->typeId(), platform->iTileData, ((short)path->m_startPos.x) << 1, ((short)path->m_startPos.y) << 1, 0, 0, path->m_angle, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
         } else if (auto* path = dynamic_cast<EllipsePath*>(basepath)) {
-            DrawPlatform(path->typeId(), platform->iTileData, ((short)path->m_startPos.x) << 1, ((short)path->m_startPos.y) << 1, 0, 0, path->dStartAngle, path->m_radius.x * 2, path->m_radius.y * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+            DrawPlatform(path->typeId(), platform->iTileData, ((short)path->m_startPos.x) << 1, ((short)path->m_startPos.y) << 1, 0, 0, path->m_startAngle, path->m_radius.x * 2, path->m_radius.y * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true);
         }
     }
 
