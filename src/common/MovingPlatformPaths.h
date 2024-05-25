@@ -28,15 +28,14 @@ public:
     }
 
 protected:
-    MovingPlatform* m_platform;
+    MovingPlatform* m_platform = nullptr;
 
     float m_speed;
-    float dVelX[2], dVelY[2];
-
     Vec2f m_startPos;
     Vec2f m_endPos;
 
-    float dCurrentX[2], dCurrentY[2];
+    Vec2f m_velocity[2];
+    Vec2f m_currentPos[2];
 
     friend class MovingPlatform;
     friend class CMap;
@@ -47,7 +46,7 @@ protected:
 
 class StraightPath : public MovingPlatformPath {
 public:
-    StraightPath(float vel, Vec2f startPos, Vec2f endPos, bool preview);
+    StraightPath(float speed, Vec2f startPos, Vec2f endPos, bool preview);
 
     PlatformPathType typeId() const override { return PlatformPathType::Straight; }
     bool Move(short type) override;
@@ -56,11 +55,11 @@ public:
 protected:
     void SetVelocity(short type);
 
-    short iOnStep[2];
-    short iSteps;
-    Vec2f* m_goalPoint[2] = {&m_startPos, &m_startPos};
-
     float m_angle;
+    short m_steps;
+
+    unsigned short m_currentStep[2] = {0, 0};
+    Vec2f* m_goalPoint[2] = {&m_startPos, &m_startPos};
 
     friend class MovingPlatform;
     friend class CMap;
@@ -71,7 +70,7 @@ protected:
 
 class StraightPathContinuous : public StraightPath {
 public:
-    StraightPathContinuous(float vel, Vec2f startPos, float angle, bool preview);
+    StraightPathContinuous(float speed, Vec2f startPos, float angle, bool preview);
 
     PlatformPathType typeId() const override { return PlatformPathType::StraightContinuous; }
     bool Move(short type) override;
@@ -89,7 +88,7 @@ private:
 
 class EllipsePath : public MovingPlatformPath {
 public:
-    EllipsePath(float vel, float dAngle, Vec2f radius, Vec2f centerPos, bool preview);
+    EllipsePath(float speed, float dAngle, Vec2f radius, Vec2f centerPos, bool preview);
 
     PlatformPathType typeId() const override { return PlatformPathType::Ellipse; }
     bool Move(short type) override;
