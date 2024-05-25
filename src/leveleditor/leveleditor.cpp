@@ -4862,21 +4862,21 @@ void loadcurrentmap()
 
         if (auto* path = dynamic_cast<StraightPath*>(g_map->platforms[iPlatform]->pPath)) {
 			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
-			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
-			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
-			g_Platforms[iPlatform].iEndX = (int)(path->dPathPointX[1]);
-			g_Platforms[iPlatform].iEndY = (int)(path->dPathPointY[1]);
+			g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
+			g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
+			g_Platforms[iPlatform].iEndX = (int)(path->m_endPos.x);
+			g_Platforms[iPlatform].iEndY = (int)(path->m_endPos.y);
         } else if (auto* path = dynamic_cast<StraightPathContinuous*>(g_map->platforms[iPlatform]->pPath)) {
 			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
-			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
-			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
+			g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
+			g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
 			g_Platforms[iPlatform].fAngle = path->dAngle;
         } else if (auto* path = dynamic_cast<EllipsePath*>(g_map->platforms[iPlatform]->pPath)) {
 			g_Platforms[iPlatform].iVelocity = (short)(path->dVelocity / 0.0030f);
 			g_Platforms[iPlatform].fRadiusX = path->dRadiusX;
 			g_Platforms[iPlatform].fRadiusY = path->dRadiusY;
-			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
-			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
+			g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
+			g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
 			g_Platforms[iPlatform].fAngle = path->dStartAngle;
 		}
 

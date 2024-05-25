@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math/Vec2.h"
+
 class MovingPlatform;
 
 
@@ -14,7 +16,7 @@ enum class PlatformPathType: unsigned char {
 
 class MovingPlatformPath {
 public:
-    MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool preview);
+    MovingPlatformPath(float speed, Vec2f startPos, Vec2f endPos, bool preview);
     virtual ~MovingPlatformPath() = default;
 
     virtual PlatformPathType typeId() const = 0;
@@ -31,7 +33,8 @@ protected:
     float dVelocity;
     float dVelX[2], dVelY[2];
 
-    float dPathPointX[2], dPathPointY[2];
+    Vec2f m_startPos;
+    Vec2f m_endPos;
 
     float dCurrentX[2], dCurrentY[2];
 
@@ -55,7 +58,7 @@ protected:
 
     short iOnStep[2];
     short iSteps;
-    short iGoalPoint[2];
+    Vec2f* m_goalPoint[2] = {&m_startPos, &m_startPos};
 
     float dAngle;
 
