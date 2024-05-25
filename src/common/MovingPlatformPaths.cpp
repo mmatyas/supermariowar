@@ -23,7 +23,7 @@ MovingPlatformPath::MovingPlatformPath(float speed, Vec2f startPos, Vec2f endPos
     if (preview) {
         m_startPos /= 2.f;
         m_endPos /= 2.f;
-        m_speed /= 2.0f;
+        m_speed /= 2.f;
     }
 }
 
@@ -49,7 +49,7 @@ StraightPath::StraightPath(float speed, Vec2f startPos, Vec2f endPos, bool previ
 {
     float width = m_endPos.x - m_startPos.x;
     float height = m_endPos.y - m_startPos.y;
-    float length = 0.0f;
+    float length = 0.f;
 
     if (width == 0) {
         // Lock angle to vertical
@@ -57,7 +57,7 @@ StraightPath::StraightPath(float speed, Vec2f startPos, Vec2f endPos, bool previ
         length = ::fabs(height);
     } else if (height == 0) {
         // Lock angle to horizontal
-        m_angle = (width > 0) ? 0.0f : PI;
+        m_angle = (width > 0) ? 0.f : PI;
         length = ::fabs(width);
     } else {
         m_angle = atan2(height, width);
@@ -96,10 +96,10 @@ void StraightPath::SetVelocity(short type)
 
     //Fix rounding errors
     if (::fabs(m_velocity[type].x) < 0.01f)
-        m_velocity[type].x = 0.0f;
+        m_velocity[type].x = 0.f;
 
     if (::fabs(m_velocity[type].y) < 0.01f)
-        m_velocity[type].y = 0.0f;
+        m_velocity[type].y = 0.f;
 }
 
 void StraightPath::Reset()
@@ -141,12 +141,12 @@ bool StraightPathContinuous::Move(short type)
     m_currentPos[type] += m_velocity[type];
 
     float dx = m_currentPos[type].x - (float)m_platform->iHalfWidth;
-    if (dx < 0.0f)
+    if (dx < 0.f)
         m_currentPos[type].x += m_edge.x;
     else if (dx >= m_edge.x)
         m_currentPos[type].x -= m_edge.x;
 
-    if (m_currentPos[type].y + (float)m_platform->iHalfHeight < 0.0f)
+    if (m_currentPos[type].y + (float)m_platform->iHalfHeight < 0.f)
         m_currentPos[type].y += m_edge.y + (float)m_platform->iHeight;
     else if (m_currentPos[type].y - (float)m_platform->iHalfHeight >= m_edge.y)
         m_currentPos[type].y -= m_edge.y + (float)m_platform->iHeight;
@@ -188,8 +188,8 @@ bool EllipsePath::Move(short type)
 
     m_angle[type] += m_speed;
 
-    if (m_speed < 0.0f) {
-        while (m_angle[type] < 0.0f)
+    if (m_speed < 0.f) {
+        while (m_angle[type] < 0.f)
             m_angle[type] += TWO_PI;
     } else {
         while (m_angle[type] >= TWO_PI)
@@ -224,7 +224,7 @@ void EllipsePath::Reset()
 //------------------------------------------------------------------------------
 
 FallingPath::FallingPath(Vec2f startPos)
-    : MovingPlatformPath(0.0f, std::move(startPos), Vec2f::zero(), false)
+    : MovingPlatformPath(0.f, std::move(startPos), Vec2f::zero(), false)
 {}
 
 bool FallingPath::Move(short type)

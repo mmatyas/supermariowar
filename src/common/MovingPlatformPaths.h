@@ -98,6 +98,7 @@ public:
 private:
     Vec2f m_radius;
     float m_startAngle;
+
     float m_angle[2];
 
     friend class MovingPlatform;

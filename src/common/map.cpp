@@ -1753,11 +1753,11 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
         MovingPlatformPath * basepath = platform->pPath;
 
         if (auto* path = dynamic_cast<StraightPath*>(basepath)) {
-            DrawPlatform(path->typeId(), platform->iTileData, ((short)path->m_startPos.x) << 1, ((short)path->m_startPos.y) << 1, ((short)path->m_endPos.x) << 1, ((short)path->m_endPos.y) << 1, 0.0f, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+            DrawPlatform(path->typeId(), platform->iTileData, path->m_startPos.x * 2.f, path->m_startPos.y * 2.f, path->m_endPos.x * 2.f, path->m_endPos.y * 2.f, 0.0f, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
         } else if (auto* path = dynamic_cast<StraightPathContinuous*>(basepath)) {
-            DrawPlatform(path->typeId(), platform->iTileData, ((short)path->m_startPos.x) << 1, ((short)path->m_startPos.y) << 1, 0, 0, path->m_angle, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+            DrawPlatform(path->typeId(), platform->iTileData, path->m_startPos.x * 2.f, path->m_startPos.y * 2.f, 0, 0, path->m_angle, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
         } else if (auto* path = dynamic_cast<EllipsePath*>(basepath)) {
-            DrawPlatform(path->typeId(), platform->iTileData, ((short)path->m_startPos.x) << 1, ((short)path->m_startPos.y) << 1, 0, 0, path->m_startAngle, path->m_radius.x * 2, path->m_radius.y * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+            DrawPlatform(path->typeId(), platform->iTileData, path->m_startPos.x * 2.f, path->m_startPos.y * 2.f, 0, 0, path->m_startAngle, path->m_radius.x * 2, path->m_radius.y * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true);
         }
     }
 
