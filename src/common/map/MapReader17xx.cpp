@@ -302,43 +302,43 @@ void MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile,
 
 MovingPlatformPath* MapReader1700::read_platform_path_details(BinaryFile& mapfile, short iPathType, bool fPreview)
 {
-    MovingPlatformPath* path = NULL;
     if (iPathType == 0) { //segment path
-        float fStartX = mapfile.read_float();
-        float fStartY = mapfile.read_float();
-        float fEndX = mapfile.read_float();
-        float fEndY = mapfile.read_float();
-        float fVelocity = mapfile.read_float();
+        float startX = mapfile.read_float();
+        float startY = mapfile.read_float();
+        float endX = mapfile.read_float();
+        float endY = mapfile.read_float();
+        float speed = mapfile.read_float();
 
-        path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, fPreview);
+        return new StraightPath(speed, Vec2f(startX, startY), Vec2f(endX, endY), fPreview);
 
         //printf("Read segment path\n");
-        //printf("StartX: %.2f StartY:%.2f EndX:%.2f EndY:%.2f Velocity:%.2f\n", fStartX, fStartY, fEndX, fEndY, fVelocity);
-    } else if (iPathType == 1) { //continuous path
-        float fStartX = mapfile.read_float();
-        float fStartY = mapfile.read_float();
-        float fAngle = mapfile.read_float();
-        float fVelocity = mapfile.read_float();
+        //printf("StartX: %.2f StartY:%.2f EndX:%.2f EndY:%.2f Velocity:%.2f\n", startX, startY, endX, endY, speed);
+    }
+    if (iPathType == 1) { //continuous path
+        float startX = mapfile.read_float();
+        float startY = mapfile.read_float();
+        float angle = mapfile.read_float();
+        float speed = mapfile.read_float();
 
-        path = new StraightPathContinuous(fVelocity, fStartX, fStartY, fAngle, fPreview);
+        return new StraightPathContinuous(speed, Vec2f(startX, startY), angle, fPreview);
 
         //printf("Read continuous path\n");
-        //printf("StartX: %.2f StartY:%.2f Angle:%.2f Velocity:%.2f\n", fStartX, fStartY, fAngle, fVelocity);
-    } else if (iPathType == 2) { //elliptical path
-        float fRadiusX = mapfile.read_float();
-        float fRadiusY = mapfile.read_float();
-        float fCenterX = mapfile.read_float();
-        float fCenterY = mapfile.read_float();
-        float fAngle = mapfile.read_float();
-        float fVelocity = mapfile.read_float();
+        //printf("StartX: %.2f StartY:%.2f Angle:%.2f Velocity:%.2f\n", startX, startY, angle, speed);
+    }
+    if (iPathType == 2) { //elliptical path
+        float radiusX = mapfile.read_float();
+        float radiusY = mapfile.read_float();
+        float centerX = mapfile.read_float();
+        float centerY = mapfile.read_float();
+        float angle = mapfile.read_float();
+        float speed = mapfile.read_float();
 
-        path = new EllipsePath(fVelocity, fAngle, fRadiusX, fRadiusY, fCenterX, fCenterY, fPreview);
+        return new EllipsePath(speed, angle, Vec2f(radiusX, radiusY), Vec2f(centerX, centerY), fPreview);
 
         //printf("Read elliptical path\n");
-        //printf("CenterX: %.2f CenterY:%.2f Angle:%.2f RadiusX: %.2f RadiusY: %.2f Velocity:%.2f\n", fCenterX, fCenterY, fAngle, fRadiusX, fRadiusY, fVelocity);
+        //printf("CenterX: %.2f CenterY:%.2f Angle:%.2f RadiusX: %.2f RadiusY: %.2f Velocity:%.2f\n", centerX, centerY, angle, radiusX, radiusY, speed);
     }
-
-    return path;
+    return nullptr;
 }
 
 bool MapReader1700::load(CMap& map, BinaryFile& mapfile, ReadType readtype)

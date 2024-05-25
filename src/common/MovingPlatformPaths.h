@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math/Vec2.h"
+
 class MovingPlatform;
 
 
@@ -14,7 +16,7 @@ enum class PlatformPathType: unsigned char {
 
 class MovingPlatformPath {
 public:
-    MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool preview);
+    MovingPlatformPath(float speed, Vec2f startPos, Vec2f endPos, bool preview);
     virtual ~MovingPlatformPath() = default;
 
     virtual PlatformPathType typeId() const = 0;
@@ -22,18 +24,18 @@ public:
     virtual void Reset();
 
     void SetPlatform(MovingPlatform* platform) {
-        pPlatform = platform;
+        m_platform = platform;
     }
 
 protected:
-    MovingPlatform* pPlatform;
+    MovingPlatform* m_platform = nullptr;
 
-    float dVelocity;
-    float dVelX[2], dVelY[2];
+    float m_speed;
+    Vec2f m_startPos;
+    Vec2f m_endPos;
 
-    float dPathPointX[2], dPathPointY[2];
-
-    float dCurrentX[2], dCurrentY[2];
+    Vec2f m_velocity[2];
+    Vec2f m_currentPos[2];
 
     friend class MovingPlatform;
     friend class CMap;
@@ -44,7 +46,7 @@ protected:
 
 class StraightPath : public MovingPlatformPath {
 public:
-    StraightPath(float vel, float startX, float startY, float endX, float endY, bool preview);
+    StraightPath(float speed, Vec2f startPos, Vec2f endPos, bool preview);
 
     PlatformPathType typeId() const override { return PlatformPathType::Straight; }
     bool Move(short type) override;
@@ -53,11 +55,11 @@ public:
 protected:
     void SetVelocity(short type);
 
-    short iOnStep[2];
-    short iSteps;
-    short iGoalPoint[2];
+    float m_angle;
+    short m_steps;
 
-    float dAngle;
+    unsigned short m_currentStep[2] = {0, 0};
+    Vec2f* m_goalPoint[2] = {&m_startPos, &m_startPos};
 
     friend class MovingPlatform;
     friend class CMap;
@@ -68,14 +70,14 @@ protected:
 
 class StraightPathContinuous : public StraightPath {
 public:
-    StraightPathContinuous(float vel, float startX, float startY, float angle, bool preview);
+    StraightPathContinuous(float speed, Vec2f startPos, float angle, bool preview);
 
     PlatformPathType typeId() const override { return PlatformPathType::StraightContinuous; }
     bool Move(short type) override;
     void Reset() override;
 
 private:
-    float dEdgeX, dEdgeY;
+    Vec2f m_edge;
 
     friend class MovingPlatform;
     friend class CMap;
@@ -86,7 +88,7 @@ private:
 
 class EllipsePath : public MovingPlatformPath {
 public:
-    EllipsePath(float vel, float dAngle, float dRadiusX, float dRadiusY, float dCenterX, float dCenterY, bool preview);
+    EllipsePath(float speed, float dAngle, Vec2f radius, Vec2f centerPos, bool preview);
 
     PlatformPathType typeId() const override { return PlatformPathType::Ellipse; }
     bool Move(short type) override;
@@ -94,8 +96,10 @@ public:
     void Reset() override;
 
 private:
-    float dRadiusX, dRadiusY;
-    float dAngle[2], dStartAngle;
+    Vec2f m_radius;
+    float m_startAngle;
+
+    float m_angle[2];
 
     friend class MovingPlatform;
     friend class CMap;
@@ -106,7 +110,7 @@ private:
 
 class FallingPath : public MovingPlatformPath {
 public:
-    FallingPath(float startX, float startY);
+    FallingPath(Vec2f startPos);
 
     PlatformPathType typeId() const override { return PlatformPathType::Falling; }
     bool Move(short type) override;
