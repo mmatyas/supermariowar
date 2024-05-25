@@ -22,11 +22,11 @@ public:
     virtual void Reset();
 
     void SetPlatform(MovingPlatform* platform) {
-        pPlatform = platform;
+        m_platform = platform;
     }
 
 protected:
-    MovingPlatform* pPlatform;
+    MovingPlatform* m_platform;
 
     float dVelocity;
     float dVelX[2], dVelY[2];

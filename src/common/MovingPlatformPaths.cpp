@@ -37,7 +37,7 @@ MovingPlatformPath::MovingPlatformPath(float vel, float startX, float startY, fl
         dVelocity /= 2.0f;
     }
 
-    pPlatform = NULL;
+    m_platform = nullptr;
 }
 
 void MovingPlatformPath::Reset()
@@ -172,16 +172,16 @@ bool StraightPathContinuous::Move(short type)
     dCurrentX[type] += dVelX[type];
     dCurrentY[type] += dVelY[type];
 
-    float dx = dCurrentX[type] - (float)pPlatform->iHalfWidth;
+    float dx = dCurrentX[type] - (float)m_platform->iHalfWidth;
     if (dx < 0.0f)
         dCurrentX[type] += dEdgeX;
     else if (dx >= dEdgeX)
         dCurrentX[type] -= dEdgeX;
 
-    if (dCurrentY[type] + (float)pPlatform->iHalfHeight < 0.0f)
-        dCurrentY[type] += dEdgeY + (float)pPlatform->iHeight;
-    else if (dCurrentY[type] - (float)pPlatform->iHalfHeight >= dEdgeY)
-        dCurrentY[type] -= dEdgeY + (float)pPlatform->iHeight;
+    if (dCurrentY[type] + (float)m_platform->iHalfHeight < 0.0f)
+        dCurrentY[type] += dEdgeY + (float)m_platform->iHeight;
+    else if (dCurrentY[type] - (float)m_platform->iHalfHeight >= dEdgeY)
+        dCurrentY[type] -= dEdgeY + (float)m_platform->iHeight;
 
     return false;
 }
@@ -270,16 +270,16 @@ bool FallingPath::Move(short type)
 {
     dVelY[type] = CapFallingVelocity(dVelY[type] + GRAVITATION);
 
-    if (pPlatform->fy - pPlatform->iHalfHeight >= App::screenHeight) {
+    if (m_platform->fy - m_platform->iHalfHeight >= App::screenHeight) {
         //If a player is standing on this platform, clear him off
         for (CPlayer* player : players) {
-            if (player->platform == pPlatform) {
-                player->platform = NULL;
+            if (player->platform == m_platform) {
+                player->platform = nullptr;
                 player->vely = dVelY[type];
             }
         }
 
-        pPlatform->fDead = true;
+        m_platform->fDead = true;
     }
 
     dCurrentY[type] += dVelY[type];
