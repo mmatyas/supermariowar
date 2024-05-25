@@ -16,6 +16,7 @@
 #define NUM_FRAMES_IN_TILE_ANIMATION        4
 #define NUM_FRAMES_BETWEEN_TILE_ANIMATION   8
 
+enum class PlatformPathType: unsigned char;
 
 
 enum ReadType: uint8_t {
@@ -150,7 +151,7 @@ struct MapBlock {
 class IO_Block;
 
 void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter);
-void DrawPlatform(short pathtype, TilesetTile ** tiles,
+void DrawPlatform(PlatformPathType pathtype, TilesetTile ** tiles,
 	short startX, short startY, short endX, short endY,
 	float angle, float radiusX, float radiusY,
 	short iSize, short iPlatformWidth, short iPlatformHeight,

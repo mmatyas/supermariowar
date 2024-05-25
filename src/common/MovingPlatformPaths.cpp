@@ -61,8 +61,6 @@ StraightPath::StraightPath(float vel, float startX, float startY, float endX, fl
     : MovingPlatformPath(vel, startX, startY, endX, endY, preview)
     , iGoalPoint{0, 0}
 {
-    iType = 0;
-
     float dWidth = dPathPointX[1] - dPathPointX[0];
     float dHeight = dPathPointY[1] - dPathPointY[0];
     float dLength = 0.0f;
@@ -153,8 +151,6 @@ void StraightPath::Reset()
 StraightPathContinuous::StraightPathContinuous(float vel, float startX, float startY, float angle, bool preview) :
     StraightPath(vel, startX, startY, 0.0f, 0.0f, preview)
 {
-    iType = 1;
-
     dAngle = angle;
 
     for (short type = 0; type < 2; type++) {
@@ -206,8 +202,6 @@ void StraightPathContinuous::Reset()
 EllipsePath::EllipsePath(float vel, float angle, float radiusx, float radiusy, float centerx, float centery, bool preview) :
     MovingPlatformPath(vel, centerx, centery, 0.0f, 0.0f, preview)
 {
-    iType = 2;
-
     dStartAngle = angle;
 
     if (preview) {

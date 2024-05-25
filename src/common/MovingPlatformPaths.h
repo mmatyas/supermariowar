@@ -3,19 +3,27 @@
 class MovingPlatform;
 
 
+/// Type ID used by the map files as a numeric identifier.
+enum class PlatformPathType: unsigned char {
+    Straight,
+    StraightContinuous,
+    Ellipse,
+    Falling,
+};
+
+
 class MovingPlatformPath {
 public:
     MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool preview);
     virtual ~MovingPlatformPath() = default;
 
+    virtual PlatformPathType typeId() const = 0;
     virtual bool Move(short type) = 0;
     virtual void Reset();
 
     void SetPlatform(MovingPlatform* platform) {
         pPlatform = platform;
     }
-
-    short GetType() const { return iType; }
 
 protected:
     MovingPlatform* pPlatform;
@@ -26,8 +34,6 @@ protected:
     float dPathPointX[2], dPathPointY[2];
 
     float dCurrentX[2], dCurrentY[2];
-
-    short iType;
 
     friend class MovingPlatform;
     friend class CMap;
@@ -40,6 +46,7 @@ class StraightPath : public MovingPlatformPath {
 public:
     StraightPath(float vel, float startX, float startY, float endX, float endY, bool preview);
 
+    PlatformPathType typeId() const override { return PlatformPathType::Straight; }
     bool Move(short type) override;
     void Reset() override;
 
@@ -63,6 +70,7 @@ class StraightPathContinuous : public StraightPath {
 public:
     StraightPathContinuous(float vel, float startX, float startY, float angle, bool preview);
 
+    PlatformPathType typeId() const override { return PlatformPathType::StraightContinuous; }
     bool Move(short type) override;
     void Reset() override;
 
@@ -80,6 +88,7 @@ class EllipsePath : public MovingPlatformPath {
 public:
     EllipsePath(float vel, float dAngle, float dRadiusX, float dRadiusY, float dCenterX, float dCenterY, bool preview);
 
+    PlatformPathType typeId() const override { return PlatformPathType::Ellipse; }
     bool Move(short type) override;
     void SetPosition(short type);
     void Reset() override;
@@ -99,6 +108,7 @@ class FallingPath : public MovingPlatformPath {
 public:
     FallingPath(float startX, float startY);
 
+    PlatformPathType typeId() const override { return PlatformPathType::Falling; }
     bool Move(short type) override;
     void Reset() override;
 
