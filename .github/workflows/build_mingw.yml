@@ -20,7 +20,8 @@ jobs:
 
       - name: Configure
         run: cmake
-          -S . -B build -G Ninja
+          -B build
+          -G Ninja
           -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/mingw_toolchain.cmake
           -DUSE_PNG_SAVE=ON
           -DUSE_SDL2_LIBS=ON
@@ -28,6 +29,8 @@ jobs:
           -DCMAKE_CXX_FLAGS=-fdiagnostics-color=always
       - name: Build
         run: cmake --build build --verbose
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
 
       - name: Package
         run: |
