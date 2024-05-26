@@ -4861,23 +4861,23 @@ void loadcurrentmap()
 		g_Platforms[iPlatform].iPathType = g_map->platforms[iPlatform]->pPath->typeId();
 
         if (auto* path = dynamic_cast<StraightPath*>(g_map->platforms[iPlatform]->pPath)) {
-			g_Platforms[iPlatform].iVelocity = (int)(path->m_speed * 4.0f);
-			g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
-			g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
-			g_Platforms[iPlatform].iEndX = (int)(path->m_endPos.x);
-			g_Platforms[iPlatform].iEndY = (int)(path->m_endPos.y);
+			g_Platforms[iPlatform].iVelocity = (int)(path->speed() * 4.0f);
+			g_Platforms[iPlatform].iStartX = (int)(path->startPos().x);
+			g_Platforms[iPlatform].iStartY = (int)(path->startPos().y);
+			g_Platforms[iPlatform].iEndX = (int)(path->endPos().x);
+			g_Platforms[iPlatform].iEndY = (int)(path->endPos().y);
         } else if (auto* path = dynamic_cast<StraightPathContinuous*>(g_map->platforms[iPlatform]->pPath)) {
-			g_Platforms[iPlatform].iVelocity = (int)(path->m_speed * 4.0f);
-			g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
-			g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
-			g_Platforms[iPlatform].fAngle = path->m_angle;
+			g_Platforms[iPlatform].iVelocity = (int)(path->speed() * 4.0f);
+			g_Platforms[iPlatform].iStartX = (int)(path->startPos().x);
+			g_Platforms[iPlatform].iStartY = (int)(path->startPos().y);
+			g_Platforms[iPlatform].fAngle = path->angle();
         } else if (auto* path = dynamic_cast<EllipsePath*>(g_map->platforms[iPlatform]->pPath)) {
-			g_Platforms[iPlatform].iVelocity = (short)(path->m_speed / 0.0030f);
-			g_Platforms[iPlatform].fRadiusX = path->m_radius.x;
-			g_Platforms[iPlatform].fRadiusY = path->m_radius.y;
-			g_Platforms[iPlatform].iStartX = (int)(path->m_startPos.x);
-			g_Platforms[iPlatform].iStartY = (int)(path->m_startPos.y);
-			g_Platforms[iPlatform].fAngle = path->m_startAngle;
+			g_Platforms[iPlatform].iVelocity = (short)(path->speed() / 0.0030f);
+			g_Platforms[iPlatform].fRadiusX = path->radius().x;
+			g_Platforms[iPlatform].fRadiusY = path->radius().y;
+			g_Platforms[iPlatform].iStartX = (int)(path->centerPos().x);
+			g_Platforms[iPlatform].iStartY = (int)(path->centerPos().y);
+			g_Platforms[iPlatform].fAngle = path->startAngle();
 		}
 
 		g_Platforms[iPlatform].UpdatePreview();

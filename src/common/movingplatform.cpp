@@ -106,8 +106,8 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
     rDstRect.w = w * iTileSize;
     rDstRect.h = h * iTileSize;
 
-    fVelX = pPath->m_velocity[0].x;
-    fVelY = pPath->m_velocity[0].y;
+    fVelX = pPath->velocity0().x;
+    fVelY = pPath->velocity0().y;
 
     fOldVelX = fVelX;
     fOldVelY = fVelY;
@@ -132,7 +132,7 @@ MovingPlatform::~MovingPlatform()
 void MovingPlatform::draw()
 {
     //Comment this back in to see the no spawn area of the platform
-    //SDL_Rect r = {(int)pPath->m_currentPos[1].x - iHalfWidth, (int)pPath->m_currentPos[1].y - iHalfHeight, iWidth, iHeight};
+    //SDL_Rect r = {(int)pPath->currentPos1().x - iHalfWidth, (int)pPath->currentPos1().y - iHalfHeight, iWidth, iHeight};
     //SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 0, 0, 255));
 
     rDstRect.x = ix - iHalfWidth + x_shake;
@@ -237,11 +237,11 @@ void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 
 void MovingPlatform::update()
 {
-    fOldX = pPath->m_currentPos[0].x;
-    fOldY = pPath->m_currentPos[0].y;
+    fOldX = pPath->currentPos0().x;
+    fOldY = pPath->currentPos0().y;
 
-    fOldVelX = pPath->m_velocity[0].x;
-    fOldVelY = pPath->m_velocity[0].y;
+    fOldVelX = pPath->velocity0().x;
+    fOldVelY = pPath->velocity0().y;
 
     //Path will affect new fVelX and fVelY to move the platform to it's next location
     pPath->Move(0);
@@ -249,19 +249,19 @@ void MovingPlatform::update()
     //Will move the path "shadow" to the next location (for spawn collision detection)
     pPath->Move(1);
 
-    fVelX = pPath->m_velocity[0].x;
-    fVelY = pPath->m_velocity[0].y;
+    fVelX = pPath->velocity0().x;
+    fVelY = pPath->velocity0().y;
 
-    setXf(pPath->m_currentPos[0].x);
-    setYf(pPath->m_currentPos[0].y);
+    setXf(pPath->currentPos0().x);
+    setYf(pPath->currentPos0().y);
 }
 
 void MovingPlatform::ResetPath()
 {
     pPath->Reset();
 
-    setXf(pPath->m_currentPos[0].x);
-    setYf(pPath->m_currentPos[0].y);
+    setXf(pPath->currentPos0().x);
+    setYf(pPath->currentPos0().y);
 
     fOldX = fx;
     fOldY = fy;
@@ -1365,18 +1365,18 @@ short MovingPlatform::coldec_object(IO_MovingObject * object)
 
 bool MovingPlatform::IsInNoSpawnZone(short iX, short iY, short w, short h)
 {
-    short iTop = (short)pPath->m_currentPos[1].y - iHalfHeight;
+    short iTop = (short)pPath->currentPos1().y - iHalfHeight;
 
     if (iY + h < iTop)
         return false;
 
-    short iBottom = (short)pPath->m_currentPos[1].y + iHalfHeight;
+    short iBottom = (short)pPath->currentPos1().y + iHalfHeight;
 
     if (iY >= iBottom)
         return false;
 
-    short iLeft = (short)pPath->m_currentPos[1].x - iHalfWidth;
-    short iRight = (short)pPath->m_currentPos[1].x + iHalfWidth;
+    short iLeft = (short)pPath->currentPos1().x - iHalfWidth;
+    short iRight = (short)pPath->currentPos1().x + iHalfWidth;
 
     //Deal with screen side overlap
     if (iX + w < iLeft)
