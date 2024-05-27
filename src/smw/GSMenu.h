@@ -3,6 +3,7 @@
 
 #include "GameState.h"
 
+#include <memory>
 #include <vector>
 
 class UI_Menu;
@@ -93,8 +94,8 @@ class MenuState : public GameState
 #endif
 
 	private:
-		MenuState() {}
-		~MenuState() {}
+		MenuState();
+		~MenuState();
         MenuState(MenuState const&);
         void operator=(MenuState const&);
 
@@ -110,43 +111,43 @@ class MenuState : public GameState
 		void DisplayControllingTeamMessage(short iControlTeam);
 
 
-		UI_Menu * mCurrentMenu;
-		UI_MainMenu* mMainMenu;
+		UI_Menu* mCurrentMenu = nullptr;
+		std::unique_ptr<UI_MainMenu> mMainMenu;
 
 		// Options menu
-		UI_OptionsMenu* mOptionsMenu;
-		UI_GameplayOptionsMenu* mGameplayOptionsMenu;
-		UI_TeamOptionsMenu* mTeamOptionsMenu;
-		UI_PowerupDropRatesMenu* mPowerupDropRatesMenu;
-		UI_PowerupSettingsMenu* mPowerupSettingsMenu;
-		UI_ProjectileLimitsMenu* mProjectileLimitsMenu;
-		UI_ProjectileOptionsMenu* mProjectileOptionsMenu;
-		UI_GraphicsOptionsMenu* mGraphicsOptionsMenu;
-		UI_EyeCandyOptionsMenu* mEyeCandyOptionsMenu;
-                UI_SoundOptionsMenu* mSoundOptionsMenu;
+		std::unique_ptr<UI_OptionsMenu> mOptionsMenu;
+		std::unique_ptr<UI_GameplayOptionsMenu> mGameplayOptionsMenu;
+		std::unique_ptr<UI_TeamOptionsMenu> mTeamOptionsMenu;
+		std::unique_ptr<UI_PowerupDropRatesMenu> mPowerupDropRatesMenu;
+		std::unique_ptr<UI_PowerupSettingsMenu> mPowerupSettingsMenu;
+		std::unique_ptr<UI_ProjectileLimitsMenu> mProjectileLimitsMenu;
+		std::unique_ptr<UI_ProjectileOptionsMenu> mProjectileOptionsMenu;
+		std::unique_ptr<UI_GraphicsOptionsMenu> mGraphicsOptionsMenu;
+		std::unique_ptr<UI_EyeCandyOptionsMenu> mEyeCandyOptionsMenu;
+		std::unique_ptr<UI_SoundOptionsMenu> mSoundOptionsMenu;
 
 		// Controls menu
-		UI_PlayerControlsSelectMenu* mPlayerControlsSelectMenu;
-		UI_PlayerControlsMenu* mPlayerControlsMenu;
+		std::unique_ptr<UI_PlayerControlsSelectMenu> mPlayerControlsSelectMenu;
+		std::unique_ptr<UI_PlayerControlsMenu> mPlayerControlsMenu;
 
 		// Gameplay menus
-		UI_ModeOptionsMenu* mModeOptionsMenu;
-		UI_MatchSelectionMenu* mMatchSelectionMenu;
-		UI_GameSettingsMenu* mGameSettingsMenu;
-		UI_MapFilterEditMenu* mMapFilterEditMenu;
-		UI_TourStopMenu* mTourStopMenu;
-		UI_WorldMenu* mWorldMenu;
-		UI_TeamSelectMenu* mTeamSelectMenu;
-		UI_TournamentScoreboardMenu* mTournamentScoreboardMenu;
-		UI_BonusWheelMenu* mBonusWheelMenu;
+		std::unique_ptr<UI_ModeOptionsMenu> mModeOptionsMenu;
+		std::unique_ptr<UI_MatchSelectionMenu> mMatchSelectionMenu;
+		std::unique_ptr<UI_GameSettingsMenu> mGameSettingsMenu;
+		std::unique_ptr<UI_MapFilterEditMenu> mMapFilterEditMenu;
+		std::unique_ptr<UI_TourStopMenu> mTourStopMenu;
+		std::unique_ptr<UI_WorldMenu> mWorldMenu;
+		std::unique_ptr<UI_TeamSelectMenu> mTeamSelectMenu;
+		std::unique_ptr<UI_TournamentScoreboardMenu> mTournamentScoreboardMenu;
+		std::unique_ptr<UI_BonusWheelMenu> mBonusWheelMenu;
 
 		// Multiplayer menu
-		UI_NetServersMenu* mNetServersMenu;
-		UI_NetEditServersMenu* mNetEditServersMenu;
-		UI_NetLobbyMenu* mNetLobbyMenu;
-		UI_NetNewRoomMenu* mNetNewRoomMenu;
-		UI_NetNewRoomSettingsMenu* mNetNewRoomSettingsMenu;
-		UI_NetRoomMenu* mNetRoomMenu;
+		std::unique_ptr<UI_NetServersMenu> mNetServersMenu;
+		std::unique_ptr<UI_NetEditServersMenu> mNetEditServersMenu;
+		std::unique_ptr<UI_NetLobbyMenu> mNetLobbyMenu;
+		std::unique_ptr<UI_NetNewRoomMenu> mNetNewRoomMenu;
+		std::unique_ptr<UI_NetNewRoomSettingsMenu> mNetNewRoomSettingsMenu;
+		std::unique_ptr<UI_NetRoomMenu> mNetRoomMenu;
 
 		DisplayError iDisplayError;
 		short iDisplayErrorTimer;

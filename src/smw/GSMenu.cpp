@@ -114,6 +114,11 @@ extern SoundsList *soundpacklist;
 extern TourList *tourlist;
 extern WorldList *worldlist;
 
+// std::uniue_ptr requires that the special member function have access
+// to the complete types.
+MenuState::MenuState() = default;
+MenuState::~MenuState() = default;
+
 MenuState& MenuState::instance()
 {
     static MenuState menu;
@@ -122,48 +127,47 @@ MenuState& MenuState::instance()
 
 bool MenuState::init()
 {
-    CreateMenu();
-    return true;
-}
+    mMainMenu = std::make_unique<UI_MainMenu>();
 
-void MenuState::CreateMenu()
-{
-    mMainMenu = new UI_MainMenu();
+    // Options menu
+    mOptionsMenu = std::make_unique<UI_OptionsMenu>();
+    mGameplayOptionsMenu = std::make_unique<UI_GameplayOptionsMenu>();
+    mTeamOptionsMenu = std::make_unique<UI_TeamOptionsMenu>();
+    mPowerupDropRatesMenu = std::make_unique<UI_PowerupDropRatesMenu>();
+    mPowerupSettingsMenu = std::make_unique<UI_PowerupSettingsMenu>();
+    mProjectileLimitsMenu = std::make_unique<UI_ProjectileLimitsMenu>();
+    mProjectileOptionsMenu = std::make_unique<UI_ProjectileOptionsMenu>();
+    mGraphicsOptionsMenu = std::make_unique<UI_GraphicsOptionsMenu>();
+    mEyeCandyOptionsMenu = std::make_unique<UI_EyeCandyOptionsMenu>();
+    mSoundOptionsMenu = std::make_unique<UI_SoundOptionsMenu>();
 
-    mOptionsMenu = new UI_OptionsMenu();
-    mGameplayOptionsMenu = new UI_GameplayOptionsMenu();
-    mTeamOptionsMenu = new UI_TeamOptionsMenu();
-    mPowerupDropRatesMenu = new UI_PowerupDropRatesMenu();
-    mPowerupSettingsMenu = new UI_PowerupSettingsMenu();
-    mProjectileLimitsMenu = new UI_ProjectileLimitsMenu();
-    mProjectileOptionsMenu = new UI_ProjectileOptionsMenu();
-    mGraphicsOptionsMenu = new UI_GraphicsOptionsMenu();
-    mEyeCandyOptionsMenu = new UI_EyeCandyOptionsMenu();
-    mSoundOptionsMenu = new UI_SoundOptionsMenu();
+    // Controls menu
+    mPlayerControlsSelectMenu = std::make_unique<UI_PlayerControlsSelectMenu>();
+    mPlayerControlsMenu = std::make_unique<UI_PlayerControlsMenu>();
 
-    mPlayerControlsSelectMenu = new UI_PlayerControlsSelectMenu();
-    mPlayerControlsMenu = new UI_PlayerControlsMenu();
+    // Gameplay menu
+    mModeOptionsMenu = std::make_unique<UI_ModeOptionsMenu>();
+    mMatchSelectionMenu = std::make_unique<UI_MatchSelectionMenu>();
+    mGameSettingsMenu = std::make_unique<UI_GameSettingsMenu>();
+    mMapFilterEditMenu = std::make_unique<UI_MapFilterEditMenu>();
+    mTourStopMenu = std::make_unique<UI_TourStopMenu>();
+    mWorldMenu = std::make_unique<UI_WorldMenu>();
+    mTeamSelectMenu = std::make_unique<UI_TeamSelectMenu>();
+    mTournamentScoreboardMenu = std::make_unique<UI_TournamentScoreboardMenu>();
+    mBonusWheelMenu = std::make_unique<UI_BonusWheelMenu>();
 
-    mModeOptionsMenu = new UI_ModeOptionsMenu();
-    mMatchSelectionMenu = new UI_MatchSelectionMenu();
-    mGameSettingsMenu = new UI_GameSettingsMenu();
-    mMapFilterEditMenu = new UI_MapFilterEditMenu();
-    mTourStopMenu = new UI_TourStopMenu();
-    mWorldMenu = new UI_WorldMenu();
-    mTeamSelectMenu = new UI_TeamSelectMenu();
-    mTournamentScoreboardMenu = new UI_TournamentScoreboardMenu();
-    mBonusWheelMenu = new UI_BonusWheelMenu();
+    // Multiplayer menu
+    mNetServersMenu = std::make_unique<UI_NetServersMenu>();
+    mNetEditServersMenu = std::make_unique<UI_NetEditServersMenu>();
+    mNetLobbyMenu = std::make_unique<UI_NetLobbyMenu>();
+    mNetNewRoomMenu = std::make_unique<UI_NetNewRoomMenu>();
+    mNetNewRoomSettingsMenu = std::make_unique<UI_NetNewRoomSettingsMenu>(mGameSettingsMenu.get());
+    mNetRoomMenu = std::make_unique<UI_NetRoomMenu>();
 
-    mNetServersMenu = new UI_NetServersMenu();
-    mNetEditServersMenu = new UI_NetEditServersMenu();
-    mNetLobbyMenu = new UI_NetLobbyMenu();
-    mNetNewRoomMenu = new UI_NetNewRoomMenu();
-    mNetNewRoomSettingsMenu = new UI_NetNewRoomSettingsMenu(mGameSettingsMenu);
-    mNetRoomMenu = new UI_NetRoomMenu();
-
-    mCurrentMenu = mMainMenu;
-
+    mCurrentMenu = mMainMenu.get();
     szCurrentMapName = mGameSettingsMenu->miMapField->GetMapName();
+
+    return true;
 }
 
 //---------------------------------------------------------------
@@ -185,15 +189,15 @@ void MenuState::onEnterState()
     if (game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1 &&
             (((game_values.matchtype == MatchType::SingleGame || game_values.matchtype == MatchType::QuickGame || game_values.matchtype == MatchType::MiniGame || game_values.matchtype == MatchType::Tournament || game_values.matchtype == MatchType::NetGame) && game_values.bonuswheel == 2) || (game_values.matchtype == MatchType::Tour && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
         mBonusWheelMenu->miBonusWheel->Reset(false);
-        mCurrentMenu = mBonusWheelMenu;
+        mCurrentMenu = mBonusWheelMenu.get();
     } else if (game_values.matchtype != MatchType::SingleGame && game_values.matchtype != MatchType::QuickGame && game_values.matchtype != MatchType::MiniGame && game_values.matchtype != MatchType::NetGame) {
-        mCurrentMenu = mTournamentScoreboardMenu;
+        mCurrentMenu = mTournamentScoreboardMenu.get();
     } else if (game_values.matchtype == MatchType::QuickGame) {
         //Reset back to main menu after quick game
-        mCurrentMenu = mMainMenu;
+        mCurrentMenu = mMainMenu.get();
         mCurrentMenu->ResetMenu();
     } else if (game_values.matchtype == MatchType::NetGame) {
-        mCurrentMenu = mNetLobbyMenu;
+        mCurrentMenu = mNetLobbyMenu.get();
         mCurrentMenu->ResetMenu();
         netplay.joinSuccessful = false;
         netplay.gameRunning = false;
@@ -225,7 +229,7 @@ void MenuState::onEnterState()
 
         //If we're suposed to skip the scoreboard, then reset back to the world map
         if (game_values.worldskipscoreboard) {
-            mCurrentMenu = mWorldMenu;
+            mCurrentMenu = mWorldMenu.get();
             mCurrentMenu->ResetMenu();
 
             game_values.worldskipscoreboard = false;
@@ -369,7 +373,7 @@ void MenuState::onEnterState()
     }
 
     if (game_values.matchtype != MatchType::World && game_values.matchtype != MatchType::QuickGame && game_values.matchtype != MatchType::NetGame) {
-        if (mCurrentMenu == mGameSettingsMenu || mCurrentMenu == mTournamentScoreboardMenu)
+        if (mCurrentMenu == mGameSettingsMenu.get() || mCurrentMenu == mTournamentScoreboardMenu.get())
             mGameSettingsMenu->miMapField->LoadCurrentMap();
     }
 
@@ -436,7 +440,7 @@ void MenuState::update()
                 g_fAutoTest = !g_fAutoTest;
 
                 if (g_fAutoTest) {
-                    mCurrentMenu = mMainMenu;
+                    mCurrentMenu = mMainMenu.get();
                     mCurrentMenu->ResetMenu();
 
                     LoadScript("Scripts/StartMenuAutomation.txt");
@@ -470,7 +474,7 @@ void MenuState::update()
     }
 
     //If AI is controlling the tournament menu, select the options
-    if (game_values.matchtype == MatchType::Tournament && iTournamentAITimer > 0 && mCurrentMenu == mGameSettingsMenu && mGameSettingsMenu->IsOnStartBtn()) {
+    if (game_values.matchtype == MatchType::Tournament && iTournamentAITimer > 0 && mCurrentMenu == mGameSettingsMenu.get() && mGameSettingsMenu->IsOnStartBtn()) {
         if (--iTournamentAITimer == 0) {
             iTournamentAIStep++;
 
@@ -568,14 +572,14 @@ void MenuState::update()
             iDisplayErrorTimer = 0;
             net_endSession();
 
-            mCurrentMenu = mMainMenu;
+            mCurrentMenu = mMainMenu.get();
         } else if (MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code) {
-            mCurrentMenu = mMatchSelectionMenu;
+            mCurrentMenu = mMatchSelectionMenu.get();
             iUnlockMinigameOptionIndex = 0;
         } else if (MENU_CODE_TO_MATCH_SELECTION_MENU == code) {
             mMatchSelectionMenu->WorldMapChanged();
 
-            mCurrentMenu = mMatchSelectionMenu;
+            mCurrentMenu = mMatchSelectionMenu.get();
             mCurrentMenu->ResetMenu();
             iUnlockMinigameOptionIndex = 0;
         } else if (MENU_CODE_MATCH_SELECTION_START == code || MENU_CODE_QUICK_GAME_START == code) {
@@ -587,7 +591,7 @@ void MenuState::update()
                 game_values.matchtype = mMatchSelectionMenu->GetSelectedMatchType();
 
             mTeamSelectMenu->ResetTeamSelect();
-            mCurrentMenu = mTeamSelectMenu;
+            mCurrentMenu = mTeamSelectMenu.get();
             mCurrentMenu->ResetMenu();
             printf("Hello\n");
 
@@ -600,36 +604,36 @@ void MenuState::update()
         } else if (MENU_CODE_WORLD_MAP_CHANGED == code) {
             mMatchSelectionMenu->WorldMapChanged();
         } else if (MENU_CODE_TO_OPTIONS_MENU == code) {
-            mCurrentMenu = mOptionsMenu;
+            mCurrentMenu = mOptionsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_BACK_TO_OPTIONS_MENU == code) {
-            mCurrentMenu = mOptionsMenu;
+            mCurrentMenu = mOptionsMenu.get();
         } else if (MENU_CODE_TO_NET_SERVERS_MENU == code) {
-            mCurrentMenu = mNetServersMenu;
+            mCurrentMenu = mNetServersMenu.get();
             mCurrentMenu->ResetMenu();
             net_startSession();
         } else if (MENU_CODE_BACK_TO_GRAPHIC_OPTIONS_MENU == code) {
-            mCurrentMenu = mGraphicsOptionsMenu;
+            mCurrentMenu = mGraphicsOptionsMenu.get();
         } else if (MENU_CODE_TO_CONTROLS_MENU == code) {
-            mCurrentMenu = mPlayerControlsSelectMenu;
+            mCurrentMenu = mPlayerControlsSelectMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
-            mCurrentMenu = mPlayerControlsSelectMenu;
+            mCurrentMenu = mPlayerControlsSelectMenu.get();
         } else if (MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
             mPlayerControlsMenu->SetPlayer(0);
-            mCurrentMenu = mPlayerControlsMenu;
+            mCurrentMenu = mPlayerControlsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_PLAYER_2_CONTROLS == code) {
             mPlayerControlsMenu->SetPlayer(1);
-            mCurrentMenu = mPlayerControlsMenu;
+            mCurrentMenu = mPlayerControlsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_PLAYER_3_CONTROLS == code) {
             mPlayerControlsMenu->SetPlayer(2);
-            mCurrentMenu = mPlayerControlsMenu;
+            mCurrentMenu = mPlayerControlsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_PLAYER_4_CONTROLS == code) {
             mPlayerControlsMenu->SetPlayer(3);
-            mCurrentMenu = mPlayerControlsMenu;
+            mCurrentMenu = mPlayerControlsMenu.get();
             mCurrentMenu->ResetMenu();
         }
         else if (MENU_CODE_TOGGLE_FULLSCREEN == code) {
@@ -774,14 +778,14 @@ void MenuState::update()
                         if (mGameSettingsMenu->GetCurrentGameModeID() == game_mode_owned)
                             mGameSettingsMenu->HideGMSettingsBtn();
 
-                        mCurrentMenu = mGameSettingsMenu;
+                        mCurrentMenu = mGameSettingsMenu.get();
                         mCurrentMenu->ResetMenu();
 
                         //If it is a tournament, then set the controlling team
                         if (MatchType::Tournament == game_values.matchtype)
                             SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
                         } else if (MatchType::Tour == game_values.matchtype) {
-                            mCurrentMenu = mTourStopMenu;
+                            mCurrentMenu = mTourStopMenu.get();
                             mCurrentMenu->ResetMenu();
                         } else if (MatchType::World == game_values.matchtype) {
                             game_values.screenfadespeed = 8;
@@ -815,9 +819,9 @@ void MenuState::update()
                     ResetTournamentBackToMainMenu();
                 } else if (game_values.tournamentwinner >= 0) {
                     mBonusWheelMenu->miBonusWheel->Reset(true);
-                    mCurrentMenu = mBonusWheelMenu;
+                    mCurrentMenu = mBonusWheelMenu.get();
                 } else {
-                    mCurrentMenu = mWorldMenu;
+                    mCurrentMenu = mWorldMenu.get();
                     mWorldMenu->miWorldStop->Refresh(game_values.tourstopcurrent);
 
                     fNeedTeamAnnouncement = true;
@@ -830,13 +834,13 @@ void MenuState::update()
                         ResetTournamentBackToMainMenu();
                     } else {
                         mBonusWheelMenu->miBonusWheel->Reset(true);
-                        mCurrentMenu = mBonusWheelMenu;
+                        mCurrentMenu = mBonusWheelMenu.get();
                     }
                 } else { //Next Tour/Tourament Game
                     if (game_values.matchtype == MatchType::Tour) {
-                        mCurrentMenu = mTourStopMenu;
+                        mCurrentMenu = mTourStopMenu.get();
                     } else {
-                        mCurrentMenu = mGameSettingsMenu;
+                        mCurrentMenu = mGameSettingsMenu.get();
                     }
                 }
             }
@@ -851,9 +855,9 @@ void MenuState::update()
                 mWorldMenu->miWorld->DisplayTeamControlAnnouncement();
         } else if (MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS == code) {
             if (netplay.active)
-                mCurrentMenu = mNetNewRoomSettingsMenu;
+                mCurrentMenu = mNetNewRoomSettingsMenu.get();
             else
-                mCurrentMenu = mGameSettingsMenu;
+                mCurrentMenu = mGameSettingsMenu.get();
         } else if (MENU_CODE_MODE_CHANGED == code) {
             game_values.gamemode = gamemodes[mGameSettingsMenu->GetCurrentGameModeID()];
             mGameSettingsMenu->RefreshGameModeButtons();
@@ -869,7 +873,7 @@ void MenuState::update()
                 if (iTournamentAITimer > 0)
                     SetControllingTeamForSettingsMenu(-1, false);
             } else {
-                mCurrentMenu = mTeamSelectMenu;
+                mCurrentMenu = mTeamSelectMenu.get();
                 mCurrentMenu->ResetMenu();
             }
         } else if (MENU_CODE_SOUND_VOLUME_CHANGED == code) {
@@ -914,15 +918,15 @@ void MenuState::update()
             if (mBonusWheelMenu->miBonusWheel->GetPowerupSelectionDone()) {
                 if (game_values.matchtype == MatchType::World) {
                     if (game_values.tournamentwinner == -1)
-                        mCurrentMenu = mTournamentScoreboardMenu;
+                        mCurrentMenu = mTournamentScoreboardMenu.get();
                     else
                         ResetTournamentBackToMainMenu();
                 } else {
                     if ((game_values.matchtype == MatchType::Tour || game_values.matchtype == MatchType::Tournament) && game_values.tournamentwinner == -1 &&
                             ((game_values.matchtype != MatchType::Tour && game_values.bonuswheel == 2) || (game_values.matchtype == MatchType::Tour && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
-                        mCurrentMenu = mTournamentScoreboardMenu;
+                        mCurrentMenu = mTournamentScoreboardMenu.get();
                     } else if (game_values.matchtype == MatchType::SingleGame) {
-                        mCurrentMenu = mGameSettingsMenu;
+                        mCurrentMenu = mGameSettingsMenu.get();
                         mCurrentMenu->ResetMenu();
                         mGameSettingsMenu->miMapField->LoadCurrentMap();
                     } else {
@@ -931,31 +935,31 @@ void MenuState::update()
                 }
             }
         } else if (MENU_CODE_TO_POWERUP_SELECTION_MENU == code) {
-            mCurrentMenu = mPowerupDropRatesMenu;
+            mCurrentMenu = mPowerupDropRatesMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_POWERUP_SETTINGS_MENU == code) {
-            mCurrentMenu = mPowerupSettingsMenu;
+            mCurrentMenu = mPowerupSettingsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_GRAPHICS_OPTIONS_MENU == code) {
-            mCurrentMenu = mGraphicsOptionsMenu;
+            mCurrentMenu = mGraphicsOptionsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_EYECANDY_OPTIONS_MENU == code) {
-            mCurrentMenu = mEyeCandyOptionsMenu;
+            mCurrentMenu = mEyeCandyOptionsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_SOUND_OPTIONS_MENU == code) {
-            mCurrentMenu = mSoundOptionsMenu;
+            mCurrentMenu = mSoundOptionsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_GAMEPLAY_OPTIONS_MENU == code) {
-            mCurrentMenu = mGameplayOptionsMenu;
+            mCurrentMenu = mGameplayOptionsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_TEAM_OPTIONS_MENU == code) {
-            mCurrentMenu = mTeamOptionsMenu;
+            mCurrentMenu = mTeamOptionsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_PROJECTILES_OPTIONS_MENU == code) {
-            mCurrentMenu = mProjectileOptionsMenu;
+            mCurrentMenu = mProjectileOptionsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_PROJECTILES_LIMITS_MENU == code) {
-            mCurrentMenu = mProjectileLimitsMenu;
+            mCurrentMenu = mProjectileLimitsMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code) {
             if (netplay.active) {
@@ -1033,7 +1037,7 @@ void MenuState::update()
             for (short iPlayer = 0; iPlayer < 4; iPlayer++)
                 game_values.storedpowerups[iPlayer] = -1;
         } else if (MENU_CODE_MAP_CHANGED == code) {
-            if (mCurrentMenu == mNetNewRoomSettingsMenu) {
+            if (mCurrentMenu == mNetNewRoomSettingsMenu.get()) {
                 assert(netplay.active);
                 netplay.mapfilepath = mNetNewRoomSettingsMenu->getCurrentMapPath();
                 printf("[net] Selected map: %s\n", netplay.mapfilepath.c_str());
@@ -1061,18 +1065,18 @@ void MenuState::update()
         } else if (MENU_CODE_TO_MAP_FILTER_EDIT == code) {
             mMapFilterEditMenu->miMapBrowser->Reset(0);
 
-            mCurrentMenu = mMapFilterEditMenu;
+            mCurrentMenu = mMapFilterEditMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_MAP_BROWSER_EXIT == code) {
             mGameSettingsMenu->miMapField->LoadCurrentMap();
             szCurrentMapName = mGameSettingsMenu->miMapField->GetMapName();
 
-            mCurrentMenu = mGameSettingsMenu;
+            mCurrentMenu = mGameSettingsMenu.get();
             //mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_MAP_BROWSER_THUMBNAILS == code) {
             mMapFilterEditMenu->miMapBrowser->Reset(1);
 
-            mCurrentMenu = mMapFilterEditMenu;
+            mCurrentMenu = mMapFilterEditMenu.get();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_SAVE_ALL_MAP_THUMBNAILS == code) {
             ((UI_OptionsMenu*) mCurrentMenu)->showThumbnailsPopup();
@@ -1130,7 +1134,7 @@ void MenuState::update()
             if (MENU_CODE_TO_NET_SERVERLIST == code) {
                 mNetServersMenu->OpenServerList();
             } else if (MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU == code) {
-                mCurrentMenu = mNetEditServersMenu;
+                mCurrentMenu = mNetEditServersMenu.get();
                 mCurrentMenu->ResetMenu();
                 mNetEditServersMenu->Restore();
             } else if (MENU_CODE_NET_ADDREMOVE_SERVER_ON_ADD_BTN == code) {
@@ -1172,13 +1176,13 @@ void MenuState::update()
                     mNetLobbyMenu->Restore();
                     mNetNewRoomMenu->Restore();
 
-                mCurrentMenu = mNetLobbyMenu;
+                mCurrentMenu = mNetLobbyMenu.get();
                 mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU == code) {
-                mCurrentMenu = mNetNewRoomSettingsMenu;
+                mCurrentMenu = mNetNewRoomSettingsMenu.get();
                 mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU == code) {
-                mCurrentMenu = mNetNewRoomMenu;
+                mCurrentMenu = mNetNewRoomMenu.get();
                 mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_NET_CHAT_SEND == code) {
                 if (strlen(netplay.mychatmessage) > 0)
@@ -1186,7 +1190,7 @@ void MenuState::update()
                 else
                     code = MENU_CODE_TO_NET_ROOM_MENU;
             } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {
-                mCurrentMenu = mNetRoomMenu;
+                mCurrentMenu = mNetRoomMenu.get();
                 mCurrentMenu->ResetMenu();
                 netplay.currentMenuChanged = true;
                 netplay.operationInProgress = false;
@@ -1242,7 +1246,7 @@ void MenuState::update()
     //--------------- draw everything ----------------------
 
     //Don't draw backdrop for world
-    if (mCurrentMenu != mWorldMenu)
+    if (mCurrentMenu != mWorldMenu.get())
         rm->menu_backdrop.draw(0, 0);
     else
         SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
@@ -1394,7 +1398,7 @@ void MenuState::update()
         } else if (AppState::StartWorld == game_values.appstate) { //Fade to world match type
             game_values.screenfadespeed = -8;
 
-            mCurrentMenu = mWorldMenu;
+            mCurrentMenu = mWorldMenu.get();
             mCurrentMenu->ResetMenu();
 
             rm->backgroundmusic[2].stop();
@@ -1674,7 +1678,7 @@ void MenuState::Exit()
 
 void MenuState::ResetTournamentBackToMainMenu()
 {
-    mCurrentMenu = mMainMenu;
+    mCurrentMenu = mMainMenu.get();
     mCurrentMenu->ResetMenu();
 
     if (game_values.matchtype != MatchType::SingleGame && game_values.matchtype != MatchType::QuickGame && game_values.matchtype != MatchType::MiniGame && game_values.matchtype != MatchType::NetGame) {
@@ -1748,7 +1752,7 @@ void MenuState::GetNextScriptOperation()
     //slowdowntimer = 0;
 
     if (iScriptState == 1) {
-        if (mCurrentMenu == mGameSettingsMenu) {
+        if (mCurrentMenu == mGameSettingsMenu.get()) {
             if (!fScriptRunPreGameOptions) {
                 fScriptRunPreGameOptions = true;
                 LoadScript("Scripts/GameModeOptionsOnly.txt");
@@ -1786,7 +1790,7 @@ void MenuState::GetNextScriptOperation()
             }
 
             game_values.gamemode->setdebuggoal();
-        } else if (mCurrentMenu == mTourStopMenu) {
+        } else if (mCurrentMenu == mTourStopMenu.get()) {
             static int tournext = RANDOM_INT(200);
 
             if (--tournext < 0) {
@@ -1799,7 +1803,7 @@ void MenuState::GetNextScriptOperation()
 
         return;
     } else if (iScriptState == 2) {
-        if (mCurrentMenu == mTournamentScoreboardMenu) {
+        if (mCurrentMenu == mTournamentScoreboardMenu.get()) {
             static int scoreboardnext = RANDOM_INT(200);
 
             if (--scoreboardnext < 0) {
@@ -1809,14 +1813,14 @@ void MenuState::GetNextScriptOperation()
             }
 
             return;
-        } else if (mCurrentMenu == mGameSettingsMenu) {
+        } else if (mCurrentMenu == mGameSettingsMenu.get()) {
             iScriptState = 0;
-            mCurrentMenu = mMainMenu;
+            mCurrentMenu = mMainMenu.get();
             mCurrentMenu->ResetMenu();
             LoadScript("Scripts/StartMenuAutomation.txt");
             fScriptRunPreGameOptions = true;
             return;
-        } else if (mCurrentMenu == mBonusWheelMenu) {
+        } else if (mCurrentMenu == mBonusWheelMenu.get()) {
             static int bonuswheelnext = RANDOM_INT(200) + 300;
 
             if (--bonuswheelnext < 0) {
@@ -1825,7 +1829,7 @@ void MenuState::GetNextScriptOperation()
                 bonuswheelnext = RANDOM_INT(200) + 300;
             }
             return;
-        } else if (mCurrentMenu == mTourStopMenu) {
+        } else if (mCurrentMenu == mTourStopMenu.get()) {
             static int tournext = RANDOM_INT(200);
 
             if (--tournext < 0) {
@@ -1838,20 +1842,20 @@ void MenuState::GetNextScriptOperation()
 
         return;
     } else if (iScriptState == 3) {
-        if (mCurrentMenu == mBonusWheelMenu) {
+        if (mCurrentMenu == mBonusWheelMenu.get()) {
             game_values.playerInput.outputControls[0].menu_select.fPressed = true;
             return;
-        } else if (mCurrentMenu == mGameSettingsMenu) {
+        } else if (mCurrentMenu == mGameSettingsMenu.get()) {
             iScriptState = 0;
             LoadScript("Scripts/GameModeOptionsOnly.txt");
             fScriptRunPreGameOptions = true;
             return;
-        } else if (mCurrentMenu == mMainMenu) {
+        } else if (mCurrentMenu == mMainMenu.get()) {
             iScriptState = 0;
             LoadScript("Scripts/StartMenuAutomation.txt");
             fScriptRunPreGameOptions = true;
             return;
-        } else if (mCurrentMenu == mTourStopMenu) {
+        } else if (mCurrentMenu == mTourStopMenu.get()) {
             static int tournext = RANDOM_INT(200);
 
             if (--tournext < 0) {
