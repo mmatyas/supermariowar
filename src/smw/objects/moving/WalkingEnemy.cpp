@@ -230,7 +230,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject* object)
 
         if (((type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang) && (fKillOnWeakWeapon || frozen)) || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion || type == movingobject_sledgehammer) {
             // Don't kill enemies with non-moving shells
-            if (type == movingobject_shell && object->state == 2)
+            if (type == movingobject_shell && object->GetState() == 2)
                 return;
 
             // Don't kill enemies with slow or non-moving boxes

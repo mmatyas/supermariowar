@@ -15,35 +15,27 @@ public:
     virtual void animate();
 
     virtual bool collide(CPlayer* player);
-
     void collide(IO_MovingObject*) {}
-    MovingObjectType getMovingObjectType() const
-    {
-        return movingObjectType;
-    }
+
+    MovingObjectType getMovingObjectType() const { return movingObjectType; }
+
     void applyfriction();
     void collision_detection_map();
     bool collision_detection_checksides();
     void flipsidesifneeded();
 
     virtual void SideBounce(bool fRightSide) {}
-    virtual float BottomBounce()
-    {
-        return bounce;
-    }
+    virtual float BottomBounce() { return bounce; }
     void KillObjectMapHazard(short playerID = -1);
 
-    virtual void CheckAndDie()
-    {
+    virtual void CheckAndDie() {
         dead = true;
     }
-    virtual void Die()
-    {
+    virtual void Die() {
         dead = true;
     }
 
-    bool CollidesWithMap() const
-    {
+    bool CollidesWithMap() const {
         return fObjectCollidesWithMap;
     }
 
@@ -89,11 +81,6 @@ protected:
     friend class B_OnOffSwitchBlock;
     friend class B_SwitchBlock;
     friend class B_WeaponBreakableBlock;
-
-    friend class MO_BulletBill;
-    friend class MO_WalkingEnemy;
-    friend class MO_CheepCheep;
-    friend class MO_PirhanaPlant;
 
     friend class MovingPlatform;
 

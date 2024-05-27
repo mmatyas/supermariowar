@@ -184,7 +184,7 @@ void MO_BulletBill::collide(IO_MovingObject* object)
         ifSoundOnPlay(rm->sfx_bobombsound);
     } else if (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
         // Don't kill things with shells that are sitting still
-        if (type == movingobject_shell && object->state == 2)
+        if (type == movingobject_shell && object->GetState() == 2)
             return;
 
         // Don't kill things with boxesx that aren't moving fast enough
