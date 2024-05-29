@@ -5,6 +5,7 @@
 #include "GameMode.h"
 #include "GlobalConstants.h"
 #include "MapList.h" // req. only by WriteConfig
+#include "Version.h"
 #include "sfx.h"
 
 #include <stdio.h>
@@ -26,9 +27,6 @@ extern GraphicsList *gamegraphicspacklist;
 extern SoundsList *soundpacklist;
 
 extern short joystickcount;
-
-extern int32_t g_iVersion[];
-extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 
 //[Keyboard/Joystick][Game/Menu][NumPlayers][NumKeys]  left, right, jump, down, turbo, powerup, start, cancel
@@ -303,10 +301,13 @@ void CGameConfig::ReadBinaryConfig() {
         if (!options.is_open())
             throw std::runtime_error("Could not open " + options_path);
 
-        int32_t version[4];
-        options.read_i32_array(version, 4);
+        Version version;
+        version.major = options.read_i32();
+        version.minor = options.read_i32();
+        version.patch = options.read_i32();
+        version.build = options.read_i32();
 
-        if (!VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
+        if (GAME_VERSION != version) {
             printf("Old options.bin detected. Skipped reading it.\n");
             return;
         }
@@ -449,7 +450,10 @@ void CGameConfig::WriteConfig() const
         if (!options.is_open())
             throw std::runtime_error("Could not open " + options_path);
 
-        options.write_raw(g_iVersion, sizeof(int) * 4);
+        options.write_i32(GAME_VERSION.major);
+        options.write_i32(GAME_VERSION.minor);
+        options.write_i32(GAME_VERSION.patch);
+        options.write_i32(GAME_VERSION.build);
 
         options.write_u8(static_cast<uint8_t>(spawnstyle));
         options.write_u8(static_cast<uint8_t>(awardstyle));

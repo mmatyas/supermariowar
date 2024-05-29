@@ -1,6 +1,5 @@
 #include "FileList.h"
 #include "GameValues.h"
-#include "Game.h"
 #include "gfx.h"
 #include "map.h"
 #include "MapList.h"
@@ -11,15 +10,6 @@
 #include <algorithm>
 #include <array>
 
-//1.8.0.0 == Release to staff
-//1.8.0.1 == Second release to staff
-//1.8.0.2 == beta1
-//1.8.0.3 == beta2
-//1.8.0.4 == final
-//1.9.0.0 == neagix work-in-progress, not released
-//2.0.0.0 == fluffypillow netplay code
-int32_t g_iVersion[] = {2, 0, 0, 0};
-
 // main game directory, read from command line argument
 #ifdef __ANDROID__
 std::string RootDataDirectory = GetHomeDirectory() + "data";
@@ -28,56 +18,6 @@ std::string RootDataDirectory = GetRootDirectory() + "data";
 #endif
 
 CResourceManager *rm;
-
-bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
-{
-    return iVersion[0] == iMajor && iVersion[1] == iMinor && iVersion[2] == iMicro && iVersion[3] == iBuild;
-}
-
-bool VersionIsEqualOrBefore(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
-{
-    if (iVersion[0] < iMajor)
-        return true;
-
-    if (iVersion[0] == iMajor) {
-        if (iVersion[1] < iMinor)
-            return true;
-
-        if (iVersion[1] == iMinor) {
-            if (iVersion[2] < iMicro)
-                return true;
-
-            if (iVersion[2] == iMicro) {
-                return iVersion[3] <= iBuild;
-            }
-        }
-    }
-
-    return false;
-}
-
-bool VersionIsEqualOrAfter(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
-{
-    if (iVersion[0] > iMajor)
-        return true;
-
-    if (iVersion[0] == iMajor) {
-        if (iVersion[1] > iMinor)
-            return true;
-
-        if (iVersion[1] == iMinor) {
-            if (iVersion[2] > iMicro)
-                return true;
-
-            if (iVersion[2] == iMicro) {
-                return iVersion[3] >= iBuild;
-            }
-        }
-    }
-
-    return false;
-}
-
 CGameValues game_values;
 
 FiltersList *filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor

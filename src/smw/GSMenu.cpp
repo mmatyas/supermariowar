@@ -22,6 +22,7 @@
 #include "ui/MI_TourStop.h"
 #include "ui/MI_World.h"
 #include "world.h"
+#include "Version.h"
 
 #include "menu/BonusWheelMenu.h"
 #include "menu/GameSettingsMenu.h"
@@ -82,7 +83,7 @@ extern WorldMap g_worldmap;
 
 extern void LoadCurrentMapBackground();
 
-extern TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld);
+extern TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorld);
 
 extern CMap* g_map;
 
@@ -1476,7 +1477,7 @@ bool MenuState::ReadTourFile()
 
     char buffer[256];
     bool fReadVersion = false;
-    int32_t iVersion[4] = {0, 0, 0, 0};
+    Version version;
     while (fgets(buffer, 256, fp) && game_values.tourstoptotal < 10) {
         if (strchr(ignorable_leads, buffer[0]))
             continue;
@@ -1486,24 +1487,24 @@ bool MenuState::ReadTourFile()
 
             char * psz = strtok(buffer, ".\n");
             if (psz)
-                iVersion[0] = atoi(psz);
+                version.major = atoi(psz);
 
             psz = strtok(NULL, ".\n");
             if (psz)
-                iVersion[1] = atoi(psz);
+                version.minor = atoi(psz);
 
             psz = strtok(NULL, ".\n");
             if (psz)
-                iVersion[2] = atoi(psz);
+                version.patch = atoi(psz);
 
             psz = strtok(NULL, ".\n");
             if (psz)
-                iVersion[3] = atoi(psz);
+                version.build = atoi(psz);
 
             continue;
         }
 
-        TourStop * ts = ParseTourStopLine(buffer, iVersion, false);
+        TourStop * ts = ParseTourStopLine(buffer, version, false);
 
         game_values.tourstops.push_back(ts);
         game_values.tourstoptotal++;
@@ -1513,7 +1514,7 @@ bool MenuState::ReadTourFile()
         mTourStopMenu->miTourStop->Refresh(game_values.tourstopcurrent);
 
         //For old tours, turn on the bonus wheel at the end
-        if (iVersion[0] == 1 && iVersion[1] == 7 && iVersion[2] == 0 && iVersion[3] <= 1)
+        if (version.major == 1 && version.minor == 7 && version.patch == 0 && version.build <= 1)
             game_values.tourstops[game_values.tourstoptotal - 1]->iBonusType = 1;
     }
 

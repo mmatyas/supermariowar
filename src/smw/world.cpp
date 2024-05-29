@@ -7,6 +7,7 @@
 #include "ResourceManager.h"
 #include "FileList.h"
 #include "MapList.h"
+#include "Version.h"
 
 #include <cstdio>
 #include <cstdlib> // atoi()
@@ -22,17 +23,12 @@
 #endif
 
 void ResetTourStops();
-TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld);
+TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorld);
 void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld);
 
 WorldMap g_worldmap;
 
 extern std::string stripPathAndExtension(const std::string &path);
-
-extern int32_t g_iVersion[];
-extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrBefore(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrAfter(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 extern CGameMode * gamemodes[GAMEMODE_LAST];
 
@@ -416,7 +412,7 @@ bool WorldMap::Load(short tilesize)
     std::string line;
     char* buffer = NULL;
     short iReadType = 0;
-    int32_t iVersion[4] = {0, 0, 0, 0};
+    Version version;
     short iMapTileReadRow = 0;
     short iCurrentStage = 0;
     short iCurrentWarp = 0;
@@ -439,19 +435,19 @@ bool WorldMap::Load(short tilesize)
         if (iReadType == 0) { //Read version number
             char * psz = strtok(buffer, ".\n");
             if (psz)
-                iVersion[0] = atoi(psz);
+                version.major = atoi(psz);
 
             psz = strtok(NULL, ".\n");
             if (psz)
-                iVersion[1] = atoi(psz);
+                version.minor = atoi(psz);
 
             psz = strtok(NULL, ".\n");
             if (psz)
-                iVersion[2] = atoi(psz);
+                version.patch = atoi(psz);
 
             psz = strtok(NULL, ".\n");
             if (psz)
-                iVersion[3] = atoi(psz);
+                version.build = atoi(psz);
 
             iReadType = 1;
         } else if (iReadType == 1) { //music category
@@ -619,7 +615,7 @@ bool WorldMap::Load(short tilesize)
 
             iReadType = iNumStages == 0 ? 12 : 11;
         } else if (iReadType == 11) { //stage details
-            TourStop * ts = ParseTourStopLine(buffer, iVersion, true);
+            TourStop * ts = ParseTourStopLine(buffer, version, true);
 
             game_values.tourstops.push_back(ts);
             game_values.tourstoptotal++;
@@ -1752,7 +1748,7 @@ short ReadTourStopSetting(T& output, T defaultVal)
     }
 }
 
-TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
+TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorld)
 {
     TourStop * ts = new TourStop();
     ts->fUseSettings = false;
@@ -1789,7 +1785,7 @@ TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
             ts->iMode = -1;
 
         //If this is 1.8.0.2 or earlier and we are playing a minigame, use the default map
-        if (VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2) &&
+        if (version <= Version {1, 8, 0, 2} &&
                 (ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame)) {
             //Get a bogus map name so the mode will know to load the default map
             ts->pszMapFile = maplist->GetUnknownMapName();
@@ -1819,7 +1815,7 @@ TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
 
         //The pipe minigame was using the value 24 from version 1.8.0.0 to 1.8.0.2
         //It was later switched to 1000 to accomodate new modes easily
-        if (VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2)) {
+        if (version <= Version {1, 8, 0, 2}) {
             if (ts->iMode == 24)
                 ts->iMode = game_mode_pipe_minigame;
         }
@@ -1846,7 +1842,7 @@ TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
                 ts->iGoal = 50;
         }
 
-        if (VersionIsEqualOrAfter(iVersion, 1, 7, 0, 2)) {
+        if (version >= Version {1, 7, 0, 2}) {
             pszTemp = strtok(NULL, ",\n");
 
             //Read in point value for tour stop
@@ -1920,7 +1916,7 @@ TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
             sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
         }
 
-        if (VersionIsEqualOrAfter(iVersion, 1, 8, 0, 0)) {
+        if (version >= Version {1, 8, 0, 0}) {
             if (fIsWorld) {
                 //is this a world ending stage?
                 pszTemp = strtok(NULL, ",\n");

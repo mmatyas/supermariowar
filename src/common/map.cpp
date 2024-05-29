@@ -10,6 +10,7 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "TilesetManager.h"
+#include "Version.h"
 
 #include "SDL_image.h"
 #include "sdl12wrapper.h"
@@ -39,11 +40,6 @@ using std::endl;
 
 
 extern gfxSprite spr_frontmap[2];
-// extern int32_t g_iVersion[];
-
-extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrBefore(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrAfter(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 //Converts the tile type into the flags that this tile carries (solid + ice + death, etc)
 short g_iTileTypeConversion[NUMTILETYPES] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113, 4096};
@@ -581,13 +577,11 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         return;
     }
 
-    //Load version number
-    int32_t version[4];
-    //version[0] = mapfile.read_i32(); //Major
-    //version[1] = mapfile.read_i32(); //Minor
-    //version[2] = mapfile.read_i32(); //Micro
-    //version[3] = mapfile.read_i32(); //Build
-    mapfile.read_i32_array(version, 4);
+    Version version;
+    version.major = mapfile.read_i32();
+    version.minor = mapfile.read_i32();
+    version.patch = mapfile.read_i32();
+    version.build = mapfile.read_i32();
 
     if (iReadType != read_type_summary) {
         cout << "loading map " << file;
@@ -595,9 +589,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         if (iReadType == read_type_preview)
             cout << " (preview)";
 
-        if (VersionIsEqualOrAfter(version, 1, 6, 0, 0)) {
-            cout << " [v" << version[0] << '.' << version[1] << '.'
-                 << version[2] << '.' << version[3] << "]";
+        if (version >= Version {1, 6, 0, 0}) {
+            printf(" [v%d.%d.%d.%d]", version.major, version.minor, version.patch, version.build);
         }
         else
             cout << " [v1.5]";

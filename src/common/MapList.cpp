@@ -5,12 +5,11 @@
 #include "GameValues.h"
 #include "linfunc.h"
 #include "map.h"
+#include "Version.h"
 
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
-
-extern int32_t g_iVersion[];
 
 extern CMap* g_map;
 extern FiltersList* filterslist;
@@ -433,7 +432,7 @@ void MapList::WriteFilters()
                 continue;
 
             fprintf(fp, "#Version\n");
-            fprintf(fp, "%d.%d.%d.%d\n\n", g_iVersion[0], g_iVersion[1], g_iVersion[2], g_iVersion[3]);
+            fprintf(fp, "%d.%d.%d.%d\n\n", GAME_VERSION.major, GAME_VERSION.minor, GAME_VERSION.patch, GAME_VERSION.build);
 
             fprintf(fp, "#Icon\n");
             fprintf(fp, "%d\n\n", game_values.piFilterIcons[iFilter + NUM_AUTO_FILTERS]);

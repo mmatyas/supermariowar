@@ -7,6 +7,7 @@ class CMap;
 class MovingPlatformPath;
 struct TilesetTile;
 struct MapTile;
+struct Version;
 enum ReadType: unsigned char;
 
 class MapReader {
@@ -16,7 +17,7 @@ public:
 
     virtual bool load(CMap&, BinaryFile&, ReadType) = 0;
 
-    static MapReader* getLoaderByVersion(int32_t (&mapversion)[4]);
+    static MapReader* getLoaderByVersion(const Version& mapversion);
 };
 
 /*
