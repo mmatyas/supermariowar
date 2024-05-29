@@ -66,6 +66,7 @@ add_library(CommonFiles STATIC
     uicontrol.h
     uimenu.cpp
     uimenu.h
+    Version.h
 )
 
 add_subdirectory(ui)
