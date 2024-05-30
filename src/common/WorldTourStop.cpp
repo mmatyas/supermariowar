@@ -6,6 +6,7 @@
 #include "RandomNumberGenerator.h"
 #include "Version.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 
@@ -15,16 +16,18 @@ extern MapList *maplist;
 
 
 namespace {
+/// Reads the next integer token, converts it to type T, and returns `true`.
+/// If there are no more tokens, uses the default value, and returns `false`.
 template<typename T>
-short ReadTourStopSetting(T& output, T defaultVal)
+bool ReadTourStopSetting(T& output, T defaultVal)
 {
     char* tok = strtok(NULL, ",\n");
     if (tok) {
         output = static_cast<T>(atoi(tok));
-        return 1;
+        return true;
     } else {
         output = defaultVal;
-        return 0;
+        return false;
     }
 }
 
@@ -195,6 +198,7 @@ template<> std::vector<short> serialize(const BossGameModeSettings& gms) {
     };
 }
 
+/// Turns the selected game mode settings into a list of integers
 std::vector<short> serializeGMS(short gamemodeId, const GameModeSettings& gmsSettings)
 {
     switch (gamemodeId) {
@@ -220,6 +224,223 @@ std::vector<short> serializeGMS(short gamemodeId, const GameModeSettings& gmsSet
         case game_mode_chase: return serialize(gmsSettings.chase);
         case game_mode_shyguytag: return serialize(gmsSettings.shyguytag);
         case game_mode_boss_minigame: return serialize(gmsSettings.boss);
+    }
+    return {};
+}
+
+// Deserialization functions for each game mode
+
+template<typename T> std::vector<bool> deserialize(T& gms) = delete;
+
+template<> std::vector<bool> deserialize(ClassicGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.style, game_values.gamemodemenusettings.classic.style),
+        ReadTourStopSetting(gms.scoring, game_values.gamemodemenusettings.classic.scoring),
+    };
+}
+template<> std::vector<bool> deserialize(FragGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.style, game_values.gamemodemenusettings.frag.style),
+        ReadTourStopSetting(gms.scoring, game_values.gamemodemenusettings.frag.scoring),
+    };
+}
+template<> std::vector<bool> deserialize(TimeGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.style, game_values.gamemodemenusettings.time.style),
+        ReadTourStopSetting(gms.scoring, game_values.gamemodemenusettings.time.scoring),
+        ReadTourStopSetting(gms.percentextratime, game_values.gamemodemenusettings.time.percentextratime),
+    };
+}
+template<> std::vector<bool> deserialize(JailGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.style, game_values.gamemodemenusettings.jail.style),
+        ReadTourStopSetting(gms.timetofree, game_values.gamemodemenusettings.jail.timetofree),
+        ReadTourStopSetting(gms.tagfree, game_values.gamemodemenusettings.jail.tagfree),
+        ReadTourStopSetting(gms.percentkey, game_values.gamemodemenusettings.jail.percentkey),
+    };
+}
+template<> std::vector<bool> deserialize(CoinGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.penalty, game_values.gamemodemenusettings.coins.penalty),
+        ReadTourStopSetting(gms.quantity, game_values.gamemodemenusettings.coins.quantity),
+        ReadTourStopSetting(gms.percentextracoin, game_values.gamemodemenusettings.coins.percentextracoin),
+    };
+}
+template<> std::vector<bool> deserialize(StompGameModeSettings& gms) {
+    std::vector<bool> values;
+    values.reserve(1 + gms.enemyweight.size());
+
+    values.emplace_back(ReadTourStopSetting(gms.rate, game_values.gamemodemenusettings.stomp.rate));
+    for (size_t i = 0; i < gms.enemyweight.size(); i++)
+        values.emplace_back(ReadTourStopSetting(gms.enemyweight[i], game_values.gamemodemenusettings.stomp.enemyweight[i]));
+
+    return values;
+}
+template<> std::vector<bool> deserialize(EggGameModeSettings& gms) {
+    std::vector<bool> values;
+    values.reserve(gms.eggs.size() + gms.yoshis.size() + 1);
+
+    for (size_t i = 0; i < gms.eggs.size(); i++) {
+        values.emplace_back(ReadTourStopSetting(gms.eggs[i], game_values.gamemodemenusettings.egg.eggs[i]));
+    }
+    for (size_t i = 0; i < gms.yoshis.size(); i++) {
+        values.emplace_back(ReadTourStopSetting(gms.yoshis[i], game_values.gamemodemenusettings.egg.yoshis[i]));
+    }
+    values.emplace_back(ReadTourStopSetting(gms.explode, game_values.gamemodemenusettings.egg.explode));
+
+    return values;
+}
+template<> std::vector<bool> deserialize(FlagGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.speed, game_values.gamemodemenusettings.flag.speed),
+        ReadTourStopSetting(gms.touchreturn, game_values.gamemodemenusettings.flag.touchreturn),
+        ReadTourStopSetting(gms.pointmove, game_values.gamemodemenusettings.flag.pointmove),
+        ReadTourStopSetting(gms.autoreturn, game_values.gamemodemenusettings.flag.autoreturn),
+        ReadTourStopSetting(gms.homescore, game_values.gamemodemenusettings.flag.homescore),
+        ReadTourStopSetting(gms.centerflag, game_values.gamemodemenusettings.flag.centerflag),
+    };
+}
+template<> std::vector<bool> deserialize(ChickenGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.usetarget, game_values.gamemodemenusettings.chicken.usetarget),
+        ReadTourStopSetting(gms.glide, game_values.gamemodemenusettings.chicken.glide),
+    };
+}
+template<> std::vector<bool> deserialize(TagGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.tagontouch, game_values.gamemodemenusettings.tag.tagontouch),
+    };
+}
+template<> std::vector<bool> deserialize(StarGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.time, game_values.gamemodemenusettings.star.time),
+        ReadTourStopSetting(gms.shine, game_values.gamemodemenusettings.star.shine),
+        ReadTourStopSetting(gms.percentextratime, game_values.gamemodemenusettings.star.percentextratime),
+    };
+}
+template<> std::vector<bool> deserialize(DominationGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.quantity, game_values.gamemodemenusettings.domination.quantity),
+        ReadTourStopSetting(gms.relocationfrequency, game_values.gamemodemenusettings.domination.relocationfrequency),
+        ReadTourStopSetting(gms.loseondeath, game_values.gamemodemenusettings.domination.loseondeath),
+        ReadTourStopSetting(gms.relocateondeath, game_values.gamemodemenusettings.domination.relocateondeath),
+        ReadTourStopSetting(gms.stealondeath, game_values.gamemodemenusettings.domination.stealondeath),
+    };
+}
+template<> std::vector<bool> deserialize(KingOfTheHillModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.areasize, game_values.gamemodemenusettings.kingofthehill.areasize),
+        ReadTourStopSetting(gms.relocationfrequency, game_values.gamemodemenusettings.kingofthehill.relocationfrequency),
+        ReadTourStopSetting(gms.maxmultiplier, game_values.gamemodemenusettings.kingofthehill.maxmultiplier),
+    };
+}
+template<> std::vector<bool> deserialize(RaceGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.quantity, game_values.gamemodemenusettings.race.quantity),
+        ReadTourStopSetting(gms.speed, game_values.gamemodemenusettings.race.speed),
+        ReadTourStopSetting(gms.penalty, game_values.gamemodemenusettings.race.penalty),
+    };
+}
+template<> std::vector<bool> deserialize(FrenzyGameModeSettings& gms) {
+    std::vector<bool> values;
+    values.reserve(3 + gms.powerupweight.size());
+
+    values.emplace_back(ReadTourStopSetting(gms.quantity, game_values.gamemodemenusettings.frenzy.quantity));
+    values.emplace_back(ReadTourStopSetting(gms.rate, game_values.gamemodemenusettings.frenzy.rate));
+    values.emplace_back(ReadTourStopSetting(gms.storedshells, game_values.gamemodemenusettings.frenzy.storedshells));
+    for (size_t i = 0; i < gms.powerupweight.size(); i++) {
+        values.emplace_back(ReadTourStopSetting(gms.powerupweight[i], game_values.gamemodemenusettings.frenzy.powerupweight[i]));
+    }
+
+    return values;
+}
+template<> std::vector<bool> deserialize(SurvivalGameModeSettings& gms) {
+    std::vector<bool> values;
+    values.reserve(gms.enemyweight.size() + 3);
+
+    for (size_t i = 0; i < gms.enemyweight.size(); i++) {
+        values.emplace_back(ReadTourStopSetting(gms.enemyweight[i], game_values.gamemodemenusettings.survival.enemyweight[i]));
+    }
+    values.emplace_back(ReadTourStopSetting(gms.density, game_values.gamemodemenusettings.survival.density));
+    values.emplace_back(ReadTourStopSetting(gms.speed, game_values.gamemodemenusettings.survival.speed));
+    values.emplace_back(ReadTourStopSetting(gms.shield, game_values.gamemodemenusettings.survival.shield));
+
+    return values;
+}
+template<> std::vector<bool> deserialize(GreedGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.coinlife, game_values.gamemodemenusettings.greed.coinlife),
+        ReadTourStopSetting(gms.owncoins, game_values.gamemodemenusettings.greed.owncoins),
+        ReadTourStopSetting(gms.multiplier, game_values.gamemodemenusettings.greed.multiplier),
+        ReadTourStopSetting(gms.percentextracoin, game_values.gamemodemenusettings.greed.percentextracoin),
+    };
+}
+template<> std::vector<bool> deserialize(HealthGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.startlife, game_values.gamemodemenusettings.health.startlife),
+        ReadTourStopSetting(gms.maxlife, game_values.gamemodemenusettings.health.maxlife),
+        ReadTourStopSetting(gms.percentextralife, game_values.gamemodemenusettings.health.percentextralife),
+    };
+}
+template<> std::vector<bool> deserialize(CollectionGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.quantity, game_values.gamemodemenusettings.collection.quantity),
+        ReadTourStopSetting(gms.rate, game_values.gamemodemenusettings.collection.rate),
+        ReadTourStopSetting(gms.banktime, game_values.gamemodemenusettings.collection.banktime),
+        ReadTourStopSetting(gms.cardlife, game_values.gamemodemenusettings.collection.cardlife),
+    };
+}
+template<> std::vector<bool> deserialize(ChaseGameModeSettings& gms) {
+    std::vector<bool> values;
+    values.reserve(1 + gms.phantoquantity.size());
+
+    values.emplace_back(ReadTourStopSetting(gms.phantospeed, game_values.gamemodemenusettings.chase.phantospeed));
+    for (size_t i = 0; i < gms.phantoquantity.size(); i++)
+        values.emplace_back(ReadTourStopSetting(gms.phantoquantity[i], game_values.gamemodemenusettings.chase.phantoquantity[i]));
+
+    return values;
+}
+template<> std::vector<bool> deserialize(ShyGuyTagGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.tagonsuicide, game_values.gamemodemenusettings.shyguytag.tagonsuicide),
+        ReadTourStopSetting(gms.tagtransfer, game_values.gamemodemenusettings.shyguytag.tagtransfer),
+        ReadTourStopSetting(gms.freetime, game_values.gamemodemenusettings.shyguytag.freetime),
+    };
+}
+template<> std::vector<bool> deserialize(BossGameModeSettings& gms) {
+    return {
+        ReadTourStopSetting(gms.bosstype, game_values.gamemodemenusettings.boss.bosstype),
+        ReadTourStopSetting(gms.difficulty, game_values.gamemodemenusettings.boss.difficulty),
+        ReadTourStopSetting(gms.hitpoints, game_values.gamemodemenusettings.boss.hitpoints),
+    };
+}
+
+/// Parses the active tokenizer of `strtok` (a list of integers) into the selected game mode settings
+std::vector<bool> deserializeGMS(short gamemodeId, GameModeSettings& gmsSettings)
+{
+    switch (gamemodeId) {
+        case game_mode_classic: return deserialize(gmsSettings.classic);
+        case game_mode_frag: return deserialize(gmsSettings.frag);
+        case game_mode_timelimit: return deserialize(gmsSettings.time);
+        case game_mode_jail: return deserialize(gmsSettings.jail);
+        case game_mode_coins: return deserialize(gmsSettings.coins);
+        case game_mode_stomp: return deserialize(gmsSettings.stomp);
+        case game_mode_eggs: return deserialize(gmsSettings.egg);
+        case game_mode_ctf: return deserialize(gmsSettings.flag);
+        case game_mode_chicken: return deserialize(gmsSettings.chicken);
+        case game_mode_tag: return deserialize(gmsSettings.tag);
+        case game_mode_star: return deserialize(gmsSettings.star);
+        case game_mode_domination: return deserialize(gmsSettings.domination);
+        case game_mode_koth: return deserialize(gmsSettings.kingofthehill);
+        case game_mode_race: return deserialize(gmsSettings.race);
+        case game_mode_frenzy: return deserialize(gmsSettings.frenzy);
+        case game_mode_survival: return deserialize(gmsSettings.survival);
+        case game_mode_greed: return deserialize(gmsSettings.greed);
+        case game_mode_health: return deserialize(gmsSettings.health);
+        case game_mode_collection: return deserialize(gmsSettings.collection);
+        case game_mode_chase: return deserialize(gmsSettings.chase);
+        case game_mode_shyguytag: return deserialize(gmsSettings.shyguytag);
+        case game_mode_boss_minigame: return deserialize(gmsSettings.boss);
     }
     return {};
 }
@@ -408,151 +629,9 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
             //Copy in default values first
             memcpy(&ts->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
 
-            if (ts->iMode == game_mode_classic) {
-                ts->fUseSettings = true;
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.classic.style, game_values.gamemodemenusettings.classic.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.classic.scoring, game_values.gamemodemenusettings.classic.scoring);
-            } else if (ts->iMode == game_mode_frag) {
-                ts->fUseSettings = true;
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frag.style, game_values.gamemodemenusettings.frag.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frag.scoring, game_values.gamemodemenusettings.frag.scoring);
-            } else if (ts->iMode == game_mode_timelimit) {
-                ts->fUseSettings = true;
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.style, game_values.gamemodemenusettings.time.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.scoring, game_values.gamemodemenusettings.time.scoring);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.percentextratime, game_values.gamemodemenusettings.time.percentextratime);
-            } else if (ts->iMode == game_mode_jail) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.style, game_values.gamemodemenusettings.jail.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.timetofree, game_values.gamemodemenusettings.jail.timetofree);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.tagfree, game_values.gamemodemenusettings.jail.tagfree);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.percentkey, game_values.gamemodemenusettings.jail.percentkey);
-            } else if (ts->iMode == game_mode_coins) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.coins.penalty, game_values.gamemodemenusettings.coins.penalty);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.coins.quantity, game_values.gamemodemenusettings.coins.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.coins.percentextracoin, game_values.gamemodemenusettings.coins.percentextracoin);
-            } else if (ts->iMode == game_mode_stomp) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.stomp.rate, game_values.gamemodemenusettings.stomp.rate);
-
-                for (int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.stomp.enemyweight[iEnemy]), game_values.gamemodemenusettings.stomp.enemyweight[iEnemy]);
-            } else if (ts->iMode == game_mode_eggs) {
-                ts->fUseSettings = true;
-
-                for (int iEgg = 0; iEgg < 4; iEgg++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.egg.eggs[iEgg]), game_values.gamemodemenusettings.egg.eggs[iEgg]);
-
-                for (int iYoshi = 0; iYoshi < 4; iYoshi++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.egg.yoshis[iYoshi]), game_values.gamemodemenusettings.egg.yoshis[iYoshi]);
-
-                ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.egg.explode), game_values.gamemodemenusettings.egg.explode);
-            } else if (ts->iMode == game_mode_ctf) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.speed, game_values.gamemodemenusettings.flag.speed);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.touchreturn, game_values.gamemodemenusettings.flag.touchreturn);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.pointmove, game_values.gamemodemenusettings.flag.pointmove);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.autoreturn, game_values.gamemodemenusettings.flag.autoreturn);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.homescore, game_values.gamemodemenusettings.flag.homescore);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.centerflag, game_values.gamemodemenusettings.flag.centerflag);
-            } else if (ts->iMode == game_mode_chicken) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chicken.usetarget, game_values.gamemodemenusettings.chicken.usetarget);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chicken.glide, game_values.gamemodemenusettings.chicken.glide);
-            } else if (ts->iMode == game_mode_tag) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.tag.tagontouch, game_values.gamemodemenusettings.tag.tagontouch);
-            } else if (ts->iMode == game_mode_star) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.time, game_values.gamemodemenusettings.star.time);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.shine, game_values.gamemodemenusettings.star.shine);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.percentextratime, game_values.gamemodemenusettings.star.percentextratime);
-            } else if (ts->iMode == game_mode_domination) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.quantity, game_values.gamemodemenusettings.domination.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.relocationfrequency, game_values.gamemodemenusettings.domination.relocationfrequency);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.loseondeath, game_values.gamemodemenusettings.domination.loseondeath);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.relocateondeath, game_values.gamemodemenusettings.domination.relocateondeath);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.stealondeath, game_values.gamemodemenusettings.domination.stealondeath);
-            } else if (ts->iMode == game_mode_koth) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.kingofthehill.areasize, game_values.gamemodemenusettings.kingofthehill.areasize);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.kingofthehill.relocationfrequency, game_values.gamemodemenusettings.kingofthehill.relocationfrequency);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.kingofthehill.maxmultiplier, game_values.gamemodemenusettings.kingofthehill.maxmultiplier);
-            } else if (ts->iMode == game_mode_race) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.race.quantity, game_values.gamemodemenusettings.race.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.race.speed, game_values.gamemodemenusettings.race.speed);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.race.penalty, game_values.gamemodemenusettings.race.penalty);
-            } else if (ts->iMode == game_mode_frenzy) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frenzy.quantity, game_values.gamemodemenusettings.frenzy.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frenzy.rate, game_values.gamemodemenusettings.frenzy.rate);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frenzy.storedshells, game_values.gamemodemenusettings.frenzy.storedshells);
-
-                for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.frenzy.powerupweight[iPowerup]), game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
-            } else if (ts->iMode == game_mode_survival) {
-                ts->fUseSettings = true;
-
-                for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.survival.enemyweight[iEnemy]), game_values.gamemodemenusettings.survival.enemyweight[iEnemy]);
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.survival.density, game_values.gamemodemenusettings.survival.density);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.survival.speed, game_values.gamemodemenusettings.survival.speed);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.survival.shield, game_values.gamemodemenusettings.survival.shield);
-            } else if (ts->iMode == game_mode_greed) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.coinlife, game_values.gamemodemenusettings.greed.coinlife);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.owncoins, game_values.gamemodemenusettings.greed.owncoins);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.multiplier, game_values.gamemodemenusettings.greed.multiplier);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.percentextracoin, game_values.gamemodemenusettings.greed.percentextracoin);
-            } else if (ts->iMode == game_mode_health) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.health.startlife, game_values.gamemodemenusettings.health.startlife);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.health.maxlife, game_values.gamemodemenusettings.health.maxlife);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.health.percentextralife, game_values.gamemodemenusettings.health.percentextralife);
-            } else if (ts->iMode == game_mode_collection) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.quantity, game_values.gamemodemenusettings.collection.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.rate, game_values.gamemodemenusettings.collection.rate);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.banktime, game_values.gamemodemenusettings.collection.banktime);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.cardlife, game_values.gamemodemenusettings.collection.cardlife);
-            } else if (ts->iMode == game_mode_chase) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chase.phantospeed, game_values.gamemodemenusettings.chase.phantospeed);
-
-                for (short iPhanto = 0; iPhanto < 3; iPhanto++)
-                    ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chase.phantoquantity[iPhanto], game_values.gamemodemenusettings.chase.phantoquantity[iPhanto]);
-            } else if (ts->iMode == game_mode_shyguytag) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.shyguytag.tagonsuicide, game_values.gamemodemenusettings.shyguytag.tagonsuicide);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.shyguytag.tagtransfer, game_values.gamemodemenusettings.shyguytag.tagtransfer);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.shyguytag.freetime, game_values.gamemodemenusettings.shyguytag.freetime);
-            } else if (ts->iMode == game_mode_boss_minigame) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.bosstype, game_values.gamemodemenusettings.boss.bosstype);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.difficulty, game_values.gamemodemenusettings.boss.difficulty);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.hitpoints, game_values.gamemodemenusettings.boss.hitpoints);
-            }
+            const std::vector<bool> usedSettings = deserializeGMS(ts->iMode, ts->gmsSettings);
+            ts->iNumUsedSettings = std::count(usedSettings.cbegin(), usedSettings.cend(), true);
+            ts->fUseSettings = !usedSettings.empty();
         }
     } else if (iStageType == 1) { //Bonus House
         if (pszTemp) {
