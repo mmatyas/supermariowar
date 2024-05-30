@@ -96,8 +96,6 @@ class MenuState : public GameState
 	private:
 		MenuState();
 		~MenuState();
-        MenuState(MenuState const&);
-        void operator=(MenuState const&);
 
 		void onEnterState();
 
