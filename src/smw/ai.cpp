@@ -13,6 +13,7 @@
 #include "gamemodes/Tag.h"
 #include "objects/IO_FlameCannon.h"
 
+#include "objects/moving/MO_BonusHouseChest.h"
 #include "objects/moving/MO_Boomerang.h"
 #include "objects/moving/MO_CarriedObject.h"
 #include "objects/moving/MO_Coin.h"
@@ -105,33 +106,24 @@ void CPlayerAI::Init()
     //Scan yoshi's egg mode objects to make sure that we ignore eggs without matching yoshis
     if (game_values.gamemode->gamemode == game_mode_eggs) {
         bool fYoshi[4] = {false, false, false, false};
+
         //Scan Yoshis to see which ones are present
         for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-            if (object_moving == obj->getObjectType()) {
-                IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
-
-                if (movingobject_yoshi == movingobject->getMovingObjectType()) {
-                    MO_Yoshi * yoshi = (MO_Yoshi*)movingobject;
-                    fYoshi[yoshi->getColor()] = true;
-                }
+            if (auto* yoshi = dynamic_cast<MO_Yoshi*>(obj.get())) {
+                fYoshi[yoshi->getColor()] = true;
             }
         }
 
         //Now scan eggs and ignore any egg that doesn't have a yoshi
         for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-            if (object_moving == obj->getObjectType()) {
-                IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
+            if (auto* egg = dynamic_cast<CO_Egg*>(obj.get())) {
+                if (!fYoshi[egg->getColor()]) {
+                    AttentionObject * ao = new AttentionObject();
+                    ao->iID = egg->iNetworkID;
+                    ao->iType = 1;     //Ignore this object
+                    ao->iTimer = 0;		//Ignore it forever
 
-                if (movingobject_egg == movingobject->getMovingObjectType()) {
-                    CO_Egg * egg = (CO_Egg*)movingobject;
-                    if (!fYoshi[egg->getColor()]) {
-                        AttentionObject * ao = new AttentionObject();
-                        ao->iID = egg->iNetworkID;
-                        ao->iType = 1;     //Ignore this object
-                        ao->iTimer = 0;		//Ignore it forever
-
-                        attentionObjects[ao->iID] = ao;
-                    }
+                    attentionObjects[ao->iID] = ao;
                 }
             }
         }
@@ -367,17 +359,17 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 if (!pPlayer->inair) playerKeys->game_down.fDown = true;
             }
 
-            if (goal->getObjectType() == object_moving && ((IO_MovingObject*)goal)->getMovingObjectType() == movingobject_egg)
+            if (dynamic_cast<CO_Egg*>(goal))
                 playerKeys->game_turbo.fDown = true;
-            else if (goal->getObjectType() == object_moving && ((IO_MovingObject*) goal)->getMovingObjectType() == movingobject_star && pPlayer->throw_star == 0)
+            else if (dynamic_cast<CO_Star*>(goal) && pPlayer->throw_star == 0)
                 playerKeys->game_turbo.fDown = true;
-            else if (goal->getObjectType() == object_moving && ((IO_MovingObject*) goal)->getMovingObjectType() == movingobject_flag)
+            else if (dynamic_cast<CO_Flag*>(goal))
                 playerKeys->game_turbo.fDown = true;
 
             //Drop current item if we're going after another carried item
             if (carriedItem) {
-                if (goal->getObjectType() == object_moving) {
-                    MovingObjectType goalobjecttype = ((IO_MovingObject*)goal)->getMovingObjectType();
+                if (auto* movingobject = dynamic_cast<IO_MovingObject*>(goal)) {
+                    MovingObjectType goalobjecttype = movingobject->getMovingObjectType();
                     if (goalobjecttype == movingobject_egg || goalobjecttype == movingobject_flag ||
                             goalobjecttype == movingobject_star || goalobjecttype == movingobject_phantokey) {
                         MovingObjectType carriedobjecttype = carriedItem->getMovingObjectType();
@@ -392,7 +384,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             }
 
             //Open treasure chests in bonus houses in world mode
-            if (goal->getObjectType() == object_moving && ((IO_MovingObject*)goal)->getMovingObjectType() == movingobject_treasurechest)
+            if (dynamic_cast<MO_BonusHouseChest*>(goal))
                 playerKeys->game_turbo.fPressed = true;
         } else if (actionType == 2) { //Evade Threat
             CObject * threat = nearestObjects.threat;
@@ -521,8 +513,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
         }
 
         //Drop live bombs if they are not yours
-        if (carriedobjecttype == movingobject_bomb) {
-            CO_Bomb * bomb = (CO_Bomb*)carriedItem;
+        if (auto* bomb = dynamic_cast<CO_Bomb*>(carriedItem)) {
             if (bomb->iTeamID != pPlayer->teamID)
                 playerKeys->game_turbo.fDown = false;
         } else if (carriedobjecttype == movingobject_carried || carriedobjecttype == movingobject_throwbox) { //Drop springs,spikes,shoes
