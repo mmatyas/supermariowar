@@ -13,10 +13,8 @@ extern CGameMode * gamemodes[GAMEMODE_LAST];
 extern CGameValues game_values;
 extern MapList *maplist;
 
-/**********************************
-* Tour Stop functions
-**********************************/
 
+namespace {
 template<typename T>
 short ReadTourStopSetting(T& output, T defaultVal)
 {
@@ -29,6 +27,204 @@ short ReadTourStopSetting(T& output, T defaultVal)
         return 0;
     }
 }
+
+// Serialization functions for each game mode setting
+
+template<typename T> std::vector<short> serialize(const T& gms) = delete;
+
+template<> std::vector<short> serialize(const ClassicGameModeSettings& gms) {
+    return {
+        static_cast<short>(gms.style),
+        static_cast<short>(gms.scoring),
+    };
+}
+template<> std::vector<short> serialize(const FragGameModeSettings& gms) {
+    return {
+        static_cast<short>(gms.style),
+        static_cast<short>(gms.scoring),
+    };
+}
+template<> std::vector<short> serialize(const TimeGameModeSettings& gms) {
+    return {
+        static_cast<short>(gms.style),
+        static_cast<short>(gms.scoring),
+        gms.percentextratime,
+    };
+}
+template<> std::vector<short> serialize(const JailGameModeSettings& gms) {
+    return {
+        static_cast<short>(gms.style),
+        gms.timetofree,
+        gms.tagfree,
+        gms.percentkey,
+    };
+}
+template<> std::vector<short> serialize(const CoinGameModeSettings& gms) {
+    return {
+        gms.penalty,
+        gms.quantity,
+        gms.percentextracoin,
+    };
+}
+template<> std::vector<short> serialize(const StompGameModeSettings& gms) {
+    std::vector<short> values;
+    values.reserve(1 + gms.enemyweight.size());
+    values.emplace_back(gms.rate);
+    values.insert(values.end(), gms.enemyweight.cbegin(), gms.enemyweight.cend());
+    return values;
+}
+template<> std::vector<short> serialize(const EggGameModeSettings& gms) {
+    std::vector<short> values;
+    values.reserve(gms.eggs.size() + gms.yoshis.size() + 1);
+    values.insert(values.end(), gms.eggs.cbegin(), gms.eggs.cend());
+    values.insert(values.end(), gms.yoshis.cbegin(), gms.yoshis.cend());
+    values.emplace_back(gms.explode);
+    return values;
+}
+template<> std::vector<short> serialize(const FlagGameModeSettings& gms) {
+    return {
+        gms.speed,
+        gms.touchreturn,
+        gms.pointmove,
+        gms.autoreturn,
+        gms.homescore,
+        gms.centerflag,
+    };
+}
+template<> std::vector<short> serialize(const ChickenGameModeSettings& gms) {
+    return {
+        gms.usetarget,
+        gms.glide,
+    };
+}
+template<> std::vector<short> serialize(const TagGameModeSettings& gms) {
+    return {
+        gms.tagontouch,
+    };
+}
+template<> std::vector<short> serialize(const StarGameModeSettings& gms) {
+    return {
+        gms.time,
+        static_cast<short>(gms.shine),
+        gms.percentextratime,
+    };
+}
+template<> std::vector<short> serialize(const DominationGameModeSettings& gms) {
+    return {
+        gms.quantity,
+        gms.relocationfrequency,
+        gms.loseondeath,
+        gms.relocateondeath,
+        gms.stealondeath,
+    };
+}
+template<> std::vector<short> serialize(const KingOfTheHillModeSettings& gms) {
+    return {
+        gms.areasize,
+        gms.relocationfrequency,
+        gms.maxmultiplier,
+    };
+}
+template<> std::vector<short> serialize(const RaceGameModeSettings& gms) {
+    return {
+        gms.quantity,
+        gms.speed,
+        gms.penalty,
+    };
+}
+template<> std::vector<short> serialize(const FrenzyGameModeSettings& gms) {
+    std::vector<short> values;
+    values.reserve(3 + gms.powerupweight.size());
+    values.emplace_back(gms.quantity);
+    values.emplace_back(gms.rate);
+    values.emplace_back(gms.storedshells);
+    values.insert(values.end(), gms.powerupweight.cbegin(), gms.powerupweight.cend());
+    return values;
+}
+template<> std::vector<short> serialize(const SurvivalGameModeSettings& gms) {
+    std::vector<short> values;
+    values.reserve(gms.enemyweight.size() + 3);
+    values.insert(values.end(), gms.enemyweight.cbegin(), gms.enemyweight.cend());
+    values.emplace_back(gms.density);
+    values.emplace_back(gms.speed);
+    values.emplace_back(gms.shield);
+    return values;
+}
+template<> std::vector<short> serialize(const GreedGameModeSettings& gms) {
+    return {
+        gms.coinlife,
+        gms.owncoins,
+        gms.multiplier,
+        gms.percentextracoin,
+    };
+}
+template<> std::vector<short> serialize(const HealthGameModeSettings& gms) {
+    return {
+        gms.startlife,
+        gms.maxlife,
+        gms.percentextralife,
+    };
+}
+template<> std::vector<short> serialize(const CollectionGameModeSettings& gms) {
+    return {
+        gms.quantity,
+        gms.rate,
+        gms.banktime,
+        gms.cardlife,
+    };
+}
+template<> std::vector<short> serialize(const ChaseGameModeSettings& gms) {
+    std::vector<short> values;
+    values.reserve(1 + gms.phantoquantity.size());
+    values.emplace_back(gms.phantospeed);
+    values.insert(values.end(), gms.phantoquantity.cbegin(), gms.phantoquantity.cend());
+    return values;
+}
+template<> std::vector<short> serialize(const ShyGuyTagGameModeSettings& gms) {
+    return {
+        gms.tagonsuicide,
+        gms.tagtransfer,
+        gms.freetime,
+    };
+}
+template<> std::vector<short> serialize(const BossGameModeSettings& gms) {
+    return {
+        static_cast<short>(gms.bosstype),
+        gms.difficulty,
+        gms.hitpoints,
+    };
+}
+
+std::vector<short> serializeGMS(short gamemodeId, const GameModeSettings& gmsSettings)
+{
+    switch (gamemodeId) {
+        case game_mode_classic: return serialize(gmsSettings.classic);
+        case game_mode_frag: return serialize(gmsSettings.frag);
+        case game_mode_timelimit: return serialize(gmsSettings.time);
+        case game_mode_jail: return serialize(gmsSettings.jail);
+        case game_mode_coins: return serialize(gmsSettings.coins);
+        case game_mode_stomp: return serialize(gmsSettings.stomp);
+        case game_mode_eggs: return serialize(gmsSettings.egg);
+        case game_mode_ctf: return serialize(gmsSettings.flag);
+        case game_mode_chicken: return serialize(gmsSettings.chicken);
+        case game_mode_tag: return serialize(gmsSettings.tag);
+        case game_mode_star: return serialize(gmsSettings.star);
+        case game_mode_domination: return serialize(gmsSettings.domination);
+        case game_mode_koth: return serialize(gmsSettings.kingofthehill);
+        case game_mode_race: return serialize(gmsSettings.race);
+        case game_mode_frenzy: return serialize(gmsSettings.frenzy);
+        case game_mode_survival: return serialize(gmsSettings.survival);
+        case game_mode_greed: return serialize(gmsSettings.greed);
+        case game_mode_health: return serialize(gmsSettings.health);
+        case game_mode_collection: return serialize(gmsSettings.collection);
+        case game_mode_chase: return serialize(gmsSettings.chase);
+        case game_mode_shyguytag: return serialize(gmsSettings.shyguytag);
+        case game_mode_boss_minigame: return serialize(gmsSettings.boss);
+    }
+    return {};
+}
+} // namespace
+
 
 TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorld)
 {
@@ -475,364 +671,11 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
         }
 
         if (ts->fUseSettings) {
-            if (ts->iMode == game_mode_classic) { //classic
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.classic.style));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.classic.scoring));
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_frag) { //frag
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.frag.style));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.frag.scoring));
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_timelimit) { //time
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.time.style));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.time.scoring));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.time.percentextratime);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_jail) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.jail.style));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.jail.timetofree);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.jail.tagfree);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.jail.percentkey);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_coins) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.coins.penalty);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.coins.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.coins.percentextracoin);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_stomp) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.stomp.rate);
-                    strcat(buffer, szTemp);
-                }
-
-                for (int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++) {
-                    if (ts->iNumUsedSettings > iEnemy + 1) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.stomp.enemyweight[iEnemy]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-            } else if (ts->iMode == game_mode_eggs) {
-                for (int iEgg = 0; iEgg < 4; iEgg++) {
-                    if (ts->iNumUsedSettings > iEgg) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.egg.eggs[iEgg]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-
-                for (int iYoshi = 0; iYoshi < 4; iYoshi++) {
-                    if (ts->iNumUsedSettings > iYoshi + 4) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.egg.yoshis[iYoshi]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-
-                if (ts->iNumUsedSettings > 8) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.egg.explode);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_ctf) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.speed);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.touchreturn);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.pointmove);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.autoreturn);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 4) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.homescore);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 5) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.centerflag);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_chicken) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.chicken.usetarget);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.chicken.glide);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_tag) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.tag.tagontouch);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_star) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.star.time);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.star.shine));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.star.percentextratime);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_domination) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocationfrequency);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.loseondeath);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocateondeath);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 4) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.stealondeath);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_koth) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.areasize);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.relocationfrequency);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.maxmultiplier);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_race) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.race.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.race.speed);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.race.penalty);
-                    strcat(buffer, szTemp);
-                }
-            // NOTE: Owned missing
-            } else if (ts->iMode == game_mode_frenzy) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.rate);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.storedshells);
-                    strcat(buffer, szTemp);
-                }
-
-                for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
-                    if (ts->iNumUsedSettings > iPowerup + 3) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.powerupweight[iPowerup]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-            } else if (ts->iMode == game_mode_survival) {
-                for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++) {
-                    if (ts->iNumUsedSettings > iEnemy) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.survival.enemyweight[iEnemy]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.survival.density);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 4) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.survival.speed);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 5) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.survival.shield);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_greed) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.greed.coinlife);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.greed.owncoins);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.greed.multiplier);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.greed.percentextracoin);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_health) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.health.startlife);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.health.maxlife);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.health.percentextralife);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_collection) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.collection.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.collection.rate);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.collection.banktime);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.collection.cardlife);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_chase) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantospeed);
-                    strcat(buffer, szTemp);
-                }
-
-                for (short iPhanto = 0; iPhanto < 3; iPhanto++) {
-                    if (ts->iNumUsedSettings > iPhanto + 1) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantoquantity[iPhanto]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-            } else if (ts->iMode == game_mode_shyguytag) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagonsuicide);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagtransfer);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.freetime);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_boss_minigame) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.boss.bosstype));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.boss.difficulty);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.boss.hitpoints);
-                    strcat(buffer, szTemp);
-                }
+            std::vector<short> values = serializeGMS(ts->iMode, ts->gmsSettings);
+            values.resize(ts->iNumUsedSettings);
+            for (short value : values) {
+                sprintf(szTemp, ",%d", value);
+                strcat(buffer, szTemp);
             }
         }
     } else if (ts->iStageType == 1) { //Bonus House
