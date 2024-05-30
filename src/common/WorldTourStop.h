@@ -15,7 +15,7 @@ struct WorldStageBonus {
 };
 
 struct TourStop {
-    const char * pszMapFile;
+    std::string pszMapFile;
     short iMode;
     short iGoal;
     short iPoints;
@@ -36,6 +36,6 @@ struct TourStop {
 };
 
 
-TourStop* ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld);
+TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld);
 std::string WriteTourStopLine(const TourStop& ts, bool fIsWorld);
 void ResetTourStops();

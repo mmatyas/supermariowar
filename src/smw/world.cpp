@@ -605,7 +605,8 @@ bool WorldMap::Load(short tilesize)
 
             iReadType = iNumStages == 0 ? 12 : 11;
         } else if (iReadType == 11) { //stage details
-            TourStop * ts = ParseTourStopLine(buffer, version, true);
+            TourStop* ts = new TourStop();
+            *ts = ParseTourStopLine(buffer, version, true);
 
             game_values.tourstops.push_back(ts);
             game_values.tourstoptotal++;

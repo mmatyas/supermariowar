@@ -3495,15 +3495,13 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 				sMapThumbnail = NULL;
 			}
         } else {
-			const char * pszMapName = ts->pszMapFile;
-
-            if (pszMapName) {
+            if (!ts->pszMapFile.empty()) {
                 if (sMapThumbnail) {
 					SDL_FreeSurface(sMapThumbnail);
 					sMapThumbnail = NULL;
 				}
 
-                if (maplist->findexact(pszMapName, false)) {
+                if (maplist->findexact(ts->pszMapFile.c_str(), false)) {
 					g_map->loadMap(maplist->currentFilename(), read_type_preview);
 					sMapThumbnail = g_map->createThumbnailSurface(true);
                 } else { //otherwise show a unknown map icon
@@ -3732,10 +3730,10 @@ void EditStage(short iEditStage)
 	miPointsField->setOutputPtr(&ts->iPoints);
 	miFinalStageField->setOutputPtr(&ts->fEndStage);
 
-	if (!ts->pszMapFile)
+	if (ts->pszMapFile.empty())
 		ts->pszMapFile = maplist->currentShortmapname();
 
-	miMapField->SetMap(ts->pszMapFile, false);
+	miMapField->SetMap(ts->pszMapFile.c_str(), false);
 
 	miBonusType->setOutputPtr(&ts->iBonusType);
 	miBonusTextField[0]->SetData(ts->szBonusText[0], 128);

@@ -163,12 +163,12 @@ void MI_TourStop::Refresh(short iTourStop)
         miPointsField->add(szTemp, 0, false);
 
         if (tourstop->iMode == game_mode_pipe_minigame) {
-            bool fFound = miMapField->SetMap(tourstop->pszMapFile, true);
+            bool fFound = miMapField->SetMap(tourstop->pszMapFile.c_str(), true);
 
             if (!fFound)
                 miMapField->SetSpecialMap("Pipe Minigame", "maps/special/two52_special_pipe_minigame.map");
         } else if (tourstop->iMode == game_mode_boss_minigame) {
-            bool fFound = miMapField->SetMap(tourstop->pszMapFile, true);
+            bool fFound = miMapField->SetMap(tourstop->pszMapFile.c_str(), true);
 
             if (!fFound) {
                 switch (tourstop->gmsSettings.boss.bosstype) {
@@ -184,12 +184,12 @@ void MI_TourStop::Refresh(short iTourStop)
                 }
             }
         } else if (tourstop->iMode == game_mode_boxes_minigame) {
-            bool fFound = miMapField->SetMap(tourstop->pszMapFile, true);
+            bool fFound = miMapField->SetMap(tourstop->pszMapFile.c_str(), true);
 
             if (!fFound)
                 miMapField->SetSpecialMap("Boxes Minigame", "maps/special/two52_special_boxes_minigame.map");
         } else {
-            miMapField->SetMap(tourstop->pszMapFile, true);
+            miMapField->SetMap(tourstop->pszMapFile.c_str(), true);
         }
 
         miTourStopMenuHeaderText->SetText(tourstop->szName);

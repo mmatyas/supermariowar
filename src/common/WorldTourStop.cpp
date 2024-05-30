@@ -451,64 +451,61 @@ std::vector<bool> deserializeGMS(short gamemodeId, GameModeSettings& gmsSettings
 } // namespace
 
 
-TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorld)
+TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
 {
-    TourStop * ts = new TourStop();
-    ts->fUseSettings = false;
-    ts->iNumUsedSettings = 0;
+    TourStop ts;
+    ts.fUseSettings = false;
+    ts.iNumUsedSettings = 0;
 
-    char * pszTemp = strtok(buffer, ",\n");
+    char* pszTemp = strtok(buffer, ",\n");
 
-    short iStageType = 0;
+    ts.iStageType = 0;
     if (fIsWorld) {
-        iStageType = atoi(pszTemp);
-        if (iStageType < 0 || iStageType > 1)
-            iStageType = 0;
+        ts.iStageType = atoi(pszTemp);
+        if (ts.iStageType < 0 || ts.iStageType > 1)
+            ts.iStageType = 0;
 
         pszTemp = strtok(NULL, ",\n");
     }
 
-    ts->iStageType = iStageType;
+    ts.szBonusText[0][0] = 0;
+    ts.szBonusText[1][0] = 0;
+    ts.szBonusText[2][0] = 0;
+    ts.szBonusText[3][0] = 0;
+    ts.szBonusText[4][0] = 0;
 
-    ts->szBonusText[0][0] = 0;
-    ts->szBonusText[1][0] = 0;
-    ts->szBonusText[2][0] = 0;
-    ts->szBonusText[3][0] = 0;
-    ts->szBonusText[4][0] = 0;
-
-    if (iStageType == 0) {
-        char * szMap = new char[strlen(pszTemp) + 1];
+    if (ts.iStageType == 0) {
+        char* szMap = new char[strlen(pszTemp) + 1];
         strcpy(szMap, pszTemp);
-
         pszTemp = strtok(NULL, ",\n");
 
         if (pszTemp)
-            ts->iMode = atoi(pszTemp);
+            ts.iMode = atoi(pszTemp);
         else
-            ts->iMode = -1;
+            ts.iMode = -1;
+
+        const bool isMinigame = ts.iMode == game_mode_pipe_minigame || ts.iMode == game_mode_boss_minigame || ts.iMode == game_mode_boxes_minigame;
 
         //If this is 1.8.0.2 or earlier and we are playing a minigame, use the default map
-        if (version <= Version {1, 8, 0, 2} &&
-                (ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame)) {
+        if (version <= Version {1, 8, 0, 2} && isMinigame) {
             //Get a bogus map name so the mode will know to load the default map
-            ts->pszMapFile = maplist->GetUnknownMapName();
+            ts.pszMapFile = maplist->GetUnknownMapName();
         } else {
             //Using the maplist to cheat and find a map for us
             maplist->SaveCurrent();
 
             //If that map is not found
             bool fMapFound = maplist->findexact(szMap, true);
-
             if (!fMapFound) {
-                if (ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame) {
+                if (isMinigame) {
                     //Get a bogus map name so the mode will know to load the default map
-                    ts->pszMapFile = maplist->GetUnknownMapName();
+                    ts.pszMapFile = maplist->GetUnknownMapName();
                 } else {
                     maplist->random(false);
-                    ts->pszMapFile = maplist->currentShortmapname();
+                    ts.pszMapFile = maplist->currentShortmapname();
                 }
             } else {
-                ts->pszMapFile = maplist->currentShortmapname();
+                ts.pszMapFile = maplist->currentShortmapname();
             }
 
             maplist->ResumeCurrent();
@@ -519,30 +516,30 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
         //The pipe minigame was using the value 24 from version 1.8.0.0 to 1.8.0.2
         //It was later switched to 1000 to accomodate new modes easily
         if (version <= Version {1, 8, 0, 2}) {
-            if (ts->iMode == 24)
-                ts->iMode = game_mode_pipe_minigame;
+            if (ts.iMode == 24)
+                ts.iMode = game_mode_pipe_minigame;
         }
 
         //If a valid mode was not detected, then just choose a random mode
-        if (ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame && ts->iMode != game_mode_boss_minigame && ts->iMode != game_mode_boxes_minigame))
-            ts->iMode = RANDOM_INT(GAMEMODE_LAST);
+        if (ts.iMode < 0 || (ts.iMode >= GAMEMODE_LAST && !isMinigame))
+            ts.iMode = RANDOM_INT(GAMEMODE_LAST);
 
         pszTemp = strtok(NULL, ",\n");
 
         //This gets the closest game mode to what the tour has
-        ts->iGoal = -1;
+        ts.iGoal = -1;
         if (pszTemp) {
             //If it is commented out, this will allow things like 33 coins, 17 kill goals, etc.
-            //ts->iGoal = gamemodes[ts->iMode]->GetClosestGoal(atoi(pszTemp));
-            ts->iGoal = atoi(pszTemp);
+            //ts.iGoal = gamemodes[ts.iMode]->GetClosestGoal(atoi(pszTemp));
+            ts.iGoal = atoi(pszTemp);
         }
 
         //Default to a random goal if an invalid goal was used
-        if (ts->iGoal <= 0) {
-            if (ts->iMode < GAMEMODE_LAST)
-                ts->iGoal = gamemodes[ts->iMode]->GetOptions()[RANDOM_INT(GAMEMODE_NUM_OPTIONS - 1)].iValue;
+        if (ts.iGoal <= 0) {
+            if (ts.iMode < GAMEMODE_LAST)
+                ts.iGoal = gamemodes[ts.iMode]->GetOptions()[RANDOM_INT(GAMEMODE_NUM_OPTIONS - 1)].iValue;
             else
-                ts->iGoal = 50;
+                ts.iGoal = 50;
         }
 
         if (version >= Version {1, 7, 0, 2}) {
@@ -550,15 +547,15 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
 
             //Read in point value for tour stop
             if (pszTemp)
-                ts->iPoints = atoi(pszTemp);
+                ts.iPoints = atoi(pszTemp);
             else
-                ts->iPoints = 1;
+                ts.iPoints = 1;
 
             pszTemp = strtok(NULL, ",\n");
 
             if (fIsWorld) {
-                ts->iBonusType = 0;
-                ts->iNumBonuses = 0;
+                ts.iBonusType = 0;
+                ts.iNumBonuses = 0;
 
                 char * pszStart = pszTemp;
 
@@ -574,9 +571,9 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
                     else if (iWinnerPlace < 1 || iWinnerPlace > 4)
                         iWinnerPlace = 1;
 
-                    strcpy(ts->wsbBonuses[ts->iNumBonuses].szBonusString, pszStart);
+                    strcpy(ts.wsbBonuses[ts.iNumBonuses].szBonusString, pszStart);
 
-                    ts->wsbBonuses[ts->iNumBonuses].iWinnerPlace = iWinnerPlace - 1;
+                    ts.wsbBonuses[ts.iNumBonuses].iWinnerPlace = iWinnerPlace - 1;
 
                     short iPowerupOffset = 0;
                     if (pszStart[1] == 'w' || pszStart[1] == 'W')
@@ -588,9 +585,9 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
                     if (iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
                         iBonus = 0;
 
-                    ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
+                    ts.wsbBonuses[ts.iNumBonuses].iBonus = iBonus;
 
-                    if (++ts->iNumBonuses >= 10)
+                    if (++ts.iNumBonuses >= 10)
                         break;
 
                     if (pszEnd)
@@ -600,23 +597,23 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
                 }
             } else {
                 if (pszTemp)
-                    ts->iBonusType = atoi(pszTemp);
+                    ts.iBonusType = atoi(pszTemp);
                 else
-                    ts->iBonusType = 0;
+                    ts.iBonusType = 0;
             }
 
             pszTemp = strtok(NULL, ",\n");
 
             if (pszTemp) {
-                strncpy(ts->szName, pszTemp, 127);
-                ts->szName[127] = 0;
+                strncpy(ts.szName, pszTemp, 127);
+                ts.szName[127] = 0;
             } else {
-                sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
+                sprintf(ts.szName, "Tour Stop %d", game_values.tourstoptotal + 1);
             }
         } else {
-            ts->iPoints = 1;
-            ts->iBonusType = 0;
-            sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
+            ts.iPoints = 1;
+            ts.iBonusType = 0;
+            sprintf(ts.szName, "Tour Stop %d", game_values.tourstoptotal + 1);
         }
 
         if (version >= Version {1, 8, 0, 0}) {
@@ -625,24 +622,24 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
                 pszTemp = strtok(NULL, ",\n");
 
                 if (pszTemp)
-                    ts->fEndStage = pszTemp[0] == '1';
+                    ts.fEndStage = pszTemp[0] == '1';
                 else
-                    ts->fEndStage = false;
+                    ts.fEndStage = false;
             }
 
             //Copy in default values first
-            memcpy(&ts->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
+            memcpy(&ts.gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
 
-            const std::vector<bool> usedSettings = deserializeGMS(ts->iMode, ts->gmsSettings);
-            ts->iNumUsedSettings = std::count(usedSettings.cbegin(), usedSettings.cend(), true);
-            ts->fUseSettings = !usedSettings.empty();
+            const std::vector<bool> usedSettings = deserializeGMS(ts.iMode, ts.gmsSettings);
+            ts.iNumUsedSettings = std::count(usedSettings.cbegin(), usedSettings.cend(), true);
+            ts.fUseSettings = !usedSettings.empty();
         }
-    } else if (iStageType == 1) { //Bonus House
+    } else if (ts.iStageType == 1) { //Bonus House
         if (pszTemp) {
-            strncpy(ts->szName, pszTemp, 127);
-            ts->szName[127] = 0;
+            strncpy(ts.szName, pszTemp, 127);
+            ts.szName[127] = 0;
         } else {
-            sprintf(ts->szName, "Bonus House %d", game_values.tourstoptotal + 1);
+            sprintf(ts.szName, "Bonus House %d", game_values.tourstoptotal + 1);
         }
 
         pszTemp = strtok(NULL, ",\n");
@@ -651,31 +648,31 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
         if (iBonusOrdering < 0 || iBonusOrdering > 1)
             iBonusOrdering = 0;
 
-        ts->iBonusType = iBonusOrdering;
+        ts.iBonusType = iBonusOrdering;
 
         pszTemp = strtok(NULL, ",\n");
 
         char * pszStart = pszTemp;
 
-        ts->iBonusTextLines = 0;
+        ts.iBonusTextLines = 0;
         while (pszStart != NULL && pszStart[0] != '-') {
             char * pszEnd = strstr(pszStart, "|");
 
             if (pszEnd)
                 *pszEnd = 0;
 
-            strcpy(ts->szBonusText[ts->iBonusTextLines], pszStart);
+            strcpy(ts.szBonusText[ts.iBonusTextLines], pszStart);
 
-            if (++ts->iBonusTextLines >= 5 || !pszEnd)
+            if (++ts.iBonusTextLines >= 5 || !pszEnd)
                 break;
 
             pszStart = pszEnd + 1;
         }
 
-        ts->iNumBonuses = 0;
+        ts.iNumBonuses = 0;
         pszTemp = strtok(NULL, ",\n");
         while (pszTemp) {
-            strcpy(ts->wsbBonuses[ts->iNumBonuses].szBonusString, pszTemp);
+            strcpy(ts.wsbBonuses[ts.iNumBonuses].szBonusString, pszTemp);
 
             short iPowerupOffset = 0;
             if (pszTemp[0] == 'w' || pszTemp[0] == 'W')
@@ -689,10 +686,10 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
             if (iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS + NUM_WORLD_SCORE_BONUSES)
                 iBonus = 0;
 
-            ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
-            ts->wsbBonuses[ts->iNumBonuses].iWinnerPlace = -1;
+            ts.wsbBonuses[ts.iNumBonuses].iBonus = iBonus;
+            ts.wsbBonuses[ts.iNumBonuses].iWinnerPlace = -1;
 
-            if (++ts->iNumBonuses >= MAX_BONUS_CHESTS)
+            if (++ts.iNumBonuses >= MAX_BONUS_CHESTS)
                 break;
 
             pszTemp = strtok(NULL, ",\n");

@@ -1312,7 +1312,7 @@ void MenuState::update()
                     if (game_values.gamemode->gamemode == game_mode_pipe_minigame ||
                             game_values.gamemode->gamemode == game_mode_boss_minigame ||
                             game_values.gamemode->gamemode == game_mode_boxes_minigame) {
-                        fMiniGameMapFound = maplist->findexact(game_values.tourstops[game_values.tourstopcurrent]->pszMapFile, true);
+                        fMiniGameMapFound = maplist->findexact(game_values.tourstops[game_values.tourstopcurrent]->pszMapFile.c_str(), true);
 
                         if (fMiniGameMapFound) {
                             g_map->loadMap(maplist->currentFilename(), read_type_full);
@@ -1502,7 +1502,8 @@ bool MenuState::ReadTourFile()
             continue;
         }
 
-        TourStop * ts = ParseTourStopLine(buffer, version, false);
+        TourStop* ts = new TourStop();
+        *ts = ParseTourStopLine(buffer, version, false);
 
         game_values.tourstops.push_back(ts);
         game_values.tourstoptotal++;
