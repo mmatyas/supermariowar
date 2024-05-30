@@ -16,6 +16,10 @@ extern MapList *maplist;
 
 
 namespace {
+constexpr const char* const DELIM_EMPTY = "";
+constexpr const char* const DELIM_COMMA = ",";
+constexpr const char* const DELIM_PIPE = "|";
+
 /// Reads the next integer token, converts it to type T, and returns `true`.
 /// If there are no more tokens, uses the default value, and returns `false`.
 template<typename T>
@@ -698,90 +702,90 @@ TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorl
     return ts;
 }
 
-void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
+std::string WriteTourStopLine(const TourStop& ts, bool fIsWorld)
 {
-    buffer[0] = 0;
-    char szTemp[32];
+    std::vector<std::string> fields;
 
     if (fIsWorld) {
         //Write stage type (battle stage vs. bonus house, etc.)
-        sprintf(szTemp, "%d,", ts->iStageType);
-        strcat(buffer, szTemp);
+        fields.emplace_back(std::to_string(ts.iStageType));
     }
 
     //Battle stage
-    if (ts->iStageType == 0) {
-        strcat(buffer, ts->pszMapFile);
-        strcat(buffer, ",");
-
-        sprintf(szTemp, "%d,", ts->iMode);
-        strcat(buffer, szTemp);
-
-        sprintf(szTemp, "%d,", ts->iGoal);
-        strcat(buffer, szTemp);
-
-        sprintf(szTemp, "%d,", ts->iPoints);
-        strcat(buffer, szTemp);
+    if (ts.iStageType == 0) {
+        fields.emplace_back(ts.pszMapFile);
+        fields.emplace_back(std::to_string(ts.iMode));
+        fields.emplace_back(std::to_string(ts.iGoal));
+        fields.emplace_back(std::to_string(ts.iPoints));
 
         if (fIsWorld) {
-            if (ts->iNumBonuses <= 0) {
-                strcat(buffer, "0");
+            if (ts.iNumBonuses <= 0) {
+                fields.emplace_back("0");
             } else {
-                for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
-                    if (iBonus > 0)
-                        strcat(buffer, "|");
-
-                    strcat(buffer, ts->wsbBonuses[iBonus].szBonusString);
+                std::string field;
+                const char* delim = DELIM_EMPTY;
+                for (short iBonus = 0; iBonus < ts.iNumBonuses; iBonus++) {
+                    field += delim;
+                    field += ts.wsbBonuses[iBonus].szBonusString;
+                    delim = DELIM_PIPE;
                 }
+                fields.emplace_back(std::move(field));
             }
-
-            strcat(buffer, ",");
         } else {
-            sprintf(szTemp, "%d,", ts->iBonusType);
-            strcat(buffer, szTemp);
+            fields.emplace_back(std::to_string(ts.iBonusType));
         }
 
-        strcat(buffer, ts->szName);
-        strcat(buffer, ",");
+        fields.emplace_back(ts.szName);
 
         if (fIsWorld) {
-            sprintf(szTemp, "%d", ts->fEndStage);
-            strcat(buffer, szTemp);
+            fields.emplace_back(std::to_string(ts.fEndStage));
         }
 
-        if (ts->fUseSettings) {
-            std::vector<short> values = serializeGMS(ts->iMode, ts->gmsSettings);
-            values.resize(ts->iNumUsedSettings);
+        if (ts.fUseSettings) {
+            std::vector<short> values = serializeGMS(ts.iMode, ts.gmsSettings);
+            values.resize(ts.iNumUsedSettings);
             for (short value : values) {
-                sprintf(szTemp, ",%d", value);
-                strcat(buffer, szTemp);
+                fields.emplace_back(std::to_string(value));
             }
         }
-    } else if (ts->iStageType == 1) { //Bonus House
-        strcat(buffer, ts->szName);
-        strcat(buffer, ",");
+    } else if (ts.iStageType == 1) { //Bonus House
+        fields.emplace_back(ts.szName);
+        fields.emplace_back(std::to_string(ts.iBonusType));
 
-        sprintf(szTemp, "%d,", ts->iBonusType);
-        strcat(buffer, szTemp);
-
-        for (short iText = 0; iText < ts->iBonusTextLines; iText++) {
-            if (iText != 0)
-                strcat(buffer, "|");
-
-            strcat(buffer, ts->szBonusText[iText]);
+        std::string field;
+        const char* delim = DELIM_EMPTY;
+        for (short iText = 0; iText < ts.iBonusTextLines; iText++) {
+            field += delim;
+            field += ts.szBonusText[iText];
+            delim = DELIM_PIPE;
         }
 
-        if (ts->iNumBonuses == 0) {
-            strcat(buffer, ",p0");
+        if (ts.iNumBonuses == 0) {
+            fields.emplace_back("p0");
         } else {
-            for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
-                strcat(buffer, ",");
-                strcat(buffer, ts->wsbBonuses[iBonus].szBonusString);
+            for (short iBonus = 0; iBonus < ts.iNumBonuses; iBonus++) {
+                fields.emplace_back(ts.wsbBonuses[iBonus].szBonusString);
             }
         }
     }
 
-    strcat(buffer, "\n");
+    size_t out_size = 0;
+    for (const std::string& field : fields) {
+        out_size += field.size() + 1;  // Either comma or line break
+    }
+
+    std::string out;
+    out.reserve(out_size);
+
+    const char* delim = DELIM_EMPTY;
+    for (std::string& field : fields) {
+        out += delim;
+        out += std::move(field);
+        delim = DELIM_COMMA;
+    }
+
+    out += "\n";
+    return out;
 }
 
 void ResetTourStops()

@@ -2,6 +2,8 @@
 
 #include "GameModeSettings.h"
 
+#include <string>
+
 struct TourStop;
 struct Version;
 
@@ -35,5 +37,5 @@ struct TourStop {
 
 
 TourStop* ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld);
-void WriteTourStopLine(TourStop* ts, char* buffer, bool fIsWorld);
+std::string WriteTourStopLine(const TourStop& ts, bool fIsWorld);
 void ResetTourStops();

@@ -945,9 +945,8 @@ bool WorldMap::Save(const std::string& szPath)
     fprintf(file, "%d\n", game_values.tourstoptotal);
 
     for (short iStage = 0; iStage < game_values.tourstoptotal; iStage++) {
-        char szLine[4096];
-        WriteTourStopLine(game_values.tourstops[iStage], szLine, true);
-        fprintf(file, "%s", szLine);
+        std::string line = WriteTourStopLine(*game_values.tourstops[iStage], true);
+        fprintf(file, "%s", line.c_str());
     }
     fprintf(file, "\n");
 
