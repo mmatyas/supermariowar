@@ -8,6 +8,7 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
+#include "WorldTourStop.h"
 #include "objects/powerup/PU_TreasureChestBonus.h"
 
 extern CScore *score[4];

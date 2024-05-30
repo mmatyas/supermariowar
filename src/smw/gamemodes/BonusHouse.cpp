@@ -6,6 +6,7 @@
 #include "player.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
+#include "WorldTourStop.h"
 #include "objects/moving/MO_BonusHouseChest.h"
 
 extern CObjectContainer objectcontainer[3];

@@ -7,6 +7,7 @@
 #include "ResourceManager.h"
 #include "uimenu.h"
 #include "world.h"
+#include "WorldTourStop.h"
 
 #include <cmath>
 

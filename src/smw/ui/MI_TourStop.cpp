@@ -2,6 +2,7 @@
 
 #include "GameValues.h"
 #include "ResourceManager.h"
+#include "WorldTourStop.h"
 #include "gamemodes/MiniBoss.h"
 #include "gamemodes/MiniBoxes.h"
 #include "gamemodes/MiniPipe.h"

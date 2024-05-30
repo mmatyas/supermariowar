@@ -29,6 +29,8 @@
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"
+#include "world.h"
+#include "WorldTourStop.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_MapField.h"
@@ -46,7 +48,6 @@
 #include "objects/carriable/CO_ThrowBox.h"
 #include "objects/moving/MO_Coin.h"
 #include "objects/overmap/WO_Area.h"
-#include "world.h"
 
 #ifdef PNG_SAVE_FORMAT
 	// this function was added to SDL2

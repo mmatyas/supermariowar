@@ -15,6 +15,7 @@
 #include "ResourceManager.h"
 #include "Score.h"
 #include "sfx.h"
+#include "WorldTourStop.h"
 #include "gamemodes/Chicken.h"
 #include "gamemodes/MiniBoss.h"
 #include "gamemodes/Tag.h"

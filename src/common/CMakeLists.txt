@@ -67,6 +67,8 @@ add_library(CommonFiles STATIC
     uimenu.cpp
     uimenu.h
     Version.h
+    WorldTourStop.cpp
+    WorldTourStop.h
 )
 
 add_subdirectory(ui)

@@ -13,6 +13,7 @@
 
 class sfxSound;
 class CGameMode;
+struct TourStop;
 
 void ifSoundOnPlay(sfxSound&);
 #define ifsoundonandreadyplay(x) (x.isReady() && game_values.sound ? x.play() : -1)
@@ -39,34 +40,6 @@ struct TournamentScores {
     short       type[MAXTOURNAMENTGAMES];
     short       total;      //used for running total in a tour
 };
-
-struct WorldStageBonus {
-    short iWinnerPlace;
-    short iBonus;
-    char szBonusString[8];
-};
-
-struct TourStop {
-    const char * pszMapFile;
-    short iMode;
-    short iGoal;
-    short iPoints;
-    short iBonusType;
-    char szName[128];
-
-    bool fEndStage;
-    short iNumBonuses;
-    WorldStageBonus wsbBonuses[10];
-    short iStageType;
-
-    bool fUseSettings;
-    short iNumUsedSettings;
-    GameModeSettings gmsSettings;
-
-    short iBonusTextLines;
-    char szBonusText[5][128];
-};
-
 
 /// Gameplay-specific variables, which are reset on the start of a game.
 struct GameplayFlags {

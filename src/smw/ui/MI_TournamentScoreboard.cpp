@@ -7,6 +7,7 @@
 #include "ResourceManager.h"
 #include "Score.h"
 #include "uimenu.h"
+#include "WorldTourStop.h"
 #include "ui/MI_Image.h"
 #include "ui/MI_ScoreText.h"
 

@@ -21,8 +21,9 @@
 #include "ui/MI_TournamentScoreboard.h"
 #include "ui/MI_TourStop.h"
 #include "ui/MI_World.h"
-#include "world.h"
 #include "Version.h"
+#include "world.h"
+#include "WorldTourStop.h"
 
 #include "menu/BonusWheelMenu.h"
 #include "menu/GameSettingsMenu.h"
@@ -78,12 +79,9 @@ extern void UpdateScoreBoard();
 
 extern short LookupTeamID(short id);
 
-extern void ResetTourStops();
 extern WorldMap g_worldmap;
 
 extern void LoadCurrentMapBackground();
-
-extern TourStop * ParseTourStopLine(char * buffer, const Version& version, bool fIsWorld);
 
 extern CMap* g_map;
 
