@@ -5,6 +5,7 @@
 #include "RandomNumberGenerator.h"
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -194,44 +195,35 @@ public:
     bool fUsesWorldOverrides;
 };
 
-class WorldMusicList
-{
+class WorldMusicList {
 public:
     WorldMusicList();
-    ~WorldMusicList();
 
-    std::string GetMusic(int musicID, const char * szWorldName);
-    std::string GetCurrentMusic();
-
-    int GetCurrentIndex() {
-        return currentIndex;
+    size_t currentIndex() const {
+        return m_currentIndex;
     }
-    void SetCurrent(unsigned int index) {
-        if (index < entries.size())
-            currentIndex = index;
-        else
-            currentIndex = 0;
-    };
-
-    const char * current_name() {
-        return entries[currentIndex]->name.c_str();
+    void setCurrent(size_t index) {
+        m_currentIndex = index < m_entries.size() ? index : 0;
     }
+    const std::string& currentName() const {
+        return m_entries[m_currentIndex]->name;
+    }
+    std::string currentMusic(int musicID, const char * szWorldName) const {
+        return m_entries[m_currentIndex]->GetMusic(musicID, szWorldName);
+    }
+    size_t count() const {
+        return m_entries.size();
+    }
+
     void next();
     void prev();
-    void random() {
-        currentIndex = RANDOM_INT(entries.size());
-    }
+    void random();
 
-    int GetCount() {
-        return entries.size();
-    }
-
-    void UpdateEntriesWithOverrides();
+    void updateEntriesWithOverrides();
 
 private:
-    std::string CurrentMusic;
-    std::vector<WorldMusicEntry*> entries;
-    int currentIndex;
+    std::vector<std::unique_ptr<WorldMusicEntry>> m_entries;
+    size_t m_currentIndex = 0;
 };
 
 #endif // FILELIST_H

@@ -197,7 +197,7 @@ void create_globals()
 
     announcerlist->setCurrentIndex(0);
     musiclist->SetCurrent(0);
-    worldmusiclist->SetCurrent(0);
+    worldmusiclist->setCurrent(0);
     menugraphicspacklist->setCurrentIndex(0);
     worldgraphicspacklist->setCurrentIndex(0);
     gamegraphicspacklist->setCurrentIndex(0);

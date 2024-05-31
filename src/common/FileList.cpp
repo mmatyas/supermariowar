@@ -105,7 +105,7 @@ void UpdateMusicWithOverrides()
     }
 
     musiclist->UpdateEntriesWithOverrides();
-    worldmusiclist->UpdateEntriesWithOverrides();
+    worldmusiclist->updateEntriesWithOverrides();
 }
 
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -662,60 +662,32 @@ WorldMusicList::WorldMusicList()
     DirectoryListing d(convertPath("music/world/"));
     std::string currentdir;
     while (d.NextDirectory(currentdir)) {
-        WorldMusicEntry *m = new WorldMusicEntry(d.fullName(currentdir));
+        std::unique_ptr<WorldMusicEntry> m = std::make_unique<WorldMusicEntry>(d.fullName(currentdir));
         if (!m->fError)
-            entries.push_back(m);
-        else
-            delete m;
+            m_entries.push_back(std::move(m));
     }
 
-    if (entries.empty()) {
-        throw "Empty Music directory!";
+    if (m_entries.empty()) {
+        throw "Empty music directory!";
     }
-
-    currentIndex = 0;
 }
 
-WorldMusicList::~WorldMusicList()
-{
-    for (unsigned int i = 0; i < entries.size(); i++) {
-        delete entries[i];
-    }
-
-    entries.clear();
+void WorldMusicList::next() {
+    m_currentIndex = (m_currentIndex + 1) % m_entries.size();
 }
 
-std::string WorldMusicList::GetMusic(int musicID, const char * szWorldName)
-{
-    return entries[currentIndex]->GetMusic(musicID, szWorldName);
+void WorldMusicList::prev() {
+    m_currentIndex = (m_currentIndex == 0 ? m_entries.size() : m_currentIndex) - 1;
 }
 
-std::string WorldMusicList::GetCurrentMusic()
-{
-    return CurrentMusic;
+void WorldMusicList::random() {
+    m_currentIndex = RANDOM_INT(m_entries.size());
 }
 
-
-void WorldMusicList::next()
+void WorldMusicList::updateEntriesWithOverrides()
 {
-    if (currentIndex+1 == int(entries.size()))
-        currentIndex = 0;
-    else
-        currentIndex++;
-}
-
-void WorldMusicList::prev()
-{
-    if (currentIndex == 0)
-        currentIndex = entries.size()-1;
-    else
-        currentIndex--;
-}
-
-void WorldMusicList::UpdateEntriesWithOverrides()
-{
-    for (unsigned short i = 0; i < entries.size(); i++) {
-        entries[i]->UpdateWithOverrides();
+    for (std::unique_ptr<WorldMusicEntry>& entry : m_entries) {
+        entry->UpdateWithOverrides();
     }
 }
 

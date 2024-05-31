@@ -176,7 +176,7 @@ void MI_World::AdvanceTurn()
 {
     if (iSleepTurns > 0) {
         if (--iSleepTurns <= 0) {
-            rm->backgroundmusic[5].load(worldmusiclist->GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
+            rm->backgroundmusic[5].load(worldmusiclist->currentMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
             rm->backgroundmusic[5].play(false, false);
         }
     } else {
@@ -884,7 +884,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         fUsedItem = true;
         ifSoundOnPlay(rm->sfx_collectpowerup);
 
-        rm->backgroundmusic[5].load(worldmusiclist->GetMusic(WORLDMUSICSLEEP, ""));
+        rm->backgroundmusic[5].load(worldmusiclist->currentMusic(WORLDMUSICSLEEP, ""));
         rm->backgroundmusic[5].play(false, false);
     } else if (iPowerup == NUM_POWERUPS + 1) { //Cloud (allows player to skip stages)
         if (!fUsingCloud && iState == -1) {

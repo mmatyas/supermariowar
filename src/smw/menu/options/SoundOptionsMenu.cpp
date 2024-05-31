@@ -66,14 +66,14 @@ UI_SoundOptionsMenu::UI_SoundOptionsMenu()
     miPlaylistField = new MI_PlaylistField(&rm->spr_selectfield, 70, 300, "Game Music Pack", 500, 220);
     miWorldMusicField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 340, "World Music Pack", 500, 220);
 
-    int iCurrentMusic = worldmusiclist->GetCurrentIndex();
-    worldmusiclist->SetCurrent(0);
-    for (short iMusic = 0; iMusic < worldmusiclist->GetCount(); iMusic++) {
-        miWorldMusicField->add(worldmusiclist->current_name(), iMusic);
+    int iCurrentMusic = worldmusiclist->currentIndex();
+    worldmusiclist->setCurrent(0);
+    for (short iMusic = 0; iMusic < worldmusiclist->count(); iMusic++) {
+        miWorldMusicField->add(worldmusiclist->currentName(), iMusic);
         worldmusiclist->next();
     }
     miWorldMusicField->setCurrentValue(iCurrentMusic);
-    worldmusiclist->SetCurrent(iCurrentMusic);
+    worldmusiclist->setCurrent(iCurrentMusic);
     miWorldMusicField->setItemChangedCode(MENU_CODE_WORLD_MUSIC_CHANGED);
 
     miSoundOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);

@@ -1004,7 +1004,7 @@ void MenuState::update()
         } else if (MENU_CODE_WORLD_STAGE_NO_START == code) {
             mWorldMenu->CloseStageStart();
         } else if (MENU_CODE_WORLD_MUSIC_CHANGED == code) {
-            worldmusiclist->SetCurrent(mSoundOptionsMenu->GetCurrentWorldMusicID());
+            worldmusiclist->setCurrent(mSoundOptionsMenu->GetCurrentWorldMusicID());
         } else if (MENU_CODE_TOUR_STOP_CONTINUE == code || MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code) {
             //If this tour stop is forced, we need to load the map first
             if (MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
@@ -1300,7 +1300,7 @@ void MenuState::update()
                 LoadCurrentMapBackground();
 
                 if (game_values.music) {
-                    rm->backgroundmusic[0].load(worldmusiclist->GetMusic(WORLDMUSICBONUS, ""));
+                    rm->backgroundmusic[0].load(worldmusiclist->currentMusic(WORLDMUSICBONUS, ""));
                     rm->backgroundmusic[0].play(false, false);
                 }
             } else {
@@ -1401,7 +1401,7 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
 
             rm->backgroundmusic[2].stop();
-            rm->backgroundmusic[5].load(worldmusiclist->GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
+            rm->backgroundmusic[5].load(worldmusiclist->currentMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
             rm->backgroundmusic[5].play(false, false);
             fNeedMenuMusicReset = true;
 
