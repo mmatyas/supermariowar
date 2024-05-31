@@ -394,7 +394,7 @@ void CGameConfig::ReadBinaryConfig() {
         }
 
         announcerlist->setCurrentIndex(options.read_u8());
-        musiclist->SetCurrent(options.read_u8());
+        musiclist->setCurrent(options.read_u8());
         worldmusiclist->setCurrent(options.read_u8());
         soundpacklist->setCurrentIndex(options.read_u8());
         menugraphicspacklist->setCurrentIndex(options.read_u8());
@@ -533,7 +533,7 @@ void CGameConfig::WriteConfig() const
         options.write_raw(&playercontrol, sizeof(short) * 4);
 
         options.write_u8(announcerlist->currentIndex());
-        options.write_u8(musiclist->GetCurrentIndex());
+        options.write_u8(musiclist->currentIndex());
         options.write_u8(worldmusiclist->currentIndex());
         options.write_u8(soundpacklist->currentIndex());
         options.write_u8(menugraphicspacklist->currentIndex());

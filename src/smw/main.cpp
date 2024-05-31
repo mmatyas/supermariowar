@@ -196,7 +196,7 @@ void create_globals()
     gamegraphicspacklist = new GraphicsList();
 
     announcerlist->setCurrentIndex(0);
-    musiclist->SetCurrent(0);
+    musiclist->setCurrent(0);
     worldmusiclist->setCurrent(0);
     menugraphicspacklist->setCurrentIndex(0);
     worldgraphicspacklist->setCurrentIndex(0);

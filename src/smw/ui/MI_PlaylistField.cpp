@@ -41,7 +41,7 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
         if (playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
             musiclist->next();
             rm->backgroundmusic[2].stop();
-            rm->backgroundmusic[2].load(musiclist->GetMusic(1));
+            rm->backgroundmusic[2].load(musiclist->music(1));
 
             if (game_values.music)
                 rm->backgroundmusic[2].play(false, false);
@@ -52,7 +52,7 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
         if (playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed) {
             musiclist->prev();
             rm->backgroundmusic[2].stop();
-            rm->backgroundmusic[2].load(musiclist->GetMusic(1));
+            rm->backgroundmusic[2].load(musiclist->music(1));
 
             if (game_values.music)
                 rm->backgroundmusic[2].play(false, false);
@@ -63,7 +63,7 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
         if (playerInput->outputControls[iPlayer].menu_random.fPressed) {
             musiclist->random();
             rm->backgroundmusic[2].stop();
-            rm->backgroundmusic[2].load(musiclist->GetMusic(1));
+            rm->backgroundmusic[2].load(musiclist->music(1));
 
             if (game_values.music)
                 rm->backgroundmusic[2].play(false, false);
@@ -101,7 +101,7 @@ void MI_PlaylistField::Draw()
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
     rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName.c_str());
-    rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, musiclist->current_name());
+    rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, musiclist->currentName().c_str());
 
     miModifyImageLeft->Draw();
     miModifyImageRight->Draw();

@@ -1374,8 +1374,8 @@ void MenuState::update()
                 game_values.singleplayermode = -1;
 
                 if (game_values.music) {
-                    musiclist->SetRandomMusic(g_map->musicCategoryID, sShortMapName.c_str(), g_map->szBackgroundFile);
-                    rm->backgroundmusic[0].load(musiclist->GetCurrentMusic());
+                    musiclist->setRandomMusic(g_map->musicCategoryID, sShortMapName.c_str(), g_map->szBackgroundFile);
+                    rm->backgroundmusic[0].load(musiclist->currentMusic());
                     rm->backgroundmusic[0].play(game_values.playnextmusic, false);
                 }
             }
@@ -1605,11 +1605,11 @@ void MenuState::StartGame()
     }
 
     //Load soundtrack music if changed
-    if (game_values.loadedmusic != musiclist->GetCurrentIndex()) {
-        game_values.loadedmusic = (short)musiclist->GetCurrentIndex();
-        rm->backgroundmusic[1].load(musiclist->GetMusic(0)); //Stage Clear
-        rm->backgroundmusic[3].load(musiclist->GetMusic(2)); //Tournament Menu
-        rm->backgroundmusic[4].load(musiclist->GetMusic(3)); //Tournament Over
+    if (game_values.loadedmusic != musiclist->currentIndex()) {
+        game_values.loadedmusic = (short)musiclist->currentIndex();
+        rm->backgroundmusic[1].load(musiclist->music(0)); //Stage Clear
+        rm->backgroundmusic[3].load(musiclist->music(2)); //Tournament Menu
+        rm->backgroundmusic[4].load(musiclist->music(3)); //Tournament Over
     }
 
     rm->backgroundmusic[2].stop();

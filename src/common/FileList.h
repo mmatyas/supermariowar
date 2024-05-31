@@ -104,76 +104,72 @@ private:
 };
 
 
-class MusicOverride
-{
+class MusicOverride {
 public:
-    std::vector<int> songs;
+    std::vector<size_t> songs;
 };
 
-class MusicEntry
-{
+
+class MusicEntry {
 public:
-    MusicEntry(const std::string & musicdirectory);
-    ~MusicEntry() {}
+    explicit MusicEntry(std::string name);
 
-    void UpdateWithOverrides();
+    static std::unique_ptr<MusicEntry> load(const std::string& musicDirectory);
 
-    std::string GetMusic(unsigned int musicID);
-    std::string GetRandomMusic(int iCategoryID, const char * szMapName, const char * szBackground);
-    std::string GetNextMusic(int iCategoryID, const char * szMapName, const char * szBackground);
+    void updateWithOverrides();
 
-    int numsongsforcategory[MAXMUSICCATEGORY];
-    int songsforcategory[MAXMUSICCATEGORY][MAXCATEGORYTRACKS];
+    const std::string& name() const { return m_name; }
+    const std::string& music(size_t musicID) const;
+    const std::string& randomMusic(size_t categoryID, const std::string& mapName, const std::string& background);
+    const std::string& nextMusic(size_t categoryID, const std::string& mapName, const std::string& background);
+
+private:
+    std::string m_name;
+    size_t m_currentMusic = 0;
+
+    size_t numsongsforcategory[MAXMUSICCATEGORY];
+    size_t songsforcategory[MAXMUSICCATEGORY][MAXCATEGORYTRACKS];
     std::vector<std::string> songFileNames;
 
     std::map<std::string, MusicOverride*> mapoverride;
     std::map<std::string, MusicOverride*> backgroundoverride;
-
-    std::string name;
-    unsigned short iCurrentMusic;
-
-    bool fError;
-
-    bool fUsesMapOverrides;
-    bool fUsesBackgroundOverrides;
 };
+
 
 class MusicList
 {
 public:
     MusicList();
-    ~MusicList();
 
-    std::string GetMusic(int musicID);
-    void SetRandomMusic(int iCategoryID, const char * szMapName, const char * szBackground);
-    void SetNextMusic(int iCategoryID, const char * szMapName, const char * szBackground);
-    std::string GetCurrentMusic();
+    const std::string& music(size_t musicID) const {
+        return m_entries[m_currentIndex]->music(musicID);
+    }
+    const std::string& currentMusic() const {
+        return m_currentMusic;
+    }
+    void setRandomMusic(size_t iCategoryID, const std::string& szMapName, const std::string& szBackground);
+    void setNextMusic(size_t iCategoryID, const std::string& szMapName, const std::string& szBackground);
 
-    int GetCurrentIndex() {
-        return currentIndex;
+    size_t currentIndex() const {
+        return m_currentIndex;
     };
-    void SetCurrent(unsigned int index) {
-        if (index < entries.size())
-            currentIndex = index;
-        else
-            currentIndex = 0;
+    void setCurrent(size_t index) {
+        m_currentIndex = index < m_entries.size() ? index : 0;
+    };
+    const std::string& currentName() const {
+        return m_entries[m_currentIndex]->name();
     };
 
-    const char * current_name() {
-        return entries[currentIndex]->name.c_str();
-    };
     void next();
     void prev();
-    void random() {
-        currentIndex = RANDOM_INT(entries.size());
-    };
+    void random();
 
-    void UpdateEntriesWithOverrides();
+    void updateEntriesWithOverrides();
 
 private:
-    std::string CurrentMusic;
-    std::vector<MusicEntry*> entries;
-    int currentIndex;
+    std::string m_currentMusic;
+    std::vector<std::unique_ptr<MusicEntry>> m_entries;
+    size_t m_currentIndex = 0;
 };
 
 
