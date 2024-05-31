@@ -663,7 +663,7 @@ WorldMusicList::WorldMusicList()
     std::string currentdir;
     while (d.NextDirectory(currentdir)) {
         std::unique_ptr<WorldMusicEntry> m = std::make_unique<WorldMusicEntry>(d.fullName(currentdir));
-        if (!m->fError)
+        if (m)
             m_entries.push_back(std::move(m));
     }
 
@@ -687,32 +687,33 @@ void WorldMusicList::random() {
 void WorldMusicList::updateEntriesWithOverrides()
 {
     for (std::unique_ptr<WorldMusicEntry>& entry : m_entries) {
-        entry->UpdateWithOverrides();
+        entry->updateWithOverrides();
     }
 }
 
 
 ///////////// WorldMusicEntry ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
-{
-    fError = false;
-    fUsesWorldOverrides = false;
+WorldMusicEntry::WorldMusicEntry(std::string name)
+    : m_name(std::move(name))
+{}
 
-    size_t separator_pos = musicdirectory.rfind(dirSeparator());
-    if (separator_pos != std::string::npos)
-        name = musicdirectory.substr(separator_pos + 1);
-    else
-        name = musicdirectory;
+std::unique_ptr<WorldMusicEntry> WorldMusicEntry::load(const std::string& musicdirectory)
+{
+    const size_t separator_pos = musicdirectory.rfind(dirSeparator());
+    std::string name = separator_pos != std::string::npos
+        ? musicdirectory.substr(separator_pos + 1)
+        : musicdirectory;
 
     name = name.substr(0, name.rfind("."));
 
     std::string musicfile = musicdirectory + dirSeparator() + std::string("Music.txt");
-    FILE * in = fopen(musicfile.c_str(), "r");
+    FILE* in = fopen(musicfile.c_str(), "r");
     if (!in) {
         printf("Error: Could not open: %s\n", musicfile.c_str());
-        fError = true;
-        return;
+        return {};
     }
+
+    auto wme = std::make_unique<WorldMusicEntry>(std::move(name));
 
     int iAddToCategory = -1;
     char szBuffer[256];
@@ -762,53 +763,45 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 
         if (iAddToCategory > -1 && iAddToCategory <= WORLDMUSICSLEEP) {
             std::string sPath = musicdirectory + dirSeparator() + szBuffer;
-
             if (FileExists(sPath.c_str()))
-                songFileNames[iAddToCategory] = sPath;
+                wme->m_songFileNames[iAddToCategory] = sPath;
         } else if (iAddToCategory == WORLDMUSICWORLDS) {
-            char * pszName = strtok(szBuffer, ",\n");
-
+            char* pszName = strtok(szBuffer, ",\n");
             if (!pszName)
                 continue;
 
-            char * pszMusic = strtok(NULL, ",\n");
-
+            char* pszMusic = strtok(NULL, ",\n");
             if (!pszMusic)
                 continue;
 
             std::string sPath = musicdirectory + dirSeparator() + pszMusic;
-
             if (!FileExists(sPath.c_str()))
                 continue;
 
-            fUsesWorldOverrides = true;
-            worldoverride[pszName] = sPath;
-
+            wme->m_worldOverrides[pszName] = sPath;
         }
     }
 
     fclose(in);
+    return wme;
 }
 
-std::string WorldMusicEntry::GetMusic(unsigned int musicID, const char * szWorldName)
+const std::string& WorldMusicEntry::music(size_t musicID, const std::string& worldName) const
 {
     //First check if there is specific map music
-    if (fUsesWorldOverrides && worldoverride.find(szWorldName) != worldoverride.end()) {
-        return worldoverride[szWorldName];
+    auto iter = m_worldOverrides.find(worldName);
+    if (iter != m_worldOverrides.cend()) {
+        return iter->second;
     }
 
-    if (musicID > WORLDMUSICSLEEP)
-        return songFileNames[0];
-
-    return songFileNames[musicID];
+    return (musicID <= WORLDMUSICSLEEP)
+        ? m_songFileNames[musicID]
+        : m_songFileNames[0];
 }
 
-void WorldMusicEntry::UpdateWithOverrides()
+void WorldMusicEntry::updateWithOverrides()
 {
-    if (!worldmusicoverrides.empty())
-        fUsesWorldOverrides = true;
-
     for (const WorldMusicOverride& override : worldmusicoverrides) {
-        worldoverride[override.worldname] = override.song;
+        m_worldOverrides[override.worldname] = override.song;
     }
 }

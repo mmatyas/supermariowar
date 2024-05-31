@@ -4,6 +4,7 @@
 #include "path.h"
 #include "RandomNumberGenerator.h"
 
+#include <array>
 #include <map>
 #include <memory>
 #include <string>
@@ -175,25 +176,24 @@ private:
     int currentIndex;
 };
 
-class WorldMusicEntry
-{
+
+class WorldMusicEntry {
 public:
-    WorldMusicEntry(const std::string & musicdirectory);
-    ~WorldMusicEntry() {}
+    explicit WorldMusicEntry(std::string name);
 
-    void UpdateWithOverrides();
+    static std::unique_ptr<WorldMusicEntry> load(const std::string& musicDirectory);
 
-    std::string GetMusic(unsigned int musicID, const char * szWorldName);
+    const std::string& music(size_t musicID, const std::string& worldName) const;
+    const std::string& name() const { return m_name; }
 
-    std::string songFileNames[MAXWORLDMUSICCATEGORY + 2];
-    std::string name;
+    void updateWithOverrides();
 
-    std::map<std::string, std::string> worldoverride;
-
-    bool fError;
-
-    bool fUsesWorldOverrides;
+private:
+    std::string m_name;
+    std::map<std::string, std::string> m_worldOverrides;
+    std::array<std::string, MAXWORLDMUSICCATEGORY + 2> m_songFileNames;
 };
+
 
 class WorldMusicList {
 public:
@@ -206,10 +206,10 @@ public:
         m_currentIndex = index < m_entries.size() ? index : 0;
     }
     const std::string& currentName() const {
-        return m_entries[m_currentIndex]->name;
+        return m_entries[m_currentIndex]->name();
     }
-    std::string currentMusic(int musicID, const char * szWorldName) const {
-        return m_entries[m_currentIndex]->GetMusic(musicID, szWorldName);
+    const std::string& currentMusic(int musicID, const std::string& worldName) const {
+        return m_entries[m_currentIndex]->music(musicID, worldName);
     }
     size_t count() const {
         return m_entries.size();
