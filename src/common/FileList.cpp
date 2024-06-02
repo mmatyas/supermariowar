@@ -3,6 +3,8 @@
 #include "dirlist.h"
 #include "GlobalConstants.h"
 #include "linfunc.h"
+#include "path.h"
+#include "RandomNumberGenerator.h"
 
 #include <algorithm>
 #include <fstream>
@@ -16,8 +18,6 @@ extern WorldMusicList* worldmusiclist;
 
 namespace {
 const short g_iDefaultMusicCategory[MAXMUSICCATEGORY] {0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 0};
-}// namespace
-
 
 struct MapMusicOverride {
     std::string mapname;
@@ -31,6 +31,8 @@ struct WorldMusicOverride {
 
 std::vector<MapMusicOverride> mapmusicoverrides;
 std::vector<WorldMusicOverride> worldmusicoverrides;
+} // namespace
+
 
 void UpdateMusicWithOverrides()
 {
@@ -216,6 +218,36 @@ bool SimpleFileList::find(const std::string& name)
 
     return fFound;
 }
+
+
+AnnouncerList::AnnouncerList()
+    : SimpleFileList(convertPath("sfx/announcer/"), ".txt")
+{}
+
+GraphicsList::GraphicsList()
+    : SimpleDirectoryList(convertPath("gfx/packs/"))
+{}
+
+SoundsList::SoundsList()
+    : SimpleDirectoryList(convertPath("sfx/packs/"))
+{}
+
+TourList::TourList()
+    : SimpleFileList(convertPath("tours/"), ".txt")
+{}
+
+WorldList::WorldList()
+    : SimpleFileList(convertPath("worlds/"), ".txt", true)
+{}
+
+BackgroundList::BackgroundList()
+    : SimpleFileList(convertPath("gfx/packs/Classic/backgrounds/"), ".png")
+{}
+
+FiltersList::FiltersList()
+    : SimpleFileList(convertPath("filters/"), ".txt")
+{}
+
 
 ///////////// SkinList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SkinList::SkinList()

@@ -1,8 +1,10 @@
 #include "world.h"
 
-#include "GameValues.h"
-#include "ResourceManager.h"
 #include "FileList.h"
+#include "GameValues.h"
+#include "path.h"
+#include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
 #include "Version.h"
 #include "WorldTourStop.h"
 

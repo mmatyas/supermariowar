@@ -4,6 +4,7 @@
 #include "FileList.h"
 #include "Game.h"
 #include "GameValues.h"
+#include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "uimenu.h"
 #include "world.h"

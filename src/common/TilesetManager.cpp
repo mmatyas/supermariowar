@@ -1,7 +1,7 @@
 #include "TilesetManager.h"
 
 #include "FileIO.h"
-#include "map.h"
+#include "path.h"
 
 #include <algorithm>
 #include <cassert>

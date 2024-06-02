@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "GameValues.h"
 #include "TilesetManager.h"
+#include "path.h"
 #include "gfx/Color.h"
 
 extern SkinList *skinlist;

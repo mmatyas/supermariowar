@@ -7,6 +7,7 @@
 #include "GSMenu.h"
 #include "GSGameplay.h"
 #include "eyecandy.h"
+#include "path.h"
 #include "ResourceManager.h"
 
 extern SDL_Surface* screen;

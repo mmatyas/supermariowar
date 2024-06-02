@@ -5,6 +5,7 @@
 #include "GameMode.h"
 #include "GlobalConstants.h"
 #include "MapList.h" // req. only by WriteConfig
+#include "path.h"
 #include "Version.h"
 #include "sfx.h"
 

@@ -1,8 +1,4 @@
-#ifndef FILELIST_H
-#define FILELIST_H
-
-#include "path.h"
-#include "RandomNumberGenerator.h"
+#pragma once
 
 #include <array>
 #include <map>
@@ -13,6 +9,11 @@
 #define MAXMUSICCATEGORY        11
 #define MAXWORLDMUSICCATEGORY   9
 #define MAXCATEGORYTRACKS       64
+
+
+// Adds music overrides to the music lists
+void UpdateMusicWithOverrides();
+
 
 //it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
 class SimpleFileList {
@@ -51,37 +52,37 @@ public:
 
 class AnnouncerList : public SimpleFileList {
 public:
-    AnnouncerList(): SimpleFileList(convertPath("sfx/announcer/"), ".txt") {}
+    AnnouncerList();
 };
 
 class GraphicsList : public SimpleDirectoryList {
 public:
-    GraphicsList(): SimpleDirectoryList(convertPath("gfx/packs/")) {}
+    GraphicsList();
 };
 
 class SoundsList : public SimpleDirectoryList {
 public:
-    SoundsList(): SimpleDirectoryList(convertPath("sfx/packs/")) {}
+    SoundsList();
 };
 
 class TourList : public SimpleFileList {
 public:
-    TourList() : SimpleFileList(convertPath("tours/"), ".txt") {}
+    TourList();
 };
 
 class WorldList : public SimpleFileList {
 public:
-    WorldList() : SimpleFileList(convertPath("worlds/"), ".txt", true) {}
+    WorldList();
 };
 
 class BackgroundList : public SimpleFileList {
 public:
-    BackgroundList() : SimpleFileList(convertPath("gfx/packs/Classic/backgrounds/"), ".png") {}
+    BackgroundList();
 };
 
 class FiltersList : public SimpleFileList {
 public:
-    FiltersList() : SimpleFileList(convertPath("filters/"), ".txt") {}
+    FiltersList();
 };
 
 
@@ -221,5 +222,3 @@ private:
     std::vector<std::unique_ptr<WorldMusicEntry>> m_entries;
     size_t m_currentIndex = 0;
 };
-
-#endif // FILELIST_H

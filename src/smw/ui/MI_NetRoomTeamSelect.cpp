@@ -1,8 +1,9 @@
 #include "MI_NetRoomTeamSelect.h"
 
-#include "GameValues.h"
-#include "ResourceManager.h"
 #include "FileList.h"
+#include "GameValues.h"
+#include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
 #include "ui/MI_Image.h"
 
 extern CGameValues game_values;

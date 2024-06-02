@@ -5,6 +5,8 @@
 #include "GameValues.h"
 #include "linfunc.h"
 #include "map.h"
+#include "path.h"
+#include "RandomNumberGenerator.h"
 #include "Version.h"
 
 #include <cstdlib>

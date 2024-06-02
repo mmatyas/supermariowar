@@ -21,7 +21,7 @@
 #include "map.h"
 #include "MapList.h"
 #include "net.h"
-#include "linfunc.h"
+#include "path.h"
 #include "player.h"
 #include "ResourceManager.h"
 #include "sfx.h"
@@ -103,9 +103,6 @@ CGM_Boss_MiniGame	*bossgamemode = NULL;
 CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 
 short currentgamemode = 0;
-
-//Adds music overrides to the music lists
-extern void UpdateMusicWithOverrides();
 
 extern SDL_Joystick     **joysticks;
 extern short            joystickcount;

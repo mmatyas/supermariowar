@@ -7,6 +7,8 @@
 #include "net.h"
 #include "map.h"
 #include "MapList.h"
+#include "path.h"
+#include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
 #include "gamemodes/BonusHouse.h"

@@ -7,6 +7,7 @@
 #include "FileIO.h"
 #include "map/MapReader.h"
 #include "movingplatform.h"
+#include "path.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "TilesetManager.h"

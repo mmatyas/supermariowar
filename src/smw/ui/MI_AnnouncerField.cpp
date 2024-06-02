@@ -2,6 +2,7 @@
 
 #include "FileList.h"
 #include "input.h"
+#include "path.h"
 #include "ResourceManager.h"
 #include "ui/MI_Image.h"
 

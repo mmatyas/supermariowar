@@ -3,6 +3,7 @@
 #include "gfx.h"
 #include "map.h"
 #include "MapList.h"
+#include "path.h"
 #include "ResourceManager.h"
 #include "TilesetManager.h"
 
