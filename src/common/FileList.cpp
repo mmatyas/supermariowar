@@ -564,6 +564,8 @@ std::unique_ptr<MusicEntry> MusicEntry::load(const std::string& musicdirectory)
             printf("%d\n", songsforcategory[i][k]);
     }
     */
+
+    return me;
 }
 
 const std::string& MusicEntry::music(size_t musicID) const
