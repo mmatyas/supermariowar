@@ -187,6 +187,7 @@ if(NOT MSVC)
 	check_and_add_flag(CXX11_NARROWING_OFF -Wno-c++11-narrowing)
 	check_and_add_flag(OVERLOADED_VIRTUAL_OFF -Wno-overloaded-virtual)
 	check_and_add_flag(UNUSED_PARAMETER_OFF -Wno-unused-parameter)
+	check_and_add_flag(ALWAYS_RETURN -Werror=return-type)
 
 	# gcc uses some optimizations which might break stuff without this flag
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing -fexceptions -Wno-shadow")
