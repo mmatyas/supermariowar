@@ -153,13 +153,13 @@ public:
 
     size_t currentIndex() const {
         return m_currentIndex;
-    };
+    }
     void setCurrent(size_t index) {
         m_currentIndex = index < m_entries.size() ? index : 0;
-    };
+    }
     const std::string& currentName() const {
         return m_entries[m_currentIndex]->name();
-    };
+    }
 
     void next();
     void prev();
