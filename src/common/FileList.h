@@ -121,8 +121,8 @@ public:
 
     const std::string& name() const { return m_name; }
     const std::string& music(size_t musicID) const;
-    const std::string& randomMusic(size_t categoryID, const std::string& mapName, const std::string& background);
-    const std::string& nextMusic(size_t categoryID, const std::string& mapName, const std::string& background);
+    const std::string& randomMusic(short categoryID, const std::string& mapName, const std::string& background);
+    const std::string& nextMusic(short categoryID, const std::string& mapName, const std::string& background);
 
 private:
     std::string m_name;
@@ -148,8 +148,8 @@ public:
     const std::string& currentMusic() const {
         return m_currentMusic;
     }
-    void setRandomMusic(size_t iCategoryID, const std::string& szMapName, const std::string& szBackground);
-    void setNextMusic(size_t iCategoryID, const std::string& szMapName, const std::string& szBackground);
+    void setRandomMusic(short iCategoryID, const std::string& szMapName, const std::string& szBackground);
+    void setNextMusic(short iCategoryID, const std::string& szMapName, const std::string& szBackground);
 
     size_t currentIndex() const {
         return m_currentIndex;

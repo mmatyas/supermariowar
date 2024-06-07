@@ -324,12 +324,12 @@ MusicList::MusicList()
     }
 }
 
-void MusicList::setRandomMusic(size_t musicCategory, const std::string& mapName, const std::string& background)
+void MusicList::setRandomMusic(short musicCategory, const std::string& mapName, const std::string& background)
 {
     m_currentMusic = m_entries[m_currentIndex]->randomMusic(musicCategory, mapName, background);
 }
 
-void MusicList::setNextMusic(size_t musicCategory, const std::string& mapName, const std::string& background)
+void MusicList::setNextMusic(short musicCategory, const std::string& mapName, const std::string& background)
 {
     m_currentMusic = m_entries[m_currentIndex]->nextMusic(musicCategory, mapName, background);
 }
@@ -575,7 +575,7 @@ const std::string& MusicEntry::music(size_t musicID) const
         : songFileNames[musicID];
 }
 
-const std::string& MusicEntry::randomMusic(size_t musicCategory, const std::string& mapName, const std::string& background)
+const std::string& MusicEntry::randomMusic(short musicCategory, const std::string& mapName, const std::string& background)
 {
     //First check if there is specific map music
     const auto mapIter = mapoverride.find(mapName);
@@ -600,7 +600,7 @@ const std::string& MusicEntry::randomMusic(size_t musicCategory, const std::stri
     return songFileNames[4];
 }
 
-const std::string& MusicEntry::nextMusic(size_t musicCategory, const std::string& mapName, const std::string& background)
+const std::string& MusicEntry::nextMusic(short musicCategory, const std::string& mapName, const std::string& background)
 {
     //First check if there is specific map music
     const auto mapIter = mapoverride.find(mapName);
