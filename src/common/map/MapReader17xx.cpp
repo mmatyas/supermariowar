@@ -8,12 +8,10 @@
 #include "TilesetManager.h"
 
 #include <cassert>
-#include <cstring>
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
 
-using namespace std;
 
 MapReader1700::MapReader1700()
     : MapReader1600()
@@ -194,9 +192,9 @@ bool MapReader1700::read_spawn_areas(CMap& map, BinaryFile& mapfile)
         map.numspawnareas[i] = (short)mapfile.read_i32();
 
         if (map.numspawnareas[i] > MAXSPAWNAREAS) {
-            cout << endl << " ERROR: Number of spawn areas (" << map.numspawnareas[i]
-                 << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
-                 << endl;
+            std::cout << std::endl << " ERROR: Number of spawn areas (" << map.numspawnareas[i]
+                << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
+                << std::endl;
             return false;
         }
 

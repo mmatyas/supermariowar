@@ -10,8 +10,6 @@
 
 extern CTilesetManager* g_tilesetmanager;
 
-using namespace std;
-
 
 namespace {
 struct TilesetTranslation {
@@ -217,9 +215,9 @@ bool MapReader1800::read_spawn_areas(CMap& map, BinaryFile& mapfile)
         map.numspawnareas[i] = (short)mapfile.read_i32();
 
         if (map.numspawnareas[i] > MAXSPAWNAREAS) {
-            cout << endl << " ERROR: Number of spawn areas (" << map.numspawnareas[i]
-                 << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
-                 << endl;
+            std::cout << std::endl << " ERROR: Number of spawn areas (" << map.numspawnareas[i]
+                << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
+                << std::endl;
             return false;
         }
 

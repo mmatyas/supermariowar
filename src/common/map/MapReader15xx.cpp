@@ -6,8 +6,6 @@
 #include "FileIO.h"
 #include "TilesetManager.h"
 
-#include <cstring>
-
 extern CTilesetManager* g_tilesetmanager;
 
 
