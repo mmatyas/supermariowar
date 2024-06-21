@@ -30,5 +30,8 @@ constexpr std::array<std::string_view, 26> g_szBackgroundConversion {
     "Bonus_HillsAtNight.png",
     "Castle_CastlePillars.png",
     "Land_GreenHillsAndClouds.png",
-    "Platforms_BlueSpottedHills.png"
+    "Platforms_BlueSpottedHills.png",
 };
+
+//Converts the tile type into the flags that this tile carries (solid + ice + death, etc)
+constexpr std::array<short, 19> g_iTileTypeConversion {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113, 4096};

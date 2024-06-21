@@ -12,7 +12,6 @@
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
-extern short g_iTileTypeConversion[NUMTILETYPES];
 
 using namespace std;
 
@@ -164,7 +163,7 @@ void MapReader1700::read_warp_locations(CMap& map, BinaryFile& mapfile)
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
             TileType iType = (TileType)mapfile.read_i32();
 
-            if (iType >= 0 && iType < NUMTILETYPES) {
+            if (0 <= iType && iType < g_iTileTypeConversion.size()) {
                 map.mapdatatop[i][j].iType = iType;
                 map.mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
             } else {
@@ -290,7 +289,7 @@ void MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile,
                 type = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
             }
 
-            if (type >= 0 && type < NUMTILETYPES) {
+            if (0 <= type && type < g_iTileTypeConversion.size()) {
                 types[iCol][iRow].iType = type;
                 types[iCol][iRow].iFlags = g_iTileTypeConversion[type];
             } else {

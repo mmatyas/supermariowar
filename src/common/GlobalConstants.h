@@ -101,8 +101,6 @@
 #define TILESETHEIGHT   30
 #define TILESETWIDTH    32
 
-#define NUMTILETYPES    19
-
 #define TILESETANIMATED     -1
 #define TILESETNONE         -2
 #define TILESETUNKNOWN      -3

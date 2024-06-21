@@ -9,7 +9,6 @@
 #include <cstring>
 
 extern CTilesetManager* g_tilesetmanager;
-extern short g_iTileTypeConversion[NUMTILETYPES];
 
 
 namespace {
@@ -39,7 +38,7 @@ void MapReader1500::read_tiles(CMap& map, BinaryFile& mapfile)
 
             TileType iType = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
 
-            if (iType >= 0 && iType < NUMTILETYPES) {
+            if (0 <= iType && iType < g_iTileTypeConversion.size()) {
                 map.mapdatatop[i][j].iType = iType;
                 map.mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
             } else {

@@ -1,6 +1,7 @@
 #include "MapReader.h"
 
 #include "map.h"
+#include "MapReaderConstants.h"
 #include "movingplatform.h"
 #include "FileIO.h"
 #include "TilesetManager.h"
@@ -8,7 +9,6 @@
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
-extern short g_iTileTypeConversion[NUMTILETYPES];
 
 using namespace std;
 
@@ -179,7 +179,7 @@ void MapReader1800::read_warp_locations(CMap& map, BinaryFile& mapfile)
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
             TileType iType = (TileType)mapfile.read_i32();
 
-            if (iType >= 0 && iType < NUMTILETYPES) {
+            if (0 <= iType && iType < g_iTileTypeConversion.size()) {
                 map.mapdatatop[i][j].iType = iType;
                 map.mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
             } else {
@@ -349,7 +349,7 @@ void MapReader1800::read_platform_tiles(CMap& map, BinaryFile& mapfile,
 
             TileType iType = (TileType)mapfile.read_i32();
 
-            if (iType >= 0 && iType < NUMTILETYPES) {
+            if (0 <= iType && iType < g_iTileTypeConversion.size()) {
                 types[iCol][iRow].iType = iType;
                 types[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
             } else {

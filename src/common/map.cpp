@@ -5,13 +5,14 @@
 #include "GlobalConstants.h"
 #include "Game.h"
 #include "FileIO.h"
-#include "map/MapReader.h"
 #include "movingplatform.h"
 #include "path.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "TilesetManager.h"
 #include "Version.h"
+#include "map/MapReader.h"
+#include "map/MapReaderConstants.h"
 
 #include "SDL_image.h"
 #include "sdl12wrapper.h"
@@ -41,9 +42,6 @@ using std::endl;
 
 
 extern gfxSprite spr_frontmap[2];
-
-//Converts the tile type into the flags that this tile carries (solid + ice + death, etc)
-short g_iTileTypeConversion[NUMTILETYPES] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113, 4096};
 
 short g_iCurrentDrawIndex = 0;
 
@@ -749,7 +747,7 @@ void CMap::saveMap(const std::string& file)
             for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
                 //Set the tile type flags for each tile
                 int iType = platforms[iPlatform]->iTileType[iCol][iRow].iType;
-                if (iType >= 0 && iType < NUMTILETYPES) {
+                if (0 <= iType && iType < g_iTileTypeConversion.size()) {
                     platforms[iPlatform]->iTileType[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
                 } else {
                     platforms[iPlatform]->iTileType[iCol][iRow].iType = tile_nonsolid;
@@ -777,7 +775,7 @@ void CMap::saveMap(const std::string& file)
         for (i = 0; i < MAPWIDTH; i++) {
             //Set the tile type flags for each tile
             int iType = mapdatatop[i][j].iType;
-            if (iType >= 0 && iType < NUMTILETYPES) {
+            if (0 <= iType && iType < g_iTileTypeConversion.size()) {
                 mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
             } else {
                 mapdatatop[i][j].iType = tile_nonsolid;
