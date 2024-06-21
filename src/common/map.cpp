@@ -949,7 +949,7 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Write background File
-    mapfile.write_string_long(szBackgroundFile);
+    mapfile.write_string_long(szBackgroundFile.c_str());
 
     //Save the default on/off switch states
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)

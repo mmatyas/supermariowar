@@ -1002,12 +1002,12 @@ int editor_edit()
                         backgroundlist->next();
 
                         rm->spr_background.init(backgroundlist->currentPath());
-                        strcpy(g_map->szBackgroundFile, getFilenameFromPath(backgroundlist->currentPath()).c_str());
+                        g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath());
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
 								//Set music to background default
                             for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
-                                if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile, strlen(g_szMusicCategoryNames[iCategory]))) {
+                                if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile.c_str(), strlen(g_szMusicCategoryNames[iCategory]))) {
 										g_map->musicCategoryID = iCategory;
 										break;
 									}
@@ -4232,12 +4232,12 @@ int editor_backgrounds()
                                 backgroundlist->setCurrentIndex(iPage * 16 + iBackground);
 
                                 rm->spr_background.init(backgroundlist->currentPath());
-                                strcpy(g_map->szBackgroundFile, getFilenameFromPath(backgroundlist->currentPath()).c_str());
+                                g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath());
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
 									//Set music to background default
                                     for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
-                                        if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile, strlen(g_szMusicCategoryNames[iCategory]))) {
+                                        if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile.c_str(), strlen(g_szMusicCategoryNames[iCategory]))) {
 											g_map->musicCategoryID = iCategory;
 											break;
 										}

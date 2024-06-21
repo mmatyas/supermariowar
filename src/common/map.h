@@ -246,7 +246,7 @@ class CMap
 		bool findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned);
 		bool IsInPlatformNoSpawnZone(short x, short y, short width, short height);
 
-		char szBackgroundFile[128];
+		std::string szBackgroundFile;
 		short backgroundID;
 		short eyecandy[3];
 		short musicCategoryID;

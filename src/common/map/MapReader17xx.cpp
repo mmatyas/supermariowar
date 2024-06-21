@@ -2,6 +2,7 @@
 
 #include "GameValues.h"
 #include "map.h"
+#include "MapReaderConstants.h"
 #include "movingplatform.h"
 #include "FileIO.h"
 #include "TilesetManager.h"
@@ -11,7 +12,6 @@
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
-extern const char* g_szBackgroundConversion[26];
 extern short g_iTileTypeConversion[NUMTILETYPES];
 
 using namespace std;
@@ -89,19 +89,18 @@ void MapReader1700::read_tiles(CMap& map, BinaryFile& mapfile)
 void MapReader1701::read_background(CMap& map, BinaryFile& mapfile)
 {
     //Read in background to use
-    mapfile.read_string_long(map.szBackgroundFile, 128);
+    char text[128];
+    mapfile.read_string_long(text, 128);
+    map.szBackgroundFile = text;
 
-    for (short iBackground = 0; iBackground < 26; iBackground++) {
-        const char * szFindUnderscore = strstr(g_szBackgroundConversion[iBackground], "_");
-
+    for (const std::string_view background : g_szBackgroundConversion) {
         // All items must have an underscore in g_szBackgroundConversion
-        assert(szFindUnderscore);
+        const size_t underscorePos = background.find("_");
+        assert(underscorePos != background.npos);
 
-        szFindUnderscore++;
-
-        if (!strcmp(szFindUnderscore, map.szBackgroundFile)) {
-            assert(strlen(g_szBackgroundConversion[iBackground]) <= 128);
-            strcpy(map.szBackgroundFile, g_szBackgroundConversion[iBackground]);
+        if (background.substr(underscorePos + 1) == map.szBackgroundFile) {
+            map.szBackgroundFile = background;
+            break;
         }
     }
 }
@@ -109,7 +108,9 @@ void MapReader1701::read_background(CMap& map, BinaryFile& mapfile)
 void MapReader1702::read_background(CMap& map, BinaryFile& mapfile)
 {
     //Read in background to use
-    mapfile.read_string_long(map.szBackgroundFile, 128);
+    char text[128];
+    mapfile.read_string_long(text, 128);
+    map.szBackgroundFile = text;
 }
 
 void MapReader1700::set_preview_switches(CMap& map, BinaryFile& mapfile)
