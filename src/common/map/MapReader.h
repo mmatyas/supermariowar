@@ -6,9 +6,9 @@
 class CMap;
 class MovingPlatformPath;
 struct TilesetTile;
-struct MapTile;
 struct Version;
 enum ReadType: unsigned char;
+enum class TileType : unsigned char;
 
 class MapReader {
 public:
@@ -93,7 +93,7 @@ protected:
     virtual bool read_spawn_areas(CMap&, BinaryFile&);
 
     virtual void read_platforms(CMap&, BinaryFile&, bool preview);
-    virtual void read_platform_tiles(CMap&, BinaryFile&, short w, short h, TilesetTile**&, MapTile**&);
+    virtual void read_platform_tiles(CMap&, BinaryFile&, short w, short h, TilesetTile**&, TileType**&);
     MovingPlatformPath* read_platform_path_details(BinaryFile&, short type, bool preview);
 
     unsigned char patch_version;
@@ -142,7 +142,7 @@ protected:
     virtual void read_extra_tiledata(CMap&, BinaryFile&);
     virtual void read_gamemode_settings(CMap&, BinaryFile&);
     virtual void read_platforms(CMap&, BinaryFile&, bool preview);
-    virtual void read_platform_tiles(CMap&, BinaryFile&, short w, short h, TilesetTile**&, MapTile**&);
+    virtual void read_platform_tiles(CMap&, BinaryFile&, short w, short h, TilesetTile**&, TileType**&);
 
 private:
     short iMaxTilesetID;

@@ -752,21 +752,21 @@ TileType CalculateTileType(short x, short y)
 
 void UpdateTileType(short x, short y)
 {
-	g_map->mapdatatop[x][y].iType = CalculateTileType(x, y);
+	g_map->mapdatatop[x][y] = CalculateTileType(x, y);
 }
 
 bool TileTypeIsModified(short x, short y)
 {
-	return g_map->mapdatatop[x][y].iType != CalculateTileType(x, y);
+	return g_map->mapdatatop[x][y] != CalculateTileType(x, y);
 }
 
 void AdjustMapItems(short iClickX, short iClickY)
 {
     for (short j = 0; j < g_map->iNumMapItems; j++) {
         if (g_map->mapitems[j].ix == iClickX && g_map->mapitems[j].iy == iClickY) {
-			if ((g_map->mapdatatop[iClickX][iClickY].iType != TileType::NonSolid &&
-				g_map->mapdatatop[iClickX][iClickY].iType != TileType::SolidOnTop &&
-				g_map->mapdatatop[iClickX][iClickY].iType != TileType::IceOnTop) ||
+			if ((g_map->mapdatatop[iClickX][iClickY] != TileType::NonSolid &&
+				g_map->mapdatatop[iClickX][iClickY] != TileType::SolidOnTop &&
+				g_map->mapdatatop[iClickX][iClickY] != TileType::IceOnTop) ||
                     g_map->objectdata[iClickX][iClickY].iType != -1) {
 				g_map->iNumMapItems--;
 
@@ -1048,7 +1048,7 @@ int editor_edit()
                         } else if (edit_mode == 6) {
 								for (short iRow = 0; iRow < MAPHEIGHT; iRow++)
 									for (short iCol = 0; iCol < MAPWIDTH; iCol++)
-										g_map->mapdatatop[iCol][iRow].iType = TileType::NonSolid;
+										g_map->mapdatatop[iCol][iRow] = TileType::NonSolid;
 							}
 						}
 
@@ -1294,7 +1294,7 @@ int editor_edit()
                         } else if (edit_mode == 5) { // no item spawn areas
 								g_map->nospawn[5][iClickX][iClickY] = true;
                         } else if (edit_mode == 6) { //tile types
-								g_map->mapdatatop[iClickX][iClickY].iType = set_tiletype;
+								g_map->mapdatatop[iClickX][iClickY] = set_tiletype;
 								AdjustMapItems(iClickX, iClickY);
                         } else if (edit_mode == 7) { //map items
                             if (g_map->iNumMapItems < MAXMAPITEMS) {
@@ -1306,9 +1306,9 @@ int editor_edit()
 										}
 									}
 
-									if (g_map->mapdatatop[iClickX][iClickY].iType != TileType::NonSolid &&
-										g_map->mapdatatop[iClickX][iClickY].iType != TileType::SolidOnTop &&
-										g_map->mapdatatop[iClickX][iClickY].iType != TileType::IceOnTop)
+									if (g_map->mapdatatop[iClickX][iClickY] != TileType::NonSolid &&
+										g_map->mapdatatop[iClickX][iClickY] != TileType::SolidOnTop &&
+										g_map->mapdatatop[iClickX][iClickY] != TileType::IceOnTop)
 										fTileNotAvailable = true;
 
                                 if (!fTileNotAvailable) {
@@ -1367,7 +1367,7 @@ int editor_edit()
                         } else if (edit_mode == 5) {
 								g_map->nospawn[5][iClickX][iClickY] = false;
                         } else if (edit_mode == 6) {
-								g_map->mapdatatop[iClickX][iClickY].iType = TileType::NonSolid;
+								g_map->mapdatatop[iClickX][iClickY] = TileType::NonSolid;
                         } else if (edit_mode == 7) {
 								RemoveMapItemAt(iClickX, iClickY);
 							}
@@ -1425,7 +1425,7 @@ int editor_edit()
                         } else if (edit_mode == 5) {
 								g_map->nospawn[5][iClickX][iClickY] = true;
                         } else if (edit_mode == 6) {
-								g_map->mapdatatop[iClickX][iClickY].iType = set_tiletype;
+								g_map->mapdatatop[iClickX][iClickY] = set_tiletype;
 								AdjustMapItems(iClickX, iClickY);
                         } else if (edit_mode == 8) {
                             for (short i = 0; i < set_tile_cols; i++) {
@@ -1464,7 +1464,7 @@ int editor_edit()
                         } else if (edit_mode == 5) {
 								g_map->nospawn[5][iClickX][iClickY] = false;
                         } else if (edit_mode == 6) {
-								g_map->mapdatatop[iClickX][iClickY].iType = TileType::NonSolid;
+								g_map->mapdatatop[iClickX][iClickY] = TileType::NonSolid;
 							}
 						}
 
@@ -1627,8 +1627,8 @@ int editor_edit()
             } else if (edit_mode == 6) {
                 for (int k = 0; k < MAPHEIGHT; k++) {
                     for (int j = 0; j < MAPWIDTH; j++) {
-						if (g_map->mapdatatop[j][k].iType != TileType::NonSolid)
-                            rm->spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, static_cast<int>(PrevTileType(g_map->mapdatatop[j][k].iType)) * TILESIZE, 0, TILESIZE, TILESIZE);
+						if (g_map->mapdatatop[j][k] != TileType::NonSolid)
+                            rm->spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, static_cast<int>(PrevTileType(g_map->mapdatatop[j][k])) * TILESIZE, 0, TILESIZE, TILESIZE);
 					}
 				}
 
@@ -4850,7 +4850,7 @@ void loadcurrentmap()
             for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
                 if (iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight) {
 					CopyTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow], &g_map->platforms[iPlatform]->iTileData[iCol][iRow]);
-					g_Platforms[iPlatform].types[iCol][iRow] = g_map->platforms[iPlatform]->iTileType[iCol][iRow].iType;
+					g_Platforms[iPlatform].types[iCol][iRow] = g_map->platforms[iPlatform]->iTileType[iCol][iRow];
                 } else {
 					ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
 					g_Platforms[iPlatform].types[iCol][iRow] = TileType::NonSolid;
@@ -4932,15 +4932,15 @@ void insert_platforms_into_map()
 		CalculatePlatformDims(iPlatform, &iLeft, &iTop, &iWidth, &iHeight);
 
 		TilesetTile ** tiles = new TilesetTile*[iWidth];
-		MapTile ** types = new MapTile*[iWidth];
+		TileType ** types = new TileType*[iWidth];
 
         for (short iCol = 0; iCol < iWidth; iCol++) {
 			tiles[iCol] = new TilesetTile[iHeight];
-			types[iCol] = new MapTile[iHeight];
+			types[iCol] = new TileType[iHeight];
 
             for (short iRow = 0; iRow < iHeight; iRow++) {
 				CopyTilesetTile(&tiles[iCol][iRow], &g_Platforms[iPlatform].tiles[iCol + iLeft][iRow + iTop]);
-				types[iCol][iRow].iType = g_Platforms[iPlatform].types[iCol + iLeft][iRow + iTop];
+				types[iCol][iRow] = g_Platforms[iPlatform].types[iCol + iLeft][iRow + iTop];
 			}
 		}
 
@@ -5100,7 +5100,7 @@ bool copyselectedtiles()
 				copiedtiles[j][k].warp.direction = g_map->warpdata[j][k].direction;
 				copiedtiles[j][k].warp.id = g_map->warpdata[j][k].id;
 
-				copiedtiles[j][k].tiletype = g_map->mapdatatop[j][k].iType;
+				copiedtiles[j][k].tiletype = g_map->mapdatatop[j][k];
 
 				for (short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
 					copiedtiles[j][k].nospawn[iType] = g_map->nospawn[iType][j][k];
@@ -5221,7 +5221,7 @@ void pasteselectedtiles(int movex, int movey)
 						replacetile(&g_map->warpdata[iNewX][iNewY].id, copiedtiles[j][k].warp.id, copiedtiles[j][k].warp.connection != -1);
 
 						if (move_replace)
-							g_map->mapdatatop[iNewX][iNewY].iType = copiedtiles[j][k].tiletype;
+							g_map->mapdatatop[iNewX][iNewY] = copiedtiles[j][k].tiletype;
 						else
 							UpdateTileType(j, k);
 

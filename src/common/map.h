@@ -137,10 +137,6 @@ struct AnimatedTile {
 	MovingPlatform * pPlatform;
 };
 
-struct MapTile {
-	TileType iType;
-};
-
 struct MapBlock {
 	short iType;
 	short iSettings[NUM_BLOCK_SETTINGS];
@@ -199,7 +195,7 @@ class CMap
 		//returns the tiletype at the specific position (map coordinates) of the
 		//front most visible tile
     int map(int x, int y) {
-        return tileToFlags(mapdatatop[x][y].iType);
+        return tileToFlags(mapdatatop[x][y]);
     }
 
     IO_Block * block(short x, short y) {
@@ -263,7 +259,7 @@ class CMap
 		void calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDeath);
 
 		TilesetTile	mapdata[MAPWIDTH][MAPHEIGHT][MAPLAYERS];
-		MapTile		mapdatatop[MAPWIDTH][MAPHEIGHT];
+		TileType		mapdatatop[MAPWIDTH][MAPHEIGHT];
 		MapBlock	objectdata[MAPWIDTH][MAPHEIGHT];
 		IO_Block*   blockdata[MAPWIDTH][MAPHEIGHT];
 		bool		nospawn[NUMSPAWNAREATYPES][MAPWIDTH][MAPHEIGHT];

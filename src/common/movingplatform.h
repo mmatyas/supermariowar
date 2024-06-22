@@ -11,7 +11,7 @@ class IO_MovingObject;
 class MovingPlatform
 {
 	public:
-		MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, short drawlayer, MovingPlatformPath * path, bool preview);
+		MovingPlatform(TilesetTile ** tiledata, TileType ** tiletypes, short w, short h, short drawlayer, MovingPlatformPath * path, bool preview);
 		~MovingPlatform();
 
 		void draw();
@@ -61,7 +61,7 @@ class MovingPlatform
 		bool collision_detection_check_sides(IO_MovingObject * object);
 
 		TilesetTile ** iTileData;
-		MapTile ** iTileType;
+		TileType ** iTileType;
 		short ix, iy;
 		short iWidth, iHeight;
 		short iTileWidth, iTileHeight;

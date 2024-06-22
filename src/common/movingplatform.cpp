@@ -34,7 +34,7 @@ enum CollisionStyle {collision_none, collision_normal, collision_overlap_left, c
 // Moving Platform
 //------------------------------------------------------------------------------
 
-MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, short drawlayer, MovingPlatformPath * path, bool fPreview)
+MovingPlatform::MovingPlatform(TilesetTile ** tiledata, TileType ** tiletypes, short w, short h, short drawlayer, MovingPlatformPath * path, bool fPreview)
 {
     fDead = false;
     iPlayerId = -1;
@@ -350,10 +350,10 @@ void MovingPlatform::collide(CPlayer * player)
             int t2 = tile_flag_nonsolid;
 
             if (fRelativeY1 >= 0.0f && fRelativeY1 < iHeight)
-                t1 = tileToFlags(iTileType[tx][(short)fRelativeY1 / TILESIZE].iType);
+                t1 = tileToFlags(iTileType[tx][(short)fRelativeY1 / TILESIZE]);
 
             if (fRelativeY2 >= 0.0f && fRelativeY2 < iHeight)
-                t2 = tileToFlags(iTileType[tx][(short)fRelativeY2 / TILESIZE].iType);
+                t2 = tileToFlags(iTileType[tx][(short)fRelativeY2 / TILESIZE]);
 
             if ((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) {
                 bool fDeathTileToLeft = ((t1 & tile_flag_death_on_left) && (t2 & tile_flag_death_on_left)) ||
@@ -413,10 +413,10 @@ void MovingPlatform::collide(CPlayer * player)
             int t2 = tile_flag_nonsolid;
 
             if (fRelativeY1 >= 0 && fRelativeY1 < iHeight)
-                t1 = tileToFlags(iTileType[tx][(short)fRelativeY1 / TILESIZE].iType);
+                t1 = tileToFlags(iTileType[tx][(short)fRelativeY1 / TILESIZE]);
 
             if (fRelativeY2 >= 0 && fRelativeY2 < iHeight)
-                t2 = tileToFlags(iTileType[tx][(short)fRelativeY2 / TILESIZE].iType);
+                t2 = tileToFlags(iTileType[tx][(short)fRelativeY2 / TILESIZE]);
 
             if ((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) {
                 bool fDeathTileToRight = ((t1 & tile_flag_death_on_right) && (t2 & tile_flag_death_on_right)) ||
@@ -496,10 +496,10 @@ void MovingPlatform::collide(CPlayer * player)
             int t2 = tile_flag_nonsolid;
 
             if (fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-                t1 = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty].iType);
+                t1 = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty]);
 
             if (fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-                t2 = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty].iType);
+                t2 = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty]);
 
             bool fSolidTileOverPlayer = (t1 & tile_flag_solid) || (t2 & tile_flag_solid);
 
@@ -551,10 +551,10 @@ void MovingPlatform::collide(CPlayer * player)
             int t2 = tile_flag_nonsolid;
 
             if (fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-                t1 = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty].iType);
+                t1 = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty]);
 
             if (fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-                t2 = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty].iType);
+                t2 = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty]);
 
             bool fSolidTileUnderPlayer = (t1 & tile_flag_solid) || (t2 & tile_flag_solid);
 
@@ -762,10 +762,10 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
         int t2 = tile_flag_nonsolid;
 
         if (tyTop >= 0)
-            t1 = tileToFlags(iTileType[txLeft][tyTop].iType);
+            t1 = tileToFlags(iTileType[txLeft][tyTop]);
 
         if (tyBottom >= 0)
-            t2 = tileToFlags(iTileType[txLeft][tyBottom].iType);
+            t2 = tileToFlags(iTileType[txLeft][tyBottom]);
 
         if (t1 & tile_flag_solid)
             iCase |= 0x01;
@@ -779,10 +779,10 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
         int t2 = tile_flag_nonsolid;
 
         if (tyTop >= 0)
-            t1 = tileToFlags(iTileType[txRight][tyTop].iType);
+            t1 = tileToFlags(iTileType[txRight][tyTop]);
 
         if (tyBottom >= 0)
-            t2 = tileToFlags(iTileType[txRight][tyBottom].iType);
+            t2 = tileToFlags(iTileType[txRight][tyBottom]);
 
         if (t1 & tile_flag_solid)
             iCase |= 0x02;
@@ -1009,10 +1009,10 @@ void MovingPlatform::GetTileTypesFromPlayer(CPlayer * player, int * lefttile, in
         fRelativeX2 = player->fx + PW - fx + iHalfWidth;
 
     if (fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-        *lefttile = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty].iType);
+        *lefttile = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty]);
 
     if (fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-        *righttile = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty].iType);
+        *righttile = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty]);
 }
 
 int MovingPlatform::GetTileTypeFromCoord(short x, short y)
@@ -1032,7 +1032,7 @@ int MovingPlatform::GetTileTypeFromCoord(short x, short y)
     if (fRelativeX < 0.0f || fRelativeX >= iWidth)
         return tile_flag_nonsolid;
 
-    return tileToFlags(iTileType[(short)fRelativeX / TILESIZE][(short)fRelativeY / TILESIZE].iType);
+    return tileToFlags(iTileType[(short)fRelativeX / TILESIZE][(short)fRelativeY / TILESIZE]);
 }
 
 void MovingPlatform::collide(IO_MovingObject * object)
@@ -1095,10 +1095,10 @@ void MovingPlatform::collide(IO_MovingObject * object)
             int t2 = tile_flag_nonsolid;
 
             if (fRelativeY1 >= 0.0f && fRelativeY1 < iHeight)
-                t1 = tileToFlags(iTileType[tx][(short)fRelativeY1 / TILESIZE].iType);
+                t1 = tileToFlags(iTileType[tx][(short)fRelativeY1 / TILESIZE]);
 
             if (fRelativeY2 >= 0.0f && fRelativeY2 < iHeight)
-                t2 = tileToFlags(iTileType[tx][(short)fRelativeY2 / TILESIZE].iType);
+                t2 = tileToFlags(iTileType[tx][(short)fRelativeY2 / TILESIZE]);
 
             if ((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) {
                 if (object->iHorizontalPlatformCollision == 3) {
@@ -1161,10 +1161,10 @@ void MovingPlatform::collide(IO_MovingObject * object)
             int t2 = tile_flag_nonsolid;
 
             if (fRelativeY1 >= 0 && fRelativeY1 < iHeight)
-                t1 = tileToFlags(iTileType[tx][(short)fRelativeY1 / TILESIZE].iType);
+                t1 = tileToFlags(iTileType[tx][(short)fRelativeY1 / TILESIZE]);
 
             if (fRelativeY2 >= 0 && fRelativeY2 < iHeight)
-                t2 = tileToFlags(iTileType[tx][(short)fRelativeY2 / TILESIZE].iType);
+                t2 = tileToFlags(iTileType[tx][(short)fRelativeY2 / TILESIZE]);
 
             if ((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) {
                 if (object->iHorizontalPlatformCollision == 1) {
@@ -1242,10 +1242,10 @@ void MovingPlatform::collide(IO_MovingObject * object)
             int t2 = tile_flag_nonsolid;
 
             if (fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-                t1 = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty].iType);
+                t1 = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty]);
 
             if (fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-                t2 = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty].iType);
+                t2 = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty]);
 
             if ((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) {
                 if (object->iVerticalPlatformCollision == 2) {
@@ -1277,10 +1277,10 @@ void MovingPlatform::collide(IO_MovingObject * object)
             int t2 = tile_flag_nonsolid;
 
             if (fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-                t1 = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty].iType);
+                t1 = tileToFlags(iTileType[(short)fRelativeX1 / TILESIZE][ty]);
 
             if (fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-                t2 = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty].iType);
+                t2 = tileToFlags(iTileType[(short)fRelativeX2 / TILESIZE][ty]);
 
             if (((t1 & tile_flag_solid_on_top) || (t2 & tile_flag_solid_on_top)) && object->fOldY + object->collisionHeight <= (ty << 5) + fOldY - iHalfHeight) {
                 if (object->iVerticalPlatformCollision == 0) {
@@ -1399,7 +1399,7 @@ bool MovingPlatform::IsInNoSpawnZone(short iX, short iY, short w, short h)
                 short tx = iRelativeX[sX] / TILESIZE;
                 short ty = iRelativeY[sY] / TILESIZE;
 
-                int t = tileToFlags(iTileType[tx][ty].iType);
+                int t = tileToFlags(iTileType[tx][ty]);
 
                 if (t & tile_flag_solid) {
                     return true;

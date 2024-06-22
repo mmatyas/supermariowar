@@ -482,7 +482,7 @@ void CMap::clearMap()
                 mapdata[i][j][k].iID = TILESETNONE;  //no tile selected
             }
 
-            mapdatatop[i][j].iType = TileType::NonSolid;
+            mapdatatop[i][j] = TileType::NonSolid;
 
             objectdata[i][j].iType = -1;
             warpdata[i][j].direction = WARP_UNDEFINED;
@@ -655,18 +655,18 @@ void CMap::SetTileGap(short i, short j)
     IO_Block * topRightBlock = NULL;
 
     if (j > 0) {
-        topLeftTile = tileToFlags(mapdatatop[iLeftTile][j - 1].iType);
-        topCenterTile = tileToFlags(mapdatatop[i][j - 1].iType);
-        topRightTile = tileToFlags(mapdatatop[iRightTile][j - 1].iType);
+        topLeftTile = tileToFlags(mapdatatop[iLeftTile][j - 1]);
+        topCenterTile = tileToFlags(mapdatatop[i][j - 1]);
+        topRightTile = tileToFlags(mapdatatop[iRightTile][j - 1]);
 
         topLeftBlock = blockdata[iLeftTile][j - 1];
         topCenterBlock = blockdata[i][j - 1];
         topRightBlock = blockdata[iRightTile][j - 1];
     }
 
-    int leftTile = tileToFlags(mapdatatop[iLeftTile][j].iType);
-    int centerTile = tileToFlags(mapdatatop[i][j].iType);
-    int rightTile = tileToFlags(mapdatatop[iRightTile][j].iType);
+    int leftTile = tileToFlags(mapdatatop[iLeftTile][j]);
+    int centerTile = tileToFlags(mapdatatop[i][j]);
+    int rightTile = tileToFlags(mapdatatop[iRightTile][j]);
 
     IO_Block * leftBlock = blockdata[iLeftTile][j];
     IO_Block * centerBlock = blockdata[i][j];
@@ -686,9 +686,9 @@ void CMap::SetTileGap(short i, short j)
     bool fTopRightSolid = (topRightTile & tile_flag_solid) || (topRightBlock && !topRightBlock->isTransparent() && !topRightBlock->isHidden());
 
     if (fLeftSolid && !fCenterSolid && fRightSolid && !fTopLeftSolid && !fTopCenterSolid && !fTopRightSolid) {
-        mapdatatop[i][j].iType = TileType::Gap;
-    } else if (mapdatatop[i][j].iType == TileType::Gap) {
-        mapdatatop[i][j].iType = TileType::NonSolid;
+        mapdatatop[i][j] = TileType::Gap;
+    } else if (mapdatatop[i][j] == TileType::Gap) {
+        mapdatatop[i][j] = TileType::NonSolid;
     }
 }
 
@@ -744,7 +744,7 @@ void CMap::saveMap(const std::string& file)
             for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
 
                 //Set the tile type flags for each tile
-                TileType iType = platforms[iPlatform]->iTileType[iCol][iRow].iType;
+                TileType iType = platforms[iPlatform]->iTileType[iCol][iRow];
                 unsigned short iFlags = tileToFlags(iType);
 
                 TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
@@ -800,7 +800,7 @@ void CMap::saveMap(const std::string& file)
             }
 
             short iBlockType = objectdata[i][j].iType;
-            int iFlags = tileToFlags(mapdatatop[i][j].iType);
+            int iFlags = tileToFlags(mapdatatop[i][j]);
 
             //Calculate auto map filters
             if (iFlags & tile_flag_has_death)
@@ -960,7 +960,7 @@ void CMap::saveMap(const std::string& file)
                 mapfile.write_i8(tile->iCol);
                 mapfile.write_i8(tile->iRow);
 
-                mapfile.write_i32(static_cast<int>(platforms[iPlatform]->iTileType[iCol][iRow].iType));
+                mapfile.write_i32(static_cast<int>(platforms[iPlatform]->iTileType[iCol][iRow]));
             }
         }
 
@@ -1026,7 +1026,7 @@ void CMap::saveMap(const std::string& file)
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             //Write tile collision types (ice, solid, death, etc.)
-            mapfile.write_i32(static_cast<int>(mapdatatop[i][j].iType));
+            mapfile.write_i32(static_cast<int>(mapdatatop[i][j]));
 
             //Write per tile warp data
             mapfile.write_i32(warpdata[i][j].direction);
@@ -1407,7 +1407,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                     fUsed = true;
             }
 
-            if (!fUsed && (tileToFlags(mapdatatop[i][j].iType) & tile_flag_solid)) {
+            if (!fUsed && tileToFlags(mapdatatop[i][j]) & tile_flag_solid) {
                 fUsed = true;
             }
 
@@ -1422,7 +1422,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                 //If there is a death tile directly above
                 if (!fUsed) {
                     if (j > 0) {
-                        if (tileToFlags(mapdatatop[i][j - 1].iType) & tile_flag_death_on_bottom) {
+                        if (tileToFlags(mapdatatop[i][j - 1]) & tile_flag_death_on_bottom) {
                             fUsed = true;
                         }
                     }
@@ -1432,7 +1432,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                 if (!fUsed && !fIgnoreDeath) {
                     int m;
                     for (m = j; m < MAPHEIGHT; m++) {
-                        TileType type = mapdatatop[i][m].iType;
+                        TileType type = mapdatatop[i][m];
                         int flags = tileToFlags(type);
                         short objBlock = objectdata[i][m].iType;
 
@@ -1459,7 +1459,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                     //If we didn't find a landing spot from here to bottom, then try to wrap around and see
                     if (m == MAPHEIGHT) {
                         for (m = 0; m < j; m++) {
-                            TileType type = mapdatatop[i][m].iType;
+                            TileType type = mapdatatop[i][m];
                             short objBlock = objectdata[i][m].iType;
 
                             if (type == TileType::DeathOnTop || type == TileType::Death || type == TileType::SuperDeathTop || type == TileType::SuperDeath || type == TileType::PlayerDeath) {

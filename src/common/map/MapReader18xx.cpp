@@ -175,7 +175,7 @@ void MapReader1800::read_warp_locations(CMap& map, BinaryFile& mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
-            map.mapdatatop[i][j].iType = (TileType)mapfile.read_i32();;
+            map.mapdatatop[i][j] = (TileType)mapfile.read_i32();;
 
             map.warpdata[i][j].direction = (WarpEnterDirection)mapfile.read_i32();
             map.warpdata[i][j].connection = (short)mapfile.read_i32();
@@ -281,7 +281,7 @@ void MapReader1800::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
         short iHeight = (short)mapfile.read_i32();
 
         TilesetTile ** tiles = new TilesetTile*[iWidth];
-        MapTile ** types = new MapTile*[iWidth];
+        TileType ** types = new TileType*[iWidth];
 
         read_platform_tiles(map, mapfile, iWidth, iHeight, tiles, types);
 
@@ -308,11 +308,11 @@ void MapReader1800::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
 }
 
 void MapReader1800::read_platform_tiles(CMap& map, BinaryFile& mapfile,
-    short iWidth, short iHeight, TilesetTile**& tiles, MapTile**& types)
+    short iWidth, short iHeight, TilesetTile**& tiles, TileType**& types)
 {
     for (short iCol = 0; iCol < iWidth; iCol++) {
         tiles[iCol] = new TilesetTile[iHeight];
-        types[iCol] = new MapTile[iHeight];
+        types[iCol] = new TileType[iHeight];
 
         for (short iRow = 0; iRow < iHeight; iRow++) {
             TilesetTile * tile = &tiles[iCol][iRow];
@@ -337,7 +337,7 @@ void MapReader1800::read_platform_tiles(CMap& map, BinaryFile& mapfile,
                     tile->iID = translationid[tile->iID];
             }
 
-            types[iCol][iRow].iType = (TileType)mapfile.read_i32();;
+            types[iCol][iRow] = (TileType)mapfile.read_i32();;
         }
     }
 }
