@@ -121,7 +121,7 @@ SDL_Surface		*screen;
 SDL_Surface		*blitdest;
 SDL_Event		event;
 
-TileType		set_type = tile_solid;
+TileType		set_type = TileType::Solid;
 int				set_tile_rows = 0;
 int				set_tile_cols = 0;
 int				set_tile_tileset = 0;
@@ -138,7 +138,7 @@ int				view_animated_tileset_x = 0;
 
 int				set_block = 0;
 int				set_block_switch_on = 0;
-TileType		set_tiletype = tile_nonsolid;
+TileType		set_tiletype = TileType::NonSolid;
 int				set_mapitem = 0;
 
 int				set_direction = 0;
@@ -584,7 +584,7 @@ int main(int argc, char *argv[])
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
             for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
 				ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
-				g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
+				g_Platforms[iPlatform].types[iCol][iRow] = TileType::NonSolid;
 			}
 		}
 
@@ -731,17 +731,17 @@ void gameloop_frame()
 
 TileType CalculateTileType(short x, short y)
 {
-	TileType type = tile_nonsolid;
+	TileType type = TileType::NonSolid;
     for (short k = MAPLAYERS - 1; k >= 0; k--) {
 		TilesetTile * tile = &g_map->mapdata[x][y][k];
 
-		TileType iTileType = tile_nonsolid;
+		TileType iTileType = TileType::NonSolid;
 		if (tile->iID >= 0)
                     iTileType = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
 		else if (tile->iID == TILESETANIMATED)
 			iTileType = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
 
-        if (iTileType != tile_nonsolid) {
+        if (iTileType != TileType::NonSolid) {
 			type = iTileType;
 			break;
 		}
@@ -764,9 +764,9 @@ void AdjustMapItems(short iClickX, short iClickY)
 {
     for (short j = 0; j < g_map->iNumMapItems; j++) {
         if (g_map->mapitems[j].ix == iClickX && g_map->mapitems[j].iy == iClickY) {
-			if ((g_map->mapdatatop[iClickX][iClickY].iType != tile_nonsolid &&
-				g_map->mapdatatop[iClickX][iClickY].iType != tile_solid_on_top &&
-				g_map->mapdatatop[iClickX][iClickY].iType != tile_ice_on_top) ||
+			if ((g_map->mapdatatop[iClickX][iClickY].iType != TileType::NonSolid &&
+				g_map->mapdatatop[iClickX][iClickY].iType != TileType::SolidOnTop &&
+				g_map->mapdatatop[iClickX][iClickY].iType != TileType::IceOnTop) ||
                     g_map->objectdata[iClickX][iClickY].iType != -1) {
 				g_map->iNumMapItems--;
 
@@ -1048,7 +1048,7 @@ int editor_edit()
                         } else if (edit_mode == 6) {
 								for (short iRow = 0; iRow < MAPHEIGHT; iRow++)
 									for (short iCol = 0; iCol < MAPWIDTH; iCol++)
-										g_map->mapdatatop[iCol][iRow].iType = tile_nonsolid;
+										g_map->mapdatatop[iCol][iRow].iType = TileType::NonSolid;
 							}
 						}
 
@@ -1306,9 +1306,9 @@ int editor_edit()
 										}
 									}
 
-									if (g_map->mapdatatop[iClickX][iClickY].iType != tile_nonsolid &&
-										g_map->mapdatatop[iClickX][iClickY].iType != tile_solid_on_top &&
-										g_map->mapdatatop[iClickX][iClickY].iType != tile_ice_on_top)
+									if (g_map->mapdatatop[iClickX][iClickY].iType != TileType::NonSolid &&
+										g_map->mapdatatop[iClickX][iClickY].iType != TileType::SolidOnTop &&
+										g_map->mapdatatop[iClickX][iClickY].iType != TileType::IceOnTop)
 										fTileNotAvailable = true;
 
                                 if (!fTileNotAvailable) {
@@ -1367,7 +1367,7 @@ int editor_edit()
                         } else if (edit_mode == 5) {
 								g_map->nospawn[5][iClickX][iClickY] = false;
                         } else if (edit_mode == 6) {
-								g_map->mapdatatop[iClickX][iClickY].iType = tile_nonsolid;
+								g_map->mapdatatop[iClickX][iClickY].iType = TileType::NonSolid;
                         } else if (edit_mode == 7) {
 								RemoveMapItemAt(iClickX, iClickY);
 							}
@@ -1464,7 +1464,7 @@ int editor_edit()
                         } else if (edit_mode == 5) {
 								g_map->nospawn[5][iClickX][iClickY] = false;
                         } else if (edit_mode == 6) {
-								g_map->mapdatatop[iClickX][iClickY].iType = tile_nonsolid;
+								g_map->mapdatatop[iClickX][iClickY].iType = TileType::NonSolid;
 							}
 						}
 
@@ -1627,8 +1627,8 @@ int editor_edit()
             } else if (edit_mode == 6) {
                 for (int k = 0; k < MAPHEIGHT; k++) {
                     for (int j = 0; j < MAPWIDTH; j++) {
-						if (g_map->mapdatatop[j][k].iType != tile_nonsolid)
-							rm->spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, (g_map->mapdatatop[j][k].iType - 1) * TILESIZE, 0, TILESIZE, TILESIZE);
+						if (g_map->mapdatatop[j][k].iType != TileType::NonSolid)
+                            rm->spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, static_cast<int>(PrevTileType(g_map->mapdatatop[j][k].iType)) * TILESIZE, 0, TILESIZE, TILESIZE);
 					}
 				}
 
@@ -2669,9 +2669,9 @@ int editor_platforms()
 
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState) {
 							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix][iy]);
-							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
+							g_Platforms[iEditPlatform].types[ix][iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
+							g_Platforms[iEditPlatform].types[ix][iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
                     #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                         const Uint8 * keystate = SDL_GetKeyboardState(NULL);
@@ -2710,13 +2710,13 @@ int editor_platforms()
 							}
                     } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
 							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix][iy]);
-							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
+							g_Platforms[iEditPlatform].types[ix][iy] = TileType::NonSolid;
 						}
                 } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 						if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
 							g_Platforms[iEditPlatform].types[ix][iy] = set_tiletype;
 						else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
-							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
+							g_Platforms[iEditPlatform].types[ix][iy] = TileType::NonSolid;
                 } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
                     #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
@@ -3035,7 +3035,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 
             if (fDrawTileTypes) {
 				TileType type = g_Platforms[iPlatform].types[iCol][iRow];
-				rm->spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, (type - 1) * TILESIZE, 0, TILESIZE, TILESIZE);
+                rm->spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, static_cast<int>(PrevTileType(type)) * TILESIZE, 0, TILESIZE, TILESIZE);
 			}
 		}
 	}
@@ -3761,8 +3761,8 @@ int editor_tiles()
         for (i = view_tileset_x; i < view_tileset_x + 20 && i < tileset->width(); i++) {
             for (j = view_tileset_y; j < view_tileset_y + 15 && j < tileset->height(); j++) {
                                 TileType t = tileset->tileType(i, j);
-				if (t != tile_nonsolid)
-					rm->spr_tiletypes.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5, (t-1) << 3, 0, 8, 8);
+				if (t != TileType::NonSolid)
+                                    rm->spr_tiletypes.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5, static_cast<int>(PrevTileType(t)) << 3, 0, 8, 8);
 			}
 		}
 
@@ -4444,8 +4444,8 @@ int editor_animation()
 				rm->spr_tileanimation[0].draw(iDestX, iDestY, iSrcX, iSrcY, TILESIZE, TILESIZE);
 
 				TileType t = animatedtiletypes[iCol + (iRow << 5)];
-				if (t != tile_nonsolid)
-					rm->spr_tiletypes.draw(iDestX, iDestY, (t-1) << 3, 0, 8, 8);
+				if (t != TileType::NonSolid)
+					rm->spr_tiletypes.draw(iDestX, iDestY, static_cast<int>(PrevTileType(t)) << 3, 0, 8, 8);
 			}
 		}
 
@@ -4853,7 +4853,7 @@ void loadcurrentmap()
 					g_Platforms[iPlatform].types[iCol][iRow] = g_map->platforms[iPlatform]->iTileType[iCol][iRow].iType;
                 } else {
 					ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
-					g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
+					g_Platforms[iPlatform].types[iCol][iRow] = TileType::NonSolid;
 				}
 			}
 		}
@@ -4890,7 +4890,7 @@ void SetPlatformToDefaults(short iPlatform)
     for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
         for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
 			ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
-			g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
+			g_Platforms[iPlatform].types[iCol][iRow] = TileType::NonSolid;
 		}
 	}
 
@@ -5357,7 +5357,7 @@ bool ReadAnimatedTileTypeFile(const char * szFile)
 		animatedtiletypes = new TileType[256];
 
         for (short i = 0; i < 256; i++) {
-			animatedtiletypes[i] = tile_nonsolid;
+			animatedtiletypes[i] = TileType::NonSolid;
 		}
 	}
 
@@ -5373,7 +5373,7 @@ bool WriteAnimatedTileTypeFile(const char * szFile)
 	}
 
     for (short i = 0; i < 256; i++) {
-		tsf.write_i32(animatedtiletypes[i]);
+            tsf.write_i32(static_cast<int>(animatedtiletypes[i]));
 	}
 
 	return true;

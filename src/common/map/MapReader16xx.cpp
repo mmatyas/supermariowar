@@ -86,13 +86,13 @@ void MapReader1600::read_tiles(CMap& map, BinaryFile& mapfile)
                 }
             }
 
-            map.mapdatatop[i][j].iType = tile_nonsolid;
+            map.mapdatatop[i][j].iType = TileType::NonSolid;
             map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
 
             for (short k = MAPLAYERS - 1; k >= 0; k--) {
                 TilesetTile * tile = &map.mapdata[i][j][k];
                 TileType type = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
-                if (type != tile_nonsolid) {
+                if (type != TileType::NonSolid) {
                     map.mapdatatop[i][j].iType = type;
                     map.mapdatatop[i][j].iFlags = tileToFlags(type);
                     break;

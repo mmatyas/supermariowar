@@ -1,27 +1,29 @@
 #pragma once
 
+#include <cassert>
 
-enum TileType {
-    tile_nonsolid = 0,
-    tile_solid = 1,
-    tile_solid_on_top = 2,
-    tile_ice = 3,
-    tile_death = 4,
-    tile_death_on_top = 5,
-    tile_death_on_bottom = 6,
-    tile_death_on_left = 7,
-    tile_death_on_right = 8,
-    tile_ice_on_top = 9,
-    tile_ice_death_on_bottom = 10,
-    tile_ice_death_on_left = 11,
-    tile_ice_death_on_right = 12,
-    tile_super_death = 13,
-    tile_super_death_top = 14,
-    tile_super_death_bottom = 15,
-    tile_super_death_left = 16,
-    tile_super_death_right = 17,
-    tile_player_death = 18,
-    tile_gap = 19,
+
+enum class TileType : unsigned char {
+    NonSolid = 0,
+    Solid = 1,
+    SolidOnTop = 2,
+    Ice = 3,
+    Death = 4,
+    DeathOnTop = 5,
+    DeathOnBottom = 6,
+    DeathOnLeft = 7,
+    DeathOnRight = 8,
+    IceOnTop = 9,
+    IceDeathOnBottom = 10,
+    IceDeathOnLleft = 11,
+    IceDeathOnRight = 12,
+    SuperDeath = 13,
+    SuperDeathTop = 14,
+    SuperDeathBottom = 15,
+    SuperDeathLeft = 16,
+    SuperDeathRight = 17,
+    PlayerDeath = 18,
+    Gap = 19,
 };
 
 
@@ -55,30 +57,33 @@ enum TileTypeFlag {
 
 constexpr unsigned short tileToFlags(TileType tiletype) {
     switch (tiletype) {
-        case tile_nonsolid: return tile_flag_nonsolid;
-        case tile_solid: return tile_flag_solid;
-        case tile_solid_on_top: return tile_flag_solid_on_top;
-        case tile_ice: return tile_flag_solid | tile_flag_ice;
+        case TileType::NonSolid: return tile_flag_nonsolid;
+        case TileType::Solid: return tile_flag_solid;
+        case TileType::SolidOnTop: return tile_flag_solid_on_top;
+        case TileType::Ice: return tile_flag_solid | tile_flag_ice;
 
-        case tile_death: return tile_flag_solid | tile_flag_has_regular_death;
-        case tile_death_on_top: return tile_flag_solid | tile_flag_death_on_top;
-        case tile_death_on_bottom: return tile_flag_solid | tile_flag_death_on_bottom;
-        case tile_death_on_left: return tile_flag_solid | tile_flag_death_on_left;
-        case tile_death_on_right: return tile_flag_solid | tile_flag_death_on_right;
+        case TileType::Death: return tile_flag_solid | tile_flag_has_regular_death;
+        case TileType::DeathOnTop: return tile_flag_solid | tile_flag_death_on_top;
+        case TileType::DeathOnBottom: return tile_flag_solid | tile_flag_death_on_bottom;
+        case TileType::DeathOnLeft: return tile_flag_solid | tile_flag_death_on_left;
+        case TileType::DeathOnRight: return tile_flag_solid | tile_flag_death_on_right;
 
-        case tile_ice_on_top: return tile_flag_ice | tile_flag_solid_on_top;
-        case tile_ice_death_on_bottom: return tile_flag_solid | tile_flag_ice | tile_flag_death_on_bottom;
-        case tile_ice_death_on_left: return tile_flag_solid | tile_flag_ice | tile_flag_death_on_left;
-        case tile_ice_death_on_right: return tile_flag_solid | tile_flag_ice | tile_flag_death_on_right;
+        case TileType::IceOnTop: return tile_flag_ice | tile_flag_solid_on_top;
+        case TileType::IceDeathOnBottom: return tile_flag_solid | tile_flag_ice | tile_flag_death_on_bottom;
+        case TileType::IceDeathOnLleft: return tile_flag_solid | tile_flag_ice | tile_flag_death_on_left;
+        case TileType::IceDeathOnRight: return tile_flag_solid | tile_flag_ice | tile_flag_death_on_right;
 
-        case tile_super_death: return tile_flag_solid | tile_flag_has_regular_death | tile_flag_has_super_death;
-        case tile_super_death_top: return tile_flag_solid | tile_flag_super_death_top | tile_flag_death_on_top;
-        case tile_super_death_bottom: return tile_flag_solid | tile_flag_super_death_bottom | tile_flag_death_on_bottom;
-        case tile_super_death_left: return tile_flag_solid | tile_flag_super_death_left | tile_flag_death_on_left;
-        case tile_super_death_right: return tile_flag_solid | tile_flag_super_death_right | tile_flag_death_on_right;
-        case tile_player_death: return tile_flag_player_death;
+        case TileType::SuperDeath: return tile_flag_solid | tile_flag_has_regular_death | tile_flag_has_super_death;
+        case TileType::SuperDeathTop: return tile_flag_solid | tile_flag_super_death_top | tile_flag_death_on_top;
+        case TileType::SuperDeathBottom: return tile_flag_solid | tile_flag_super_death_bottom | tile_flag_death_on_bottom;
+        case TileType::SuperDeathLeft: return tile_flag_solid | tile_flag_super_death_left | tile_flag_death_on_left;
+        case TileType::SuperDeathRight: return tile_flag_solid | tile_flag_super_death_right | tile_flag_death_on_right;
+        case TileType::PlayerDeath: return tile_flag_player_death;
 
-        case tile_gap: return tile_flag_gap;
+        case TileType::Gap: return tile_flag_gap;
+        default:
+            assert(false);
+            return tile_flag_nonsolid;
     }
 }
 

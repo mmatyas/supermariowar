@@ -403,7 +403,8 @@ void EC_Corpse::update()
         if (nexty >= 0) {
             short ty = nexty / TILESIZE;
 
-            if (g_map->map(tx, ty) == tile_solid_on_top || g_map->map(tx2, ty) == tile_solid_on_top) {
+            // FIXME: This seems to be wrong
+            if (g_map->map(tx, ty) == static_cast<int>(TileType::SolidOnTop) || g_map->map(tx2, ty) == static_cast<int>(TileType::SolidOnTop)) {
                 //on ground on tile solid_on_top
                 if ((dy + 32.0f - vely) / TILESIZE < ty) {
                     //only if we were above the tile in the previous frame

@@ -6,25 +6,25 @@
 
 namespace {
 constexpr std::array<TileType, 19> ordered_tile_types {
-    tile_nonsolid,
-    tile_solid,
-    tile_solid_on_top,
-    tile_ice,
-    tile_death,
-    tile_death_on_top,
-    tile_death_on_bottom,
-    tile_death_on_left,
-    tile_death_on_right,
-    tile_ice_on_top,
-    tile_ice_death_on_bottom,
-    tile_ice_death_on_left,
-    tile_ice_death_on_right,
-    tile_super_death,
-    tile_super_death_top,
-    tile_super_death_bottom,
-    tile_super_death_left,
-    tile_super_death_right,
-    tile_player_death,
+    TileType::NonSolid,
+    TileType::Solid,
+    TileType::SolidOnTop,
+    TileType::Ice,
+    TileType::Death,
+    TileType::DeathOnTop,
+    TileType::DeathOnBottom,
+    TileType::DeathOnLeft,
+    TileType::DeathOnRight,
+    TileType::IceOnTop,
+    TileType::IceDeathOnBottom,
+    TileType::IceDeathOnLleft,
+    TileType::IceDeathOnRight,
+    TileType::SuperDeath,
+    TileType::SuperDeathTop,
+    TileType::SuperDeathBottom,
+    TileType::SuperDeathLeft,
+    TileType::SuperDeathRight,
+    TileType::PlayerDeath,
 };
 } // namespace
 
@@ -33,7 +33,7 @@ TileType NextTileType(TileType type)
 {
     auto it = std::find(ordered_tile_types.cbegin(), ordered_tile_types.cend(), type);
     if (it == ordered_tile_types.cend())
-        return tile_nonsolid;
+        return TileType::NonSolid;
 
     ++it;
     return it == ordered_tile_types.cend() ? ordered_tile_types.front() : *it;
@@ -44,7 +44,7 @@ TileType PrevTileType(TileType type)
 {
     auto it = std::find(ordered_tile_types.cbegin(), ordered_tile_types.cend(), type);
     if (it == ordered_tile_types.cend())
-        return tile_nonsolid;
+        return TileType::NonSolid;
 
     return it == ordered_tile_types.cbegin() ? ordered_tile_types.back() : *(--it);
 }

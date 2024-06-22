@@ -62,7 +62,7 @@ CTileset::CTileset(const std::string& dir)
 
     m_width = std::min(m_sprites[0].getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
     m_height = std::min(m_sprites[0].getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
-    m_tiletypes = std::vector<TileType>(m_width * m_height, tile_nonsolid);
+    m_tiletypes = std::vector<TileType>(m_width * m_height, TileType::NonSolid);
 }
 
 
@@ -123,7 +123,7 @@ void CTileset::saveTileset() const
     tsf.write_i32(m_tiletypes.size());
 
     for (TileType tiletype : m_tiletypes)
-        tsf.write_i32(tiletype);
+        tsf.write_i32(static_cast<int>(tiletype));
 
 #if defined(__APPLE__)
     chmod(m_tilesetPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH);

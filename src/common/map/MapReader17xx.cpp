@@ -272,7 +272,7 @@ void MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile,
                 tile->iCol = 0;
                 tile->iRow = 0;
 
-                type = tile_nonsolid;
+                type = TileType::NonSolid;
             } else {
                 tile->iID = g_tilesetmanager->classicTilesetIndex();
                 tile->iCol = iTile % TILESETWIDTH;

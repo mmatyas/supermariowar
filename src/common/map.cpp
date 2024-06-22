@@ -482,7 +482,7 @@ void CMap::clearMap()
                 mapdata[i][j][k].iID = TILESETNONE;  //no tile selected
             }
 
-            mapdatatop[i][j].iType = tile_nonsolid;
+            mapdatatop[i][j].iType = TileType::NonSolid;
             mapdatatop[i][j].iFlags = tile_flag_nonsolid;
 
             objectdata[i][j].iType = -1;
@@ -687,10 +687,10 @@ void CMap::SetTileGap(short i, short j)
     bool fTopRightSolid = (topRightTile & tile_flag_solid) || (topRightBlock && !topRightBlock->isTransparent() && !topRightBlock->isHidden());
 
     if (fLeftSolid && !fCenterSolid && fRightSolid && !fTopLeftSolid && !fTopCenterSolid && !fTopRightSolid) {
-        mapdatatop[i][j].iType = tile_gap;
+        mapdatatop[i][j].iType = TileType::Gap;
         mapdatatop[i][j].iFlags = tile_flag_gap;
     } else if (mapdatatop[i][j].iFlags == tile_flag_gap) {
-        mapdatatop[i][j].iType = tile_nonsolid;
+        mapdatatop[i][j].iType = TileType::NonSolid;
         mapdatatop[i][j].iFlags = tile_flag_nonsolid;
     }
 }
@@ -967,7 +967,7 @@ void CMap::saveMap(const std::string& file)
                 mapfile.write_i8(tile->iCol);
                 mapfile.write_i8(tile->iRow);
 
-                mapfile.write_i32(platforms[iPlatform]->iTileType[iCol][iRow].iType);
+                mapfile.write_i32(static_cast<int>(platforms[iPlatform]->iTileType[iCol][iRow].iType));
             }
         }
 
@@ -1033,7 +1033,7 @@ void CMap::saveMap(const std::string& file)
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             //Write tile collision types (ice, solid, death, etc.)
-            mapfile.write_i32(mapdatatop[i][j].iType);
+            mapfile.write_i32(static_cast<int>(mapdatatop[i][j].iType));
 
             //Write per tile warp data
             mapfile.write_i32(warpdata[i][j].direction);
@@ -1446,18 +1446,18 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                         if (m == j && (flags & tile_flag_solid_on_top))
                             continue;
 
-                        if (type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death) {
+                        if (type == TileType::DeathOnTop || type == TileType::Death || type == TileType::SuperDeathTop || type == TileType::SuperDeath || type == TileType::PlayerDeath) {
                             fUsed = true;
                             break;
                         }
 
                         if (fUseTempBlocks) {
-                            if ((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
+                            if ((type != TileType::NonSolid && type != TileType::Gap) || objBlock != -1) {
                                 break;
                             }
                         } else {
                             //Ignore the blocks that might not be there anymore (destroyed, turned off, etc)
-                            if ((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
+                            if ((type != TileType::NonSolid && type != TileType::Gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
                                 break;
                             }
                         }
@@ -1469,17 +1469,17 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                             TileType type = mapdatatop[i][m].iType;
                             short objBlock = objectdata[i][m].iType;
 
-                            if (type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death) {
+                            if (type == TileType::DeathOnTop || type == TileType::Death || type == TileType::SuperDeathTop || type == TileType::SuperDeath || type == TileType::PlayerDeath) {
                                 fUsed = true;
                                 break;
                             }
 
                             if (fUseTempBlocks) {
-                                if ((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
+                                if ((type != TileType::NonSolid && type != TileType::Gap) || objBlock != -1) {
                                     break;
                                 }
                             } else {
-                                if ((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
+                                if ((type != TileType::NonSolid && type != TileType::Gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
                                     break;
                                 }
                             }
@@ -2466,7 +2466,7 @@ void CMap::drawfrontlayer()
     {
     	for (short j = 0; j < MAPWIDTH; j++)
     	{
-            if (mapdatatop[j][i].iType == tile_gap)
+            if (mapdatatop[j][i].iType == TileType::gap)
     		{
     			SDL_Rect r = {j << 5, i << 5, TILESIZE, TILESIZE};
     			SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 255, 0, 255));
@@ -2502,7 +2502,7 @@ void CMap::optimize()
             for (int m = 1; m < MAPLAYERS; m++) {
                 TilesetTile * tile = &mapdata[i][j][m];
                 TileType type = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
-                if (type != tile_nonsolid && type != tile_gap && type != tile_solid_on_top) {
+                if (type != TileType::NonSolid && type != TileType::Gap && type != TileType::SolidOnTop) {
                     for (int k = m - 1; k >= 0; k--) {
                         TilesetTile * compareTile = &mapdata[i][j][k];
                         if (compareTile->iID == TILESETNONE) {
