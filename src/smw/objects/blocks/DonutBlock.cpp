@@ -71,7 +71,6 @@ void B_DonutBlock::triggerBehavior(short iPlayerId)
     MapTile ** typedata = new MapTile*[1];
     typedata[0] = new MapTile[1];
     typedata[0][0].iType = TileType::Solid;
-    typedata[0][0].iFlags = tile_flag_solid;
 
     MovingPlatformPath * path = new FallingPath(Vec2f((float)ix + 16.0f, (float)iy + 15.8f));
     MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, 2, path, false);

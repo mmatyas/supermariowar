@@ -36,7 +36,6 @@ void MapReader1500::read_tiles(CMap& map, BinaryFile& mapfile)
 
             TileType iType = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
             map.mapdatatop[i][j].iType = iType;
-            map.mapdatatop[i][j].iFlags = tileToFlags(iType);
 
             map.mapdata[i][j][0].iID = TILESETNONE;
             map.mapdata[i][j][2].iID = TILESETNONE;

@@ -159,9 +159,7 @@ void MapReader1700::read_warp_locations(CMap& map, BinaryFile& mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
-            TileType iType = (TileType)mapfile.read_i32();
-            map.mapdatatop[i][j].iType = iType;
-            map.mapdatatop[i][j].iFlags = tileToFlags(iType);
+            map.mapdatatop[i][j].iType = (TileType)mapfile.read_i32();
 
             map.warpdata[i][j].direction = (WarpEnterDirection)mapfile.read_i32();
             map.warpdata[i][j].connection = (short)mapfile.read_i32();
@@ -282,7 +280,6 @@ void MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile,
             }
 
             types[iCol][iRow].iType = type;
-            types[iCol][iRow].iFlags = tileToFlags(type);
         }
     }
 }

@@ -139,7 +139,6 @@ struct AnimatedTile {
 
 struct MapTile {
 	TileType iType;
-	int iFlags;
 };
 
 struct MapBlock {
@@ -200,8 +199,8 @@ class CMap
 		//returns the tiletype at the specific position (map coordinates) of the
 		//front most visible tile
     int map(int x, int y) {
-			return mapdatatop[x][y].iFlags;
-		}
+        return tileToFlags(mapdatatop[x][y].iType);
+    }
 
     IO_Block * block(short x, short y) {
 			return blockdata[x][y];
