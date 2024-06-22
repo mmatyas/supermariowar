@@ -176,14 +176,8 @@ void MapReader1800::read_warp_locations(CMap& map, BinaryFile& mapfile)
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
             TileType iType = (TileType)mapfile.read_i32();
-
-            if (0 <= iType && iType < g_iTileTypeConversion.size()) {
-                map.mapdatatop[i][j].iType = iType;
-                map.mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
-            } else {
-                map.mapdatatop[i][j].iType = tile_nonsolid;
-                map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-            }
+            map.mapdatatop[i][j].iType = iType;
+            map.mapdatatop[i][j].iFlags = tileToFlags(iType);
 
             map.warpdata[i][j].direction = (WarpEnterDirection)mapfile.read_i32();
             map.warpdata[i][j].connection = (short)mapfile.read_i32();
@@ -346,14 +340,8 @@ void MapReader1800::read_platform_tiles(CMap& map, BinaryFile& mapfile,
             }
 
             TileType iType = (TileType)mapfile.read_i32();
-
-            if (0 <= iType && iType < g_iTileTypeConversion.size()) {
-                types[iCol][iRow].iType = iType;
-                types[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
-            } else {
-                types[iCol][iRow].iType = tile_nonsolid;
-                types[iCol][iRow].iFlags = tile_flag_nonsolid;
-            }
+            types[iCol][iRow].iType = iType;
+            types[iCol][iRow].iFlags = tileToFlags(iType);
         }
     }
 }

@@ -35,14 +35,8 @@ void MapReader1500::read_tiles(CMap& map, BinaryFile& mapfile)
             tile->iRow = iTileID / 32;
 
             TileType iType = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
-
-            if (0 <= iType && iType < g_iTileTypeConversion.size()) {
-                map.mapdatatop[i][j].iType = iType;
-                map.mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
-            } else {
-                map.mapdatatop[i][j].iType = tile_nonsolid;
-                map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-            }
+            map.mapdatatop[i][j].iType = iType;
+            map.mapdatatop[i][j].iFlags = tileToFlags(iType);
 
             map.mapdata[i][j][0].iID = TILESETNONE;
             map.mapdata[i][j][2].iID = TILESETNONE;

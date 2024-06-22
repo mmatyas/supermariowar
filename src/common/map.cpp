@@ -745,17 +745,13 @@ void CMap::saveMap(const std::string& file)
     for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
         for (short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++) {
             for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
+
                 //Set the tile type flags for each tile
-                int iType = platforms[iPlatform]->iTileType[iCol][iRow].iType;
-                if (0 <= iType && iType < g_iTileTypeConversion.size()) {
-                    platforms[iPlatform]->iTileType[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
-                } else {
-                    platforms[iPlatform]->iTileType[iCol][iRow].iType = tile_nonsolid;
-                    platforms[iPlatform]->iTileType[iCol][iRow].iFlags = tile_flag_nonsolid;
-                }
+                TileType iType = platforms[iPlatform]->iTileType[iCol][iRow].iType;
+                unsigned short iFlags = tileToFlags(iType);
+                platforms[iPlatform]->iTileType[iCol][iRow].iFlags = iFlags;
 
                 TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
-                int iFlags = platforms[iPlatform]->iTileType[iCol][iRow].iFlags;
 
                 if (tile->iID != TILESETNONE)
                     iPlatformCount++;
@@ -774,13 +770,7 @@ void CMap::saveMap(const std::string& file)
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             //Set the tile type flags for each tile
-            int iType = mapdatatop[i][j].iType;
-            if (0 <= iType && iType < g_iTileTypeConversion.size()) {
-                mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
-            } else {
-                mapdatatop[i][j].iType = tile_nonsolid;
-                mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-            }
+            mapdatatop[i][j].iFlags = tileToFlags(mapdatatop[i][j].iType);
 
             //Calculate what warp tiles belong together (any warps that have the same connection that are
             //next to each other are merged into a single warp)
