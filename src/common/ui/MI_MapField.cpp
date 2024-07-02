@@ -24,10 +24,10 @@ MI_MapField::MI_MapField(gfxSprite* nspr, short x, short y, std::string name, sh
     , iSearchStringTimer(0)
     , fShowtags(showtags)
 {
-    miModifyImageLeft = std::make_unique<MI_Image>(nspr, ix + indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
+    miModifyImageLeft = std::make_unique<MI_Image>(nspr, m_pos.x + indent - 26, m_pos.y + 4, 32, 64, 26, 24, 4, 1, 8);
     miModifyImageLeft->Show(false);
 
-    miModifyImageRight = std::make_unique<MI_Image>(nspr, ix + iWidth - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
+    miModifyImageRight = std::make_unique<MI_Image>(nspr, m_pos.x + iWidth - 16, m_pos.y + 4, 32, 88, 26, 24, 4, 1, 8);
     miModifyImageRight->Show(false);
 
     if (fShowtags) {
@@ -192,12 +192,12 @@ void MI_MapField::Draw()
         return;
 
     //Draw the select field background
-    spr->draw(ix, iy, 0, (fSelected ? 32 : 0), iIndent - 16, 32);
-    spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
-    spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
+    spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0), iIndent - 16, 32);
+    spr->draw(m_pos.x + iIndent - 16, m_pos.y, 0, (fSelected ? 96 : 64), 32, 32);
+    spr->draw(m_pos.x + iIndent + 16, m_pos.y, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
-    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName.c_str());
-    rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szMapName);
+    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, iIndent - 8, szName.c_str());
+    rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 24, szMapName);
 
     MI_MapPreview::Draw();
 
@@ -233,7 +233,7 @@ MenuCodeEnum MI_MapField::MouseClick(short iMouseX, short iMouseY)
     }
 
     //Otherwise just check to see if we clicked on the whole control
-    if (iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32)
+    if (iMouseX >= m_pos.x && iMouseX < m_pos.x + iWidth && iMouseY >= m_pos.y && iMouseY < m_pos.y + 32)
         return MENU_CODE_CLICKED;
 
     //Otherwise this control wasn't clicked at all
@@ -277,8 +277,8 @@ void MI_MapField::SetDimensions(short width, short indent)
 {
     MI_MapPreview::SetDimensions(width, indent);
 
-    miModifyImageLeft->SetPosition(ix + indent - 26, iy + 4);
-    miModifyImageRight->SetPosition(ix + iWidth - 16, iy + 4);
+    miModifyImageLeft->SetPosition(m_pos.x + indent - 26, m_pos.y + 4);
+    miModifyImageRight->SetPosition(m_pos.x + iWidth - 16, m_pos.y + 4);
 
     if (fShowtags) {
         //iSlideListOut = (iWidth - 352) >> 1;

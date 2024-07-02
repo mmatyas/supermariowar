@@ -20,7 +20,7 @@ void MI_StoredPowerupResetButton::Draw()
     MI_Button::Draw();
 
     for (short iPowerup = 0; iPowerup < 4; iPowerup++) {
-        rm->spr_selectfield.draw(ix + iWidth - 142 + iPowerup * 30, iy + 4, 188, 88, 24, 24);
-        rm->spr_storedpowerupsmall.draw(ix + iWidth - 138 + iPowerup * 30, iy + 8, game_values.storedpowerups[iPowerup] * 16, 0, 16, 16);
+        rm->spr_selectfield.draw(m_pos.x + iWidth - 142 + iPowerup * 30, m_pos.y + 4, 188, 88, 24, 24);
+        rm->spr_storedpowerupsmall.draw(m_pos.x + iWidth - 138 + iPowerup * 30, m_pos.y + 8, game_values.storedpowerups[iPowerup] * 16, 0, 16, 16);
     }
 }

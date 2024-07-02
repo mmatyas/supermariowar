@@ -4,8 +4,7 @@
 
 
 UI_Control::UI_Control(short x, short y)
-    : ix(x)
-    , iy(y)
+    : m_pos(x, y)
 {
     neighborControls.fill(nullptr);
 }
@@ -14,8 +13,7 @@ UI_Control::UI_Control(short x, short y)
 UI_Control& UI_Control::operator= (const UI_Control& other)
 {
     if (this != &other) {
-        ix = other.ix;
-        iy = other.iy;
+        m_pos = other.m_pos;
 
         fSelected = other.fSelected;
         fModifying = other.fModifying;

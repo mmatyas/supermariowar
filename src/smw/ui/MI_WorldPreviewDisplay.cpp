@@ -54,8 +54,8 @@ void MI_WorldPreviewDisplay::Init()
 
     rectDstSurface.w = 320;
     rectDstSurface.h = 240;
-    rectDstSurface.x = ix;
-    rectDstSurface.y = iy;
+    rectDstSurface.x = m_pos.x;
+    rectDstSurface.y = m_pos.y;
 
     if (g_worldmap.iWidth < 20)
         rectDstSurface.x += (20 - g_worldmap.iWidth) * 8;

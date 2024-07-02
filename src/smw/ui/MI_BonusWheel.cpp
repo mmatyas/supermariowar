@@ -31,7 +31,7 @@ MI_BonusWheel::MI_BonusWheel(short x, short y)
     //Fix the last sector to allow correct detection of sector for tick sound
     dSelectionSector[NUMBONUSITEMSONWHEEL] = TWO_PI;
 
-    miContinueButton = new MI_Button(&rm->menu_plain_field, ix + 76, iy + 390, "Continue", 200, TextAlign::CENTER);
+    miContinueButton = new MI_Button(&rm->menu_plain_field, m_pos.x + 76, m_pos.y + 390, "Continue", 200, TextAlign::CENTER);
     miContinueButton->Show(false);
     miContinueButton->SetCode(MENU_CODE_BONUS_DONE);
 }
@@ -89,8 +89,8 @@ void MI_BonusWheel::Update()
         if (--iDisplayPowerupTimer <= 0) {
             iDisplayPowerupTimer = 20;
 
-            short iPoofX = ix + 152 + (short)(110.0f * cos(dSelectionSector[iDisplayPowerupIndex]));
-            short iPoofY = iy + 200 + (short)(110.0f * sin(dSelectionSector[iDisplayPowerupIndex]));
+            short iPoofX = m_pos.x + 152 + (short)(110.0f * cos(dSelectionSector[iDisplayPowerupIndex]));
+            short iPoofY = m_pos.y + 200 + (short)(110.0f * sin(dSelectionSector[iDisplayPowerupIndex]));
 
             uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, iPoofX, iPoofY, 4, 5));
 
@@ -190,10 +190,10 @@ void MI_BonusWheel::Draw()
     if (!fShow)
         return;
 
-    rm->spr_tournament_powerup_splash.draw(ix, iy);
+    rm->spr_tournament_powerup_splash.draw(m_pos.x, m_pos.y);
 
-    short iSelectorX = ix + 144 + (short)(110.0f * cos(dSelectionAngle));
-    short iSelectorY = iy + 190 + (short)(110.0f * sin(dSelectionAngle));
+    short iSelectorX = m_pos.x + 144 + (short)(110.0f * cos(dSelectionAngle));
+    short iSelectorY = m_pos.y + 190 + (short)(110.0f * sin(dSelectionAngle));
 
     if (iState > 0)
         rm->spr_powerupselector.draw(iSelectorX, iSelectorY, iSelectorAnimation * 64, 0, 64, 64);
@@ -212,7 +212,7 @@ void MI_BonusWheel::Draw()
     miContinueButton->Draw();
 
     if (iState == 1 && !fPressedSelect)
-        rm->menu_font_large.drawCentered(App::screenWidth/2, iy + 390, "Press a Button To Stop The Wheel");
+        rm->menu_font_large.drawCentered(App::screenWidth/2, m_pos.y + 390, "Press a Button To Stop The Wheel");
 }
 
 void MI_BonusWheel::Reset(bool fTournament)
@@ -262,9 +262,9 @@ void MI_BonusWheel::Reset(bool fTournament)
 
     miPlayerImages = new MI_Image * [iNumPlayers];
 
-    short iPlayerX = ix + 160 - ((iNumPlayers - 1) * 17);
+    short iPlayerX = m_pos.x + 160 - ((iNumPlayers - 1) * 17);
     for (short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++) {
-        miPlayerImages[iPlayer] = new MI_Image(rm->spr_player[game_values.teamids[iWinningTeam][iPlayer]][PGFX_JUMPING_R], iPlayerX, iy + 210, 0, 0, 32, 32, 1, 1, 0);
+        miPlayerImages[iPlayer] = new MI_Image(rm->spr_player[game_values.teamids[iWinningTeam][iPlayer]][PGFX_JUMPING_R], iPlayerX, m_pos.y + 210, 0, 0, 32, 32, 1, 1, 0);
         iPlayerX += 34;
     }
 

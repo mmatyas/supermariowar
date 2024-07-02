@@ -14,14 +14,14 @@ void MI_ScoreText::Draw()
     if (!fShow)
         return;
 
-    rm->spr_scoretext.draw(iDigitRightDstX, iy, iDigitRightSrcX, 0, 16, 16);
+    rm->spr_scoretext.draw(iDigitRightDstX, m_pos.y, iDigitRightSrcX, 0, 16, 16);
 
     if (iDigitLeftSrcX > 0) {
-        rm->spr_scoretext.draw(iDigitMiddleDstX, iy, iDigitMiddleSrcX, 0, 16, 16);
-        rm->spr_scoretext.draw(iDigitLeftDstX, iy, iDigitLeftSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, m_pos.y, iDigitMiddleSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitLeftDstX, m_pos.y, iDigitLeftSrcX, 0, 16, 16);
     }
     else if (iDigitMiddleSrcX > 0) {
-        rm->spr_scoretext.draw(iDigitMiddleDstX, iy, iDigitMiddleSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, m_pos.y, iDigitMiddleSrcX, 0, 16, 16);
     }
 }
 
@@ -37,14 +37,14 @@ void MI_ScoreText::SetScore(short sScore)
 
     if (iDigitLeftSrcX == 0) {
         if (iDigitMiddleSrcX == 0) {
-            iDigitRightDstX = ix - 8;
+            iDigitRightDstX = m_pos.x - 8;
         } else {
-            iDigitMiddleDstX = ix - 16;
-            iDigitRightDstX = ix;
+            iDigitMiddleDstX = m_pos.x - 16;
+            iDigitRightDstX = m_pos.x;
         }
     } else {
-        iDigitLeftDstX = ix - 24;
-        iDigitMiddleDstX = ix - 8;
-        iDigitRightDstX = ix + 8;
+        iDigitLeftDstX = m_pos.x - 24;
+        iDigitMiddleDstX = m_pos.x - 8;
+        iDigitRightDstX = m_pos.x + 8;
     }
 }

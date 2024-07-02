@@ -24,7 +24,7 @@ MI_TextField::MI_TextField(gfxSprite * nspr, short x, short y, const char * name
     , iAdjustmentY(width > 256 ? 0 : 128)
     , iAllowedWidth(iWidth - iIndent - 24)
 {
-    miModifyCursor = std::make_unique<MI_Image>(nspr, ix + indent, iy + 4, 136, 64, 15, 24, 4, 1, 8);
+    miModifyCursor = std::make_unique<MI_Image>(nspr, m_pos.x + indent, m_pos.y + 4, 136, 64, 15, 24, 4, 1, 8);
     miModifyCursor->SetBlink(true, 20);
     miModifyCursor->Show(false);
 }
@@ -186,17 +186,17 @@ void MI_TextField::Draw()
     if (!fShow)
         return;
 
-    spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);
-    spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
-    spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
+    spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);
+    spr->draw(m_pos.x + iIndent - 16, m_pos.y, 0, (fSelected ? 96 : 64), 32, 32);
+    spr->draw(m_pos.x + iIndent + 16, m_pos.y, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
 
-    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName.c_str());
+    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, iIndent - 8, szName.c_str());
 
     if (szOutValue) {
         if (iStringWidth <= iAllowedWidth || !fModifying) {
-            rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iAllowedWidth, szOutValue);
+            rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iAllowedWidth, szOutValue);
         } else {
-            rm->menu_font_large.drawChopLeft(ix + iWidth - 16, iy + 5, iAllowedWidth, szTempValue.c_str());
+            rm->menu_font_large.drawChopLeft(m_pos.x + iWidth - 16, m_pos.y + 5, iAllowedWidth, szTempValue.c_str());
         }
     }
 
@@ -231,7 +231,7 @@ MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
             szChar[0] = szOutValue[iChar];
             iPixelCount += rm->menu_font_large.getWidth(szChar);
 
-            if (iPixelCount >= iMouseX - (ix + iIndent + 8)) {
+            if (iPixelCount >= iMouseX - (m_pos.x + iIndent + 8)) {
                 iCursorIndex = iChar;
                 UpdateCursor();
                 return MENU_CODE_NONE;
@@ -240,7 +240,7 @@ MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
     }
 
     //Otherwise just check to see if we clicked on the whole control
-    if (iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32) {
+    if (iMouseX >= m_pos.x && iMouseX < m_pos.x + iWidth && iMouseY >= m_pos.y && iMouseY < m_pos.y + 32) {
         iCursorIndex = strlen(szOutValue);
         UpdateCursor();
         return MENU_CODE_CLICKED;
@@ -269,9 +269,9 @@ void MI_TextField::UpdateCursor()
 
     iStringWidth = rm->menu_font_large.getWidth(szTempValue.c_str());
     if (iStringWidth <= iAllowedWidth) {
-        miModifyCursor->SetPosition(ix + iIndent + 10 + iStringWidth, iy + 4);
+        miModifyCursor->SetPosition(m_pos.x + iIndent + 10 + iStringWidth, m_pos.y + 4);
     } else {
-        miModifyCursor->SetPosition(ix + iIndent + 10 + iAllowedWidth, iy + 4);
+        miModifyCursor->SetPosition(m_pos.x + iIndent + 10 + iAllowedWidth, m_pos.y + 4);
     }
 }
 

@@ -16,10 +16,6 @@ public:
     void Update() override;
     void Draw() override;
 
-    void SetPosition(short x, short y) {
-        ix = x;
-        iy = y;
-    }
     void SetAnimationSpeed(short speed) {
         iSpeed = speed;
     }
@@ -58,8 +54,8 @@ public:
     }
 
     void GetPositionAndSize(short& x, short& y, short& w, short& h) const {
-        x = ix;
-        y = iy;
+        x = m_pos.x;
+        y = m_pos.y;
         w = iw;
         h = ih;
     }

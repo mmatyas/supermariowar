@@ -39,24 +39,24 @@ void MI_Button::Draw()
     if (!fShow)
         return;
 
-    spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iHalfWidth, 32);
-    spr->draw(ix + iHalfWidth, iy, 512 - iWidth + iHalfWidth, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iHalfWidth, 32);
+    spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0) + iAdjustmentY, iHalfWidth, 32);
+    spr->draw(m_pos.x + iHalfWidth, m_pos.y, 512 - iWidth + iHalfWidth, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iHalfWidth, 32);
 
     switch (m_text_align) {
         case TextAlign::LEFT:
-            rm->menu_font_large.drawChopRight(ix + 16 + (iImageW > 0 ? iImageW + 2 : 0), iy + 5, iWidth - 32, szName.c_str());
+            rm->menu_font_large.drawChopRight(m_pos.x + 16 + (iImageW > 0 ? iImageW + 2 : 0), m_pos.y + 5, iWidth - 32, szName.c_str());
             if (sprImage)
-                sprImage->draw(ix + 16, iy + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
+                sprImage->draw(m_pos.x + 16, m_pos.y + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
             break;
         case TextAlign::CENTER:
-            rm->menu_font_large.drawCentered(ix + ((iWidth + (iImageW > 0 ? iImageW + 2 : 0)) >> 1), iy + 5, szName.c_str());
+            rm->menu_font_large.drawCentered(m_pos.x + ((iWidth + (iImageW > 0 ? iImageW + 2 : 0)) >> 1), m_pos.y + 5, szName.c_str());
             if (sprImage)
-                sprImage->draw(ix + (iWidth >> 1) - ((iTextW + iImageW) >> 1) - 1, iy + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
+                sprImage->draw(m_pos.x + (iWidth >> 1) - ((iTextW + iImageW) >> 1) - 1, m_pos.y + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
             break;
         case TextAlign::RIGHT:
-            rm->menu_font_large.drawRightJustified(ix + iWidth - 16, iy + 5, szName.c_str());
+            rm->menu_font_large.drawRightJustified(m_pos.x + iWidth - 16, m_pos.y + 5, szName.c_str());
             if (sprImage)
-                sprImage->draw(ix + iWidth - 18 - iTextW - iImageW, iy + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
+                sprImage->draw(m_pos.x + iWidth - 18 - iTextW - iImageW, m_pos.y + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
             break;
     }
 }
@@ -81,7 +81,7 @@ MenuCodeEnum MI_Button::MouseClick(short iMouseX, short iMouseY)
     if (fDisable)
         return MENU_CODE_NONE;
 
-    if (iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32) {
+    if (iMouseX >= m_pos.x && iMouseX < m_pos.x + iWidth && iMouseY >= m_pos.y && iMouseY < m_pos.y + 32) {
         return menuCode;
     }
 

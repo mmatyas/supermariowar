@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ui/MenuCode.h"
+#include "math/Vec2.h"
 
 #include <array>
 
@@ -23,9 +24,13 @@ public:
     UI_Control& operator=(const UI_Control&);
     virtual ~UI_Control() = default;
 
+    /// Updates animations or other events every frame
     virtual void Update() {}
+
+    /// Draws every frame
     virtual void Draw() {}
 
+    /// Sends player input to control on every frame
     virtual MenuCodeEnum SendInput(CPlayerInput*) {
         return MENU_CODE_NONE;
     }
@@ -55,8 +60,7 @@ public:
     }
 
     void SetPosition(short x, short y) {
-        ix = x;
-        iy = y;
+        m_pos = {x, y};
     }
 
     void SetNeighbor(unsigned short iNeighbor, UI_Control* uiControl);
@@ -95,8 +99,7 @@ public:
     }
 
 protected:
-    short ix = 0;
-    short iy = 0;
+    Vec2s m_pos = Vec2s::zero();
 
     bool fSelected = false;
     bool fModifying = false;

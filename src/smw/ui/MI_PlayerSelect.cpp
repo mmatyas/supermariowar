@@ -15,7 +15,7 @@ MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, short x, short y, std::string
     , iWidth(width)
     , iIndent(indent)
 {
-    miModifyImage = std::make_unique<MI_Image>(nspr, ix, iy - 6, 32, 128, 78, 78, 4, 1, 8);
+    miModifyImage = std::make_unique<MI_Image>(nspr, m_pos.x, m_pos.y - 6, 32, 128, 78, 78, 4, 1, 8);
     miModifyImage->Show(false);
 
     const short iSpacing = (width - indent - 136) / 5;
@@ -94,7 +94,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput* playerInput)
 
 void MI_PlayerSelect::SetImagePosition()
 {
-    miModifyImage->SetPosition(ix + iPlayerPosition[iSelectedPlayer] - 22, iy - 7);
+    miModifyImage->SetPosition(m_pos.x + iPlayerPosition[iSelectedPlayer] - 22, m_pos.y - 7);
 }
 
 void MI_PlayerSelect::Update()
@@ -107,15 +107,15 @@ void MI_PlayerSelect::Draw()
     if (!fShow)
         return;
 
-    spr->draw(ix, iy, 0, (fSelected ? 64 : 0), iIndent - 16, 64);
-    spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 192 : 128), 32, 64);
-    spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 64 : 0), iWidth - iIndent - 16, 64);
+    spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 64 : 0), iIndent - 16, 64);
+    spr->draw(m_pos.x + iIndent - 16, m_pos.y, 0, (fSelected ? 192 : 128), 32, 64);
+    spr->draw(m_pos.x + iIndent + 16, m_pos.y, 528 - iWidth + iIndent, (fSelected ? 64 : 0), iWidth - iIndent - 16, 64);
 
-    rm->menu_font_large.drawChopRight(ix + 16, iy + 20, iIndent - 8, szName.c_str());
+    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 20, iIndent - 8, szName.c_str());
 
     miModifyImage->Draw();
 
     for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
-        spr->draw(ix + iPlayerPosition[iPlayer], iy + 16, game_values.playercontrol[iPlayer] * 34 + 32, 206, 34, 32);
+        spr->draw(m_pos.x + iPlayerPosition[iPlayer], m_pos.y + 16, game_values.playercontrol[iPlayer] * 34 + 32, 206, 34, 32);
     }
 }

@@ -99,12 +99,12 @@ void MI_MapFilterScroll::Draw()
         return;
 
            //Draw the background for the map preview
-    rm->menu_dialog.draw(ix, iy, 0, 0, iWidth - 16, iNumLines * 32 + 32);
-    rm->menu_dialog.draw(ix + iWidth - 16, iy, 496, 0, 16, iNumLines * 32 + 32);
-    rm->menu_dialog.draw(ix, iy + iNumLines * 32 + 32, 0, 464, iWidth - 16, 16);
-    rm->menu_dialog.draw(ix + iWidth - 16, iy + iNumLines * 32 + 32, 496, 464, 16, 16);
+    rm->menu_dialog.draw(m_pos.x, m_pos.y, 0, 0, iWidth - 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(m_pos.x + iWidth - 16, m_pos.y, 496, 0, 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(m_pos.x, m_pos.y + iNumLines * 32 + 32, 0, 464, iWidth - 16, 16);
+    rm->menu_dialog.draw(m_pos.x + iWidth - 16, m_pos.y + iNumLines * 32 + 32, 496, 464, 16, 16);
 
-    rm->menu_font_large.drawCentered(ix + (iWidth >> 1), iy + 5, "Map Filters");
+    rm->menu_font_large.drawCentered(m_pos.x + (iWidth >> 1), m_pos.y + 5, "Map Filters");
 
            //Draw each filter field
     for (short iLine = 0; iLine < iNumLines && (unsigned short)iLine < items.size(); iLine++) {
@@ -112,22 +112,22 @@ void MI_MapFilterScroll::Draw()
             short iHalfLineWidth = (iWidth - 64) >> 1;
             short iLineWidth = iWidth - 64;
 
-            spr->draw(ix + 16, iy + 32 + iLine * 32, 0, (iSelectedLine == iLine  && iSelectedColumn == 0 ? 32 : 0), iHalfLineWidth, 32);
-            spr->draw(ix + 16 + iHalfLineWidth, iy + 32 + iLine * 32, 512 - iLineWidth + iHalfLineWidth, (iSelectedLine == iLine && iSelectedColumn == 0 ? 32 : 0), iLineWidth - iHalfLineWidth, 32);
+            spr->draw(m_pos.x + 16, m_pos.y + 32 + iLine * 32, 0, (iSelectedLine == iLine  && iSelectedColumn == 0 ? 32 : 0), iHalfLineWidth, 32);
+            spr->draw(m_pos.x + 16 + iHalfLineWidth, m_pos.y + 32 + iLine * 32, 512 - iLineWidth + iHalfLineWidth, (iSelectedLine == iLine && iSelectedColumn == 0 ? 32 : 0), iLineWidth - iHalfLineWidth, 32);
 
-            rm->menu_map_filter.draw(ix + iWidth - 48, iy + 32 + iLine * 32, 48, (iSelectedLine == iLine && iSelectedColumn == 1 ? 32 : 0), 32, 32);
+            rm->menu_map_filter.draw(m_pos.x + iWidth - 48, m_pos.y + 32 + iLine * 32, 48, (iSelectedLine == iLine && iSelectedColumn == 1 ? 32 : 0), 32, 32);
         } else {
             short iHalfLineWidth = (iWidth - 32) >> 1;
             short iLineWidth = iWidth - 32;
-            spr->draw(ix + 16, iy + 32 + iLine * 32, 0, (iSelectedLine == iLine && iSelectedColumn == 0 ? 32 : 0), iHalfLineWidth, 32);
-            spr->draw(ix + 16 + iHalfLineWidth, iy + 32 + iLine * 32, 512 - iLineWidth + iHalfLineWidth, (iSelectedLine == iLine && iSelectedColumn == 0 ? 32 : 0), iLineWidth - iHalfLineWidth, 32);
+            spr->draw(m_pos.x + 16, m_pos.y + 32 + iLine * 32, 0, (iSelectedLine == iLine && iSelectedColumn == 0 ? 32 : 0), iHalfLineWidth, 32);
+            spr->draw(m_pos.x + 16 + iHalfLineWidth, m_pos.y + 32 + iLine * 32, 512 - iLineWidth + iHalfLineWidth, (iSelectedLine == iLine && iSelectedColumn == 0 ? 32 : 0), iLineWidth - iHalfLineWidth, 32);
         }
 
         if (items[iOffset + iLine]->fSelected)
-            rm->menu_map_filter.draw(ix + 24, iy + 32 + iLine * 32 + 4, 24, 0, 24, 24);
+            rm->menu_map_filter.draw(m_pos.x + 24, m_pos.y + 32 + iLine * 32 + 4, 24, 0, 24, 24);
 
-        rm->menu_font_large.drawChopRight(ix + 52, iy + 5 + iLine * 32 + 32, iWidth - 104, items[iOffset + iLine]->sName.c_str());
-        rm->spr_map_filter_icons.draw(ix + 28, iy + 32 + iLine * 32 + 8, items[iOffset + iLine]->iIcon % 10 * 16, items[iOffset + iLine]->iIcon / 10 * 16, 16, 16);
+        rm->menu_font_large.drawChopRight(m_pos.x + 52, m_pos.y + 5 + iLine * 32 + 32, iWidth - 104, items[iOffset + iLine]->sName.c_str());
+        rm->spr_map_filter_icons.draw(m_pos.x + 28, m_pos.y + 32 + iLine * 32 + 8, items[iOffset + iLine]->iIcon % 10 * 16, items[iOffset + iLine]->iIcon / 10 * 16, 16, 16);
     }
 }
 

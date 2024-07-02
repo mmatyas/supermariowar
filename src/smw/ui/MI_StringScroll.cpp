@@ -136,21 +136,21 @@ void MI_StringScroll::Draw()
     if (!fShow)
         return;
 
-    rm->menu_dialog.draw(ix, iy, 0, 0, iWidth - 16, iNumLines * 32 + 32);
-    rm->menu_dialog.draw(ix + iWidth - 16, iy, 496, 0, 16, iNumLines * 32 + 32);
-    rm->menu_dialog.draw(ix, iy + iNumLines * 32 + 32, 0, 464, iWidth - 16, 16);
-    rm->menu_dialog.draw(ix + iWidth - 16, iy + iNumLines * 32 + 32, 496, 464, 16, 16);
+    rm->menu_dialog.draw(m_pos.x, m_pos.y, 0, 0, iWidth - 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(m_pos.x + iWidth - 16, m_pos.y, 496, 0, 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(m_pos.x, m_pos.y + iNumLines * 32 + 32, 0, 464, iWidth - 16, 16);
+    rm->menu_dialog.draw(m_pos.x + iWidth - 16, m_pos.y + iNumLines * 32 + 32, 496, 464, 16, 16);
 
-    rm->menu_font_large.drawCentered(ix + (iWidth >> 1), iy + 5, sTitle.c_str());
+    rm->menu_font_large.drawCentered(m_pos.x + (iWidth >> 1), m_pos.y + 5, sTitle.c_str());
 
     //Draw each filter field
     for (short iLine = 0; iLine < iNumLines && (unsigned short)iLine < items.size(); iLine++) {
         short iLineWidth = iWidth - 32;
         short iHalfLineWidth = iLineWidth >> 1;
-        spr->draw(ix + 16, iy + 32 + iLine * 32, 0, (iSelectedLine == iLine ? 32 : 0), iHalfLineWidth, 32);
-        spr->draw(ix + 16 + iHalfLineWidth, iy + 32 + iLine * 32, 512 - iLineWidth + iHalfLineWidth, (iSelectedLine == iLine ? 32 : 0), iLineWidth - iHalfLineWidth, 32);
+        spr->draw(m_pos.x + 16, m_pos.y + 32 + iLine * 32, 0, (iSelectedLine == iLine ? 32 : 0), iHalfLineWidth, 32);
+        spr->draw(m_pos.x + 16 + iHalfLineWidth, m_pos.y + 32 + iLine * 32, 512 - iLineWidth + iHalfLineWidth, (iSelectedLine == iLine ? 32 : 0), iLineWidth - iHalfLineWidth, 32);
 
-        items[iOffset + iLine].draw(ix, 32 + iy + iLine * 32, iWidth - 104);
+        items[iOffset + iLine].draw(m_pos.x, 32 + m_pos.y + iLine * 32, iWidth - 104);
     }
 }
 

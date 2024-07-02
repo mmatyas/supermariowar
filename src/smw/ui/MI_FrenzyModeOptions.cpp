@@ -160,7 +160,7 @@ void MI_FrenzyModeOptions::SetupPowerupFields()
             slider->Show(false);
         else {
             slider->Show(true);
-            slider->SetPosition(ix + (iPosition % 2) * 295, iy + 118 + 38 * (iPosition / 2 - iOffset));
+            slider->SetPosition(m_pos.x + (iPosition % 2) * 295, m_pos.y + 118 + 38 * (iPosition / 2 - iOffset));
         }
     }
 }
