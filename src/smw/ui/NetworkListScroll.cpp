@@ -102,7 +102,7 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_left.fPressed) {
-            if (neighborControls[2]) {
+            if (neighbor(MenuNavDirection::Left)) {
                 iSelectedLineBackup = iSelectedLine;
                 iSelectedLine = -1;
                 return MENU_CODE_UNSELECT_ITEM;
@@ -111,7 +111,7 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_right.fPressed) {
-            if (neighborControls[3]) {
+            if (neighbor(MenuNavDirection::Right)) {
                 iSelectedLineBackup = iSelectedLine;
                 iSelectedLine = -1;
                 return MENU_CODE_UNSELECT_ITEM;

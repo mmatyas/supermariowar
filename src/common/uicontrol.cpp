@@ -6,7 +6,7 @@
 UI_Control::UI_Control(short x, short y)
     : m_pos(x, y)
 {
-    neighborControls.fill(nullptr);
+    m_neighbors.fill(nullptr);
 }
 
 
@@ -21,8 +21,8 @@ UI_Control& UI_Control::operator= (const UI_Control& other)
         fDisable = other.fDisable;
         m_visible = other.m_visible;
 
-        uiMenu = nullptr;
-        neighborControls.fill(nullptr);
+        m_parentMenu = nullptr;
+        m_neighbors.fill(nullptr);
         iControllingTeam = other.iControllingTeam;
     }
     return *this;
@@ -35,8 +35,8 @@ UI_Control::UI_Control(const UI_Control& other)
 }
 
 
-void UI_Control::SetNeighbor(unsigned short iNeighbor, UI_Control* uiControl)
+void UI_Control::setNeighbor(MenuNavDirection iNeighbor, UI_Control* uiControl)
 {
-    assert(iNeighbor < neighborControls.size());
-    neighborControls[iNeighbor] = uiControl;
+    const auto idx = static_cast<std::size_t>(iNeighbor);
+    m_neighbors[idx] = uiControl;
 }

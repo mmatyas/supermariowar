@@ -147,7 +147,7 @@ void MI_TournamentScoreboard::Update()
         }
     }
 
-    if (uiMenu) {
+    if (m_parentMenu) {
         if (iTournamentWinner != -1) { //Single tournament winning team
             if (--iFireworksCounter < 0 && iTournamentWinner >= 0) {
                 iFireworksCounter = (short)(RANDOM_INT(30) + 10);
@@ -167,7 +167,7 @@ void MI_TournamentScoreboard::Update()
                         float dVelY = dVel * sin(dAngle);
 
                         short iRandomColor = (short)RANDOM_INT(iTeamCounts[iTournamentWinner]);
-                        uiMenu->AddEyeCandy(new EC_FallingObject(&rm->spr_bonus, iRandX, iRandY, dVelX, dVelY, 4, 2, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 4, 16, 16));
+                        m_parentMenu->AddEyeCandy(new EC_FallingObject(&rm->spr_bonus, iRandX, iRandY, dVelX, dVelY, 4, 2, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 4, 16, 16));
                         dAngle -= (float)PI / 14;
                     }
                 } else {
@@ -177,7 +177,7 @@ void MI_TournamentScoreboard::Update()
                     short iRandY = (short)(RANDOM_INT(416));
                     short iRandomColor = (short)RANDOM_INT(iTeamCounts[iTournamentWinner]);
 
-                    uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireworks, iRandX, iRandY, 8, 4, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 6, 64, 64));
+                    m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireworks, iRandX, iRandY, 8, 4, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 6, 64, 64));
                 }
             }
 
@@ -196,7 +196,7 @@ void MI_TournamentScoreboard::Update()
                 short iRandX = (short)(RANDOM_INT(App::screenWidth - iStringWidth) + (iStringWidth >> 1));
                 short iRandY = (short)(RANDOM_INT(App::screenHeight - 100) + 100);
 
-                uiMenu->AddEyeCandy(new EC_GravText(&rm->menu_font_large, iRandX, iRandY, szWinnerText, -VELJUMP));
+                m_parentMenu->AddEyeCandy(new EC_GravText(&rm->menu_font_large, iRandX, iRandY, szWinnerText, -VELJUMP));
             }
         }
     }

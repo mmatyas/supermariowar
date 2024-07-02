@@ -102,14 +102,14 @@ MenuCodeEnum MI_StringScroll::SendInput(CPlayerInput * playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_left.fPressed) {
-            if (neighborControls[2])
+            if (neighbor(MenuNavDirection::Left))
                 return MENU_CODE_UNSELECT_ITEM;
 
             return MENU_CODE_NONE;
         }
 
         if (playerInput->outputControls[iPlayer].menu_right.fPressed) {
-            if (neighborControls[3])
+            if (neighbor(MenuNavDirection::Right))
                 return MENU_CODE_UNSELECT_ITEM;
 
             return MENU_CODE_NONE;

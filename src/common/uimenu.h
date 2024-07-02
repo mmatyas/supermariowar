@@ -61,7 +61,7 @@ public:
     void Refresh();
 
 protected:
-    MenuCodeEnum MoveNextControl(MenuCodeEnum iDirection);
+    MenuCodeEnum MoveNextControl(MenuNavDirection iDirection);
 
     std::vector<std::unique_ptr<UI_Control>> controls;
 

@@ -35,6 +35,25 @@ public:
         return MENU_CODE_NONE;
     }
 
+    /// Called when user selects this control to change it's value
+    virtual MenuCodeEnum Modify(bool modify) {
+        if (fDisable)
+            return MENU_CODE_UNSELECT_ITEM;
+
+        fModifying = modify;
+        return MENU_CODE_MODIFY_ACCEPTED;
+    }
+
+    virtual MenuCodeEnum MouseClick(short iMouseX, short iMouseY) {
+        return MENU_CODE_NONE;
+    }
+
+    virtual void Refresh() {}
+
+    virtual void Disable(bool disable) {
+        fDisable = disable;
+    }
+
     bool Select(bool select) {
         fSelected = select;
 
@@ -42,14 +61,6 @@ public:
             Modify(true);
 
         return fModifying;
-    }
-
-    virtual MenuCodeEnum Modify(bool modify) {
-        if (fDisable)
-            return MENU_CODE_UNSELECT_ITEM;
-
-        fModifying = modify;
-        return MENU_CODE_MODIFY_ACCEPTED;
     }
 
     void SetAutoModify(bool autoModify) {
@@ -63,10 +74,11 @@ public:
         m_pos = {x, y};
     }
 
-    void SetNeighbor(unsigned short iNeighbor, UI_Control* uiControl);
+    void setNeighbor(MenuNavDirection iNeighbor, UI_Control* uiControl);
 
-    UI_Control* GetNeighbor(short iNeighbor) const {
-        return neighborControls[iNeighbor];
+    UI_Control* neighbor(MenuNavDirection iNeighbor) const {
+        const auto idx = static_cast<std::size_t>(iNeighbor);
+        return m_neighbors[idx];
     }
 
     void setVisible(bool show) {
@@ -76,8 +88,8 @@ public:
         return m_visible;
     }
 
-    void SetMenuParent(UI_Menu* menu) {
-        uiMenu = menu;
+    void setParent(UI_Menu* menu) {
+        m_parentMenu = menu;
     }
 
     bool IsModifying() const {
@@ -86,16 +98,6 @@ public:
 
     void SetControllingTeam(short teamid) {
         iControllingTeam = teamid;
-    }
-
-    virtual MenuCodeEnum MouseClick(short iMouseX, short iMouseY) {
-        return MENU_CODE_NONE;
-    }
-
-    virtual void Refresh() {}
-
-    virtual void Disable(bool disable) {
-        fDisable = disable;
     }
 
 protected:
@@ -107,8 +109,8 @@ protected:
     bool fDisable = false;
     bool m_visible = true;
 
-    std::array<UI_Control*, 4> neighborControls;
+    std::array<UI_Control*, 4> m_neighbors;
 
-    UI_Menu* uiMenu = nullptr;
+    UI_Menu* m_parentMenu = nullptr;
     short iControllingTeam = -1;
 };

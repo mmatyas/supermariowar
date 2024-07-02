@@ -86,8 +86,8 @@ void UI_NetRoomMenu::Refresh()
 {
     miNetRoomHeaderText->SetText(netplay.currentRoom.name.c_str());
 
-    miNetRoomStartButton->SetNeighbor(MENU_ITEM_NEIGHBOR_UP, miSkinSelector[netplay.remotePlayerNumber]);
-    miNetRoomMessageField->SetNeighbor(MENU_ITEM_NEIGHBOR_DOWN, miSkinSelector[netplay.remotePlayerNumber]);
+    miNetRoomStartButton->setNeighbor(MenuNavDirection::Up, miSkinSelector[netplay.remotePlayerNumber]);
+    miNetRoomMessageField->setNeighbor(MenuNavDirection::Down, miSkinSelector[netplay.remotePlayerNumber]);
 
     for (short p = 0; p < 4; p++) {
         miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p].c_str());

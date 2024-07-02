@@ -3,24 +3,41 @@
 #include "GameValues.h" // UI_Menu::SendInput
 #include "uicontrol.h"
 
+#include <cassert>
+
 extern short LookupTeamID(short id);
 
 extern CGameValues game_values;
 
 
+namespace {
+constexpr MenuCodeEnum navDir2menuCode(MenuNavDirection direction)
+{
+    switch (direction) {
+        case MenuNavDirection::Up: return MenuCodeEnum::MENU_CODE_NEIGHBOR_UP;
+        case MenuNavDirection::Down: return MenuCodeEnum::MENU_CODE_NEIGHBOR_DOWN;
+        case MenuNavDirection::Left: return MenuCodeEnum::MENU_CODE_NEIGHBOR_LEFT;
+        case MenuNavDirection::Right: return MenuCodeEnum::MENU_CODE_NEIGHBOR_RIGHT;
+    }
+    assert(false);
+    return MenuCodeEnum::MENU_CODE_NONE;
+}
+} // namespace
+
+
 void UI_Menu::AddControl(UI_Control* control, UI_Control* up, UI_Control* down, UI_Control* left, UI_Control* right)
 {
-    control->SetMenuParent(this);
-    control->SetNeighbor(MENU_ITEM_NEIGHBOR_UP, up);
-    control->SetNeighbor(MENU_ITEM_NEIGHBOR_DOWN, down);
-    control->SetNeighbor(MENU_ITEM_NEIGHBOR_LEFT, left);
-    control->SetNeighbor(MENU_ITEM_NEIGHBOR_RIGHT, right);
+    control->setParent(this);
+    control->setNeighbor(MenuNavDirection::Up, up);
+    control->setNeighbor(MenuNavDirection::Down, down);
+    control->setNeighbor(MenuNavDirection::Left, left);
+    control->setNeighbor(MenuNavDirection::Right, right);
     controls.emplace_back(control);
 }
 
 void UI_Menu::AddNonControl(UI_Control* control)
 {
-    control->SetMenuParent(this);
+    control->setParent(this);
     controls.emplace_back(control);
 }
 
@@ -94,19 +111,19 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput* playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_up.fPressed) {
-            return MoveNextControl(MENU_CODE_NEIGHBOR_UP);
+            return MoveNextControl(MenuNavDirection::Up);
         }
 
         if (playerInput->outputControls[iPlayer].menu_down.fPressed) {
-            return MoveNextControl(MENU_CODE_NEIGHBOR_DOWN);
+            return MoveNextControl(MenuNavDirection::Down);
         }
 
         if (playerInput->outputControls[iPlayer].menu_left.fPressed) {
-            return MoveNextControl(MENU_CODE_NEIGHBOR_LEFT);
+            return MoveNextControl(MenuNavDirection::Left);
         }
 
         if (playerInput->outputControls[iPlayer].menu_right.fPressed) {
-            return MoveNextControl(MENU_CODE_NEIGHBOR_RIGHT);
+            return MoveNextControl(MenuNavDirection::Right);
         }
 
         if (playerInput->outputControls[iPlayer].menu_select.fPressed) {
@@ -137,22 +154,22 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput* playerInput)
     return MENU_CODE_NONE;
 }
 
-MenuCodeEnum UI_Menu::MoveNextControl(MenuCodeEnum iDirection)
+MenuCodeEnum UI_Menu::MoveNextControl(MenuNavDirection iDirection)
 {
     if (!m_currentFocus)
         return MENU_CODE_NONE;
 
-    UI_Control* neighbor = m_currentFocus->GetNeighbor(iDirection);
+    UI_Control* neighbor = m_currentFocus->neighbor(iDirection);
 
     while (neighbor && !neighbor->IsVisible()) {
-        neighbor = neighbor->GetNeighbor(iDirection);
+        neighbor = neighbor->neighbor(iDirection);
     }
 
     if (neighbor) {
         m_currentFocus->Select(false);
         m_currentFocus = neighbor;
         fModifyingItem = m_currentFocus->Select(true);
-        return iDirection;
+        return navDir2menuCode(iDirection);
     }
 
     return MENU_CODE_NONE;

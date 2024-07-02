@@ -133,11 +133,6 @@
 #define HALF_PI             1.5707963f
 #define QUARTER_PI          0.7853982f
 
-#define MENU_ITEM_NEIGHBOR_UP       0
-#define MENU_ITEM_NEIGHBOR_DOWN     1
-#define MENU_ITEM_NEIGHBOR_LEFT     2
-#define MENU_ITEM_NEIGHBOR_RIGHT    3
-
 #define NUM_POWERUPS            26
 #define NUM_WORLD_POWERUPS      15
 #define NUM_WORLD_SCORE_BONUSES 20

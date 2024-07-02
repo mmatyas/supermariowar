@@ -228,7 +228,7 @@ void MI_PowerupSelection::EnablePowerupFields(bool fEnable)
         miPowerupSlider[iPowerup]->Disable(!fEnable);
     }
 
-    miPreset->SetNeighbor(1, fEnable ? miPowerupSlider[0] : NULL);
+    miPreset->setNeighbor(MenuNavDirection::Down, fEnable ? miPowerupSlider[0] : NULL);
 }
 
 MenuCodeEnum MI_PowerupSelection::Modify(bool modify)
