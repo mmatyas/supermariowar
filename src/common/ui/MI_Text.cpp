@@ -20,7 +20,7 @@ void MI_Text::SetText(std::string text)
 
 void MI_Text::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     if (m_align == TextAlign::LEFT && iw == 0)

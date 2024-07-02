@@ -36,7 +36,7 @@ MenuCodeEnum MI_Button::SendInput(CPlayerInput*)
 
 void MI_Button::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0) + iAdjustmentY, iHalfWidth, 32);

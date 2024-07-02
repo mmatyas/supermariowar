@@ -14,7 +14,7 @@ MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite* nspr, short 
 
 void MI_StoredPowerupResetButton::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     MI_Button::Draw();

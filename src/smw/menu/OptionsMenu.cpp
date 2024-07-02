@@ -61,11 +61,11 @@ UI_OptionsMenu::UI_OptionsMenu()
     miGenerateThumbsDialogYesButton->SetCode(MENU_CODE_GENERATE_THUMBS_RESET_YES);
     miGenerateThumbsDialogNoButton->SetCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);
 
-    miGenerateThumbsDialogImage->Show(false);
-    miGenerateThumbsDialogAreYouText->Show(false);
-    miGenerateThumbsDialogSureText->Show(false);
-    miGenerateThumbsDialogYesButton->Show(false);
-    miGenerateThumbsDialogNoButton->Show(false);
+    miGenerateThumbsDialogImage->setVisible(false);
+    miGenerateThumbsDialogAreYouText->setVisible(false);
+    miGenerateThumbsDialogSureText->setVisible(false);
+    miGenerateThumbsDialogYesButton->setVisible(false);
+    miGenerateThumbsDialogNoButton->setVisible(false);
 
     AddControl(miGameplayOptionsMenuButton, miOptionsMenuBackButton, miTeamOptionsMenuButton, NULL, miOptionsMenuBackButton);
     AddControl(miTeamOptionsMenuButton, miGameplayOptionsMenuButton, miPowerupOptionsMenuButton, NULL, miOptionsMenuBackButton);
@@ -97,11 +97,11 @@ UI_OptionsMenu::UI_OptionsMenu()
 
 void UI_OptionsMenu::showThumbnailsPopup()
 {
-    miGenerateThumbsDialogImage->Show(true);
-    miGenerateThumbsDialogAreYouText->Show(true);
-    miGenerateThumbsDialogSureText->Show(true);
-    miGenerateThumbsDialogYesButton->Show(true);
-    miGenerateThumbsDialogNoButton->Show(true);
+    miGenerateThumbsDialogImage->setVisible(true);
+    miGenerateThumbsDialogAreYouText->setVisible(true);
+    miGenerateThumbsDialogSureText->setVisible(true);
+    miGenerateThumbsDialogYesButton->setVisible(true);
+    miGenerateThumbsDialogNoButton->setVisible(true);
 
     RememberCurrent();
 
@@ -111,11 +111,11 @@ void UI_OptionsMenu::showThumbnailsPopup()
 
 void UI_OptionsMenu::hideThumbnailsPopup()
 {
-    miGenerateThumbsDialogImage->Show(false);
-    miGenerateThumbsDialogAreYouText->Show(false);
-    miGenerateThumbsDialogSureText->Show(false);
-    miGenerateThumbsDialogYesButton->Show(false);
-    miGenerateThumbsDialogNoButton->Show(false);
+    miGenerateThumbsDialogImage->setVisible(false);
+    miGenerateThumbsDialogAreYouText->setVisible(false);
+    miGenerateThumbsDialogSureText->setVisible(false);
+    miGenerateThumbsDialogYesButton->setVisible(false);
+    miGenerateThumbsDialogNoButton->setVisible(false);
 
     setInitialFocus(miGameplayOptionsMenuButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);

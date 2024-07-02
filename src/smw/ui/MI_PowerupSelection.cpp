@@ -139,18 +139,18 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
     miDialogYesButton->SetCode(MENU_CODE_POWERUP_RESET_YES);
     miDialogNoButton->SetCode(MENU_CODE_POWERUP_RESET_NO);
 
-    miDialogImage->Show(false);
-    miDialogAreYouText->Show(false);
-    miDialogSureText->Show(false);
-    miDialogYesButton->Show(false);
-    miDialogNoButton->Show(false);
+    miDialogImage->setVisible(false);
+    miDialogAreYouText->setVisible(false);
+    miDialogSureText->setVisible(false);
+    miDialogYesButton->setVisible(false);
+    miDialogNoButton->setVisible(false);
 
     mMenu->AddControl(miOverride, NULL, miPreset, NULL, NULL);
     mMenu->AddControl(miPreset, miOverride, miPowerupSlider[0], NULL, NULL);
 
     miUpArrow = new MI_Image(&rm->menu_verticalarrows, 310, 128, 20, 0, 20, 20, 1, 4, 8);
     miDownArrow = new MI_Image(&rm->menu_verticalarrows, 310, 406, 0, 0, 20, 20, 1, 4, 8);
-    miUpArrow->Show(false);
+    miUpArrow->setVisible(false);
 
     for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
         UI_Control * upcontrol = NULL;
@@ -214,9 +214,9 @@ void MI_PowerupSelection::SetupPowerupFields()
         MI_PowerupSlider * slider = miPowerupSlider[iPosition];
 
         if ((iPosition >> 1) < iOffset || (iPosition >> 1) >= iOffset + iNumLines)
-            slider->Show(false);
+            slider->setVisible(false);
         else {
-            slider->Show(true);
+            slider->setVisible(true);
             slider->SetPosition(m_pos.x + (iPosition % 2) * 295, m_pos.y + 84 + 38 * (iPosition / 2 - iOffset));
         }
     }
@@ -266,11 +266,11 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
             game_values.allPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]] = game_values.powerupweights[iPowerupPositionMap[iPowerup]];
         }
     } else if (MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS == ret || MENU_CODE_CLEAR_POWERUP_WEIGHTS == ret) {
-        miDialogImage->Show(true);
-        miDialogAreYouText->Show(true);
-        miDialogSureText->Show(true);
-        miDialogYesButton->Show(true);
-        miDialogNoButton->Show(true);
+        miDialogImage->setVisible(true);
+        miDialogAreYouText->setVisible(true);
+        miDialogSureText->setVisible(true);
+        miDialogYesButton->setVisible(true);
+        miDialogNoButton->setVisible(true);
 
         mMenu->RememberCurrent();
 
@@ -284,11 +284,11 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput* playerInput)
             miDialogYesButton->SetCode(MENU_CODE_POWERUP_RESET_YES);
 
     } else if (MENU_CODE_POWERUP_RESET_YES == ret || MENU_CODE_POWERUP_RESET_NO == ret || MENU_CODE_POWERUP_CLEAR_YES == ret) {
-        miDialogImage->Show(false);
-        miDialogAreYouText->Show(false);
-        miDialogSureText->Show(false);
-        miDialogYesButton->Show(false);
-        miDialogNoButton->Show(false);
+        miDialogImage->setVisible(false);
+        miDialogAreYouText->setVisible(false);
+        miDialogSureText->setVisible(false);
+        miDialogYesButton->setVisible(false);
+        miDialogNoButton->setVisible(false);
 
         mMenu->setInitialFocus(miOverride);
         mMenu->SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -329,7 +329,7 @@ void MI_PowerupSelection::Update()
 
 void MI_PowerupSelection::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     mMenu->Draw();
@@ -362,12 +362,12 @@ void MI_PowerupSelection::MovePrev()
 void MI_PowerupSelection::AdjustDisplayArrows()
 {
     if (iIndex > iTopStop)
-        miUpArrow->Show(true);
+        miUpArrow->setVisible(true);
     else
-        miUpArrow->Show(false);
+        miUpArrow->setVisible(false);
 
     if (iIndex < iBottomStop)
-        miDownArrow->Show(true);
+        miDownArrow->setVisible(true);
     else
-        miDownArrow->Show(false);
+        miDownArrow->setVisible(false);
 }

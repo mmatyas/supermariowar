@@ -32,7 +32,7 @@ MI_BonusWheel::MI_BonusWheel(short x, short y)
     dSelectionSector[NUMBONUSITEMSONWHEEL] = TWO_PI;
 
     miContinueButton = new MI_Button(&rm->menu_plain_field, m_pos.x + 76, m_pos.y + 390, "Continue", 200, TextAlign::CENTER);
-    miContinueButton->Show(false);
+    miContinueButton->setVisible(false);
     miContinueButton->SetCode(MENU_CODE_BONUS_DONE);
 }
 
@@ -153,7 +153,7 @@ void MI_BonusWheel::Update()
 
             if (!fPowerupSelectionDone) {
                 fPowerupSelectionDone = true;
-                miContinueButton->Show(true);
+                miContinueButton->setVisible(true);
                 miContinueButton->Select(true);
 
                        //Reset all player's stored item
@@ -187,7 +187,7 @@ void MI_BonusWheel::Update()
 
 void MI_BonusWheel::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     rm->spr_tournament_powerup_splash.draw(m_pos.x, m_pos.y);
@@ -272,7 +272,7 @@ void MI_BonusWheel::Reset(bool fTournament)
     iPressSelectTimer = 0;
     fPressedSelect = false;
     fPowerupSelectionDone = false;
-    miContinueButton->Show(false);
+    miContinueButton->setVisible(false);
 
            //Counters to animate the selector's wings
     iSelectorAnimation = 0;

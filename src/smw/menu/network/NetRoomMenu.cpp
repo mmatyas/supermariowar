@@ -64,8 +64,8 @@ UI_NetRoomMenu::UI_NetRoomMenu()
     miNetRoomStartingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetRoomStartingDialogText = new MI_HeaderText("Starting...", 320, 240 - 40);
 
-    miNetRoomStartingDialogImage->Show(false);
-    miNetRoomStartingDialogText->Show(false);
+    miNetRoomStartingDialogImage->setVisible(false);
+    miNetRoomStartingDialogText->setVisible(false);
 
     AddNonControl(miNetRoomStartingDialogImage);
     AddNonControl(miNetRoomStartingDialogText);
@@ -124,8 +124,8 @@ void UI_NetRoomMenu::StartInProgress()
         netplay.client.local_gamehost.sendStartRoomMessage();
         netplay.operationInProgress = true;
 
-        miNetRoomStartingDialogImage->Show(true);
-        miNetRoomStartingDialogText->Show(true);
+        miNetRoomStartingDialogImage->setVisible(true);
+        miNetRoomStartingDialogText->setVisible(true);
         RememberCurrent();
 
         setInitialFocus(miNetRoomStartingDialogText);
@@ -138,8 +138,8 @@ void UI_NetRoomMenu::StartInProgress()
 
 void UI_NetRoomMenu::Restore()
 {
-    miNetRoomStartingDialogImage->Show(false);
-    miNetRoomStartingDialogText->Show(false);
+    miNetRoomStartingDialogImage->setVisible(false);
+    miNetRoomStartingDialogText->setVisible(false);
     /*if (netplay.client.theHostIsMe)
         miNetRoomStartButton->SetName("Start");
     else

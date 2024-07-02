@@ -67,7 +67,7 @@ void MI_MapPreview::Update()
 
 void MI_MapPreview::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     short iMapBoxX = m_pos.x + (iWidth >> 1) - 176 - iSlideListOut;

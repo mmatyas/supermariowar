@@ -416,7 +416,7 @@ void MI_World::RepositionMapImage()
 
 void MI_World::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     short iPlayerX, iPlayerY;

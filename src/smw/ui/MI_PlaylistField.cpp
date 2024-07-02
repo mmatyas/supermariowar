@@ -20,16 +20,16 @@ MI_PlaylistField::MI_PlaylistField(gfxSprite* nspr, short x, short y, std::strin
     , iIndent(indent)
 {
     miModifyImageLeft = std::make_unique<MI_Image>(nspr, m_pos.x + indent - 26, m_pos.y + 4, 32, 64, 26, 24, 4, 1, 8);
-    miModifyImageLeft->Show(false);
+    miModifyImageLeft->setVisible(false);
 
     miModifyImageRight = std::make_unique<MI_Image>(nspr, m_pos.x + iWidth - 16, m_pos.y + 4, 32, 88, 26, 24, 4, 1, 8);
-    miModifyImageRight->Show(false);
+    miModifyImageRight->setVisible(false);
 }
 
 MenuCodeEnum MI_PlaylistField::Modify(bool modify)
 {
-    miModifyImageLeft->Show(modify);
-    miModifyImageRight->Show(modify);
+    miModifyImageLeft->setVisible(modify);
+    miModifyImageRight->setVisible(modify);
 
     fModifying = modify;
     return MENU_CODE_MODIFY_ACCEPTED;
@@ -72,8 +72,8 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            miModifyImageLeft->Show(false);
-            miModifyImageRight->Show(false);
+            miModifyImageLeft->setVisible(false);
+            miModifyImageRight->setVisible(false);
 
             fModifying = false;
 
@@ -92,7 +92,7 @@ void MI_PlaylistField::Update()
 
 void MI_PlaylistField::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     //Draw the select field background

@@ -59,7 +59,7 @@ void MI_TeamSelect::Update()
 
 void MI_TeamSelect::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     miImage->Draw();

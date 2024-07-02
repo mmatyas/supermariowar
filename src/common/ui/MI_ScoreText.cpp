@@ -11,7 +11,7 @@ MI_ScoreText::MI_ScoreText(short x, short y)
 
 void MI_ScoreText::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     rm->spr_scoretext.draw(iDigitRightDstX, m_pos.y, iDigitRightSrcX, 0, 16, 16);

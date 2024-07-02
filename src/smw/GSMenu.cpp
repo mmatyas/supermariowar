@@ -913,7 +913,7 @@ void MenuState::update()
                     game_values.storedpowerups[iPlayer] = -1;
 
                 ResetTournamentBackToMainMenu();
-                mWorldMenu->miWorldStop->Show(false);
+                mWorldMenu->miWorldStop->setVisible(false);
             }
         } else if (MENU_CODE_BONUS_DONE == code) {
             if (mBonusWheelMenu->miBonusWheel->GetPowerupSelectionDone()) {

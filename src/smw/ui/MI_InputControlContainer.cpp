@@ -343,7 +343,7 @@ void MI_InputControlField::SetKey(SDL_KEYTYPE * iSetKey, SDL_KEYTYPE key, short 
 
 void MI_InputControlField::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0), iIndent - 16, 32);
@@ -471,7 +471,7 @@ void MI_InputControlContainer::Update()
 
 void MI_InputControlContainer::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     mInputMenu->Draw();
@@ -521,11 +521,11 @@ void MI_InputControlContainer::SetVisibleInputFields()
     int selDevice = miDeviceSelectField->currentValue();
 
     for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
-        miGameInputControlFields[iKey]->Show(0 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
+        miGameInputControlFields[iKey]->setVisible(0 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
     }
 
     for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
-        miMenuInputControlFields[iKey]->Show(1 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
+        miMenuInputControlFields[iKey]->setVisible(1 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
     }
 }
 

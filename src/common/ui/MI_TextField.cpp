@@ -26,7 +26,7 @@ MI_TextField::MI_TextField(gfxSprite * nspr, short x, short y, const char * name
 {
     miModifyCursor = std::make_unique<MI_Image>(nspr, m_pos.x + indent, m_pos.y + 4, 136, 64, 15, 24, 4, 1, 8);
     miModifyCursor->SetBlink(true, 20);
-    miModifyCursor->Show(false);
+    miModifyCursor->setVisible(false);
 }
 
 void MI_TextField::SetTitle(std::string name)
@@ -42,7 +42,7 @@ MenuCodeEnum MI_TextField::Modify(bool modify)
     if (MENU_CODE_NONE != mcControlSelectedCode)
         return mcControlSelectedCode;
 
-    miModifyCursor->Show(modify);
+    miModifyCursor->setVisible(modify);
     fModifying = modify;
     return MENU_CODE_MODIFY_ACCEPTED;
 }
@@ -65,7 +65,7 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            miModifyCursor->Show(false);
+            miModifyCursor->setVisible(false);
 
             fModifying = false;
 
@@ -183,7 +183,7 @@ void MI_TextField::Update()
 
 void MI_TextField::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);

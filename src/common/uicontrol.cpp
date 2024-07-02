@@ -19,7 +19,7 @@ UI_Control& UI_Control::operator= (const UI_Control& other)
         fModifying = other.fModifying;
         fAutoModify = other.fAutoModify;
         fDisable = other.fDisable;
-        fShow = other.fShow;
+        m_visible = other.m_visible;
 
         uiMenu = nullptr;
         neighborControls.fill(nullptr);

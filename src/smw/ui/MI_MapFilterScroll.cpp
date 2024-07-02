@@ -95,7 +95,7 @@ void MI_MapFilterScroll::Update()
 
 void MI_MapFilterScroll::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
            //Draw the background for the map preview

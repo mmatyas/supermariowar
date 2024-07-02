@@ -16,7 +16,7 @@ MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, short x, short y, std::string
     , iIndent(indent)
 {
     miModifyImage = std::make_unique<MI_Image>(nspr, m_pos.x, m_pos.y - 6, 32, 128, 78, 78, 4, 1, 8);
-    miModifyImage->Show(false);
+    miModifyImage->setVisible(false);
 
     const short iSpacing = (width - indent - 136) / 5;
     for (size_t i = 0; i < iPlayerPosition.size(); i++) {
@@ -28,7 +28,7 @@ MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, short x, short y, std::string
 
 MenuCodeEnum MI_PlayerSelect::Modify(bool modify)
 {
-    miModifyImage->Show(modify);
+    miModifyImage->setVisible(modify);
     fModifying = modify;
     return MENU_CODE_MODIFY_ACCEPTED;
 }
@@ -83,7 +83,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput* playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            miModifyImage->Show(false);
+            miModifyImage->setVisible(false);
             fModifying = false;
             return MENU_CODE_UNSELECT_ITEM;
         }
@@ -104,7 +104,7 @@ void MI_PlayerSelect::Update()
 
 void MI_PlayerSelect::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 64 : 0), iIndent - 16, 64);

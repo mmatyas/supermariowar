@@ -26,7 +26,7 @@ MI_Image::MI_Image(
 
 void MI_Image::Update()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     if (iSpeed > 0 && ++iTimer >= iSpeed) {
@@ -79,7 +79,7 @@ void MI_Image::Update()
 
 void MI_Image::Draw()
 {
-    if (!fShow || (fBlink && !fBlinkShow))
+    if (!m_visible || (fBlink && !fBlinkShow))
         return;
 
     short iXOffset = 0;

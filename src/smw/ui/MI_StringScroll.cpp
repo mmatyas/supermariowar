@@ -133,7 +133,7 @@ void MI_StringScroll::Update()
 
 void MI_StringScroll::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     rm->menu_dialog.draw(m_pos.x, m_pos.y, 0, 0, iWidth - 16, iNumLines * 32 + 32);

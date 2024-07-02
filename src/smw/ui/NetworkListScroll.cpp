@@ -140,7 +140,7 @@ void MI_NetworkListScroll::Update()
 
 void MI_NetworkListScroll::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     //Draw the background for the map preview

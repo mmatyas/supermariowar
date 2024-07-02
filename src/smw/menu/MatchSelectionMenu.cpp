@@ -44,7 +44,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
     miTournamentField->add("10", 10);
     miTournamentField->setOutputPtr(&game_values.tournamentgames);
     miTournamentField->setCurrentValue(game_values.tournamentgames);
-    miTournamentField->Show(false);
+    miTournamentField->setVisible(false);
 
     miTourField = new MI_SelectField<short>(&rm->spr_selectfield, 130, 380, "Tour", 380, 100);
     for (size_t iTour = 0; iTour < tourlist->count(); iTour++) {
@@ -54,7 +54,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
     }
     miTourField->setOutputPtr(&game_values.tourindex);
     miTourField->setCurrentValue(game_values.tourindex);
-    miTourField->Show(false);
+    miTourField->setVisible(false);
 
     miWorldField = new MI_SelectField<short>(&rm->spr_selectfield, 130, 380, "World", 380, 100);
     for (size_t iWorld = 0; iWorld < worldlist->count(); iWorld++) {
@@ -64,7 +64,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
     miWorldField->setOutputPtr(&game_values.worldindex);
     miWorldField->setCurrentValue(game_values.worldindex);
     miWorldField->setItemChangedCode(MENU_CODE_WORLD_MAP_CHANGED);
-    miWorldField->Show(false);
+    miWorldField->setVisible(false);
 
     miMinigameField = new MI_SelectField<Minigame>(&rm->spr_selectfield, 130, 380, "Game", 380, 100);
     miMinigameField->add("Pipe Coin Game", Minigame::PipeCoin);
@@ -74,7 +74,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
     miMinigameField->add("Boxes Game", Minigame::Boxes);
     miMinigameField->setOutputPtr(&game_values.selectedminigame);
     miMinigameField->setCurrentValue(game_values.selectedminigame);
-    miMinigameField->Show(false);
+    miMinigameField->setVisible(false);
 
     miMatchSelectionMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miMatchSelectionMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
@@ -82,7 +82,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
 
     miMatchSelectionDisplayImage = new MI_Image(&rm->menu_match_select, 160, 80, 0, 0, 320, 240, 1, 1, 0);
     miWorldPreviewDisplay = new MI_WorldPreviewDisplay(160, 80, 20, 15);
-    miWorldPreviewDisplay->Show(false);
+    miWorldPreviewDisplay->setVisible(false);
 
     AddNonControl(miMatchSelectionMenuLeftHeaderBar);
     AddNonControl(miMatchSelectionMenuRightHeaderBar);
@@ -104,13 +104,13 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
 
 void UI_MatchSelectionMenu::SelectionChanged()
 {
-    miTournamentField->Show(game_values.matchtype == MatchType::Tournament);
-    miTourField->Show(game_values.matchtype == MatchType::Tour);
-    miWorldField->Show(game_values.matchtype == MatchType::World);
-    miMinigameField->Show(game_values.matchtype == MatchType::MiniGame);
+    miTournamentField->setVisible(game_values.matchtype == MatchType::Tournament);
+    miTourField->setVisible(game_values.matchtype == MatchType::Tour);
+    miWorldField->setVisible(game_values.matchtype == MatchType::World);
+    miMinigameField->setVisible(game_values.matchtype == MatchType::MiniGame);
 
     // miMatchSelectionDisplayImage->Show(game_values.matchtype != MatchType::World);
-    miWorldPreviewDisplay->Show(game_values.matchtype == MatchType::World);
+    miWorldPreviewDisplay->setVisible(game_values.matchtype == MatchType::World);
 
     if (game_values.matchtype == MatchType::World)
         miMatchSelectionDisplayImage->SetImage(320, 0, 320, 240);
@@ -128,13 +128,13 @@ void UI_MatchSelectionMenu::ActivateMinigameField()
     miMatchSelectionField->hideItem(MatchType::MiniGame, false);
     miMatchSelectionField->setCurrentValue(MatchType::MiniGame);
 
-    miTournamentField->Show(false);
-    miTourField->Show(false);
-    miWorldField->Show(false);
-    miMinigameField->Show(true);
+    miTournamentField->setVisible(false);
+    miTourField->setVisible(false);
+    miWorldField->setVisible(false);
+    miMinigameField->setVisible(true);
 
-    miMatchSelectionDisplayImage->Show(true);
-    miWorldPreviewDisplay->Show(false);
+    miMatchSelectionDisplayImage->setVisible(true);
+    miWorldPreviewDisplay->setVisible(false);
     miMatchSelectionDisplayImage->SetImage(0, 240 * static_cast<int>(game_values.matchtype), 320, 240);
 }
 

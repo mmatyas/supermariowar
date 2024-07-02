@@ -16,7 +16,7 @@ MI_PowerupSlider::MI_PowerupSlider(gfxSprite* nspr, gfxSprite* nsprSlider, gfxSp
 
 void MI_PowerupSlider::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     m_spr->draw(m_pos.x + 38, m_pos.y, 0, (fSelected ? 32 : 0) + m_adjustmentY, m_halfWidth, 32);

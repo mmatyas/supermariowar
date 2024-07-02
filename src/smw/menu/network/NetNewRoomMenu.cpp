@@ -35,8 +35,8 @@ UI_NetNewRoomMenu::UI_NetNewRoomMenu()
     miNetNewRoomCreatingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetNewRoomCreatingDialogText = new MI_HeaderText("Creating...", 320, 240 - 12);
 
-    miNetNewRoomCreatingDialogImage->Show(false);
-    miNetNewRoomCreatingDialogText->Show(false);
+    miNetNewRoomCreatingDialogImage->setVisible(false);
+    miNetNewRoomCreatingDialogText->setVisible(false);
 
     AddNonControl(miNetNewRoomCreatingDialogImage);
     AddNonControl(miNetNewRoomCreatingDialogText);
@@ -59,8 +59,8 @@ void UI_NetNewRoomMenu::CreateInProgress()
         netplay.client.sendCreateRoomMessage();
         netplay.operationInProgress = true;
 
-        miNetNewRoomCreatingDialogImage->Show(true);
-        miNetNewRoomCreatingDialogText->Show(true);
+        miNetNewRoomCreatingDialogImage->setVisible(true);
+        miNetNewRoomCreatingDialogText->setVisible(true);
 
         RememberCurrent();
         setInitialFocus(miNetNewRoomCreatingDialogText);
@@ -79,8 +79,8 @@ void UI_NetNewRoomMenu::AbortCreate()
 
 void UI_NetNewRoomMenu::Restore()
 {
-    miNetNewRoomCreatingDialogImage->Show(false);
-    miNetNewRoomCreatingDialogText->Show(false);
+    miNetNewRoomCreatingDialogImage->setVisible(false);
+    miNetNewRoomCreatingDialogText->setVisible(false);
     setInitialFocus(miNetNewRoomNameField);
     SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 }

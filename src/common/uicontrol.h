@@ -69,11 +69,11 @@ public:
         return neighborControls[iNeighbor];
     }
 
-    void Show(bool show) {
-        fShow = show;
+    void setVisible(bool show) {
+        m_visible = show;
     }
     bool IsVisible() const {
-        return fShow;
+        return m_visible;
     }
 
     void SetMenuParent(UI_Menu* menu) {
@@ -105,7 +105,7 @@ protected:
     bool fModifying = false;
     bool fAutoModify = false;
     bool fDisable = false;
-    bool fShow = true;
+    bool m_visible = true;
 
     std::array<UI_Control*, 4> neighborControls;
 

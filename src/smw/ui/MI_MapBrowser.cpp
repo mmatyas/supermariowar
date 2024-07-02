@@ -67,7 +67,7 @@ void MI_MapBrowser::Update()
 
 void MI_MapBrowser::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     SDL_Rect rSrc = {0, 0, 160, 120};

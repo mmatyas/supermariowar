@@ -25,10 +25,10 @@ MI_MapField::MI_MapField(gfxSprite* nspr, short x, short y, std::string name, sh
     , fShowtags(showtags)
 {
     miModifyImageLeft = std::make_unique<MI_Image>(nspr, m_pos.x + indent - 26, m_pos.y + 4, 32, 64, 26, 24, 4, 1, 8);
-    miModifyImageLeft->Show(false);
+    miModifyImageLeft->setVisible(false);
 
     miModifyImageRight = std::make_unique<MI_Image>(nspr, m_pos.x + iWidth - 16, m_pos.y + 4, 32, 88, 26, 24, 4, 1, 8);
-    miModifyImageRight->Show(false);
+    miModifyImageRight->setVisible(false);
 
     if (fShowtags) {
         iSlideListOut = (iWidth - 352) >> 1;
@@ -44,8 +44,8 @@ MenuCodeEnum MI_MapField::Modify(bool modify)
     if (fDisable)
         return MENU_CODE_UNSELECT_ITEM;
 
-    miModifyImageLeft->Show(modify);
-    miModifyImageRight->Show(modify);
+    miModifyImageLeft->setVisible(modify);
+    miModifyImageRight->setVisible(modify);
 
     fModifying = modify;
     return MENU_CODE_MODIFY_ACCEPTED;
@@ -107,8 +107,8 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            miModifyImageLeft->Show(false);
-            miModifyImageRight->Show(false);
+            miModifyImageLeft->setVisible(false);
+            miModifyImageRight->setVisible(false);
 
             fModifying = false;
             return MENU_CODE_UNSELECT_ITEM;
@@ -188,7 +188,7 @@ void MI_MapField::Update()
 
 void MI_MapField::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     //Draw the select field background

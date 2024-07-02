@@ -53,10 +53,10 @@ UI_NetEditServersMenu::UI_NetEditServersMenu()
     miDialogCancel = new MI_Button(&rm->spr_selectfield, 150, 432, "Cancel", 100, TextAlign::CENTER);
     miDialogCancel->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
-    miDialogTitle->Show(false);
-    miDialogTextField->Show(false);
-    miDialogOK->Show(false);
-    miDialogCancel->Show(false);
+    miDialogTitle->setVisible(false);
+    miDialogTextField->setVisible(false);
+    miDialogOK->setVisible(false);
+    miDialogCancel->setVisible(false);
 
     AddControl(miAddButton, miBackButton, miEditButton, NULL, NULL);
     AddControl(miEditButton, miAddButton, miRemoveButton, NULL, NULL);
@@ -91,18 +91,18 @@ void UI_NetEditServersMenu::ReloadScroll()
 
 void UI_NetEditServersMenu::ShowDialog()
 {
-    miDialogTitle->Show(true);
-    miDialogTextField->Show(true);
-    miDialogOK->Show(true);
-    miDialogCancel->Show(true);
+    miDialogTitle->setVisible(true);
+    miDialogTextField->setVisible(true);
+    miDialogOK->setVisible(true);
+    miDialogCancel->setVisible(true);
 }
 
 void UI_NetEditServersMenu::HideDialog()
 {
-    miDialogTitle->Show(false);
-    miDialogTextField->Show(false);
-    miDialogOK->Show(false);
-    miDialogCancel->Show(false);
+    miDialogTitle->setVisible(false);
+    miDialogTextField->setVisible(false);
+    miDialogOK->setVisible(false);
+    miDialogCancel->setVisible(false);
 }
 
 void UI_NetEditServersMenu::Restore()

@@ -676,7 +676,7 @@ int main(int argc, char *argv[])
 		miModeField->add(stagemodes[iGameMode].szName, iGameMode);
 
 		miGoalField[iGameMode] = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, stagemodes[iGameMode].szGoal, 352, 120);
-		miGoalField[iGameMode]->Show(iGameMode == 0);
+		miGoalField[iGameMode]->setVisible(iGameMode == 0);
 
         for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
 			StageModeOption * option = &stagemodes[iGameMode].options[iGameModeOption];
@@ -694,7 +694,7 @@ int main(int argc, char *argv[])
 
 	//Create goal field for pipe game
 	miSpecialGoalField[0] = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, "Points", 352, 120);
-	miSpecialGoalField[0]->Show(false);
+	miSpecialGoalField[0]->setVisible(false);
 
     for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
 		short iValue = 10 + iGameModeOption * 10;
@@ -705,7 +705,7 @@ int main(int argc, char *argv[])
 
 	//Create goal field for boss game
 	miSpecialGoalField[1] = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, "Lives", 352, 120);
-	miSpecialGoalField[1]->Show(false);
+	miSpecialGoalField[1]->setVisible(false);
 
     for (short iGameLives = 1; iGameLives <= 30; iGameLives++) {
 		char szName[16];
@@ -715,7 +715,7 @@ int main(int argc, char *argv[])
 
 	//Create goal field for boxes game
 	miSpecialGoalField[2] = new MI_SelectField<short>(&rm->spr_selectfield, 70, 100, "Lives", 352, 120);
-	miSpecialGoalField[2]->Show(false);
+	miSpecialGoalField[2]->setVisible(false);
 
     for (short iGameLives = 1; iGameLives <= 30; iGameLives++) {
 		char szName[16];
@@ -781,11 +781,11 @@ int main(int argc, char *argv[])
 	miDeleteStageDialogYesButton->SetCode(MENU_CODE_DELETE_STAGE_YES);
 	miDeleteStageDialogNoButton->SetCode(MENU_CODE_DELETE_STAGE_NO);
 
-	miDeleteStageDialogImage->Show(false);
-	miDeleteStageDialogAreYouText->Show(false);
-	miDeleteStageDialogSureText->Show(false);
-	miDeleteStageDialogYesButton->Show(false);
-	miDeleteStageDialogNoButton->Show(false);
+	miDeleteStageDialogImage->setVisible(false);
+	miDeleteStageDialogAreYouText->setVisible(false);
+	miDeleteStageDialogSureText->setVisible(false);
+	miDeleteStageDialogYesButton->setVisible(false);
+	miDeleteStageDialogNoButton->setVisible(false);
 
 	//Add Name Field
 	mStageSettingsMenu.AddControl(miNameField, miDeleteStageButton, miModeField, NULL, NULL);
@@ -3752,30 +3752,30 @@ void EditStage(short iEditStage)
 		iMode += 975;
 
 	//Show fields applicable for this mode
-	miPointsField->Show(iStageType == 0);
-	miFinalStageField->Show(iStageType == 0);
-	miMapField->Show(iStageType == 0);
+	miPointsField->setVisible(iStageType == 0);
+	miFinalStageField->setVisible(iStageType == 0);
+	miMapField->setVisible(iStageType == 0);
 
-	miBonusType->Show(iStageType == 1);
-	miBonusTextField[0]->Show(iStageType == 1);
-	miBonusTextField[1]->Show(iStageType == 1);
-	miBonusTextField[2]->Show(iStageType == 1);
-	miBonusTextField[3]->Show(iStageType == 1);
-	miBonusTextField[4]->Show(iStageType == 1);
+	miBonusType->setVisible(iStageType == 1);
+	miBonusTextField[0]->setVisible(iStageType == 1);
+	miBonusTextField[1]->setVisible(iStageType == 1);
+	miBonusTextField[2]->setVisible(iStageType == 1);
+	miBonusTextField[3]->setVisible(iStageType == 1);
+	miBonusTextField[4]->setVisible(iStageType == 1);
 
-	miSpecialGoalField[0]->Show(iMode == 1000);
-	miSpecialGoalField[1]->Show(iMode == 1001);
-	miSpecialGoalField[2]->Show(iMode == 1002);
+	miSpecialGoalField[0]->setVisible(iMode == 1000);
+	miSpecialGoalField[1]->setVisible(iMode == 1001);
+	miSpecialGoalField[2]->setVisible(iMode == 1002);
 
 	miBonusItemsButton->SetPosition(430, iStageType == 0 ? 220 : 340);
 
     if (iStageType == 0 && iMode >= 0 && iMode < GAMEMODE_LAST) {
 		miModeField->setCurrentValue(iMode);
 
-		miModeSettingsButton->Show(iMode != game_mode_owned);
+		miModeSettingsButton->setVisible(iMode != game_mode_owned);
 
         for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-			miGoalField[iGameMode]->Show(iMode == iGameMode);
+			miGoalField[iGameMode]->setVisible(iMode == iGameMode);
 		}
 
 		miGoalField[iMode]->setOutputPtr(&game_values.tourstops[iEditStage]->iGoal);
@@ -3787,10 +3787,10 @@ void EditStage(short iEditStage)
 		game_values.tourstops[iEditStage]->iNumUsedSettings = g_iNumGameModeSettings[iMode];
     } else {
 		//Show the settings button for boss mode
-		miModeSettingsButton->Show(iMode == 1001);
+		miModeSettingsButton->setVisible(iMode == 1001);
 
         for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-			miGoalField[iGameMode]->Show(false);
+			miGoalField[iGameMode]->setVisible(false);
 		}
 
         if (iStageType == 1) { //Bonus House
@@ -4086,29 +4086,29 @@ int editor_stage()
             } else if (MENU_CODE_MODE_CHANGED == code) {
 				short iMode = miModeField->currentValue();
 
-				miPointsField->Show(iMode != 24);
-				miFinalStageField->Show(iMode != 24);
+				miPointsField->setVisible(iMode != 24);
+				miFinalStageField->setVisible(iMode != 24);
 
-				miMapField->Show(iMode != 24);
+				miMapField->setVisible(iMode != 24);
 
-				miBonusType->Show(iMode == 24);
-				miBonusTextField[0]->Show(iMode == 24);
-				miBonusTextField[1]->Show(iMode == 24);
-				miBonusTextField[2]->Show(iMode == 24);
-				miBonusTextField[3]->Show(iMode == 24);
-				miBonusTextField[4]->Show(iMode == 24);
+				miBonusType->setVisible(iMode == 24);
+				miBonusTextField[0]->setVisible(iMode == 24);
+				miBonusTextField[1]->setVisible(iMode == 24);
+				miBonusTextField[2]->setVisible(iMode == 24);
+				miBonusTextField[3]->setVisible(iMode == 24);
+				miBonusTextField[4]->setVisible(iMode == 24);
 
-				miSpecialGoalField[0]->Show(iMode == 25);
-				miSpecialGoalField[1]->Show(iMode == 26);
-				miSpecialGoalField[2]->Show(iMode == 27);
+				miSpecialGoalField[0]->setVisible(iMode == 25);
+				miSpecialGoalField[1]->setVisible(iMode == 26);
+				miSpecialGoalField[2]->setVisible(iMode == 27);
 
 				miBonusItemsButton->SetPosition(430, iMode != 24 ? 220 : 340);
 
                 if (iMode >= 0 && iMode < GAMEMODE_LAST) {
-					miModeSettingsButton->Show(iMode != game_mode_owned);
+					miModeSettingsButton->setVisible(iMode != game_mode_owned);
 
                     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-						miGoalField[iGameMode]->Show(iMode == iGameMode);
+						miGoalField[iGameMode]->setVisible(iMode == iGameMode);
 					}
 
 					miGoalField[iMode]->setOutputPtr(&game_values.tourstops[iEditStage]->iGoal);
@@ -4120,10 +4120,10 @@ int editor_stage()
 					game_values.tourstops[iEditStage]->iNumUsedSettings = g_iNumGameModeSettings[iMode];
                 } else {
 					//Show the settings button for boss mode
-					miModeSettingsButton->Show(iMode == 26);
+					miModeSettingsButton->setVisible(iMode == 26);
 
 					for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
-						miGoalField[iGameMode]->Show(false);
+						miGoalField[iGameMode]->setVisible(false);
 
                     if (iMode == 24) {
 						game_values.tourstops[iEditStage]->iStageType = 1;
@@ -4169,11 +4169,11 @@ int editor_stage()
 				mCurrentMenu = &mBonusItemPicker;
 				mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_DELETE_STAGE_BUTTON == code) {
-				miDeleteStageDialogImage->Show(true);
-				miDeleteStageDialogAreYouText->Show(true);
-				miDeleteStageDialogSureText->Show(true);
-				miDeleteStageDialogYesButton->Show(true);
-				miDeleteStageDialogNoButton->Show(true);
+				miDeleteStageDialogImage->setVisible(true);
+				miDeleteStageDialogAreYouText->setVisible(true);
+				miDeleteStageDialogSureText->setVisible(true);
+				miDeleteStageDialogYesButton->setVisible(true);
+				miDeleteStageDialogNoButton->setVisible(true);
 
 				EnableStageMenu(false);
 
@@ -4183,11 +4183,11 @@ int editor_stage()
 				mStageSettingsMenu.SetCancelCode(MENU_CODE_DELETE_STAGE_NO);
 				mStageSettingsMenu.ResetMenu();
             } else if (MENU_CODE_DELETE_STAGE_YES == code || MENU_CODE_DELETE_STAGE_NO == code) {
-				miDeleteStageDialogImage->Show(false);
-				miDeleteStageDialogAreYouText->Show(false);
-				miDeleteStageDialogSureText->Show(false);
-				miDeleteStageDialogYesButton->Show(false);
-				miDeleteStageDialogNoButton->Show(false);
+				miDeleteStageDialogImage->setVisible(false);
+				miDeleteStageDialogAreYouText->setVisible(false);
+				miDeleteStageDialogSureText->setVisible(false);
+				miDeleteStageDialogYesButton->setVisible(false);
+				miDeleteStageDialogNoButton->setVisible(false);
 
 				mStageSettingsMenu.setInitialFocus(miNameField);
 				mStageSettingsMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);

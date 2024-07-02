@@ -36,8 +36,8 @@ UI_NetLobbyMenu::UI_NetLobbyMenu()
     miNetLobbyJoiningDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetLobbyJoiningDialogText = new MI_HeaderText("Joining...", 320, 240 - 12);
 
-    miNetLobbyJoiningDialogImage->Show(false);
-    miNetLobbyJoiningDialogText->Show(false);
+    miNetLobbyJoiningDialogImage->setVisible(false);
+    miNetLobbyJoiningDialogText->setVisible(false);
 
     /*for (unsigned iRoom = 0; iRoom < netplay.rooms.size(); iRoom++) {
         Room * room = &netplay.rooms[iRoom];
@@ -71,8 +71,8 @@ void UI_NetLobbyMenu::JoinInProgress()
     netplay.client.sendJoinRoomMessage();
     netplay.operationInProgress = true;
 
-    miNetLobbyJoiningDialogImage->Show(true);
-    miNetLobbyJoiningDialogText->Show(true);
+    miNetLobbyJoiningDialogImage->setVisible(true);
+    miNetLobbyJoiningDialogText->setVisible(true);
 
     setInitialFocus(miNetLobbyJoiningDialogText);
     SetCancelCode(MENU_CODE_NET_JOIN_ROOM_ABORT);
@@ -87,8 +87,8 @@ void UI_NetLobbyMenu::AbortJoin()
 
 void UI_NetLobbyMenu::Restore()
 {
-    miNetLobbyJoiningDialogImage->Show(false);
-    miNetLobbyJoiningDialogText->Show(false);
+    miNetLobbyJoiningDialogImage->setVisible(false);
+    miNetLobbyJoiningDialogText->setVisible(false);
     setInitialFocus(miNetLobbyNewRoomButton);
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 }

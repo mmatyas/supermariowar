@@ -36,17 +36,17 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld)
         miBonusField->Disable(true);
 
         miEndStageImage[0] = std::make_unique<MI_Image>(&rm->spr_worlditemsplace, 54, 201, 0, 20, 80, 248, 1, 1, 0);
-        miEndStageImage[0]->Show(false);
+        miEndStageImage[0]->setVisible(false);
 
         miEndStageImage[1] = std::make_unique<MI_Image>(&rm->spr_worlditemsplace, 506, 201, 0, 20, 80, 248, 1, 1, 0);
-        miEndStageImage[1]->Show(false);
+        miEndStageImage[1]->setVisible(false);
 
         for (short iBonus = 0; iBonus < 10; iBonus++) {
             miBonusIcon[iBonus] = std::make_unique<MI_Image>(&rm->spr_worlditemssmall, 170 + iBonus * 20, 133, 0, 0, 16, 16, 1, 1, 0);
             miBonusBackground[iBonus] = std::make_unique<MI_Image>(&rm->spr_worlditemsplace, 168 + iBonus * 20, 131, 0, 0, 20, 20, 1, 1, 0);
 
-            miBonusIcon[iBonus]->Show(false);
-            miBonusBackground[iBonus]->Show(false);
+            miBonusIcon[iBonus]->setVisible(false);
+            miBonusBackground[iBonus]->setVisible(false);
         }
     } else {
         miModeField = std::make_unique<MI_ImageSelectField>(&rm->spr_selectfielddisabled, &rm->menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
@@ -79,7 +79,7 @@ MenuCodeEnum MI_TourStop::Modify(bool fModify)
 
 void MI_TourStop::Update()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     miStartButton->Update();
@@ -100,7 +100,7 @@ void MI_TourStop::Update()
 
 void MI_TourStop::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     miStartButton->Draw();
@@ -196,8 +196,8 @@ void MI_TourStop::Refresh(short iTourStop)
 
         if (fIsWorld) {
             miBonusField->clear();
-            miEndStageImage[0]->Show(tourstop->fEndStage);
-            miEndStageImage[1]->Show(tourstop->fEndStage);
+            miEndStageImage[0]->setVisible(tourstop->fEndStage);
+            miEndStageImage[1]->setVisible(tourstop->fEndStage);
 
             for (short iBonus = 0; iBonus < 10; iBonus++) {
                 bool fShowBonus = iBonus < tourstop->iNumBonuses;
@@ -208,8 +208,8 @@ void MI_TourStop::Refresh(short iTourStop)
                     miBonusBackground[iBonus]->SetImage(tourstop->wsbBonuses[iBonus].iWinnerPlace * 20, 0, 20, 20);
                 }
 
-                miBonusIcon[iBonus]->Show(fShowBonus);
-                miBonusBackground[iBonus]->Show(fShowBonus);
+                miBonusIcon[iBonus]->setVisible(fShowBonus);
+                miBonusBackground[iBonus]->setVisible(fShowBonus);
             }
         }
     }

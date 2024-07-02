@@ -19,10 +19,10 @@ MI_SelectField<T>::MI_SelectField(gfxSprite* nspr, short x, short y, std::string
     , m_indent(indent)
 {
     miModifyImageLeft = std::make_unique<MI_Image>(nspr, m_pos.x + indent - 26, m_pos.y + 4, 32, 64, 26, 24, 4, 1, 8);
-    miModifyImageLeft->Show(false);
+    miModifyImageLeft->setVisible(false);
 
     miModifyImageRight = std::make_unique<MI_Image>(nspr, m_pos.x + width - 16, m_pos.y + 4, 32, 88, 26, 24, 4, 1, 8);
-    miModifyImageRight->Show(false);
+    miModifyImageRight->setVisible(false);
 }
 
 
@@ -46,10 +46,10 @@ MI_SelectField<T>::MI_SelectField(const MI_SelectField<T>& other)
     setCurrentIndex(other.m_index);
 
     miModifyImageLeft = std::make_unique<MI_Image>(m_spr, m_pos.x + m_indent - 26, m_pos.y + 4, 32, 64, 26, 24, 4, 1, 8);
-    miModifyImageLeft->Show(false);
+    miModifyImageLeft->setVisible(false);
 
     miModifyImageRight = std::make_unique<MI_Image>(m_spr, m_pos.x + m_width - 16, m_pos.y + 4, 32, 88, 26, 24, 4, 1, 8);
-    miModifyImageRight->Show(false);
+    miModifyImageRight->setVisible(false);
 }
 
 
@@ -64,7 +64,7 @@ void MI_SelectField<T>::Update()
 template<typename T>
 void MI_SelectField<T>::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     if (m_indent == 0) {
@@ -109,8 +109,8 @@ MenuCodeEnum MI_SelectField<T>::Modify(bool modify)
     if (MENU_CODE_NONE != mcControlSelectedCode)
         return mcControlSelectedCode;
 
-    miModifyImageLeft->Show(modify);
-    miModifyImageRight->Show(modify);
+    miModifyImageLeft->setVisible(modify);
+    miModifyImageRight->setVisible(modify);
     fModifying = modify;
     return MENU_CODE_MODIFY_ACCEPTED;
 }
@@ -150,8 +150,8 @@ MenuCodeEnum MI_SelectField<T>::SendInput(CPlayerInput * playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            miModifyImageLeft->Show(false);
-            miModifyImageRight->Show(false);
+            miModifyImageLeft->setVisible(false);
+            miModifyImageRight->setVisible(false);
 
             fModifying = false;
 

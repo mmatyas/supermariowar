@@ -73,7 +73,7 @@ void MI_WorldPreviewDisplay::Init()
 
 void MI_WorldPreviewDisplay::Update()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     bool fNeedMapSurfaceUpdate = false;
@@ -190,7 +190,7 @@ void MI_WorldPreviewDisplay::Update()
 
 void MI_WorldPreviewDisplay::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     rectSrcSurface.x = iMapOffsetX;

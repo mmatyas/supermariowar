@@ -31,7 +31,7 @@ void MI_SliderField::SetPosition(short x, short y)
 
 void MI_SliderField::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     m_spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0) + m_adjustmentY, m_indent - 16, 32);

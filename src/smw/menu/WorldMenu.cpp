@@ -18,7 +18,7 @@ UI_WorldMenu::UI_WorldMenu()
     miWorld->SetAutoModify(true);
 
     miWorldStop = new MI_TourStop(70, 45, true);
-    miWorldStop->Show(false);
+    miWorldStop->setVisible(false);
 
     // Exit tour dialog box
     miWorldExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
@@ -30,10 +30,10 @@ UI_WorldMenu::UI_WorldMenu()
     miWorldExitDialogYesButton->SetCode(MENU_CODE_EXIT_WORLD_YES);
     miWorldExitDialogNoButton->SetCode(MENU_CODE_EXIT_WORLD_NO);
 
-    miWorldExitDialogImage->Show(false);
-    miWorldExitDialogExitTourText->Show(false);
-    miWorldExitDialogYesButton->Show(false);
-    miWorldExitDialogNoButton->Show(false);
+    miWorldExitDialogImage->setVisible(false);
+    miWorldExitDialogExitTourText->setVisible(false);
+    miWorldExitDialogYesButton->setVisible(false);
+    miWorldExitDialogNoButton->setVisible(false);
 
     AddControl(miWorld, NULL, NULL, NULL, NULL);
 
@@ -52,7 +52,7 @@ UI_WorldMenu::UI_WorldMenu()
 void UI_WorldMenu::OpenStageStart()
 {
     miWorldStop->Refresh(game_values.tourstopcurrent);
-    miWorldStop->Show(true);
+    miWorldStop->setVisible(true);
 
     RememberCurrent();
 
@@ -64,7 +64,7 @@ void UI_WorldMenu::OpenStageStart()
 
 void UI_WorldMenu::CloseStageStart()
 {
-    miWorldStop->Show(false);
+    miWorldStop->setVisible(false);
 
     setInitialFocus(miWorld);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
@@ -74,10 +74,10 @@ void UI_WorldMenu::CloseStageStart()
 
 void UI_WorldMenu::OpenExitDialog()
 {
-    miWorldExitDialogImage->Show(true);
-    miWorldExitDialogExitTourText->Show(true);
-    miWorldExitDialogYesButton->Show(true);
-    miWorldExitDialogNoButton->Show(true);
+    miWorldExitDialogImage->setVisible(true);
+    miWorldExitDialogExitTourText->setVisible(true);
+    miWorldExitDialogYesButton->setVisible(true);
+    miWorldExitDialogNoButton->setVisible(true);
 
     RememberCurrent();
 
@@ -88,10 +88,10 @@ void UI_WorldMenu::OpenExitDialog()
 
 void UI_WorldMenu::CloseExitDialog()
 {
-    miWorldExitDialogImage->Show(false);
-    miWorldExitDialogExitTourText->Show(false);
-    miWorldExitDialogYesButton->Show(false);
-    miWorldExitDialogNoButton->Show(false);
+    miWorldExitDialogImage->setVisible(false);
+    miWorldExitDialogExitTourText->setVisible(false);
+    miWorldExitDialogYesButton->setVisible(false);
+    miWorldExitDialogNoButton->setVisible(false);
 
     setInitialFocus(miWorld);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);

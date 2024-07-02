@@ -57,7 +57,7 @@ UI_GameSettingsMenu::UI_GameSettingsMenu()
     for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
         miGoalField[iGameMode] = new MI_SelectField<short>(&rm->spr_selectfield, 70, 125, gamemodes[iGameMode]->GetGoalName().c_str(), 352, 120);
         // miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
-        miGoalField[iGameMode]->Show(iGameMode == 0);
+        miGoalField[iGameMode]->setVisible(iGameMode == 0);
 
         for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS; iGameModeOption++) {
             SModeOption* option = &gamemodes[iGameMode]->GetOptions()[iGameModeOption];
@@ -77,14 +77,14 @@ UI_GameSettingsMenu::UI_GameSettingsMenu()
     miMapFiltersButton->SetCode(MENU_CODE_TO_MAP_FILTERS);
 
     miMapFiltersOnImage = new MI_Image(&rm->menu_map_filter, 530, 213, 0, 48, 16, 16, 1, 1, 0);
-    miMapFiltersOnImage->Show(false);
+    miMapFiltersOnImage->setVisible(false);
 
     miMapThumbnailsButton = new MI_Button(&rm->spr_selectfield, 430, 245, "Thumbs", 140);
     miMapThumbnailsButton->SetCode(MENU_CODE_TO_MAP_BROWSER_THUMBNAILS);
 
     miMapFilterScroll = new MI_MapFilterScroll(&rm->menu_plain_field, 120, 72, 400, 9);
     miMapFilterScroll->SetAutoModify(true);
-    miMapFilterScroll->Show(false);
+    miMapFilterScroll->setVisible(false);
 
     // Add auto map filters
     for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
@@ -113,11 +113,11 @@ UI_GameSettingsMenu::UI_GameSettingsMenu()
     miGameSettingsExitDialogYesButton->SetCode(MENU_CODE_EXIT_TOURNAMENT_YES);
     miGameSettingsExitDialogNoButton->SetCode(MENU_CODE_EXIT_TOURNAMENT_NO);
 
-    miGameSettingsExitDialogImage->Show(false);
-    miGameSettingsExitDialogTournamentText->Show(false);
-    miGameSettingsExitDialogExitText->Show(false);
-    miGameSettingsExitDialogYesButton->Show(false);
-    miGameSettingsExitDialogNoButton->Show(false);
+    miGameSettingsExitDialogImage->setVisible(false);
+    miGameSettingsExitDialogTournamentText->setVisible(false);
+    miGameSettingsExitDialogExitText->setVisible(false);
+    miGameSettingsExitDialogYesButton->setVisible(false);
+    miGameSettingsExitDialogNoButton->setVisible(false);
 
     AddControl(miSettingsStartButton, miMapThumbnailsButton, miModeField, NULL, NULL);
     AddControl(miModeField, miSettingsStartButton, miGoalField[0], NULL, NULL);
@@ -157,17 +157,17 @@ UI_GameSettingsMenu::UI_GameSettingsMenu()
 void UI_GameSettingsMenu::RefreshGameModeButtons()
 {
     // Unhide/hide the settings button
-    miModeSettingsButton->Show(miModeField->currentValue() != game_mode_owned);
+    miModeSettingsButton->setVisible(miModeField->currentValue() != game_mode_owned);
 
     // Show the approprate goal field
     for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
-        miGoalField[iMode]->Show(miModeField->currentValue() == iMode);
+        miGoalField[iMode]->setVisible(miModeField->currentValue() == iMode);
     }
 }
 
 void UI_GameSettingsMenu::OpenMapFilters()
 {
-    miMapFilterScroll->Show(true);
+    miMapFilterScroll->setVisible(true);
     RememberCurrent();
 
     setInitialFocus(miMapFilterScroll);
@@ -177,23 +177,23 @@ void UI_GameSettingsMenu::OpenMapFilters()
 
 void UI_GameSettingsMenu::CloseMapFilters()
 {
-    miMapFilterScroll->Show(false);
+    miMapFilterScroll->setVisible(false);
 
     setInitialFocus(miSettingsStartButton);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
     RestoreCurrent();
 
-    miMapFiltersOnImage->Show(game_values.fFiltersOn);
+    miMapFiltersOnImage->setVisible(game_values.fFiltersOn);
 }
 
 void UI_GameSettingsMenu::OpenExitDialog()
 {
-    miGameSettingsExitDialogImage->Show(true);
-    miGameSettingsExitDialogTournamentText->Show(true);
-    miGameSettingsExitDialogExitText->Show(true);
-    miGameSettingsExitDialogYesButton->Show(true);
-    miGameSettingsExitDialogNoButton->Show(true);
+    miGameSettingsExitDialogImage->setVisible(true);
+    miGameSettingsExitDialogTournamentText->setVisible(true);
+    miGameSettingsExitDialogExitText->setVisible(true);
+    miGameSettingsExitDialogYesButton->setVisible(true);
+    miGameSettingsExitDialogNoButton->setVisible(true);
 
     RememberCurrent();
 
@@ -204,11 +204,11 @@ void UI_GameSettingsMenu::OpenExitDialog()
 
 void UI_GameSettingsMenu::CloseExitDialog()
 {
-    miGameSettingsExitDialogImage->Show(false);
-    miGameSettingsExitDialogTournamentText->Show(false);
-    miGameSettingsExitDialogExitText->Show(false);
-    miGameSettingsExitDialogYesButton->Show(false);
-    miGameSettingsExitDialogNoButton->Show(false);
+    miGameSettingsExitDialogImage->setVisible(false);
+    miGameSettingsExitDialogTournamentText->setVisible(false);
+    miGameSettingsExitDialogExitText->setVisible(false);
+    miGameSettingsExitDialogYesButton->setVisible(false);
+    miGameSettingsExitDialogNoButton->setVisible(false);
 
     setInitialFocus(miSettingsStartButton);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
@@ -230,7 +230,7 @@ void UI_GameSettingsMenu::GameModeChanged(short gmID)
 
 void UI_GameSettingsMenu::HideGMSettingsBtn()
 {
-    miModeSettingsButton->Show(false);
+    miModeSettingsButton->setVisible(false);
 }
 
 short UI_GameSettingsMenu::GetCurrentGameModeID()
