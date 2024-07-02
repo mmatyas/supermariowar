@@ -1,34 +1,35 @@
 #pragma once
 
 
-struct Vec2f {
-    float x = 0.f;
-    float y = 0.f;
+template<typename T>
+struct Vec2 {
+    T x = 0;
+    T y = 0;
 
-    constexpr explicit Vec2f() = default;
-    constexpr explicit Vec2f(float inX, float inY) : x(inX), y(inY) {}
+    constexpr explicit Vec2() = default;
+    constexpr Vec2(T inX, T inY) : x(inX), y(inY) {}
 
-    static constexpr Vec2f zero() {
-        return Vec2f();
+    static constexpr Vec2 zero() {
+        return Vec2();
     }
 
-    constexpr Vec2f& operator+=(const Vec2f& rhs) {
+    constexpr Vec2& operator+=(const Vec2& rhs) {
         x += rhs.x;
         y += rhs.y;
         return *this;
     }
-    constexpr Vec2f& operator-=(const Vec2f& rhs) {
+    constexpr Vec2& operator-=(const Vec2& rhs) {
         x -= rhs.x;
         y -= rhs.y;
         return *this;
     }
 
-    constexpr Vec2f& operator*=(float val) {
+    template<typename Scalar> constexpr Vec2& operator*=(Scalar val) {
         x *= val;
         y *= val;
         return *this;
     }
-    constexpr Vec2f& operator/=(float val) {
+    template<typename Scalar> constexpr Vec2& operator/=(Scalar val) {
         x /= val;
         y /= val;
         return *this;
@@ -36,22 +37,26 @@ struct Vec2f {
 };
 
 
-constexpr Vec2f operator+(const Vec2f& lhs, const Vec2f& rhs) {
-    return Vec2f(lhs.x + rhs.x, lhs.y + rhs.y);
+template<typename T> constexpr Vec2<T> operator+(const Vec2<T>& lhs, const Vec2<T>& rhs) {
+    return {lhs.x + rhs.x, lhs.y + rhs.y};
 }
-constexpr Vec2f operator-(const Vec2f& lhs, const Vec2f& rhs) {
-    return Vec2f(lhs.x - rhs.x, lhs.y - rhs.y);
+template<typename T> constexpr Vec2<T> operator-(const Vec2<T>& lhs, const Vec2<T>& rhs) {
+    return {lhs.x - rhs.x, lhs.y - rhs.y};
 }
-constexpr Vec2f operator*(const Vec2f& lhs, const Vec2f& rhs) {
-    return Vec2f(lhs.x * rhs.x, lhs.y * rhs.y);
+template<typename T> constexpr Vec2<T> operator*(const Vec2<T>& lhs, const Vec2<T>& rhs) {
+    return {lhs.x * rhs.x, lhs.y * rhs.y};
 }
-constexpr Vec2f operator/(const Vec2f& lhs, const Vec2f& rhs) {
-    return Vec2f(lhs.x / rhs.x, lhs.y / rhs.y);
+template<typename T> constexpr Vec2<T> operator/(const Vec2<T>& lhs, const Vec2<T>& rhs) {
+    return {lhs.x / rhs.x, lhs.y / rhs.y};
 }
 
-constexpr Vec2f operator*(const Vec2f& lhs, float scalar) {
-    return Vec2f(lhs.x * scalar, lhs.y * scalar);
+template<typename T, typename Scalar> constexpr Vec2<T> operator*(const Vec2<T>& lhs, Scalar scalar) {
+    return {lhs.x * scalar, lhs.y * scalar};
 }
-constexpr Vec2f operator/(const Vec2f& lhs, float scalar) {
-    return Vec2f(lhs.x / scalar, lhs.y / scalar);
+template<typename T, typename Scalar> constexpr Vec2<T> operator/(const Vec2<T>& lhs, Scalar scalar) {
+    return {lhs.x / scalar, lhs.y / scalar};
 }
+
+
+using Vec2f = Vec2<float>;
+using Vec2s = Vec2<short>;
