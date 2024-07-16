@@ -18,7 +18,7 @@
 constexpr int MAX_TILES_PER_AXIS = 128;
 
 namespace {
-std::vector<TileType> readTileTypeFile(const std::string& path)
+std::vector<TileType> readTileTypeFile(const std::string& path, int expectedCount)
 {
     constexpr int MAX_TILES = MAX_TILES_PER_AXIS * MAX_TILES_PER_AXIS;
 
@@ -36,7 +36,7 @@ std::vector<TileType> readTileTypeFile(const std::string& path)
     if (tiletype_count <= 0 || tiletype_count > MAX_TILES)
         return {};
 
-    tiletype_count = std::min<int>(tiletype_count, path.size());
+    tiletype_count = std::min<int>(tiletype_count, expectedCount);
 
     std::vector<TileType> tiletypes;
     tiletypes.reserve(tiletype_count);
@@ -54,7 +54,6 @@ std::vector<TileType> readTileTypeFile(const std::string& path)
 CTileset::CTileset(const std::string& dir)
     : m_name(getFilenameFromPath(dir))
     , m_tilesetPath(dir + "/tileset.tls")
-    , m_tiletypes(readTileTypeFile(m_tilesetPath))
 {
     gfx_loadimage(m_sprites[0], dir + "/large.png", false);
     gfx_loadimage(m_sprites[1], dir + "/medium.png", false);
@@ -62,7 +61,7 @@ CTileset::CTileset(const std::string& dir)
 
     m_width = std::min(m_sprites[0].getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
     m_height = std::min(m_sprites[0].getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
-    m_tiletypes = std::vector<TileType>(m_width * m_height, TileType::NonSolid);
+    m_tiletypes = readTileTypeFile(m_tilesetPath, m_width * m_height);
 }
 
 
