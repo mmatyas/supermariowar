@@ -9,6 +9,7 @@
 #include "RandomNumberGenerator.h"
 #include "Version.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
@@ -571,7 +572,7 @@ void MapList::WriteMapSummaryCache()
 //Applies the currently selected filters to the entire map set
 //After this call, when flipping through maps, only the matched maps
 //will show up in the map field or in the thumbnail browser
-void MapList::ApplyFilters(bool * pfFilters)
+void MapList::ApplyFilters(const std::vector<bool>& pfFilters)
 {
     std::multimap<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
@@ -579,7 +580,7 @@ void MapList::ApplyFilters(bool * pfFilters)
     short iTotalCount = 0;
     while (itr != lim) {
         bool fMatched = true;
-        for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->count(); iFilter++) {
+        for (size_t iFilter = 0; iFilter < pfFilters.size(); iFilter++) {
             if (pfFilters[iFilter]) {
                 if (!(*itr).second->pfFilters[iFilter]) {
                     fMatched = false;
@@ -601,14 +602,7 @@ void MapList::ApplyFilters(bool * pfFilters)
         itr++;
     }
 
-    game_values.fFiltersOn = false;
-    for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->count(); iFilter++) {
-        if (pfFilters[iFilter]) {
-            game_values.fFiltersOn = true;
-            break;
-        }
-    }
-
+    game_values.fFiltersOn = std::find(pfFilters.cbegin(), pfFilters.cend(), true) != pfFilters.cend();
     FindFilteredMap();
 }
 

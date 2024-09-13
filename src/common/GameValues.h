@@ -226,8 +226,8 @@ public:
 
     bool		soundcapable;
 
-    bool *		pfFilters;
-    short *		piFilterIcons;
+    std::vector<bool> pfFilters;
+    std::vector<short> piFilterIcons;
     short		selectedmapfilter;
     bool		fNeedWriteFilters;
     bool		fFiltersOn;

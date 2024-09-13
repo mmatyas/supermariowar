@@ -455,9 +455,6 @@ void main_game()
         delete score[k];
     }
 
-    delete [] game_values.pfFilters;
-    delete [] game_values.piFilterIcons;
-
 	// release all resources
 	delete rm;
 }

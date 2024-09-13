@@ -83,15 +83,15 @@ class MapList
 		void WriteFilters();
 		void ReadFilters();
 
-    bool GetFilter(short iFilter) {
+    bool GetFilter(size_t iFilter) const {
         return (*current).second->pfFilters[iFilter];
     }
-    void ToggleFilter(short iFilter) {
+    void ToggleFilter(size_t iFilter) {
         (*current).second->pfFilters[iFilter] = !(*current).second->pfFilters[iFilter];
     }
 
 		bool FindFilteredMap();
-		void ApplyFilters(bool * pfFilters);
+		void ApplyFilters(const std::vector<bool>& pfFilters);
 		bool MapInFilteredSet();
 
 		std::multimap<std::string, MapListNode*>::iterator GetIteratorAt(unsigned short iIndex, bool fUseFilters);

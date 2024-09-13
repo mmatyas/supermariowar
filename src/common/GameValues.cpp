@@ -215,14 +215,9 @@ void CGameValues::init()
     tournamentcontrolstyle = TournamentControlStyle::All;
 
 
-    pfFilters     = new bool[NUM_AUTO_FILTERS + filterslist->count()];
-    piFilterIcons   = new short[NUM_AUTO_FILTERS + filterslist->count()];
+    pfFilters.resize(NUM_AUTO_FILTERS + filterslist->count(), false);
+    piFilterIcons.resize(NUM_AUTO_FILTERS + filterslist->count(), 0);
     fNeedWriteFilters = false;
-
-    for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->count(); iFilter++) {
-        pfFilters[iFilter] = false;
-        piFilterIcons[iFilter] = 0;
-    }
 
     //networktype   = 0;
     //networkhost   = false;
