@@ -1447,7 +1447,7 @@ void MenuState::update()
         //Write out all the map thumbnails for the map browser and filter editor
         std::map<std::string, MapListNode*>::iterator itr = maplist->GetIteratorAt(0, false);
 
-        short iMapCount = maplist->GetCount();
+        short iMapCount = maplist->count();
         for (short iMap = 0; iMap < iMapCount; iMap++) {
             std::string szThumbnail("maps/cache/");
             szThumbnail += GetNameFromFileName(itr->second->filename);

@@ -1088,7 +1088,7 @@ int editor_edit()
                     if (key == SDLK_PAGEUP) {
                         do {
 								maplist->prev(false);
-                        } while (!maplist->GetValid());
+                        } while (!maplist->isValid());
 
 							loadcurrentmap();
 						}
@@ -1096,7 +1096,7 @@ int editor_edit()
                     if (key == SDLK_PAGEDOWN) {
                         do {
 								maplist->next(false);
-                        } while (!maplist->GetValid());
+                        } while (!maplist->isValid());
 
 							loadcurrentmap();
 
@@ -1521,7 +1521,7 @@ int editor_edit()
 
 		}
 
-        if (maplist->GetValid()) {
+        if (maplist->isValid()) {
 			drawmap(false, TILESIZE);
         } else {
 			SDL_FillRect(screen, NULL, 0x0);
@@ -4804,7 +4804,7 @@ int clearMap()
 #ifdef _DEBUG
 void convertAll()
 {
-    for (int k = 0; k < maplist->GetCount(); k++) {
+    for (int k = 0; k < maplist->count(); k++) {
 		//g_map->convertMap();
 		g_map->saveMap(maplist->currentFilename());
 		maplist->next(false);

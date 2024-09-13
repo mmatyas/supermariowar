@@ -243,10 +243,10 @@ void MI_MapBrowser::Reset(short type)
         iFilterTagAnimationTimer = 0;
         iFilterTagAnimationFrame = 72;
 
-        iMapCount = maplist->GetCount();
+        iMapCount = maplist->count();
     } else {
         iSelectedIndex = maplist->GetCurrent()->second->iFilteredIndex;
-        iMapCount = maplist->GetFilteredCount();
+        iMapCount = maplist->filteredCount();
     }
 
     iSelectedRow = (iSelectedIndex / 3) % 3;

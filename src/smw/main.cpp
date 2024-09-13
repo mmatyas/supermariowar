@@ -176,7 +176,7 @@ void create_globals()
     maplist = new MapList(false);
 
     //TODO: add proper test via size
-    if (maplist->IsEmpty()) {
+    if (maplist->isEmpty()) {
         throw "Empty map directory!";
     }
 

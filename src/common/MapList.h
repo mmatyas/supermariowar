@@ -53,23 +53,22 @@ class MapList
 
     std::string randomFilename() const;
 
-		//Sets/Gets if a map at the current map node is valid and can be loaded
-    void SetValid(bool fValid) {
+    /// Sets whether the current map is valid and can be loaded
+    void setValid(bool fValid) {
         (*current).second->fValid = fValid;
     }
-    bool GetValid() {
+    /// The current map is valid and can be loaded
+    bool isValid() const {
         return (*current).second->fValid;
     }
 
-		//TODO: use size?
-    bool IsEmpty() {
+    bool isEmpty() const {
         return maps.empty();
     }
-
-    int GetFilteredCount() {
+    size_t filteredCount() const {
         return iFilteredMapCount;
     }
-    int GetCount() {
+    size_t count() const {
         return maps.size();
     }
 
@@ -118,7 +117,7 @@ class MapList
 
 		std::multimap<std::string, MapListNode*>::iterator outercurrent;
 
-		short iFilteredMapCount;
+		size_t iFilteredMapCount;
 
 		std::multimap<std::string, MapListNode*>::iterator * mlnFilteredMaps;
 		std::multimap<std::string, MapListNode*>::iterator * mlnMaps;
