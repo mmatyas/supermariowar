@@ -108,8 +108,8 @@ MapList::MapList(bool fWorldEditor)
 
     iFilteredMapCount = maps.size();
 
-    mlnFilteredMaps = new std::multimap<std::string, MapListNode*>::iterator[maps.size()];
-    mlnMaps = new std::multimap<std::string, MapListNode*>::iterator[maps.size()];
+    mlnFilteredMaps.resize(maps.size());
+    mlnMaps.resize(maps.size());
 
     //Load in the "tour only" maps directory
     DirectoryListing tourMapDir(convertPath("maps/tour/"), ".map");
@@ -165,9 +165,6 @@ MapList::~MapList()
     }
 
     worldmaps.clear();
-
-    delete [] mlnFilteredMaps;
-    delete [] mlnMaps;
 }
 
 //Called by level editor to load world maps into the map list

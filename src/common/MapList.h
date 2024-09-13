@@ -119,8 +119,8 @@ class MapList
 
 		size_t iFilteredMapCount;
 
-		std::multimap<std::string, MapListNode*>::iterator * mlnFilteredMaps;
-		std::multimap<std::string, MapListNode*>::iterator * mlnMaps;
+		std::vector<decltype(maps)::iterator> mlnFilteredMaps;
+		std::vector<decltype(maps)::iterator> mlnMaps;
 
 		char szUnknownMapString[2];
 };
