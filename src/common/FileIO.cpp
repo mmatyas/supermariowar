@@ -111,6 +111,11 @@ void BinaryFile::write_string(const char* string)
     fwrite_or_exception(string, sizeof(char), len);
 }
 
+void BinaryFile::write_string(const std::string& string)
+{
+    write_string(string.c_str());
+}
+
 void BinaryFile::write_string_long(const char* string)
 {
     assert(string);
@@ -123,6 +128,11 @@ void BinaryFile::write_string_long(const char* string)
 
     write_i32(len);
     fwrite_or_exception(string, sizeof(char), len);
+}
+
+void BinaryFile::write_string_long(const std::string& string)
+{
+    write_string_long(string.c_str());
 }
 
 void BinaryFile::write_raw(const void* source, size_t size)

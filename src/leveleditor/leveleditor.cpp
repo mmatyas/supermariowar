@@ -1638,7 +1638,7 @@ int editor_edit()
 				rm->menu_font_small.draw(0, 0, "Map Item Mode");
 			}
 
-			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
             if (g_musiccategorydisplaytimer > 0) {
 				--g_musiccategorydisplaytimer;
@@ -1942,7 +1942,7 @@ int editor_warp()
         r.h = 480;
 
 		SDL_BlitSurface(rm->spr_warps[0].getSurface(), NULL, screen, &r);
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
         return EDITOR_WARP;
@@ -2030,7 +2030,7 @@ int editor_eyecandy()
 		}
 
 		rm->menu_font_small.draw(0,480-rm->menu_font_small.getHeight(), "Eyecandy: [e] Exit, [LMB] Choose Eyecandy");
-		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		return EDITOR_EYECANDY;
@@ -2233,7 +2233,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		}
 
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		FPSLimiter::instance().beforeFlip();
@@ -2780,7 +2780,7 @@ int editor_platforms()
             rm->menu_font_small.drawCentered(320, r.y + 18, "Platforms");
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Platform Mode: [esc] Exit  [c] Check Paths, [1-8] Select, [n] New");
-			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 			for (int iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
 				SDL_BlitSurface(s_platform, &g_Platforms[iPlatform].rIcon[0], screen, &g_Platforms[iPlatform].rIcon[1]);
@@ -3422,7 +3422,7 @@ int editor_maphazards()
 			}
 		}
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		return EDITOR_MAPHAZARDS;
@@ -3754,7 +3754,7 @@ int editor_tiles()
         r.h = 480;
 
         SDL_BlitSurface(g_tilesetmanager->tileset(set_tile_tileset)->surface(0), &rectSrc, screen, &r);
-		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
                 rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), tileset->name());
 
         int i, j;
@@ -3881,7 +3881,7 @@ int editor_blocks()
 
 		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rBlocksRow3Src, screen, &rBlocksRow3Dst);
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		return EDITOR_BLOCKS;
@@ -3929,7 +3929,7 @@ int editor_mapitems()
 
 		rm->spr_mapitems[0].draw(0, 0, 0, 0, 192, 32);
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 		rm->menu_font_small.drawRightJustified(0, 480 - rm->menu_font_small.getHeight(), "Map Items");
 
 		DrawMessage();
@@ -4099,7 +4099,7 @@ int editor_modeitems()
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Set Flag Base Locations - Press [1] for Race Goals");
 		}
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		return EDITOR_MODEITEMS;
@@ -4149,7 +4149,7 @@ int editor_tiletype()
 
 		rm->spr_transparenttiles.draw(0, 0);
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		return EDITOR_TILETYPE;
@@ -4457,7 +4457,7 @@ int editor_animation()
 			}
 		}
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Use Arrow Keys To Scroll");
 
@@ -4667,7 +4667,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 	rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
-	rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+	rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 	gfx_flipscreen();
 
     while (true) {
@@ -4696,7 +4696,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 							gfx_flipscreen();
 
 							currentChar--;
@@ -4752,7 +4752,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 							gfx_flipscreen();
 						}
 					}

@@ -114,13 +114,13 @@ void MI_MapPreview::Draw()
 
 void MI_MapPreview::LoadCurrentMap()
 {
-    strncpy(szMapName, maplist->currentShortmapname(), 255);
+    strncpy(szMapName, maplist->currentShortmapname().c_str(), 255);
     szMapName[255] = 0;
 
     LoadMap(maplist->currentFilename());
 }
 
-void MI_MapPreview::LoadMap(const char * szMapPath)
+void MI_MapPreview::LoadMap(const std::string& szMapPath)
 {
     g_map->loadMap(szMapPath, read_type_preview);
     smallDelay(); //Sleeps to help the music from skipping

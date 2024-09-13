@@ -23,7 +23,7 @@ public:
     virtual void Draw();
 
     void LoadCurrentMap();
-    void LoadMap(const char * szMapPath);
+    void LoadMap(const std::string& szMapPath);
 
     bool SetMap(const char * szMapName, bool fWorld);
     void SetSpecialMap(const char * szMapName, const char * szMapPath);

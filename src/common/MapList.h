@@ -37,13 +37,13 @@ class MapList
         bool startswith(char letter);
 		bool startswith(std::string match);
 
-    const char* currentFilename() {
-        return (*outercurrent).second->filename.c_str();
+    const std::string& currentFilename() const {
+        return (*outercurrent).second->filename;
     }
-    const char* currentShortmapname() {
-        return (*outercurrent).first.c_str();
+    const std::string& currentShortmapname() const {
+        return (*outercurrent).first;
     }
-    int currentShortMapNameLen() {
+    int currentShortMapNameLen() const {
         return (*outercurrent).second->iShortNameLength;
     }
 

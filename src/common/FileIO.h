@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string>
 
 class BinaryFile {
 public:
@@ -19,7 +20,9 @@ public:
     void write_bool(bool);
     void write_float(float);
     void write_string(const char*);
+    void write_string(const std::string&);
     void write_string_long(const char*);
+    void write_string_long(const std::string&);
     void write_raw(const void*, size_t);
 
     int8_t read_i8();

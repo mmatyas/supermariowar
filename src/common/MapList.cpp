@@ -308,7 +308,7 @@ bool MapList::startswith(std::string match)
     do {
         next(true);	//sets us to the beginning if we hit the end -> loop through the maps
 
-        const char * szMapName = currentShortmapname();
+        std::string szMapName = currentShortmapname();
         const int iMapNameLen = currentShortMapNameLen();
 
         if (iMatchLen > iMapNameLen)
