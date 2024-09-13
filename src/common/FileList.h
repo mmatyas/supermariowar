@@ -11,10 +11,6 @@
 #define MAXCATEGORYTRACKS       64
 
 
-// Adds music overrides to the music lists
-void UpdateMusicWithOverrides();
-
-
 //it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
 class SimpleFileList {
 public:
@@ -222,3 +218,7 @@ private:
     std::vector<std::unique_ptr<WorldMusicEntry>> m_entries;
     size_t m_currentIndex = 0;
 };
+
+
+/// Adds music overrides to the music lists
+void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusiclist);

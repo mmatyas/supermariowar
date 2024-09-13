@@ -13,9 +13,6 @@
 
 extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 
-extern MusicList* musiclist;
-extern WorldMusicList* worldmusiclist;
-
 namespace {
 const short g_iDefaultMusicCategory[MAXMUSICCATEGORY] {0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 0};
 
@@ -34,7 +31,7 @@ std::vector<WorldMusicOverride> worldmusicoverrides;
 } // namespace
 
 
-void UpdateMusicWithOverrides()
+void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusiclist)
 {
     enum class Category : unsigned char {
         None,
@@ -106,8 +103,8 @@ void UpdateMusicWithOverrides()
         }
     }
 
-    musiclist->updateEntriesWithOverrides();
-    worldmusiclist->updateEntriesWithOverrides();
+    musiclist.updateEntriesWithOverrides();
+    worldmusiclist.updateEntriesWithOverrides();
 }
 
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

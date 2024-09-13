@@ -382,7 +382,7 @@ void main_game()
 
     game_values.init();
 
-    UpdateMusicWithOverrides();
+    UpdateMusicWithOverrides(*musiclist, *worldmusiclist);
 
     create_gamemodes();
 
