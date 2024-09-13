@@ -3,24 +3,22 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
-class MapListNode
-{
-	public:
-		MapListNode(std::string fullName);
-		~MapListNode();
+class MapListNode {
+public:
+    MapListNode(std::string fullName);
 
-		bool * pfFilters;
-		bool fInCurrentFilterSet;
-		std::string filename;
-		short iIndex;
-		short iFilteredIndex;
+    std::vector<bool> pfFilters;
+    std::string filename;
+    int iShortNameLength = 0;
 
-		int iShortNameLength;
+    short iIndex = 0;
+    short iFilteredIndex = 0;
 
-		bool fReadFromCache;
-
-		bool fValid;
+    bool fInCurrentFilterSet = false;
+    bool fReadFromCache = false;
+    bool fValid = true;
 };
 
 //announcerlist and musiclist are still a screwed up (a vector accessed like a vector and a list), but way better than before
@@ -87,9 +85,6 @@ class MapList
 
     bool GetFilter(short iFilter) {
         return (*current).second->pfFilters[iFilter];
-    }
-    bool * GetFilters() {
-        return (*current).second->pfFilters;
     }
     void ToggleFilter(short iFilter) {
         (*current).second->pfFilters[iFilter] = !(*current).second->pfFilters[iFilter];

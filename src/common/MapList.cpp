@@ -19,24 +19,9 @@ extern CGameValues game_values;
 
 MapListNode::MapListNode(std::string fullName)
 {
-    pfFilters = new bool[NUM_AUTO_FILTERS + filterslist->count()];
-    for (size_t iFilter = 0; iFilter < filterslist->count() + NUM_AUTO_FILTERS; iFilter++)
-        pfFilters[iFilter] = false;
-
-    fInCurrentFilterSet = true;
-    filename = fullName;
-    iIndex = 0;
-
-    fReadFromCache = false;
-
+    pfFilters.resize(NUM_AUTO_FILTERS + filterslist->count(), false);
+    filename = std::move(fullName);
     iShortNameLength = strlen(stripCreatorAndExt(fullName).c_str());
-
-    fValid = true;
-}
-
-MapListNode::~MapListNode()
-{
-    delete [] pfFilters;
 }
 
 ///////////// MapList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -499,7 +484,7 @@ void MapList::ReadFilters()
         if (!current->second->fReadFromCache) {
             MapListNode * mln = current->second;
             g_map->loadMap(mln->filename, read_type_summary);
-            memcpy(mln->pfFilters, g_map->fAutoFilter, sizeof(bool) * NUM_AUTO_FILTERS);
+            std::copy(g_map->fAutoFilter.cbegin(), g_map->fAutoFilter.cend(), mln->pfFilters.begin());
         }
 
         current++;
@@ -551,7 +536,7 @@ void MapList::ReloadMapAutoFilters()
     while (itr != lim) {
         MapListNode * mln = itr->second;
         g_map->loadMap(mln->filename, read_type_summary);
-        memcpy(mln->pfFilters, g_map->fAutoFilter, sizeof(bool) * NUM_AUTO_FILTERS);
+        std::copy(g_map->fAutoFilter.cbegin(), g_map->fAutoFilter.cend(), mln->pfFilters.begin());
 
         itr++;
     }
@@ -570,7 +555,7 @@ void MapList::WriteMapSummaryCache()
         fprintf(fp, "%s", itr->first.c_str());
 
         for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
-            fprintf(fp, ",%d", itr->second->pfFilters[iFilter]);
+            fprintf(fp, ",%d", itr->second->pfFilters[iFilter] ? 1 : 0);
 
         fprintf(fp, "\n");
         itr++;

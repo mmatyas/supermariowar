@@ -294,7 +294,7 @@ class CMap
 		std::array<short, 4> iSwitches;
 		std::list<IO_Block*> switchBlocks[8];
 
-		bool		fAutoFilter[NUM_AUTO_FILTERS];
+		std::array<bool, NUM_AUTO_FILTERS> fAutoFilter;
 
 		Point       racegoallocations[MAXRACEGOALS];
 
