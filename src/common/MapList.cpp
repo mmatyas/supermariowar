@@ -394,16 +394,16 @@ void MapList::random(bool fUseFilters)
         next(fUseFilters);
 }
 
-const char* MapList::randomFilename()
+std::string MapList::randomFilename() const
 {
-    std::multimap<std::string, MapListNode*>::iterator rnd = maps.begin();
+    auto rnd = maps.cbegin();
 
     short iRand = RANDOM_INT(maps.size());
 
     for (short iMap = 0; iMap < iRand; iMap++)
         rnd++;
 
-    return (*rnd).second->filename.c_str();
+    return (*rnd).second->filename;
 }
 
 

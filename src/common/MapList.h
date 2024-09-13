@@ -51,7 +51,7 @@ class MapList
         void next(bool fUseFilters);
 		void random(bool fUseFilters);
 
-		const char* randomFilename();
+    std::string randomFilename() const;
 
 		//Sets/Gets if a map at the current map node is valid and can be loaded
     void SetValid(bool fValid) {

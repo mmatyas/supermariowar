@@ -1352,7 +1352,7 @@ void MenuState::update()
                     }
                 } else if (game_values.matchtype == MatchType::QuickGame) {
                     //Load a random map for the quick game
-                    const char * szMapName = maplist->randomFilename();
+                    std::string szMapName = maplist->randomFilename();
                     g_map->loadMap(szMapName, read_type_full);
                     sShortMapName = stripPathAndExtension(szMapName);
 
