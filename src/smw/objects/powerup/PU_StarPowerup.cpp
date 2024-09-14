@@ -24,7 +24,7 @@ bool PU_StarPowerup::collide(CPlayer* player)
         if (!player->isInvincible() && !player->shyguy) {
             player->makeinvincible();
         } else {
-            player->SetStoredPowerup(6);
+            player->SetStoredPowerup(PowerupType::Star);
         }
     }
 

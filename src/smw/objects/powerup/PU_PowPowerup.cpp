@@ -15,7 +15,7 @@ bool PU_PowPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
         dead = true;
-        player->SetStoredPowerup(9);
+        player->SetStoredPowerup(PowerupType::Pow);
     }
 
     return false;

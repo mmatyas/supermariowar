@@ -14,7 +14,7 @@ PU_ClockPowerup::PU_ClockPowerup(gfxSprite* nspr, short x, short y, short iNumSp
 bool PU_ClockPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
-        player->SetStoredPowerup(7);
+        player->SetStoredPowerup(PowerupType::Clock);
         dead = true;
     }
 

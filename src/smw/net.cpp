@@ -859,7 +859,7 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
 
     // TODO: make this nicer
     // TODO: this might be overriden by a late packet, in tryReleasingPowerup()
-    players[pkg.player_id]->powerupused = pkg.powerup_id;
+    players[pkg.player_id]->powerupused = static_cast<PowerupType>(pkg.powerup_id);
     players[pkg.player_id]->powerupradius = 100.0f;
     for (; missed_frames > 0; missed_frames--) {
         players[pkg.player_id]->powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
@@ -1672,10 +1672,10 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
 void NetGameHost::sendPowerupStartByGH()
 {
     assert(netplay.theHostIsMe);
-    assert(players[netplay.remotePlayerNumber]->powerupused >= 0);
+    assert(players[netplay.remotePlayerNumber]->powerupused.has_value());
 
     NetPkgs::StartPowerup pkg(netplay.remotePlayerNumber,
-        players[netplay.remotePlayerNumber]->powerupused, 0);
+        static_cast<uint8_t>(players[netplay.remotePlayerNumber]->powerupused.value()), 0);
     sendMessageToMyPeers(&pkg, sizeof(NetPkgs::StartPowerup));
 
     players[netplay.remotePlayerNumber]->net_waitingForPowerupTrigger = false;

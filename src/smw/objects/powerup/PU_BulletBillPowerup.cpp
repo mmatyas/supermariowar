@@ -15,7 +15,7 @@ bool PU_BulletBillPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
         dead = true;
-        player->SetStoredPowerup(10);
+        player->SetStoredPowerup(PowerupType::BulletBill);
     }
 
     return false;

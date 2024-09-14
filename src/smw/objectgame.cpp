@@ -74,6 +74,7 @@ IO_MovingObject* spawnRegularPowerup(PowerupType type, short spawnX, short spawn
         case PowerupType::Bomb: return new PU_BombPowerup(&rm->spr_bombpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
         case PowerupType::Leaf: return new PU_LeafPowerup(&rm->spr_leafpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
         case PowerupType::PWings: return new PU_PWingsPowerup(&rm->spr_pwingspowerup, spawnX, spawnY);
+        case PowerupType::JailKey: return new PU_JailKeyPowerup(&rm->spr_jailkeypowerup, spawnX, spawnY);
     }
     return nullptr;
 }

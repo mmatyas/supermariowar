@@ -28,7 +28,7 @@ bool PlayerTanookiSuit::canTurnIntoStatue(CPlayer& player) {
     return player.playerKeys->game_turbo.fPressed
         && player.playerKeys->game_down.fDown
         && !statue_lock
-        && player.powerupused == -1
+        && !player.powerupused.has_value()
         && !player.lockfire
         && !player.kuriboshoe.is_on()
         && !player.tail.isInUse();

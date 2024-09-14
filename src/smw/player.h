@@ -4,9 +4,10 @@
 #include "ai.h"
 #include "gfx.h"
 #include "GlobalConstants.h"
-#include "Score.h"
+#include "objectgame.h"
 #include "PlayerKillStyles.h"
 #include "PlayerKillTypes.h"
+#include "Score.h"
 
 #include "player_components/PlayerAwardEffects.h"
 #include "player_components/PlayerBurnupTimer.h"
@@ -26,6 +27,8 @@
 #include "player_components/PlayerTanookiSuit.h"
 #include "player_components/PlayerWarpStatus.h"
 #include "player_components/PlayerWings.h"
+
+#include <optional>
 
 namespace NetPkgs {
     struct MapCollision;
@@ -163,6 +166,9 @@ public:
 
     void SetPowerup(short iPowerup);
     void SetStoredPowerup(short iPowerup);
+    void SetStoredPowerup(PowerupType iPowerup) {
+        SetStoredPowerup(static_cast<short>(iPowerup));
+    }
     void StripPowerups();
 
     void DecreaseProjectileLimit();
@@ -353,7 +359,7 @@ private:
 
 		PlayerWarpStatus warpstatus;
 
-		short powerupused;
+		std::optional<PowerupType> powerupused;
 		float powerupradius;
 		float powerupangle;
 

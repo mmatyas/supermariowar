@@ -15,7 +15,7 @@ bool PU_PodoboPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
         dead = true;
-        player->SetStoredPowerup(22);
+        player->SetStoredPowerup(PowerupType::Podobo);
     }
 
     return false;

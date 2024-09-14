@@ -30,6 +30,7 @@ enum class PowerupType : unsigned char {
     Bomb,
     Leaf,
     PWings,
+    JailKey,
 };
 
 

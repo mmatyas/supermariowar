@@ -15,7 +15,7 @@ bool PU_JailKeyPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
         dead = true;
-        player->SetStoredPowerup(26);
+        player->SetStoredPowerup(PowerupType::JailKey);
     }
 
     return false;
