@@ -33,7 +33,7 @@ private:
     SDL_Surface* mapSurfaces[9];
     MapListNode* mapListNodes[9];
     std::string mapNames[9];
-    std::map<std::string, MapListNode*>::iterator mapListItr[9];
+    std::map<std::string, MapListNode>::iterator mapListItr[9];
 
     short iFilterTagAnimationTimer = 0;
     short iFilterTagAnimationFrame = 0;

@@ -20,13 +20,13 @@ extern CGameValues game_values;
 
 
 namespace {
-void addMapsFrom(const std::string& relDir, std::multimap<std::string, MapListNode*>& container)
+void addMapsFrom(const std::string& relDir, std::multimap<std::string, MapListNode>& container)
 {
     DirectoryListing d(convertPath(relDir), ".map");
     std::string curname;
     while (d(curname)) {
-        auto* node = new MapListNode(d.fullName(curname));
-        container.emplace(stripCreatorAndExt(curname), node);
+        MapListNode node(d.fullName(curname));
+        container.emplace(stripCreatorAndExt(curname), std::move(node));
     }
 }
 } // namespace
@@ -77,7 +77,7 @@ MapList::MapList(bool fWorldEditor)
 
     short iIndex = 0;
     while (current != maps.end()) {
-        (*current).second->iIndex = iIndex++;
+        (*current).second.iIndex = iIndex++;
         current++;
     }
 
@@ -104,37 +104,11 @@ MapList::MapList(bool fWorldEditor)
     addMapsFrom("maps/special/", worldmaps);
 }
 
-MapList::~MapList()
-{
-    //Delete all map list nodes
-    std::multimap<std::string, MapListNode*>::iterator iterateAll = maps.begin(), lim = maps.end();
-
-    while (iterateAll != lim) {
-        delete (iterateAll->second);
-        iterateAll++;
-    }
-
-    maps.clear();
-
-    //Delete all world map list nodes
-    iterateAll = worldmaps.begin();
-    lim = worldmaps.end();
-
-    while (iterateAll != lim) {
-        delete (iterateAll->second);
-        iterateAll++;
-    }
-
-    worldmaps.clear();
-}
-
 //Called by level editor to load world maps into the map list
 void MapList::addWorldMaps()
 {
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
-
-    short iDirCount = worldmapdirs.count();
-    for (short iDir = 0; iDir < iDirCount; iDir++) {
+    for (short iDir = 0; iDir < worldmapdirs.count(); iDir++) {
         std::string szName = worldmapdirs.currentPath() + '/';
         addMapsFrom(szName, maps);
         worldmapdirs.next();
@@ -144,20 +118,19 @@ void MapList::addWorldMaps()
 void MapList::add(const char * name)
 {
     std::string fullName = convertPath("maps/") + name;
-
-    MapListNode * node = new MapListNode(fullName);
-    maps.insert(std::make_pair(stripCreatorAndExt(name), node));
+    MapListNode node(std::move(fullName));
+    maps.emplace(stripCreatorAndExt(name), std::move(node));
 }
 
 bool MapList::find(const char * name)
 {
     bool fFound = false;
 
-    std::multimap<std::string, MapListNode*>::iterator oldCurrent = current;
+    auto oldCurrent = current;
     do {
         next(false);	//sets us to the beginning if we hit the end -> loop through the maps
 
-        if (strstr((*current).second->filename.c_str(), name))	//compare names after
+        if (strstr((*current).second.filename.c_str(), name))	//compare names after
             fFound = true;
     } while (current != oldCurrent && !fFound);
 
@@ -175,7 +148,7 @@ bool MapList::findexact(const char * name, bool fWorld)
     //If we're looking for a world, then search the world maps first
     //if the world map isn't found, then search the regular map list
     if (fWorld) {
-        std::multimap<std::string, MapListNode*>::iterator iterateAll = worldmaps.begin(), lim = worldmaps.end();
+        auto iterateAll = worldmaps.begin(), lim = worldmaps.end();
 
         while (iterateAll != lim && !fFound) {
             char * szCurrentName = new char[iterateAll->first.length() + 1];
@@ -198,7 +171,7 @@ bool MapList::findexact(const char * name, bool fWorld)
         }
     }
 
-    std::multimap<std::string, MapListNode*>::iterator oldCurrent = current;
+    auto oldCurrent = current;
 
     fFound = false;
     do {
@@ -222,7 +195,7 @@ bool MapList::findexact(const char * name, bool fWorld)
 //Returns true if the map needs to be reloaded
 bool MapList::FindFilteredMap()
 {
-    if ((*current).second->fInCurrentFilterSet)
+    if ((*current).second.fInCurrentFilterSet)
         return false;
 
     next(true);
@@ -236,7 +209,7 @@ bool MapList::startswith(char letter)
     if (letter >= 'a' && letter <= 'z')
         letter -= 32;
 
-    std::multimap<std::string, MapListNode*>::iterator oldCurrent = current;
+    auto oldCurrent = current;
     do {
         next(true);	//sets us to the beginning if we hit the end -> loop through the maps
 
@@ -250,7 +223,7 @@ bool MapList::startswith(char letter)
 //Searches for maps that start with this entire string
 bool MapList::startswith(const std::string& match)
 {
-    std::multimap<std::string, MapListNode*>::iterator oldCurrent = current;
+    auto oldCurrent = current;
     do {
         next(true);	//sets us to the beginning if we hit the end -> loop through the maps
 
@@ -279,12 +252,12 @@ TRYNEXTMAP:
 void MapList::prev(bool fUseFilters)
 {
     if (fUseFilters) {
-        std::multimap<std::string, MapListNode*>::iterator oldCurrent = current;
+        auto oldCurrent = current;
 
         do {
             prev(false);
 
-            if ((*current).second->fInCurrentFilterSet)
+            if ((*current).second.fInCurrentFilterSet)
                 return;
         } while (current != oldCurrent);
     } else {
@@ -302,19 +275,19 @@ void MapList::prev(bool fUseFilters)
 void MapList::next(bool fUseFilters)
 {
     if (fUseFilters) {
-        std::multimap<std::string, MapListNode*>::iterator oldCurrent = current;
+        auto oldCurrent = current;
 
         do {
             next(false);
 
-            if ((*current).second->fInCurrentFilterSet)
+            if ((*current).second.fInCurrentFilterSet)
                 return;
         } while (current != oldCurrent);
     } else {
-        if (current == --maps.end())	//we are at the last valid element
+        ++current;
+
+        if (current == maps.end())	//we are at the last valid element
             current = maps.begin();	//continue from start
-        else
-            ++current;
 
         outercurrent = current;
     }
@@ -347,7 +320,7 @@ std::string MapList::randomFilename() const
     for (short iMap = 0; iMap < iRand; iMap++)
         rnd++;
 
-    return (*rnd).second->filename;
+    return (*rnd).second.filename;
 }
 
 
@@ -371,10 +344,10 @@ void MapList::WriteFilters()
 
             fprintf(fp, "#Maps\n");
 
-            std::multimap<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
+            auto itr = maps.begin(), lim = maps.end();
 
             while (itr != lim) {
-                if ((*itr).second->pfFilters[iFilter + NUM_AUTO_FILTERS])
+                if ((*itr).second.pfFilters[iFilter + NUM_AUTO_FILTERS])
                     fprintf(fp, "%s\n", (*itr).first.c_str());
 
                 itr++;
@@ -402,7 +375,7 @@ void MapList::ReadFilters()
     if (mfp) {
         while (fgets(buffer, 256, mfp)) {
             char * pszMapName = strtok(buffer, ",\n");
-            MapListNode * node = maps.find(pszMapName)->second;
+            MapListNode& node = maps.find(pszMapName)->second;
 
             if (maps.find(pszMapName) != maps.end()) {
                 bool fErrorReading = false;
@@ -410,7 +383,7 @@ void MapList::ReadFilters()
                     char * psz = strtok(NULL, ",\n");
 
                     if (psz) {
-                        node->pfFilters[iFilter] = strcmp(psz, "0") != 0;
+                        node.pfFilters[iFilter] = strcmp(psz, "0") != 0;
                     } else {
                         fErrorReading = true;
                         break;
@@ -418,7 +391,7 @@ void MapList::ReadFilters()
                 }
 
                 if (!fErrorReading)
-                    node->fReadFromCache = true;
+                    node.fReadFromCache = true;
             }
         }
 
@@ -426,10 +399,10 @@ void MapList::ReadFilters()
     }
 
     while (current != maps.end()) {
-        if (!current->second->fReadFromCache) {
-            MapListNode * mln = current->second;
-            g_map->loadMap(mln->filename, read_type_summary);
-            std::copy(g_map->fAutoFilter.cbegin(), g_map->fAutoFilter.cend(), mln->pfFilters.begin());
+        if (!current->second.fReadFromCache) {
+            MapListNode& mln = current->second;
+            g_map->loadMap(mln.filename, read_type_summary);
+            std::copy(g_map->fAutoFilter.cbegin(), g_map->fAutoFilter.cend(), mln.pfFilters.begin());
         }
 
         current++;
@@ -461,7 +434,7 @@ void MapList::ReadFilters()
 
                 //If that map is found
                 if (findexact(pszMap, false))
-                    (*current).second->pfFilters[iFilter + NUM_AUTO_FILTERS] = true;
+                    (*current).second.pfFilters[iFilter + NUM_AUTO_FILTERS] = true;
             }
         }
 
@@ -476,12 +449,12 @@ void MapList::ReadFilters()
 //Forces all the maps to reload the auto filters from the live map files (flush the cache)
 void MapList::ReloadMapAutoFilters()
 {
-    std::multimap<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
+    auto itr = maps.begin(), lim = maps.end();
 
     while (itr != lim) {
-        MapListNode * mln = itr->second;
-        g_map->loadMap(mln->filename, read_type_summary);
-        std::copy(g_map->fAutoFilter.cbegin(), g_map->fAutoFilter.cend(), mln->pfFilters.begin());
+        MapListNode& mln = itr->second;
+        g_map->loadMap(mln.filename, read_type_summary);
+        std::copy(g_map->fAutoFilter.cbegin(), g_map->fAutoFilter.cend(), mln.pfFilters.begin());
 
         itr++;
     }
@@ -494,13 +467,13 @@ void MapList::WriteMapSummaryCache()
     if (!fp)
         return;
 
-    std::multimap<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
+    auto itr = maps.begin(), lim = maps.end();
 
     while (itr != lim) {
         fprintf(fp, "%s", itr->first.c_str());
 
         for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
-            fprintf(fp, ",%d", itr->second->pfFilters[iFilter] ? 1 : 0);
+            fprintf(fp, ",%d", itr->second.pfFilters[iFilter] ? 1 : 0);
 
         fprintf(fp, "\n");
         itr++;
@@ -518,7 +491,7 @@ void MapList::WriteMapSummaryCache()
 //will show up in the map field or in the thumbnail browser
 void MapList::ApplyFilters(const std::vector<bool>& pfFilters)
 {
-    std::multimap<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
+    auto itr = maps.begin(), lim = maps.end();
 
     iFilteredMapCount = 0;
     short iTotalCount = 0;
@@ -526,17 +499,17 @@ void MapList::ApplyFilters(const std::vector<bool>& pfFilters)
         bool fMatched = true;
         for (size_t iFilter = 0; iFilter < pfFilters.size(); iFilter++) {
             if (pfFilters[iFilter]) {
-                if (!(*itr).second->pfFilters[iFilter]) {
+                if (!(*itr).second.pfFilters[iFilter]) {
                     fMatched = false;
                     break;
                 }
             }
         }
 
-        (*itr).second->fInCurrentFilterSet = fMatched;
+        (*itr).second.fInCurrentFilterSet = fMatched;
 
         if (fMatched) {
-            (*itr).second->iFilteredIndex = iFilteredMapCount;
+            (*itr).second.iFilteredIndex = iFilteredMapCount;
             mlnFilteredMaps[iFilteredMapCount] = itr;
             iFilteredMapCount++;
         }
@@ -552,10 +525,10 @@ void MapList::ApplyFilters(const std::vector<bool>& pfFilters)
 
 bool MapList::MapInFilteredSet()
 {
-    return (*current).second->fInCurrentFilterSet;
+    return (*current).second.fInCurrentFilterSet;
 }
 
-std::multimap<std::string, MapListNode*>::iterator MapList::GetIteratorAt(unsigned short iIndex, bool fUseFilters)
+std::multimap<std::string, MapListNode>::iterator MapList::GetIteratorAt(unsigned short iIndex, bool fUseFilters)
 {
     if (fUseFilters) {
         if (iIndex >= iFilteredMapCount)

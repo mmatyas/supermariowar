@@ -238,14 +238,14 @@ void MI_MapBrowser::Reset(short type)
     iType = type;
 
     if (iType == 0) {
-        iSelectedIndex = maplist->GetCurrent()->second->iIndex;
+        iSelectedIndex = maplist->GetCurrent()->second.iIndex;
 
         iFilterTagAnimationTimer = 0;
         iFilterTagAnimationFrame = 72;
 
         iMapCount = maplist->count();
     } else {
-        iSelectedIndex = maplist->GetCurrent()->second->iFilteredIndex;
+        iSelectedIndex = maplist->GetCurrent()->second.iFilteredIndex;
         iMapCount = maplist->filteredCount();
     }
 
@@ -264,12 +264,12 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
         if (iIndex >= iMapCount)
             return;
 
-        std::map<std::string, MapListNode*>::iterator itr = maplist->GetIteratorAt(iIndex, fUseFilters);
+        std::map<std::string, MapListNode>::iterator itr = maplist->GetIteratorAt(iIndex, fUseFilters);
 
                //See if we already have a thumbnail saved for this map
 
         std::string szThumbnail("maps/cache/");
-        szThumbnail += GetNameFromFileName((*itr).second->filename.c_str());
+        szThumbnail += GetNameFromFileName((*itr).second.filename.c_str());
 
 #ifdef PNG_SAVE_FORMAT
         szThumbnail += ".png";
@@ -280,7 +280,7 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
         std::string sConvertedPath = convertPath(szThumbnail);
 
         if (!FileExists(sConvertedPath)) {
-            g_map->loadMap((*itr).second->filename, read_type_preview);
+            g_map->loadMap((*itr).second.filename, read_type_preview);
             smallDelay();  //Sleeps to help the music from skipping
             g_map->saveThumbnail(sConvertedPath, false);
             smallDelay();
@@ -291,7 +291,7 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 
         mapSurfaces[iMap] = IMG_Load(sConvertedPath.c_str());
 
-        mapListNodes[iMap] = (*itr).second;
+        mapListNodes[iMap] = &(*itr).second;
         mapNames[iMap] = (*itr).first.c_str();
         mapListItr[iMap] = itr;
     }

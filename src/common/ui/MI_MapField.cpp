@@ -118,7 +118,7 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
             if ((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
                     (iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9) ||
                     iPressedKey == SDLK_MINUS || iPressedKey == SDLK_EQUALS) {
-                short iOldIndex = maplist->GetCurrent()->second->iIndex;
+                short iOldIndex = maplist->GetCurrent()->second.iIndex;
 
                 //maplist->startswith((char)playerInput->iPressedKey);
 
@@ -130,7 +130,7 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
                     iSearchStringTimer = 0;
                 }
 
-                if (iOldIndex != maplist->GetCurrent()->second->iIndex) {
+                if (iOldIndex != maplist->GetCurrent()->second.iIndex) {
                     LoadCurrentMap();
                     return MENU_CODE_MAP_CHANGED;
                 }
@@ -145,10 +145,10 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 
 MenuCodeEnum MI_MapField::ChooseRandomMap()
 {
-    short iOldIndex = maplist->GetCurrent()->second->iIndex;
+    short iOldIndex = maplist->GetCurrent()->second.iIndex;
     maplist->random(true);
 
-    if (iOldIndex != maplist->GetCurrent()->second->iIndex) {
+    if (iOldIndex != maplist->GetCurrent()->second.iIndex) {
         LoadCurrentMap();
         return MENU_CODE_MAP_CHANGED;
     }
@@ -257,7 +257,7 @@ bool MI_MapField::Move(bool fNext, bool fScrollFast)
     if (fScrollFast)
         numadvance = 10;
 
-    short iOldIndex = maplist->GetCurrent()->second->iIndex;
+    short iOldIndex = maplist->GetCurrent()->second.iIndex;
     for (int k = 0; k < numadvance; k++) {
         if (fNext)
             maplist->next(true);
@@ -265,7 +265,7 @@ bool MI_MapField::Move(bool fNext, bool fScrollFast)
             maplist->prev(true);
     }
 
-    if (iOldIndex != maplist->GetCurrent()->second->iIndex) {
+    if (iOldIndex != maplist->GetCurrent()->second.iIndex) {
         LoadCurrentMap();
         return true;
     }
