@@ -18,11 +18,24 @@ extern CMap* g_map;
 extern FiltersList* filterslist;
 extern CGameValues game_values;
 
+
+namespace {
+void addMapsFrom(const std::string& relDir, std::multimap<std::string, MapListNode*>& container)
+{
+    DirectoryListing d(convertPath(relDir), ".map");
+    std::string curname;
+    while (d(curname)) {
+        auto* node = new MapListNode(d.fullName(curname));
+        container.emplace(stripCreatorAndExt(curname), node);
+    }
+}
+} // namespace
+
+
 MapListNode::MapListNode(std::string fullName)
 {
     pfFilters.resize(NUM_AUTO_FILTERS + filterslist->count(), false);
     filename = std::move(fullName);
-    iShortNameLength = strlen(stripCreatorAndExt(fullName).c_str());
 }
 
 ///////////// MapList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,62 +43,28 @@ MapList::MapList(bool fWorldEditor)
 {
     strcpy(szUnknownMapString, "-");
 
-    DirectoryListing d(convertPath("maps/"), ".map");
-    std::string curname;
-
-    while (d(curname)) {
-        MapListNode * node = new MapListNode(d.fullName(curname));
-        maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-    }
+    addMapsFrom("maps/", maps);
 
 #ifdef _DEBUG
-    DirectoryListing debugMapDir(convertPath("maps/test/"), ".map");
-    while (debugMapDir(curname)) {
-        MapListNode * node = new MapListNode(debugMapDir.fullName(curname));
-        maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-    }
-
-    DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
-    while (specialDebugMapDir(curname)) {
-        MapListNode * node = new MapListNode(specialDebugMapDir.fullName(curname));
-        maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-    }
+    addMapsFrom("maps/test/", maps);
+    addMapsFrom("maps/special/", maps);
 #endif
 
     //If this is for the world editor, load all the world maps into the map viewer UI control
     if (fWorldEditor) {
         //Load in the "tour only" maps directory
-        DirectoryListing tourMapDir(convertPath("maps/tour/"), ".map");
-
-        while (tourMapDir(curname)) {
-            MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
-            maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-        }
+        addMapsFrom("maps/tour/", maps);
 
         SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
-
-        short iEditorDirCount = worldeditormapdirs.count();
-        for (short iDir = 0; iDir < iEditorDirCount; iDir++) {
-            std::string szName = worldeditormapdirs.currentPath();
-
-            DirectoryListing worldMapDir(szName + '/', ".map");
-
-            while (worldMapDir(curname)) {
-                MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
-                maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-            }
-
+        for (size_t iDir = 0; iDir < worldeditormapdirs.count(); iDir++) {
+            std::string szName = worldeditormapdirs.currentPath() + '/';
+            addMapsFrom(szName, maps);
             worldeditormapdirs.next();
         }
 
 #ifndef _DEBUG
-        DirectoryListing specialEditorMapDir(convertPath("maps/special/"), ".map");
-        while (specialEditorMapDir(curname)) {
-            MapListNode * node = new MapListNode(specialEditorMapDir.fullName(curname));
-            maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-        }
+        addMapsFrom("maps/special/", maps);
 #endif
-
     }
 
     //TODO: add proper test via size
@@ -112,35 +91,17 @@ MapList::MapList(bool fWorldEditor)
     mlnMaps.resize(maps.size());
 
     //Load in the "tour only" maps directory
-    DirectoryListing tourMapDir(convertPath("maps/tour/"), ".map");
-
-    while (tourMapDir(curname)) {
-        MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
-        worldmaps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-    }
+    addMapsFrom("maps/tour/", worldmaps);
 
     //Read all world map directories and load them into the world/tour only list
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
-
-    short iDirCount = worldmapdirs.count();
-    for (short iDir = 0; iDir < iDirCount; iDir++) {
-        std::string szName = worldmapdirs.currentPath();
-
-        DirectoryListing worldMapDir(szName + '/', ".map");
-
-        while (worldMapDir(curname)) {
-            MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
-            worldmaps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-        }
-
+    for (size_t iDir = 0; iDir < worldmapdirs.count(); iDir++) {
+        std::string szName = worldmapdirs.currentPath() + '/';
+        addMapsFrom(szName, worldmaps);
         worldmapdirs.next();
     }
 
-    DirectoryListing specialMapDir(convertPath("maps/special/"), ".map");
-    while (specialMapDir(curname)) {
-        MapListNode * node = new MapListNode(specialMapDir.fullName(curname));
-        worldmaps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-    }
+    addMapsFrom("maps/special/", worldmaps);
 }
 
 MapList::~MapList()
@@ -174,18 +135,8 @@ void MapList::addWorldMaps()
 
     short iDirCount = worldmapdirs.count();
     for (short iDir = 0; iDir < iDirCount; iDir++) {
-        std::string szName = worldmapdirs.currentPath();
-
-        DirectoryListing worldMapDir(szName + '/', ".map");
-
-        DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
-
-        std::string curname;
-        while (worldMapDir(curname)) {
-            MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
-            maps.insert(std::make_pair(stripCreatorAndExt(curname), node));
-        }
-
+        std::string szName = worldmapdirs.currentPath() + '/';
+        addMapsFrom(szName, maps);
         worldmapdirs.next();
     }
 }
@@ -297,21 +248,17 @@ bool MapList::startswith(char letter)
 }
 
 //Searches for maps that start with this entire string
-bool MapList::startswith(std::string match)
+bool MapList::startswith(const std::string& match)
 {
-    int iMatchLen = strlen(match.c_str());
-
     std::multimap<std::string, MapListNode*>::iterator oldCurrent = current;
     do {
         next(true);	//sets us to the beginning if we hit the end -> loop through the maps
 
         std::string szMapName = currentShortmapname();
-        const int iMapNameLen = currentShortMapNameLen();
-
-        if (iMatchLen > iMapNameLen)
+        if (match.length() > szMapName.length())
             continue;
 
-        for (short iIndex = 0; iIndex < iMatchLen && iIndex < iMapNameLen; iIndex++) {
+        for (short iIndex = 0; iIndex < match.length() && iIndex < szMapName.length(); iIndex++) {
             if (tolower(szMapName[iIndex]) == tolower(match[iIndex]))
                 continue;
 

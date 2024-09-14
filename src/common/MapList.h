@@ -11,7 +11,6 @@ public:
 
     std::vector<bool> pfFilters;
     std::string filename;
-    int iShortNameLength = 0;
 
     short iIndex = 0;
     short iFilteredIndex = 0;
@@ -22,11 +21,10 @@ public:
 };
 
 //announcerlist and musiclist are still a screwed up (a vector accessed like a vector and a list), but way better than before
-class MapList
-{
-    public:
-        MapList(bool fWorldEditor);
-        ~MapList();
+class MapList {
+public:
+    MapList(bool fWorldEditor);
+    ~MapList();
 
 		//Adds maps in all world map directories to the map list so they can be edited in the map editor
 		void addWorldMaps();
@@ -34,17 +32,14 @@ class MapList
         void add(const char * name);
         bool find(const char * name);
 		bool findexact(const char * name, bool fWorld);
-        bool startswith(char letter);
-		bool startswith(std::string match);
+    bool startswith(char letter);
+    bool startswith(const std::string& match);
 
     const std::string& currentFilename() const {
         return (*outercurrent).second->filename;
     }
     const std::string& currentShortmapname() const {
         return (*outercurrent).first;
-    }
-    int currentShortMapNameLen() const {
-        return (*outercurrent).second->iShortNameLength;
     }
 
 		void prev(bool fUseFilters);
