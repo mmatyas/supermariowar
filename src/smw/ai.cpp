@@ -634,32 +634,58 @@ ExitDeathCheck:
     ***************************************************/
 
     if (iStoredPowerup > 0) {
-        //use 1-5up, clock, pow, bulletbill, mod, podobo, right away
-        if (iStoredPowerup == 1  || iStoredPowerup == 2 || iStoredPowerup == 3 || iStoredPowerup == 4 ||
-                iStoredPowerup == 7 || iStoredPowerup == 9 || iStoredPowerup == 10 || iStoredPowerup == 16 ||
-                iStoredPowerup == 22) {
-            playerKeys->game_powerup.fDown = true;
-        } else if (((iStoredPowerup == 5 || iStoredPowerup == 11 || iStoredPowerup == 17 || iStoredPowerup == 19 || iStoredPowerup == 21 || iStoredPowerup == 23 || iStoredPowerup == 24 || iStoredPowerup == 25) &&
-                   pPlayer->powerup == -1) || //Use fireflower, hammer, feather, boomerang, cape, wings, sledge, bombs
-                  (iStoredPowerup == 6 && !pPlayer->isInvincible()) || //Use star
-                  (iStoredPowerup == 8 && !pPlayer->bobomb) || //use bob-omb
-                  (iStoredPowerup >= 12 && iStoredPowerup <= 15 && !carriedItem) || //Use shell
-                  (iStoredPowerup == 20 && !pPlayer->tanookisuit.isOn())) { //use tanooki
-            playerKeys->game_powerup.fDown = true;
-        } else if (iStoredPowerup == 18) { //mystery mushroom
-            //See if another player has a powerup
-            for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
-                if (iPlayer == pPlayer->localID || players[iPlayer]->teamID == iTeamID)
-                    continue;
-
-                if (game_values.gamepowerups[players[iPlayer]->globalID] > 0) {
-                    playerKeys->game_powerup.fDown = true;
+        const auto canUse = [this, carriedItem, iTeamID](PowerupType powerup) -> bool {
+            switch (powerup) {
+                case PowerupType::PoisonMushroom:
+                    return false;
+                case PowerupType::ExtraLife1:
+                case PowerupType::ExtraLife2:
+                case PowerupType::ExtraLife3:
+                case PowerupType::ExtraLife5:
+                case PowerupType::Clock:
+                case PowerupType::Pow:
+                case PowerupType::BulletBill:
+                case PowerupType::Mod:
+                case PowerupType::Podobo:
+                    return true;  // use 1-5up, clock, pow, bulletbill, mod, podobo, right away
+                case PowerupType::Fire:
+                case PowerupType::Hammer:
+                case PowerupType::Feather:
+                case PowerupType::Boomerang:
+                case PowerupType::IceWand:
+                case PowerupType::Bomb:
+                case PowerupType::Leaf:
+                case PowerupType::PWings:
+                    return pPlayer->powerup == -1;
+                case PowerupType::Star:
+                    return !pPlayer->isInvincible();
+                case PowerupType::Bobomb:
+                    return !pPlayer->bobomb;
+                case PowerupType::ShellGreen:
+                case PowerupType::ShellRed:
+                case PowerupType::ShellSpiny:
+                case PowerupType::ShellBuzzy:
+                    return !carriedItem;
+                case PowerupType::Tanooki:
+                    return !pPlayer->tanookisuit.isOn();
+                case PowerupType::JailKey:
+                    return pPlayer->jail.isActive();
+                case PowerupType::MysteryMushroom:
+                    //See if another player has a powerup
+                    for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
+                        if (iPlayer == pPlayer->localID || players[iPlayer]->teamID == iTeamID) {
+                            continue;
+                        }
+                        if (game_values.gamepowerups[players[iPlayer]->globalID] > 0) {
+                            return true;
+                        }
+                    }
                     break;
-                }
             }
-        } else if (iStoredPowerup == 26) { //jail key
-            if (pPlayer->jail.isActive())
-                playerKeys->game_powerup.fDown = true;
+            return false;
+        };
+        if (canUse(static_cast<PowerupType>(iStoredPowerup))) {
+            playerKeys->game_powerup.fDown = true;
         }
     }
 }
