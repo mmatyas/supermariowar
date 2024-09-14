@@ -108,7 +108,7 @@ MapList::MapList(bool fWorldEditor)
 void MapList::addWorldMaps()
 {
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
-    for (short iDir = 0; iDir < worldmapdirs.count(); iDir++) {
+    for (size_t iDir = 0; iDir < worldmapdirs.count(); iDir++) {
         std::string szName = worldmapdirs.currentPath() + '/';
         addMapsFrom(szName, maps);
         worldmapdirs.next();
@@ -227,23 +227,20 @@ bool MapList::startswith(const std::string& match)
     do {
         next(true);	//sets us to the beginning if we hit the end -> loop through the maps
 
-        std::string szMapName = currentShortmapname();
+        const std::string& szMapName = currentShortmapname();
         if (match.length() > szMapName.length())
             continue;
 
-        for (short iIndex = 0; iIndex < match.length() && iIndex < szMapName.length(); iIndex++) {
-            if (tolower(szMapName[iIndex]) == tolower(match[iIndex]))
-                continue;
-
-            goto TRYNEXTMAP;
+        bool matches = true;
+        for (size_t iIndex = 0; iIndex < match.length(); iIndex++) {
+            if (tolower(szMapName[iIndex]) != tolower(match[iIndex])) {
+                matches = false;
+                break;
+            }
         }
 
-        //gets here if we matched
-        return true;
-
-        //Label that we break to if we don't match (it'd be nice if we had labeled continues in c++)
-TRYNEXTMAP:
-        continue;
+        if (matches)
+            return true;
     } while (current != oldCurrent);
 
     return false;
@@ -262,10 +259,9 @@ void MapList::prev(bool fUseFilters)
         } while (current != oldCurrent);
     } else {
         if (current == maps.begin())	//we are at the first element
-            current = --maps.end();	//continue from end
-        else
-            --current;
+            current = maps.end();	//continue from end
 
+        --current;
         outercurrent = current;
     }
 
