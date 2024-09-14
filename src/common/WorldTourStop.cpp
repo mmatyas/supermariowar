@@ -19,6 +19,7 @@ namespace {
 constexpr const char* const DELIM_EMPTY = "";
 constexpr const char* const DELIM_COMMA = ",";
 constexpr const char* const DELIM_PIPE = "|";
+constexpr const char* const UNKNOWN_MAP_NAME = "-";
 
 /// Reads the next integer token, converts it to type T, and returns `true`.
 /// If there are no more tokens, uses the default value, and returns `false`.
@@ -489,7 +490,7 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
         //If this is 1.8.0.2 or earlier and we are playing a minigame, use the default map
         if (version <= Version {1, 8, 0, 2} && isMinigame) {
             //Get a bogus map name so the mode will know to load the default map
-            ts.pszMapFile = maplist->GetUnknownMapName();
+            ts.pszMapFile = UNKNOWN_MAP_NAME;
         } else {
             //Using the maplist to cheat and find a map for us
             maplist->SaveCurrent();
@@ -499,7 +500,7 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
             if (!fMapFound) {
                 if (isMinigame) {
                     //Get a bogus map name so the mode will know to load the default map
-                    ts.pszMapFile = maplist->GetUnknownMapName();
+                    ts.pszMapFile = UNKNOWN_MAP_NAME;
                 } else {
                     maplist->random(false);
                     ts.pszMapFile = maplist->currentShortmapname();

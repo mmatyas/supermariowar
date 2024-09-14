@@ -104,8 +104,6 @@ public:
 		void ReloadMapAutoFilters();
 		void WriteMapSummaryCache();
 
-		const char * GetUnknownMapName();
-
     private:
 
     std::multimap<std::string, MapListNode> maps;
@@ -119,8 +117,6 @@ public:
     std::vector<decltype(maps)::iterator> mlnMaps;
 
     size_t iFilteredMapCount;
-
-    char szUnknownMapString[2];
 };
 
 #endif // MAPLIST_H

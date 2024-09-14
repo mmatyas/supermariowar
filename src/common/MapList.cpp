@@ -41,8 +41,6 @@ MapListNode::MapListNode(std::string fullName)
 ///////////// MapList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MapList::MapList(bool fWorldEditor)
 {
-    strcpy(szUnknownMapString, "-");
-
     addMapsFrom("maps/", maps);
 
 #ifdef _DEBUG
@@ -537,9 +535,4 @@ std::multimap<std::string, MapListNode>::iterator MapList::GetIteratorAt(unsigne
 
         return mlnMaps[iIndex];
     }
-}
-
-const char * MapList::GetUnknownMapName()
-{
-    return szUnknownMapString;
 }
