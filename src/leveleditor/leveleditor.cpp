@@ -437,7 +437,7 @@ int main(int argc, char *argv[])
 
     {
         const std::string options_path(GetHomeDirectory() + "leveleditor.bin");
-        BinaryFile editor_settings(options_path.c_str(), "rb");
+        BinaryFile editor_settings(options_path, "rb");
         if (editor_settings.is_open()) {
             g_fFullScreen = editor_settings.read_bool();
             editor_settings.read_string_long(findstring, FILEBUFSIZE);
@@ -715,7 +715,7 @@ void gameloop_frame()
 	save_map(convertPath("maps/ZZleveleditor.map"));
 
     const std::string options_path(GetHomeDirectory() + "leveleditor.bin");
-    BinaryFile editor_settings(options_path.c_str(), "wb");
+    BinaryFile editor_settings(options_path, "wb");
     if (editor_settings.is_open()) {
         editor_settings.write_bool(g_fFullScreen);
         editor_settings.write_string_long(maplist->currentFilename());

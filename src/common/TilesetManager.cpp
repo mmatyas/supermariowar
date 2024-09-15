@@ -26,7 +26,7 @@ std::vector<TileType> readTileTypeFile(const std::string& path, int expectedCoun
     if (!FileExists(path))
         return {};
 
-    BinaryFile tsf(path.c_str(), "rb");
+    BinaryFile tsf(path, "rb");
     if (!tsf.is_open()) {
         printf("ERROR: couldn't open tileset file: %s\n", path.c_str());
         return {};
@@ -113,7 +113,7 @@ void CTileset::Draw(SDL_Surface* dstSurface, short tileSize, SDL_Rect* srcRect, 
 
 void CTileset::saveTileset() const
 {
-    BinaryFile tsf(m_tilesetPath.c_str(), "wb");
+    BinaryFile tsf(m_tilesetPath, "wb");
     if (!tsf.is_open()) {
         printf("ERROR: couldn't open tileset file to save tile types: %s\n", m_tilesetPath.c_str());
         return;

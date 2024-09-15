@@ -569,7 +569,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     cout << " ...";
     */
 
-    BinaryFile mapfile(file.c_str(), "rb");
+    BinaryFile mapfile(file, "rb");
     if (!mapfile.is_open()) {
         cout << endl << " ERROR: Couldn't open map" << endl;
         return;
@@ -698,7 +698,7 @@ void CMap::saveMap(const std::string& file)
 
     cout << "saving map " << file << " ... ";
 
-    BinaryFile mapfile(file.c_str(), "wb");
+    BinaryFile mapfile(file, "wb");
     if (!mapfile.is_open()) {
         cout << endl << " ERROR: couldn't save map" << endl;
         return;

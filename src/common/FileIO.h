@@ -1,16 +1,17 @@
-#ifndef FILEIO_H
-#define FILEIO_H
+#pragma once
 
 #include <stdio.h>
 #include <stdint.h>
 #include <string>
 
+
 class BinaryFile {
 public:
-    BinaryFile(const char* filename, const char* options);
+    BinaryFile(const char* path, const char* options);
+    BinaryFile(const std::string& path, const char* options);
     ~BinaryFile();
 
-    bool is_open();
+    bool is_open() const { return fp; };
     void rewind();
 
     void write_i8(int8_t);
@@ -38,10 +39,8 @@ public:
     void read_raw(void*, size_t);
 
 private:
-    FILE* fp;
+    FILE* fp = nullptr;
 
     void fread_or_exception(void*, size_t, size_t);
     void fwrite_or_exception(const void*, size_t, size_t);
 };
-
-#endif // FILEIO_H

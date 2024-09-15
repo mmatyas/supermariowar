@@ -498,7 +498,7 @@ int main(int argc, char *argv[])
     int saved_col = 0, saved_row = 0;
     {
         const std::string options_path(GetHomeDirectory() + "worldeditor.bin");
-        BinaryFile editor_settings(options_path.c_str(), "rb");
+        BinaryFile editor_settings(options_path, "rb");
         if (editor_settings.is_open()) {
             saved_col = editor_settings.read_i32();
             saved_row = editor_settings.read_i32();
@@ -1061,7 +1061,7 @@ int main(int argc, char *argv[])
 
     {
         const std::string options_path(GetHomeDirectory() + "worldeditor.bin");
-        BinaryFile editor_settings(options_path.c_str(), "wb");
+        BinaryFile editor_settings(options_path, "wb");
         if (editor_settings.is_open()) {
             editor_settings.write_i32(draw_offset_col);
             editor_settings.write_i32(draw_offset_row);

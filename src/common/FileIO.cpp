@@ -7,11 +7,14 @@
 #include <stdexcept>
 #include <vector>
 
-BinaryFile::BinaryFile(const char* filename, const char* options)
-    : fp(NULL)
+BinaryFile::BinaryFile(const char* path, const char* options)
 {
-    fp = fopen(filename, options);
+    fp = fopen(path, options);
 }
+
+BinaryFile::BinaryFile(const std::string& path, const char* options)
+    : BinaryFile(path.c_str(), options)
+{}
 
 BinaryFile::~BinaryFile()
 {
@@ -29,11 +32,6 @@ void BinaryFile::fwrite_or_exception(const void* ptr, size_t size, size_t count)
 {
     if (fwrite(ptr, size, count, fp) != count)
         throw std::runtime_error("File write error");
-}
-
-bool BinaryFile::is_open()
-{
-    return fp;
 }
 
 void BinaryFile::rewind()

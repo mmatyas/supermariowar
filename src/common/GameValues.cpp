@@ -293,7 +293,7 @@ void CGameValues::resetSecretCounters()
 void CGameConfig::ReadBinaryConfig() {
     try {
         std::string options_path(GetHomeDirectory() + "options.bin");
-        BinaryFile options(options_path.c_str(), "rb");
+        BinaryFile options(options_path, "rb");
         if (!options.is_open())
             throw std::runtime_error("Could not open " + options_path);
 
@@ -412,7 +412,7 @@ void CGameConfig::ReadBinaryConfig() {
 #else
         std::string controls_path(GetHomeDirectory() + "controls.sdl.bin");
 #endif
-        BinaryFile controls(controls_path.c_str(), "rb");
+        BinaryFile controls(controls_path, "rb");
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);
 
@@ -442,7 +442,7 @@ void CGameConfig::WriteConfig() const
 {
     try {
         std::string options_path(GetHomeDirectory() + "options.bin");
-        BinaryFile options(options_path.c_str(), "wb");
+        BinaryFile options(options_path, "wb");
         if (!options.is_open())
             throw std::runtime_error("Could not open " + options_path);
 
@@ -548,7 +548,7 @@ void CGameConfig::WriteConfig() const
 #else
         std::string controls_path(GetHomeDirectory() + "controls.sdl.bin");
 #endif
-        BinaryFile controls(controls_path.c_str(), "wb");
+        BinaryFile controls(controls_path, "wb");
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);
 
