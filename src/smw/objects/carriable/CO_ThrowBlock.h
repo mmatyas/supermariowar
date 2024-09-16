@@ -9,7 +9,7 @@ class Spotlight;
 
 class CO_ThrowBlock : public MO_CarriedObject {
 public:
-    CO_ThrowBlock(gfxSprite* nspr, short x, short y, ThrowBlockType type);
+    CO_ThrowBlock(gfxSprite* nspr, Vec2s pos, ThrowBlockType type);
 
     void update() override;
     void draw() override;

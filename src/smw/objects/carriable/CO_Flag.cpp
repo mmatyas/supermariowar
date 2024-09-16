@@ -14,7 +14,7 @@ extern CResourceManager* rm;
 // class flag (for Capture the Flag mode)
 //------------------------------------------------------------------------------
 CO_Flag::CO_Flag(gfxSprite* nspr, MO_FlagBase* base, short iTeamID, short iColorID)
-    : MO_CarriedObject(nspr, 0, 0, 4, 8, 30, 30, 1, 1, 0, iColorID << 6, 32, 32)
+    : MO_CarriedObject(nspr, Vec2s::zero(), 4, 8, 30, 30, 1, 1, 0, iColorID << 6, 32, 32)
 {
     state = 1;
     movingObjectType = movingobject_flag;

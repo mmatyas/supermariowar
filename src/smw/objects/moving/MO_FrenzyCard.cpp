@@ -45,25 +45,25 @@ bool MO_FrenzyCard::collide(CPlayer* player)
     } else {
         switch (type) {
         case 14: {
-            CO_Shell* shell = new CO_Shell(ShellType::Green, 0, 0, true, true, true, false);
+            CO_Shell* shell = new CO_Shell(ShellType::Green, Vec2s::zero(), true, true, true, false);
             if (objectcontainer[1].add(shell))
                 shell->UsedAsStoredPowerup(player);
             break;
         }
         case 15: {
-            CO_Shell* shell = new CO_Shell(ShellType::Red, 0, 0, false, true, true, false);
+            CO_Shell* shell = new CO_Shell(ShellType::Red, Vec2s::zero(), false, true, true, false);
             if (objectcontainer[1].add(shell))
                 shell->UsedAsStoredPowerup(player);
             break;
         }
         case 16: {
-            CO_Shell* shell = new CO_Shell(ShellType::Spiny, 0, 0, false, false, true, true);
+            CO_Shell* shell = new CO_Shell(ShellType::Spiny, Vec2s::zero(), false, false, true, true);
             if (objectcontainer[1].add(shell))
                 shell->UsedAsStoredPowerup(player);
             break;
         }
         case 17: {
-            CO_Shell* shell = new CO_Shell(ShellType::Buzzy, 0, 0, false, true, false, false);
+            CO_Shell* shell = new CO_Shell(ShellType::Buzzy, Vec2s::zero(), false, true, false, false);
             if (objectcontainer[1].add(shell))
                 shell->UsedAsStoredPowerup(player);
             break;

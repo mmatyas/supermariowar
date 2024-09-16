@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class throwable box - can be used as a shield, thrown at a player, or holds items
 //------------------------------------------------------------------------------
-CO_ThrowBox::CO_ThrowBox(gfxSprite* nspr, short x, short y, short item)
-    : MO_CarriedObject(nspr, x, y, 4, 8, 30, 30, 1, 1)
+CO_ThrowBox::CO_ThrowBox(gfxSprite* nspr, Vec2s pos, short item)
+    : MO_CarriedObject(nspr, pos, 4, 8, 30, 30, 1, 1)
 {
     state = 1;
     ih = 32;

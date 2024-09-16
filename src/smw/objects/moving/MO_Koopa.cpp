@@ -91,12 +91,9 @@ void MO_Koopa::Die()
 void MO_Koopa::DropShell(bool fBounce, bool fFlip)
 {
     // Give the shell a state 2 so it is already spawned but sitting
-    CO_Shell* shell;
-
-    if (fRed)
-        shell = new CO_Shell(ShellType::Red, ix - 1, iy + 8, false, true, true, false);
-    else
-        shell = new CO_Shell(ShellType::Green, ix - 1, iy + 8, true, true, true, false);
+    const Vec2s pos(ix - 1, iy + 8);
+    const ShellType type = fRed ? ShellType::Red : ShellType::Green;
+    CO_Shell* shell = new CO_Shell(type, pos, false, true, true, false);
 
     shell->nospawn(iy + 8, fBounce);
 

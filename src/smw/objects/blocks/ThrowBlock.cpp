@@ -114,7 +114,7 @@ bool B_ThrowBlock::hitleft(CPlayer * player, bool useBehavior)
 
 void B_ThrowBlock::GiveBlockToPlayer(CPlayer * player)
 {
-    CO_ThrowBlock * block = new CO_ThrowBlock(&rm->spr_blueblock, ix, iy, iType);
+    CO_ThrowBlock * block = new CO_ThrowBlock(&rm->spr_blueblock, {ix, iy}, iType);
     if (player->AcceptItem(block)) {
         dead = true;
         g_map->blockdata[col][row] = NULL;

@@ -16,8 +16,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class bomb
 //------------------------------------------------------------------------------
-CO_Bomb::CO_Bomb(gfxSprite* nspr, short x, short y, float fVelX, float fVelY, short aniSpeed, short iGlobalID, short teamID, short iColorID, short timetolive)
-    : MO_CarriedObject(nspr, x, y, 5, aniSpeed, 24, 24, 4, 13)
+CO_Bomb::CO_Bomb(gfxSprite* nspr, Vec2s pos, Vec2f vel, short aniSpeed, short iGlobalID, short teamID, short iColorID, short timetolive)
+    : MO_CarriedObject(nspr, pos, 5, aniSpeed, 24, 24, 4, 13)
 {
     iw = 28;
     ih = 38;
@@ -31,8 +31,8 @@ CO_Bomb::CO_Bomb(gfxSprite* nspr, short x, short y, float fVelX, float fVelY, sh
 
     ttl = timetolive;
 
-    velx = fVelX;
-    vely = fVelY;
+    velx = vel.x;
+    vely = vel.y;
 
     iOwnerRightOffset = 14;
     iOwnerLeftOffset = -16;

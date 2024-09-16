@@ -60,10 +60,10 @@ IO_MovingObject* spawnRegularPowerup(PowerupType type, Vec2s spawnPos, bool move
         case PowerupType::Pow: return new PU_PowPowerup(&rm->spr_powpowerup, spawnPos, 8, movesRight, 8, 30, 30, 1, 1);
         case PowerupType::BulletBill: return new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);
         case PowerupType::Hammer: return new PU_HammerPowerup(&rm->spr_hammerpowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);
-        case PowerupType::ShellGreen: return new CO_Shell(ShellType::Green, spawnPos.x, spawnPos.y, true, true, true, false);
-        case PowerupType::ShellRed: return new CO_Shell(ShellType::Red, spawnPos.x, spawnPos.y, false, true, true, false);
-        case PowerupType::ShellSpiny: return new CO_Shell(ShellType::Spiny, spawnPos.x, spawnPos.y, false, false, true, true);
-        case PowerupType::ShellBuzzy: return new CO_Shell(ShellType::Buzzy, spawnPos.x, spawnPos.y, false, true, false, false);
+        case PowerupType::ShellGreen: return new CO_Shell(ShellType::Green, spawnPos, true, true, true, false);
+        case PowerupType::ShellRed: return new CO_Shell(ShellType::Red, spawnPos, false, true, true, false);
+        case PowerupType::ShellSpiny: return new CO_Shell(ShellType::Spiny, spawnPos, false, false, true, true);
+        case PowerupType::ShellBuzzy: return new CO_Shell(ShellType::Buzzy, spawnPos, false, true, false, false);
         case PowerupType::Mod: return new PU_ModPowerup(&rm->spr_modpowerup, spawnPos, 8, movesRight, 8, 30, 30, 1, 1);
         case PowerupType::Feather: return new PU_FeatherPowerup(&rm->spr_featherpowerup, spawnPos, 1, 0, 30, 30, 1, 1);
         case PowerupType::MysteryMushroom: return new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);

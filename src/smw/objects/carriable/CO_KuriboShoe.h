@@ -4,7 +4,7 @@
 
 class CO_KuriboShoe : public CO_Spring {
 public:
-    CO_KuriboShoe(gfxSprite* nspr, short ix, short iy, bool fSticky);
+    CO_KuriboShoe(gfxSprite* nspr, Vec2s pos, bool fSticky);
 
 private:
     void hittop(CPlayer* player);

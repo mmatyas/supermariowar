@@ -4,7 +4,7 @@
 
 class CO_Spike : public CO_Spring {
 public:
-    CO_Spike(gfxSprite* nspr, short ix, short iy);
+    CO_Spike(gfxSprite* nspr, Vec2s pos);
 
 private:
     void hittop(CPlayer* player);

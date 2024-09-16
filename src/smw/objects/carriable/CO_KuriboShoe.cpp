@@ -11,8 +11,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class kuribo's shoe
 //------------------------------------------------------------------------------
-CO_KuriboShoe::CO_KuriboShoe(gfxSprite* nspr, short iX, short iY, bool sticky)
-    : CO_Spring(nspr, iX, iY + 15, false)
+CO_KuriboShoe::CO_KuriboShoe(gfxSprite* nspr, Vec2s pos, bool sticky)
+    : CO_Spring(nspr, pos + Vec2s(0, 15), false)
 {
     iw = 32;
     ih = 32;

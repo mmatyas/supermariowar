@@ -11,7 +11,7 @@ extern CResourceManager* rm;
 // class phanto key (for chase mode)
 //------------------------------------------------------------------------------
 CO_PhantoKey::CO_PhantoKey(gfxSprite* nspr)
-    : MO_CarriedObject(nspr, 0, 0, 1, 0, 30, 30, 1, 1, 0, 0, 32, 32)
+    : MO_CarriedObject(nspr, Vec2s::zero(), 1, 0, 30, 30, 1, 1, 0, 0, 32, 32)
 {
     state = 1;
     movingObjectType = movingobject_phantokey;

@@ -16,8 +16,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // State 1: Moving
 // State 2: Holding
-CO_ThrowBlock::CO_ThrowBlock(gfxSprite* nspr, short x, short y, ThrowBlockType type)
-    : MO_CarriedObject(nspr, x, y, 4, 2, 30, 30, 1, 1)
+CO_ThrowBlock::CO_ThrowBlock(gfxSprite* nspr, Vec2s pos, ThrowBlockType type)
+    : MO_CarriedObject(nspr, pos, 4, 2, 30, 30, 1, 1)
 {
     state = 2;
     ih = 32;

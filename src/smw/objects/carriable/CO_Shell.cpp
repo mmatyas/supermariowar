@@ -24,8 +24,8 @@ extern CResourceManager* rm;
 // state 1: Shell is moving
 // state 2: Shell is waiting to be picked up
 // state 3: Shell is being held
-CO_Shell::CO_Shell(ShellType type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer)
-    : MO_CarriedObject(&rm->spr_shell, x, y, 4, 4, 30, 20, 1, 11, 0, static_cast<int>(type) * 32, 32, 32)
+CO_Shell::CO_Shell(ShellType type, Vec2s pos, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer)
+    : MO_CarriedObject(&rm->spr_shell, pos, 4, 4, 30, 20, 1, 11, 0, static_cast<int>(type) * 32, 32, 32)
 {
     iShellType = type;
 

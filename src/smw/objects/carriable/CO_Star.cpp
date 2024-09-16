@@ -12,7 +12,7 @@ extern CResourceManager* rm;
 // class star (for star mode)
 //------------------------------------------------------------------------------
 CO_Star::CO_Star(gfxSprite* nspr, short type, short id)
-    : MO_CarriedObject(nspr, 0, 0, 8, 8, 30, 30, 1, 1)
+    : MO_CarriedObject(nspr, Vec2s::zero(), 8, 8, 30, 30, 1, 1)
 {
     iID = id;
 

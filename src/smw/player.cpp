@@ -763,25 +763,25 @@ void CPlayer::triggerPowerup()
         break;
     }
     case PowerupType::ShellGreen: {
-        CO_Shell * shell = new CO_Shell(ShellType::Green, 0, 0, true, true, true, false);
+        CO_Shell * shell = new CO_Shell(ShellType::Green, Vec2s::zero(), true, true, true, false);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
     case PowerupType::ShellRed: {
-        CO_Shell * shell = new CO_Shell(ShellType::Red, 0, 0, false, true, true, false);
+        CO_Shell * shell = new CO_Shell(ShellType::Red, Vec2s::zero(), false, true, true, false);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
     case PowerupType::ShellSpiny: {
-        CO_Shell * shell = new CO_Shell(ShellType::Spiny, 0, 0, false, false, true, true);
+        CO_Shell * shell = new CO_Shell(ShellType::Spiny, Vec2s::zero(), false, false, true, true);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
     case PowerupType::ShellBuzzy: {
-        CO_Shell * shell = new CO_Shell(ShellType::Buzzy, 0, 0, false, true, false, false);
+        CO_Shell * shell = new CO_Shell(ShellType::Buzzy, Vec2s::zero(), false, true, false, false);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
@@ -1417,7 +1417,7 @@ void CPlayer::CommitAction()
         if (game_values.wandlimit > 0)
             DecreaseProjectileLimit();
     } else if (PlayerAction::Bomb == action) {
-        CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, ix + HALFPW - 14, iy - 8, isFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, RANDOM_INT(120) + 120);
+        CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, {ix + HALFPW - 14, iy - 8}, {isFacingRight() ? 3.0f : -3.0f, -3.0f}, 4, globalID, teamID, colorID, RANDOM_INT(120) + 120);
 
         if (AcceptItem(bomb)) {
             bomb->owner = this;
@@ -1671,7 +1671,7 @@ void CPlayer::die(PlayerDeathStyle deathStyle, bool fTeamRemoved, bool fKillCarr
 
     //Drop a shoe item if the player died in one
     if (kuriboshoe.is_on()) {
-        CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET, kuriboshoe.getType() == STICKY);
+        CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, {ix - PWOFFSET, iy - PHOFFSET}, kuriboshoe.getType() == STICKY);
         shoe->collision_detection_checksides();
 
         objectcontainer[1].add(shoe);

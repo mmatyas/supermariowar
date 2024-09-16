@@ -16,7 +16,7 @@ extern CResourceManager* rm;
 // class egg (for egg mode)
 //------------------------------------------------------------------------------
 CO_Egg::CO_Egg(gfxSprite* nspr, short iColor)
-    : MO_CarriedObject(nspr, 0, 0, 2, 16, 28, 30, 2, 1, 0, iColor << 5, 32, 32)
+    : MO_CarriedObject(nspr, Vec2s::zero(), 2, 16, 28, 30, 2, 1, 0, iColor << 5, 32, 32)
 {
     state = 1;
     movingObjectType = movingobject_egg;

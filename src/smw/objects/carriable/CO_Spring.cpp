@@ -11,8 +11,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class spring
 //------------------------------------------------------------------------------
-CO_Spring::CO_Spring(gfxSprite* nspr, short iX, short iY, bool fsuper)
-    : MO_CarriedObject(nspr, iX, iY, 4, 4, 30, 31, 1, 0)
+CO_Spring::CO_Spring(gfxSprite* nspr, Vec2s pos, bool fsuper)
+    : MO_CarriedObject(nspr, pos, 4, 4, 30, 31, 1, 0)
 {
     fSuper = fsuper;
     iOffsetY = fSuper ? 32 : 0;

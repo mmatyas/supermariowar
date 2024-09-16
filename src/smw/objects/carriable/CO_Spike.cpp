@@ -5,8 +5,8 @@
 //------------------------------------------------------------------------------
 // class spike
 //------------------------------------------------------------------------------
-CO_Spike::CO_Spike(gfxSprite* nspr, short iX, short iY)
-    : CO_Spring(nspr, iX, iY, false)
+CO_Spike::CO_Spike(gfxSprite* nspr, Vec2s pos)
+    : CO_Spring(nspr, pos, false)
 {
     iw = 32;
     ih = 32;

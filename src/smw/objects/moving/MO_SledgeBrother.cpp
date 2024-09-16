@@ -351,7 +351,7 @@ void MO_SledgeBrother::throwprojectile()
     } else if (iType == 1) {
         float fBombVelX = ((float)(RANDOM_INT(5) + 12)) / 2.0f - (face_right ? 0.0f : 14.0f);
         float fBombVelY = -(float)(RANDOM_INT(13)) / 2.0f - 6.0f;
-        objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, face_right ? ix + iw - 32 : ix - 20, iy, fBombVelX, fBombVelY, 4, -1, -1, -1, RANDOM_INT(60) + 120));
+        objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, {face_right ? ix + iw - 32 : ix - 20, iy}, {fBombVelX, fBombVelY}, 4, -1, -1, -1, RANDOM_INT(60) + 120));
     } else if (iType == 2) {
         float fFireVelX = ((float)(RANDOM_INT(9) + 6)) / 2.0f - (face_right ? 0.0f : 10.0f);
         float fFireVelY = (float)(RANDOM_INT(17)) / 2.0f - 4.0f;
