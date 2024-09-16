@@ -99,8 +99,6 @@ target_sources(smw PRIVATE
 	moving/MO_Yoshi.h
 	moving/MovingObject.cpp
 	moving/MovingObject.h
-	moving/Powerup.cpp
-	moving/Powerup.h
 
 	overmap/OverMapObject.cpp
 	overmap/OverMapObject.h
@@ -125,6 +123,8 @@ target_sources(smw PRIVATE
 	overmap/WO_Thwomp.cpp
 	overmap/WO_Thwomp.h
 
+	powerup/Powerup.cpp
+	powerup/Powerup.h
 	powerup/PU_BobombPowerup.cpp
 	powerup/PU_BobombPowerup.h
 	powerup/PU_BombPowerup.cpp

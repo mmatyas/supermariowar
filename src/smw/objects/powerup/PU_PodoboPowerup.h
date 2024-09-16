@@ -1,6 +1,6 @@
 #pragma once
 
-#include "objects/moving/Powerup.h"
+#include "objects/powerup/Powerup.h"
 
 class CPlayer;
 class gfxSprite;
