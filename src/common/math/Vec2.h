@@ -9,6 +9,15 @@ struct Vec2 {
     constexpr explicit Vec2() = default;
     constexpr Vec2(T inX, T inY) : x(inX), y(inY) {}
 
+#ifdef _MSC_VER
+    // MSVC has skill issues
+    template<typename U1, typename U2>
+    constexpr Vec2(U1 inX, U2 inY)
+        : x(static_cast<T>(inX))
+        , y(static_cast<T>(inY))
+    {}
+#endif
+
     static constexpr Vec2 zero() {
         return Vec2();
     }
