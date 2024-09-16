@@ -8,7 +8,7 @@ class gfxSprite;
 
 class PU_Tanooki : public MO_Powerup {
 public:
-    PU_Tanooki(short x, short y);
+    PU_Tanooki(Vec2s pos);
 
     bool collide(CPlayer* player) override;
 };

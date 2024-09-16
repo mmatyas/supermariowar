@@ -8,7 +8,7 @@ class gfxSprite;
 
 class PU_JailKeyPowerup : public MO_Powerup {
 public:
-    PU_JailKeyPowerup(gfxSprite* nspr, short x, short y);
+    PU_JailKeyPowerup(gfxSprite* nspr, Vec2s pos);
 
     bool collide(CPlayer* player) override;
 };

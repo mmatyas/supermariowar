@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math/Vec2.h"
+
 #include <array>
 
 class gfxSprite;

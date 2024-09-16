@@ -6,8 +6,8 @@
 //------------------------------------------------------------------------------
 // class powerup
 //------------------------------------------------------------------------------
-MO_Powerup::MO_Powerup(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
-    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+MO_Powerup::MO_Powerup(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
+    : IO_MovingObject(nspr, pos.x, pos.y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
     desty = fy - collisionHeight;
     movingObjectType = movingobject_powerup;

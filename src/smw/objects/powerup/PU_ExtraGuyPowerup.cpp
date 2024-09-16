@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class 1up powerup
 //------------------------------------------------------------------------------
-PU_ExtraGuyPowerup::PU_ExtraGuyPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short type)
-    : MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_ExtraGuyPowerup::PU_ExtraGuyPowerup(gfxSprite* nspr, Vec2s pos, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short type)
+    : MO_Powerup(nspr, pos, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
     , iType(type)
 {
     if (moveToRight)

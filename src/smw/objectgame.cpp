@@ -45,46 +45,46 @@ extern CResourceManager* rm;
 
 
 namespace {
-IO_MovingObject* spawnRegularPowerup(PowerupType type, short spawnX, short spawnY, bool movesRight)
+IO_MovingObject* spawnRegularPowerup(PowerupType type, Vec2s spawnPos, bool movesRight)
 {
     switch (type) {
-        case PowerupType::PoisonMushroom: return new PU_PoisonPowerup(&rm->spr_poisonpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
-        case PowerupType::ExtraLife1: return new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1, 1);
-        case PowerupType::ExtraLife2: return new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1, 2);
-        case PowerupType::ExtraLife3: return new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1, 3);
-        case PowerupType::ExtraLife5: return new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1, 5);
-        case PowerupType::Fire: return new PU_FirePowerup(&rm->spr_firepowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
-        case PowerupType::Star: return new PU_StarPowerup(&rm->spr_starpowerup, spawnX, spawnY, 4, movesRight, 2, 30, 30, 1, 1);
-        case PowerupType::Clock: return new PU_ClockPowerup(&rm->spr_clockpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
-        case PowerupType::Bobomb: return new PU_BobombPowerup(&rm->spr_bobombpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
-        case PowerupType::Pow: return new PU_PowPowerup(&rm->spr_powpowerup, spawnX, spawnY, 8, movesRight, 8, 30, 30, 1, 1);
-        case PowerupType::BulletBill: return new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
-        case PowerupType::Hammer: return new PU_HammerPowerup(&rm->spr_hammerpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
-        case PowerupType::ShellGreen: return new CO_Shell(ShellType::Green, spawnX, spawnY, true, true, true, false);
-        case PowerupType::ShellRed: return new CO_Shell(ShellType::Red, spawnX, spawnY, false, true, true, false);
-        case PowerupType::ShellSpiny: return new CO_Shell(ShellType::Spiny, spawnX, spawnY, false, false, true, true);
-        case PowerupType::ShellBuzzy: return new CO_Shell(ShellType::Buzzy, spawnX, spawnY, false, true, false, false);
-        case PowerupType::Mod: return new PU_ModPowerup(&rm->spr_modpowerup, spawnX, spawnY, 8, movesRight, 8, 30, 30, 1, 1);
-        case PowerupType::Feather: return new PU_FeatherPowerup(&rm->spr_featherpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
-        case PowerupType::MysteryMushroom: return new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, spawnX, spawnY, 1, movesRight, 0, 30, 30, 1, 1);
-        case PowerupType::Boomerang: return new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, spawnX, spawnY, 1, movesRight, 0, 30, 26, 1, 5);
-        case PowerupType::Tanooki: return new PU_Tanooki(spawnX, spawnY);
-        case PowerupType::IceWand: return new PU_IceWandPowerup(&rm->spr_icewandpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
-        case PowerupType::Podobo: return new PU_PodoboPowerup(&rm->spr_podobopowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
-        case PowerupType::Bomb: return new PU_BombPowerup(&rm->spr_bombpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
-        case PowerupType::Leaf: return new PU_LeafPowerup(&rm->spr_leafpowerup, spawnX, spawnY, 1, 0, 30, 30, 1, 1);
-        case PowerupType::PWings: return new PU_PWingsPowerup(&rm->spr_pwingspowerup, spawnX, spawnY);
-        case PowerupType::JailKey: return new PU_JailKeyPowerup(&rm->spr_jailkeypowerup, spawnX, spawnY);
+        case PowerupType::PoisonMushroom: return new PU_PoisonPowerup(&rm->spr_poisonpowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::ExtraLife1: return new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1, 1);
+        case PowerupType::ExtraLife2: return new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1, 2);
+        case PowerupType::ExtraLife3: return new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1, 3);
+        case PowerupType::ExtraLife5: return new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1, 5);
+        case PowerupType::Fire: return new PU_FirePowerup(&rm->spr_firepowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Star: return new PU_StarPowerup(&rm->spr_starpowerup, spawnPos, 4, movesRight, 2, 30, 30, 1, 1);
+        case PowerupType::Clock: return new PU_ClockPowerup(&rm->spr_clockpowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Bobomb: return new PU_BobombPowerup(&rm->spr_bobombpowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Pow: return new PU_PowPowerup(&rm->spr_powpowerup, spawnPos, 8, movesRight, 8, 30, 30, 1, 1);
+        case PowerupType::BulletBill: return new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Hammer: return new PU_HammerPowerup(&rm->spr_hammerpowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::ShellGreen: return new CO_Shell(ShellType::Green, spawnPos.x, spawnPos.y, true, true, true, false);
+        case PowerupType::ShellRed: return new CO_Shell(ShellType::Red, spawnPos.x, spawnPos.y, false, true, true, false);
+        case PowerupType::ShellSpiny: return new CO_Shell(ShellType::Spiny, spawnPos.x, spawnPos.y, false, false, true, true);
+        case PowerupType::ShellBuzzy: return new CO_Shell(ShellType::Buzzy, spawnPos.x, spawnPos.y, false, true, false, false);
+        case PowerupType::Mod: return new PU_ModPowerup(&rm->spr_modpowerup, spawnPos, 8, movesRight, 8, 30, 30, 1, 1);
+        case PowerupType::Feather: return new PU_FeatherPowerup(&rm->spr_featherpowerup, spawnPos, 1, 0, 30, 30, 1, 1);
+        case PowerupType::MysteryMushroom: return new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, spawnPos, 1, movesRight, 0, 30, 30, 1, 1);
+        case PowerupType::Boomerang: return new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, spawnPos, 1, movesRight, 0, 30, 26, 1, 5);
+        case PowerupType::Tanooki: return new PU_Tanooki(spawnPos);
+        case PowerupType::IceWand: return new PU_IceWandPowerup(&rm->spr_icewandpowerup, spawnPos, 1, 0, 30, 30, 1, 1);
+        case PowerupType::Podobo: return new PU_PodoboPowerup(&rm->spr_podobopowerup, spawnPos, 1, 0, 30, 30, 1, 1);
+        case PowerupType::Bomb: return new PU_BombPowerup(&rm->spr_bombpowerup, spawnPos, 1, 0, 30, 30, 1, 1);
+        case PowerupType::Leaf: return new PU_LeafPowerup(&rm->spr_leafpowerup, spawnPos, 1, 0, 30, 30, 1, 1);
+        case PowerupType::PWings: return new PU_PWingsPowerup(&rm->spr_pwingspowerup, spawnPos);
+        case PowerupType::JailKey: return new PU_JailKeyPowerup(&rm->spr_jailkeypowerup, spawnPos);
     }
     return nullptr;
 }
 
-IO_MovingObject* spawnSpecialPowerup(short type, short spawnX, short spawnY)
+IO_MovingObject* spawnSpecialPowerup(short type, Vec2s spawnPos)
 {
     switch (type) {
-        case HEALTH_POWERUP: return new PU_ExtraHeartPowerup(&rm->spr_extraheartpowerup, spawnX, spawnY);
-        case TIME_POWERUP: return new PU_ExtraTimePowerup(&rm->spr_extratimepowerup, spawnX, spawnY);
-        case JAIL_KEY_POWERUP: return new PU_JailKeyPowerup(&rm->spr_jailkeypowerup, spawnX, spawnY);
+        case HEALTH_POWERUP: return new PU_ExtraHeartPowerup(&rm->spr_extraheartpowerup, spawnPos);
+        case TIME_POWERUP: return new PU_ExtraTimePowerup(&rm->spr_extratimepowerup, spawnPos);
+        case JAIL_KEY_POWERUP: return new PU_JailKeyPowerup(&rm->spr_jailkeypowerup, spawnPos);
         case COIN_POWERUP: {
             short iRandCoin = RANDOM_INT(9);
             CoinColor color = CoinColor::Yellow;
@@ -100,13 +100,13 @@ IO_MovingObject* spawnSpecialPowerup(short type, short spawnX, short spawnY)
             static short iGreedValue[4] = {10, 15, 5, 20};
             const size_t colorIdx = static_cast<size_t>(color);
 
-            return new PU_CoinPowerup(&rm->spr_coin, spawnX, spawnY, color, game_values.gamemode->gamemode == game_mode_greed ? iGreedValue[colorIdx] : iCoinValue[colorIdx]);
+            return new PU_CoinPowerup(&rm->spr_coin, spawnPos, color, game_values.gamemode->gamemode == game_mode_greed ? iGreedValue[colorIdx] : iCoinValue[colorIdx]);
         }
-        case MINIGAME_COIN: return new MO_Coin(&rm->spr_coin, 0.0f, -VELJUMP / 2.0, spawnX, spawnY, 2, -1, 2, 0, false);
-        case SECRET1_POWERUP: return new PU_SecretPowerup(&rm->spr_secret1, spawnX, spawnY, 0);
-        case SECRET2_POWERUP: return new PU_SecretPowerup(&rm->spr_secret2, spawnX, spawnY, 1);
-        case SECRET3_POWERUP: return new PU_SecretPowerup(&rm->spr_secret3, spawnX, spawnY, 2);
-        case SECRET4_POWERUP: return new PU_SecretPowerup(&rm->spr_secret4, spawnX, spawnY, 3);
+        case MINIGAME_COIN: return new MO_Coin(&rm->spr_coin, 0.0f, -VELJUMP / 2.0, spawnPos.x, spawnPos.y, 2, -1, 2, 0, false);
+        case SECRET1_POWERUP: return new PU_SecretPowerup(&rm->spr_secret1, spawnPos, 0);
+        case SECRET2_POWERUP: return new PU_SecretPowerup(&rm->spr_secret2, spawnPos, 1);
+        case SECRET3_POWERUP: return new PU_SecretPowerup(&rm->spr_secret3, spawnPos, 2);
+        case SECRET4_POWERUP: return new PU_SecretPowerup(&rm->spr_secret4, spawnPos, 3);
         default: return nullptr;
     }
 }
@@ -142,18 +142,17 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
     }
 }
 
-IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool spawn)
+IO_MovingObject* createpowerup(short iType, Vec2s pos, bool side, bool spawn)
 {
     MO_Powerup* powerup = nullptr;
     CO_Shell* shell = nullptr;
     PU_FeatherPowerup* feather = nullptr;
     MO_Coin* coin = nullptr;
 
-    const short spawnX = ix + 1;
-    const short spawnY = iy - 1;
+    const Vec2s specialPos = pos + Vec2s(1, -1);
 
     if (iType < 0) {
-        IO_MovingObject* object = spawnSpecialPowerup(iType, spawnX, spawnY);
+        IO_MovingObject* object = spawnSpecialPowerup(iType, specialPos);
         if (iType == MINIGAME_COIN) {
             coin = static_cast<MO_Coin*>(object);
         } else {
@@ -162,7 +161,7 @@ IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool 
     }
     else if (iType < NUM_POWERUPS) {
         const auto powerupType = static_cast<PowerupType>(iType);
-        IO_MovingObject* object = spawnRegularPowerup(powerupType, spawnX, spawnY, side);
+        IO_MovingObject* object = spawnRegularPowerup(powerupType, specialPos, side);
 
         switch (powerupType) {
             case PowerupType::ShellGreen:
@@ -188,7 +187,7 @@ IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool 
     } else if (powerup) {
         if (objectcontainer[0].add(powerup)) {
             if (!spawn) {
-                powerup->nospawn(iy);
+                powerup->nospawn(pos.y);
                 powerup->collision_detection_checksides();
             }
 
@@ -197,7 +196,7 @@ IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool 
     } else if (shell) {
         if (objectcontainer[1].add(shell)) {
             if (!spawn) {
-                shell->nospawn(iy, true);
+                shell->nospawn(pos.y, true);
                 shell->collision_detection_checksides();
             }
 
@@ -206,13 +205,13 @@ IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool 
     } else if (feather) {
         if (objectcontainer[0].add(feather)) {
             if (!spawn)
-                feather->nospawn(iy);
+                feather->nospawn(pos.y);
 
             return feather;
         }
     } else {
         //If no powerups were selected for this block, then fire out a podobo
-        IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, ix + 2, iy, -(float(RANDOM_INT(5)) / 2.0f) - 6.0f, -1, -1, -1, true);
+        IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, pos.x + 2, pos.y, -(float(RANDOM_INT(5)) / 2.0f) - 6.0f, -1, -1, -1, true);
         objectcontainer[2].add(podobo);
         return podobo;
     }
@@ -224,6 +223,9 @@ void CheckSecret(short id)
 {
     if (!game_values.secretsenabled)
         return;
+
+    const Vec2s randomPos(RANDOM_INT(App::screenWidth), RANDOM_INT(App::screenHeight));
+
     if (id == 0 && !game_values.unlocksecretunlocked[0]) {
         short iCountTeams = 0;
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
@@ -235,7 +237,7 @@ void CheckSecret(short id)
             game_values.unlocksecretunlocked[0] = true;
             ifSoundOnPlay(rm->sfx_transform);
 
-            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, RANDOM_INT(App::screenWidth), RANDOM_INT(App::screenHeight), true, false);
+            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, randomPos, true, false);
 
             if (object)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -245,7 +247,7 @@ void CheckSecret(short id)
             game_values.unlocksecretunlocked[1] = true;
             ifSoundOnPlay(rm->sfx_transform);
 
-            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, RANDOM_INT(App::screenWidth), RANDOM_INT(App::screenHeight), true, false);
+            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, randomPos, true, false);
 
             if (object)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -257,7 +259,7 @@ void CheckSecret(short id)
                 game_values.unlocksecretunlocked[2] = true;
                 ifSoundOnPlay(rm->sfx_transform);
 
-                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, RANDOM_INT(App::screenWidth), RANDOM_INT(App::screenHeight), true, false);
+                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, randomPos, true, false);
 
                 if (object)
                     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -267,7 +269,7 @@ void CheckSecret(short id)
         game_values.unlocksecretunlocked[3] = true;
         ifSoundOnPlay(rm->sfx_transform);
 
-        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, RANDOM_INT(App::screenWidth), RANDOM_INT(App::screenHeight), true, false);
+        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, randomPos, true, false);
 
         if (object)
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));

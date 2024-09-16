@@ -12,8 +12,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class special extra coin powerup for coin or greed mode
 //------------------------------------------------------------------------------
-PU_CoinPowerup::PU_CoinPowerup(gfxSprite* nspr, short x, short y, CoinColor color, short value)
-    : MO_Powerup(nspr, x, y, 4, 8, 30, 30, 1, 1)
+PU_CoinPowerup::PU_CoinPowerup(gfxSprite* nspr, Vec2s pos, CoinColor color, short value)
+    : MO_Powerup(nspr, pos, 4, 8, 30, 30, 1, 1)
     , iColorOffsetY(static_cast<int>(color) * 32)
     , iValue(value)
 {

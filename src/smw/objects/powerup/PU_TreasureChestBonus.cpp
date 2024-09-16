@@ -16,7 +16,7 @@ extern CResourceManager* rm;
 // class treasure chest powerup
 //------------------------------------------------------------------------------
 PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite* nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem)
-    : MO_Powerup(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+    : MO_Powerup(nspr, Vec2s::zero(), iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
     , bonusitem(iBonusItem)
 {
     velx = 0.0f;

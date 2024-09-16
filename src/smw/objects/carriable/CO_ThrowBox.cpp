@@ -239,7 +239,7 @@ void CO_ThrowBox::DieHelper()
 
     // Check to see if we should spawn an item here
     if (iItem != NO_POWERUP) {
-        createpowerup(iItem, ix, iy, velx < 0.0f, false);
+        createpowerup(iItem, {ix, iy}, velx < 0.0f, false);
     }
 }
 
