@@ -12,6 +12,7 @@ add_library(CommonFiles STATIC
     FileList.h
     Game.cpp
     Game.h
+    GameMode.h
     GameModeSettings.cpp
     GameModeSettings.h
     GameValues.cpp
