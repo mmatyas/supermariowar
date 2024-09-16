@@ -5,7 +5,7 @@
 
 class IO_BulletBillCannon : public CObject {
 public:
-    IO_BulletBillCannon(short x, short y, short freq, float vel, bool preview);
+    IO_BulletBillCannon(Vec2s pos, short freq, float vel, bool preview);
     ~IO_BulletBillCannon() {}
 
     void draw() {}

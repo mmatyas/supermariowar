@@ -5,7 +5,7 @@
 
 class MO_CollectionCard : public IO_MovingObject {
 public:
-    MO_CollectionCard(gfxSprite* nspr, short iType, short iValue, short iUncollectableTime, float dvelx, float dvely, short ix, short iy);
+    MO_CollectionCard(gfxSprite* nspr, short iType, short iValue, short iUncollectableTime, Vec2f vel, Vec2s pos);
 
     void update() override;
     void draw() override;

@@ -21,8 +21,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 extern SDL_Rect g_rPirhanaRects[4][4][4];
 
-MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short direction, bool preview)
-    : IO_MovingObject(NULL, x, y, 1, 0)
+MO_PirhanaPlant::MO_PirhanaPlant(Vec2s pos, short type, short freq, short direction, bool preview)
+    : IO_MovingObject(NULL, pos, 1, 0)
 {
     iType = type;
     iDirection = direction;

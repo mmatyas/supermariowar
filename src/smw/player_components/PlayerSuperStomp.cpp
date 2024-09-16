@@ -47,8 +47,8 @@ void PlayerSuperStomp::update_onGroundHit(CPlayer &player)
         ifSoundOnPlay(rm->sfx_bobombsound);
         is_stomping = false;
 
-        objectcontainer[1].add(new MO_AttackZone(player.getGlobalID(), player.getTeamID(), player.leftX() - 32, player.topY() + 10, 32, 15, 8, KillStyle::KuriboShoe, false));
-        objectcontainer[1].add(new MO_AttackZone(player.getGlobalID(), player.getTeamID(), player.rightX(), player.topY() + 10, 32, 15, 8, KillStyle::KuriboShoe, false));
+        objectcontainer[1].add(new MO_AttackZone(player.getGlobalID(), player.getTeamID(), {player.leftX() - 32, player.topY() + 10}, {32, 15}, 8, KillStyle::KuriboShoe, false));
+        objectcontainer[1].add(new MO_AttackZone(player.getGlobalID(), player.getTeamID(), {player.rightX(), player.topY() + 10}, {32, 15}, 8, KillStyle::KuriboShoe, false));
     }
 }
 

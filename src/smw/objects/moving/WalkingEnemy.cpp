@@ -26,7 +26,7 @@ extern CResourceManager* rm;
 // class walking enemy (base class for goomba and koopa)
 //------------------------------------------------------------------------------
 MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite* nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool bouncing, bool fallOffLedges)
-    : IO_MovingObject(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
+    : IO_MovingObject(nspr, Vec2s::zero(), iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
 {
     if (moveToRight)
         velx = 1.0f;

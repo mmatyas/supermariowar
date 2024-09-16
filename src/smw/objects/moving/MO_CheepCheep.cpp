@@ -20,7 +20,7 @@ extern CResourceManager* rm;
 // class cheep cheep
 //------------------------------------------------------------------------------
 MO_CheepCheep::MO_CheepCheep(gfxSprite* nspr)
-    : IO_MovingObject(nspr, 0, App::screenHeight, 2, 8, 30, 28, 1, 3)
+    : IO_MovingObject(nspr, {0, App::screenHeight}, 2, 8, 30, 28, 1, 3)
 {
     ih = 32;
     setXi((short)(RANDOM_INT(608)));

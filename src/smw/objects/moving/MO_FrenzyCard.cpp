@@ -20,7 +20,7 @@ extern CResourceManager* rm;
 // class frenzycard (for fire frenzy mode)
 //------------------------------------------------------------------------------
 MO_FrenzyCard::MO_FrenzyCard(gfxSprite* nspr, short iType)
-    : IO_MovingObject(nspr, 0, 0, 12, 8, -1, -1, -1, -1, 0, iType * 32, 32, 32)
+    : IO_MovingObject(nspr, Vec2s::zero(), 12, 8, -1, -1, -1, -1, 0, iType * 32, 32, 32)
 {
     state = 1;
     objectType = object_frenzycard;

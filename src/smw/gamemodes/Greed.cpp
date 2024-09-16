@@ -112,16 +112,14 @@ PlayerKillType CGM_Greed::ReleaseCoins(CPlayer &player, KillStyle style)
         player.Score().AdjustScore(-iDamage);
     }
 
-    short ix = player.centerX() - 16;
-    short iy = player.centerY() - 16;
+    const Vec2s pos(player.centerX() - 16, player.centerY() - 16);
 
     for (short k = 0; k < iDamage; k++) {
-        float vel = 7.0f + ((float)RANDOM_INT(9)) / 2.0f;
+        float speed = 7.0f + ((float)RANDOM_INT(9)) / 2.0f;
         float angle = -((float)RANDOM_INT(314)) / 100.0f;
-        float velx = vel * cos(angle);
-        float vely = vel * sin(angle);
+        Vec2f vel(speed * cos(angle), speed * sin(angle));
 
-        objectcontainer[1].add(new MO_Coin(&rm->spr_coin, velx, vely, ix, iy, player.getColorID(), player.getTeamID(), 1, 30, false));
+        objectcontainer[1].add(new MO_Coin(&rm->spr_coin, vel, pos, player.getColorID(), player.getTeamID(), 1, 30, false));
     }
 
     //Play warning sound if game is almost over

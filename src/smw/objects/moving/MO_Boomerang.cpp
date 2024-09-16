@@ -18,8 +18,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class boomerang
 //------------------------------------------------------------------------------
-MO_Boomerang::MO_Boomerang(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short teamID, short iColorID)
-    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 3, 0, 0)
+MO_Boomerang::MO_Boomerang(gfxSprite* nspr, Vec2s pos, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short teamID, short iColorID)
+    : IO_MovingObject(nspr, pos, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 3, 0, 0)
 {
     // boomerangs sprites have both right and left sprites in them
     ih = ih >> 3;

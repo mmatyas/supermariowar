@@ -10,8 +10,8 @@ extern CGameValues game_values;
 //------------------------------------------------------------------------------
 // class Ice Blast
 //------------------------------------------------------------------------------
-MO_IceBlast::MO_IceBlast(gfxSprite* nspr, short x, short y, float fVelyX, short iGlobalID, short teamID, short iColorID)
-    : IO_MovingObject(nspr, x, y, 4, 8, 32, 32, 0, 0, 0, (iColorID + 1) << 5, 32, 32)
+MO_IceBlast::MO_IceBlast(gfxSprite* nspr, Vec2s pos, float fVelyX, short iGlobalID, short teamID, short iColorID)
+    : IO_MovingObject(nspr, pos, 4, 8, 32, 32, 0, 0, 0, (iColorID + 1) << 5, 32, 32)
 {
     iPlayerID = iGlobalID;
     iTeamID = teamID;

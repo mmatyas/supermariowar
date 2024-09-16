@@ -8,19 +8,18 @@ public:
     IO_FlameCannon(short x, short y, short freq, short direction);
     ~IO_FlameCannon() {}
 
-    void draw();
+    void draw() override;
     void draw(short iOffsetX, short iOffsetY);
-    void update();
+    void update() override;
 
-    bool collide(CPlayer* player);
-    void collide(IO_MovingObject*) {}
+    bool collide(CPlayer* player) override;
+    void collide(IO_MovingObject*) override {};
 
 private:
     void SetNewTimer();
 
     short iFreq, iTimer, iCycle;
-    short iFrame;
-
+    short iFrame = 0;
     short iDirection;
 
     friend class CPlayerAI;

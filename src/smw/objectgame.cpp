@@ -102,7 +102,7 @@ IO_MovingObject* spawnSpecialPowerup(short type, Vec2s spawnPos)
 
             return new PU_CoinPowerup(&rm->spr_coin, spawnPos, color, game_values.gamemode->gamemode == game_mode_greed ? iGreedValue[colorIdx] : iCoinValue[colorIdx]);
         }
-        case MINIGAME_COIN: return new MO_Coin(&rm->spr_coin, 0.0f, -VELJUMP / 2.0, spawnPos.x, spawnPos.y, 2, -1, 2, 0, false);
+        case MINIGAME_COIN: return new MO_Coin(&rm->spr_coin, {0.0f, -VELJUMP / 2.0}, spawnPos, 2, -1, 2, 0, false);
         case SECRET1_POWERUP: return new PU_SecretPowerup(&rm->spr_secret1, spawnPos, 0);
         case SECRET2_POWERUP: return new PU_SecretPowerup(&rm->spr_secret2, spawnPos, 1);
         case SECRET3_POWERUP: return new PU_SecretPowerup(&rm->spr_secret3, spawnPos, 2);
@@ -211,7 +211,7 @@ IO_MovingObject* createpowerup(short iType, Vec2s pos, bool side, bool spawn)
         }
     } else {
         //If no powerups were selected for this block, then fire out a podobo
-        IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, pos.x + 2, pos.y, -(float(RANDOM_INT(5)) / 2.0f) - 6.0f, -1, -1, -1, true);
+        IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, {pos.x + 2, pos.y}, -(float(RANDOM_INT(5)) / 2.0f) - 6.0f, -1, -1, -1, true);
         objectcontainer[2].add(podobo);
         return podobo;
     }

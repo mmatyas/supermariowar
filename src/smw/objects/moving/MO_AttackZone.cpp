@@ -15,8 +15,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // attack zone(invisible area that kills objects and players)
 //------------------------------------------------------------------------------
-MO_AttackZone::MO_AttackZone(short playerId, short teamId, short x, short y, short w, short h, short time, KillStyle style, bool dieoncollision)
-    : IO_MovingObject(NULL, x, y, 1, 0, w, h, 0, 0)
+MO_AttackZone::MO_AttackZone(short playerId, short teamId, Vec2s pos, Vec2s size, short time, KillStyle style, bool dieoncollision)
+    : IO_MovingObject(NULL, pos, 1, 0, size.x, size.y, 0, 0)
 {
     iPlayerID = playerId;
     iTeamID = teamId;

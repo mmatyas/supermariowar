@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class treasure chest powerup
 //------------------------------------------------------------------------------
-MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite* nspr, short iX, short iY, short iBonusItem)
-    : IO_MovingObject(nspr, iX, iY, 1, 0, 64, 64, 0, 0)
+MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite* nspr, Vec2s pos, short iBonusItem)
+    : IO_MovingObject(nspr, pos, 1, 0, 64, 64, 0, 0)
 {
     iw = 64;
     ih = 64;

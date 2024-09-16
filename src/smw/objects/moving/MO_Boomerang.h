@@ -8,7 +8,7 @@ enum class BoomerangStyle : unsigned char;
 
 class MO_Boomerang : public IO_MovingObject {
 public:
-    MO_Boomerang(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID);
+    MO_Boomerang(gfxSprite* nspr, Vec2s pos, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID);
 
     void update() override;
     bool collide(CPlayer* player) override;

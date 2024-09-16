@@ -17,8 +17,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class coin (for coin mode)
 //------------------------------------------------------------------------------
-MO_Coin::MO_Coin(gfxSprite* nspr, float dvelx, float dvely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin)
-    : IO_MovingObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
+MO_Coin::MO_Coin(gfxSprite* nspr, Vec2f vel, Vec2s pos, short color, short team, short type, short uncollectabletime, bool placecoin)
+    : IO_MovingObject(nspr, pos, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
 {
     state = 1;
     objectType = object_moving;
@@ -31,8 +31,8 @@ MO_Coin::MO_Coin(gfxSprite* nspr, float dvelx, float dvely, short ix, short iy, 
     iTeam = team;
 
     iUncollectableTime = uncollectabletime;
-    velx = dvelx;
-    vely = dvely;
+    velx = vel.x;
+    vely = vel.y;
 
     timer = 0;
     if (placecoin) {

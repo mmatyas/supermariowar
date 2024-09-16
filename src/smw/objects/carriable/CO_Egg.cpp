@@ -93,7 +93,7 @@ void CO_Egg::update()
         if (--explosiondrawtimer <= 0) {
             explosiondrawtimer = 62;
             if (--explosiondrawframe < 0) {
-                objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + (iw >> 1) - 96, iy + (ih >> 1) - 64, 2, 4, -1, -1, KillStyle::Bomb));
+                objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, {ix + (iw >> 1) - 96, iy + (ih >> 1) - 64}, 2, 4, -1, -1, KillStyle::Bomb));
                 placeEgg();
 
                 ifSoundOnPlay(rm->sfx_bobombsound);

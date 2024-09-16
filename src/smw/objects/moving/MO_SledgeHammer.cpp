@@ -20,8 +20,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class sledge hammer
 //------------------------------------------------------------------------------
-MO_SledgeHammer::MO_SledgeHammer(gfxSprite* nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer)
-    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() / 5, 0, 0)
+MO_SledgeHammer::MO_SledgeHammer(gfxSprite* nspr, Vec2s pos, short iNumSpr, Vec2f vel, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer)
+    : IO_MovingObject(nspr, pos, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() / 5, 0, 0)
 {
     ih = collisionHeight;
 
@@ -30,8 +30,8 @@ MO_SledgeHammer::MO_SledgeHammer(gfxSprite* nspr, short x, short y, short iNumSp
     colorOffset = (iColorID + 1) * 32;
     movingObjectType = movingobject_sledgehammer;
     state = 1;
-    velx = fVelyX;
-    vely = fVelyY;
+    velx = vel.x;
+    vely = vel.y;
 
     fSuper = superHammer;
 
@@ -89,7 +89,7 @@ bool MO_SledgeHammer::collide(CPlayer* player)
 void MO_SledgeHammer::explode()
 {
     if (fSuper) {
-        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, -1, -1, KillStyle::Hammer));
+        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, {ix + (iw >> 2) - 96, iy + (ih >> 2) - 64}, 2, 4, -1, -1, KillStyle::Hammer));
         ifSoundOnPlay(rm->sfx_bobombsound);
     } else {
         short iCenterX = ix + (iw >> 1) - 14;
@@ -101,7 +101,7 @@ void MO_SledgeHammer::explode()
             float dVel = (float)(RANDOM_INT(5)) / 2.0f + 3.0f;
             float dVelX = dVel * cos(dAngle);
             float dVelY = dVel * sin(dAngle);
-            objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, iCenterX, iCenterY, 6, dVelX, dVelY, 5, playerID, teamID, iColorID, true));
+            objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, {iCenterX, iCenterY}, 6, {dVelX, dVelY}, 5, playerID, teamID, iColorID, true));
         }
 
         CPlayer* player = GetPlayerFromGlobalID(playerID);

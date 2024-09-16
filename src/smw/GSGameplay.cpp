@@ -1579,7 +1579,7 @@ void LoadMapObjects(bool fPreview)
         //If map has less than 5 boxes, then insert coins into map in random locations
         short iExtraCoinsNeeded = 5 - iThrowBoxCount;
         for (short iExtraCoin = 0; iExtraCoin < iExtraCoinsNeeded; iExtraCoin++) {
-            objectcontainer[1].add(new MO_Coin(&rm->spr_coin, 0.0f, 0.0f, 0, 0, 2, -1, 2, 0, true));
+            objectcontainer[1].add(new MO_Coin(&rm->spr_coin, Vec2f::zero(), Vec2s::zero(), 2, -1, 2, 0, true));
         }
     }
 
@@ -1786,7 +1786,7 @@ void updateBulletBillPowerup()
             if (--game_values.bulletbillspawntimer[iPlayer] <= 0) {
                 game_values.bulletbillspawntimer[iPlayer] = (short)(RANDOM_INT(20) + 25);
                 float speed = ((float)(RANDOM_INT(21) + 20)) / 10.0f;
-                objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, 0, (short)(RANDOM_INT(448)), (RANDOM_INT(2) ? speed : -speed), iPlayer, false));
+                objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, {0, (short)(RANDOM_INT(448))}, (RANDOM_INT(2) ? speed : -speed), iPlayer, false));
                 ifSoundOnPlay(rm->sfx_bulletbillsound);
             }
         }

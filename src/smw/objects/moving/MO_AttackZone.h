@@ -6,7 +6,7 @@
 
 class MO_AttackZone : public IO_MovingObject {
 public:
-    MO_AttackZone(short playerID, short teamID, short x, short y, short w, short h, short time, KillStyle style, bool dieoncollision);
+    MO_AttackZone(short playerID, short teamID, Vec2s pos, Vec2s size, short time, KillStyle style, bool dieoncollision);
 
     void update() override;
     void draw() override {}  // This is invisible

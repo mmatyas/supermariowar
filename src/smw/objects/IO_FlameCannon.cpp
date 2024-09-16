@@ -14,12 +14,12 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, short direction)
     : CObject(NULL, x, y)
+    , iFreq(freq)
+    , iDirection(direction)
 {
-    iFreq = freq;
-    state = 0;
-    SetNewTimer();
-
     objectType = object_flamecannon;
+
+    SetNewTimer();
 
     iw = g_rFlameRects[direction][0].w;
     ih = g_rFlameRects[direction][0].h;
@@ -28,10 +28,6 @@ IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, short direction)
     collisionWidth = iw;
     collisionOffsetX = 0;
     collisionOffsetY = 0;
-
-    iDirection = direction;
-
-    iFrame = 0;
 
     if (iDirection == 1) {
         ix -= 64;

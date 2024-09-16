@@ -13,11 +13,11 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class podobo (for survival mode)
 //------------------------------------------------------------------------------
-MO_Podobo::MO_Podobo(gfxSprite* nspr, short x, short y, float dVelY, short playerid, short teamid, short colorid, bool isSpawned)
-    : IO_MovingObject(nspr, x, y, 4, 6)
+MO_Podobo::MO_Podobo(gfxSprite* nspr, Vec2s pos, float dVelY, short playerid, short teamid, short colorid, bool isSpawned)
+    : IO_MovingObject(nspr, pos, 4, 6)
 {
     fIsSpawned = isSpawned;
-    iHiddenPlane = y;
+    iHiddenPlane = pos.y;
 
     objectType = object_moving;
     movingObjectType = movingobject_podobo;

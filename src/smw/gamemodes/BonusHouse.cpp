@@ -66,7 +66,7 @@ void CGM_Bonus::init()
 
     //float dx = 288.0f - (dSpacing * (float)(iNumBonuses - 1) / 2.0f);
     for (short iChest = 0; iChest < iNumBonuses; iChest++) {
-        objectcontainer[0].add(new MO_BonusHouseChest(&rm->spr_worldbonushouse, (short)dx, 384, tsTourStop->wsbBonuses[iChestOrder[iChest]].iBonus));
+        objectcontainer[0].add(new MO_BonusHouseChest(&rm->spr_worldbonushouse, {(short)dx, 384}, tsTourStop->wsbBonuses[iChestOrder[iChest]].iBonus));
         dx += dSpacing + 64.0f;
     }
 }

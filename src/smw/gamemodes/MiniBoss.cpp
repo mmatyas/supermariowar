@@ -71,7 +71,7 @@ void CGM_Boss_MiniGame::think()
         } else if (iBossType == Boss::Fire) {
             //Only create podobos if the difficulty is moderate or greater
             if (--enemytimer <= 0 && game_values.gamemodesettings.boss.difficulty >= 2) {
-                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, {(short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight}, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 enemytimer = (short)(RANDOM_INT(80) + 60);
             }
 

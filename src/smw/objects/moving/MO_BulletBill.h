@@ -5,7 +5,7 @@
 
 class MO_BulletBill : public IO_MovingObject {
 public:
-    MO_BulletBill(gfxSprite* nspr, gfxSprite* nsprdead, short x, short y, float nspeed, short playerID, bool isspawned);
+    MO_BulletBill(gfxSprite* nspr, gfxSprite* nsprdead, Vec2s pos, float nspeed, short playerID, bool isspawned);
     ~MO_BulletBill() {};
 
     void update();

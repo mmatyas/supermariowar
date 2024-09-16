@@ -17,7 +17,7 @@ extern CResourceManager* rm;
 // class yoshi (for egg mode)
 //------------------------------------------------------------------------------
 MO_Yoshi::MO_Yoshi(gfxSprite* nspr, short iColor)
-    : IO_MovingObject(nspr, 0, 0, 2, 8, 52, 56, 0, 0, 0, iColor * 56, 56, 52)
+    : IO_MovingObject(nspr, Vec2s::zero(), 2, 8, 52, 56, 0, 0, 0, iColor * 56, 56, 52)
 {
     objectType = object_moving;
     movingObjectType = movingobject_yoshi;

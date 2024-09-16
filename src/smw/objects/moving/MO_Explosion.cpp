@@ -13,8 +13,8 @@ extern CGameValues game_values;
 //------------------------------------------------------------------------------
 // class explosion (for bob-omb mode)
 //------------------------------------------------------------------------------
-MO_Explosion::MO_Explosion(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short playerid, short teamid, KillStyle style)
-    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed)
+MO_Explosion::MO_Explosion(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short playerid, short teamid, KillStyle style)
+    : IO_MovingObject(nspr, pos, iNumSpr, aniSpeed)
 {
     state = 1;
 

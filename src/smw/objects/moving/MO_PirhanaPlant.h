@@ -5,7 +5,7 @@
 
 class MO_PirhanaPlant : public IO_MovingObject {
 public:
-    MO_PirhanaPlant(short x, short y, short type, short freq, short direction, bool preview);
+    MO_PirhanaPlant(Vec2s pos, short type, short freq, short direction, bool preview);
     ~MO_PirhanaPlant() {}
 
     void draw();

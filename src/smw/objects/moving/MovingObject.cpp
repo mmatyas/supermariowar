@@ -28,8 +28,8 @@ extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 //------------------------------------------------------------------------------
 // class MovingObject (all moving objects inheirit from this class)
 //------------------------------------------------------------------------------
-IO_MovingObject::IO_MovingObject(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth)
-    : CObject(nspr, x, y)
+IO_MovingObject::IO_MovingObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth)
+    : CObject(nspr, pos.x, pos.y)
 {
     iNumSprites = iNumSpr;
 

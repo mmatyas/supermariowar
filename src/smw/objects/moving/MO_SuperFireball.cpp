@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class super fireball
 //------------------------------------------------------------------------------
-MO_SuperFireball::MO_SuperFireball(gfxSprite* nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short teamID, short iColorID)
-    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, nspr->getWidth() / iNumSpr, nspr->getHeight() / 10, 0, 0)
+MO_SuperFireball::MO_SuperFireball(gfxSprite* nspr, Vec2s pos, short iNumSpr, Vec2f vel, short aniSpeed, short iGlobalID, short teamID, short iColorID)
+    : IO_MovingObject(nspr, pos, iNumSpr, aniSpeed, nspr->getWidth() / iNumSpr, nspr->getHeight() / 10, 0, 0)
 {
     ih /= 10;
 
@@ -26,8 +26,8 @@ MO_SuperFireball::MO_SuperFireball(gfxSprite* nspr, short x, short y, short iNum
 
     state = 1;
 
-    velx = fVelyX;
-    vely = fVelyY;
+    velx = vel.x;
+    vely = vel.y;
     ttl = RANDOM_INT(30) + 60;
 
     drawframe = 0;

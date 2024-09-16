@@ -78,7 +78,7 @@ short g_iSledgeBrotherWaitTime[3][5][2] = {
 };
 
 MO_SledgeBrother::MO_SledgeBrother(gfxSprite* nspr, short platformY, Boss type)
-    : IO_MovingObject(nspr, 0, 0, 8, 0, 32, 56, 8, 8)
+    : IO_MovingObject(nspr, Vec2s::zero(), 8, 0, 32, 56, 8, 8)
 {
     iType = static_cast<short>(type);  // FIXME
     state = 1;
@@ -188,7 +188,7 @@ void MO_SledgeBrother::update()
                 short numPodobos = RANDOM_INT(5) + 8;
 
                 for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)(RANDOM_INT(608)), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
+                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, {(short)(RANDOM_INT(608)), App::screenHeight}, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 }
             }
         }
@@ -347,7 +347,7 @@ void MO_SledgeBrother::throwprojectile()
 
     if (iType == 0) {
         float fHammerVelX = ((float)(RANDOM_INT(9) + 2)) / 2.0f - (face_right ? 0.0f : 6.0f);
-        objectcontainer[2].add(new MO_SledgeHammer(&rm->spr_sledgehammer, (face_right ? ix + 32 : ix) - collisionOffsetX, iy, 8, fHammerVelX, -HAMMERTHROW, 5, -1, -1, -1, false));
+        objectcontainer[2].add(new MO_SledgeHammer(&rm->spr_sledgehammer, {(face_right ? ix + 32 : ix) - collisionOffsetX, iy}, 8, {fHammerVelX, -HAMMERTHROW}, 5, -1, -1, -1, false));
     } else if (iType == 1) {
         float fBombVelX = ((float)(RANDOM_INT(5) + 12)) / 2.0f - (face_right ? 0.0f : 14.0f);
         float fBombVelY = -(float)(RANDOM_INT(13)) / 2.0f - 6.0f;
@@ -355,7 +355,7 @@ void MO_SledgeBrother::throwprojectile()
     } else if (iType == 2) {
         float fFireVelX = ((float)(RANDOM_INT(9) + 6)) / 2.0f - (face_right ? 0.0f : 10.0f);
         float fFireVelY = (float)(RANDOM_INT(17)) / 2.0f - 4.0f;
-        objectcontainer[2].add(new MO_SuperFireball(&rm->spr_superfireball, face_right ? ix + iw - 32 : ix - 16, iy, 4, fFireVelX, fFireVelY, 4, -1, -1, -1));
+        objectcontainer[2].add(new MO_SuperFireball(&rm->spr_superfireball, {face_right ? ix + iw - 32 : ix - 16, iy}, 4, {fFireVelX, fFireVelY}, 4, -1, -1, -1));
     }
 
     need_action[1] = 0;

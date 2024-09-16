@@ -66,7 +66,7 @@ void CGM_Survival::think()
                 objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)RANDOM_INT(App::screenWidth * 0.92f), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(RANDOM_INT(20))/10.0f));
                 timer = (short)(RANDOM_INT(21) - 10 + rate);
             } else if (1 == iSelectedEnemy) {
-                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(App::screenWidth * 0.95f ), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 8.0f, -1, -1, -1, false));
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, {(short)RANDOM_INT(App::screenWidth * 0.95f ), App::screenHeight}, -(float(RANDOM_INT(9)) / 2.0f) - 8.0f, -1, -1, -1, false));
                 timer = (short)(RANDOM_INT(21) - 10 + rate - 20);
             } else {
                 float dSpeed = ((float)(RANDOM_INT(21) + 20)) / 10.0f;
