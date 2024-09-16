@@ -7,10 +7,10 @@
 #include "player.h"
 #include "ResourceManager.h"
 #include "objects/moving/MovingObject.h"
-#include "objects/moving/WalkingEnemy.h"
 #include "objects/carriable/CO_Shell.h"
 #include "objects/carriable/CO_ThrowBlock.h"
 #include "objects/carriable/CO_ThrowBox.h"
+#include "objects/walkingenemy/WalkingEnemy.h"
 
 extern CMap* g_map;
 extern CObjectContainer objectcontainer[3];

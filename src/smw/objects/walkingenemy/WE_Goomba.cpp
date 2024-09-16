@@ -1,4 +1,4 @@
-#include "MO_Goomba.h"
+#include "WE_Goomba.h"
 
 #include "eyecandy.h"
 #include "GameMode.h"

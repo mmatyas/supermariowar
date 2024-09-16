@@ -6,9 +6,9 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "objects/moving/MO_FrenzyCard.h"
-#include "objects/moving/MO_Koopa.h"
 #include "objects/moving/MO_Podobo.h"
 #include "objects/moving/MO_SledgeBrother.h"
+#include "objects/walkingenemy/WE_Koopa.h"
 
 extern std::vector<CPlayer*> players;
 extern short score_cnt;

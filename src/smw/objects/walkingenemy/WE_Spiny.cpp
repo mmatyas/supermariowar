@@ -1,4 +1,4 @@
-#include "MO_Spiny.h"
+#include "WE_Spiny.h"
 
 #include "eyecandy.h"
 #include "GameMode.h"

@@ -1,4 +1,4 @@
-#include "MO_Koopa.h"
+#include "WE_Koopa.h"
 
 #include "eyecandy.h"
 #include "GameMode.h"

@@ -63,8 +63,6 @@ target_sources(smw PRIVATE
 	moving/MO_Boomerang.h
 	moving/MO_BulletBill.cpp
 	moving/MO_BulletBill.h
-	moving/MO_BuzzyBeetle.cpp
-	moving/MO_BuzzyBeetle.h
 	moving/MO_CarriedObject.cpp
 	moving/MO_CarriedObject.h
 	moving/MO_CheepCheep.cpp
@@ -81,14 +79,10 @@ target_sources(smw PRIVATE
 	moving/MO_FlagBase.h
 	moving/MO_FrenzyCard.cpp
 	moving/MO_FrenzyCard.h
-	moving/MO_Goomba.cpp
-	moving/MO_Goomba.h
 	moving/MO_Hammer.cpp
 	moving/MO_Hammer.h
 	moving/MO_IceBlast.cpp
 	moving/MO_IceBlast.h
-	moving/MO_Koopa.cpp
-	moving/MO_Koopa.h
 	moving/MO_PirhanaPlant.cpp
 	moving/MO_PirhanaPlant.h
 	moving/MO_Podobo.cpp
@@ -99,8 +93,6 @@ target_sources(smw PRIVATE
 	moving/MO_SledgeHammer.h
 	moving/MO_SpinAttack.cpp
 	moving/MO_SpinAttack.h
-	moving/MO_Spiny.cpp
-	moving/MO_Spiny.h
 	moving/MO_SuperFireball.cpp
 	moving/MO_SuperFireball.h
 	moving/MO_Yoshi.cpp
@@ -109,8 +101,6 @@ target_sources(smw PRIVATE
 	moving/MovingObject.h
 	moving/Powerup.cpp
 	moving/Powerup.h
-	moving/WalkingEnemy.cpp
-	moving/WalkingEnemy.h
 
 	overmap/OverMapObject.cpp
 	overmap/OverMapObject.h
@@ -185,4 +175,15 @@ target_sources(smw PRIVATE
 	powerup/PU_Tanooki.h
 	powerup/PU_TreasureChestBonus.cpp
 	powerup/PU_TreasureChestBonus.h
+
+	walkingenemy/WE_BuzzyBeetle.cpp
+	walkingenemy/WE_BuzzyBeetle.h
+	walkingenemy/WE_Goomba.cpp
+	walkingenemy/WE_Goomba.h
+	walkingenemy/WE_Koopa.cpp
+	walkingenemy/WE_Koopa.h
+	walkingenemy/WE_Spiny.cpp
+	walkingenemy/WE_Spiny.h
+	walkingenemy/WalkingEnemy.cpp
+	walkingenemy/WalkingEnemy.h
 )

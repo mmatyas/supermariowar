@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MovingObject.h"
+#include "objects/moving/MovingObject.h"
 #include "PlayerKillStyles.h"
 
 

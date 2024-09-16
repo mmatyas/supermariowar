@@ -1,4 +1,4 @@
-#include "MO_BuzzyBeetle.h"
+#include "WE_BuzzyBeetle.h"
 
 #include "eyecandy.h"
 #include "GameMode.h"

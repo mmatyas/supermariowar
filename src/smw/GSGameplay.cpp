@@ -39,7 +39,6 @@
 #include "objects/moving/MO_BulletBill.h"
 #include "objects/moving/MO_Coin.h"
 #include "objects/moving/MO_PirhanaPlant.h"
-#include "objects/moving/WalkingEnemy.h"
 #include "objects/powerup/PU_BobombPowerup.h"
 #include "objects/powerup/PU_BombPowerup.h"
 #include "objects/powerup/PU_BoomerangPowerup.h"
@@ -59,6 +58,7 @@
 #include "objects/powerup/PU_PWingsPowerup.h"
 #include "objects/powerup/PU_StarPowerup.h"
 #include "objects/powerup/PU_Tanooki.h"
+#include "objects/walkingenemy/WalkingEnemy.h"
 
 #include <algorithm>
 #include <cmath>
