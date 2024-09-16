@@ -5,7 +5,7 @@
 
 class B_BounceBlock : public IO_Block {
 public:
-	B_BounceBlock(gfxSprite *nspr, short x, short y, bool fHidden);
+	B_BounceBlock(gfxSprite *nspr, Vec2s pos, bool fHidden);
 
 	void update() override;
 	void draw() override;

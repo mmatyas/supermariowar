@@ -20,8 +20,8 @@ extern CResourceManager* rm;
 // class powerup block
 //------------------------------------------------------------------------------
 
-B_PowerupBlock::B_PowerupBlock(gfxSprite* nspr1, short x, short y, short iNumSpr, short aniSpeed, bool fHidden, const short * piSettings)
-    : IO_Block(nspr1, x, y)
+B_PowerupBlock::B_PowerupBlock(gfxSprite* nspr1, Vec2s pos, short iNumSpr, short aniSpeed, bool fHidden, const short * piSettings)
+    : IO_Block(nspr1, pos)
 {
     iw = (short)spr->getWidth() >> 2;
     ih = (short)spr->getHeight() >> 1;  //This sprite has two images (unused and used blocks)

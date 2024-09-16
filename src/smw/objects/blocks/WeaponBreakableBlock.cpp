@@ -20,8 +20,8 @@ extern CResourceManager* rm;
 extern CGameValues game_values;
 extern CEyecandyContainer eyecandy[3];
 
-B_WeaponBreakableBlock::B_WeaponBreakableBlock(gfxSprite *nspr, short x, short y, WeaponDamageType type)
-    : IO_Block(nspr, x, y)
+B_WeaponBreakableBlock::B_WeaponBreakableBlock(gfxSprite *nspr, Vec2s pos, WeaponDamageType type)
+    : IO_Block(nspr, pos)
     , iType(type)
     , iDrawOffsetX(static_cast<short>(type) * 32)
 {

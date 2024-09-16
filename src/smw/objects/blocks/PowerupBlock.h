@@ -10,7 +10,7 @@ class IO_MovingObject;
 
 class B_PowerupBlock : public IO_Block {
 public:
-    B_PowerupBlock(gfxSprite* nspr, short x, short y,
+    B_PowerupBlock(gfxSprite* nspr, Vec2s pos,
         short iNumSpr, short aniSpeed, bool fHidden, const short * piSettings);
     virtual ~B_PowerupBlock();
 

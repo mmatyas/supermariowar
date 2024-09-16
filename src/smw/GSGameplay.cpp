@@ -1475,39 +1475,39 @@ enum MapBlockType {
     MapBlock_WpnBreakLeaf,
 };
 
-IO_Block* spawnMapBlock(short typeId, short drawX, short drawY, const MapBlock& objdata, const std::array<short, 4>& switchStates)
+IO_Block* spawnMapBlock(short typeId, Vec2s drawPos, const MapBlock& objdata, const std::array<short, 4>& switchStates)
 {
     switch (typeId) {
-        case MapBlock_BrickYellow: return new B_BreakableBlock(&rm->spr_breakableblock, drawX, drawY, 4, 10);
-        case MapBlock_Powerup: return new B_PowerupBlock(&rm->spr_powerupblock, drawX, drawY, 4, 10, objdata.fHidden, objdata.iSettings);
-        case MapBlock_Donut: return new B_DonutBlock(&rm->spr_donutblock, drawX, drawY);
-        case MapBlock_Flip: return new B_FlipBlock(&rm->spr_flipblock, drawX, drawY, objdata.fHidden);
-        case MapBlock_Bounce: return new B_BounceBlock(&rm->spr_bounceblock, drawX, drawY, objdata.fHidden);
-        case MapBlock_NoteGray: return new B_NoteBlock(&rm->spr_noteblock, drawX, drawY, 4, 10, NoteBlockType::Gray, objdata.fHidden);
-        case MapBlock_BrickBlue: return new B_ThrowBlock(&rm->spr_throwblock, drawX, drawY, 4, 10, ThrowBlockType::Blue);
-        case MapBlock_SwitchToggleRed: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Red, switchStates[0]);
-        case MapBlock_SwitchToggleGreen: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Green, switchStates[1]);
-        case MapBlock_SwitchToggleYellow: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Yellow, switchStates[2]);
-        case MapBlock_SwitchToggleBlue: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Blue, switchStates[3]);
-        case MapBlock_SwitchBlockRed: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Red, objdata.iSettings[0]);
-        case MapBlock_SwitchBlockGreen: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Green, objdata.iSettings[0]);
-        case MapBlock_SwitchBlockYellow: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Yellow, objdata.iSettings[0]);
-        case MapBlock_SwitchBlockBlue: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Blue, objdata.iSettings[0]);
-        case MapBlock_View: return new B_ViewBlock(&rm->spr_viewblock, drawX, drawY, objdata.fHidden, objdata.iSettings);
-        case MapBlock_BrickRed: return new B_ThrowBlock(&rm->spr_throwblock, drawX, drawY, 4, 10, ThrowBlockType::Red);
-        case MapBlock_NoteRed: return new B_NoteBlock(&rm->spr_noteblock, drawX, drawY, 4, 10, NoteBlockType::Red, objdata.fHidden);
-        case MapBlock_NoteBlue: return new B_NoteBlock(&rm->spr_noteblock, drawX, drawY, 4, 10, NoteBlockType::Blue, objdata.fHidden);
-        case MapBlock_BrickGray: return new B_ThrowBlock(&rm->spr_throwblock, drawX, drawY, 4, 10, ThrowBlockType::Gray);
-        case MapBlock_WpnBreakFireball: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Fireball);
-        case MapBlock_WpnBreakFeather: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Feather);
-        case MapBlock_WpnBreakShell: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Shell);
-        case MapBlock_WpnBreakBomb: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Bomb);
-        case MapBlock_WpnBreakBoomerang: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Boomerang);
-        case MapBlock_WpnBreakHammer: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Hammer);
-        case MapBlock_WpnBreakKuriboShoe: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::KuriboShoe);
-        case MapBlock_WpnBreakPWings: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::PWings);
-        case MapBlock_WpnBreakStar: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Star);
-        case MapBlock_WpnBreakLeaf: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Leaf);
+        case MapBlock_BrickYellow: return new B_BreakableBlock(&rm->spr_breakableblock, drawPos, 4, 10);
+        case MapBlock_Powerup: return new B_PowerupBlock(&rm->spr_powerupblock, drawPos, 4, 10, objdata.fHidden, objdata.iSettings);
+        case MapBlock_Donut: return new B_DonutBlock(&rm->spr_donutblock, drawPos);
+        case MapBlock_Flip: return new B_FlipBlock(&rm->spr_flipblock, drawPos, objdata.fHidden);
+        case MapBlock_Bounce: return new B_BounceBlock(&rm->spr_bounceblock, drawPos, objdata.fHidden);
+        case MapBlock_NoteGray: return new B_NoteBlock(&rm->spr_noteblock, drawPos, 4, 10, NoteBlockType::Gray, objdata.fHidden);
+        case MapBlock_BrickBlue: return new B_ThrowBlock(&rm->spr_throwblock, drawPos, 4, 10, ThrowBlockType::Blue);
+        case MapBlock_SwitchToggleRed: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Red, switchStates[0]);
+        case MapBlock_SwitchToggleGreen: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Green, switchStates[1]);
+        case MapBlock_SwitchToggleYellow: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Yellow, switchStates[2]);
+        case MapBlock_SwitchToggleBlue: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Blue, switchStates[3]);
+        case MapBlock_SwitchBlockRed: return new B_SwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Red, objdata.iSettings[0]);
+        case MapBlock_SwitchBlockGreen: return new B_SwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Green, objdata.iSettings[0]);
+        case MapBlock_SwitchBlockYellow: return new B_SwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Yellow, objdata.iSettings[0]);
+        case MapBlock_SwitchBlockBlue: return new B_SwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Blue, objdata.iSettings[0]);
+        case MapBlock_View: return new B_ViewBlock(&rm->spr_viewblock, drawPos, objdata.fHidden, objdata.iSettings);
+        case MapBlock_BrickRed: return new B_ThrowBlock(&rm->spr_throwblock, drawPos, 4, 10, ThrowBlockType::Red);
+        case MapBlock_NoteRed: return new B_NoteBlock(&rm->spr_noteblock, drawPos, 4, 10, NoteBlockType::Red, objdata.fHidden);
+        case MapBlock_NoteBlue: return new B_NoteBlock(&rm->spr_noteblock, drawPos, 4, 10, NoteBlockType::Blue, objdata.fHidden);
+        case MapBlock_BrickGray: return new B_ThrowBlock(&rm->spr_throwblock, drawPos, 4, 10, ThrowBlockType::Gray);
+        case MapBlock_WpnBreakFireball: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Fireball);
+        case MapBlock_WpnBreakFeather: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Feather);
+        case MapBlock_WpnBreakShell: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Shell);
+        case MapBlock_WpnBreakBomb: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Bomb);
+        case MapBlock_WpnBreakBoomerang: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Boomerang);
+        case MapBlock_WpnBreakHammer: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Hammer);
+        case MapBlock_WpnBreakKuriboShoe: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::KuriboShoe);
+        case MapBlock_WpnBreakPWings: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::PWings);
+        case MapBlock_WpnBreakStar: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Star);
+        case MapBlock_WpnBreakLeaf: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Leaf);
         default: return nullptr;
     }
 }
@@ -1524,7 +1524,7 @@ void LoadMapObjects(bool fPreview)
     for (short x = 0; x < MAPWIDTH; x++) {
         for (short y = 0; y < MAPHEIGHT; y++) {
             const short typeId = g_map->objectdata[x][y].iType;
-            IO_Block* block = spawnMapBlock(typeId, x * 32, y * 32, g_map->objectdata[x][y], g_map->iSwitches);
+            IO_Block* block = spawnMapBlock(typeId, {x * 32, y * 32}, g_map->objectdata[x][y], g_map->iSwitches);
             g_map->blockdata[x][y] = block;
 
             if (block)

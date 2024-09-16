@@ -8,8 +8,8 @@
 extern CMap* g_map;
 extern CTilesetManager* g_tilesetmanager;
 
-B_DonutBlock::B_DonutBlock(gfxSprite *nspr, short x, short y) :
-    IO_Block(nspr, x, y)
+B_DonutBlock::B_DonutBlock(gfxSprite *nspr, Vec2s pos)
+    : IO_Block(nspr, pos)
 {
     counter = 0;
     jigglex = 0;

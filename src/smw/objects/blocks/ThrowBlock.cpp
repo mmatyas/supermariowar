@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 extern CEyecandyContainer eyecandy[3];
 extern CObjectContainer objectcontainer[3];
 
-B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, ThrowBlockType type) :
-    IO_Block(nspr, x, y)
+B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, Vec2s pos, short iNumSpr, short aniSpeed, ThrowBlockType type) :
+    IO_Block(nspr, pos)
 {
     iw = 32;
     ih = 32;

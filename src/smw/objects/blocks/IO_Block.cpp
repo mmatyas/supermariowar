@@ -26,8 +26,8 @@ extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 // class Block base class
 //------------------------------------------------------------------------------
 
-IO_Block::IO_Block(gfxSprite *nspr, short x, short y)
-    : CObject(nspr, x, y)
+IO_Block::IO_Block(gfxSprite *nspr, Vec2s pos)
+    : CObject(nspr, pos.x, pos.y)
 {
     objectType = object_block;
 
@@ -37,11 +37,11 @@ IO_Block::IO_Block(gfxSprite *nspr, short x, short y)
     fposx = fx;
     fposy = fy;
 
-    iposx = x;
-    iposy = y;
+    iposx = pos.x;
+    iposy = pos.y;
 
-    col = x / TILESIZE;
-    row = y / TILESIZE;
+    col = pos.x / TILESIZE;
+    row = pos.y / TILESIZE;
 
     hidden = ishiddentype = false;
     iHiddenTimer = 0;

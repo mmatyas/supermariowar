@@ -18,8 +18,8 @@ extern CEyecandyContainer eyecandy[3];
 // class breakable block
 //------------------------------------------------------------------------------
 
-B_BreakableBlock::B_BreakableBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed) :
-    IO_Block(nspr, x, y)
+B_BreakableBlock::B_BreakableBlock(gfxSprite *nspr, Vec2s pos, short iNumSpr, short aniSpeed) :
+    IO_Block(nspr, pos)
 {
     iw = (short)nspr->getWidth() >> 2;
     iNumSprites = iNumSpr;

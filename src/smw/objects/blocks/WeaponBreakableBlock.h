@@ -19,7 +19,7 @@ enum class WeaponDamageType : unsigned char {
 
 class B_WeaponBreakableBlock : public IO_Block {
 public:
-    B_WeaponBreakableBlock(gfxSprite *nspr, short x, short y, WeaponDamageType type);
+    B_WeaponBreakableBlock(gfxSprite *nspr, Vec2s pos, WeaponDamageType type);
 
     void draw() override;
     void update() override;

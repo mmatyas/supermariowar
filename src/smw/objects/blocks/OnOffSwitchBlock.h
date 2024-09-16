@@ -6,7 +6,7 @@
 
 class B_OnOffSwitchBlock : public IO_Block {
 public:
-	B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor color, short state);
+	B_OnOffSwitchBlock(gfxSprite *nspr, Vec2s pos, SwitchColor color, short state);
 
 	void update() override;
 	void draw() override;

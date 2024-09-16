@@ -29,8 +29,8 @@ extern CEyecandyContainer eyecandy[3];
 // power, you're dead.  Plus fireballs have a large enough collision box that you can be hit
 // with them too.
 //------------------------------------------------------------------------------
-B_FlipBlock::B_FlipBlock(gfxSprite *nspr, short x, short y, bool fHidden) :
-    IO_Block(nspr, x, y)
+B_FlipBlock::B_FlipBlock(gfxSprite *nspr, Vec2s pos, bool fHidden) :
+    IO_Block(nspr, pos)
 {
     iw = (short)spr->getWidth() >> 2;
     collisionWidth = iw;

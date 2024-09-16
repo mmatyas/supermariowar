@@ -6,7 +6,7 @@
 
 class B_SwitchBlock : public IO_Block {
 public:
-	B_SwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor color, short state);
+	B_SwitchBlock(gfxSprite *nspr, Vec2s pos, SwitchColor color, short state);
 
 	void draw() override;
 	bool collide(CPlayer * player, short direction, bool useBehavior) override;

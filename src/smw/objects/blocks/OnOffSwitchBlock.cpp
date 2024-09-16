@@ -17,8 +17,8 @@ extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-B_OnOffSwitchBlock::B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor color, short iState) :
-    IO_Block(nspr, x, y)
+B_OnOffSwitchBlock::B_OnOffSwitchBlock(gfxSprite *nspr, Vec2s pos, SwitchColor color, short iState) :
+    IO_Block(nspr, pos)
 {
     iw = (short)spr->getWidth() >> 2;
     collisionWidth = iw;
