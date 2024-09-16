@@ -15,20 +15,20 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class pipe powerup (for coin pipe minigame)
 //------------------------------------------------------------------------------
-OMO_PipeBonus::OMO_PipeBonus(gfxSprite* nspr, float dvelx, float dvely, short iX, short iY, short type, short duration, short uncollectabletime)
-    : IO_OverMapObject(nspr, iX, iY, 4, 8, 30, 30, 1, 1, 0, type << 5, 32, 32)
+OMO_PipeBonus::OMO_PipeBonus(gfxSprite* nspr, Vec2f vel, Vec2s pos, short type, short duration, short uncollectabletime)
+    : IO_OverMapObject(nspr, pos, 4, 8, 30, 30, 1, 1, 0, type << 5, 32, 32)
     , iType(type)
     , iDuration(duration)
 {
     state = 1;
     objectType = object_pipe_bonus;
 
-    velx = dvelx;
+    velx = vel.x;
 
     if (pipegamemode->IsSlowdown())
-        vely = dvely / 1.5f;
+        vely = vel.y / 1.5f;
     else
-        vely = dvely;
+        vely = vel.y;
 
     iUncollectableTime = uncollectabletime;
 }

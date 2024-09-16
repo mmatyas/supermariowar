@@ -8,7 +8,7 @@ class CPlayer;
 
 class IO_OverMapObject : public CObject {
 public:
-    IO_OverMapObject(gfxSprite* nspr, short x, short y, short iNumSpr,
+    IO_OverMapObject(gfxSprite* nspr, Vec2s pos, short iNumSpr,
         short aniSpeed, short iCollisionWidth = -1,
         short iCollisionHeight = -1, short iCollisionOffsetX = -1,
         short iCollisionOffsetY = -1, short iAnimationOffsetX = -1,

@@ -4,8 +4,7 @@
 
 class OMO_PipeCoin : public IO_OverMapObject {
 public:
-    OMO_PipeCoin(gfxSprite* nspr, float velx, float vely, short ix, short iy,
-        short teamid, short colorid, short uncollectabletime);
+    OMO_PipeCoin(gfxSprite* nspr, Vec2f vel, Vec2s pos, short teamid, short colorid, short uncollectabletime);
 
     void update() override;
     void draw() override;

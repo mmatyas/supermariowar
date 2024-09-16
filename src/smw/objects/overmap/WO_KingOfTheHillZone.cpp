@@ -20,7 +20,7 @@ constexpr short iKingOfTheHillZoneLimits[4][4] = {{0, 0, 1, 2}, {0, 1, 2, 4}, {0
 // class KingOfTheHillArea (for King of the Hill mode)
 //------------------------------------------------------------------------------
 OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite* nspr)
-    : IO_OverMapObject(nspr, 0, 0, 5, 0)
+    : IO_OverMapObject(nspr, Vec2s::zero(), 5, 0)
 {
     size = game_values.gamemodesettings.kingofthehill.areasize;
 

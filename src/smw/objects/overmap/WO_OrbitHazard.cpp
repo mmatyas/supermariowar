@@ -11,17 +11,15 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class OMO Orbit Hazard - component of the fireball string or rotodisc
 //------------------------------------------------------------------------------
-OMO_OrbitHazard::OMO_OrbitHazard(gfxSprite* nspr, short x, short y, float radius, float vel, float angle, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth)
-    : IO_OverMapObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
+OMO_OrbitHazard::OMO_OrbitHazard(gfxSprite* nspr, Vec2s pos, float radius, float vel, float angle, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth)
+    : IO_OverMapObject(nspr, pos, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
 {
     objectType = object_orbithazard;
 
     dRadius = radius;
     dVel = vel;
     dAngle = angle;
-
-    dCenterX = (float)x;
-    dCenterY = (float)y;
+    dCenter = {pos.x, pos.y};
 
     CalculatePosition();
 }
@@ -51,6 +49,6 @@ bool OMO_OrbitHazard::collide(CPlayer* player)
 
 void OMO_OrbitHazard::CalculatePosition()
 {
-    setXf(dCenterX + dRadius * cos(dAngle) - (float)iw / 2.0f);
-    setYf(dCenterY + dRadius * sin(dAngle) - (float)ih / 2.0f);
+    setXf(dCenter.x + dRadius * cos(dAngle) - (float)iw / 2.0f);
+    setYf(dCenter.y + dRadius * sin(dAngle) - (float)ih / 2.0f);
 }

@@ -17,7 +17,7 @@ extern CResourceManager* rm;
 // class area (for Domination mode)
 //------------------------------------------------------------------------------
 OMO_Area::OMO_Area(gfxSprite* nspr, short iNumAreas)
-    : IO_OverMapObject(nspr, 1280, 960, 5, 0)
+    : IO_OverMapObject(nspr, {1280, 960}, 5, 0)
     , numareas(iNumAreas)
 {
     iw = (short)spr->getWidth() / 5;

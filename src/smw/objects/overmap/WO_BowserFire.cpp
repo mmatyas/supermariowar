@@ -10,15 +10,15 @@ extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 //------------------------------------------------------------------------------
 // class Bowser Fire (for survival mode)
 //------------------------------------------------------------------------------
-OMO_BowserFire::OMO_BowserFire(gfxSprite* nspr, short x, short y, float dVelX, float dVelY, short id, short teamid, short colorid)
-    : IO_OverMapObject(nspr, x, y, 3, 6)
+OMO_BowserFire::OMO_BowserFire(gfxSprite* nspr, Vec2s pos, Vec2f vel, short id, short teamid, short colorid)
+    : IO_OverMapObject(nspr, pos, 3, 6)
     , iPlayerID(id)
     , iTeamID(teamid)
     , iColorOffsetY((colorid + 1) * 64)
 {
     objectType = object_bowserfire;
-    velx = dVelX;
-    vely = dVelY;
+    velx = vel.x;
+    vely = vel.y;
 
     ih = 32;
     collisionHeight = ih;

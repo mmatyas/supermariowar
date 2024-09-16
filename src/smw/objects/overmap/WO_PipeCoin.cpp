@@ -14,20 +14,20 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class pipe coin (for coin pipe minigame)
 //------------------------------------------------------------------------------
-OMO_PipeCoin::OMO_PipeCoin(gfxSprite* nspr, float dvelx, float dvely, short iX, short iY, short teamid, short colorid, short uncollectabletime)
-    : IO_OverMapObject(nspr, iX, iY, 4, 8, 30, 30, 1, 1, 0, colorid << 5, 32, 32)
+OMO_PipeCoin::OMO_PipeCoin(gfxSprite* nspr, Vec2f vel, Vec2s pos, short teamid, short colorid, short uncollectabletime)
+    : IO_OverMapObject(nspr, pos, 4, 8, 30, 30, 1, 1, 0, colorid << 5, 32, 32)
     , iTeamID(teamid)
     , iColorID(colorid)
 {
     state = 1;
     objectType = object_pipe_coin;
 
-    velx = dvelx;
+    velx = vel.x;
 
     if (pipegamemode->IsSlowdown())
-        vely = dvely / 2.0f;
+        vely = vel.y / 2.0f;
     else
-        vely = dvely;
+        vely = vel.y;
 
     iUncollectableTime = uncollectabletime;
 }

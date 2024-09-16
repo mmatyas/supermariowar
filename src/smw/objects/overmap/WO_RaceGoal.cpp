@@ -24,7 +24,7 @@ short flagpositions[3][4][2] = { { { 18, 20 }, { 34, 20 }, { 0, 0 }, { 0, 0 } },
     { { 18, 20 }, { 34, 20 }, { 18, 36 }, { 34, 36 } } };
 
 OMO_RaceGoal::OMO_RaceGoal(gfxSprite* nspr, short id)
-    : IO_OverMapObject(nspr, 0, 0, 2, 8)
+    : IO_OverMapObject(nspr, Vec2s::zero(), 2, 8)
     , goalID(id)
 {
     iw = (short)spr->getWidth() >> 1;

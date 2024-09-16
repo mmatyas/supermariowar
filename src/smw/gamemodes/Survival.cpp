@@ -76,7 +76,7 @@ void CGM_Survival::think()
                 if (dVel < 0)
                     x = 694;
 
-                objectcontainer[2].add(new OMO_BowserFire(&rm->spr_bowserfire, x, (short)RANDOM_INT( App::screenHeight * 0.93f ), dVel, 0.0f, -1, -1, -1));
+                objectcontainer[2].add(new OMO_BowserFire(&rm->spr_bowserfire, {x, (short)RANDOM_INT( App::screenHeight * 0.93f )}, {dVel, 0.0f}, -1, -1, -1));
                 timer = (short)(RANDOM_INT(21) - 10 + rate);
             }
         }

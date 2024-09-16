@@ -27,7 +27,7 @@ void LoadMapHazards(bool fPreview)
         MapHazard * hazard = &g_map->maphazards[iMapHazard];
         if (hazard->itype == 0) {
             for (short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
-                objectcontainer[1].add(new OMO_OrbitHazard(&rm->spr_hazard_fireball[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
+                objectcontainer[1].add(new OMO_OrbitHazard(&rm->spr_hazard_fireball[fPreview ? 1 : 0], {(hazard->ix << 4) + 16, (hazard->iy << 4) + 16}, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
         } else if (hazard->itype == 1) {
             float dSector = TWO_PI / hazard->iparam[0];
             for (short iRotoDisc = 0; iRotoDisc < hazard->iparam[0]; iRotoDisc++) {
@@ -35,7 +35,7 @@ void LoadMapHazards(bool fPreview)
                 if (dAngle > TWO_PI)
                     dAngle -= TWO_PI;
 
-                objectcontainer[1].add(new OMO_OrbitHazard(&rm->spr_hazard_rotodisc[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 21, 8, 32, 32, 0, 0, 0, 0, 32, 32));
+                objectcontainer[1].add(new OMO_OrbitHazard(&rm->spr_hazard_rotodisc[fPreview ? 1 : 0], {(hazard->ix << 4) + 16, (hazard->iy << 4) + 16}, hazard->dparam[2], hazard->dparam[0], dAngle, 21, 8, 32, 32, 0, 0, 0, 0, 32, 32));
             }
         } else if (hazard->itype == 2) {
             noncolcontainer.add(new IO_BulletBillCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->dparam[0], fPreview));

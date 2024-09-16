@@ -46,6 +46,9 @@ void CGM_Pipe_MiniGame::think()
     }
 
     if (--iNextItemTimer <= 0) {
+        const Vec2f vel((float)(RANDOM_INT(21) - 10) / 2.0f, -((float)RANDOM_INT(11) / 2.0f + 7.0f));
+        const Vec2s pos(304, 256);
+
         if (iBonusType == 0 || iBonusType == 2 || iBonusType == 4) {
             if (iBonusType == 2)
                 iNextItemTimer = RANDOM_INT(10) + 10;
@@ -54,12 +57,12 @@ void CGM_Pipe_MiniGame::think()
 
             short iRandPowerup = RANDOM_INT(50);
             if (iBonusType == 0 && iRandPowerup < 5) { //bonuses
-                objectcontainer[1].add(new OMO_PipeBonus(&rm->spr_pipegamebonus, (float)(RANDOM_INT(21) - 10) / 2.0f, -((float)RANDOM_INT(11) / 2.0f + 7.0f), 304, 256, iRandPowerup, 620, 15));
+                objectcontainer[1].add(new OMO_PipeBonus(&rm->spr_pipegamebonus, vel, pos, iRandPowerup, 620, 15));
             } else if (iRandPowerup < 10) { //fireballs
-                objectcontainer[1].add(new OMO_PipeBonus(&rm->spr_pipegamebonus, (float)(RANDOM_INT(21) - 10) / 2.0f, -((float)RANDOM_INT(11) / 2.0f + 7.0f), 304, 256, 5, 0, 15));
+                objectcontainer[1].add(new OMO_PipeBonus(&rm->spr_pipegamebonus, vel, pos, 5, 0, 15));
             } else { //coins
                 short iRandCoin = RANDOM_INT(20);
-                objectcontainer[1].add(new OMO_PipeCoin(&rm->spr_coin, (float)(RANDOM_INT(21) - 10) / 2.0f, -((float)RANDOM_INT(11) / 2.0f + 7.0f), 304, 256, -1, iRandCoin < 16 ? 2 : (iRandCoin < 19 ? 0 : 1), 15));
+                objectcontainer[1].add(new OMO_PipeCoin(&rm->spr_coin, vel, pos, -1, iRandCoin < 16 ? 2 : (iRandCoin < 19 ? 0 : 1), 15));
             }
         } else if (iBonusType == 1) {
             iNextItemTimer = RANDOM_INT(10) + 10;
@@ -72,10 +75,10 @@ void CGM_Pipe_MiniGame::think()
 
             short iRandPlayer = game_values.teamids[iRandTeam][RANDOM_INT(game_values.teamcounts[iRandTeam])];
 
-            objectcontainer[1].add(new OMO_PipeCoin(&rm->spr_coin, (float)((RANDOM_INT(21)) - 10) / 2.0f, -((float)RANDOM_INT(11) / 2.0f + 7.0f), 304, 256, iRandTeam, game_values.colorids[iRandPlayer], 15));
+            objectcontainer[1].add(new OMO_PipeCoin(&rm->spr_coin, vel, pos, iRandTeam, game_values.colorids[iRandPlayer], 15));
         } else if (iBonusType == 3) {
             iNextItemTimer = RANDOM_INT(5) + 10;
-            objectcontainer[1].add(new OMO_PipeCoin(&rm->spr_coin, (float)((RANDOM_INT(21)) - 10) / 2.0f, -((float)RANDOM_INT(11) / 2.0f + 7.0f), 304, 256, -1, 0, 15));
+            objectcontainer[1].add(new OMO_PipeCoin(&rm->spr_coin, vel, pos, -1, 0, 15));
         }
     }
 

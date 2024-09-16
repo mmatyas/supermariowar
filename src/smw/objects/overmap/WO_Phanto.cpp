@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class Phanto (for phanto mode)
 //------------------------------------------------------------------------------
-OMO_Phanto::OMO_Phanto(gfxSprite* nspr, short x, short y, float dVelX, float dVelY, short type)
-    : IO_OverMapObject(nspr, x, y, 1, 0, 30, 32, 1, 0, type << 5, 0, 32, 32)
+OMO_Phanto::OMO_Phanto(gfxSprite* nspr, Vec2s pos, float dVelX, float dVelY, short type)
+    : IO_OverMapObject(nspr, pos, 1, 0, 30, 32, 1, 0, type << 5, 0, 32, 32)
     , iType(type)
 {
     objectType = object_phanto;
