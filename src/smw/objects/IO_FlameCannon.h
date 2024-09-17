@@ -5,7 +5,7 @@
 
 class IO_FlameCannon : public CObject {
 public:
-    IO_FlameCannon(short x, short y, short freq, short direction);
+    IO_FlameCannon(Vec2s pos, short freq, short direction);
     ~IO_FlameCannon() {}
 
     void draw() override;

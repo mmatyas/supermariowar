@@ -12,8 +12,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class IO_FlameCannon - shoots a flame
 //------------------------------------------------------------------------------
-IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, short direction)
-    : CObject(NULL, x, y)
+IO_FlameCannon::IO_FlameCannon(Vec2s pos, short freq, short direction)
+    : CObject(NULL, pos.x, pos.y)
     , iFreq(freq)
     , iDirection(direction)
 {
