@@ -6,21 +6,18 @@
 class IO_BulletBillCannon : public CObject {
 public:
     IO_BulletBillCannon(Vec2s pos, short freq, float vel, bool preview);
-    ~IO_BulletBillCannon() {}
 
-    void draw() {}
-    void update();
+    void draw() override {}
+    void update() override;
 
-    bool collide(CPlayer*)
-    {
-        return false;
-    }
-    void collide(IO_MovingObject*) {}
+    bool collide(CPlayer*) override { return false; }
+    void collide(IO_MovingObject*) override {}
 
 private:
     void SetNewTimer();
 
-    short iFreq, iTimer;
-    float dVel;
-    bool fPreview;
+    short m_freq = 0;
+    short m_timer = 0;
+    float m_vel = 0.f;
+    bool m_preview = false;
 };
