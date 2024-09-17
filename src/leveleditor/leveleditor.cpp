@@ -760,43 +760,34 @@ bool TileTypeIsModified(short x, short y)
 	return g_map->mapdatatop[x][y] != CalculateTileType(x, y);
 }
 
-void AdjustMapItems(short iClickX, short iClickY)
+void AdjustMapItems(short x, short y)
 {
-    for (short j = 0; j < g_map->iNumMapItems; j++) {
-        if (g_map->mapitems[j].ix == iClickX && g_map->mapitems[j].iy == iClickY) {
-			if ((g_map->mapdatatop[iClickX][iClickY] != TileType::NonSolid &&
-				g_map->mapdatatop[iClickX][iClickY] != TileType::SolidOnTop &&
-				g_map->mapdatatop[iClickX][iClickY] != TileType::IceOnTop) ||
-                    g_map->objectdata[iClickX][iClickY].iType != -1) {
-				g_map->iNumMapItems--;
+    constexpr std::array<TileType, 3> IGNORED_TILES {
+        TileType::NonSolid,
+        TileType::SolidOnTop,
+        TileType::IceOnTop,
+    };
 
-                for (short k = j; k < g_map->iNumMapItems - 1; k++) {
-					g_map->mapitems[k].itype = g_map->mapitems[k + 1].itype;
-					g_map->mapitems[k].ix = g_map->mapitems[k + 1].ix;
-					g_map->mapitems[k].iy = g_map->mapitems[k + 1].iy;
-				}
-			}
+    const auto pred = [x, y](const MapItem& item){ return item.ix == x && item.iy == y; };
+    const auto it = std::find_if(g_map->mapitems.begin(), g_map->mapitems.end(), pred);
+    if (it != g_map->mapitems.end()) {
+        const TileType tiletype = g_map->mapdatatop[x][y];
+        const short objtype = g_map->objectdata[x][y].iType;
 
-			break;
-		}
-	}
+        const bool tiletypeValid = std::find(IGNORED_TILES.cbegin(), IGNORED_TILES.cend(), tiletype) == IGNORED_TILES.cend();
+        const bool objtypeValid = objtype != -1;
+        if (tiletypeValid || objtypeValid) {
+            g_map->mapitems.erase(it);
+        }
+    }
 }
 
+/// Removes map items located at the XY position.
 void RemoveMapItemAt(short x, short y)
 {
-    for (short j = 0; j < g_map->iNumMapItems; j++) {
-        if (g_map->mapitems[j].ix == x && g_map->mapitems[j].iy == y) {
-			g_map->iNumMapItems--;
-
-            for (short k = j; k < g_map->iNumMapItems; k++) {
-				g_map->mapitems[k].itype = g_map->mapitems[k + 1].itype;
-				g_map->mapitems[k].ix = g_map->mapitems[k + 1].ix;
-				g_map->mapitems[k].iy = g_map->mapitems[k + 1].iy;
-			}
-
-			break;
-		}
-	}
+    const auto pred = [x, y](const MapItem& item){ return item.ix == x && item.iy == y; };
+    const auto it = std::remove_if(g_map->mapitems.begin(), g_map->mapitems.end(), pred);
+    g_map->mapitems.erase(it, g_map->mapitems.end());
 }
 
 bool fExiting = false;
@@ -1297,29 +1288,27 @@ int editor_edit()
 								g_map->mapdatatop[iClickX][iClickY] = set_tiletype;
 								AdjustMapItems(iClickX, iClickY);
                         } else if (edit_mode == 7) { //map items
-                            if (g_map->iNumMapItems < MAXMAPITEMS) {
-									bool fTileNotAvailable = false;
-                                for (short j = 0; j < g_map->iNumMapItems; j++) {
-                                    if (g_map->mapitems[j].ix == iClickX && g_map->mapitems[j].iy == iClickY) {
-											fTileNotAvailable = true;
-											break;
-										}
-									}
-
-									if (g_map->mapdatatop[iClickX][iClickY] != TileType::NonSolid &&
-										g_map->mapdatatop[iClickX][iClickY] != TileType::SolidOnTop &&
-										g_map->mapdatatop[iClickX][iClickY] != TileType::IceOnTop)
-										fTileNotAvailable = true;
-
+                            if (g_map->mapitems.size() < MAXMAPITEMS) {
+                                bool fTileNotAvailable = false;
+                                for (const MapItem& item : g_map->mapitems) {
+                                    if (item.ix == iClickX && item.iy == iClickY) {
+                                        fTileNotAvailable = true;
+                                        break;
+                                    }
+                                }
+                                if (g_map->mapdatatop[iClickX][iClickY] != TileType::NonSolid &&
+                                    g_map->mapdatatop[iClickX][iClickY] != TileType::SolidOnTop &&
+                                    g_map->mapdatatop[iClickX][iClickY] != TileType::IceOnTop) {
+                                    fTileNotAvailable = true;
+                                }
                                 if (!fTileNotAvailable) {
-										MapItem * mapitem = &g_map->mapitems[g_map->iNumMapItems];
-										mapitem->itype = set_mapitem;
-										mapitem->ix = iClickX;
-										mapitem->iy = iClickY;
-
-										g_map->iNumMapItems++;
-									}
-								}
+                                    MapItem mapitem = {};
+                                    mapitem.itype = static_cast<MapItemType>(set_mapitem);
+                                    mapitem.ix = iClickX;
+                                    mapitem.iy = iClickY;
+                                    g_map->mapitems.emplace_back(std::move(mapitem));
+                                }
+                            }
                         } else if (edit_mode == 8) { //animated tiles
                             for (short i = 0; i < set_tile_cols; i++) {
 									short iLocalX = iClickX + i;
@@ -1817,9 +1806,9 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		g_map->drawPlatforms(1);
 
     if (!view_only_layer || fScreenshot) {
-        for (short j = 0; j < g_map->iNumMapItems; j++) {
-			rm->spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(g_map->mapitems[j].ix * iBlockSize, g_map->mapitems[j].iy * iBlockSize, g_map->mapitems[j].itype * iBlockSize, 0, iBlockSize, iBlockSize);
-		}
+        for (const MapItem& item : g_map->mapitems) {
+            rm->spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(item.ix * iBlockSize, item.iy * iBlockSize, item.itype * iBlockSize, 0, iBlockSize, iBlockSize);
+        }
 
         if (!fScreenshot) {
             for (int j = 0; j < MAPHEIGHT; j++) {
@@ -5103,19 +5092,19 @@ bool copyselectedtiles()
 					copiedtiles[j][k].nospawn[iType] = g_map->nospawn[iType][j][k];
 
 				copiedtiles[j][k].item = -1;
-                for (short iMapItem = 0; iMapItem < g_map->iNumMapItems; iMapItem++) {
-                    if (g_map->mapitems[iMapItem].ix == j && g_map->mapitems[iMapItem].iy == k) {
-						copiedtiles[j][k].item = g_map->mapitems[iMapItem].itype;
-						break;
-					}
-				}
-			}
-		}
-	}
+                for (const MapItem& item : g_map->mapitems) {
+                    if (item.ix == j && item.iy == k) {
+                        copiedtiles[j][k].item = item.itype;
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
-	copiedlayer = selected_layer;
+    copiedlayer = selected_layer;
 
-	return ret;
+    return ret;
 }
 
 void clearselectedmaptiles()
@@ -5228,16 +5217,15 @@ void pasteselectedtiles(int movex, int movey)
 						//if (move_replace)
 						//	RemoveMapItemAt(j, k);
 
-                        if (g_map->iNumMapItems < MAXMAPITEMS && copiedtiles[j][k].item >= 0) {
+                                                if (g_map->mapitems.size() < MAXMAPITEMS && copiedtiles[j][k].item >= 0) {
 						//	if (!move_replace)
 						//		RemoveMapItemAt(j, k);
 
-							MapItem * mapitem = &g_map->mapitems[g_map->iNumMapItems];
-							mapitem->itype = copiedtiles[j][k].item;
-							mapitem->ix = iNewX;
-							mapitem->iy = iNewY;
-
-							g_map->iNumMapItems++;
+                                                    MapItem item = {};
+                                                    item.itype = static_cast<MapItemType>(copiedtiles[j][k].item);
+                                                    item.ix = iNewX;
+                                                    item.iy = iNewY;
+                                                    g_map->mapitems.emplace_back(std::move(item));
 						}
 					}
 				}

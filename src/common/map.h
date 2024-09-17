@@ -25,6 +25,16 @@ enum ReadType: uint8_t {
     read_type_summary = 2
 };
 
+// NOTE: Types have a fixed order! See the 1.8 map reader.
+enum MapItemType : unsigned char {
+    GreenSpring,
+    Spike,
+    GreenKuriboShoe,
+    GoldenSpring,
+    StickyKuriboShoe,
+    ThrowBox,
+};
+
 /*
 									PD  SDR SDL SDB SDT G	DR	DL	DB	DT	I	SOT	S
 	tile_nonsolid = 0				0	0	0	0	0	0	0	0	0	0	0	0	0
@@ -106,9 +116,9 @@ struct SpawnArea {
 };
 
 struct MapItem {
-	short itype;
-	short ix;
-	short iy;
+    MapItemType itype;
+    short ix;
+    short iy;
 };
 
 struct MapHazard {
@@ -246,8 +256,6 @@ class CMap
 		short eyecandy[3];
 		short musicCategoryID;
 
-		short iNumMapItems = 0;
-
 		short iNumRaceGoals = 0;
 		short iNumFlagBases = 0;
 
@@ -268,7 +276,7 @@ class CMap
                 std::vector<MovingPlatform*> platforms;
 		std::list<MovingPlatform*> tempPlatforms;
 
-		MapItem		mapitems[MAXMAPITEMS];
+                std::vector<MapItem> mapitems;
                 std::vector<MapHazard>	maphazards;
 
 		SpawnArea	spawnareas[NUMSPAWNAREATYPES][MAXSPAWNAREAS];

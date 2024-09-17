@@ -135,12 +135,14 @@ void MapReader1800::read_switches(CMap& map, BinaryFile& mapfile)
 void MapReader1800::read_items(CMap& map, BinaryFile& mapfile)
 {
     //Load map items (like carryable spikes and springs)
-    map.iNumMapItems = mapfile.read_i32();
+    const size_t iNumMapItems = mapfile.read_i32();
 
-    for (short j = 0; j < map.iNumMapItems; j++) {
-        map.mapitems[j].itype = mapfile.read_i32();
-        map.mapitems[j].ix = mapfile.read_i32();
-        map.mapitems[j].iy = mapfile.read_i32();
+    for (size_t idx = 0; idx < iNumMapItems; idx++) {
+        MapItem item = {};
+        item.itype = static_cast<MapItemType>(mapfile.read_i32()); // TODO: Error handling
+        item.ix = mapfile.read_i32();
+        item.iy = mapfile.read_i32();
+        map.mapitems.emplace_back(std::move(item));
     }
 }
 

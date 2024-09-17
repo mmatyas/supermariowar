@@ -423,6 +423,7 @@ CMap::CMap()
     , racegoallocations()
     , flagbaselocations()
 {
+    mapitems.reserve(MAXMAPITEMS);
     maphazards.reserve(MAXMAPHAZARDS);
 }
 
@@ -498,7 +499,7 @@ void CMap::clearMap()
     eyecandy[1] = 0;
     eyecandy[2] = 0;
 
-    iNumMapItems = 0;
+    mapitems.clear();
     maphazards.clear();
 
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)
@@ -550,7 +551,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     eyecandy[0] = 0;
     eyecandy[1] = 0;
     eyecandy[2] = 0;
-    iNumMapItems = 0;
+    mapitems.clear();
     maphazards.clear();
 
     /*
@@ -842,7 +843,7 @@ void CMap::saveMap(const std::string& file)
     mapfile.write_i32(maphazards.size());
     mapfile.write_i32(iItemDestroyableBlockCount);
     mapfile.write_i32(iHiddenBlockCount);
-    mapfile.write_i32(iNumMapItems);
+    mapfile.write_i32(mapitems.size());
     mapfile.write_i32(iDensity);
 
     //Write tileset names and indexes for translation at load time
@@ -986,12 +987,12 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Write map items (carried springs, spikes, kuribo's shoe, etc)
-    mapfile.write_i32(iNumMapItems);
+    mapfile.write_i32(mapitems.size());
 
-    for (short iMapItem = 0; iMapItem < iNumMapItems; iMapItem++) {
-        mapfile.write_i32(mapitems[iMapItem].itype);
-        mapfile.write_i32(mapitems[iMapItem].ix);  //tile aligned
-        mapfile.write_i32(mapitems[iMapItem].iy);
+    for (const MapItem& item : mapitems) {
+        mapfile.write_i32(item.itype);
+        mapfile.write_i32(item.ix);  //tile aligned
+        mapfile.write_i32(item.iy);
     }
 
     //Write map hazards (fireball strings, rotodiscs, pirhana plants, etc)
@@ -1765,9 +1766,9 @@ void CMap::preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail)
         iScreenshotSize = 1;
     }
 
-    for (int j = 0; j < iNumMapItems; j++) {
-        SDL_Rect rSrc = {mapitems[j].itype * iTileSize, 0, iTileSize, iTileSize};
-        SDL_Rect rDst = {mapitems[j].ix * iTileSize, mapitems[j].iy * iTileSize, iTileSize, iTileSize};
+    for (const MapItem& item : mapitems) {
+        SDL_Rect rSrc = {item.itype * iTileSize, 0, iTileSize, iTileSize};
+        SDL_Rect rDst = {item.ix * iTileSize, item.iy * iTileSize, iTileSize, iTileSize};
 
         SDL_BlitSurface(rm->spr_thumbnail_mapitems[iScreenshotSize].getSurface(), &rSrc, targetSurface, &rDst);
     }

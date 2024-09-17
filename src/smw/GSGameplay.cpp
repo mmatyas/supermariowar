@@ -1555,8 +1555,8 @@ void LoadMapObjects(bool fPreview)
     bool * fBoxHasCoin = NULL;
 
     if (game_values.gamemode->gamemode == game_mode_boxes_minigame) {
-        for (short iItem = 0; iItem < g_map->iNumMapItems; iItem++) {
-            if (g_map->mapitems[iItem].itype == 5)
+        for (const MapItem& item : g_map->mapitems) {
+            if (item.itype == 5)
                 iThrowBoxCount++;
         }
 
@@ -1585,10 +1585,9 @@ void LoadMapObjects(bool fPreview)
 
     //Add map objects like springs, shoes and spikes
     short iAddThrowBoxIndex = 0;
-    for (short i = 0; i < g_map->iNumMapItems; i++) {
-        MapItem * mapItem = &g_map->mapitems[i];
-        short iType = mapItem->itype;
-        Vec2s pos(mapItem->ix * 32, mapItem->iy * 32);
+    for (const MapItem& item : g_map->mapitems) {
+        const short iType = item.itype;
+        const Vec2s pos(item.ix * 32, item.iy * 32);
 
         if (iType == 0)
             objectcontainer[1].add(new CO_Spring(&rm->spr_spring, pos, false));
