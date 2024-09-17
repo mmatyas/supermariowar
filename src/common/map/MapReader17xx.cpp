@@ -223,10 +223,10 @@ void MapReader1700::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
     map.clearPlatforms();
 
     //Load moving platforms
-    map.iNumPlatforms = (short)mapfile.read_i32();
-    map.platforms = new MovingPlatform*[map.iNumPlatforms];
+    const size_t iNumPlatforms = (short)mapfile.read_i32();
+    map.platforms.reserve(iNumPlatforms);
 
-    for (short iPlatform = 0; iPlatform < map.iNumPlatforms; iPlatform++) {
+    for (size_t idx = 0; idx < iNumPlatforms; idx++) {
         short iWidth = (short)mapfile.read_i32();
         short iHeight = (short)mapfile.read_i32();
 
@@ -241,13 +241,12 @@ void MapReader1700::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
         short iPathType = 0;
         //printf("PathType: %d\n", iPathType);
 
-        MovingPlatformPath* path = NULL;
-        path = read_platform_path_details(mapfile, iPathType, fPreview);
+        MovingPlatformPath* path = read_platform_path_details(mapfile, iPathType, fPreview);
         if (!path)
             continue;
 
-        MovingPlatform * platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);
-        map.platforms[iPlatform] = platform;
+        MovingPlatform* platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);
+        map.platforms.emplace_back(platform);
         map.platformdrawlayer[iDrawLayer].push_back(platform);
     }
 }

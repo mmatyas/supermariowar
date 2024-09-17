@@ -12,7 +12,6 @@
 #include "TilesetManager.h"
 #include "Version.h"
 #include "map/MapReader.h"
-#include "map/MapReaderConstants.h"
 
 #include "SDL_image.h"
 #include "sdl12wrapper.h"
@@ -514,16 +513,10 @@ void CMap::clearPlatforms()
     for (short iLayer = 0; iLayer < 5; iLayer++)
         platformdrawlayer[iLayer].clear();
 
-    if (platforms) {
-        for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-            delete platforms[iPlatform];
-        }
+    for (MovingPlatform* platform : platforms)
+        delete platform;
 
-        delete [] platforms;
-        platforms = NULL;
-    }
-
-    iNumPlatforms = 0;
+    platforms.clear();
 
     std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
 
@@ -741,15 +734,15 @@ void CMap::saveMap(const std::string& file)
     int iItemDestroyableBlockCount = 0;
     int iHiddenBlockCount = 0;
 
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        for (short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++) {
-            for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
+    for (MovingPlatform* platform : platforms) {
+        for (short iCol = 0; iCol < platform->iTileWidth; iCol++) {
+            for (short iRow = 0; iRow < platform->iTileHeight; iRow++) {
 
                 //Set the tile type flags for each tile
-                TileType iType = platforms[iPlatform]->iTileType[iCol][iRow];
+                TileType iType = platform->iTileType[iCol][iRow];
                 unsigned short iFlags = tileToFlags(iType);
 
-                TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
+                TilesetTile * tile = &platform->iTileData[iCol][iRow];
 
                 if (tile->iID != TILESETNONE)
                     iPlatformCount++;
@@ -870,10 +863,10 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Scan platforms too for tilesets used
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        for (short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++) {
-            for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
-                TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
+    for (MovingPlatform* platform : platforms) {
+        for (short iCol = 0; iCol < platform->iTileWidth; iCol++) {
+            for (short iRow = 0; iRow < platform->iTileHeight; iRow++) {
+                TilesetTile * tile = &platform->iTileData[iCol][iRow];
 
                 if (tile->iID >= 0)
                     fTilesetUsed[tile->iID] = true;
@@ -939,15 +932,15 @@ void CMap::saveMap(const std::string& file)
         mapfile.write_i32(iSwitches[iSwitch]);
 
     //Write moving platforms
-    mapfile.write_i32(iNumPlatforms);
+    mapfile.write_i32(platforms.size());
 
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        mapfile.write_i32(platforms[iPlatform]->iTileWidth);
-        mapfile.write_i32(platforms[iPlatform]->iTileHeight);
+    for (MovingPlatform* platform : platforms) {
+        mapfile.write_i32(platform->iTileWidth);
+        mapfile.write_i32(platform->iTileHeight);
 
-        for (short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++) {
-            for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
-                TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
+        for (short iCol = 0; iCol < platform->iTileWidth; iCol++) {
+            for (short iRow = 0; iRow < platform->iTileHeight; iRow++) {
+                TilesetTile * tile = &platform->iTileData[iCol][iRow];
 
                 //Make sure the tile's col and row are within the tileset
                 if (tile->iID >= 0) {
@@ -962,27 +955,27 @@ void CMap::saveMap(const std::string& file)
                 mapfile.write_i8(tile->iCol);
                 mapfile.write_i8(tile->iRow);
 
-                mapfile.write_i32(static_cast<int>(platforms[iPlatform]->iTileType[iCol][iRow]));
+                mapfile.write_i32(static_cast<int>(platform->iTileType[iCol][iRow]));
             }
         }
 
-        mapfile.write_i32(platforms[iPlatform]->iDrawLayer);
+        mapfile.write_i32(platform->iDrawLayer);
 
-        short iPathType = static_cast<short>(platforms[iPlatform]->pPath->typeId());
+        short iPathType = static_cast<short>(platform->pPath->typeId());
         mapfile.write_i32(iPathType);
 
-        if (auto* path = dynamic_cast<StraightPath*>(platforms[iPlatform]->pPath)) {
+        if (auto* path = dynamic_cast<StraightPath*>(platform->pPath)) {
             mapfile.write_float(path->startPos().x);
             mapfile.write_float(path->startPos().y);
             mapfile.write_float(path->endPos().x);
             mapfile.write_float(path->endPos().y);
             mapfile.write_float(path->speed());
-        } else if (auto* path = dynamic_cast<StraightPathContinuous*>(platforms[iPlatform]->pPath)) {
+        } else if (auto* path = dynamic_cast<StraightPathContinuous*>(platform->pPath)) {
             mapfile.write_float(path->startPos().x);
             mapfile.write_float(path->startPos().y);
             mapfile.write_float(path->angle());
             mapfile.write_float(path->speed());
-        } else if (auto* path = dynamic_cast<EllipsePath*>(platforms[iPlatform]->pPath)) {
+        } else if (auto* path = dynamic_cast<EllipsePath*>(platform->pPath)) {
             mapfile.write_float(path->radius().x);
             mapfile.write_float(path->radius().y);
             mapfile.write_float(path->centerPos().x);
@@ -1665,9 +1658,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 
 void CMap::addPlatformAnimatedTiles()
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        MovingPlatform * platform = platforms[iPlatform];
-
+    for (MovingPlatform* platform : platforms) {
         short iHeight = platform->iTileHeight;
         short iWidth = platform->iTileWidth;
         TilesetTile ** tiles = platform->iTileData;
@@ -1725,8 +1716,7 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
 {
     blitdest = targetSurface;
 
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        MovingPlatform * platform = platforms[iPlatform];
+    for (MovingPlatform* platform : platforms) {
         MovingPlatformPath * basepath = platform->pPath;
 
         if (auto* path = dynamic_cast<StraightPath*>(basepath)) {
@@ -2168,8 +2158,8 @@ void CMap::SetupAnimatedTiles()
 
 void CMap::updatePlatforms()
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        platforms[iPlatform]->update();
+    for (MovingPlatform* platform : platforms) {
+        platform->update();
     }
 
     std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
@@ -2217,8 +2207,8 @@ void CMap::drawPlatforms(short iOffsetX, short iOffsetY, short iLayer)
 
 void CMap::movingPlatformCollision(IO_MovingObject * object)
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        platforms[iPlatform]->collide(object);
+    for (MovingPlatform* platform : platforms) {
+        platform->collide(object);
     }
 
     std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
@@ -2231,8 +2221,8 @@ void CMap::movingPlatformCollision(IO_MovingObject * object)
 bool CMap::movingPlatformCheckSides(IO_MovingObject * object)
 {
     bool fRet = false;
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        fRet |= platforms[iPlatform]->collision_detection_check_sides(object);
+    for (MovingPlatform* platform : platforms) {
+        fRet |= platform->collision_detection_check_sides(object);
     }
 
     std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
@@ -2246,8 +2236,8 @@ bool CMap::movingPlatformCheckSides(IO_MovingObject * object)
 
 void CMap::resetPlatforms()
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        platforms[iPlatform]->ResetPath();
+    for (MovingPlatform* platform : platforms) {
+        platform->ResetPath();
     }
 
     std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
@@ -2404,8 +2394,8 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
         break;
     }
     //Check to see if we are spawning into a platform
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        if (platforms[iPlatform]->IsInNoSpawnZone(*x, *y, width, height))
+    for (MovingPlatform* platform : platforms) {
+        if (platform->IsInNoSpawnZone(*x, *y, width, height))
             return false;
     }
 
@@ -2423,7 +2413,7 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 
 void CMap::AddPermanentPlatform(MovingPlatform * platform)
 {
-    platforms[iNumPlatforms++] = platform;
+    platforms.emplace_back(platform);
     platformdrawlayer[platform->iDrawLayer].push_back(platform);
 }
 
@@ -2434,8 +2424,8 @@ void CMap::AddTemporaryPlatform(MovingPlatform * platform)
 
 bool CMap::IsInPlatformNoSpawnZone(short x, short y, short width, short height)
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        if (platforms[iPlatform]->IsInNoSpawnZone(x, y, width, height))
+    for (MovingPlatform* platform : platforms) {
+        if (platform->IsInNoSpawnZone(x, y, width, height))
             return true;
     }
 

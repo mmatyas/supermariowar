@@ -64,22 +64,17 @@ void CScore::AdjustScore(short iValue)
 void CMap::movingPlatformCollision(CPlayer * player)
 {
     //Collide player with normal moving platforms
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        platforms[iPlatform]->collide(player);
-
+    for (MovingPlatform* platform : platforms) {
+        platform->collide(player);
         if (!player->isready())
             return;
     }
 
     //Collide player with temporary platforms (like falling donut blocks)
-    std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
-    while (iterateAll != lim) {
-        (*iterateAll)->collide(player);
-
+    for (MovingPlatform* platform : tempPlatforms) {
+        platform->collide(player);
         if (!player->isready())
             return;
-
-        iterateAll++;
     }
 }
 

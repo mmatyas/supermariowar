@@ -560,7 +560,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
 
         //Look through all platforms and see if we are hitting solid or death tiles in them
-        for (short iPlatform = 0; iPlatform < g_map->iNumPlatforms; iPlatform++) {
+        for (short iPlatform = 0; iPlatform < g_map->platforms.size(); iPlatform++) {
             int lefttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix, iDeathY << 5);
             int righttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix + PW, iDeathY << 5);
 

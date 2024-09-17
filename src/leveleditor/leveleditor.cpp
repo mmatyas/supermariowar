@@ -4840,7 +4840,7 @@ void loadcurrentmap()
 
 	rm->spr_background.init(path);
 
-	g_iNumPlatforms = g_map->iNumPlatforms;
+        g_iNumPlatforms = g_map->platforms.size();
 
     for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
@@ -4922,7 +4922,7 @@ void insert_platforms_into_map()
 	g_map->clearPlatforms();
 
 	//g_map->iNumPlatforms = g_iNumPlatforms;
-	g_map->platforms = new MovingPlatform*[g_iNumPlatforms];
+        g_map->platforms.reserve(g_iNumPlatforms);
 
     for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
 		short iTop, iLeft, iWidth, iHeight;

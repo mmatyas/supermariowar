@@ -265,9 +265,7 @@ class CMap
 
 		std::vector<AnimatedTile*> animatedtiles;
 
-		MovingPlatform ** platforms = nullptr;
-		short		iNumPlatforms = 0;
-
+                std::vector<MovingPlatform*> platforms;
 		std::list<MovingPlatform*> tempPlatforms;
 
 		MapItem		mapitems[MAXMAPITEMS];
