@@ -385,7 +385,7 @@ void ClearTilesetTile(TilesetTile * tile)
 }
 
 short NewMapHazard();
-void DrawMapHazardControls(MapHazard * hazard);
+void DrawMapHazardControls(const MapHazard& hazard);
 void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY);
 
 void SetNoSpawn(short nospawnmode, short col, short row, bool value);
@@ -3140,11 +3140,11 @@ int editor_maphazards()
 						}
                 } else if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9) {
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
-							short iHazard = event.key.keysym.sym - SDLK_1;
-                        if (iHazard < g_map->iNumMapHazards) {
-								iEditMapHazard = iHazard;
-								iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
-							}
+                        short iHazard = event.key.keysym.sym - SDLK_1;
+                        if (iHazard < static_cast<short>(g_map->maphazards.size())) {
+                            iEditMapHazard = iHazard;
+                            iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
+                        }
                     } else if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
@@ -3153,21 +3153,21 @@ int editor_maphazards()
 						}
                 } else if (event.key.keysym.sym == SDLK_DELETE) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState || MAPHAZARD_EDIT_STATE_LOCATION == iEditState) {
-							//Copy platforms into empty spot
-                        for (short iMapHazard = iEditMapHazard; iMapHazard < g_map->iNumMapHazards - 1; iMapHazard++) {
-								g_map->maphazards[iMapHazard].itype = g_map->maphazards[iMapHazard + 1].itype;
-								g_map->maphazards[iMapHazard].ix = g_map->maphazards[iMapHazard + 1].ix;
-								g_map->maphazards[iMapHazard].iy = g_map->maphazards[iMapHazard + 1].iy;
+                        //Copy platforms into empty spot
+                        for (short iMapHazard = iEditMapHazard; iMapHazard < g_map->maphazards.size() - 1; iMapHazard++) {
+                            g_map->maphazards[iMapHazard].itype = g_map->maphazards[iMapHazard + 1].itype;
+                            g_map->maphazards[iMapHazard].ix = g_map->maphazards[iMapHazard + 1].ix;
+                            g_map->maphazards[iMapHazard].iy = g_map->maphazards[iMapHazard + 1].iy;
 
                             for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++) {
-									g_map->maphazards[iMapHazard].iparam[iParam] = g_map->maphazards[iMapHazard + 1].iparam[iParam];
-									g_map->maphazards[iMapHazard].dparam[iParam] = g_map->maphazards[iMapHazard + 1].dparam[iParam];
-								}
-							}
+                                g_map->maphazards[iMapHazard].iparam[iParam] = g_map->maphazards[iMapHazard + 1].iparam[iParam];
+                                g_map->maphazards[iMapHazard].dparam[iParam] = g_map->maphazards[iMapHazard + 1].dparam[iParam];
+                            }
+                        }
 
-							g_map->iNumMapHazards--;
-							iEditState = MAPHAZARD_EDIT_STATE_SELECT;
-						}
+                        g_map->maphazards.pop_back();
+                        iEditState = MAPHAZARD_EDIT_STATE_SELECT;
+                    }
                 } else if (event.key.keysym.sym == SDLK_ESCAPE) {
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
                             editor_maphazards_initialized = false;
@@ -3249,25 +3249,25 @@ int editor_maphazards()
 						short iClickY = event.button.y;
 
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
-							//check clicks on existing platforms
-                        for (int iMapHazard = 0; iMapHazard < g_map->iNumMapHazards; iMapHazard++) {
-								if (iClickX >= rIconRects[iMapHazard][1].x && iClickX < rIconRects[iMapHazard][1].x + rIconRects[iMapHazard][1].w &&
-                                    iClickY >= rIconRects[iMapHazard][1].y && iClickY < rIconRects[iMapHazard][1].y + rIconRects[iMapHazard][1].h) {
-									iEditMapHazard = iMapHazard;
-									iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
-									ignoreclick = true;
+                        //check clicks on existing platforms
+                        for (int iMapHazard = 0; iMapHazard < static_cast<int>(g_map->maphazards.size()); iMapHazard++) {
+                            if (iClickX >= rIconRects[iMapHazard][1].x && iClickX < rIconRects[iMapHazard][1].x + rIconRects[iMapHazard][1].w &&
+                                iClickY >= rIconRects[iMapHazard][1].y && iClickY < rIconRects[iMapHazard][1].y + rIconRects[iMapHazard][1].h) {
+                                iEditMapHazard = iMapHazard;
+                                iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
+                                ignoreclick = true;
 
-									break;
-								}
-							}
+                                break;
+                            }
+                        }
 
-							//check click on the new button
-							if (g_map->iNumMapHazards < MAXMAPHAZARDS && iClickX >= rNewButton[1].x && iClickX < rNewButton[1].x + rNewButton[1].w &&
-                                iClickY >= rNewButton[1].y && iClickY < rNewButton[1].y + rNewButton[1].h) {
-								iEditMapHazard = NewMapHazard();
-								iEditState = MAPHAZARD_EDIT_STATE_TYPE;
-								ignoreclick = true;
-							}
+                        //check click on the new button
+                        if (g_map->maphazards.size() < MAXMAPHAZARDS && iClickX >= rNewButton[1].x && iClickX < rNewButton[1].x + rNewButton[1].w &&
+                            iClickY >= rNewButton[1].y && iClickY < rNewButton[1].y + rNewButton[1].h) {
+                            iEditMapHazard = NewMapHazard();
+                            iEditState = MAPHAZARD_EDIT_STATE_TYPE;
+                            ignoreclick = true;
+                        }
                     } else if (MAPHAZARD_EDIT_STATE_TYPE == iEditState && !ignoreclick) {
                         for (int iType = 0; iType < 8; iType++) {
 								if (iClickX >= rTypeButton[iType][1].x && iClickX < rTypeButton[iType][1].x + rTypeButton[iType][1].w &&
@@ -3373,10 +3373,10 @@ int editor_maphazards()
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Map Hazard Mode: [esc] Exit");
 
-			for (int iMapHazard = 0; iMapHazard < g_map->iNumMapHazards; iMapHazard++)
+			for (int iMapHazard = 0; iMapHazard < g_map->maphazards.size(); iMapHazard++)
 				SDL_BlitSurface(s_platform, &rIconRects[iMapHazard][0], screen, &rIconRects[iMapHazard][1]);
 
-			if (g_map->iNumMapHazards < MAXMAPHAZARDS)
+			if (g_map->maphazards.size() < MAXMAPHAZARDS)
 				SDL_BlitSurface(s_platform, &rNewButton[0], screen, &rNewButton[1]);
 
 			rm->menu_font_small.drawCentered(320, rBackground[1].y - 18, "Hazards");
@@ -3393,70 +3393,67 @@ int editor_maphazards()
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Choose Hazard Type");
         } else if (MAPHAZARD_EDIT_STATE_LOCATION == iEditState) {
-			MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
+			const MapHazard& hazard = g_map->maphazards[iEditMapHazard];
 			DrawMapHazard(hazard, 0, true);
 			DrawMapHazardControls(hazard);
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Location: [esc] Exit, [p] Properties, [LMB] Set Location");
         } else if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
-			MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
-			DrawMapHazard(hazard, 0, true);
-			DrawMapHazardControls(hazard);
+            const MapHazard& hazard = g_map->maphazards[iEditMapHazard];
+            DrawMapHazard(hazard, 0, true);
+            DrawMapHazardControls(hazard);
 
-            if (hazard->itype == 0 || hazard->itype == 1) {
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 3, "Properties");
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 2, "[esc] Exit, [l] Location, [+/-] Velocity, [LMB] Angle and Radius");
+            if (hazard.itype == 0 || hazard.itype == 1) {
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 3, "Properties");
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 2, "[esc] Exit, [l] Location, [+/-] Velocity, [LMB] Angle and Radius");
 
-				if (hazard->itype == 1)
-					rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle, [1-9] Number of Rotodiscs");
-				else
-					rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle");
-            } else if (hazard->itype == 2) {
-				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location, [d] Direction");
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[-/+] Velocity, [[/]] or [</>] Frequency");
-            } else if (hazard->itype >= 3 && hazard->itype <= 7) {
-				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location");
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[[/]] or [</>] Frequency, [d] direction");
+                if (hazard.itype == 1) {
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle, [1-9] Number of Rotodiscs");
+                } else {
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle");
+                }
+            } else if (hazard.itype == 2) {
+                rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location, [d] Direction");
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[-/+] Velocity, [[/]] or [</>] Frequency");
+            } else if (hazard.itype >= 3 && hazard.itype <= 7) {
+                rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location");
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[[/]] or [</>] Frequency, [d] direction");
             } else {
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location");
-			}
-		}
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location");
+            }
+        }
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
+        rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
-		DrawMessage();
-		return EDITOR_MAPHAZARDS;
+        DrawMessage();
+        return EDITOR_MAPHAZARDS;
 }
 
 short NewMapHazard()
 {
-	//Clear new map hazard
-	short iEditMapHazard = g_map->iNumMapHazards;
-
-	MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
-	hazard->itype = 0;
-	hazard->ix = 10;
-	hazard->iy = 7;
+    MapHazard hazard;
+    hazard.itype = 0;
+    hazard.ix = 10;
+    hazard.iy = 7;
 
     for (short iMapHazard = 0; iMapHazard < NUMMAPHAZARDPARAMS; iMapHazard++) {
-		hazard->iparam[iMapHazard] = 0;
-		hazard->dparam[iMapHazard] = 0.0f;
-	}
+        hazard.iparam[iMapHazard] = 0;
+        hazard.dparam[iMapHazard] = 0.f;
+    }
 
-	g_map->iNumMapHazards++;
-
-	return iEditMapHazard;
+    g_map->maphazards.emplace_back(std::move(hazard));
+    return g_map->maphazards.size() - 1;
 }
 
-void DrawMapHazardControls(MapHazard * hazard)
+void DrawMapHazardControls(const MapHazard& hazard)
 {
-    if (hazard->itype == 0 || hazard->itype == 1 || hazard->itype == 2) {
+    if (hazard.itype == 0 || hazard.itype == 1 || hazard.itype == 2) {
 		short iVelMarkerX = 0;
 
-		if (hazard->itype == 2)
-			iVelMarkerX = (short)(hazard->dparam[0] + 10.0f) * 12 + 196;
+		if (hazard.itype == 2)
+			iVelMarkerX = (short)(hazard.dparam[0] + 10.0f) * 12 + 196;
 		else
-			iVelMarkerX = (short)((hazard->dparam[0] + 0.05f) / 0.005f) * 12 + 196;
+			iVelMarkerX = (short)((hazard.dparam[0] + 0.05f) / 0.005f) * 12 + 196;
 
 		SDL_Rect rVel[2] = {{0, 400, 244, 17},{198, 420, 244, 17}};
 		SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
@@ -3464,7 +3461,7 @@ void DrawMapHazardControls(MapHazard * hazard)
 		SDL_Rect rMarker[2] = {{244,400,8,18},{iVelMarkerX,418,8,18}};
 		SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
 
-        if (hazard->itype == 2) {
+        if (hazard.itype == 2) {
 			rm->menu_font_small.drawRightJustified(190, 420, "Left");
 			rm->menu_font_small.draw(450, 420, "Right");
         } else {
@@ -3473,8 +3470,8 @@ void DrawMapHazardControls(MapHazard * hazard)
 		}
 	}
 
-    if (hazard->itype >= 2 && hazard->itype <= 7) { // Draw frequency for bullet bill and flame cannon
-		short iFreqMarkerX = ((hazard->iparam[0] / 30) - 1) * 12 + 196;
+    if (hazard.itype >= 2 && hazard.itype <= 7) { // Draw frequency for bullet bill and flame cannon
+		short iFreqMarkerX = ((hazard.iparam[0] / 30) - 1) * 12 + 196;
 
 		SDL_Rect rVel[2] = {{0, 384, 184, 13},{198, 390, 184, 13}};
 		SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
@@ -5308,8 +5305,8 @@ void takescreenshot()
 		}
 
 		//Draw map hazards
-		for (short iHazard = 0; iHazard < g_map->iNumMapHazards; iHazard++)
-			DrawMapHazard(&g_map->maphazards[iHazard], iScreenshotSize, false);
+                for (const MapHazard& hazard : g_map->maphazards)
+                    DrawMapHazard(hazard, iScreenshotSize, false);
 
 		//Save the screenshot with the same name as the map file
 		std::string szSaveFile("maps/screenshots/");

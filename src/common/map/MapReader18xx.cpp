@@ -147,18 +147,21 @@ void MapReader1800::read_items(CMap& map, BinaryFile& mapfile)
 void MapReader1800::read_hazards(CMap& map, BinaryFile& mapfile)
 {
     //Load map hazards (like fireball strings, rotodiscs, pirhana plants)
-    map.iNumMapHazards = mapfile.read_i32();
+    const size_t iNumMapHazards = mapfile.read_i32();
 
-    for (short iMapHazard = 0; iMapHazard < map.iNumMapHazards; iMapHazard++) {
-        map.maphazards[iMapHazard].itype = mapfile.read_i32();
-        map.maphazards[iMapHazard].ix = mapfile.read_i32();
-        map.maphazards[iMapHazard].iy = mapfile.read_i32();
-
-        for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            map.maphazards[iMapHazard].iparam[iParam] = mapfile.read_i32();
+    for (size_t idx = 0; idx < iNumMapHazards; idx++) {
+        MapHazard hazard = {};
+        hazard.itype = mapfile.read_i32();
+        hazard.ix = mapfile.read_i32();
+        hazard.iy = mapfile.read_i32();
 
         for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            map.maphazards[iMapHazard].dparam[iParam] = mapfile.read_float();
+            hazard.iparam[iParam] = mapfile.read_i32();
+
+        for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
+            hazard.dparam[iParam] = mapfile.read_float();
+
+        map.maphazards.emplace_back(std::move(hazard));
     }
 }
 

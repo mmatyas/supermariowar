@@ -119,7 +119,7 @@ int GetScreenHeight(int iSize) {
 } // namespace
 
 
-void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
+void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter)
 {
     short iSizeShift = 5 - iSize;
     short iTileSize = 1 << iSizeShift;
@@ -127,18 +127,18 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
     SDL_Rect rDotSrc = {iPlatformPathDotOffset[iSize] + 22, 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rDotDst;
     SDL_Rect rPathSrc = {iStandardOffset[iSize], 12, iTileSize, iTileSize}, rPathDst;
 
-    rPathDst = {hazard->ix << (iSizeShift - 1), hazard->iy << (iSizeShift - 1), iTileSize, iTileSize};
+    rPathDst = {hazard.ix << (iSizeShift - 1), hazard.iy << (iSizeShift - 1), iTileSize, iTileSize};
 
     if (fDrawCenter) {
-        if (hazard->itype <= 1) {
+        if (hazard.itype <= 1) {
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
         }
     }
 
-    if (hazard->itype == 0) { //fireball string
+    if (hazard.itype == 0) { //fireball string
         short iNumDots = 16;
-        float dRadius = (float)((hazard->iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
-        float dAngle = hazard->dparam[1];
+        float dRadius = (float)((hazard.iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
+        float dAngle = hazard.dparam[1];
         for (short iDot = 0; iDot < iNumDots; iDot++) {
             rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
@@ -149,16 +149,16 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
         }
 
         //Draw the fireball string
-        for (short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++) {
-            short x = (hazard->ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
-            short y = (hazard->iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
+        for (short iFireball = 0; iFireball < hazard.iparam[0]; iFireball++) {
+            short x = (hazard.ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
+            short y = (hazard.iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
 
             rm->spr_hazard_fireball[iSize].draw(x, y, 0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]);
         }
-    } else if (hazard->itype == 1) { //rotodisc
+    } else if (hazard.itype == 1) { //rotodisc
         short iNumDots = 16;
-        float dRadius = (hazard->dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
-        float dAngle = hazard->dparam[1];
+        float dRadius = (hazard.dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
+        float dAngle = hazard.dparam[1];
         for (short iDot = 0; iDot < iNumDots; iDot++) {
             rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
@@ -169,10 +169,10 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
         }
 
         //Draw the rotodiscs
-        float dSector = TWO_PI / hazard->iparam[0];
-        dAngle = hazard->dparam[1];
-        dRadius = hazard->dparam[2] / (float)(1 << iSize);
-        for (short iRotodisc = 0; iRotodisc < hazard->iparam[0]; iRotodisc++) {
+        float dSector = TWO_PI / hazard.iparam[0];
+        dAngle = hazard.dparam[1];
+        dRadius = hazard.dparam[2] / (float)(1 << iSize);
+        for (short iRotodisc = 0; iRotodisc < hazard.iparam[0]; iRotodisc++) {
             short x = rPathDst.x + (short)(dRadius * cos(dAngle));
             short y = rPathDst.y + (short)(dRadius * sin(dAngle));
 
@@ -180,45 +180,45 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 
             dAngle += dSector;
         }
-    } else if (hazard->itype == 2) { //bullet bill
-        rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, 0, hazard->dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize);
+    } else if (hazard.itype == 2) { //bullet bill
+        rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, 0, hazard.dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize);
 
         short iBulletPathX = rPathDst.x - iPlatformPathDotSize[iSize];
-        if (hazard->dparam[0] > 0.0f)
+        if (hazard.dparam[0] > 0.0f)
             iBulletPathX = rPathDst.x + iTileSize;
 
-        short iBulletPathSpacing = (short)(hazard->dparam[0] * dBulletBillFrequency[iSize]);
+        short iBulletPathSpacing = (short)(hazard.dparam[0] * dBulletBillFrequency[iSize]);
         while (iBulletPathX >= 0 && iBulletPathX < GetScreenWidth(iSize)) {
             rDotDst = {iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
 
-            iBulletPathX += hazard->iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
+            iBulletPathX += hazard.iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
         }
-    } else if (hazard->itype == 3) { //flame cannon
-        const SDL_Rect * rect = &g_rFlameRects[hazard->iparam[1]][2];
+    } else if (hazard.itype == 3) { //flame cannon
+        const SDL_Rect * rect = &g_rFlameRects[hazard.iparam[1]][2];
 
         short iOffsetX = 0;
         short iOffsetY = 0;
 
-        if (hazard->iparam[1] == 1) {
+        if (hazard.iparam[1] == 1) {
             iOffsetX = -(iTileSize << 1);
-        } else if (hazard->iparam[1] == 2) {
+        } else if (hazard.iparam[1] == 2) {
             iOffsetY = -(iTileSize << 1);
         }
 
         rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
-    } else if (hazard->itype >= 4 && hazard->itype <= 7) { //pirhana plants
-        const SDL_Rect * rect = &g_rPirhanaRects[hazard->itype - 4][hazard->iparam[1]][0];
+    } else if (hazard.itype >= 4 && hazard.itype <= 7) { //pirhana plants
+        const SDL_Rect * rect = &g_rPirhanaRects[hazard.itype - 4][hazard.iparam[1]][0];
         short iOffsetX = 0;
         short iOffsetY = 0;
 
-        if (hazard->iparam[1] == 0) {
-            if (hazard->itype == 6)
+        if (hazard.iparam[1] == 0) {
+            if (hazard.itype == 6)
                 iOffsetY = -iTileSize;
             else
                 iOffsetY = -(iTileSize >> 1);
-        } else if (hazard->iparam[1] == 2) {
-            if (hazard->itype == 6)
+        } else if (hazard.iparam[1] == 2) {
+            if (hazard.itype == 6)
                 iOffsetX = -iTileSize;
             else
                 iOffsetX = -(iTileSize >> 1);
@@ -423,7 +423,9 @@ CMap::CMap()
     , iSwitches()
     , racegoallocations()
     , flagbaselocations()
-{}
+{
+    maphazards.reserve(MAXMAPHAZARDS);
+}
 
 CMap::~CMap()
 {}
@@ -498,7 +500,7 @@ void CMap::clearMap()
     eyecandy[2] = 0;
 
     iNumMapItems = 0;
-    iNumMapHazards = 0;
+    maphazards.clear();
 
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)
         iSwitches[iSwitch] = 0;
@@ -556,7 +558,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     eyecandy[1] = 0;
     eyecandy[2] = 0;
     iNumMapItems = 0;
-    iNumMapHazards = 0;
+    maphazards.clear();
 
     /*
     cout << "loading map " << file;
@@ -844,7 +846,7 @@ void CMap::saveMap(const std::string& file)
     mapfile.write_i32(iThrowBlockCount);
     mapfile.write_i32(iOnOffBlockCount);
     mapfile.write_i32(iPlatformCount);
-    mapfile.write_i32(iNumMapHazards);
+    mapfile.write_i32(maphazards.size());
     mapfile.write_i32(iItemDestroyableBlockCount);
     mapfile.write_i32(iHiddenBlockCount);
     mapfile.write_i32(iNumMapItems);
@@ -1000,18 +1002,18 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Write map hazards (fireball strings, rotodiscs, pirhana plants, etc)
-    mapfile.write_i32(iNumMapHazards);
+    mapfile.write_i32(maphazards.size());
 
-    for (short iMapHazard = 0; iMapHazard < iNumMapHazards; iMapHazard++) {
-        mapfile.write_i32(maphazards[iMapHazard].itype);
-        mapfile.write_i32(maphazards[iMapHazard].ix);
-        mapfile.write_i32(maphazards[iMapHazard].iy);
-
-        for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            mapfile.write_i32(maphazards[iMapHazard].iparam[iParam]);
+    for (const MapHazard& hazard : maphazards) {
+        mapfile.write_i32(hazard.itype);
+        mapfile.write_i32(hazard.ix);
+        mapfile.write_i32(hazard.iy);
 
         for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            mapfile.write_float(maphazards[iMapHazard].dparam[iParam]);
+            mapfile.write_i32(hazard.iparam[iParam]);
+
+        for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
+            mapfile.write_float(hazard.dparam[iParam]);
     }
 
     //Write eyecandy for all eyecandy layers
@@ -1712,8 +1714,8 @@ void CMap::drawThumbnailHazards(SDL_Surface * targetSurface)
 {
     blitdest = targetSurface;
 
-    for (short iHazard = 0; iHazard < iNumMapHazards; iHazard++) {
-        DrawMapHazard(&maphazards[iHazard], 2, false);
+    for (const MapHazard& hazard : maphazards) {
+        DrawMapHazard(hazard, 2, false);
     }
 
     blitdest = screen;

@@ -145,7 +145,7 @@ struct MapBlock {
 
 class IO_Block;
 
-void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter);
+void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter);
 void DrawPlatform(PlatformPathType pathtype, TilesetTile ** tiles,
 	short startX, short startY, short endX, short endY,
 	float angle, float radiusX, float radiusY,
@@ -247,7 +247,6 @@ class CMap
 		short musicCategoryID;
 
 		short iNumMapItems = 0;
-		short iNumMapHazards = 0;
 
 		short iNumRaceGoals = 0;
 		short iNumFlagBases = 0;
@@ -272,7 +271,7 @@ class CMap
 		std::list<MovingPlatform*> tempPlatforms;
 
 		MapItem		mapitems[MAXMAPITEMS];
-		MapHazard	maphazards[MAXMAPHAZARDS];
+                std::vector<MapHazard>	maphazards;
 
 		SpawnArea	spawnareas[NUMSPAWNAREATYPES][MAXSPAWNAREAS];
 		short		numspawnareas[NUMSPAWNAREATYPES];
