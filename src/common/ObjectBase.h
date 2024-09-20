@@ -35,7 +35,7 @@ float CapSideVelocity(float vel);
 //object base class
 class CObject {
 public:
-    CObject(gfxSprite* nspr, short x, short y);
+    CObject(gfxSprite* nspr, Vec2s pos);
     virtual ~CObject() = default;
 
     virtual void draw(){};

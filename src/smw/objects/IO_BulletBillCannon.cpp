@@ -14,7 +14,7 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 
 IO_BulletBillCannon::IO_BulletBillCannon(Vec2s pos, short freq, float vel, bool preview)
-    : CObject(NULL, pos.x, pos.y)
+    : CObject(NULL, pos)
     , m_freq(freq)
     , m_vel(vel)
     , m_preview(preview)

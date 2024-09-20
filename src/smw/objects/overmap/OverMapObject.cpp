@@ -6,7 +6,7 @@
 // class OverMapObject - moving objects that don't collide with map or objects, just player
 //------------------------------------------------------------------------------
 IO_OverMapObject::IO_OverMapObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth)
-    : CObject(nspr, pos.x, pos.y)
+    : CObject(nspr, pos)
 {
     objectType = object_overmap;
     // movingObjectType = movingobject_none;

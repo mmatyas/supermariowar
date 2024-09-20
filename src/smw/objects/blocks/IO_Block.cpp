@@ -27,7 +27,7 @@ extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 //------------------------------------------------------------------------------
 
 IO_Block::IO_Block(gfxSprite *nspr, Vec2s pos)
-    : CObject(nspr, pos.x, pos.y)
+    : CObject(nspr, pos)
 {
     objectType = object_block;
 

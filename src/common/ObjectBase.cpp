@@ -31,11 +31,11 @@ float CapSideVelocity(float vel)
 //------------------------------------------------------------------------------
 // class Object base class
 //------------------------------------------------------------------------------
-CObject::CObject(gfxSprite *nspr1, short x, short y)
+CObject::CObject(gfxSprite* nspr1, Vec2s pos)
     : spr(nspr1)
 {
-    setXi(x);
-    setYi(y);
+    setXi(pos.x);
+    setYi(pos.y);
 
     if (spr) {
         iw = (short)spr->getWidth();
