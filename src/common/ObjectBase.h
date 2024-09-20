@@ -67,7 +67,11 @@ public:
     int w() const { return iw; }
     int h() const { return ih; }
 
-    float velx = 0.f, vely = 0.f;
+    float velX() const { return velx; }
+    float velY() const { return vely; }
+    float& mutVelX() { return velx; }
+    float& mutVelY() { return vely; }
+
     int iNetworkID;
 
     short collisionWidth;
@@ -88,6 +92,7 @@ protected:
     short ix = 0, iy = 0;
     short iw = 0, ih = 0;
     float fx = 0.f, fy = 0.f;
+    float velx = 0.f, vely = 0.f;
 
     gfxSprite* spr = nullptr;
     short state = 0;

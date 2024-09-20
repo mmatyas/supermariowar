@@ -38,12 +38,9 @@ void pushBombs(CObjectContainer& container, short x, short y)
         int dist = bombx * bombx + bomby * bomby;
 
         if (dist < 10000) {
-            if (bombx > 0)
-                bomb->velx += ((float)(RANDOM_INT(30)) / 10.0f + 4.0f);
-            else
-                bomb->velx -= ((float)(RANDOM_INT(30)) / 10.0f + 4.0f);
-
-            bomb->vely -= (float)(RANDOM_INT(30)) / 10.0f + 6.0f;
+            const float signX = (bombx > 0) ? 1.f : -1.f;
+            bomb->mutVelX() += signX * (static_cast<float>(RANDOM_INT(30)) / 10.0f + 4.0f);
+            bomb->mutVelY() -= static_cast<float>(RANDOM_INT(30)) / 10.0f + 6.0f;
         }
     }
 }
