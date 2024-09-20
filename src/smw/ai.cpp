@@ -1100,8 +1100,8 @@ void CPlayerAI::DistanceToObject(CObject * object, CObject ** target, int * near
 void CPlayerAI::DistanceToObjectCenter(CObject * object, CObject ** target, int * nearest, bool * wrap)
 {
     //Calculate normal screen
-    short tx = object->x() + (object->collisionWidth >> 1) - pPlayer->ix - HALFPW;
-    short ty = object->y() + (object->collisionHeight >> 1) - pPlayer->iy - HALFPH;
+    short tx = object->x() + (object->collisionRectW() / 2) - pPlayer->ix - HALFPW;
+    short ty = object->y() + (object->collisionRectH() / 2) - pPlayer->iy - HALFPH;
     bool fScreenWrap = false;
 
     if (tx > App::screenWidth/2) {

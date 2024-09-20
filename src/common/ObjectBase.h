@@ -72,12 +72,10 @@ public:
     float& mutVelX() { return velx; }
     float& mutVelY() { return vely; }
 
-    int iNetworkID;
+    short collisionRectW() const { return collisionWidth; }
+    short collisionRectH() const { return collisionHeight; }
 
-    short collisionWidth;
-    short collisionHeight;
-    short collisionOffsetX = 0;
-    short collisionOffsetY = 0;
+    int iNetworkID;
 
     short GetState() const { return state; }
     bool isDead() const { return dead; }
@@ -93,6 +91,11 @@ protected:
     short iw = 0, ih = 0;
     float fx = 0.f, fy = 0.f;
     float velx = 0.f, vely = 0.f;
+
+    short collisionWidth;
+    short collisionHeight;
+    short collisionOffsetX = 0;
+    short collisionOffsetY = 0;
 
     gfxSprite* spr = nullptr;
     short state = 0;

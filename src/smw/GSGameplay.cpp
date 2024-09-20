@@ -2586,21 +2586,21 @@ bool coldec_player2obj(CPlayer * o1, CObject * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
     if (o1->rightX() < o2->x()) {
-        return o1->ix + App::screenWidth < o2->x() + o2->collisionWidth && o1->rightX() + App::screenWidth >= o2->x() && o1->iy < o2->y() + o2->collisionHeight && o1->bottomY() >= o2->y();
-    } else if (o2->x() + o2->collisionWidth < o1->ix) {
-        return o1->ix < o2->x() + o2->collisionWidth + App::screenWidth && o1->rightX() >= o2->x() + App::screenWidth && o1->iy < o2->y() + o2->collisionHeight && o1->bottomY() >= o2->y();
+        return o1->ix + App::screenWidth < o2->x() + o2->collisionRectW() && o1->rightX() + App::screenWidth >= o2->x() && o1->iy < o2->y() + o2->collisionRectH() && o1->bottomY() >= o2->y();
+    } else if (o2->x() + o2->collisionRectW() < o1->ix) {
+        return o1->ix < o2->x() + o2->collisionRectW() + App::screenWidth && o1->rightX() >= o2->x() + App::screenWidth && o1->iy < o2->y() + o2->collisionRectH() && o1->bottomY() >= o2->y();
     } else { //Normal case where no overlap
-        return o1->ix < o2->x() + o2->collisionWidth && o1->rightX() >= o2->x() && o1->iy < o2->y() + o2->collisionHeight && o2->y() <= o1->bottomY();
+        return o1->ix < o2->x() + o2->collisionRectW() && o1->rightX() >= o2->x() && o1->iy < o2->y() + o2->collisionRectH() && o2->y() <= o1->bottomY();
     }
 }
 
 bool coldec_obj2obj(CObject * o1, CObject * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
-    short o1r = o1->x() + o1->collisionWidth;
-    short o1b = o1->y() + o1->collisionHeight;
-    short o2r = o2->x() + o2->collisionWidth;
-    short o2b = o2->y() + o2->collisionHeight;
+    short o1r = o1->x() + o1->collisionRectW();
+    short o1b = o1->y() + o1->collisionRectH();
+    short o2r = o2->x() + o2->collisionRectW();
+    short o2b = o2->y() + o2->collisionRectH();
 
     if (o1r < o2->x()) {
         return o1->x() + App::screenWidth < o2r && o1r + App::screenWidth >= o2->x() && o1->y() < o2b && o1b >= o2->y();
