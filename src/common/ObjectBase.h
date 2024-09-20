@@ -64,8 +64,9 @@ public:
 
     int x() const { return ix; }
     int y() const { return iy; }
+    int w() const { return iw; }
+    int h() const { return ih; }
 
-    short iw = 0, ih = 0;
     float velx = 0.f, vely = 0.f;
     int iNetworkID;
 
@@ -84,7 +85,8 @@ public:
 protected:
     ObjectType objectType = object_none;
 
-    short ix, iy;
+    short ix = 0, iy = 0;
+    short iw = 0, ih = 0;
     float fx = 0.f, fy = 0.f;
 
     gfxSprite* spr = nullptr;
