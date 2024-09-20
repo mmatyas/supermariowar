@@ -2585,29 +2585,29 @@ bool coldec_player2player(CPlayer * o1, CPlayer * o2)
 bool coldec_player2obj(CPlayer * o1, CObject * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
-    if (o1->rightX() < o2->ix) {
-        return o1->ix + App::screenWidth < o2->ix + o2->collisionWidth && o1->rightX() + App::screenWidth >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o1->bottomY() >= o2->iy;
-    } else if (o2->ix + o2->collisionWidth < o1->ix) {
-        return o1->ix < o2->ix + o2->collisionWidth + App::screenWidth && o1->rightX() >= o2->ix + App::screenWidth && o1->iy < o2->iy + o2->collisionHeight && o1->bottomY() >= o2->iy;
+    if (o1->rightX() < o2->x()) {
+        return o1->ix + App::screenWidth < o2->x() + o2->collisionWidth && o1->rightX() + App::screenWidth >= o2->x() && o1->iy < o2->y() + o2->collisionHeight && o1->bottomY() >= o2->y();
+    } else if (o2->x() + o2->collisionWidth < o1->ix) {
+        return o1->ix < o2->x() + o2->collisionWidth + App::screenWidth && o1->rightX() >= o2->x() + App::screenWidth && o1->iy < o2->y() + o2->collisionHeight && o1->bottomY() >= o2->y();
     } else { //Normal case where no overlap
-        return o1->ix < o2->ix + o2->collisionWidth && o1->rightX() >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o2->iy <= o1->bottomY();
+        return o1->ix < o2->x() + o2->collisionWidth && o1->rightX() >= o2->x() && o1->iy < o2->y() + o2->collisionHeight && o2->y() <= o1->bottomY();
     }
 }
 
 bool coldec_obj2obj(CObject * o1, CObject * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
-    short o1r = o1->ix + o1->collisionWidth;
-    short o1b = o1->iy + o1->collisionHeight;
-    short o2r = o2->ix + o2->collisionWidth;
-    short o2b = o2->iy + o2->collisionHeight;
+    short o1r = o1->x() + o1->collisionWidth;
+    short o1b = o1->y() + o1->collisionHeight;
+    short o2r = o2->x() + o2->collisionWidth;
+    short o2b = o2->y() + o2->collisionHeight;
 
-    if (o1r < o2->ix) {
-        return o1->ix + App::screenWidth < o2r && o1r + App::screenWidth >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
-    } else if (o2r < o1->ix) {
-        return o1->ix < o2r + App::screenWidth && o1r >= o2->ix + App::screenWidth && o1->iy < o2b && o1b >= o2->iy;
+    if (o1r < o2->x()) {
+        return o1->x() + App::screenWidth < o2r && o1r + App::screenWidth >= o2->x() && o1->y() < o2b && o1b >= o2->y();
+    } else if (o2r < o1->x()) {
+        return o1->x() < o2r + App::screenWidth && o1r >= o2->x() + App::screenWidth && o1->y() < o2b && o1b >= o2->y();
     } else {
-        return o1->ix < o2r && o1r >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
+        return o1->x() < o2r && o1r >= o2->x() && o1->y() < o2b && o1b >= o2->y();
     }
 }
 

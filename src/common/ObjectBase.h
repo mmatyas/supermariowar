@@ -62,7 +62,9 @@ public:
         fy = static_cast<float>(iy);
     }
 
-    short ix, iy;
+    int x() const { return ix; }
+    int y() const { return iy; }
+
     short iw = 0, ih = 0;
     float velx = 0.f, vely = 0.f;
     int iNetworkID;
@@ -82,6 +84,7 @@ public:
 protected:
     ObjectType objectType = object_none;
 
+    short ix, iy;
     float fx = 0.f, fy = 0.f;
 
     gfxSprite* spr = nullptr;

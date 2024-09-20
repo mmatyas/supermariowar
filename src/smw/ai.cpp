@@ -348,14 +348,14 @@ void CPlayerAI::Think(COutputControl * playerKeys)
         } else if (actionType == 1) { //Go for goal
             CObject * goal = nearestObjects.goal;
 
-            if ((goal->ix > ix && nearestObjects.goalwrap) || (goal->ix < ix && !nearestObjects.goalwrap))
+            if ((goal->x() > ix && nearestObjects.goalwrap) || (goal->x() < ix && !nearestObjects.goalwrap))
                 playerKeys->game_left.fDown = true;
             else
                 playerKeys->game_right.fDown = true;
 
-            if (goal->iy <= iy && goal->ix - ix < 45 && goal->ix - ix > -45) {
+            if (goal->y() <= iy && goal->x() - ix < 45 && goal->x() - ix > -45) {
                 playerKeys->game_jump.fDown = true;
-            } else if (goal->iy > iy && goal->ix - ix < 45 && goal->ix - ix > -45) {
+            } else if (goal->y() > iy && goal->x() - ix < 45 && goal->x() - ix > -45) {
                 if (!pPlayer->inair) playerKeys->game_down.fDown = true;
             }
 
@@ -392,14 +392,14 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             //If threat, always use turbo
             playerKeys->game_turbo.fDown = true;
 
-            if ((threat->ix > ix && nearestObjects.threatwrap) || (threat->ix < ix && !nearestObjects.threatwrap))
+            if ((threat->x() > ix && nearestObjects.threatwrap) || (threat->x() < ix && !nearestObjects.threatwrap))
                 playerKeys->game_right.fDown = true;
             else
                 playerKeys->game_left.fDown = true;
 
-            if (threat->iy <= iy && threat->ix - ix < 60 && threat->ix - ix > -60) {
+            if (threat->y() <= iy && threat->x() - ix < 60 && threat->x() - ix > -60) {
                 if (!pPlayer->inair) playerKeys->game_down.fDown = true;
-            } else if (threat->iy > iy && threat->ix - ix < 60 && threat->ix - ix > -60) {
+            } else if (threat->y() > iy && threat->x() - ix < 60 && threat->x() - ix > -60) {
                 playerKeys->game_jump.fDown = true;
             }
         } else if (actionType == 3) { //Tag teammate
@@ -420,7 +420,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             bool * moveToward;
             bool * moveAway;
 
-            if ((stomp->ix > ix && nearestObjects.stompwrap) || (stomp->ix < ix && !nearestObjects.stompwrap)) {
+            if ((stomp->x() > ix && nearestObjects.stompwrap) || (stomp->x() < ix && !nearestObjects.stompwrap)) {
                 moveToward = &playerKeys->game_left.fDown;
                 moveAway = &playerKeys->game_right.fDown;
             } else {
@@ -428,7 +428,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 moveAway = &playerKeys->game_left.fDown;
             }
 
-            if (stomp->iy > iy + PH || pPlayer->shyguy || pPlayer->isInvincible() ||
+            if (stomp->y() > iy + PH || pPlayer->shyguy || pPlayer->isInvincible() ||
                     (carriedItem && (carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock))) {
                 //if true stomp target is lower or at the same level, run toward
                 *moveToward = true;
@@ -440,9 +440,9 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             }
 
 
-            if (stomp->iy <= iy + PH && nearestObjects.stompdistance < 2025) {
+            if (stomp->y() <= iy + PH && nearestObjects.stompdistance < 2025) {
                 playerKeys->game_jump.fDown = true;
-            } else if (stomp->iy > iy + PH && nearestObjects.stompdistance < 2025) {
+            } else if (stomp->y() > iy + PH && nearestObjects.stompdistance < 2025) {
                 if (!pPlayer->inair) playerKeys->game_down.fDown = true;
 
                 if (!pPlayer->superstomp.isInSuperStompState()) {
@@ -1075,8 +1075,8 @@ void CPlayerAI::GetNearestObjects()
 void CPlayerAI::DistanceToObject(CObject * object, CObject ** target, int * nearest, bool * wrap)
 {
     //Calculate normal screen
-    short tx = object->ix - pPlayer->ix;
-    short ty = object->iy - pPlayer->iy;
+    short tx = object->x() - pPlayer->ix;
+    short ty = object->y() - pPlayer->iy;
     bool fScreenWrap = false;
 
     //See if it is a shorter distance wrapping around the screen
@@ -1100,8 +1100,8 @@ void CPlayerAI::DistanceToObject(CObject * object, CObject ** target, int * near
 void CPlayerAI::DistanceToObjectCenter(CObject * object, CObject ** target, int * nearest, bool * wrap)
 {
     //Calculate normal screen
-    short tx = object->ix + (object->collisionWidth >> 1) - pPlayer->ix - HALFPW;
-    short ty = object->iy + (object->collisionHeight >> 1) - pPlayer->iy - HALFPH;
+    short tx = object->x() + (object->collisionWidth >> 1) - pPlayer->ix - HALFPW;
+    short ty = object->y() + (object->collisionHeight >> 1) - pPlayer->iy - HALFPH;
     bool fScreenWrap = false;
 
     if (tx > App::screenWidth/2) {

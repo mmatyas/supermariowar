@@ -59,8 +59,8 @@ float CObjectContainer::getClosestObject(short ix, short iy, ObjectType objectTy
         if (obj->getObjectType() != objectType)
             continue;
 
-        short x = obj->ix - ix;
-        short y = obj->iy - iy;
+        short x = obj->x() - ix;
+        short y = obj->y() - iy;
 
         float dist = x * x + y * y;
         if (dist < minDist)
@@ -79,8 +79,8 @@ float CObjectContainer::getClosestMovingObject(short ix, short iy, MovingObjectT
         if (!movobj || movobj->getMovingObjectType() != movingObjectType)
             continue;
 
-        short x = obj->ix - ix;
-        short y = obj->iy - iy;
+        short x = obj->x() - ix;
+        short y = obj->y() - iy;
 
         float dist = x * x + y * y;
         if (dist < minDist)

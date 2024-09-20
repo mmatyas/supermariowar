@@ -32,8 +32,8 @@ void pushBombs(CObjectContainer& container, short x, short y)
         if (!bomb || bomb->HasOwner())
             continue;
 
-        int bombx = bomb->ix + (bomb->iw >> 1) - x;
-        int bomby = bomb->iy + (bomb->ih >> 1) - y;
+        int bombx = bomb->x() + (bomb->iw >> 1) - x;
+        int bomby = bomb->y() + (bomb->ih >> 1) - y;
 
         int dist = bombx * bombx + bomby * bomby;
 
