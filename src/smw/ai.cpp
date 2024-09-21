@@ -119,7 +119,7 @@ void CPlayerAI::Init()
             if (auto* egg = dynamic_cast<CO_Egg*>(obj.get())) {
                 if (!fYoshi[egg->getColor()]) {
                     AttentionObject * ao = new AttentionObject();
-                    ao->iID = egg->iNetworkID;
+                    ao->iID = egg->networkId();
                     ao->iType = 1;     //Ignore this object
                     ao->iTimer = 0;		//Ignore it forever
 
@@ -162,7 +162,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
     //If there is a goal, then make sure we aren't paying attention to it for too long
     if (nearestObjects.goal) {
-        if (currentAttentionObject.iID == nearestObjects.goal->iNetworkID) {
+        if (currentAttentionObject.iID == nearestObjects.goal->networkId()) {
             //If we have been paying attention to this goal for too long, then start ignoring it
             if (++currentAttentionObject.iTimer > iTenSeconds) {
                 AttentionObject * ao = new AttentionObject();
@@ -173,7 +173,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 attentionObjects[ao->iID] = ao;
             }
         } else {
-            currentAttentionObject.iID = nearestObjects.goal->iNetworkID;
+            currentAttentionObject.iID = nearestObjects.goal->networkId();
             currentAttentionObject.iTimer = 0;
         }
     } else {
@@ -494,13 +494,13 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 playerKeys->game_turbo.fDown = false;
 
                 //Ignore the key for a little while
-                if (attentionObjects.find(carriedItem->iNetworkID) != attentionObjects.end()) {
-                    AttentionObject * ao = attentionObjects[carriedItem->iNetworkID];
+                if (attentionObjects.find(carriedItem->networkId()) != attentionObjects.end()) {
+                    AttentionObject * ao = attentionObjects[carriedItem->networkId()];
                     ao->iType = 1;
                     ao->iTimer = iDecisionPercentage[game_values.cpudifficulty] / 3;
                 } else {
                     AttentionObject * ao = new AttentionObject();
-                    ao->iID = carriedItem->iNetworkID;
+                    ao->iID = carriedItem->networkId();
                     ao->iType = 1;
                     ao->iTimer = iDecisionPercentage[game_values.cpudifficulty] / 3;
                     attentionObjects[ao->iID] = ao;
@@ -508,7 +508,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             }
         }
         //If we are holding something that we are ignoring, drop it
-        else if (attentionObjects.find(carriedItem->iNetworkID) != attentionObjects.end()) {
+        else if (attentionObjects.find(carriedItem->networkId()) != attentionObjects.end()) {
             playerKeys->game_turbo.fDown = false;
         }
 
@@ -701,7 +701,7 @@ void CPlayerAI::GetNearestObjects()
     std::map<int, AttentionObject*>::iterator lim = attentionObjects.end();
 
     for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-        if (attentionObjects.find(obj->iNetworkID) != lim) {
+        if (attentionObjects.find(obj->networkId()) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
         }
@@ -896,7 +896,7 @@ void CPlayerAI::GetNearestObjects()
     }
 
     for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list()) {
-        if (attentionObjects.find(obj->iNetworkID) != lim) {
+        if (attentionObjects.find(obj->networkId()) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
         }
@@ -959,7 +959,7 @@ void CPlayerAI::GetNearestObjects()
     }
 
     for (const std::unique_ptr<CObject>& obj : objectcontainer[2].list()) {
-        if (attentionObjects.find(obj->iNetworkID) != lim) {
+        if (attentionObjects.find(obj->networkId()) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
         }

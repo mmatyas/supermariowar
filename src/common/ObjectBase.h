@@ -75,11 +75,11 @@ public:
     short collisionRectW() const { return collisionWidth; }
     short collisionRectH() const { return collisionHeight; }
 
-    int iNetworkID;
-
     short GetState() const { return state; }
     bool isDead() const { return dead; }
     bool GetWrap() const;
+
+    int networkId() const { return iNetworkID; }
 
     /// Returns the blocks touching each of the four corners,
     std::array<IO_Block*, 4> GetCollisionBlocks() const;
@@ -100,4 +100,6 @@ protected:
     gfxSprite* spr = nullptr;
     short state = 0;
     bool dead = false;
+
+    int iNetworkID;  // TODO: remove, unused
 };
