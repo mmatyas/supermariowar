@@ -156,7 +156,7 @@ struct MapBlock {
 class IO_Block;
 
 void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter);
-void DrawPlatform(PlatformPathType pathtype, TilesetTile ** tiles,
+void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& tiles,
 	short startX, short startY, short endX, short endY,
 	float angle, float radiusX, float radiusY,
 	short iSize, short iPlatformWidth, short iPlatformHeight,

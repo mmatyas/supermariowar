@@ -285,10 +285,7 @@ void MapReader1800::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
         short iWidth = (short)mapfile.read_i32();
         short iHeight = (short)mapfile.read_i32();
 
-        TilesetTile ** tiles = new TilesetTile*[iWidth];
-        TileType ** types = new TileType*[iWidth];
-
-        read_platform_tiles(map, mapfile, iWidth, iHeight, tiles, types);
+        auto [tiles, types] = read_platform_tiles(map, mapfile, iWidth, iHeight);
 
         short iDrawLayer = 2;
         if (patch_version >= 1)
@@ -306,45 +303,52 @@ void MapReader1800::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
         if (!path)
             continue;
 
-        MovingPlatform* platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);
+        MovingPlatform* platform = new MovingPlatform(std::move(tiles), std::move(types), iWidth, iHeight, iDrawLayer, path, fPreview);
         map.platforms.emplace_back(platform);
         map.platformdrawlayer[iDrawLayer].push_back(platform);
     }
 }
 
-void MapReader1800::read_platform_tiles(CMap& map, BinaryFile& mapfile,
-    short iWidth, short iHeight, TilesetTile**& tiles, TileType**& types)
+std::pair<std::vector<TilesetTile>, std::vector<TileType>>
+MapReader1800::read_platform_tiles(CMap& map, BinaryFile& mapfile, short iWidth, short iHeight)
 {
+    std::vector<TilesetTile> tiles;
+    std::vector<TileType> types;
+    tiles.reserve(iWidth * iHeight);
+    types.reserve(iWidth * iHeight);
+
     for (short iCol = 0; iCol < iWidth; iCol++) {
-        tiles[iCol] = new TilesetTile[iHeight];
-        types[iCol] = new TileType[iHeight];
-
         for (short iRow = 0; iRow < iHeight; iRow++) {
-            TilesetTile * tile = &tiles[iCol][iRow];
+            TilesetTile tile;
 
-            tile->iID = mapfile.read_i8();
-            tile->iCol = mapfile.read_i8();
-            tile->iRow = mapfile.read_i8();
+            tile.iID = mapfile.read_i8();
+            tile.iCol = mapfile.read_i8();
+            tile.iRow = mapfile.read_i8();
 
-            if (tile->iID >= 0) {
-                if (iMaxTilesetID != -1 && tile->iID > iMaxTilesetID)
-                    tile->iID = 0;
+            if (tile.iID >= 0) {
+                if (iMaxTilesetID != -1 && tile.iID > iMaxTilesetID)
+                    tile.iID = 0;
 
                 //Make sure the column and row we read in is within the bounds of the tileset
-                if (tile->iCol < 0 || (tilesetwidths && tile->iCol >= tilesetwidths[tile->iID]))
-                    tile->iCol = 0;
+                if (tile.iCol < 0 || (tilesetwidths && tile.iCol >= tilesetwidths[tile.iID]))
+                    tile.iCol = 0;
 
-                if (tile->iRow < 0 || (tilesetheights && tile->iRow >= tilesetheights[tile->iID]))
-                    tile->iRow = 0;
+                if (tile.iRow < 0 || (tilesetheights && tile.iRow >= tilesetheights[tile.iID]))
+                    tile.iRow = 0;
 
                 //Convert tileset ids into the current game's tileset's ids
                 if (translationid)
-                    tile->iID = translationid[tile->iID];
+                    tile.iID = translationid[tile.iID];
             }
 
-            types[iCol][iRow] = (TileType)mapfile.read_i32();;
+            TileType type = static_cast<TileType>(mapfile.read_i32());
+
+            tiles.emplace_back(std::move(tile));
+            types.emplace_back(std::move(type));
         }
     }
+
+    return {tiles, types};
 }
 
 bool MapReader1800::load(CMap& map, BinaryFile& mapfile/*, const char* filename*/, ReadType readtype)

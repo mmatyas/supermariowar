@@ -62,18 +62,15 @@ void B_DonutBlock::triggerBehavior(short iPlayerId)
 {
     //eyecandy[2].add(new EC_FallingObject(&rm->spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0));
 
-    TilesetTile ** tiledata = new TilesetTile*[1];
-    tiledata[0] = new TilesetTile[1];
-    tiledata[0][0].iID = g_tilesetmanager->classicTilesetIndex();
-    tiledata[0][0].iCol = 29;
-    tiledata[0][0].iRow = 15;
+    TilesetTile tile;
+    tile.iID = g_tilesetmanager->classicTilesetIndex();
+    tile.iCol = 29;
+    tile.iRow = 15;
 
-    TileType ** typedata = new TileType*[1];
-    typedata[0] = new TileType[1];
-    typedata[0][0] = TileType::Solid;
+    TileType type = TileType::Solid;
 
     MovingPlatformPath * path = new FallingPath(Vec2f((float)ix + 16.0f, (float)iy + 15.8f));
-    MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, 2, path, false);
+    MovingPlatform * platform = new MovingPlatform({ tile }, { type }, 1, 1, 2, path, false);
     platform->SetPlayerId(iPlayerId);
 
     g_map->AddTemporaryPlatform(platform);

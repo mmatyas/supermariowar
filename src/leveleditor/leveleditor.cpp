@@ -205,24 +205,15 @@ IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool 
 class MapPlatform
 {
 	public:
-    MapPlatform() {
-			tiles = new TilesetTile*[MAPWIDTH];
-
-			for (short i = 0; i < MAPWIDTH; i++)
-				tiles[i] = new TilesetTile[MAPHEIGHT];
-
-			preview = NULL;
-		}
+    MapPlatform()
+        : tiles(MAPWIDTH * MAPHEIGHT)
+        , types(MAPWIDTH * MAPHEIGHT)
+    {}
 
     ~MapPlatform() {
-			for (short i = 0; i < MAPWIDTH; i++)
-				delete [] tiles[i];
-
-			delete [] tiles;
-
-			if (preview)
-				SDL_FreeSurface(preview);
-		}
+        if (preview)
+            SDL_FreeSurface(preview);
+    }
 
     void UpdatePreview() {
         if (!preview) {
@@ -238,7 +229,7 @@ class MapPlatform
 
         for (short iPlatformX = 0; iPlatformX < MAPWIDTH; iPlatformX++) {
             for (short iPlatformY = 0; iPlatformY < MAPHEIGHT; iPlatformY++) {
-					TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
+					TilesetTile * tile = &tiles[iPlatformX * MAPHEIGHT + iPlatformY];
 
 					SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
                 if (tile->iID >= 0) {
@@ -253,8 +244,8 @@ class MapPlatform
 			}
 		}
 
-		TilesetTile ** tiles;
-		TileType types[MAPWIDTH][MAPHEIGHT];
+    std::vector<TilesetTile> tiles;
+    std::vector<TileType> types;
 		short iVelocity;
 		short iStartX;
 		short iStartY;
@@ -270,7 +261,7 @@ class MapPlatform
 		short iDrawLayer;
 
 		SDL_Rect rIcon[2];
-		SDL_Surface * preview;
+		SDL_Surface * preview = nullptr;
 };
 
 TileType * animatedtiletypes;
@@ -365,11 +356,11 @@ std::string g_szMessageTitle = "";
 std::string g_szMessageLine[3];
 void DrawMessage();
 
-void CopyTilesetTile(TilesetTile * to, TilesetTile * from)
+void CopyTilesetTile(TilesetTile& to, const TilesetTile& from)
 {
-	to->iID = from->iID;
-	to->iCol = from->iCol;
-	to->iRow = from->iRow;
+	to.iID = from.iID;
+	to.iCol = from.iCol;
+	to.iRow = from.iRow;
 }
 
 void SetTilesetTile(TilesetTile * tile, short iTileset, short iCol, short iRow)
@@ -583,8 +574,8 @@ int main(int argc, char *argv[])
 
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
             for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-				ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
-				g_Platforms[iPlatform].types[iCol][iRow] = TileType::NonSolid;
+				ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
+				g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = TileType::NonSolid;
 			}
 		}
 
@@ -2469,8 +2460,8 @@ int editor_platforms()
                         for (short iPlatform = iEditPlatform; iPlatform < g_iNumPlatforms - 1; iPlatform++) {
                             for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
                                 for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-										CopyTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow], &g_Platforms[iPlatform + 1].tiles[iCol][iRow]);
-										g_Platforms[iPlatform].types[iCol][iRow] = g_Platforms[iPlatform + 1].types[iCol][iRow];
+										CopyTilesetTile(g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow], g_Platforms[iPlatform + 1].tiles[iCol * MAPHEIGHT + iRow]);
+										g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = g_Platforms[iPlatform + 1].types[iCol * MAPHEIGHT + iRow];
 									}
 								}
 
@@ -2609,9 +2600,9 @@ int editor_platforms()
                             for (short i = 0; i < set_tile_cols; i++) {
                                 for (short j = 0; j < set_tile_rows; j++) {
                                     if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
-											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
+											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[(ix + i) * MAPHEIGHT + iy + j];
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-                                                                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
+                                                                                        g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
 										}
 									}
 								}
@@ -2624,9 +2615,9 @@ int editor_platforms()
                             for (short i = 0; i < set_tile_cols; i++) {
                                 for (short j = 0; j < set_tile_rows; j++) {
                                     if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
-											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
+											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[(ix + i) * MAPHEIGHT + iy + j];
 											SetTilesetTile(tile, TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
-											g_Platforms[iEditPlatform].types[ix + i][iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
+											g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
 										}
 									}
 								}
@@ -2636,7 +2627,7 @@ int editor_platforms()
 								short ix = event.button.x / TILESIZE;
 								short iy = event.button.y / TILESIZE;
 
-								g_Platforms[iEditPlatform].types[ix][iy] = set_tiletype;
+								g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = set_tiletype;
 							}
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
                     #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
@@ -2657,10 +2648,10 @@ int editor_platforms()
 						short iy = event.button.y / TILESIZE;
 
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState) {
-							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix][iy]);
-							g_Platforms[iEditPlatform].types[ix][iy] = TileType::NonSolid;
+							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix * MAPHEIGHT + iy]);
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-							g_Platforms[iEditPlatform].types[ix][iy] = TileType::NonSolid;
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
                     #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                         const Uint8 * keystate = SDL_GetKeyboardState(NULL);
@@ -2685,27 +2676,27 @@ int editor_platforms()
                         for (short i = 0; i < set_tile_cols; i++) {
                             for (short j = 0; j < set_tile_rows; j++) {
                                 if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
-										TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
+										TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[(ix + i) * MAPHEIGHT + iy + j];
 
                                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState) {
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
+                                        g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
                                     } else {
 											SetTilesetTile(tile, TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
-											g_Platforms[iEditPlatform].types[ix + i][iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
+											g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
 										}
 									}
 								}
 							}
                     } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix][iy]);
-							g_Platforms[iEditPlatform].types[ix][iy] = TileType::NonSolid;
+							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix * MAPHEIGHT + iy]);
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
 						}
                 } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 						if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
-							g_Platforms[iEditPlatform].types[ix][iy] = set_tiletype;
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = set_tiletype;
 						else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
-							g_Platforms[iEditPlatform].types[ix][iy] = TileType::NonSolid;
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                 } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
                     #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
@@ -2900,8 +2891,8 @@ void CopyPlatform(MapPlatform * toPlatform, MapPlatform * fromPlatform)
 
     for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
-			CopyTilesetTile(&toPlatform->tiles[iCol][iRow], &fromPlatform->tiles[iCol][iRow]);
-			toPlatform->types[iCol][iRow] = fromPlatform->types[iCol][iRow];
+			CopyTilesetTile(toPlatform->tiles[iCol * MAPHEIGHT + iRow], fromPlatform->tiles[iCol * MAPHEIGHT + iRow]);
+			toPlatform->types[iCol * MAPHEIGHT + iRow] = fromPlatform->types[iCol * MAPHEIGHT + iRow];
 		}
 	}
 }
@@ -3003,7 +2994,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 {
     for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
         for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-			TilesetTile * tile = &g_Platforms[iPlatform].tiles[iCol][iRow];
+			TilesetTile * tile = &g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow];
 
             if (tile->iID >= 0) {
 				g_tilesetmanager->Draw(screen, tile->iID, 0, tile->iCol, tile->iRow, iCol, iRow);
@@ -3023,7 +3014,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 			}
 
             if (fDrawTileTypes) {
-				TileType type = g_Platforms[iPlatform].types[iCol][iRow];
+				TileType type = g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow];
                 rm->spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, static_cast<int>(PrevTileType(type)) * TILESIZE, 0, TILESIZE, TILESIZE);
 			}
 		}
@@ -4835,11 +4826,11 @@ void loadcurrentmap()
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
             for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
                 if (iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight) {
-					CopyTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow], &g_map->platforms[iPlatform]->iTileData[iCol][iRow]);
-					g_Platforms[iPlatform].types[iCol][iRow] = g_map->platforms[iPlatform]->iTileType[iCol][iRow];
+                    CopyTilesetTile(g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow], g_map->platforms[iPlatform]->tileAt(iCol, iRow));
+                    g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = g_map->platforms[iPlatform]->tileTypeAt(iCol, iRow);
                 } else {
-					ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
-					g_Platforms[iPlatform].types[iCol][iRow] = TileType::NonSolid;
+					ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
+					g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = TileType::NonSolid;
 				}
 			}
 		}
@@ -4875,8 +4866,8 @@ void SetPlatformToDefaults(short iPlatform)
 {
     for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
         for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-			ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
-			g_Platforms[iPlatform].types[iCol][iRow] = TileType::NonSolid;
+			ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
+			g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = TileType::NonSolid;
 		}
 	}
 
@@ -4914,21 +4905,18 @@ void insert_platforms_into_map()
         g_map->platforms.reserve(g_iNumPlatforms);
 
     for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
-		short iTop, iLeft, iWidth, iHeight;
-		CalculatePlatformDims(iPlatform, &iLeft, &iTop, &iWidth, &iHeight);
+        short iTop, iLeft, iWidth, iHeight;
+        CalculatePlatformDims(iPlatform, &iLeft, &iTop, &iWidth, &iHeight);
 
-		TilesetTile ** tiles = new TilesetTile*[iWidth];
-		TileType ** types = new TileType*[iWidth];
+        std::vector<TilesetTile> tiles(iWidth * iHeight);
+        std::vector<TileType> types(iWidth * iHeight);
 
         for (short iCol = 0; iCol < iWidth; iCol++) {
-			tiles[iCol] = new TilesetTile[iHeight];
-			types[iCol] = new TileType[iHeight];
-
             for (short iRow = 0; iRow < iHeight; iRow++) {
-				CopyTilesetTile(&tiles[iCol][iRow], &g_Platforms[iPlatform].tiles[iCol + iLeft][iRow + iTop]);
-				types[iCol][iRow] = g_Platforms[iPlatform].types[iCol + iLeft][iRow + iTop];
-			}
-		}
+                CopyTilesetTile(tiles[iCol * iHeight + iRow], g_Platforms[iPlatform].tiles[(iCol + iLeft) * iHeight + iRow + iTop]);
+                types[iCol * iHeight + iRow] = g_Platforms[iPlatform].types[(iCol + iLeft) * iHeight + iRow + iTop];
+            }
+        }
 
 		short iDrawLayer = g_Platforms[iPlatform].iDrawLayer;
 
@@ -4952,8 +4940,8 @@ void insert_platforms_into_map()
 			path = new EllipsePath(fVelocity, g_Platforms[iPlatform].fAngle, Vec2f(radiusX, radiusY), Vec2f(fStartX, fStartY), false);
 		}
 
-		g_map->AddPermanentPlatform(new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, false));
-	}
+        g_map->AddPermanentPlatform(new MovingPlatform(std::move(tiles), std::move(types), iWidth, iHeight, iDrawLayer, path, false));
+    }
 }
 
 void save_map(const std::string &file)
@@ -4970,7 +4958,7 @@ void CalculatePlatformDims(short iPlatform, short * ix, short * iy, short * iw, 
 	//Calculate the height and width of the platform
     for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
         for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-            if (g_Platforms[iPlatform].tiles[iCol][iRow].iID != TILESETNONE) {
+            if (g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow].iID != TILESETNONE) {
 				if (iTop > iRow)
 					iTop = iRow;
 
@@ -5067,15 +5055,15 @@ void pastemoveselection(int movex, int movey)
 
 bool copyselectedtiles()
 {
-	//Copy the selected tiles and remove tiles from map
-	bool ret = false;
+    //Copy the selected tiles and remove tiles from map
+    bool ret = false;
     for (int k = 0; k < MAPHEIGHT; k++) {
         for (int j = 0; j < MAPWIDTH; j++) {
             if (selectedtiles[j][k]) {
-				ret = true;
+                ret = true;
                 for (short iLayer = 0; iLayer < MAPLAYERS; iLayer++) {
-					CopyTilesetTile(&copiedtiles[j][k].tile[iLayer], &g_map->mapdata[j][k][iLayer]);
-				}
+                    CopyTilesetTile(copiedtiles[j][k].tile[iLayer], g_map->mapdata[j][k][iLayer]);
+                }
 
 				copiedtiles[j][k].block.iType = g_map->objectdata[j][k].iType;
 				for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)

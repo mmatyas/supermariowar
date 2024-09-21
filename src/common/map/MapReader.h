@@ -3,6 +3,8 @@
 
 #include "FileIO.h"
 
+#include <vector>
+
 class CMap;
 class MovingPlatformPath;
 struct TilesetTile;
@@ -93,7 +95,7 @@ protected:
     virtual bool read_spawn_areas(CMap&, BinaryFile&);
 
     virtual void read_platforms(CMap&, BinaryFile&, bool preview);
-    virtual void read_platform_tiles(CMap&, BinaryFile&, short w, short h, TilesetTile**&, TileType**&);
+    virtual std::pair<std::vector<TilesetTile>, std::vector<TileType>> read_platform_tiles(CMap&, BinaryFile&, short w, short h);
     MovingPlatformPath* read_platform_path_details(BinaryFile&, short type, bool preview);
 
     unsigned char patch_version;
@@ -142,7 +144,7 @@ protected:
     virtual void read_extra_tiledata(CMap&, BinaryFile&);
     virtual void read_gamemode_settings(CMap&, BinaryFile&);
     virtual void read_platforms(CMap&, BinaryFile&, bool preview);
-    virtual void read_platform_tiles(CMap&, BinaryFile&, short w, short h, TilesetTile**&, TileType**&);
+    virtual std::pair<std::vector<TilesetTile>, std::vector<TileType>> read_platform_tiles(CMap&, BinaryFile&, short w, short h);
 
 private:
     short iMaxTilesetID;

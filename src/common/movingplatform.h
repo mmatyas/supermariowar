@@ -11,7 +11,7 @@ class IO_MovingObject;
 class MovingPlatform
 {
 	public:
-		MovingPlatform(TilesetTile ** tiledata, TileType ** tiletypes, short w, short h, short drawlayer, MovingPlatformPath * path, bool preview);
+		MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<TileType>&& tiletypes, short w, short h, short drawlayer, MovingPlatformPath * path, bool preview);
 		~MovingPlatform();
 
 		void draw();
@@ -50,6 +50,9 @@ class MovingPlatform
         iPlayerId = playerId;
     }
 
+    const TilesetTile& tileAt(size_t col, size_t row) const;
+    TileType tileTypeAt(size_t col, size_t row) const;
+
 	protected:
 
 		void check_map_collision_right(CPlayer * player);
@@ -60,8 +63,8 @@ class MovingPlatform
 
 		bool collision_detection_check_sides(IO_MovingObject * object);
 
-		TilesetTile ** iTileData;
-		TileType ** iTileType;
+		std::vector<TilesetTile> iTileData;
+		std::vector<TileType> iTileType;
 		short ix, iy;
 		short iWidth, iHeight;
 		short iTileWidth, iTileHeight;

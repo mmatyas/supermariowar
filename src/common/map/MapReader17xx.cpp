@@ -230,10 +230,7 @@ void MapReader1700::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
         short iWidth = (short)mapfile.read_i32();
         short iHeight = (short)mapfile.read_i32();
 
-        TilesetTile ** tiles = new TilesetTile*[iWidth];
-        TileType ** types = new TileType*[iWidth];
-
-        read_platform_tiles(map, mapfile, iWidth, iHeight, tiles, types);
+        auto [tiles, types] = read_platform_tiles(map, mapfile, iWidth, iHeight);
 
         short iDrawLayer = 2;
         //printf("Layer: %d\n", iDrawLayer);
@@ -245,42 +242,47 @@ void MapReader1700::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
         if (!path)
             continue;
 
-        MovingPlatform* platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);
+        MovingPlatform* platform = new MovingPlatform(std::move(tiles), std::move(types), iWidth, iHeight, iDrawLayer, path, fPreview);
         map.platforms.emplace_back(platform);
         map.platformdrawlayer[iDrawLayer].push_back(platform);
     }
 }
 
-void MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile,
-    short iWidth, short iHeight, TilesetTile**& tiles, TileType**& types)
+std::pair<std::vector<TilesetTile>, std::vector<TileType>>
+MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile, short iWidth, short iHeight)
 {
+    std::vector<TilesetTile> tiles;
+    std::vector<TileType> types;
+    tiles.reserve(iWidth * iHeight);
+    types.reserve(iWidth * iHeight);
+
     for (short iCol = 0; iCol < iWidth; iCol++) {
-        tiles[iCol] = new TilesetTile[iHeight];
-        types[iCol] = new TileType[iHeight];
-
         for (short iRow = 0; iRow < iHeight; iRow++) {
-            TilesetTile * tile = &tiles[iCol][iRow];
-
             short iTile = mapfile.read_i32();
+
+            TilesetTile tile;
             TileType type;
 
             if (iTile == TILESETSIZE) {
-                tile->iID = TILESETNONE;
-                tile->iCol = 0;
-                tile->iRow = 0;
+                tile.iID = TILESETNONE;
+                tile.iCol = 0;
+                tile.iRow = 0;
 
                 type = TileType::NonSolid;
             } else {
-                tile->iID = g_tilesetmanager->classicTilesetIndex();
-                tile->iCol = iTile % TILESETWIDTH;
-                tile->iRow = iTile / TILESETWIDTH;
+                tile.iID = g_tilesetmanager->classicTilesetIndex();
+                tile.iCol = iTile % TILESETWIDTH;
+                tile.iRow = iTile / TILESETWIDTH;
 
-                type = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
+                type = g_tilesetmanager->classicTileset().tileType(tile.iCol, tile.iRow);
             }
 
-            types[iCol][iRow] = type;
+            tiles.emplace_back(std::move(tile));
+            types.emplace_back(std::move(type));
         }
     }
+
+    return {tiles, types};
 }
 
 MovingPlatformPath* MapReader1700::read_platform_path_details(BinaryFile& mapfile, short iPathType, bool fPreview)
