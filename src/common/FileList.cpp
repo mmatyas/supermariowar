@@ -70,7 +70,7 @@ void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusicli
         if (currentCategory == Category::None)
             continue;
 
-        std::list<std::string> tokens = tokenize(line, ',');
+        std::list<std::string_view> tokens = tokenize(line, ',');
         if (tokens.empty())
             continue;
 
@@ -80,8 +80,8 @@ void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusicli
             override.mapname = std::move(tokens.front());
             tokens.pop_front();
 
-            for (const std::string& token : tokens) {
-                std::string path = convertPath(token);
+            for (const std::string_view token : tokens) {
+                std::string path = convertPath(std::string(token));
                 if (FileExists(path))
                     override.songs.emplace_back(std::move(path));
             }
@@ -95,7 +95,7 @@ void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusicli
             override.worldname = std::move(tokens.front());
             tokens.pop_front();
 
-            std::string path = convertPath(tokens.front());
+            std::string path = convertPath(std::string(tokens.front()));
             if (FileExists(path)) {
                 override.song = std::move(path);
                 worldmusicoverrides.emplace_back(std::move(override));
