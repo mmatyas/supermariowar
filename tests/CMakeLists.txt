@@ -7,3 +7,4 @@ endfunction()
 
 smw_create_test(test_vec2 common/math/test_vec2.cpp)
 smw_create_test(test_version common/test_version.cpp)
+smw_create_test(test_tokenize common/test_tokenize.cpp)
