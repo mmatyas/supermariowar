@@ -196,9 +196,3 @@ void MO_CheepCheep::ShatterDie()
 
     game_values.unlocksecret2part2++;
 }
-
-///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////
-#ifdef _DEBUG
-extern bool fDebugShowBossSettings;
-#endif
-///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////

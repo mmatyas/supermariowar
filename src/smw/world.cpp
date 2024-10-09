@@ -24,8 +24,6 @@
 
 WorldMap g_worldmap(0, 0);
 
-extern std::string stripPathAndExtension(const std::string &path);
-
 extern SDL_Surface* blitdest;
 
 extern CGameValues game_values;

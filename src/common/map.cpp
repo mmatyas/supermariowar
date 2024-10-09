@@ -40,10 +40,7 @@ using std::endl;
 #endif
 
 
-extern gfxSprite spr_frontmap[2];
-
 short g_iCurrentDrawIndex = 0;
-
 
 extern SDL_Surface* screen;
 extern SDL_Surface* blitdest;
@@ -63,7 +60,8 @@ SDL_Rect g_rFlameRects[4][4] = { { {0, 0, 96, 32}, {0, 32, 96, 32}, {0, 64, 96, 
 };
 
 //[Type][Direction][Frame]
-SDL_Rect g_rPirhanaRects[4][4][4] = { { { {0, 0, 32, 48}, {32, 0, 32, 48}, {64, 0, 32, 48}, {96, 0, 32, 48} },
+SDL_Rect g_rPirhanaRects[4][4][4] = {
+    {   { {0, 0, 32, 48}, {32, 0, 32, 48}, {64, 0, 32, 48}, {96, 0, 32, 48} },
         { {128, 0, 32, 48}, {160, 0, 32, 48}, {192, 0, 32, 48}, {224, 0, 32, 48} },
         { {304, 0, 48, 32}, {304, 32, 48, 32}, {304, 64, 48, 32}, {304, 96, 48, 32} },
         { {304, 128, 48, 32}, {304, 160, 48, 32}, {304, 192, 48, 32}, {304, 224, 48, 32} }
