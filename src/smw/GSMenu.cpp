@@ -75,10 +75,7 @@ extern bool g_fRecordTest;
 
 extern void SetGameModeSettingsFromMenu();
 extern void LoadMapObjects(bool fPreview);
-extern bool LoadGameSounds();
-
 extern void UpdateScoreBoard();
-
 extern short LookupTeamID(short id);
 
 extern WorldMap g_worldmap;
@@ -89,8 +86,6 @@ extern CMap* g_map;
 
 extern CScore *score[4];
 extern short score_cnt;
-
-extern std::string stripPathAndExtension(const std::string &path);
 
 extern CGameMode * gamemodes[GAMEMODE_LAST];
 extern CGM_Bonus * bonushousemode;
