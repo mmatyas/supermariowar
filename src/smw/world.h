@@ -223,65 +223,64 @@ public:
     short GetMusicCategory() const { return iMusicCategory; }
     const std::string& GetWorldName() { return worldName; }
 
-	private:
+private:
+    void Cleanup();
+    void SetTileConnections(short iCol, short iRow);
 
-		void Cleanup();
-		void SetTileConnections(short iCol, short iRow);
+    void DrawTileToSurface(SDL_Surface* surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer = 0) const;
 
-		void DrawTileToSurface(SDL_Surface* surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer = 0) const;
+    short iWidth = 0;
+    short iHeight = 0;
+    short iStartX = 0;
+    short iStartY = 0;
 
-		short iWidth = 0;
-		short iHeight = 0;
-                short iStartX = 0;
-                short iStartY = 0;
+    short iNumStages = 0;
 
-		short iNumStages = 0;
+    std::vector<std::vector<WorldMapTile>> tiles;
+    WorldPlayer player;
+    std::vector<WorldVehicle> vehicles;
+    std::vector<WorldWarp> warps;
 
-                std::vector<std::vector<WorldMapTile>> tiles;
-		WorldPlayer player;
-                std::vector<WorldVehicle> vehicles;
-                std::vector<WorldWarp> warps;
+    short iNumInitialBonuses;
+    short iInitialBonuses[32];
 
-		short iNumInitialBonuses;
-		short iInitialBonuses[32];
+    short iMusicCategory;
 
-		short iMusicCategory;
+    short iTileSize;
+    short iTileSizeShift;
+    short iTileSheet;
 
-		short iTileSize;
-		short iTileSizeShift;
-		short iTileSheet;
+    short iLastDrawRow;
+    short iLastDrawCol;
 
-		short iLastDrawRow;
-		short iLastDrawCol;
+    short iTilesPerCycle;
 
-		short iTilesPerCycle;
+    std::string worldName;
 
-		std::string worldName;
+    friend class MI_World;
+    friend class MI_WorldPreviewDisplay;
+    friend class WorldVehicle;
 
-	friend class MI_World;
-	friend class MI_WorldPreviewDisplay;
-	friend class WorldVehicle;
+    friend int editor_edit();
+    friend int editor_type();
+    friend int editor_stage();
+    friend int editor_start_items();
+    friend int editor_vehicles();
+    friend void NewStage(short * iEditStage);
 
-	friend int editor_edit();
-	friend int editor_type();
-	friend int editor_stage();
-	friend int editor_start_items();
-	friend int editor_vehicles();
-	friend void NewStage(short * iEditStage);
+    friend bool AutoSetTile(short iCol, short iRow);
+    friend void AutoSetPath(short iCol, short iRow);
+    friend void AutoSetPathSprite(short iCol, short iRow);
+    friend short AdjustForeground(short iSprite, short iCol, short iRow);
+    friend bool UpdateForeground(short iCol, short iRow);
 
-	friend bool AutoSetTile(short iCol, short iRow);
-	friend void AutoSetPath(short iCol, short iRow);
-	friend void AutoSetPathSprite(short iCol, short iRow);
-	friend short AdjustForeground(short iSprite, short iCol, short iRow);
-	friend bool UpdateForeground(short iCol, short iRow);
+    friend void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9]);
+    friend bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9]);
 
-	friend void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9]);
-	friend bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9]);
-
-	friend void ReadVehiclesIntoEditor();
-	friend void WriteVehiclesIntoWorld();
-	friend void ReadWarpsIntoEditor();
-	friend void WriteWarpsIntoWorld();
+    friend void ReadVehiclesIntoEditor();
+    friend void WriteVehiclesIntoWorld();
+    friend void ReadWarpsIntoEditor();
+    friend void WriteWarpsIntoWorld();
 };
 
 #endif // WORLD_H
