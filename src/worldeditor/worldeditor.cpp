@@ -1789,18 +1789,18 @@ int editor_edit()
 
 					short ix, iy;
 
-                    if (warp->iCol1 >= 0) {
-						ix = (warp->iCol1 - draw_offset_col) * TILESIZE + draw_offset_x;
-						iy = (warp->iRow1 - draw_offset_row) * TILESIZE + draw_offset_y;
+                    if (warp->posA.x >= 0) {
+						ix = (warp->posA.x - draw_offset_col) * TILESIZE + draw_offset_x;
+						iy = (warp->posA.y - draw_offset_row) * TILESIZE + draw_offset_y;
 
-						spr_warps[0].draw(ix, iy, warp->iID << 5, 0, 32, 32);
+						spr_warps[0].draw(ix, iy, warp->id << 5, 0, 32, 32);
 					}
 
-                    if (warp->iCol2 >= 0) {
-						ix = (warp->iCol2 - draw_offset_col) * TILESIZE + draw_offset_x;
-						iy = (warp->iRow2 - draw_offset_row) * TILESIZE + draw_offset_y;
+                    if (warp->posB.x >= 0) {
+						ix = (warp->posB.x - draw_offset_col) * TILESIZE + draw_offset_x;
+						iy = (warp->posB.y - draw_offset_row) * TILESIZE + draw_offset_y;
 
-						spr_warps[0].draw(ix, iy, warp->iID << 5, 0, 32, 32);
+						spr_warps[0].draw(ix, iy, warp->id << 5, 0, 32, 32);
 					}
 
 					itr++;
@@ -2065,9 +2065,7 @@ void ReadWarpsIntoEditor()
 	warplist.clear();
 
     for (const WorldWarp& warp : g_worldmap.warps) {
-        WorldWarp* warpcopy = new WorldWarp();
-        *warpcopy = warp;
-        warplist.push_back(warpcopy);
+        warplist.push_back(new WorldWarp(warp));
     }
 }
 
@@ -2090,7 +2088,7 @@ void AddWarpToTile(short iCol, short iRow, short iType)
 	WorldWarp * newwarp = NULL;
     while (itr != lim) {
 		WorldWarp * warp = *itr;
-        if (warp->iID == iType) {
+        if (warp->id == iType) {
 			newwarp = warp;
 			break;
 		}
@@ -2099,24 +2097,15 @@ void AddWarpToTile(short iCol, short iRow, short iType)
 	}
 
     if (!newwarp) {
-		newwarp = new WorldWarp();
-
-		newwarp->iID = iType;
-		newwarp->iCol1 = iCol;
-		newwarp->iRow1 = iRow;
-		newwarp->iCol2 = -1;
-		newwarp->iRow2 = -1;
-
-		warplist.push_back(newwarp);
+        newwarp = new WorldWarp(iType, {iCol, iRow}, {-1, -1});
+        warplist.push_back(newwarp);
     } else {
-        if (newwarp->iCol1 == -1) {
-			newwarp->iCol1 = iCol;
-			newwarp->iRow1 = iRow;
-        } else if (newwarp->iCol1 != iCol || newwarp->iRow1 != iRow) {
-			newwarp->iCol2 = iCol;
-			newwarp->iRow2 = iRow;
-		}
-	}
+        if (newwarp->posA.x == -1) {
+            newwarp->posA = {iCol, iRow};
+        } else if (newwarp->posA.x != iCol || newwarp->posA.y != iRow) {
+            newwarp->posB = {iCol, iRow};
+        }
+    }
 }
 
 void RemoveWarpFromTile(short iCol, short iRow)
@@ -2124,8 +2113,8 @@ void RemoveWarpFromTile(short iCol, short iRow)
 	std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
     while (itr != lim) {
 		WorldWarp * warp = *itr;
-        if (warp->iCol1 == iCol && warp->iRow1 == iRow) {
-            if (warp->iCol2 == -1 && warp->iRow2 == -1) {
+        if (warp->posA.x == iCol && warp->posA.y == iRow) {
+            if (warp->posB.x == -1 && warp->posB.y == -1) {
 				delete (*itr);
 
 				itr = warplist.erase(itr);
@@ -2133,11 +2122,10 @@ void RemoveWarpFromTile(short iCol, short iRow)
 
 				return;
             } else {
-				warp->iCol1 = -1;
-				warp->iRow1 = -1;
-			}
-        } else if (warp->iCol2 == iCol && warp->iRow2 == iRow) {
-            if (warp->iCol1 == -1 && warp->iRow1 == -1) {
+                warp->posA = {-1, -1};
+            }
+        } else if (warp->posB.x == iCol && warp->posB.y == iRow) {
+            if (warp->posA.x == -1 && warp->posA.y == -1) {
 				delete (*itr);
 
 				itr = warplist.erase(itr);
@@ -2145,13 +2133,12 @@ void RemoveWarpFromTile(short iCol, short iRow)
 
 				return;
             } else {
-				warp->iCol2 = -1;
-				warp->iRow2 = -1;
-			}
-		}
+                warp->posB = {-1, -1};
+            }
+        }
 
-		itr++;
-	}
+        itr++;
+    }
 }
 
 void UpdatePathSprite(short iCol, short iRow)
@@ -4839,11 +4826,11 @@ void takescreenshot()
         while (itrWarp != limWarp) {
 			WorldWarp * warp = *itrWarp;
 
-			if (warp->iCol1 >= 0)
-				spr_warps[iScreenshotSize].draw(warp->iCol1 * iTileSize, warp->iRow1 * iTileSize, warp->iID * iTileSize, 0, iTileSize, iTileSize);
+			if (warp->posA.x >= 0)
+				spr_warps[iScreenshotSize].draw(warp->posA.x * iTileSize, warp->posA.y * iTileSize, warp->id * iTileSize, 0, iTileSize, iTileSize);
 
-			if (warp->iCol2 >= 0)
-				spr_warps[iScreenshotSize].draw(warp->iCol2 * iTileSize, warp->iRow2 * iTileSize, warp->iID * iTileSize, 0, iTileSize, iTileSize);
+			if (warp->posB.x >= 0)
+				spr_warps[iScreenshotSize].draw(warp->posB.x * iTileSize, warp->posB.y * iTileSize, warp->id * iTileSize, 0, iTileSize, iTileSize);
 
 			itrWarp++;
 		}

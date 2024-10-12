@@ -59,6 +59,13 @@ template<typename T> constexpr Vec2<T> operator/(const Vec2<T>& lhs, const Vec2<
     return {lhs.x / rhs.x, lhs.y / rhs.y};
 }
 
+template<typename T> constexpr bool operator==(const Vec2<T>& lhs, const Vec2<T>& rhs) {
+    return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+template<typename T> constexpr bool operator!=(const Vec2<T>& lhs, const Vec2<T>& rhs) {
+    return !(lhs == rhs);
+}
+
 template<typename T, typename Scalar> constexpr Vec2<T> operator*(const Vec2<T>& lhs, Scalar scalar) {
     return {lhs.x * scalar, lhs.y * scalar};
 }

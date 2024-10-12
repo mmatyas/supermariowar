@@ -323,35 +323,21 @@ void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehicles
 * WorldWarp
 **********************************/
 
-WorldWarp::WorldWarp()
-{
-    iCol1 = 0;
-    iRow1 = 0;
-    iCol2 = 0;
-    iRow2 = 0;
-}
+WorldWarp::WorldWarp(short id, Vec2s posA, Vec2s posB)
+    : id(id)
+    , posA(posA)
+    , posB(posB)
+{}
 
-void WorldWarp::Init(short id, short col1, short row1, short col2, short row2)
+Vec2s WorldWarp::getOtherSide(Vec2s target) const
 {
-    iID = id;
-    iCol1 = col1;
-    iRow1 = row1;
-    iCol2 = col2;
-    iRow2 = row2;
-}
-
-void WorldWarp::GetOtherSide(short iCol, short iRow, short * iOtherCol, short * iOtherRow) const
-{
-    if (iCol1 == iCol && iRow1 == iRow) {
-        *iOtherCol = iCol2;
-        *iOtherRow = iRow2;
-    } else if (iCol2 == iCol && iRow2 == iRow) {
-        *iOtherCol = iCol1;
-        *iOtherRow = iRow1;
-    } else {
-        *iOtherCol = iCol;
-        *iOtherRow = iRow;
+    if (target == posA) {
+        return posB;
     }
+    if (target == posB) {
+        return posA;
+    }
+    return target;
 }
 
 
@@ -629,36 +615,22 @@ bool WorldMap::Load(short tilesize)
             iReadType = iNumWarps == 0 ? 14 : 13;
         } else if (iReadType == 13) { //warp details
             char * psz = strtok(buffer, ",\n");
-
             if (!psz)
                 goto RETURN;
 
-            short iCol1 = atoi(psz);
-            if (iCol1 < 0)
-                iCol1 = 0;
+            short iCol1 = std::max(0, atoi(psz));
 
             psz = strtok(NULL, ",\n");
-
-            short iRow1 = atoi(psz);
-            if (iRow1 < 0)
-                iRow1 = 0;
+            short iRow1 = std::max(0, atoi(psz));
 
             psz = strtok(NULL, ",\n");
-
-            short iCol2 = atoi(psz);
-            if (iCol2 < 0)
-                iCol2 = 0;
+            short iCol2 = std::max(0, atoi(psz));
 
             psz = strtok(NULL, ",\n");
-
-            short iRow2 = atoi(psz);
-            if (iRow2 < 0)
-                iRow2 = 0;
+            short iRow2 = std::max(0, atoi(psz));
 
             short warpId = warps.size();
-
-            warps.emplace_back(WorldWarp());
-            warps.back().Init(warpId, iCol1, iRow1, iCol2, iRow2);
+            warps.emplace_back(WorldWarp(warpId, {iCol1, iRow1}, {iCol2, iRow2}));
 
             tiles[iCol1][iRow1].iWarp = warpId;
             tiles[iCol2][iRow2].iWarp = warpId;
@@ -954,10 +926,10 @@ bool WorldMap::Save(const std::string& szPath) const
     fprintf(file, "%d\n", warps.size());
 
     for (const WorldWarp& warp : warps) {
-        fprintf(file, "%d,", warp.iCol1);
-        fprintf(file, "%d,", warp.iRow1);
-        fprintf(file, "%d,", warp.iCol2);
-        fprintf(file, "%d\n", warp.iRow2);
+        fprintf(file, "%d,", warp.posA.x);
+        fprintf(file, "%d,", warp.posA.y);
+        fprintf(file, "%d,", warp.posB.x);
+        fprintf(file, "%d\n", warp.posB.y);
     }
     fprintf(file, "\n");
 
@@ -1350,11 +1322,12 @@ short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
 bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const
 {
     short iWarp = tiles[player.iCurrentTileX][player.iCurrentTileY].iWarp;
-
     if (iWarp < 0)
         return false;
 
-    warps[iWarp].GetOtherSide(player.iCurrentTileX, player.iCurrentTileY, iWarpCol, iWarpRow);
+    Vec2s pos = warps[iWarp].getOtherSide({player.iCurrentTileX, player.iCurrentTileY});
+    *iWarpCol = pos.x;
+    *iWarpRow = pos.y;
     return true;
 }
 
@@ -1576,12 +1549,9 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
                 else if (iBackTileDirection == 3)
                     iBackTileId += 1;
                 else if (iBackTileDirection == 4) {
-                    short iWarpCol, iWarpRow;
-                    short iCol = iBackTileId % iWidth;
-                    short iRow = iBackTileId / iWidth;
-
-                    warps[tiles[iCol][iRow].iWarp].GetOtherSide(iCol, iRow, &iWarpCol, &iWarpRow);
-                    iBackTileId = tiles[iWarpCol][iWarpRow].iID;
+                    const Vec2s target(iBackTileId % iWidth, iBackTileId / iWidth);
+                    const Vec2s pos = warps[tiles[iCol][iRow].iWarp].getOtherSide(target);
+                    iBackTileId = tiles[pos.x][pos.y].iID;
                 }
 
                 if (iBackTileId == iCurrentId) {
@@ -1647,10 +1617,8 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
             }
 
             if (tile->iWarp >= 0) {
-                short iWarpCol, iWarpRow;
-                warps[tile->iWarp].GetOtherSide(tile->iCol, tile->iRow, &iWarpCol, &iWarpRow);
-
-                const WorldMapTile& warpTile = tiles[iWarpCol][iWarpRow];
+                const Vec2s pos = warps[tile->iWarp].getOtherSide({tile->iCol, tile->iRow});
+                const WorldMapTile& warpTile = tiles[pos.x][pos.y];
 
                 //Stop at door tiles
                 if (warpTile.iType >= 2 && warpTile.iType <= 5)
