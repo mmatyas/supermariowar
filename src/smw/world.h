@@ -84,7 +84,7 @@ class WorldPlayer : public WorldMovingObject
 		void Init(short iCol, short iRow);
 
 		void SetSprite(short iPlayer);
-		void Draw(short iWorldOffsetX, short iWorldOffsetY);
+                void Draw(short iWorldOffsetX, short iWorldOffsetY) const;
 
 	friend class WorldMap;
 };
@@ -140,7 +140,7 @@ class WorldWarp
 	public:
 		WorldWarp();
 		void Init(short id, short col1, short row1, short col2, short row2);
-		void GetOtherSide(short iCol, short iRow, short * iOtherCol, short * iOtherRow);
+                void GetOtherSide(short iCol, short iRow, short * iOtherCol, short * iOtherRow) const;
 
 	private:
 		short iCol1, iRow1;
@@ -156,86 +156,79 @@ class WorldWarp
 	friend void takescreenshot();
 };
 
-class WorldMap
-{
-	public:
+class WorldMap {
+public:
+    WorldMap();
+    ~WorldMap();
 
-		WorldMap();
-		~WorldMap();
+    bool Load(short iTileSize);
+    bool Save() const;
+    bool Save(const std::string& szPath) const;
 
-		bool Load(short iTileSize);
-		bool Save();
-                bool Save(const std::string& szPath);
+    void New(short iWidth, short iHeight);
+    void Resize(short iWidth, short iHeight);
+    void Clear();
 
-		void New(short iWidth, short iHeight);
-		void Resize(short iWidth, short iHeight);
-		void Clear();
+    void InitPlayer();
 
-		void InitPlayer();
+    bool Update(bool* fPlayerVehicleCollision);
+    void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping) const;
 
-		bool Update(bool * fPlayerVehicleCollision);
-		void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping);
+    void UpdateTile(SDL_Surface* surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
-		void UpdateTile(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
+    void ResetDrawCycle();
+    void DrawMapToSurface(SDL_Surface* surface) const;
+    void DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface* surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
-		void ResetDrawCycle();
-		void DrawMapToSurface(SDL_Surface * surface);
-		void DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
+    void SetPlayerSprite(short iPlayerSprite);
+    bool IsVehicleMoving() const;
 
-		void SetPlayerSprite(short iPlayerSprite);
-                bool IsVehicleMoving() const;
-
-    void GetWorldSize(short * w, short * h) {
+    void GetWorldSize(short * w, short * h) const {
         *w = iWidth;
         *h = iHeight;
     }
 
-		void GetPlayerPosition(short * iPlayerX, short * iPlayerY);
-		void SetPlayerPosition(short iPlayerCol, short iPlayerRow);
+    void GetPlayerPosition(short * iPlayerX, short * iPlayerY) const;
+    void SetPlayerPosition(short iPlayerCol, short iPlayerRow);
 
-		void GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY);
-		void GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY);
+    void GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY) const;
+    void GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY) const;
 
-		short GetPlayerState();
+    short GetPlayerState() const;
 
-		short GetVehicleInPlayerTile(short * iVehicleIndex);
-		bool GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow);
+    short GetVehicleInPlayerTile(short * iVehicleIndex) const;
+    bool GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const;
 
-		void MovePlayer(short iDirection);
-		void FacePlayer(short iDirection);
-		void MoveVehicles();
+    void MovePlayer(short iDirection);
+    void FacePlayer(short iDirection);
+    void MoveVehicles();
 
-		void RemoveVehicle(short iVehicleIndex);
+    void RemoveVehicle(short iVehicleIndex);
 
-                short NumVehiclesInTile(short iTileX, short iTileY) const;
+    short NumVehiclesInTile(short iTileX, short iTileY) const;
 
-		short GetVehicleStageScore(short iVehicleIndex);
-		void MoveBridges();
+    short GetVehicleStageScore(short iVehicleIndex) const;
+    void MoveBridges();
 
-		void IsTouchingDoor(short iCol, short iRow, bool doors[4]);
-		bool IsDoor(short iCol, short iRow);
-		short UseKey(short iKeytype, short iCol, short iRow, bool fCloud);
+    void IsTouchingDoor(short iCol, short iRow, bool doors[4]) const;
+    bool IsDoor(short iCol, short iRow) const;
+    short UseKey(short iKeytype, short iCol, short iRow, bool fCloud);
 
-		short GetVehicleBoundary(short iCol, short iRow);
+    short GetVehicleBoundary(short iCol, short iRow) const;
 
-		short GetNextInterestingMove(short iCol, short iRow);
+    short GetNextInterestingMove(short iCol, short iRow) const;
 
-		void SetInitialPowerups();
+    void SetInitialPowerups();
 
-    short GetMusicCategory() {
-        return iMusicCategory;
-    }
-
-    const char * GetWorldName() {
-        return worldName.c_str();
-    }
+    short GetMusicCategory() const { return iMusicCategory; }
+    const std::string& GetWorldName() { return worldName; }
 
 	private:
 
 		void Cleanup();
 		void SetTileConnections(short iCol, short iRow);
 
-		void DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer = 0);
+		void DrawTileToSurface(SDL_Surface* surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer = 0) const;
 
 		short iWidth = 0;
 		short iHeight = 0;

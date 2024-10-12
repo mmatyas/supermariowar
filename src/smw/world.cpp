@@ -163,7 +163,7 @@ void WorldPlayer::Init(short iCol, short iRow)
     WorldMovingObject::Init(iCol, iRow, 0, 0, 32);
 }
 
-void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY)
+void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY) const
 {
     rm->spr_player[iDrawSprite][iAnimationFrame + iDrawDirection]->draw(ix + iMapOffsetX, iy + iMapOffsetY, 0, 0, 32, 32);
 }
@@ -340,7 +340,7 @@ void WorldWarp::Init(short id, short col1, short row1, short col2, short row2)
     iRow2 = row2;
 }
 
-void WorldWarp::GetOtherSide(short iCol, short iRow, short * iOtherCol, short * iOtherRow)
+void WorldWarp::GetOtherSide(short iCol, short iRow, short * iOtherCol, short * iOtherRow) const
 {
     if (iCol1 == iCol && iRow1 == iRow) {
         *iOtherCol = iCol2;
@@ -461,8 +461,8 @@ bool WorldMap::Load(short tilesize)
                 if (!psz)
                     goto RETURN;
 
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iBackgroundWater = atoi(psz);
+                WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+                tile.iBackgroundWater = atoi(psz);
 
                 psz = strtok(NULL, ",\n");
             }
@@ -478,13 +478,13 @@ bool WorldMap::Load(short tilesize)
                 if (!psz)
                     goto RETURN;
 
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iBackgroundSprite = atoi(psz);
-                tile->fAnimated = (tile->iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE) != 1;
+                WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+                tile.iBackgroundSprite = atoi(psz);
+                tile.fAnimated = (tile.iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE) != 1;
 
-                tile->iID = iMapTileReadRow * iWidth + iMapTileReadCol;
-                tile->iCol = iMapTileReadCol;
-                tile->iRow = iMapTileReadRow;
+                tile.iID = iMapTileReadRow * iWidth + iMapTileReadCol;
+                tile.iCol = iMapTileReadCol;
+                tile.iRow = iMapTileReadRow;
 
                 psz = strtok(NULL, ",\n");
             }
@@ -500,24 +500,24 @@ bool WorldMap::Load(short tilesize)
                 if (!psz)
                     goto RETURN;
 
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iForegroundSprite = atoi(psz);
+                WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+                tile.iForegroundSprite = atoi(psz);
 
-                short iForegroundSprite = tile->iForegroundSprite;
+                short iForegroundSprite = tile.iForegroundSprite;
 
                 //Animated parts of paths
-                if (!tile->fAnimated && iForegroundSprite >= 0 && iForegroundSprite <= 8 * WORLD_PATH_SPRITE_SET_SIZE) {
+                if (!tile.fAnimated && iForegroundSprite >= 0 && iForegroundSprite <= 8 * WORLD_PATH_SPRITE_SET_SIZE) {
                     short iForeground = iForegroundSprite % WORLD_PATH_SPRITE_SET_SIZE;
-                    tile->fAnimated = iForeground >= 3 && iForeground <= 10;
+                    tile.fAnimated = iForeground >= 3 && iForeground <= 10;
                 }
 
                 //Animated 1-100 stages
-                if (!tile->fAnimated)
-                    tile->fAnimated = iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399;
+                if (!tile.fAnimated)
+                    tile.fAnimated = iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399;
 
                 //Animated foreground tiles
-                if (!tile->fAnimated)
-                    tile->fAnimated = iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29;
+                if (!tile.fAnimated)
+                    tile.fAnimated = iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29;
 
                 psz = strtok(NULL, ",\n");
             }
@@ -533,8 +533,8 @@ bool WorldMap::Load(short tilesize)
                 if (!psz)
                     goto RETURN;
 
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iConnectionType = atoi(psz);
+                WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+                tile.iConnectionType = atoi(psz);
 
                 psz = strtok(NULL, ",\n");
             }
@@ -560,16 +560,16 @@ bool WorldMap::Load(short tilesize)
                 if (!psz)
                     goto RETURN;
 
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iType = atoi(psz);
-                tile->iWarp = -1;
+                WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+                tile.iType = atoi(psz);
+                tile.iWarp = -1;
 
-                if (tile->iType == 1) {
+                if (tile.iType == 1) {
                     iStartX = iMapTileReadCol;
                     iStartY = iMapTileReadRow;
                 }
 
-                tile->iCompleted = tile->iType <= 5 ? -1 : -2;
+                tile.iCompleted = tile.iType <= 5 ? -1 : -2;
 
                 psz = strtok(NULL, ",\n");
             }
@@ -585,8 +585,8 @@ bool WorldMap::Load(short tilesize)
                 if (!psz)
                     goto RETURN;
 
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iVehicleBoundary = atoi(psz);
+                WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+                tile.iVehicleBoundary = atoi(psz);
 
                 psz = strtok(NULL, ",\n");
             }
@@ -770,61 +770,61 @@ void WorldMap::SetTileConnections(short iCol, short iRow)
     if (iCol < 0 || iRow < 0 || iCol >= iWidth || iRow >= iHeight)
         return;
 
-    WorldMapTile * tile = &tiles[iCol][iRow];
+    WorldMapTile& tile = tiles[iCol][iRow];
 
     for (short iDirection = 0; iDirection < 4; iDirection++)
-        tile->fConnection[iDirection] = false;
+        tile.fConnection[iDirection] = false;
 
     if (iRow > 0) {
-        WorldMapTile * topTile = &tiles[iCol][iRow - 1];
+        const WorldMapTile& topTile = tiles[iCol][iRow - 1];
 
-        tile->fConnection[0] = (topTile->iConnectionType == 1 || topTile->iConnectionType == 5 || topTile->iConnectionType == 6 ||
-                                topTile->iConnectionType == 7 || topTile->iConnectionType == 9 || topTile->iConnectionType == 10 ||
-                                topTile->iConnectionType == 11 || topTile->iConnectionType == 15) && (tile->iConnectionType == 1 ||
-                                        tile->iConnectionType == 3 || tile->iConnectionType == 4 || tile->iConnectionType == 7 ||
-                                        tile->iConnectionType == 8 || tile->iConnectionType == 9 || tile->iConnectionType == 11 ||
-                                        tile->iConnectionType == 15);
+        tile.fConnection[0] = (topTile.iConnectionType == 1 || topTile.iConnectionType == 5 || topTile.iConnectionType == 6 ||
+                                topTile.iConnectionType == 7 || topTile.iConnectionType == 9 || topTile.iConnectionType == 10 ||
+                                topTile.iConnectionType == 11 || topTile.iConnectionType == 15) && (tile.iConnectionType == 1 ||
+                                        tile.iConnectionType == 3 || tile.iConnectionType == 4 || tile.iConnectionType == 7 ||
+                                        tile.iConnectionType == 8 || tile.iConnectionType == 9 || tile.iConnectionType == 11 ||
+                                        tile.iConnectionType == 15);
     }
 
     if (iRow < iHeight - 1) {
-        WorldMapTile * bottomTile = &tiles[iCol][iRow + 1];
+        const WorldMapTile& bottomTile = tiles[iCol][iRow + 1];
 
-        tile->fConnection[1] = (bottomTile->iConnectionType == 1 || bottomTile->iConnectionType == 3 || bottomTile->iConnectionType == 4 ||
-                                bottomTile->iConnectionType == 7 || bottomTile->iConnectionType == 8 || bottomTile->iConnectionType == 9 ||
-                                bottomTile->iConnectionType == 11 || bottomTile->iConnectionType == 15) && (tile->iConnectionType == 1 ||
-                                        tile->iConnectionType == 5 || tile->iConnectionType == 6 || tile->iConnectionType == 7 ||
-                                        tile->iConnectionType == 9 || tile->iConnectionType == 10 || tile->iConnectionType == 11 ||
-                                        tile->iConnectionType == 15);
+        tile.fConnection[1] = (bottomTile.iConnectionType == 1 || bottomTile.iConnectionType == 3 || bottomTile.iConnectionType == 4 ||
+                                bottomTile.iConnectionType == 7 || bottomTile.iConnectionType == 8 || bottomTile.iConnectionType == 9 ||
+                                bottomTile.iConnectionType == 11 || bottomTile.iConnectionType == 15) && (tile.iConnectionType == 1 ||
+                                        tile.iConnectionType == 5 || tile.iConnectionType == 6 || tile.iConnectionType == 7 ||
+                                        tile.iConnectionType == 9 || tile.iConnectionType == 10 || tile.iConnectionType == 11 ||
+                                        tile.iConnectionType == 15);
     }
 
     if (iCol > 0) {
-        WorldMapTile * leftTile = &tiles[iCol - 1][iRow];
+        const WorldMapTile& leftTile = tiles[iCol - 1][iRow];
 
-        tile->fConnection[2] = (leftTile->iConnectionType == 2 || leftTile->iConnectionType == 4 || leftTile->iConnectionType == 5 ||
-                                leftTile->iConnectionType == 8 || leftTile->iConnectionType == 9 || leftTile->iConnectionType == 10 ||
-                                leftTile->iConnectionType == 11 || leftTile->iConnectionType == 13) && (tile->iConnectionType == 2 || tile->iConnectionType == 3 ||
-                                        tile->iConnectionType == 6 || tile->iConnectionType == 7 || tile->iConnectionType == 8 ||
-                                        tile->iConnectionType == 10 || tile->iConnectionType == 11 || tile->iConnectionType == 13);
+        tile.fConnection[2] = (leftTile.iConnectionType == 2 || leftTile.iConnectionType == 4 || leftTile.iConnectionType == 5 ||
+                                leftTile.iConnectionType == 8 || leftTile.iConnectionType == 9 || leftTile.iConnectionType == 10 ||
+                                leftTile.iConnectionType == 11 || leftTile.iConnectionType == 13) && (tile.iConnectionType == 2 || tile.iConnectionType == 3 ||
+                                        tile.iConnectionType == 6 || tile.iConnectionType == 7 || tile.iConnectionType == 8 ||
+                                        tile.iConnectionType == 10 || tile.iConnectionType == 11 || tile.iConnectionType == 13);
     }
 
     if (iCol < iWidth - 1) {
-        WorldMapTile * rightTile = &tiles[iCol + 1][iRow];
+        const WorldMapTile& rightTile = tiles[iCol + 1][iRow];
 
-        tile->fConnection[3] = (rightTile->iConnectionType == 2 || rightTile->iConnectionType == 3 || rightTile->iConnectionType == 6 ||
-                                rightTile->iConnectionType == 7 || rightTile->iConnectionType == 8 || rightTile->iConnectionType == 10 ||
-                                rightTile->iConnectionType == 11 || rightTile->iConnectionType == 13) && (tile->iConnectionType == 2 || tile->iConnectionType == 4 ||
-                                        tile->iConnectionType == 5 || tile->iConnectionType == 8 || tile->iConnectionType == 9 ||
-                                        tile->iConnectionType == 10 || tile->iConnectionType == 11 || tile->iConnectionType == 13);
+        tile.fConnection[3] = (rightTile.iConnectionType == 2 || rightTile.iConnectionType == 3 || rightTile.iConnectionType == 6 ||
+                                rightTile.iConnectionType == 7 || rightTile.iConnectionType == 8 || rightTile.iConnectionType == 10 ||
+                                rightTile.iConnectionType == 11 || rightTile.iConnectionType == 13) && (tile.iConnectionType == 2 || tile.iConnectionType == 4 ||
+                                        tile.iConnectionType == 5 || tile.iConnectionType == 8 || tile.iConnectionType == 9 ||
+                                        tile.iConnectionType == 10 || tile.iConnectionType == 11 || tile.iConnectionType == 13);
     }
 }
 
 //Saves world to file
-bool WorldMap::Save()
+bool WorldMap::Save() const
 {
     return Save(worldlist->at(game_values.worldindex));
 }
 
-bool WorldMap::Save(const std::string& szPath)
+bool WorldMap::Save(const std::string& szPath) const
 {
     FILE * file = fopen(szPath.c_str(), "w");
 
@@ -850,8 +850,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iBackgroundWater);
+            const WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+            fprintf(file, "%d", tile.iBackgroundWater);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -865,8 +865,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iBackgroundSprite);
+            const WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+            fprintf(file, "%d", tile.iBackgroundSprite);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -880,8 +880,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iForegroundSprite);
+            const WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+            fprintf(file, "%d", tile.iForegroundSprite);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -895,8 +895,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iConnectionType);
+            const WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+            fprintf(file, "%d", tile.iConnectionType);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -910,8 +910,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iType);
+            const WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+            fprintf(file, "%d", tile.iType);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -925,8 +925,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iVehicleBoundary);
+            const WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
+            fprintf(file, "%d", tile.iVehicleBoundary);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -1113,7 +1113,7 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
     return fPlayerDoneMove;
 }
 
-void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping)
+void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping) const
 {
     for (const WorldVehicle& vehicle : vehicles) {
         if (!vehicle.fEnabled)
@@ -1131,7 +1131,7 @@ void WorldMap::UpdateTile(SDL_Surface * surface, short iCol, short iRow, short i
     DrawTileToSurface(surface, iCol, iRow, iMapDrawOffsetCol, iMapDrawOffsetRow, true, iAnimationFrame);
 }
 
-void WorldMap::DrawMapToSurface(SDL_Surface * surface)
+void WorldMap::DrawMapToSurface(SDL_Surface * surface) const
 {
     for (short iRow = 0; iRow < iHeight; iRow++) {
         for (short iCol = 0; iCol < iWidth; iCol++) {
@@ -1146,7 +1146,7 @@ void WorldMap::ResetDrawCycle()
     iLastDrawCol = 0;
 }
 
-void WorldMap::DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame)
+void WorldMap::DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface* surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame)
 {
     short iRowEnd = 19 + iMapDrawOffsetRow < iHeight ? 19 : iHeight - iMapDrawOffsetRow;
     short iColEnd = 24 + iMapDrawOffsetCol < iWidth ? 24 : iWidth - iMapDrawOffsetCol;
@@ -1173,18 +1173,18 @@ STOPDRAWING:
     iLastDrawCol = iCol;
 }
 
-void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer)
+void WorldMap::DrawTileToSurface(SDL_Surface* surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer) const
 {
-    WorldMapTile * tile = &tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
+    const WorldMapTile& tile = tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
 
-    if (!tile->fAnimated && !fFullRefresh)
+    if (!tile.fAnimated && !fFullRefresh)
         return;
 
     SDL_Rect r = {iCol * iTileSize, iRow * iTileSize, iTileSize, iTileSize};
 
-    short iBackgroundSprite = tile->iBackgroundSprite;
-    short iBackgroundWater = tile->iBackgroundWater;
-    short iForegroundSprite = tile->iForegroundSprite;
+    short iBackgroundSprite = tile.iBackgroundSprite;
+    short iBackgroundWater = tile.iBackgroundWater;
+    short iForegroundSprite = tile.iForegroundSprite;
 
     short iBackgroundStyleOffset = iBackgroundSprite / WORLD_BACKGROUND_SPRITE_SET_SIZE * (4 << iTileSizeShift);
 
@@ -1218,8 +1218,8 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
     }
 
     if (iLayer != 1) {
-        if (tile->iCompleted >= 0) {
-            SDL_Rect rSrc = {(tile->iCompleted + 10) << iTileSizeShift, 5 << iTileSizeShift, iTileSize, iTileSize};
+        if (tile.iCompleted >= 0) {
+            SDL_Rect rSrc = {(tile.iCompleted + 10) << iTileSizeShift, 5 << iTileSizeShift, iTileSize, iTileSize};
             SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
         } else {
             if (iForegroundSprite >= 0 && iForegroundSprite < WORLD_FOREGROUND_STAGE_OFFSET) {
@@ -1268,7 +1268,7 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
         }
 
         //Draw doors
-        short iType = tile->iType;
+        short iType = tile.iType;
         if (iType >= 2 && iType <= 5) {
             SDL_Rect rSrc = {(iType + 8) << iTileSizeShift, 6 << iTileSizeShift, iTileSize, iTileSize};
             SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
@@ -1301,7 +1301,7 @@ bool WorldMap::IsVehicleMoving() const
     return false;
 }
 
-void WorldMap::GetPlayerPosition(short * iPlayerX, short * iPlayerY)
+void WorldMap::GetPlayerPosition(short * iPlayerX, short * iPlayerY) const
 {
     *iPlayerX = player.ix;
     *iPlayerY = player.iy;
@@ -1312,24 +1312,24 @@ void WorldMap::SetPlayerPosition(short iPlayerCol, short iPlayerRow)
     player.SetPosition(iPlayerCol, iPlayerRow);
 }
 
-void WorldMap::GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY)
+void WorldMap::GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY) const
 {
     *iPlayerCurrentTileX = player.iCurrentTileX;
     *iPlayerCurrentTileY = player.iCurrentTileY;
 }
 
-void WorldMap::GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY)
+void WorldMap::GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY) const
 {
     *iPlayerDestTileX = player.iDestTileX;
     *iPlayerDestTileY = player.iDestTileY;
 }
 
-short WorldMap::GetPlayerState()
+short WorldMap::GetPlayerState() const
 {
     return player.iState;
 }
 
-short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex)
+short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
 {
     for (size_t i = 0; i < vehicles.size(); i++) {
         const WorldVehicle& vehicle = vehicles[i];
@@ -1347,7 +1347,7 @@ short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex)
     return -1;
 }
 
-bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow)
+bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const
 {
     short iWarp = tiles[player.iCurrentTileX][player.iCurrentTileY].iWarp;
 
@@ -1396,7 +1396,7 @@ short WorldMap::NumVehiclesInTile(short iTileX, short iTileY) const
     return iVehicleCount;
 }
 
-short WorldMap::GetVehicleStageScore(short iVehicleIndex)
+short WorldMap::GetVehicleStageScore(short iVehicleIndex) const
 {
     return game_values.tourstops[vehicles[iVehicleIndex].iActionId]->iPoints;
 }
@@ -1439,12 +1439,12 @@ void WorldMap::MoveBridges()
     }
 }
 
-void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
+void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4]) const
 {
-    WorldMapTile * tile = &tiles[iCol][iRow];
+    const WorldMapTile& tile = tiles[iCol][iRow];
 
     if (iCol > 0) {
-        if (tile->iCompleted >= -1) {
+        if (tile.iCompleted >= -1) {
             short iType = tiles[iCol - 1][iRow].iType - 2;
 
             if (iType >= 0 && iType <= 3)
@@ -1453,7 +1453,7 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
     }
 
     if (iCol < iWidth - 1) {
-        if (tile->iCompleted >= -1) {
+        if (tile.iCompleted >= -1) {
             short iType = tiles[iCol + 1][iRow].iType - 2;
 
             if (iType >= 0 && iType <= 3)
@@ -1462,7 +1462,7 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
     }
 
     if (iRow > 0) {
-        if (tile->iCompleted >= -1) {
+        if (tile.iCompleted >= -1) {
             short iType = tiles[iCol][iRow - 1].iType - 2;
 
             if (iType >= 0 && iType <= 3)
@@ -1471,7 +1471,7 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
     }
 
     if (iCol < iHeight - 1) {
-        if (tile->iCompleted >= -1) {
+        if (tile.iCompleted >= -1) {
             short iType = tiles[iCol][iRow + 1].iType - 2;
 
             if (iType >= 0 && iType <= 3)
@@ -1480,7 +1480,7 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
     }
 }
 
-bool WorldMap::IsDoor(short iCol, short iRow)
+bool WorldMap::IsDoor(short iCol, short iRow) const
 {
     if (iCol >= 0 && iRow >= 0 && iCol < iWidth && iRow < iHeight) {
         short iType = tiles[iCol][iRow].iType;
@@ -1495,31 +1495,31 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow, bool fCloud)
 {
     short iDoorsOpened = 0;
 
-    WorldMapTile * tile = &tiles[iCol][iRow];
+    const WorldMapTile& tile = tiles[iCol][iRow];
 
     if (iCol > 0) {
-        if ((tile->iCompleted >= -1 || fCloud) && tiles[iCol - 1][iRow].iType - 2 == iKeyType) {
+        if ((tile.iCompleted >= -1 || fCloud) && tiles[iCol - 1][iRow].iType - 2 == iKeyType) {
             tiles[iCol - 1][iRow].iType = 0;
             iDoorsOpened |= 1;
         }
     }
 
     if (iCol < iWidth - 1) {
-        if ((tile->iCompleted >= -1 || fCloud) && tiles[iCol + 1][iRow].iType - 2 == iKeyType) {
+        if ((tile.iCompleted >= -1 || fCloud) && tiles[iCol + 1][iRow].iType - 2 == iKeyType) {
             tiles[iCol + 1][iRow].iType = 0;
             iDoorsOpened |= 2;
         }
     }
 
     if (iRow > 0) {
-        if ((tile->iCompleted >= -1 || fCloud) && tiles[iCol][iRow - 1].iType - 2 == iKeyType) {
+        if ((tile.iCompleted >= -1 || fCloud) && tiles[iCol][iRow - 1].iType - 2 == iKeyType) {
             tiles[iCol][iRow - 1].iType = 0;
             iDoorsOpened |= 4;
         }
     }
 
     if (iRow < iHeight - 1) {
-        if ((tile->iCompleted >= -1 || fCloud) && tiles[iCol][iRow + 1].iType - 2 == iKeyType) {
+        if ((tile.iCompleted >= -1 || fCloud) && tiles[iCol][iRow + 1].iType - 2 == iKeyType) {
             tiles[iCol][iRow + 1].iType = 0;
             iDoorsOpened |= 8;
         }
@@ -1528,7 +1528,7 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow, bool fCloud)
     return iDoorsOpened;
 }
 
-short WorldMap::GetVehicleBoundary(short iCol, short iRow)
+short WorldMap::GetVehicleBoundary(short iCol, short iRow) const
 {
     if (iCol >= 0 && iRow >= 0 && iCol < iWidth && iRow < iHeight) {
         return tiles[iCol][iRow].iVehicleBoundary;
@@ -1538,23 +1538,23 @@ short WorldMap::GetVehicleBoundary(short iCol, short iRow)
 }
 
 //Implements breadth first search to find a stage or vehicle of interest
-short WorldMap::GetNextInterestingMove(short iCol, short iRow)
+short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
 {
-    WorldMapTile * currentTile = &tiles[iCol][iRow];
+    const WorldMapTile& currentTile = tiles[iCol][iRow];
 
     //Look for stages or vehicles, but not bonus houses
-    if ((currentTile->iType >= 6 && currentTile->iCompleted == -2) || NumVehiclesInTile(iCol, iRow) > 0)
+    if ((currentTile.iType >= 6 && currentTile.iCompleted == -2) || NumVehiclesInTile(iCol, iRow) > 0)
         return 4; //Signal to press select on this tile
 
-    short iCurrentId = currentTile->iID;
+    short iCurrentId = currentTile.iID;
 
-    std::queue<WorldMapTile*> next;
+    std::queue<const WorldMapTile*> next;
     std::map<short, short> visitedTiles;
-    visitedTiles[currentTile->iID] = -1;
-    next.push(currentTile);
+    visitedTiles[currentTile.iID] = -1;
+    next.push(&currentTile);
 
     while (!next.empty()) {
-        WorldMapTile * tile = next.front();
+        const WorldMapTile* const tile = next.front();
 
         if (tile == NULL)
             return -1;
@@ -1600,48 +1600,48 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
         for (short iNeighbor = 0; iNeighbor < 4; iNeighbor++) {
             if (tile->fConnection[iNeighbor]) {
                 if (iNeighbor == 0 && tile->iRow > 0) {
-                    WorldMapTile * topTile = &tiles[tile->iCol][tile->iRow - 1];
+                    const WorldMapTile& topTile = tiles[tile->iCol][tile->iRow - 1];
 
                     //Stop at door tiles
-                    if (topTile->iType >= 2 && topTile->iType <= 5)
+                    if (topTile.iType >= 2 && topTile.iType <= 5)
                         continue;
 
-                    if (visitedTiles.find(topTile->iID) == visitedTiles.end()) {
-                        visitedTiles[topTile->iID] = 1;
-                        next.push(topTile);
+                    if (visitedTiles.find(topTile.iID) == visitedTiles.end()) {
+                        visitedTiles[topTile.iID] = 1;
+                        next.push(&topTile);
                     }
                 } else if (iNeighbor == 1 && tile->iRow < iHeight - 1) {
-                    WorldMapTile * bottomTile = &tiles[tile->iCol][tile->iRow + 1];
+                    const WorldMapTile& bottomTile = tiles[tile->iCol][tile->iRow + 1];
 
                     //Stop at door tiles
-                    if (bottomTile->iType >= 2 && bottomTile->iType <= 5)
+                    if (bottomTile.iType >= 2 && bottomTile.iType <= 5)
                         continue;
 
-                    if (visitedTiles.find(bottomTile->iID) == visitedTiles.end()) {
-                        visitedTiles[bottomTile->iID] = 0;
-                        next.push(bottomTile);
+                    if (visitedTiles.find(bottomTile.iID) == visitedTiles.end()) {
+                        visitedTiles[bottomTile.iID] = 0;
+                        next.push(&bottomTile);
                     }
                 } else if (iNeighbor == 2 && tile->iCol > 0) {
-                    WorldMapTile * leftTile = &tiles[tile->iCol - 1][tile->iRow];
+                    const WorldMapTile& leftTile = tiles[tile->iCol - 1][tile->iRow];
 
                     //Stop at door tiles
-                    if (leftTile->iType >= 2 && leftTile->iType <= 5)
+                    if (leftTile.iType >= 2 && leftTile.iType <= 5)
                         continue;
 
-                    if (visitedTiles.find(leftTile->iID) == visitedTiles.end()) {
-                        visitedTiles[leftTile->iID] = 3;
-                        next.push(leftTile);
+                    if (visitedTiles.find(leftTile.iID) == visitedTiles.end()) {
+                        visitedTiles[leftTile.iID] = 3;
+                        next.push(&leftTile);
                     }
                 } else if (iNeighbor == 3 && tile->iCol < iWidth - 1) {
-                    WorldMapTile * rightTile = &tiles[tile->iCol + 1][tile->iRow];
+                    const WorldMapTile& rightTile = tiles[tile->iCol + 1][tile->iRow];
 
                     //Stop at door tiles
-                    if (rightTile->iType >= 2 && rightTile->iType <= 5)
+                    if (rightTile.iType >= 2 && rightTile.iType <= 5)
                         continue;
 
-                    if (visitedTiles.find(rightTile->iID) == visitedTiles.end()) {
-                        visitedTiles[rightTile->iID] = 2;
-                        next.push(rightTile);
+                    if (visitedTiles.find(rightTile.iID) == visitedTiles.end()) {
+                        visitedTiles[rightTile.iID] = 2;
+                        next.push(&rightTile);
                     }
                 }
             }
@@ -1650,15 +1650,15 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
                 short iWarpCol, iWarpRow;
                 warps[tile->iWarp].GetOtherSide(tile->iCol, tile->iRow, &iWarpCol, &iWarpRow);
 
-                WorldMapTile * warpTile = &tiles[iWarpCol][iWarpRow];
+                const WorldMapTile& warpTile = tiles[iWarpCol][iWarpRow];
 
                 //Stop at door tiles
-                if (warpTile->iType >= 2 && warpTile->iType <= 5)
+                if (warpTile.iType >= 2 && warpTile.iType <= 5)
                     continue;
 
-                if (visitedTiles.find(warpTile->iID) == visitedTiles.end()) {
-                    visitedTiles[warpTile->iID] = 4;
-                    next.push(warpTile);
+                if (visitedTiles.find(warpTile.iID) == visitedTiles.end()) {
+                    visitedTiles[warpTile.iID] = 4;
+                    next.push(&warpTile);
                 }
             }
         }
