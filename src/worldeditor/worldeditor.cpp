@@ -1966,47 +1966,44 @@ void ReadVehiclesIntoEditor()
 
 	vehiclelist.clear();
 
-    for (short iVehicle = 0; iVehicle < g_worldmap.iNumVehicles; iVehicle++) {
-		WorldVehicle * vehicle = &g_worldmap.vehicles[iVehicle];
-		WorldVehicle * vehiclecopy = new WorldVehicle();
+    for (const WorldVehicle& vehicle : g_worldmap.vehicles) {
+        WorldVehicle * vehiclecopy = new WorldVehicle();
 
-		vehiclecopy->iDrawSprite = vehicle->iDrawSprite;
-		vehiclecopy->iActionId = vehicle->iActionId;
-		vehiclecopy->iCurrentTileX = vehicle->iCurrentTileX;
-		vehiclecopy->iCurrentTileY = vehicle->iCurrentTileY;
-		vehiclecopy->iMinMoves = vehicle->iMinMoves;
-		vehiclecopy->iMaxMoves = vehicle->iMaxMoves;
-		vehiclecopy->fSpritePaces = vehicle->fSpritePaces;
-		vehiclecopy->iDrawDirection = vehicle->iDrawDirection;
-		vehiclecopy->iBoundary = vehicle->iBoundary;
+        vehiclecopy->iDrawSprite = vehicle.iDrawSprite;
+        vehiclecopy->iActionId = vehicle.iActionId;
+        vehiclecopy->iCurrentTileX = vehicle.iCurrentTileX;
+        vehiclecopy->iCurrentTileY = vehicle.iCurrentTileY;
+        vehiclecopy->iMinMoves = vehicle.iMinMoves;
+        vehiclecopy->iMaxMoves = vehicle.iMaxMoves;
+        vehiclecopy->fSpritePaces = vehicle.fSpritePaces;
+        vehiclecopy->iDrawDirection = vehicle.iDrawDirection;
+        vehiclecopy->iBoundary = vehicle.iBoundary;
 
-		vehiclelist.push_back(vehiclecopy);
-	}
+        vehiclelist.push_back(vehiclecopy);
+    }
 }
 
 void WriteVehiclesIntoWorld()
 {
-	//Cleanup old vehicles
-	delete [] g_worldmap.vehicles;
+    //Cleanup old vehicles
+    g_worldmap.vehicles.clear();
 
-	//Insert new vehicles
-	g_worldmap.iNumVehicles = vehiclelist.size();
-	g_worldmap.vehicles = new WorldVehicle[g_worldmap.iNumVehicles];
+    //Insert new vehicles
+    g_worldmap.vehicles.reserve(vehiclelist.size());
 
-    for (short iVehicle = 0; iVehicle < g_worldmap.iNumVehicles; iVehicle++) {
-		WorldVehicle * vehicle = vehiclelist[iVehicle];
-		WorldVehicle * vehiclecopy = &g_worldmap.vehicles[iVehicle];
-
-		vehiclecopy->iDrawSprite = vehicle->iDrawSprite;
-		vehiclecopy->iActionId = vehicle->iActionId;
-		vehiclecopy->iCurrentTileX = vehicle->iCurrentTileX;
-		vehiclecopy->iCurrentTileY = vehicle->iCurrentTileY;
-		vehiclecopy->iMinMoves = vehicle->iMinMoves;
-		vehiclecopy->iMaxMoves = vehicle->iMaxMoves;
-		vehiclecopy->fSpritePaces = vehicle->fSpritePaces;
-		vehiclecopy->iDrawDirection = vehicle->iDrawDirection;
-		vehiclecopy->iBoundary = vehicle->iBoundary;
-	}
+    for (const WorldVehicle* vehicle : vehiclelist) {
+        WorldVehicle vehiclecopy;
+        vehiclecopy.iDrawSprite = vehicle->iDrawSprite;
+        vehiclecopy.iActionId = vehicle->iActionId;
+        vehiclecopy.iCurrentTileX = vehicle->iCurrentTileX;
+        vehiclecopy.iCurrentTileY = vehicle->iCurrentTileY;
+        vehiclecopy.iMinMoves = vehicle->iMinMoves;
+        vehiclecopy.iMaxMoves = vehicle->iMaxMoves;
+        vehiclecopy.fSpritePaces = vehicle->fSpritePaces;
+        vehiclecopy.iDrawDirection = vehicle->iDrawDirection;
+        vehiclecopy.iBoundary = vehicle->iBoundary;
+        g_worldmap.vehicles.emplace_back(std::move(vehiclecopy));
+    }
 }
 
 void AddVehicleToTile(short iCol, short iRow, short iType)

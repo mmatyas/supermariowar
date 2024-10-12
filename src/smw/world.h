@@ -100,7 +100,7 @@ class WorldVehicle : public WorldMovingObject
 		void Move();
 
 		bool Update();
-		void Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping);
+                void Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping) const;
 
 	private:
 
@@ -183,7 +183,7 @@ class WorldMap
 		void DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
 		void SetPlayerSprite(short iPlayerSprite);
-		bool IsVehicleMoving();
+                bool IsVehicleMoving() const;
 
     void GetWorldSize(short * w, short * h) {
         *w = iWidth;
@@ -207,7 +207,7 @@ class WorldMap
 
 		void RemoveVehicle(short iVehicleIndex);
 
-		short NumVehiclesInTile(short iTileX, short iTileY);
+                short NumVehiclesInTile(short iTileX, short iTileY) const;
 
 		short GetVehicleStageScore(short iVehicleIndex);
 		void MoveBridges();
@@ -244,11 +244,10 @@ class WorldMap
 
 		short iNumStages = 0;
 		short iNumWarps = 0;
-		short iNumVehicles = 0;
 
                 std::vector<std::vector<WorldMapTile>> tiles;
 		WorldPlayer player;
-		WorldVehicle * vehicles = nullptr;
+                std::vector<WorldVehicle> vehicles;
 		WorldWarp * warps = nullptr;
 
 		short iNumInitialBonuses;

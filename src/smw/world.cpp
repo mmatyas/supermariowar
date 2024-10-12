@@ -307,7 +307,7 @@ bool WorldVehicle::Update()
     return false;
 }
 
-void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping)
+void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping) const
 {
     if (fVehiclesSleeping) {
         SDL_Rect rDst = {ix + iWorldOffsetX, iy + iWorldOffsetY, iTileSize, iTileSize};
@@ -399,7 +399,7 @@ bool WorldMap::Load(short tilesize)
     short iMapTileReadRow = 0;
     short iCurrentStage = 0;
     short iCurrentWarp = 0;
-    short iCurrentVehicle = 0;
+    short iNumVehicles = 0;
 
     while (std::getline(file, line)) {
         if (line.empty())
@@ -669,7 +669,7 @@ bool WorldMap::Load(short tilesize)
                 iNumVehicles = 0;
 
             if (iNumVehicles > 0)
-                vehicles = new WorldVehicle[iNumVehicles];
+                vehicles.reserve(iNumVehicles);
 
             iReadType = iNumVehicles == 0 ? 16 : 15;
         } else if (iReadType == 15) { //vehicles
@@ -717,9 +717,10 @@ bool WorldMap::Load(short tilesize)
             psz = strtok(NULL, ",\n");
             short iBoundary = atoi(psz);
 
-            vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary, iTileSize);
+            vehicles.emplace_back(WorldVehicle());
+            vehicles.back().Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary, iTileSize);
 
-            if (++iCurrentVehicle >= iNumVehicles)
+            if (vehicles.size() >= iNumVehicles)
                 iReadType = 16;
         } else if (iReadType == 16) { //initial bonus items
             char * psz = strtok(buffer, ",\n");
@@ -960,9 +961,9 @@ bool WorldMap::Save(const std::string& szPath)
     fprintf(file, "#Vehicles\n");
     fprintf(file, "#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction, Boundary\n");
 
-    fprintf(file, "%d\n", iNumVehicles);
+    fprintf(file, "%d\n", vehicles.size());
 
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < vehicles.size(); iVehicle++) {
         fprintf(file, "%d,", vehicles[iVehicle].iDrawSprite);
         fprintf(file, "%d,", vehicles[iVehicle].iActionId);
         fprintf(file, "%d,", vehicles[iVehicle].iCurrentTileX);
@@ -1024,12 +1025,7 @@ void WorldMap::Clear()
         }
     }
 
-    if (vehicles) {
-        delete [] vehicles;
-        vehicles = NULL;
-    }
-
-    iNumVehicles = 0;
+    vehicles.clear();
 
     if (warps) {
         delete [] warps;
@@ -1104,13 +1100,13 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
     bool fPlayerDoneMove = player.Update();
 
     *fPlayerVehicleCollision = false;
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        if (!vehicles[iVehicle].fEnabled)
+    for (WorldVehicle& vehicle : vehicles) {
+        if (!vehicle.fEnabled)
             continue;
 
-        *fPlayerVehicleCollision |= vehicles[iVehicle].Update();
+        *fPlayerVehicleCollision |= vehicle.Update();
 
-        if (vehicles[iVehicle].iState > 0)
+        if (vehicle.iState > 0)
             fPlayMovingVehicleSound = true;
     }
 
@@ -1122,11 +1118,11 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
 
 void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping)
 {
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        if (!vehicles[iVehicle].fEnabled)
+    for (const WorldVehicle& vehicle : vehicles) {
+        if (!vehicle.fEnabled)
             continue;
 
-        vehicles[iVehicle].Draw(iMapOffsetX, iMapOffsetY, fVehiclesSleeping);
+        vehicle.Draw(iMapOffsetX, iMapOffsetY, fVehiclesSleeping);
     }
 
     if (fDrawPlayer)
@@ -1290,13 +1286,7 @@ void WorldMap::Cleanup()
     iNumInitialBonuses = 0;
 
     tiles.clear();
-
-    if (vehicles) {
-        delete [] vehicles;
-        vehicles = NULL;
-    }
-
-    iNumVehicles = 0;
+    vehicles.clear();
 
     if (warps) {
         delete [] warps;
@@ -1311,16 +1301,12 @@ void WorldMap::SetPlayerSprite(short iPlayerSprite)
     player.SetSprite(iPlayerSprite);
 }
 
-bool WorldMap::IsVehicleMoving()
+bool WorldMap::IsVehicleMoving() const
 {
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        if (!vehicles[iVehicle].fEnabled)
-            continue;
-
-        if (vehicles[iVehicle].iState > 0)
+    for (const WorldVehicle& vehicle : vehicles) {
+        if (vehicle.fEnabled && vehicle.iState > 0)
             return true;
     }
-
     return false;
 }
 
@@ -1354,15 +1340,15 @@ short WorldMap::GetPlayerState()
 
 short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex)
 {
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        WorldVehicle * vehicle = &vehicles[iVehicle];
+    for (size_t i = 0; i < vehicles.size(); i++) {
+        const WorldVehicle& vehicle = vehicles[i];
 
-        if (!vehicle->fEnabled)
+        if (!vehicle.fEnabled)
             continue;
 
-        if (vehicle->iCurrentTileX == player.iCurrentTileX && vehicle->iCurrentTileY == player.iCurrentTileY) {
-            *vehicleIndex = iVehicle;
-            return vehicle->iActionId;
+        if (vehicle.iCurrentTileX == player.iCurrentTileX && vehicle.iCurrentTileY == player.iCurrentTileY) {
+            *vehicleIndex = i;
+            return vehicle.iActionId;
         }
     }
 
@@ -1393,11 +1379,9 @@ void WorldMap::FacePlayer(short iDirection)
 
 void WorldMap::MoveVehicles()
 {
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        if (!vehicles[iVehicle].fEnabled)
-            continue;
-
-        vehicles[iVehicle].Move();
+    for (WorldVehicle& vehicle : vehicles) {
+        if (vehicle.fEnabled)
+            vehicle.Move();
     }
 }
 
@@ -1406,16 +1390,15 @@ void WorldMap::RemoveVehicle(short iVehicleIndex)
     vehicles[iVehicleIndex].fEnabled = false;
 }
 
-short WorldMap::NumVehiclesInTile(short iTileX, short iTileY)
+short WorldMap::NumVehiclesInTile(short iTileX, short iTileY) const
 {
     short iVehicleCount = 0;
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        WorldVehicle * vehicle = &vehicles[iVehicle];
 
-        if (!vehicle->fEnabled)
+    for (const WorldVehicle& vehicle : vehicles) {
+        if (!vehicle.fEnabled)
             continue;
 
-        if (vehicle->iCurrentTileX == iTileX && vehicle->iCurrentTileY == iTileY)
+        if (vehicle.iCurrentTileX == iTileX && vehicle.iCurrentTileY == iTileY)
             iVehicleCount++;
     }
 
