@@ -49,7 +49,6 @@ class WorldMovingObject
 		void Init(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize);
 		virtual void Move(short iDirection);
 		virtual bool Update();
-		void Draw(short iWorldOffsetX, short iWorldOffsetY);
 		void FaceDirection(short iDirection);
 		void SetPosition(short iCol, short iRow);
 
@@ -75,19 +74,13 @@ class WorldMovingObject
 	friend void takescreenshot();
 };
 
-class WorldPlayer : public WorldMovingObject
-{
-	public:
+class WorldPlayer : public WorldMovingObject {
+public:
+    WorldPlayer();
+    WorldPlayer(short iCol, short iRow);
 
-		WorldPlayer();
-		~WorldPlayer();
-
-		void Init(short iCol, short iRow);
-
-		void SetSprite(short iPlayer);
-                void Draw(short iWorldOffsetX, short iWorldOffsetY) const;
-
-	friend class WorldMap;
+    void SetSprite(short iPlayer);
+    void Draw(short iWorldOffsetX, short iWorldOffsetY) const;
 };
 
 class WorldVehicle : public WorldMovingObject

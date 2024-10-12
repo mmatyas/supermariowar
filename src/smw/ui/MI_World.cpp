@@ -61,8 +61,6 @@ void MI_World::Init()
     iAnimationFrame = 0;
     iDrawFullRefresh = 0;
 
-    g_worldmap.InitPlayer();
-
     iMapDrawOffsetCol = 0;
     iMapDrawOffsetRow = 0;
 

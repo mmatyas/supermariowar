@@ -151,14 +151,12 @@ void WorldMovingObject::SetPosition(short iCol, short iRow)
 * WorldPlayer
 **********************************/
 
-WorldPlayer::WorldPlayer() :
-    WorldMovingObject()
+WorldPlayer::WorldPlayer()
+    : WorldPlayer(0, 0)
 {}
 
-WorldPlayer::~WorldPlayer()
-{}
-
-void WorldPlayer::Init(short iCol, short iRow)
+WorldPlayer::WorldPlayer(short iCol, short iRow)
+    : WorldMovingObject()
 {
     WorldMovingObject::Init(iCol, iRow, 0, 0, 32);
 }
@@ -553,6 +551,7 @@ bool WorldMap::Load(short tilesize)
                 if (tile.iType == 1) {
                     iStartX = iMapTileReadCol;
                     iStartY = iMapTileReadRow;
+                    player.SetPosition(iStartX, iStartY);
                 }
 
                 tile.iCompleted = tile.iType <= 5 ? -1 : -2;
@@ -1055,11 +1054,6 @@ void WorldMap::Resize(short w, short h)
             }
         }
     }
-}
-
-void WorldMap::InitPlayer()
-{
-    player.Init(iStartX, iStartY);
 }
 
 bool WorldMap::Update(bool * fPlayerVehicleCollision)
