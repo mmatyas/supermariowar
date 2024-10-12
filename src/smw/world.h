@@ -243,12 +243,11 @@ class WorldMap
                 short iStartY = 0;
 
 		short iNumStages = 0;
-		short iNumWarps = 0;
 
                 std::vector<std::vector<WorldMapTile>> tiles;
 		WorldPlayer player;
                 std::vector<WorldVehicle> vehicles;
-		WorldWarp * warps = nullptr;
+                std::vector<WorldWarp> warps;
 
 		short iNumInitialBonuses;
 		short iInitialBonuses[32];

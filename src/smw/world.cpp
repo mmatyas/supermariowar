@@ -398,7 +398,7 @@ bool WorldMap::Load(short tilesize)
     Version version;
     short iMapTileReadRow = 0;
     short iCurrentStage = 0;
-    short iCurrentWarp = 0;
+    short iNumWarps = 0;
     short iNumVehicles = 0;
 
     while (std::getline(file, line)) {
@@ -624,7 +624,7 @@ bool WorldMap::Load(short tilesize)
                 iNumWarps = 0;
 
             if (iNumWarps > 0)
-                warps = new WorldWarp[iNumWarps];
+                warps.reserve(iNumWarps);
 
             iReadType = iNumWarps == 0 ? 14 : 13;
         } else if (iReadType == 13) { //warp details
@@ -655,12 +655,15 @@ bool WorldMap::Load(short tilesize)
             if (iRow2 < 0)
                 iRow2 = 0;
 
-            warps[iCurrentWarp].Init(iCurrentWarp, iCol1, iRow1, iCol2, iRow2);
+            short warpId = warps.size();
 
-            tiles[iCol1][iRow1].iWarp = iCurrentWarp;
-            tiles[iCol2][iRow2].iWarp = iCurrentWarp;
+            warps.emplace_back(WorldWarp());
+            warps.back().Init(warpId, iCol1, iRow1, iCol2, iRow2);
 
-            if (++iCurrentWarp >= iNumWarps)
+            tiles[iCol1][iRow1].iWarp = warpId;
+            tiles[iCol2][iRow2].iWarp = warpId;
+
+            if (warps.size() >= iNumWarps)
                 iReadType = 14;
         } else if (iReadType == 14) { //number of vehicles
             iNumVehicles = atoi(buffer);
@@ -948,13 +951,13 @@ bool WorldMap::Save(const std::string& szPath)
     fprintf(file, "#Warps\n");
     fprintf(file, "#location 1 x, y, location 2 x, y\n");
 
-    fprintf(file, "%d\n", iNumWarps);
+    fprintf(file, "%d\n", warps.size());
 
-    for (short iWarp = 0; iWarp < iNumWarps; iWarp++) {
-        fprintf(file, "%d,", warps[iWarp].iCol1);
-        fprintf(file, "%d,", warps[iWarp].iRow1);
-        fprintf(file, "%d,", warps[iWarp].iCol2);
-        fprintf(file, "%d\n", warps[iWarp].iRow2);
+    for (const WorldWarp& warp : warps) {
+        fprintf(file, "%d,", warp.iCol1);
+        fprintf(file, "%d,", warp.iRow1);
+        fprintf(file, "%d,", warp.iCol2);
+        fprintf(file, "%d\n", warp.iRow2);
     }
     fprintf(file, "\n");
 
@@ -1026,13 +1029,7 @@ void WorldMap::Clear()
     }
 
     vehicles.clear();
-
-    if (warps) {
-        delete [] warps;
-        warps = NULL;
-    }
-
-    iNumWarps = 0;
+    warps.clear();
 }
 
 //Creates clears world and resizes (essentially creating a new world to work on for editor)
@@ -1287,13 +1284,7 @@ void WorldMap::Cleanup()
 
     tiles.clear();
     vehicles.clear();
-
-    if (warps) {
-        delete [] warps;
-        warps = NULL;
-    }
-
-    iNumWarps = 0;
+    warps.clear();
 }
 
 void WorldMap::SetPlayerSprite(short iPlayerSprite)

@@ -2064,39 +2064,24 @@ void ReadWarpsIntoEditor()
 
 	warplist.clear();
 
-    for (short iWarp = 0; iWarp < g_worldmap.iNumWarps; iWarp++) {
-		WorldWarp * warp = &g_worldmap.warps[iWarp];
-		WorldWarp * warpcopy = new WorldWarp();
-
-		warpcopy->iID = warp->iID;
-		warpcopy->iCol1 = warp->iCol1;
-		warpcopy->iRow1 = warp->iRow1;
-		warpcopy->iCol2 = warp->iCol2;
-		warpcopy->iRow2 = warp->iRow2;
-
-		warplist.push_back(warpcopy);
-	}
+    for (const WorldWarp& warp : g_worldmap.warps) {
+        WorldWarp* warpcopy = new WorldWarp();
+        *warpcopy = warp;
+        warplist.push_back(warpcopy);
+    }
 }
 
 void WriteWarpsIntoWorld()
 {
-	//Cleanup old vehicles
-	delete [] g_worldmap.warps;
+    //Cleanup old vehicles
+    g_worldmap.warps.clear();
 
-	//Insert new vehicles
-	g_worldmap.iNumWarps = warplist.size();
-	g_worldmap.warps = new WorldWarp[g_worldmap.iNumWarps];
+    //Insert new vehicles
+    g_worldmap.warps.reserve(warplist.size());
 
-    for (short iWarp = 0; iWarp < g_worldmap.iNumWarps; iWarp++) {
-		WorldWarp * warp = warplist[iWarp];
-		WorldWarp * warpcopy = &g_worldmap.warps[iWarp];
-
-		warpcopy->iID = warp->iID;
-		warpcopy->iCol1 = warp->iCol1;
-		warpcopy->iRow1 = warp->iRow1;
-		warpcopy->iCol2 = warp->iCol2;
-		warpcopy->iRow2 = warp->iRow2;
-	}
+    for (const WorldWarp* warp : warplist) {
+        g_worldmap.warps.emplace_back(*warp);
+    }
 }
 
 void AddWarpToTile(short iCol, short iRow, short iType)
