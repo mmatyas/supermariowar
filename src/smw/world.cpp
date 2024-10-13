@@ -360,16 +360,7 @@ void WorldWarp::GetOtherSide(short iCol, short iRow, short * iOtherCol, short * 
 **********************************/
 
 WorldMap::WorldMap()
-{
-    iWidth = 0;
-    iHeight = 0;
-    tiles = NULL;
-    vehicles = NULL;
-    warps = NULL;
-    iNumVehicles = 0;
-    iNumStages = 0;
-    iNumWarps = 0;
-}
+{}
 
 WorldMap::~WorldMap()
 {
@@ -452,10 +443,10 @@ bool WorldMap::Load(short tilesize)
             iHeight = atoi(buffer);
             iReadType = 4;
 
-            tiles = new WorldMapTile*[iWidth];
-
+            tiles.clear();
+            tiles.resize(iWidth);
             for (short iCol = 0; iCol < iWidth; iCol++)
-                tiles[iCol] = new WorldMapTile[iHeight];
+                tiles[iCol].resize(iHeight);
 
             short iDrawSurfaceTiles = iWidth * iHeight;
 
@@ -1016,18 +1007,20 @@ bool WorldMap::Save(const std::string& szPath)
 
 void WorldMap::Clear()
 {
-    if (tiles) {
-        for (short iCol = 0; iCol < iWidth; iCol++) {
-            for (short iRow = 0; iRow < iHeight; iRow++) {
-                tiles[iCol][iRow].iBackgroundSprite = 0;
-                tiles[iCol][iRow].iBackgroundWater = 0;
-                tiles[iCol][iRow].iForegroundSprite = 0;
-                tiles[iCol][iRow].iConnectionType = 0;
-                tiles[iCol][iRow].iType = 0;
-                tiles[iCol][iRow].iID = iRow * iWidth + iCol;
-                tiles[iCol][iRow].iVehicleBoundary = 0;
-                tiles[iCol][iRow].iWarp = 0;
-            }
+    for (size_t col = 0; col < tiles.size(); col++) {
+        std::vector<WorldMapTile>& column = tiles[col];
+
+        for (size_t row = 0; row < column.size(); row++) {
+            WorldMapTile& tile = column[row];
+
+            tile.iBackgroundSprite = 0;
+            tile.iBackgroundWater = 0;
+            tile.iForegroundSprite = 0;
+            tile.iConnectionType = 0;
+            tile.iType = 0;
+            tile.iID = row * iWidth + col;
+            tile.iVehicleBoundary = 0;
+            tile.iWarp = 0;
         }
     }
 
@@ -1054,10 +1047,10 @@ void WorldMap::New(short w, short h)
     iWidth = w;
     iHeight = h;
 
-    tiles = new WorldMapTile*[iWidth];
-
+    tiles.clear();
+    tiles.resize(iWidth);
     for (short iCol = 0; iCol < iWidth; iCol++)
-        tiles[iCol] = new WorldMapTile[iHeight];
+        tiles[iCol].resize(iHeight);
 
     Clear();
 }
@@ -1066,7 +1059,9 @@ void WorldMap::New(short w, short h)
 void WorldMap::Resize(short w, short h)
 {
     //Copy tiles from old map
-    WorldMapTile ** tempTiles = tiles;
+    std::vector<std::vector<WorldMapTile>> tempTiles;
+    tempTiles.swap(tiles);
+
     short iOldWidth = iWidth;
     short iOldHeight = iHeight;
 
@@ -1074,11 +1069,12 @@ void WorldMap::Resize(short w, short h)
     iWidth = w;
     iHeight = h;
 
-    tiles = new WorldMapTile*[iWidth];
+    tiles.resize(iWidth);
 
     //Copy tiles to new map
     for (short iCol = 0; iCol < iWidth; iCol++) {
-        tiles[iCol] = new WorldMapTile[iHeight];
+        tiles[iCol].resize(iHeight);
+
         for (short iRow = 0; iRow < iHeight; iRow++) {
             if (iCol < iOldWidth && iRow < iOldHeight)
                 tiles[iCol][iRow] = tempTiles[iCol][iRow];
@@ -1093,14 +1089,6 @@ void WorldMap::Resize(short w, short h)
                 tiles[iCol][iRow].iWarp = 0;
             }
         }
-    }
-
-    //Delete old tiles
-    if (tempTiles) {
-        for (short iCol = 0; iCol < iOldWidth; iCol++)
-            delete [] tempTiles[iCol];
-
-        delete [] tempTiles;
     }
 }
 
@@ -1220,16 +1208,16 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
 
             if ((iBackgroundSprite >= 2 && iBackgroundSprite <= 48)) {
                 if (iBackgroundSprite >= 45) {
-                    SDL_Rect rSrc = {(3 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 44) << iTileSizeShift, iTileSize, iTileSize};
+                    rSrc = {(3 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 44) << iTileSizeShift, iTileSize, iTileSize};
                     SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
                 } else if (iBackgroundSprite >= 30) {
-                    SDL_Rect rSrc = {(2 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 29) << iTileSizeShift, iTileSize, iTileSize};
+                    rSrc = {(2 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 29) << iTileSizeShift, iTileSize, iTileSize};
                     SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
                 } else if (iBackgroundSprite >= 16) {
-                    SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, (iBackgroundSprite - 14) << iTileSizeShift, iTileSize, iTileSize};
+                    rSrc = {iTileSize + iBackgroundStyleOffset, (iBackgroundSprite - 14) << iTileSizeShift, iTileSize, iTileSize};
                     SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
                 } else {
-                    SDL_Rect rSrc = {iBackgroundStyleOffset, iBackgroundSprite << iTileSizeShift, iTileSize, iTileSize};
+                    rSrc = {iBackgroundStyleOffset, iBackgroundSprite << iTileSizeShift, iTileSize, iTileSize};
                     SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
                 }
             }
@@ -1301,14 +1289,7 @@ void WorldMap::Cleanup()
     iNumStages = 0;
     iNumInitialBonuses = 0;
 
-    if (tiles) {
-        for (short iCol = 0; iCol < iWidth; iCol++)
-            delete [] tiles[iCol];
-
-        delete [] tiles;
-
-        tiles = NULL;
-    }
+    tiles.clear();
 
     if (vehicles) {
         delete [] vehicles;

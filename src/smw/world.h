@@ -4,6 +4,7 @@
 #include "SDL.h"
 
 #include <string>
+#include <vector>
 
 #define WORLD_BACKGROUND_SPRITE_SET_SIZE    60
 #define WORLD_PATH_SPRITE_SET_SIZE          20
@@ -236,18 +237,19 @@ class WorldMap
 
 		void DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer = 0);
 
-		short iWidth;
-		short iHeight;
-		short iStartX, iStartY;
+		short iWidth = 0;
+		short iHeight = 0;
+                short iStartX = 0;
+                short iStartY = 0;
 
-		short iNumStages;
-		short iNumWarps;
-		short iNumVehicles;
+		short iNumStages = 0;
+		short iNumWarps = 0;
+		short iNumVehicles = 0;
 
-		WorldMapTile ** tiles;
+                std::vector<std::vector<WorldMapTile>> tiles;
 		WorldPlayer player;
-		WorldVehicle * vehicles;
-		WorldWarp * warps;
+		WorldVehicle * vehicles = nullptr;
+		WorldWarp * warps = nullptr;
 
 		short iNumInitialBonuses;
 		short iInitialBonuses[32];
