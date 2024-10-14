@@ -1,12 +1,16 @@
 #include "MI_WorldPreviewDisplay.h"
 
+#include "FileList.h"
+#include "GameValues.h"
 #include "GlobalConstants.h"
 #include "world.h"
 
 extern SDL_Surface* blitdest;
 extern SDL_Surface* screen;
 
+extern CGameValues game_values;
 extern WorldMap g_worldmap;
+extern WorldList *worldlist;
 
 
 MI_WorldPreviewDisplay::MI_WorldPreviewDisplay(short x, short y, short cols, short rows)
@@ -201,7 +205,7 @@ void MI_WorldPreviewDisplay::Draw()
 
 void MI_WorldPreviewDisplay::SetWorld()
 {
-    g_worldmap.Load(PREVIEWTILESIZE);
+    g_worldmap = WorldMap(worldlist->at(game_values.worldindex), PREVIEWTILESIZE);
 
     short w, h;
     g_worldmap.GetWorldSize(&w, &h);

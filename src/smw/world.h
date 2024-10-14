@@ -141,14 +141,16 @@ struct WorldWarp {
 
 class WorldMap {
 public:
-    WorldMap();
-    ~WorldMap();
+    WorldMap(short w, short h);
+    WorldMap(const std::string& path, short iTileSize);
 
-    bool Load(short iTileSize);
-    bool Save() const;
+    WorldMap(const WorldMap&) = delete;
+    WorldMap& operator=(const WorldMap&) = delete;
+    WorldMap(WorldMap&&) = default;
+    WorldMap& operator=(WorldMap&&) = default;
+
     bool Save(const std::string& szPath) const;
 
-    void New(short iWidth, short iHeight);
     void Resize(short iWidth, short iHeight);
     void Clear();
 
@@ -207,7 +209,6 @@ public:
     const std::string& GetWorldName() { return worldName; }
 
 private:
-    void Cleanup();
     void SetTileConnections(short iCol, short iRow);
 
     void DrawTileToSurface(SDL_Surface* surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer = 0) const;

@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 #endif
 
-WorldMap g_worldmap;
+WorldMap g_worldmap(0, 0);
 
 extern std::string stripPathAndExtension(const std::string &path);
 
@@ -31,7 +31,6 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 
 extern SkinList *skinlist;
-extern WorldList *worldlist;
 
 
 /**********************************
@@ -351,17 +350,21 @@ Vec2s WorldWarp::getOtherSide(Vec2s target) const
 * WorldMap
 **********************************/
 
-WorldMap::WorldMap()
-{}
-
-WorldMap::~WorldMap()
+WorldMap::WorldMap(short w, short h)
 {
-    Cleanup();
+    iWidth = w;
+    iHeight = h;
+
+    tiles.clear();
+    tiles.resize(iWidth);
+    for (short iCol = 0; iCol < iWidth; iCol++)
+        tiles[iCol].resize(iHeight);
+
+    ResetTourStops();  // FIXME
 }
 
-bool WorldMap::Load(short tilesize)
+WorldMap::WorldMap(const std::string& path, short tilesize)
 {
-    Cleanup();
     ResetDrawCycle();
 
     iTileSize = tilesize;
@@ -377,12 +380,11 @@ bool WorldMap::Load(short tilesize)
         iTileSheet = 2;
     }
 
-    const std::string szPath = worldlist->at(game_values.worldindex);
-    worldName = stripPathAndExtension(szPath);
+    worldName = stripPathAndExtension(path);
 
-    std::ifstream file(szPath);
+    std::ifstream file(path);
     if (!file)
-        return false;
+        throw std::runtime_error("Could not open the world file");
 
     std::string line;
     char* buffer = NULL;
@@ -741,7 +743,10 @@ RETURN:
     if (buffer)
         delete[] buffer;
 
-    return iReadType == 17;
+    if (iReadType != 17)
+        throw std::runtime_error("Invalid world file");
+
+    ResetTourStops();  // FIXME
 }
 
 void WorldMap::SetTileConnections(short iCol, short iRow)
@@ -798,11 +803,6 @@ void WorldMap::SetTileConnections(short iCol, short iRow)
 }
 
 //Saves world to file
-bool WorldMap::Save() const
-{
-    return Save(worldlist->at(game_values.worldindex));
-}
-
 bool WorldMap::Save(const std::string& szPath) const
 {
     FILE * file = fopen(szPath.c_str(), "w");
@@ -1009,22 +1009,6 @@ void WorldMap::Clear()
 
     vehicles.clear();
     warps.clear();
-}
-
-//Creates clears world and resizes (essentially creating a new world to work on for editor)
-void WorldMap::New(short w, short h)
-{
-    Cleanup();
-
-    iWidth = w;
-    iHeight = h;
-
-    tiles.clear();
-    tiles.resize(iWidth);
-    for (short iCol = 0; iCol < iWidth; iCol++)
-        tiles[iCol].resize(iHeight);
-
-    Clear();
 }
 
 //Resizes world keeping intact current tiles (if possible)
@@ -1248,17 +1232,6 @@ void WorldMap::DrawTileToSurface(SDL_Surface* surface, short iCol, short iRow, s
             SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
         }
     }
-}
-
-void WorldMap::Cleanup()
-{
-    ResetTourStops();
-    iNumStages = 0;
-    iNumInitialBonuses = 0;
-
-    tiles.clear();
-    vehicles.clear();
-    warps.clear();
 }
 
 void WorldMap::SetPlayerSprite(short iPlayerSprite)

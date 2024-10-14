@@ -4629,7 +4629,7 @@ int clear_world()
 void loadcurrentworld()
 {
 	game_values.worldindex = worldlist->currentIndex();
-	g_worldmap.Load(TILESIZE);
+	g_worldmap = WorldMap(worldlist->at(game_values.worldindex), TILESIZE);
 	ReadVehiclesIntoEditor();
 	ReadWarpsIntoEditor();
 
@@ -4672,7 +4672,7 @@ int savecurrentworld()
 
 	WriteVehiclesIntoWorld();
 	WriteWarpsIntoWorld();
-	g_worldmap.Save();
+	g_worldmap.Save(worldlist->at(game_values.worldindex));
 	return 0;
 }
 
@@ -4735,7 +4735,7 @@ int new_world()
 
 		warplist.clear();
 
-		g_worldmap.New(iWidth, iHeight);
+		g_worldmap = WorldMap(iWidth, iHeight);
         worldlist->add(convertPath(strcat(worldLocation, strcat(fileName, ".txt"))).c_str());
         worldlist->find(fileName);
         game_values.worldindex = worldlist->currentIndex();
@@ -4797,7 +4797,7 @@ void takescreenshot()
 
     for (short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
 		short iTileSize = iTileSizes[iScreenshotSize];
-		g_worldmap.Load(iTileSize);
+		g_worldmap = WorldMap(worldlist->at(game_values.worldindex), iTileSize);
 
 		short w, h;
 		g_worldmap.GetWorldSize(&w, &h);
@@ -4855,6 +4855,6 @@ void takescreenshot()
 		SDL_FreeSurface(sScreenshot);
 	}
 
-	g_worldmap.Load(iTileSizes[0]);
+	g_worldmap = WorldMap(worldlist->at(game_values.worldindex), iTileSizes[0]);
 	blitdest = screen;
 }

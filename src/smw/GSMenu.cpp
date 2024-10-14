@@ -726,11 +726,9 @@ void MenuState::update()
                     mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &rm->menu_mode_large);
                 } else if (game_values.matchtype == MatchType::World) {
                     printf("  Match type: World\n");
-                    if (!g_worldmap.Load(TILESIZE)) {
-                        iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
-                        iDisplayErrorTimer = 120;
-                        fErrorReadingTourFile = true;
-                    } else {
+                    try {
+                        g_worldmap = WorldMap(worldlist->at(game_values.worldindex), TILESIZE);
+
                         mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &rm->spr_tour_markers);
 
                         g_worldmap.SetInitialPowerups();
@@ -748,6 +746,11 @@ void MenuState::update()
 
                         mWorldMenu->miWorld->Init();
                         mWorldMenu->miWorld->SetControllingTeam(RANDOM_INT( score_cnt));
+                    }
+                    catch (const std::runtime_error& err) {
+                        iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
+                        iDisplayErrorTimer = 120;
+                        fErrorReadingTourFile = true;
                     }
                 }
 
