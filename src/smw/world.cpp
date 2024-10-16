@@ -2,16 +2,16 @@
 
 #include "FileList.h"
 #include "GameValues.h"
+#include "linfunc.h"
 #include "path.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Version.h"
 #include "WorldTourStop.h"
 
+#include <charconv>
 #include <cstdio>
-#include <cstdlib> // atoi()
 #include <cstring>
-
 #include <fstream>
 #include <map>
 #include <queue>
@@ -31,6 +31,31 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 
 extern SkinList *skinlist;
+
+
+namespace {
+std::string_view popNext(std::list<std::string_view>& list)
+{
+    std::string_view result;
+    if (!list.empty()) {
+        result = std::move(list.front());
+        list.pop_front();
+    }
+    return result;
+}
+
+int toInt(std::string_view text, int defval = 0)
+{
+    int value = defval;
+    std::from_chars(text.data(), text.data() + text.size(), value);  // TODO: Handle errors
+    return value;
+}
+
+int popNextInt(std::list<std::string_view>& list, int defval = 0)
+{
+    return toInt(popNext(list));
+}
+} // namespace
 
 
 /**********************************
@@ -387,7 +412,6 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
         throw std::runtime_error("Could not open the world file");
 
     std::string line;
-    char* buffer = NULL;
     short iReadType = 0;
     Version version;
     short iMapTileReadRow = 0;
@@ -399,42 +423,24 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
         if (line.empty())
             continue;
 
-        if (buffer)
-            delete[] buffer;
-
-        buffer = new char[line.size() + 1];
-        std::copy(line.begin(), line.end(), buffer);
-        buffer[line.size()] = '\0';
-
-        if (buffer[0] == '#' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
+        if (line[0] == '#' || line[0] == '\r' || line[0] == ' ' || line[0] == '\t')
             continue;
 
         if (iReadType == 0) { //Read version number
-            char * psz = strtok(buffer, ".\n");
-            if (psz)
-                version.major = atoi(psz);
-
-            psz = strtok(NULL, ".\n");
-            if (psz)
-                version.minor = atoi(psz);
-
-            psz = strtok(NULL, ".\n");
-            if (psz)
-                version.patch = atoi(psz);
-
-            psz = strtok(NULL, ".\n");
-            if (psz)
-                version.build = atoi(psz);
-
+            std::list<std::string_view> tokens = tokenize(line, '.');
+            version.major = popNextInt(tokens);
+            version.minor = popNextInt(tokens);
+            version.patch = popNextInt(tokens);
+            version.build = popNextInt(tokens);
             iReadType = 1;
         } else if (iReadType == 1) { //music category
-            iMusicCategory = atoi(buffer);
+            iMusicCategory = std::stoi(line);
             iReadType = 2;
         } else if (iReadType == 2) { //world width
-            iWidth = atoi(buffer);
+            iWidth = std::stoi(line);
             iReadType = 3;
         } else if (iReadType == 3) { //world height
-            iHeight = atoi(buffer);
+            iHeight = std::stoi(line);
             iReadType = 4;
 
             tiles.clear();
@@ -449,16 +455,13 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
 
             iTilesPerCycle = iDrawSurfaceTiles / 8;
         } else if (iReadType == 4) { //background water
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
-
                 WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
-                tile.iBackgroundWater = atoi(psz);
-
-                psz = strtok(NULL, ",\n");
+                tile.iBackgroundWater = popNextInt(tokens);
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -466,21 +469,18 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                 iMapTileReadRow = 0;
             }
         } else if (iReadType == 5) { //background sprites
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
-
                 WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
-                tile.iBackgroundSprite = atoi(psz);
+                tile.iBackgroundSprite = popNextInt(tokens);
                 tile.fAnimated = (tile.iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE) != 1;
 
                 tile.iID = iMapTileReadRow * iWidth + iMapTileReadCol;
                 tile.iCol = iMapTileReadCol;
                 tile.iRow = iMapTileReadRow;
-
-                psz = strtok(NULL, ",\n");
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -488,14 +488,13 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                 iMapTileReadRow = 0;
             }
         } else if (iReadType == 6) { //foreground sprites
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
-
                 WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
-                tile.iForegroundSprite = atoi(psz);
+                tile.iForegroundSprite = popNextInt(tokens);
 
                 short iForegroundSprite = tile.iForegroundSprite;
 
@@ -512,8 +511,6 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                 //Animated foreground tiles
                 if (!tile.fAnimated)
                     tile.fAnimated = iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29;
-
-                psz = strtok(NULL, ",\n");
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -521,16 +518,13 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                 iMapTileReadRow = 0;
             }
         } else if (iReadType == 7) { //path connections
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
-
                 WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
-                tile.iConnectionType = atoi(psz);
-
-                psz = strtok(NULL, ",\n");
+                tile.iConnectionType = popNextInt(tokens);
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -548,14 +542,13 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                 }
             }
         } else if (iReadType == 8) { //stages
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
-
                 WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
-                tile.iType = atoi(psz);
+                tile.iType = popNextInt(tokens);
                 tile.iWarp = -1;
 
                 if (tile.iType == 1) {
@@ -565,8 +558,6 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                 }
 
                 tile.iCompleted = tile.iType <= 5 ? -1 : -2;
-
-                psz = strtok(NULL, ",\n");
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -574,27 +565,28 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                 iMapTileReadRow = 0;
             }
         } else if (iReadType == 9) { //vehicle boundaries
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
-
                 WorldMapTile& tile = tiles[iMapTileReadCol][iMapTileReadRow];
-                tile.iVehicleBoundary = atoi(psz);
-
-                psz = strtok(NULL, ",\n");
+                tile.iVehicleBoundary = popNextInt(tokens);
             }
 
             if (++iMapTileReadRow == iHeight)
                 iReadType = 10;
         } else if (iReadType == 10) { //number of stages
-            iNumStages = atoi(buffer);
+            iNumStages = std::stoi(line);
 
             iReadType = iNumStages == 0 ? 12 : 11;
         } else if (iReadType == 11) { //stage details
             TourStop* ts = new TourStop();
+            char* buffer = new char[line.size() + 1];
+            std::copy(line.begin(), line.end(), buffer);
+            buffer[line.size()] = '\0';
             *ts = ParseTourStopLine(buffer, version, true);
+            delete[] buffer;
 
             game_values.tourstops.push_back(ts);
             game_values.tourstoptotal++;
@@ -613,7 +605,7 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                 iReadType = 12;
             }
         } else if (iReadType == 12) { //number of warps
-            iNumWarps = atoi(buffer);
+            iNumWarps = std::stoi(line);
 
             if (iNumWarps < 0)
                 iNumWarps = 0;
@@ -623,20 +615,12 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
 
             iReadType = iNumWarps == 0 ? 14 : 13;
         } else if (iReadType == 13) { //warp details
-            char * psz = strtok(buffer, ",\n");
-            if (!psz)
-                goto RETURN;
+            std::list<std::string_view> tokens = tokenize(line, ',');
 
-            short iCol1 = std::max(0, atoi(psz));
-
-            psz = strtok(NULL, ",\n");
-            short iRow1 = std::max(0, atoi(psz));
-
-            psz = strtok(NULL, ",\n");
-            short iCol2 = std::max(0, atoi(psz));
-
-            psz = strtok(NULL, ",\n");
-            short iRow2 = std::max(0, atoi(psz));
+            short iCol1 = std::max(0, popNextInt(tokens));
+            short iRow1 = std::max(0, popNextInt(tokens));
+            short iCol2 = std::max(0, popNextInt(tokens));
+            short iRow2 = std::max(0, popNextInt(tokens));
 
             short warpId = warps.size();
             warps.emplace_back(WorldWarp(warpId, {iCol1, iRow1}, {iCol2, iRow2}));
@@ -647,7 +631,7 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
             if (warps.size() >= iNumWarps)
                 iReadType = 14;
         } else if (iReadType == 14) { //number of vehicles
-            iNumVehicles = atoi(buffer);
+            iNumVehicles = std::stoi(line);
 
             if (iNumVehicles < 0)
                 iNumVehicles = 0;
@@ -657,49 +641,27 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
 
             iReadType = iNumVehicles == 0 ? 16 : 15;
         } else if (iReadType == 15) { //vehicles
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
 
-            if (!psz)
-                goto RETURN;
+            short iSprite = popNextInt(tokens);
 
-            short iSprite = atoi(psz);
-
-            psz = strtok(NULL, ",\n");
-
-            short iStage = atoi(psz);
-
+            short iStage = popNextInt(tokens);
             if (iStage > iNumStages)
                 iStage = 0;
 
-            psz = strtok(NULL, ",\n");
-            short iCol = atoi(psz);
+            short iCol = popNextInt(tokens);
+            short iRow = popNextInt(tokens);
 
-            psz = strtok(NULL, ",\n");
-            short iRow = atoi(psz);
+            short iMinMoves = std::max(0, popNextInt(tokens));
+            short iMaxMoves = std::max<short>(iMinMoves, popNextInt(tokens));
 
-            psz = strtok(NULL, ",\n");
-            short iMinMoves = atoi(psz);
+            bool fSpritePaces = popNextInt(tokens) == 1;
 
-            if (iMinMoves < 0)
-                iMinMoves = 0;
-
-            psz = strtok(NULL, ",\n");
-            short iMaxMoves = atoi(psz);
-
-            if (iMaxMoves < iMinMoves)
-                iMaxMoves = iMinMoves;
-
-            psz = strtok(NULL, ",\n");
-            bool fSpritePaces = atoi(psz) == 1;
-
-            psz = strtok(NULL, ",\n");
-            short iInitialDirection = atoi(psz);
-
+            short iInitialDirection = popNextInt(tokens);
             if (iInitialDirection != 0)
                 iInitialDirection = 1;
 
-            psz = strtok(NULL, ",\n");
-            short iBoundary = atoi(psz);
+            short iBoundary = popNextInt(tokens);
 
             vehicles.emplace_back(WorldVehicle());
             vehicles.back().Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary, iTileSize);
@@ -707,23 +669,24 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
             if (vehicles.size() >= iNumVehicles)
                 iReadType = 16;
         } else if (iReadType == 16) { //initial bonus items
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
 
             iNumInitialBonuses = 0;
 
-            while (psz != NULL) {
+            while (!tokens.empty()) {
+                std::string_view token = popNext(tokens);
+                if (token.empty())
+                    break;
+
                 //0 indicates no initial bonuses
-                if (psz[0] == '0')
+                if (token[0] == '0')
                     break;
 
                 short iBonusOffset = 0;
-                if (psz[0] == 'w' || psz[0] == 'W')
+                if (token[0] == 'w' || token[0] == 'W')
                     iBonusOffset += NUM_POWERUPS;
 
-                psz++;
-
-                short iBonus = atoi(psz) + iBonusOffset;
-
+                short iBonus = toInt(token.substr(1)) + iBonusOffset;
                 if (iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
                     iBonus = 0;
 
@@ -731,8 +694,6 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                     iInitialBonuses[iNumInitialBonuses++] = iBonus;
                 else
                     iInitialBonuses[31] = iBonus;
-
-                psz = strtok(NULL, ",\n");
             }
 
             iReadType = 17;
@@ -740,9 +701,6 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
     }
 
 RETURN:
-    if (buffer)
-        delete[] buffer;
-
     if (iReadType != 17)
         throw std::runtime_error("Invalid world file");
 
