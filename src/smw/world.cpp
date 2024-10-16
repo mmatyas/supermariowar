@@ -63,15 +63,9 @@ int popNextInt(std::list<std::string_view>& list, int defval = 0)
 **********************************/
 
 WorldMovingObject::WorldMovingObject()
-    : iDrawSprite(0)
-    , iDrawDirection(0)
-    , iTileSize(0)
 {
     SetPosition(0, 0);
 }
-
-WorldMovingObject::~WorldMovingObject()
-{}
 
 void WorldMovingObject::Init(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize)
 {
@@ -86,17 +80,17 @@ void WorldMovingObject::Init(short iCol, short iRow, short iSprite, short iIniti
 void WorldMovingObject::Move(short iDirection)
 {
     if (iDirection == 0) {
-        iDestTileY--;
+        destTile.y--;
         iState = 1;
     } else if (iDirection == 1) {
-        iDestTileY++;
+        destTile.y++;
         iState = 2;
     } else if (iDirection == 2) {
-        iDestTileX--;
+        destTile.x--;
         iState = 3;
         iDrawDirection = 1;
     } else if (iDirection == 3) {
-        iDestTileX++;
+        destTile.x++;
         iState = 4;
         iDrawDirection = 0;
     }
@@ -112,38 +106,38 @@ bool WorldMovingObject::Update()
     }
 
     if (iState == 1) {
-        iy -= 2;
-        if (iy < iDestTileY * iTileSize) {
-            iy = iDestTileY * iTileSize;
+        pos.y -= 2;
+        if (pos.y < destTile.y * iTileSize) {
+            pos.y = destTile.y * iTileSize;
             iState = 0;
-            iCurrentTileY = iDestTileY;
+            currentTile.y = destTile.y;
 
             return true;
         }
     } else if (iState == 2) { //down
-        iy += 2;
-        if (iy > iDestTileY * iTileSize) {
-            iy = iDestTileY * iTileSize;
+        pos.y += 2;
+        if (pos.y > destTile.y * iTileSize) {
+            pos.y = destTile.y * iTileSize;
             iState = 0;
-            iCurrentTileY = iDestTileY;
+            currentTile.y = destTile.y;
 
             return true;
         }
     } else if (iState == 3) { //left
-        ix -= 2;
-        if (ix < iDestTileX * iTileSize) {
-            ix = iDestTileX * iTileSize;
+        pos.x -= 2;
+        if (pos.x < destTile.x * iTileSize) {
+            pos.x = destTile.x * iTileSize;
             iState = 0;
-            iCurrentTileX = iDestTileX;
+            currentTile.x = destTile.x;
 
             return true;
         }
     } else if (iState == 4) { //right
-        ix += 2;
-        if (ix > iDestTileX * iTileSize) {
-            ix = iDestTileX * iTileSize;
+        pos.x += 2;
+        if (pos.x > destTile.x * iTileSize) {
+            pos.x = destTile.x * iTileSize;
             iState = 0;
-            iCurrentTileX = iDestTileX;
+            currentTile.x = destTile.x;
 
             return true;
         }
@@ -159,12 +153,9 @@ void WorldMovingObject::FaceDirection(short iDirection)
 
 void WorldMovingObject::SetPosition(short iCol, short iRow)
 {
-    ix = iCol * iTileSize;
-    iy = iRow * iTileSize;
-    iCurrentTileX = iCol;
-    iCurrentTileY = iRow;
-    iDestTileX = iCol;
-    iDestTileY = iRow;
+    pos = {iCol * iTileSize, iRow * iTileSize};
+    currentTile = {iCol, iRow};
+    destTile = {iCol, iRow};
 
     iState = 0;
     iAnimationFrame = 0;
@@ -187,7 +178,7 @@ WorldPlayer::WorldPlayer(short iCol, short iRow)
 
 void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY) const
 {
-    rm->spr_player[iDrawSprite][iAnimationFrame + iDrawDirection]->draw(ix + iMapOffsetX, iy + iMapOffsetY, 0, 0, 32, 32);
+    rm->spr_player[iDrawSprite][iAnimationFrame + iDrawDirection]->draw(pos.x + iMapOffsetX, pos.y + iMapOffsetY, 0, 0, 32, 32);
 }
 
 void WorldPlayer::SetSprite(short iPlayer)
@@ -259,14 +250,14 @@ void WorldVehicle::SetNextDest()
     if (iState != 0 || iMaxMoves == 0)
         return;
 
-    WorldMapTile * tile = &g_worldmap.tiles[iCurrentTileX][iCurrentTileY];
+    WorldMapTile * tile = &g_worldmap.tiles[currentTile.x][currentTile.y];
 
     short iPlayerCurrentTileX, iPlayerCurrentTileY;
     g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
 
     if (iNumMoves-- <= 0) {
-        if (tile->iType == 0 && (iPlayerCurrentTileX != iCurrentTileX || iPlayerCurrentTileY != iCurrentTileY) &&
-                g_worldmap.NumVehiclesInTile(iCurrentTileX, iCurrentTileY) <= 1)
+        if (tile->iType == 0 && (iPlayerCurrentTileX != currentTile.x || iPlayerCurrentTileY != currentTile.y) &&
+                g_worldmap.NumVehiclesInTile(currentTile.x, currentTile.y) <= 1)
             return;
     }
 
@@ -281,13 +272,13 @@ void WorldVehicle::SetNextDest()
     for (short iDirection = 0; iDirection < 4; iDirection++) {
         bool fIsDoor = false;
         if (iDirection == 0)
-            fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY - 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY - 1) == iBoundary);
+            fIsDoor = g_worldmap.IsDoor(currentTile.x, currentTile.y - 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x, currentTile.y - 1) == iBoundary);
         else if (iDirection == 1)
-            fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY + 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY + 1) == iBoundary);
+            fIsDoor = g_worldmap.IsDoor(currentTile.x, currentTile.y + 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x, currentTile.y + 1) == iBoundary);
         else if (iDirection == 2)
-            fIsDoor = g_worldmap.IsDoor(iCurrentTileX - 1, iCurrentTileY) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX - 1, iCurrentTileY) == iBoundary);
+            fIsDoor = g_worldmap.IsDoor(currentTile.x - 1, currentTile.y) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x - 1, currentTile.y) == iBoundary);
         else if (iDirection == 3)
-            fIsDoor = g_worldmap.IsDoor(iCurrentTileX + 1, iCurrentTileY) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX + 1, iCurrentTileY) == iBoundary);
+            fIsDoor = g_worldmap.IsDoor(currentTile.x + 1, currentTile.y) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x + 1, currentTile.y) == iBoundary);
 
         if (tile->fConnection[iDirection] && !fIsDoor)
             iConnections[iNumConnections++] = iDirection;
@@ -307,7 +298,7 @@ bool WorldVehicle::Update()
         short iPlayerTileX, iPlayerTileY;
         g_worldmap.GetPlayerCurrentTile(&iPlayerTileX, &iPlayerTileY);
 
-        if (iCurrentTileX == iPlayerTileX && iCurrentTileY == iPlayerTileY)
+        if (currentTile.x == iPlayerTileX && currentTile.y == iPlayerTileY)
             return true;
 
         SetNextDest();
@@ -332,14 +323,14 @@ bool WorldVehicle::Update()
 void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping) const
 {
     if (fVehiclesSleeping) {
-        SDL_Rect rDst = {ix + iWorldOffsetX, iy + iWorldOffsetY, iTileSize, iTileSize};
+        SDL_Rect rDst = {pos.x + iWorldOffsetX, pos.y + iWorldOffsetY, iTileSize, iTileSize};
 #ifdef USE_SDL2
         SDL_BlitSurface(rm->spr_worldvehicle[iTileSheet].getSurface(), &srcRects[4], blitdest, &rDst);
 #else  // SDL_BlitSurface uses a non-const source rect
         SDL_BlitSurface(rm->spr_worldvehicle[iTileSheet].getSurface(), const_cast<SDL_Rect*>(&srcRects[4]), blitdest, &rDst);
 #endif
     } else {
-        SDL_Rect rDst = {ix + iWorldOffsetX + iPaceOffset, iy + iWorldOffsetY, iTileSize, iTileSize};
+        SDL_Rect rDst = {pos.x + iWorldOffsetX + iPaceOffset, pos.y + iWorldOffsetY, iTileSize, iTileSize};
 #ifdef USE_SDL2
         SDL_BlitSurface(rm->spr_worldvehicle[iTileSheet].getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
 #else  // SDL_BlitSurface uses a non-const source rect
@@ -905,8 +896,8 @@ bool WorldMap::Save(const std::string& szPath) const
     for (short iVehicle = 0; iVehicle < vehicles.size(); iVehicle++) {
         fprintf(file, "%d,", vehicles[iVehicle].iDrawSprite);
         fprintf(file, "%d,", vehicles[iVehicle].iActionId);
-        fprintf(file, "%d,", vehicles[iVehicle].iCurrentTileX);
-        fprintf(file, "%d,", vehicles[iVehicle].iCurrentTileY);
+        fprintf(file, "%d,", vehicles[iVehicle].currentTile.x);
+        fprintf(file, "%d,", vehicles[iVehicle].currentTile.y);
         fprintf(file, "%d,", vehicles[iVehicle].iMinMoves);
         fprintf(file, "%d,", vehicles[iVehicle].iMaxMoves);
         fprintf(file, "%d,", vehicles[iVehicle].fSpritePaces);
@@ -1207,8 +1198,8 @@ bool WorldMap::IsVehicleMoving() const
 
 void WorldMap::GetPlayerPosition(short * iPlayerX, short * iPlayerY) const
 {
-    *iPlayerX = player.ix;
-    *iPlayerY = player.iy;
+    *iPlayerX = player.pos.x;
+    *iPlayerY = player.pos.y;
 }
 
 void WorldMap::SetPlayerPosition(short iPlayerCol, short iPlayerRow)
@@ -1218,14 +1209,14 @@ void WorldMap::SetPlayerPosition(short iPlayerCol, short iPlayerRow)
 
 void WorldMap::GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY) const
 {
-    *iPlayerCurrentTileX = player.iCurrentTileX;
-    *iPlayerCurrentTileY = player.iCurrentTileY;
+    *iPlayerCurrentTileX = player.currentTile.x;
+    *iPlayerCurrentTileY = player.currentTile.y;
 }
 
 void WorldMap::GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY) const
 {
-    *iPlayerDestTileX = player.iDestTileX;
-    *iPlayerDestTileY = player.iDestTileY;
+    *iPlayerDestTileX = player.destTile.x;
+    *iPlayerDestTileY = player.destTile.y;
 }
 
 short WorldMap::GetPlayerState() const
@@ -1241,7 +1232,7 @@ short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
         if (!vehicle.fEnabled)
             continue;
 
-        if (vehicle.iCurrentTileX == player.iCurrentTileX && vehicle.iCurrentTileY == player.iCurrentTileY) {
+        if (vehicle.currentTile.x == player.currentTile.x && vehicle.currentTile.y == player.currentTile.y) {
             *vehicleIndex = i;
             return vehicle.iActionId;
         }
@@ -1253,11 +1244,11 @@ short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
 
 bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const
 {
-    short iWarp = tiles[player.iCurrentTileX][player.iCurrentTileY].iWarp;
+    short iWarp = tiles[player.currentTile.x][player.currentTile.y].iWarp;
     if (iWarp < 0)
         return false;
 
-    Vec2s pos = warps[iWarp].getOtherSide({player.iCurrentTileX, player.iCurrentTileY});
+    Vec2s pos = warps[iWarp].getOtherSide({player.currentTile.x, player.currentTile.y});
     *iWarpCol = pos.x;
     *iWarpRow = pos.y;
     return true;
@@ -1294,7 +1285,7 @@ short WorldMap::NumVehiclesInTile(short iTileX, short iTileY) const
         if (!vehicle.fEnabled)
             continue;
 
-        if (vehicle.iCurrentTileX == iTileX && vehicle.iCurrentTileY == iTileY)
+        if (vehicle.currentTile.x == iTileX && vehicle.currentTile.y == iTileY)
             iVehicleCount++;
     }
 

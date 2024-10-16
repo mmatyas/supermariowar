@@ -40,38 +40,35 @@ struct WorldMapTile {
 	short iVehicleBoundary;
 };
 
-class WorldMovingObject
-{
-	public:
-		WorldMovingObject();
-		virtual ~WorldMovingObject();
+class WorldMovingObject {
+public:
+    WorldMovingObject();
+    virtual ~WorldMovingObject() = default;
 
-		void Init(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize);
-		virtual void Move(short iDirection);
-		virtual bool Update();
-		void FaceDirection(short iDirection);
-		void SetPosition(short iCol, short iRow);
+    void Init(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize);
 
-	protected:
+    virtual void Move(short iDirection);
+    virtual bool Update();
 
-		short ix;
-		short iy;
-		short iCurrentTileX;
-		short iCurrentTileY;
-		short iDestTileX;
-		short iDestTileY;
+    void FaceDirection(short iDirection);
+    void SetPosition(short iCol, short iRow);
 
-		short iState;
-		short iDrawSprite;
-		short iDrawDirection;
-		short iAnimationFrame;
-		short iAnimationTimer;
+protected:
+    Vec2s pos;
+    Vec2s currentTile;
+    Vec2s destTile;
 
-		short iTileSize;
-		short iTileSheet;
+    short iState = 0;
+    short iDrawSprite = 0;
+    short iDrawDirection = 0;
+    short iAnimationFrame = 0;
+    short iAnimationTimer = 0;
 
-	friend class WorldMap;
-	friend void takescreenshot();
+    short iTileSize = 0;
+    short iTileSheet = 0;
+
+    friend class WorldMap;
+    friend void takescreenshot();
 };
 
 class WorldPlayer : public WorldMovingObject {

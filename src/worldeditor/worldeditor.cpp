@@ -848,8 +848,8 @@ int main(int argc, char *argv[])
 
 	g_wvVehicleStamp.iDrawSprite = 0;
 	g_wvVehicleStamp.iActionId = 0;
-	g_wvVehicleStamp.iCurrentTileX = 0;
-	g_wvVehicleStamp.iCurrentTileY = 0;
+	g_wvVehicleStamp.currentTile.x = 0;
+	g_wvVehicleStamp.currentTile.y = 0;
 	g_wvVehicleStamp.iMinMoves = 5;
 	g_wvVehicleStamp.iMaxMoves = 8;
 	g_wvVehicleStamp.fSpritePaces = true;
@@ -1206,7 +1206,7 @@ int editor_edit()
 							std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
                         while (itr != lim) {
 								WorldVehicle * vehicle = *itr;
-                            if (vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow) {
+                            if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
 									g_wvVehicleStamp.iDrawSprite = vehicle->iDrawSprite;
 									g_wvVehicleStamp.iActionId = vehicle->iActionId;
 									g_wvVehicleStamp.iMinMoves = vehicle->iMinMoves;
@@ -1705,7 +1705,7 @@ int editor_edit()
 							std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
                         while (itr != lim) {
 								WorldVehicle * vehicle = *itr;
-                            if (vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow) {
+                            if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
 									iStageDisplay = vehicle->iActionId;
 									break;
 								}
@@ -1849,8 +1849,8 @@ int editor_edit()
                 while (itr != lim) {
 					WorldVehicle * vehicle = *itr;
 
-					short ix = (vehicle->iCurrentTileX  - draw_offset_col) * TILESIZE + draw_offset_x;
-					short iy = (vehicle->iCurrentTileY - draw_offset_row) * TILESIZE + draw_offset_y;
+					short ix = (vehicle->currentTile.x  - draw_offset_col) * TILESIZE + draw_offset_x;
+					short iy = (vehicle->currentTile.y - draw_offset_row) * TILESIZE + draw_offset_y;
 
 					SDL_Rect r = {ix, iy, 32, 32};
 					SDL_FillRect(blitdest, &r, color);
@@ -1971,8 +1971,8 @@ void ReadVehiclesIntoEditor()
 
         vehiclecopy->iDrawSprite = vehicle.iDrawSprite;
         vehiclecopy->iActionId = vehicle.iActionId;
-        vehiclecopy->iCurrentTileX = vehicle.iCurrentTileX;
-        vehiclecopy->iCurrentTileY = vehicle.iCurrentTileY;
+        vehiclecopy->currentTile.x = vehicle.currentTile.x;
+        vehiclecopy->currentTile.y = vehicle.currentTile.y;
         vehiclecopy->iMinMoves = vehicle.iMinMoves;
         vehiclecopy->iMaxMoves = vehicle.iMaxMoves;
         vehiclecopy->fSpritePaces = vehicle.fSpritePaces;
@@ -1995,8 +1995,8 @@ void WriteVehiclesIntoWorld()
         WorldVehicle vehiclecopy;
         vehiclecopy.iDrawSprite = vehicle->iDrawSprite;
         vehiclecopy.iActionId = vehicle->iActionId;
-        vehiclecopy.iCurrentTileX = vehicle->iCurrentTileX;
-        vehiclecopy.iCurrentTileY = vehicle->iCurrentTileY;
+        vehiclecopy.currentTile.x = vehicle->currentTile.x;
+        vehiclecopy.currentTile.y = vehicle->currentTile.y;
         vehiclecopy.iMinMoves = vehicle->iMinMoves;
         vehiclecopy.iMaxMoves = vehicle->iMaxMoves;
         vehiclecopy.fSpritePaces = vehicle->fSpritePaces;
@@ -2012,7 +2012,7 @@ void AddVehicleToTile(short iCol, short iRow, short iType)
 	WorldVehicle * newvehicle = NULL;
     while (itr != lim) {
 		WorldVehicle * vehicle = *itr;
-        if (vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow) {
+        if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
 			newvehicle = vehicle;
 			break;
 		}
@@ -2022,8 +2022,8 @@ void AddVehicleToTile(short iCol, short iRow, short iType)
 
     if (!newvehicle) {
 		newvehicle = new WorldVehicle();
-		newvehicle->iCurrentTileX = iCol;
-		newvehicle->iCurrentTileY = iRow;
+		newvehicle->currentTile.x = iCol;
+		newvehicle->currentTile.y = iRow;
 		vehiclelist.push_back(newvehicle);
 	}
 
@@ -2041,7 +2041,7 @@ void RemoveVehicleFromTile(short iCol, short iRow)
 	std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
     while (itr != lim) {
 		WorldVehicle * vehicle = *itr;
-        if (vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow) {
+        if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
 			delete (*itr);
 
 			itr = vehiclelist.erase(itr);
@@ -4180,7 +4180,7 @@ int editor_stage()
                     while (itrVehicle != limVehicle) {
 						WorldVehicle * vehicle = *itrVehicle;
                         if (vehicle->iActionId == iEditStage) {
-							RemoveVehicleFromTile(vehicle->iCurrentTileX, vehicle->iCurrentTileY);
+							RemoveVehicleFromTile(vehicle->currentTile.x, vehicle->currentTile.y);
                         } else if (vehicle->iActionId > iEditStage) {
 							vehicle->iActionId--;
 						}
@@ -4762,8 +4762,8 @@ int resize_world()
 
 		std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
         while (itrVehicle != limVehicle) {
-			if ((*itrVehicle)->iCurrentTileX >= iWidth || (*itrVehicle)->iCurrentTileY >= iHeight) {
-				RemoveVehicleFromTile((*itrVehicle)->iCurrentTileX, (*itrVehicle)->iCurrentTileY);
+			if ((*itrVehicle)->currentTile.x >= iWidth || (*itrVehicle)->currentTile.y >= iHeight) {
+				RemoveVehicleFromTile((*itrVehicle)->currentTile.x, (*itrVehicle)->currentTile.y);
 				//List was modified, restart.
 				itrVehicle = vehiclelist.begin();
 				limVehicle = vehiclelist.end();
@@ -4811,8 +4811,8 @@ void takescreenshot()
         while (itr != lim) {
 			WorldVehicle * vehicle = *itr;
 
-			short ix = vehicle->iCurrentTileX * iTileSize;
-			short iy = vehicle->iCurrentTileY * iTileSize;
+			short ix = vehicle->currentTile.x * iTileSize;
+			short iy = vehicle->currentTile.y * iTileSize;
 
 			rm->spr_worldvehicle[iScreenshotSize].draw(ix, iy, vehicle->iDrawDirection * iTileSize, vehicle->iDrawSprite * iTileSize, iTileSize, iTileSize);
 
