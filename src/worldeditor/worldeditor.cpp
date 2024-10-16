@@ -3828,7 +3828,7 @@ void NewStage(short * iEditStage)
 	ts->iBonusType = 0;
 	ts->iNumBonuses = 0;
 
-	sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
+	sprintf(ts->szName, "Tour Stop %d", game_values.tourstops.size() + 1);
 
 	ts->fEndStage = false;
 
@@ -3836,10 +3836,9 @@ void NewStage(short * iEditStage)
 	memcpy(&ts->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
 
 	game_values.tourstops.push_back(ts);
-	game_values.tourstoptotal++;
 	g_worldmap.iNumStages++;
 
-	*iEditStage = game_values.tourstoptotal - 1;
+	*iEditStage = game_values.tourstops.size() - 1;
 	EditStage(*iEditStage);
 }
 
@@ -4198,7 +4197,6 @@ int editor_stage()
 							delete (*itr);
 
 							game_values.tourstops.erase(itr);
-							game_values.tourstoptotal--;
 							g_worldmap.iNumStages--;
 
 							break;

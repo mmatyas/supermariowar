@@ -240,7 +240,7 @@ void MenuState::onEnterState()
     } else if (game_values.matchtype == MatchType::Tour) {
         mTournamentScoreboardMenu->miTournamentScoreboard->RefreshTourScores();
 
-        if (game_values.tourstopcurrent < game_values.tourstoptotal)
+        if (game_values.tourstopcurrent < game_values.tourstops.size())
             mTourStopMenu->miTourStop->Refresh(game_values.tourstopcurrent);
     } else if (game_values.matchtype == MatchType::Tournament) {
         mTournamentScoreboardMenu->miTournamentScoreboard->StopSwirl();
@@ -709,7 +709,7 @@ void MenuState::update()
                         iDisplayErrorTimer = 120;
                         fErrorReadingTourFile = true;
                     } else {
-                        mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &rm->spr_tour_markers);
+                        mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstops.size(), &rm->spr_tour_markers);
                     }
                 } else if (game_values.matchtype == MatchType::Tournament) {
                     printf("  Match type: Tournament\n");
@@ -1481,7 +1481,7 @@ bool MenuState::ReadTourFile()
     char buffer[256];
     bool fReadVersion = false;
     Version version;
-    while (fgets(buffer, 256, fp) && game_values.tourstoptotal < 10) {
+    while (fgets(buffer, 256, fp) && game_values.tourstops.size() < 10) {
         if (strchr(ignorable_leads, buffer[0]))
             continue;
 
@@ -1509,22 +1509,20 @@ bool MenuState::ReadTourFile()
 
         TourStop* ts = new TourStop();
         *ts = ParseTourStopLine(buffer, version, false);
-
         game_values.tourstops.push_back(ts);
-        game_values.tourstoptotal++;
     }
 
-    if (game_values.tourstoptotal != 0) {
+    if (game_values.tourstops.size() != 0) {
         mTourStopMenu->miTourStop->Refresh(game_values.tourstopcurrent);
 
         //For old tours, turn on the bonus wheel at the end
         if (version.major == 1 && version.minor == 7 && version.patch == 0 && version.build <= 1)
-            game_values.tourstops[game_values.tourstoptotal - 1]->iBonusType = 1;
+            game_values.tourstops[game_values.tourstops.size() - 1]->iBonusType = 1;
     }
 
     fclose(fp);
 
-    return game_values.tourstoptotal != 0;
+    return game_values.tourstops.size() != 0;
 }
 
 void MenuState::StartGame()

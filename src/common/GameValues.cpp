@@ -149,7 +149,6 @@ void CGameValues::init()
     matchtype = MatchType::SingleGame;
     tourindex     = 0;
     tourstopcurrent   = 0;
-    tourstoptotal   = 0;
     worldindex      = 0;
     teamcollision = TeamCollisionStyle::Off;
     screencrunch    = true;

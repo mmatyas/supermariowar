@@ -193,7 +193,6 @@ public:
 
     short		tourindex;
     short		tourstopcurrent;
-    short		tourstoptotal;
     std::vector<TourStop*> tourstops;
 
     short		worldindex;

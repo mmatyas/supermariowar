@@ -609,12 +609,12 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
                 strncpy(ts.szName, pszTemp, 127);
                 ts.szName[127] = 0;
             } else {
-                sprintf(ts.szName, "Tour Stop %d", game_values.tourstoptotal + 1);
+                sprintf(ts.szName, "Tour Stop %d", game_values.tourstops.size() + 1);
             }
         } else {
             ts.iPoints = 1;
             ts.iBonusType = 0;
-            sprintf(ts.szName, "Tour Stop %d", game_values.tourstoptotal + 1);
+            sprintf(ts.szName, "Tour Stop %d", game_values.tourstops.size() + 1);
         }
 
         if (version >= Version {1, 8, 0, 0}) {
@@ -640,7 +640,7 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
             strncpy(ts.szName, pszTemp, 127);
             ts.szName[127] = 0;
         } else {
-            sprintf(ts.szName, "Bonus House %d", game_values.tourstoptotal + 1);
+            sprintf(ts.szName, "Bonus House %d", game_values.tourstops.size() + 1);
         }
 
         pszTemp = strtok(NULL, ",\n");
@@ -789,7 +789,6 @@ std::string WriteTourStopLine(const TourStop& ts, bool fIsWorld)
 void ResetTourStops()
 {
     game_values.tourstopcurrent = 0;
-    game_values.tourstoptotal = 0;
 
     // added to prevent 'vector iterators incompatible' exception
     if (!game_values.tourstops.empty())

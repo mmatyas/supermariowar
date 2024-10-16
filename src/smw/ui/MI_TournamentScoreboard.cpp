@@ -466,7 +466,7 @@ void MI_TournamentScoreboard::RefreshTourScores()
             miIconImages[iTeam][iGame]->setVisible(true);
         }
 
-        for (short iGame = game_values.tourstopcurrent; iGame < game_values.tourstoptotal; iGame++) {
+        for (size_t iGame = game_values.tourstopcurrent; iGame < game_values.tourstops.size(); iGame++) {
             miIconImages[iTeam][iGame]->setVisible(false);
         }
 

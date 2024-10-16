@@ -589,11 +589,10 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
             delete[] buffer;
 
             game_values.tourstops.push_back(ts);
-            game_values.tourstoptotal++;
 
             if (++iCurrentStage >= iNumStages) {
                 //Scan stage IDs and make sure we have a stage for each one
-                short iMaxStage = game_values.tourstoptotal + 5;
+                short iMaxStage = game_values.tourstops.size() + 5;
                 for (short iRow = 0; iRow < iHeight; iRow++) {
                     for (short iCol = 0; iCol < iWidth; iCol++) {
                         short iType = tiles[iCol][iRow].iType;
@@ -877,9 +876,9 @@ bool WorldMap::Save(const std::string& szPath) const
     fprintf(file, "#Stage Type 0,Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)\n");
     fprintf(file, "#Stage Type 1,Bonus House Name,Sequential/Random Order,Display Text,Powerup List(Max 5)\n");
 
-    fprintf(file, "%d\n", game_values.tourstoptotal);
+    fprintf(file, "%d\n", game_values.tourstops.size());
 
-    for (short iStage = 0; iStage < game_values.tourstoptotal; iStage++) {
+    for (short iStage = 0; iStage < game_values.tourstops.size(); iStage++) {
         std::string line = WriteTourStopLine(*game_values.tourstops[iStage], true);
         fprintf(file, "%s", line.c_str());
     }

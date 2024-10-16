@@ -1397,7 +1397,7 @@ void UpdateScoreBoard()
             }
         }
 
-        if (++game_values.tourstopcurrent >= game_values.tourstoptotal) {
+        if (++game_values.tourstopcurrent >= game_values.tourstops.size()) {
             //Calculate Tour Winner by counting up 1st, 2nd, 3rd, and 4th place wins
 
             short iWinningTeam = -2;  //Set winning team to -2 to signify a tie between teams
