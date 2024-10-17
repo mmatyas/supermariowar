@@ -232,7 +232,7 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
     iBoundary = boundary;
 }
 
-void WorldVehicle::Move()
+void WorldVehicle::Move(const WorldMap& worldmap)
 {
     iNumMoves = RANDOM_INT(iMaxMoves - iMinMoves + 1) + iMinMoves;
 
@@ -241,19 +241,19 @@ void WorldVehicle::Move()
         iPaceTimer = 0;
     }
 
-    SetNextDest();
+    SetNextDest(worldmap);
 }
 
-void WorldVehicle::SetNextDest()
+void WorldVehicle::SetNextDest(const WorldMap& worldmap)
 {
     if (iState != 0 || iMaxMoves == 0)
         return;
 
-    WorldMapTile * tile = &g_worldmap.tiles.at(currentTile.x, currentTile.y);
-    const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
+    const WorldMapTile& tile = worldmap.tiles.at(currentTile.x, currentTile.y);
+    const Vec2s iPlayerCurrentTile = worldmap.GetPlayerCurrentTile();
 
     if (iNumMoves-- <= 0) {
-        if (tile->iType == 0 && iPlayerCurrentTile != currentTile && g_worldmap.NumVehiclesInTile(currentTile) <= 1)
+        if (tile.iType == 0 && iPlayerCurrentTile != currentTile && worldmap.NumVehiclesInTile(currentTile) <= 1)
             return;
     }
 
@@ -268,15 +268,15 @@ void WorldVehicle::SetNextDest()
     for (short iDirection = 0; iDirection < 4; iDirection++) {
         bool fIsDoor = false;
         if (iDirection == 0)
-            fIsDoor = g_worldmap.IsDoor(currentTile.x, currentTile.y - 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x, currentTile.y - 1) == iBoundary);
+            fIsDoor = worldmap.IsDoor(currentTile.x, currentTile.y - 1) || (iBoundary != 0 && worldmap.GetVehicleBoundary(currentTile.x, currentTile.y - 1) == iBoundary);
         else if (iDirection == 1)
-            fIsDoor = g_worldmap.IsDoor(currentTile.x, currentTile.y + 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x, currentTile.y + 1) == iBoundary);
+            fIsDoor = worldmap.IsDoor(currentTile.x, currentTile.y + 1) || (iBoundary != 0 && worldmap.GetVehicleBoundary(currentTile.x, currentTile.y + 1) == iBoundary);
         else if (iDirection == 2)
-            fIsDoor = g_worldmap.IsDoor(currentTile.x - 1, currentTile.y) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x - 1, currentTile.y) == iBoundary);
+            fIsDoor = worldmap.IsDoor(currentTile.x - 1, currentTile.y) || (iBoundary != 0 && worldmap.GetVehicleBoundary(currentTile.x - 1, currentTile.y) == iBoundary);
         else if (iDirection == 3)
-            fIsDoor = g_worldmap.IsDoor(currentTile.x + 1, currentTile.y) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x + 1, currentTile.y) == iBoundary);
+            fIsDoor = worldmap.IsDoor(currentTile.x + 1, currentTile.y) || (iBoundary != 0 && worldmap.GetVehicleBoundary(currentTile.x + 1, currentTile.y) == iBoundary);
 
-        if (tile->fConnection[iDirection] && !fIsDoor)
+        if (tile.fConnection[iDirection] && !fIsDoor)
             iConnections[iNumConnections++] = iDirection;
     }
 
@@ -286,15 +286,15 @@ void WorldVehicle::SetNextDest()
     }
 }
 
-bool WorldVehicle::Update()
+bool WorldVehicle::Update(const WorldMap& worldmap)
 {
     bool fMoveDone = WorldMovingObject::Update();
 
     if (fMoveDone) {
-        if (currentTile == g_worldmap.GetPlayerCurrentTile())
+        if (currentTile == worldmap.GetPlayerCurrentTile())
             return true;
 
-        SetNextDest();
+        SetNextDest(worldmap);
     }
 
     //If we're done moving, start pacing in place
@@ -986,7 +986,7 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
         if (!vehicle.fEnabled)
             continue;
 
-        *fPlayerVehicleCollision |= vehicle.Update();
+        *fPlayerVehicleCollision |= vehicle.Update(*this);
 
         if (vehicle.iState > 0)
             fPlayMovingVehicleSound = true;
@@ -1211,7 +1211,7 @@ void WorldMap::MoveVehicles()
 {
     for (WorldVehicle& vehicle : vehicles) {
         if (vehicle.fEnabled)
-            vehicle.Move();
+            vehicle.Move(*this);
     }
 }
 

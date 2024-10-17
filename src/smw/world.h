@@ -18,6 +18,8 @@
 #define WORLD_FOREGROUND_SPRITE_OFFSET          700
 #define WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET 900
 
+class WorldMap;
+
 struct WorldMapTile {
 	//Id is used for searching for AI
 	short iID;
@@ -89,14 +91,14 @@ class WorldVehicle : public WorldMovingObject
 		~WorldVehicle();
 
 		void Init(short iCol, short iRow, short iAction, short iSprite, short iMinMoves, short iMaxMoves, bool fSpritePaces, short iInitialDirection, short iBoundary, short tilesize);
-		void Move();
+		void Move(const WorldMap& worldmap);
 
-		bool Update();
+		bool Update(const WorldMap& parent);
                 void Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping) const;
 
 	private:
 
-		void SetNextDest();
+		void SetNextDest(const WorldMap& parent);
 
 		SDL_Rect srcRects[5];
 
