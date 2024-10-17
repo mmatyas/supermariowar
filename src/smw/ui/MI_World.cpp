@@ -154,7 +154,7 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
     } else {
         const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
-        WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTile.x][iPlayerCurrentTile.y];
+        WorldMapTile * tile = &g_worldmap.tiles.at(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
         //tile->iForegroundSprite = game_values.colorids[game_values.teamids[iWinningTeam][0]] + WORLD_WINNING_TEAM_SPRITE_OFFSET; //Update with team completed sprite
         //tile->fAnimated = false; //Update with team completed sprite
         tile->iCompleted = game_values.colorids[game_values.teamids[iWinningTeam][0]];
@@ -619,7 +619,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
         if (iState == -1 && iNumPopups == 0 && iPopupFlag[0] == false && iPopupFlag[1] == false && iPopupFlag[2] == false && iPopupFlag[3] == false) {
             if (iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) { //if this player is player or cpu
-                WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTile.x][iPlayerCurrentTile.y];
+                WorldMapTile * tile = &g_worldmap.tiles.at(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
 
                 short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
                 bool fVehicleInTile = g_worldmap.GetVehicleInPlayerTile(&iTemp) >= 0;
@@ -714,7 +714,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                     }
 
                            //if it is a stage, then load the stage
-                    WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTile.x][iPlayerCurrentTile.y];
+                    WorldMapTile * tile = &g_worldmap.tiles.at(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
 
                     short iType = tile->iType - 6;
                     if (iType >= 0 && iType < g_worldmap.iNumStages && tile->iCompleted == -2) {
@@ -892,7 +892,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         }
     } else if (iPowerup == NUM_POWERUPS + 3 && iState == -1) { //Advance Turn
         const Vec2s iDest = g_worldmap.GetPlayerDestTile();
-        short iSprite = g_worldmap.tiles[iDest.x][iDest.y].iForegroundSprite;
+        short iSprite = g_worldmap.tiles.at(iDest.x, iDest.y).iForegroundSprite;
 
         if (iSprite < WORLD_BRIDGE_SPRITE_OFFSET || iSprite > WORLD_BRIDGE_SPRITE_OFFSET + 3) {
             AdvanceTurn();
@@ -901,7 +901,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         }
     } else if (iPowerup == NUM_POWERUPS + 4 && iState == -1) { //Revive stage
         const Vec2s iDest = g_worldmap.GetPlayerDestTile();
-        WorldMapTile * tile = &g_worldmap.tiles[iDest.x][iDest.y];
+        WorldMapTile * tile = &g_worldmap.tiles.at(iDest.x, iDest.y);
 
         if (tile->iType >= 6 && tile->iCompleted >= 0) {
             tile->iCompleted = -2;

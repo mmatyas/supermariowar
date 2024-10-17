@@ -1362,10 +1362,10 @@ int editor_edit()
                     if (iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE) {
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
                             if (edit_mode == 0) { //selected background
-                                if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile || fAutoPaint) {
+                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile || fAutoPaint) {
 										bool fNeedUpdate = false;
-                                    if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile) {
-											g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
+                                    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile) {
+											g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = set_tile;
 											fNeedUpdate = true;
 										}
 
@@ -1378,33 +1378,33 @@ int editor_edit()
 											updateworldsurface();
 									}
                             } else if (edit_mode == 1) { //selected foreground
-                                if (g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile;
+                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile;
 										updateworldsurface();
 
 										if (set_tile >= WORLD_BRIDGE_SPRITE_OFFSET && set_tile <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
-											g_worldmap.tiles[iCol][iRow].iConnectionType = set_tile - WORLD_BRIDGE_SPRITE_OFFSET + 12;
+											g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile - WORLD_BRIDGE_SPRITE_OFFSET + 12;
 									}
                             } else if (edit_mode == 2) { //selected connection
-									g_worldmap.tiles[iCol][iRow].iConnectionType = set_tile;
+									g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile;
 
 									if (fAutoPaint)
 										UpdatePath(iCol, iRow);
                             } else if (edit_mode == 3) { //selected type
 									//start tiles
                                 if (set_tile <= 1) {
-                                    if (g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
-											g_worldmap.tiles[iCol][iRow].iType = 1;
-											g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+                                    if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
+											g_worldmap.tiles.at(iCol, iRow).iType = 1;
+											g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
 											updateworldsurface();
 										}
                                 } else if (set_tile <= 5) { //doors
-                                    if (g_worldmap.tiles[iCol][iRow].iType != set_tile) {
+                                    if (g_worldmap.tiles.at(iCol, iRow).iType != set_tile) {
 											//if the door was placed on a start tile
-											if (g_worldmap.tiles[iCol][iRow].iType == 1)
-												g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+											if (g_worldmap.tiles.at(iCol, iRow).iType == 1)
+												g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 
-											g_worldmap.tiles[iCol][iRow].iType = set_tile;
+											g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
 											updateworldsurface();
 										}
 									}
@@ -1412,8 +1412,8 @@ int editor_edit()
 									short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
 									bool fNeedUpdate = false;
 
-                                if (!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != iAdjustedTile) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
+                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != iAdjustedTile) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
 										fNeedUpdate = true;
 									}
 
@@ -1421,7 +1421,7 @@ int editor_edit()
                                 if (fAutoPaint) {
 										short iOldTiles[9];
 										GetForegroundTileValues(iCol, iRow, iOldTiles);
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
 										UpdatePathSprite(iCol, iRow);
 
 										if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
@@ -1435,28 +1435,28 @@ int editor_edit()
                             } else if (edit_mode == 6) { //selected warp
 									AddWarpToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles[iCol][iRow].iBackgroundWater != set_tile) {
-										g_worldmap.tiles[iCol][iRow].iBackgroundWater = set_tile;
+                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != set_tile) {
+										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = set_tile;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 8) { //boundary
-									g_worldmap.tiles[iCol][iRow].iVehicleBoundary = set_tile;
+									g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = set_tile;
                             } else if (edit_mode == 9) {
 									//if the stage was placed on a start tile
-                                if (g_worldmap.tiles[iCol][iRow].iType == 1) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
 									}
 
-									g_worldmap.tiles[iCol][iRow].iType = set_tile;
+									g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
 								}
                         } else if (event.button.button == SDL_BUTTON_RIGHT) {
                             if (edit_mode == 0) {
-                                if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0 || fAutoPaint) {
+                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != 0 || fAutoPaint) {
 										bool fNeedUpdate = false;
 
-                                    if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0) {
-											g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
+                                    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != 0) {
+											g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = 0;
 											fNeedUpdate = true;
 										}
 
@@ -1469,30 +1469,30 @@ int editor_edit()
 											updateworldsurface();
 									}
                             } else if (edit_mode == 1) {
-                                if (g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 2) {
-									g_worldmap.tiles[iCol][iRow].iConnectionType = 0;
+									g_worldmap.tiles.at(iCol, iRow).iConnectionType = 0;
 
 									if (fAutoPaint)
 										UpdatePath(iCol, iRow);
                             } else if (edit_mode == 3) { //selected start/door
-                                if (g_worldmap.tiles[iCol][iRow].iType == 1) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
-                                } else if (g_worldmap.tiles[iCol][iRow].iType <= 5) {
-										g_worldmap.tiles[iCol][iRow].iType = 0;
+                                } else if (g_worldmap.tiles.at(iCol, iRow).iType <= 5) {
+										g_worldmap.tiles.at(iCol, iRow).iType = 0;
 										updateworldsurface();
 									}
 
-									g_worldmap.tiles[iCol][iRow].iType = 0;
+									g_worldmap.tiles.at(iCol, iRow).iType = 0;
                             } else if (edit_mode == 4) {
 									bool fNeedUpdate = false;
 
-                                if (!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										fNeedUpdate = true;
 									}
 
@@ -1500,7 +1500,7 @@ int editor_edit()
                                 if (fAutoPaint) {
 										short iOldTiles[9];
 										GetForegroundTileValues(iCol, iRow, iOldTiles);
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										UpdatePathSprite(iCol, iRow);
 
 										if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
@@ -1515,14 +1515,14 @@ int editor_edit()
                             } else if (edit_mode == 6) {
 									RemoveWarpFromTile(iCol, iRow);
                             } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles[iCol][iRow].iBackgroundWater != 0) {
-										g_worldmap.tiles[iCol][iRow].iBackgroundWater = 0;
+                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != 0) {
+										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = 0;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 8) { //boundary
-									g_worldmap.tiles[iCol][iRow].iVehicleBoundary = 0;
+									g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = 0;
                             } else if (edit_mode == 9) { //stage
-									g_worldmap.tiles[iCol][iRow].iType = 0;
+									g_worldmap.tiles.at(iCol, iRow).iType = 0;
 									iStageDisplay = -1;
 								}
 							}
@@ -1541,10 +1541,10 @@ int editor_edit()
                     if (iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE) {
                         if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
                             if (edit_mode == 0) { //selected background
-                                if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile || fAutoPaint) {
+                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile || fAutoPaint) {
 										bool fNeedUpdate = false;
-                                    if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile) {
-											g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
+                                    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile) {
+											g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = set_tile;
 											fNeedUpdate = true;
 										}
 
@@ -1557,29 +1557,29 @@ int editor_edit()
 											updateworldsurface();
 									}
                             } else if (edit_mode == 1) {
-                                if (g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile;
+                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 2) {
-									g_worldmap.tiles[iCol][iRow].iConnectionType = set_tile;
+									g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile;
 
 									if (fAutoPaint)
 										UpdatePath(iCol, iRow);
                             } else if (edit_mode == 3) { //selected stage/door
                                 if (set_tile <= 1) {
-                                    if (g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
-											g_worldmap.tiles[iCol][iRow].iType = 1;
-											g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+                                    if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
+											g_worldmap.tiles.at(iCol, iRow).iType = 1;
+											g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
 											updateworldsurface();
 										}
                                 } else if (set_tile <= 5) {
-                                    if (g_worldmap.tiles[iCol][iRow].iType != set_tile) {
+                                    if (g_worldmap.tiles.at(iCol, iRow).iType != set_tile) {
 											//if the door was placed on a start tile
-											if (g_worldmap.tiles[iCol][iRow].iType == 1)
-												g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+											if (g_worldmap.tiles.at(iCol, iRow).iType == 1)
+												g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 
-											g_worldmap.tiles[iCol][iRow].iType = set_tile;
+											g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
 											updateworldsurface();
 										}
 									}
@@ -1587,8 +1587,8 @@ int editor_edit()
 									short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
 									bool fNeedUpdate = false;
 
-                                if (!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != iAdjustedTile) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
+                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != iAdjustedTile) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
 										fNeedUpdate = true;
 									}
 
@@ -1596,7 +1596,7 @@ int editor_edit()
                                 if (fAutoPaint) {
 										short iOldTiles[9];
 										GetForegroundTileValues(iCol, iRow, iOldTiles);
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
 										UpdatePathSprite(iCol, iRow);
 
 										if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
@@ -1610,25 +1610,25 @@ int editor_edit()
                             } else if (edit_mode == 6) {
 									AddWarpToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles[iCol][iRow].iBackgroundWater != set_tile) {
-										g_worldmap.tiles[iCol][iRow].iBackgroundWater = set_tile;
+                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != set_tile) {
+										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = set_tile;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 9) { //stage
 									//if the stage was placed on a start tile
-                                if (g_worldmap.tiles[iCol][iRow].iType == 1) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
 									}
 
-									g_worldmap.tiles[iCol][iRow].iType = set_tile;
+									g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
 								}
                         } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
                             if (edit_mode == 0) { //selected background
-                                if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0 || fAutoPaint) {
+                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != 0 || fAutoPaint) {
 										bool fNeedUpdate = false;
-                                    if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0) {
-											g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
+                                    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != 0) {
+											g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = 0;
 											fNeedUpdate = true;
 										}
 
@@ -1641,30 +1641,30 @@ int editor_edit()
 											updateworldsurface();
 									}
                             } else if (edit_mode == 1) {
-                                if (g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 2) {
-									g_worldmap.tiles[iCol][iRow].iConnectionType = 0;
+									g_worldmap.tiles.at(iCol, iRow).iConnectionType = 0;
 
 									if (fAutoPaint)
 										UpdatePath(iCol, iRow);
                             } else if (edit_mode == 3) {
-                                if (g_worldmap.tiles[iCol][iRow].iType == 1) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
-                                } else if (g_worldmap.tiles[iCol][iRow].iType <= 5) {
-										g_worldmap.tiles[iCol][iRow].iType = 0;
+                                } else if (g_worldmap.tiles.at(iCol, iRow).iType <= 5) {
+										g_worldmap.tiles.at(iCol, iRow).iType = 0;
 										updateworldsurface();
 									}
 
-									g_worldmap.tiles[iCol][iRow].iType = 0;
+									g_worldmap.tiles.at(iCol, iRow).iType = 0;
                             } else if (edit_mode == 4) {
 									bool fNeedUpdate = false;
 
-                                if (!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0) {
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										fNeedUpdate = true;
 									}
 
@@ -1672,7 +1672,7 @@ int editor_edit()
                                 if (fAutoPaint) {
 										short iOldTiles[9];
 										GetForegroundTileValues(iCol, iRow, iOldTiles);
-										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
 										UpdatePathSprite(iCol, iRow);
 
 										if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
@@ -1687,12 +1687,12 @@ int editor_edit()
                             } else if (edit_mode == 6) { //Warps
 									RemoveWarpFromTile(iCol, iRow);
                             } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles[iCol][iRow].iBackgroundWater != 0) {
-										g_worldmap.tiles[iCol][iRow].iBackgroundWater = 0;
+                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != 0) {
+										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = 0;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 9) { //stage
-									g_worldmap.tiles[iCol][iRow].iType = 0;
+									g_worldmap.tiles.at(iCol, iRow).iType = 0;
 									iStageDisplay = -1;
 								}
 							}
@@ -1715,7 +1715,7 @@ int editor_edit()
                     } else if (edit_mode == 9) {
 							iStageDisplay = -1;
                         if (iCol >= 0 && iRow >= 0 && iCol < iWorldWidth && iRow < iWorldHeight) {
-								short iType = g_worldmap.tiles[iCol][iRow].iType - 6;
+								short iType = g_worldmap.tiles.at(iCol, iRow).iType - 6;
                             if (iType >= 0) {
 									iStageDisplay = iType;
 								}
@@ -1776,7 +1776,7 @@ int editor_edit()
             if (edit_mode == 2) {
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
-						short iConnection = g_worldmap.tiles[iCol][iRow].iConnectionType;
+						short iConnection = g_worldmap.tiles.at(iCol, iRow).iConnectionType;
 
 						if (iConnection > 0)
 							spr_path.draw((iCol - draw_offset_col) * TILESIZE + draw_offset_x, (iRow - draw_offset_row) * TILESIZE + draw_offset_y, (iConnection - 1) << 5, 0, TILESIZE, TILESIZE);
@@ -1809,7 +1809,7 @@ int editor_edit()
 				int color = SDL_MapRGB(blitdest->format, 255, 0, 255);
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
-						short iBoundary = g_worldmap.tiles[iCol][iRow].iVehicleBoundary - 1;
+						short iBoundary = g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary - 1;
 
                         if (iBoundary >= 0) {
 							short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
@@ -1825,7 +1825,7 @@ int editor_edit()
 				int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
-						short iType = g_worldmap.tiles[iCol][iRow].iType - 6;
+						short iType = g_worldmap.tiles.at(iCol, iRow).iType - 6;
 
                         if (iType >= 0) {
 							short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
@@ -1932,7 +1932,7 @@ void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9])
     for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
         for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
             if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-				iOldTiles[iIndex++] = g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite;
+				iOldTiles[iIndex++] = g_worldmap.tiles.at(iAutoCol, iAutoRow).iForegroundSprite;
 			}
 		}
 	}
@@ -1947,7 +1947,7 @@ bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9])
     for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
         for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
             if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-				if (g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite != iOldTiles[iIndex++])
+				if (g_worldmap.tiles.at(iAutoCol, iAutoRow).iForegroundSprite != iOldTiles[iIndex++])
 					return true;
 			}
 		}
@@ -2159,7 +2159,7 @@ void AutoSetPathSprite(short iCol, short iRow)
 	short iPath = 0;
 	short iNeighborIndex = 0;
 
-	short iForegroundSprite = g_worldmap.tiles[iCol][iRow].iForegroundSprite;
+	short iForegroundSprite = g_worldmap.tiles.at(iCol, iRow).iForegroundSprite;
 	short iForegroundStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
 
 	if (iForegroundSprite == 0 || iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET)
@@ -2172,7 +2172,7 @@ void AutoSetPathSprite(short iCol, short iRow)
 
             if ((iAutoCol == iCol && iAutoRow != iRow) || (iAutoCol != iCol && iAutoRow == iRow)) {
                 if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-					iForegroundSprite = g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite;
+					iForegroundSprite = g_worldmap.tiles.at(iAutoCol, iAutoRow).iForegroundSprite;
 
 					if ((iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) ||
 						(iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399) ||
@@ -2194,7 +2194,7 @@ void AutoSetPathSprite(short iCol, short iRow)
 	}
 
 	//#1 == -  2 == |  3 == -o  4 == !  5 == -`  6 == o
-	g_worldmap.tiles[iCol][iRow].iForegroundSprite = AdjustForeground(iPathTypes[iPath] + iForegroundStyle * WORLD_PATH_SPRITE_SET_SIZE, iCol, iRow);
+	g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = AdjustForeground(iPathTypes[iPath] + iForegroundStyle * WORLD_PATH_SPRITE_SET_SIZE, iCol, iRow);
 }
 
 //Convert foreground sprite to match the background sprite
@@ -2203,7 +2203,7 @@ short AdjustForeground(short iSprite, short iCol, short iRow)
 	if (iSprite >= WORLD_FOREGROUND_STAGE_OFFSET)
 		return iSprite;
 
-	short iBackgroundSprite = g_worldmap.tiles[iCol][iRow].iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE;
+	short iBackgroundSprite = g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE;
 
 	short iPathStyle = iSprite / WORLD_PATH_SPRITE_SET_SIZE;
 	iSprite %= WORLD_PATH_SPRITE_SET_SIZE;
@@ -2268,7 +2268,7 @@ void AutoSetPath(short iCol, short iRow)
 	short iPath = 0;
 	short iNeighborIndex = 0;
 
-	if (g_worldmap.tiles[iCol][iRow].iConnectionType == 0)
+	if (g_worldmap.tiles.at(iCol, iRow).iConnectionType == 0)
 		return;
 
     for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
@@ -2278,7 +2278,7 @@ void AutoSetPath(short iCol, short iRow)
 
             if ((iAutoCol == iCol && iAutoRow != iRow) || (iAutoCol != iCol && iAutoRow == iRow)) {
                 if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-					if (g_worldmap.tiles[iAutoCol][iAutoRow].iConnectionType > 0)
+					if (g_worldmap.tiles.at(iAutoCol, iAutoRow).iConnectionType > 0)
 						iPath += 1 << iNeighborIndex;
 				}
 
@@ -2291,7 +2291,7 @@ void AutoSetPath(short iCol, short iRow)
 	//#7 == -|  8 == -`-  9 == |-  10 == -,-  11 == +
 
 	short iPathType = iPathTypes[iPath];
-	short iForegroundSprite = g_worldmap.tiles[iCol][iRow].iForegroundSprite;
+	short iForegroundSprite = g_worldmap.tiles.at(iCol, iRow).iForegroundSprite;
 
     if (iPathType == 2 && iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 1) {
 		iPathType = iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 12;
@@ -2299,15 +2299,15 @@ void AutoSetPath(short iCol, short iRow)
 		iPathType = iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 12;
 	}
 
-	g_worldmap.tiles[iCol][iRow].iConnectionType = iPathType;
+	g_worldmap.tiles.at(iCol, iRow).iConnectionType = iPathType;
 }
 
 bool UpdateForeground(short iCol, short iRow)
 {
-	short iNewForeground = AdjustForeground(g_worldmap.tiles[iCol][iRow].iForegroundSprite, iCol, iRow);
+	short iNewForeground = AdjustForeground(g_worldmap.tiles.at(iCol, iRow).iForegroundSprite, iCol, iRow);
 
-    if (g_worldmap.tiles[iCol][iRow].iForegroundSprite != iNewForeground) {
-		g_worldmap.tiles[iCol][iRow].iForegroundSprite = iNewForeground;
+    if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != iNewForeground) {
+		g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iNewForeground;
 		return true;
 	}
 
@@ -2336,7 +2336,7 @@ bool UpdateCoastline(short iCol, short iRow)
 bool AutoSetTile(short iCol, short iRow)
 {
 	//Don't need to do anything if this tile is solid
-	if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE == 1)
+	if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE == 1)
 		return false;
 
 	bool iTile[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -2350,7 +2350,7 @@ bool AutoSetTile(short iCol, short iRow)
 				continue;
 
             if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-				short iBackgroundSprite = g_worldmap.tiles[iAutoCol][iAutoRow].iBackgroundSprite;
+				short iBackgroundSprite = g_worldmap.tiles.at(iAutoCol, iAutoRow).iBackgroundSprite;
 
                 if (iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE == 1) {
 					iTile[iNeighborIndex] = true;
@@ -2468,8 +2468,8 @@ bool AutoSetTile(short iCol, short iRow)
 		iNewTile = iTileStyleOffset + 0;
 	}
 
-    if (g_worldmap.tiles[iCol][iRow].iBackgroundSprite != iNewTile) {
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iNewTile;
+    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != iNewTile) {
+		g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = iNewTile;
 		return true;
 	}
 
@@ -4167,10 +4167,10 @@ int editor_stage()
 					//and decrement stage numbers greater than this stage
                     for (short iRow = 0; iRow < iWorldHeight; iRow++) {
                         for (short iCol = 0; iCol < iWorldWidth; iCol++) {
-                            if (g_worldmap.tiles[iCol][iRow].iType == iEditStage + 6) {
-								g_worldmap.tiles[iCol][iRow].iType = 0;
-                            } else if (g_worldmap.tiles[iCol][iRow].iType > iEditStage + 6) {
-								g_worldmap.tiles[iCol][iRow].iType--;
+                            if (g_worldmap.tiles.at(iCol, iRow).iType == iEditStage + 6) {
+								g_worldmap.tiles.at(iCol, iRow).iType = 0;
+                            } else if (g_worldmap.tiles.at(iCol, iRow).iType > iEditStage + 6) {
+								g_worldmap.tiles.at(iCol, iRow).iType--;
 							}
 						}
 					}

@@ -3,6 +3,7 @@
 
 #include "SDL.h"
 #include "math/Vec2.h"
+#include "util/Grid.h"
 
 #include <string>
 #include <vector>
@@ -208,7 +209,7 @@ private:
 
     short iNumStages = 0;
 
-    std::vector<std::vector<WorldMapTile>> tiles;
+    Grid<WorldMapTile> tiles;
     WorldPlayer player;
     std::vector<WorldVehicle> vehicles;
     std::vector<WorldWarp> warps;
