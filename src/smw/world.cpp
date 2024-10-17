@@ -1182,48 +1182,9 @@ void WorldMap::SetPlayerSprite(short iPlayerSprite)
     player.SetSprite(iPlayerSprite);
 }
 
-bool WorldMap::IsVehicleMoving() const
-{
-    for (const WorldVehicle& vehicle : vehicles) {
-        if (vehicle.fEnabled && vehicle.iState > 0)
-            return true;
-    }
-    return false;
-}
-
 void WorldMap::SetPlayerPosition(short iPlayerCol, short iPlayerRow)
 {
     player.SetPosition(iPlayerCol, iPlayerRow);
-}
-
-short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
-{
-    for (size_t i = 0; i < vehicles.size(); i++) {
-        const WorldVehicle& vehicle = vehicles[i];
-
-        if (!vehicle.fEnabled)
-            continue;
-
-        if (vehicle.currentTile.x == player.currentTile.x && vehicle.currentTile.y == player.currentTile.y) {
-            *vehicleIndex = i;
-            return vehicle.iActionId;
-        }
-    }
-
-    *vehicleIndex = -1;
-    return -1;
-}
-
-bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const
-{
-    short iWarp = tiles[player.currentTile.x][player.currentTile.y].iWarp;
-    if (iWarp < 0)
-        return false;
-
-    Vec2s pos = warps[iWarp].getOtherSide({player.currentTile.x, player.currentTile.y});
-    *iWarpCol = pos.x;
-    *iWarpRow = pos.y;
-    return true;
 }
 
 void WorldMap::MovePlayer(short iDirection)
@@ -1234,6 +1195,32 @@ void WorldMap::MovePlayer(short iDirection)
 void WorldMap::FacePlayer(short iDirection)
 {
     player.FaceDirection(iDirection);
+}
+
+bool WorldMap::IsVehicleMoving() const
+{
+    return std::any_of(vehicles.cbegin(), vehicles.cend(),
+        [](const WorldVehicle& vehicle) {
+            return vehicle.fEnabled && vehicle.iState > 0;
+        });
+}
+
+short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
+{
+    for (size_t i = 0; i < vehicles.size(); i++) {
+        const WorldVehicle& vehicle = vehicles[i];
+
+        if (!vehicle.fEnabled)
+            continue;
+
+        if (vehicle.currentTile == player.currentTile) {
+            *vehicleIndex = i;
+            return vehicle.iActionId;
+        }
+    }
+
+    *vehicleIndex = -1;
+    return -1;
 }
 
 void WorldMap::MoveVehicles()
@@ -1260,6 +1247,18 @@ size_t WorldMap::NumVehiclesInTile(Vec2s iTile) const
 short WorldMap::GetVehicleStageScore(short iVehicleIndex) const
 {
     return game_values.tourstops[vehicles[iVehicleIndex].iActionId]->iPoints;
+}
+
+bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const
+{
+    short iWarp = tiles[player.currentTile.x][player.currentTile.y].iWarp;
+    if (iWarp < 0)
+        return false;
+
+    Vec2s pos = warps[iWarp].getOtherSide(player.currentTile);
+    *iWarpCol = pos.x;
+    *iWarpRow = pos.y;
+    return true;
 }
 
 void WorldMap::MoveBridges()

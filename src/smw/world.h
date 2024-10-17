@@ -160,40 +160,34 @@ public:
     void DrawMapToSurface(SDL_Surface* surface) const;
     void DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface* surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
-    void SetPlayerSprite(short iPlayerSprite);
-    bool IsVehicleMoving() const;
-
     void GetWorldSize(short * w, short * h) const {
         *w = iWidth;
         *h = iHeight;
     }
 
-    Vec2s GetPlayerPosition() const { return player.pos; }
-    void SetPlayerPosition(short iPlayerCol, short iPlayerRow);
-
     Vec2s GetPlayerCurrentTile() const { return player.currentTile; }
     Vec2s GetPlayerDestTile() const { return player.destTile; };
     short GetPlayerState() const { return player.iState; };
-
-    short GetVehicleInPlayerTile(short * iVehicleIndex) const;
-    bool GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const;
-
+    Vec2s GetPlayerPosition() const { return player.pos; }
+    void SetPlayerPosition(short iPlayerCol, short iPlayerRow);
+    void SetPlayerSprite(short iPlayerSprite);
     void MovePlayer(short iDirection);
     void FacePlayer(short iDirection);
-    void MoveVehicles();
 
-    void RemoveVehicle(short iVehicleIndex);
-
+    bool IsVehicleMoving() const;
+    short GetVehicleInPlayerTile(short * iVehicleIndex) const;
     size_t NumVehiclesInTile(Vec2s iTile) const;
-
     short GetVehicleStageScore(short iVehicleIndex) const;
+    void MoveVehicles();
+    void RemoveVehicle(short iVehicleIndex);
+    short GetVehicleBoundary(short iCol, short iRow) const;
+
+    bool GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const;
     void MoveBridges();
 
     void IsTouchingDoor(short iCol, short iRow, bool doors[4]) const;
     bool IsDoor(short iCol, short iRow) const;
     short UseKey(short iKeytype, short iCol, short iRow, bool fCloud);
-
-    short GetVehicleBoundary(short iCol, short iRow) const;
 
     short GetNextInterestingMove(short iCol, short iRow) const;
 
