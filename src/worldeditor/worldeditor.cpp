@@ -1967,19 +1967,7 @@ void ReadVehiclesIntoEditor()
 	vehiclelist.clear();
 
     for (const WorldVehicle& vehicle : g_worldmap.vehicles) {
-        WorldVehicle * vehiclecopy = new WorldVehicle();
-
-        vehiclecopy->iDrawSprite = vehicle.iDrawSprite;
-        vehiclecopy->iActionId = vehicle.iActionId;
-        vehiclecopy->currentTile.x = vehicle.currentTile.x;
-        vehiclecopy->currentTile.y = vehicle.currentTile.y;
-        vehiclecopy->iMinMoves = vehicle.iMinMoves;
-        vehiclecopy->iMaxMoves = vehicle.iMaxMoves;
-        vehiclecopy->fSpritePaces = vehicle.fSpritePaces;
-        vehiclecopy->iDrawDirection = vehicle.iDrawDirection;
-        vehiclecopy->iBoundary = vehicle.iBoundary;
-
-        vehiclelist.push_back(vehiclecopy);
+        vehiclelist.push_back(new WorldVehicle(vehicle));
     }
 }
 
@@ -1992,48 +1980,21 @@ void WriteVehiclesIntoWorld()
     g_worldmap.vehicles.reserve(vehiclelist.size());
 
     for (const WorldVehicle* vehicle : vehiclelist) {
-        WorldVehicle vehiclecopy;
-        vehiclecopy.iDrawSprite = vehicle->iDrawSprite;
-        vehiclecopy.iActionId = vehicle->iActionId;
-        vehiclecopy.currentTile.x = vehicle->currentTile.x;
-        vehiclecopy.currentTile.y = vehicle->currentTile.y;
-        vehiclecopy.iMinMoves = vehicle->iMinMoves;
-        vehiclecopy.iMaxMoves = vehicle->iMaxMoves;
-        vehiclecopy.fSpritePaces = vehicle->fSpritePaces;
-        vehiclecopy.iDrawDirection = vehicle->iDrawDirection;
-        vehiclecopy.iBoundary = vehicle->iBoundary;
-        g_worldmap.vehicles.emplace_back(std::move(vehiclecopy));
+        g_worldmap.vehicles.emplace_back(*vehicle);
     }
 }
 
 void AddVehicleToTile(short iCol, short iRow, short iType)
 {
-	std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-	WorldVehicle * newvehicle = NULL;
-    while (itr != lim) {
-		WorldVehicle * vehicle = *itr;
-        if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
-			newvehicle = vehicle;
-			break;
-		}
+    const auto it = std::find_if(vehiclelist.begin(), vehiclelist.end(),
+        [iCol, iRow](WorldVehicle* vehicle) {
+            return vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow;
+        });
 
-		itr++;
-	}
-
-    if (!newvehicle) {
-		newvehicle = new WorldVehicle();
-		newvehicle->currentTile.x = iCol;
-		newvehicle->currentTile.y = iRow;
-		vehiclelist.push_back(newvehicle);
-	}
-
-	newvehicle->iDrawSprite = g_wvVehicleStamp.iDrawSprite;
-	newvehicle->iActionId = g_wvVehicleStamp.iActionId;
-	newvehicle->iMinMoves = g_wvVehicleStamp.iMinMoves;
-	newvehicle->iMaxMoves = g_wvVehicleStamp.iMaxMoves;
-	newvehicle->fSpritePaces = g_wvVehicleStamp.fSpritePaces;
-	newvehicle->iDrawDirection = g_wvVehicleStamp.iDrawDirection;
-	newvehicle->iBoundary = g_wvVehicleStamp.iBoundary;
+    WorldVehicle* newvehicle = (it != vehiclelist.cend())
+        ? *it
+        : vehiclelist.emplace_back(new WorldVehicle(g_wvVehicleStamp));
+    newvehicle->SetPosition(iCol, iRow);
 }
 
 void RemoveVehicleFromTile(short iCol, short iRow)

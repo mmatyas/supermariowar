@@ -62,12 +62,7 @@ int popNextInt(std::list<std::string_view>& list, int defval = 0)
 * WorldMovingObject
 **********************************/
 
-WorldMovingObject::WorldMovingObject()
-{
-    SetPosition(0, 0);
-}
-
-void WorldMovingObject::Init(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize)
+WorldMovingObject::WorldMovingObject(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize)
 {
     iTileSize = tilesize;
     iTileSheet = tilesize == TILESIZE ? 0 : 1;
@@ -171,10 +166,8 @@ WorldPlayer::WorldPlayer()
 {}
 
 WorldPlayer::WorldPlayer(short iCol, short iRow)
-    : WorldMovingObject()
-{
-    WorldMovingObject::Init(iCol, iRow, 0, 0, 32);
-}
+    : WorldMovingObject(iCol, iRow, 0, 0, 32)
+{}
 
 void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY) const
 {
@@ -196,41 +189,21 @@ void WorldPlayer::SetSprite(short iPlayer)
 * WorldVehicle
 **********************************/
 
-WorldVehicle::WorldVehicle() :
-    WorldMovingObject()
+WorldVehicle::WorldVehicle()
+    : WorldMovingObject(0, 0, 0, 0, 0)
 {}
 
-WorldVehicle::~WorldVehicle()
-{}
-
-void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, short minMoves, short maxMoves, bool spritePaces, short iInitialDirection, short boundary, short tilesize)
+WorldVehicle::WorldVehicle(short iCol, short iRow, short iAction, short iSprite, short minMoves, short maxMoves, bool spritePaces, short iInitialDirection, short boundary, short tilesize)
+    : WorldMovingObject(iCol, iRow, iSprite, iInitialDirection, tilesize)
+    , iMinMoves(minMoves)
+    , iMaxMoves(maxMoves)
+    , iActionId(iAction)
+    , fEnabled(true)
+    , fSpritePaces(spritePaces)
+    , iBoundary(boundary)
 {
-    WorldMovingObject::Init(iCol, iRow, iSprite, iInitialDirection, tilesize);
-
-    fEnabled = true;
-
-    short iRectOffsetX = 0;
-    short iRectOffsetY = 0;
-
-    if (iDrawSprite >= 0 && iDrawSprite <= 8) {
-        iRectOffsetX = 0;
-        iRectOffsetY = iDrawSprite * tilesize;
-    }
-
     for (short iRect = 0; iRect < 5; iRect++)
-        srcRects[iRect] = {iRect * tilesize + iRectOffsetX, iRectOffsetY, tilesize, tilesize};
-
-    iNumMoves = 0;
-    iActionId = iAction;
-
-    iMinMoves = minMoves;
-    iMaxMoves = maxMoves;
-
-    fSpritePaces = spritePaces;
-    iPaceOffset = 0;
-    iPaceTimer = 0;
-
-    iBoundary = boundary;
+        srcRects[iRect] = {iRect * tilesize, 0, tilesize, tilesize};
 }
 
 void WorldVehicle::Move()
@@ -653,8 +626,7 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
 
             short iBoundary = popNextInt(tokens);
 
-            vehicles.emplace_back(WorldVehicle());
-            vehicles.back().Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary, iTileSize);
+            vehicles.emplace_back(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary, iTileSize);
 
             if (vehicles.size() >= iNumVehicles)
                 iReadType = 16;

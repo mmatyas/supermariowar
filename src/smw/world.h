@@ -42,10 +42,8 @@ struct WorldMapTile {
 
 class WorldMovingObject {
 public:
-    WorldMovingObject();
+    WorldMovingObject(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize);
     virtual ~WorldMovingObject() = default;
-
-    void Init(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize);
 
     virtual void Move(short iDirection);
     virtual bool Update();
@@ -80,38 +78,36 @@ public:
     void Draw(short iWorldOffsetX, short iWorldOffsetY) const;
 };
 
-class WorldVehicle : public WorldMovingObject
-{
-	public:
+class WorldVehicle : public WorldMovingObject {
+public:
+    WorldVehicle();
+    WorldVehicle(short iCol, short iRow, short iAction, short iSprite,
+        short iMinMoves, short iMaxMoves,
+        bool fSpritePaces, short iInitialDirection,
+        short iBoundary, short tilesize);
 
-		WorldVehicle();
-		~WorldVehicle();
+    void Move();
+    bool Update();
+    void Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping) const;
 
-		void Init(short iCol, short iRow, short iAction, short iSprite, short iMinMoves, short iMaxMoves, bool fSpritePaces, short iInitialDirection, short iBoundary, short tilesize);
-		void Move();
+private:
+    void SetNextDest();
 
-		bool Update();
-                void Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping) const;
+    SDL_Rect srcRects[5];
 
-	private:
+    short iMinMoves = 5;
+    short iMaxMoves = 8;
+    short iNumMoves = 0;
 
-		void SetNextDest();
+    short iActionId = 0;
 
-		SDL_Rect srcRects[5];
+    bool fEnabled = false;
 
-		short iMinMoves;
-		short iMaxMoves;
-		short iNumMoves;
+    bool fSpritePaces = true;
+    short iPaceOffset = 0;
+    short iPaceTimer = 0;
 
-		short iActionId;
-
-		bool fEnabled;
-
-		bool fSpritePaces;
-		short iPaceOffset;
-		short iPaceTimer;
-
-		short iBoundary;
+    short iBoundary = 0;
 
 	friend class WorldMap;
 	friend void AddVehicleToTile(short iCol, short iRow, short iType);
