@@ -129,7 +129,7 @@ class WorldVehicle : public WorldMovingObject
 struct WorldWarp {
     WorldWarp(short id, Vec2s posA, Vec2s posB);
 
-    [[nodiscard]] Vec2s getOtherSide(Vec2s target) const;
+    Vec2s getOtherSide(Vec2s target) const;
 
     short id;
     Vec2s posA;
@@ -151,8 +151,6 @@ public:
     void Resize(short iWidth, short iHeight);
     void Clear();
 
-    void InitPlayer();
-
     bool Update(bool* fPlayerVehicleCollision);
     void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping) const;
 
@@ -170,13 +168,12 @@ public:
         *h = iHeight;
     }
 
-    void GetPlayerPosition(short * iPlayerX, short * iPlayerY) const;
+    Vec2s GetPlayerPosition() const { return player.pos; }
     void SetPlayerPosition(short iPlayerCol, short iPlayerRow);
 
-    void GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY) const;
-    void GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY) const;
-
-    short GetPlayerState() const;
+    Vec2s GetPlayerCurrentTile() const { return player.currentTile; }
+    Vec2s GetPlayerDestTile() const { return player.destTile; };
+    short GetPlayerState() const { return player.iState; };
 
     short GetVehicleInPlayerTile(short * iVehicleIndex) const;
     bool GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const;
@@ -187,7 +184,7 @@ public:
 
     void RemoveVehicle(short iVehicleIndex);
 
-    short NumVehiclesInTile(short iTileX, short iTileY) const;
+    size_t NumVehiclesInTile(Vec2s iTile) const;
 
     short GetVehicleStageScore(short iVehicleIndex) const;
     void MoveBridges();

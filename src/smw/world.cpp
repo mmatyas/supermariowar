@@ -9,6 +9,7 @@
 #include "Version.h"
 #include "WorldTourStop.h"
 
+#include <algorithm>
 #include <charconv>
 #include <cstdio>
 #include <cstring>
@@ -251,13 +252,10 @@ void WorldVehicle::SetNextDest()
         return;
 
     WorldMapTile * tile = &g_worldmap.tiles[currentTile.x][currentTile.y];
-
-    short iPlayerCurrentTileX, iPlayerCurrentTileY;
-    g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+    const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
     if (iNumMoves-- <= 0) {
-        if (tile->iType == 0 && (iPlayerCurrentTileX != currentTile.x || iPlayerCurrentTileY != currentTile.y) &&
-                g_worldmap.NumVehiclesInTile(currentTile.x, currentTile.y) <= 1)
+        if (tile->iType == 0 && iPlayerCurrentTile != currentTile && g_worldmap.NumVehiclesInTile(currentTile) <= 1)
             return;
     }
 
@@ -295,10 +293,7 @@ bool WorldVehicle::Update()
     bool fMoveDone = WorldMovingObject::Update();
 
     if (fMoveDone) {
-        short iPlayerTileX, iPlayerTileY;
-        g_worldmap.GetPlayerCurrentTile(&iPlayerTileX, &iPlayerTileY);
-
-        if (currentTile.x == iPlayerTileX && currentTile.y == iPlayerTileY)
+        if (currentTile == g_worldmap.GetPlayerCurrentTile())
             return true;
 
         SetNextDest();
@@ -1196,32 +1191,9 @@ bool WorldMap::IsVehicleMoving() const
     return false;
 }
 
-void WorldMap::GetPlayerPosition(short * iPlayerX, short * iPlayerY) const
-{
-    *iPlayerX = player.pos.x;
-    *iPlayerY = player.pos.y;
-}
-
 void WorldMap::SetPlayerPosition(short iPlayerCol, short iPlayerRow)
 {
     player.SetPosition(iPlayerCol, iPlayerRow);
-}
-
-void WorldMap::GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY) const
-{
-    *iPlayerCurrentTileX = player.currentTile.x;
-    *iPlayerCurrentTileY = player.currentTile.y;
-}
-
-void WorldMap::GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY) const
-{
-    *iPlayerDestTileX = player.destTile.x;
-    *iPlayerDestTileY = player.destTile.y;
-}
-
-short WorldMap::GetPlayerState() const
-{
-    return player.iState;
 }
 
 short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
@@ -1277,19 +1249,12 @@ void WorldMap::RemoveVehicle(short iVehicleIndex)
     vehicles[iVehicleIndex].fEnabled = false;
 }
 
-short WorldMap::NumVehiclesInTile(short iTileX, short iTileY) const
+size_t WorldMap::NumVehiclesInTile(Vec2s iTile) const
 {
-    short iVehicleCount = 0;
-
-    for (const WorldVehicle& vehicle : vehicles) {
-        if (!vehicle.fEnabled)
-            continue;
-
-        if (vehicle.currentTile.x == iTileX && vehicle.currentTile.y == iTileY)
-            iVehicleCount++;
-    }
-
-    return iVehicleCount;
+    return std::count_if(vehicles.cbegin(), vehicles.cend(),
+        [iTile](const WorldVehicle& vehicle) {
+            return vehicle.fEnabled && vehicle.currentTile == iTile;
+        });
 }
 
 short WorldMap::GetVehicleStageScore(short iVehicleIndex) const
@@ -1439,7 +1404,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
     const WorldMapTile& currentTile = tiles[iCol][iRow];
 
     //Look for stages or vehicles, but not bonus houses
-    if ((currentTile.iType >= 6 && currentTile.iCompleted == -2) || NumVehiclesInTile(iCol, iRow) > 0)
+    if ((currentTile.iType >= 6 && currentTile.iCompleted == -2) || NumVehiclesInTile({iCol, iRow}) > 0)
         return 4; //Signal to press select on this tile
 
     short iCurrentId = currentTile.iID;
@@ -1458,7 +1423,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
         next.pop();
 
         //Look for stages or vehicles, but not bonus houses
-        if ((tile->iType >= 6 && tile->iCompleted == -2) || NumVehiclesInTile(tile->iCol, tile->iRow) > 0) {
+        if ((tile->iType >= 6 && tile->iCompleted == -2) || NumVehiclesInTile({tile->iCol, tile->iRow}) > 0) {
             short iBackTileDirection = visitedTiles[tile->iID];
             short iBackTileId = tile->iID;
 

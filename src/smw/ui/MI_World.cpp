@@ -152,16 +152,15 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
         game_values.tournament_scores[iWinningTeam].total += g_worldmap.GetVehicleStageScore(iVehicleId) * iBonusMult + iBonusAdd;
         g_worldmap.RemoveVehicle(iVehicleId);
     } else {
-        short iPlayerCurrentTileX, iPlayerCurrentTileY;
-        g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+        const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
-        WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+        WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTile.x][iPlayerCurrentTile.y];
         //tile->iForegroundSprite = game_values.colorids[game_values.teamids[iWinningTeam][0]] + WORLD_WINNING_TEAM_SPRITE_OFFSET; //Update with team completed sprite
         //tile->fAnimated = false; //Update with team completed sprite
         tile->iCompleted = game_values.colorids[game_values.teamids[iWinningTeam][0]];
 
-        g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
-        g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+        g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+        g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 
         game_values.tournament_scores[iWinningTeam].total += game_values.tourstops[tile->iType - 6]->iPoints * iBonusMult + iBonusAdd;
     }
@@ -195,10 +194,8 @@ void MI_World::Update()
     bool fPlayerVehicleCollision = false;
     bool fPlayerMoveDone = g_worldmap.Update(&fPlayerVehicleCollision);
 
-    short iPlayerX, iPlayerY;
-    g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
-
-    short iPlayerState = g_worldmap.GetPlayerState();
+    const Vec2s iPlayerDrawPos = g_worldmap.GetPlayerPosition();
+    const short iPlayerState = g_worldmap.GetPlayerState();
 
     UpdateMapSurface(iCycleIndex);
 
@@ -230,16 +227,16 @@ void MI_World::Update()
 
            //Player is moving from one tile to the next (up)
     if (iPlayerState == 1) {
-        if (g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerY < (g_worldmap.iHeight << 5) - (App::screenHeight * 0.53f))
+        if (g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerDrawPos.y < (g_worldmap.iHeight << 5) - (App::screenHeight * 0.53f))
             iMapOffsetY += 2;
     } else if (iPlayerState == 2) { //down
-        if (g_worldmap.iHeight > 15 && iMapOffsetY > App::screenHeight - (g_worldmap.iHeight << 5) && iPlayerY > (App::screenHeight * 0.47f))
+        if (g_worldmap.iHeight > 15 && iMapOffsetY > App::screenHeight - (g_worldmap.iHeight << 5) && iPlayerDrawPos.y > (App::screenHeight * 0.47f))
             iMapOffsetY -= 2;
     } else if (iPlayerState == 3) { //left
-        if (g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < (g_worldmap.iWidth << 5) - (App::screenWidth * 0.525f))
+        if (g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerDrawPos.x < (g_worldmap.iWidth << 5) - (App::screenWidth * 0.525f))
             iMapOffsetX += 2;
     } else if (iPlayerState == 4) { //right
-        if (g_worldmap.iWidth > 20 && iMapOffsetX > App::screenWidth - (g_worldmap.iWidth << 5) && iPlayerX > (App::screenWidth * 0.475f))
+        if (g_worldmap.iWidth > 20 && iMapOffsetX > App::screenWidth - (g_worldmap.iWidth << 5) && iPlayerDrawPos.x > (App::screenWidth * 0.475f))
             iMapOffsetX -= 2;
     }
 
@@ -360,13 +357,12 @@ void MI_World::UpdateMapSurface(short iCycleIndex)
 
 void MI_World::SetMapOffset()
 {
-    short iPlayerX, iPlayerY;
-    g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
+    const Vec2s iPlayerDrawPos = g_worldmap.GetPlayerPosition();
 
     if (g_worldmap.iWidth > 20) {
-        if (iPlayerX < (g_worldmap.iWidth << 5) - 336 && iPlayerX > 304)
-            iMapOffsetX = 304 - iPlayerX;
-        else if (iPlayerX <= 304)
+        if (iPlayerDrawPos.x < (g_worldmap.iWidth << 5) - 336 && iPlayerDrawPos.x > 304)
+            iMapOffsetX = 304 - iPlayerDrawPos.x;
+        else if (iPlayerDrawPos.x <= 304)
             iMapOffsetX = 0;
         else
             iMapOffsetX = App::screenWidth - (g_worldmap.iWidth << 5);
@@ -375,9 +371,9 @@ void MI_World::SetMapOffset()
     }
 
     if (g_worldmap.iHeight > 15) {
-        if (iPlayerY < (g_worldmap.iHeight << 5) - 256 && iPlayerY > 224)
-            iMapOffsetY = 224 - iPlayerY;
-        else if (iPlayerY <= 224)
+        if (iPlayerDrawPos.y < (g_worldmap.iHeight << 5) - 256 && iPlayerDrawPos.y > 224)
+            iMapOffsetY = 224 - iPlayerDrawPos.y;
+        else if (iPlayerDrawPos.y <= 224)
             iMapOffsetY = 0;
         else
             iMapOffsetY = App::screenHeight - (g_worldmap.iHeight << 5);
@@ -388,11 +384,10 @@ void MI_World::SetMapOffset()
 
 void MI_World::RepositionMapImage()
 {
-    short iPlayerCurrentTileX, iPlayerCurrentTileY;
-    g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+    const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
     if (g_worldmap.iWidth > 24) {
-        iMapDrawOffsetCol = iPlayerCurrentTileX - 11;
+        iMapDrawOffsetCol = iPlayerCurrentTile.x - 11;
         if (iMapDrawOffsetCol < 0)
             iMapDrawOffsetCol = 0;
         else if (iMapDrawOffsetCol > g_worldmap.iWidth - 24)
@@ -400,7 +395,7 @@ void MI_World::RepositionMapImage()
     }
 
     if (g_worldmap.iHeight > 19) {
-        iMapDrawOffsetRow = iPlayerCurrentTileY - 9;
+        iMapDrawOffsetRow = iPlayerCurrentTile.y - 9;
         if (iMapDrawOffsetRow < 0)
             iMapDrawOffsetRow = 0;
         else if (iMapDrawOffsetRow > g_worldmap.iHeight - 19)
@@ -417,8 +412,7 @@ void MI_World::Draw()
     if (!m_visible)
         return;
 
-    short iPlayerX, iPlayerY;
-    g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
+    const Vec2s iPlayerDrawPos = g_worldmap.GetPlayerPosition();
 
     if (g_worldmap.iWidth > 20)
         iSrcOffsetX = -iMapOffsetX - (iMapDrawOffsetCol << 5);
@@ -436,7 +430,7 @@ void MI_World::Draw()
 
            //Draw the cloud if the player is one
     if (fUsingCloud && iState == -1)
-        rm->spr_worlditems.draw(iPlayerX + iMapOffsetX, iPlayerY + iMapOffsetY, 32, 0, 32, 32);
+        rm->spr_worlditems.draw(iPlayerDrawPos.x + iMapOffsetX, iPlayerDrawPos.y + iMapOffsetY, 32, 0, 32, 32);
 
            //If a points modifier is in place, display it
     if (game_values.worldpointsbonus >= 0) {
@@ -450,7 +444,7 @@ void MI_World::Draw()
             short iStarX = (short)(dTeleportStarRadius * cos(dAngle));
             short iStarY = (short)(dTeleportStarRadius * sin(dAngle));
 
-            rm->spr_teleportstar.draw(iStarX + iPlayerX + iMapOffsetX, iStarY + iPlayerY + iMapOffsetY, iTeleportStarAnimationFrame, 0, 32, 32);
+            rm->spr_teleportstar.draw(iStarX + iPlayerDrawPos.x + iMapOffsetX, iStarY + iPlayerDrawPos.y + iMapOffsetY, iTeleportStarAnimationFrame, 0, 32, 32);
         }
     }
 
@@ -546,9 +540,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
             if (fNeedAiControl) {
                 if (iPressSelectTimer == 0) {
-                    short iPlayerCurrentTileX, iPlayerCurrentTileY;
-                    g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
-                    short iNextMove = g_worldmap.GetNextInterestingMove(iPlayerCurrentTileX, iPlayerCurrentTileY);
+                    const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
+                    short iNextMove = g_worldmap.GetNextInterestingMove(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
 
                            //Clear out all input from cpu controlled team
                     COutputControl * playerKeys = NULL;
@@ -576,7 +569,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
                                //See if we are touching a door
                         bool fDoor[4] = {false, false, false, false};
-                        g_worldmap.IsTouchingDoor(iPlayerCurrentTileX, iPlayerCurrentTileY, fDoor);
+                        g_worldmap.IsTouchingDoor(iPlayerCurrentTile.x, iPlayerCurrentTile.y, fDoor);
 
                                //See if we can use a key to keep going
                         for (short iPowerup = 0; iPowerup < game_values.worldpowerupcount[iControllingTeam]; iPowerup++) {
@@ -620,21 +613,20 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
     for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
-        short iPlayerCurrentTileX, iPlayerCurrentTileY;
-        g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+        const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
         short iTeamId = LookupTeamID(iPlayer);
 
         if (iState == -1 && iNumPopups == 0 && iPopupFlag[0] == false && iPopupFlag[1] == false && iPopupFlag[2] == false && iPopupFlag[3] == false) {
             if (iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) { //if this player is player or cpu
-                WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+                WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTile.x][iPlayerCurrentTile.y];
 
                 short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
                 bool fVehicleInTile = g_worldmap.GetVehicleInPlayerTile(&iTemp) >= 0;
 
                 if (playerKeys->menu_up.fPressed || playerKeys->menu_up.fDown) {
                     //Make sure there is a path connection and that there is no stage or vehicle blocking the way
-                    if ((tile->fConnection[0] || tile->iConnectionType == 14) && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY - 1) &&
+                    if ((tile->fConnection[0] || tile->iConnectionType == 14) && !g_worldmap.IsDoor(iPlayerCurrentTile.x, iPlayerCurrentTile.y - 1) &&
                         (((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 0 || fUsingCloud)) {
                         if (fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 0)
                             UseCloud(false);
@@ -653,7 +645,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                             ifSoundOnPlay(rm->sfx_hit);
                     }
                 } else if (playerKeys->menu_down.fPressed || playerKeys->menu_down.fDown) {
-                    if ((tile->fConnection[1] || tile->iConnectionType == 14) && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY + 1) &&
+                    if ((tile->fConnection[1] || tile->iConnectionType == 14) && !g_worldmap.IsDoor(iPlayerCurrentTile.x, iPlayerCurrentTile.y + 1) &&
                         (((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 1 || fUsingCloud)) {
                         if (fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 1)
                             UseCloud(false);
@@ -672,7 +664,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                             ifSoundOnPlay(rm->sfx_hit);
                     }
                 } else if (playerKeys->menu_left.fPressed || playerKeys->menu_left.fDown) {
-                    if ((tile->fConnection[2] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTileX - 1, iPlayerCurrentTileY) &&
+                    if ((tile->fConnection[2] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTile.x - 1, iPlayerCurrentTile.y) &&
                         (((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 2 || fUsingCloud)) {
                         if (fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 2)
                             UseCloud(false);
@@ -693,7 +685,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                             ifSoundOnPlay(rm->sfx_hit);
                     }
                 } else if (playerKeys->menu_right.fPressed || playerKeys->menu_right.fDown) {
-                    if ((tile->fConnection[3] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTileX + 1, iPlayerCurrentTileY) &&
+                    if ((tile->fConnection[3] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTile.x + 1, iPlayerCurrentTile.y) &&
                         (((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 3 || fUsingCloud)) {
                         if (fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 3)
                             UseCloud(false);
@@ -722,7 +714,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                     }
 
                            //if it is a stage, then load the stage
-                    WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+                    WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTile.x][iPlayerCurrentTile.y];
 
                     short iType = tile->iType - 6;
                     if (iType >= 0 && iType < g_worldmap.iNumStages && tile->iCompleted == -2) {
@@ -830,11 +822,10 @@ void MI_World::RestartDrawCycleIfNeeded()
     iNextMapDrawOffsetCol = iMapDrawOffsetCol;
     iNextMapDrawOffsetRow = iMapDrawOffsetRow;
 
-    short iPlayerDestTileX, iPlayerDestTileY;
-    g_worldmap.GetPlayerDestTile(&iPlayerDestTileX, &iPlayerDestTileY);
+    const Vec2s iPlayerDestTile = g_worldmap.GetPlayerDestTile();
 
     if (g_worldmap.iWidth > 24) {
-        iNextMapDrawOffsetCol = iPlayerDestTileX - 11;
+        iNextMapDrawOffsetCol = iPlayerDestTile.x - 11;
         if (iNextMapDrawOffsetCol < 0)
             iNextMapDrawOffsetCol = 0;
         else if (iNextMapDrawOffsetCol > g_worldmap.iWidth - 24)
@@ -842,7 +833,7 @@ void MI_World::RestartDrawCycleIfNeeded()
     }
 
     if (g_worldmap.iHeight > 19) {
-        iNextMapDrawOffsetRow = iPlayerDestTileY - 9;
+        iNextMapDrawOffsetRow = iPlayerDestTile.y - 9;
         if (iNextMapDrawOffsetRow < 0)
             iNextMapDrawOffsetRow = 0;
         else if (iNextMapDrawOffsetRow > g_worldmap.iHeight - 19)
@@ -859,8 +850,7 @@ void MI_World::RestartDrawCycleIfNeeded()
 
 bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupIsUp)
 {
-    short iPlayerCurrentTileX, iPlayerCurrentTileY;
-    g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+    const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
     short iPowerup = game_values.worldpowerups[iTeam][iIndex];
     bool fUsedItem = false;
@@ -901,9 +891,8 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
             fNoInterestingMoves = false;
         }
     } else if (iPowerup == NUM_POWERUPS + 3 && iState == -1) { //Advance Turn
-        short iDestX, iDestY;
-        g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
-        short iSprite = g_worldmap.tiles[iDestX][iDestY].iForegroundSprite;
+        const Vec2s iDest = g_worldmap.GetPlayerDestTile();
+        short iSprite = g_worldmap.tiles[iDest.x][iDest.y].iForegroundSprite;
 
         if (iSprite < WORLD_BRIDGE_SPRITE_OFFSET || iSprite > WORLD_BRIDGE_SPRITE_OFFSET + 3) {
             AdvanceTurn();
@@ -911,56 +900,55 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
             ifSoundOnPlay(rm->sfx_switchpress);
         }
     } else if (iPowerup == NUM_POWERUPS + 4 && iState == -1) { //Revive stage
-        short iDestX, iDestY;
-        g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
-        WorldMapTile * tile = &g_worldmap.tiles[iDestX][iDestY];
+        const Vec2s iDest = g_worldmap.GetPlayerDestTile();
+        WorldMapTile * tile = &g_worldmap.tiles[iDest.x][iDest.y];
 
         if (tile->iType >= 6 && tile->iCompleted >= 0) {
             tile->iCompleted = -2;
 
-            g_worldmap.UpdateTile(sMapSurface[0], iDestX - iMapDrawOffsetCol, iDestY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
-            g_worldmap.UpdateTile(sMapSurface[1], iDestX - iMapDrawOffsetCol, iDestY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+            g_worldmap.UpdateTile(sMapSurface[0], iDest.x - iMapDrawOffsetCol, iDest.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+            g_worldmap.UpdateTile(sMapSurface[1], iDest.x - iMapDrawOffsetCol, iDest.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 
-            m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, (iDestX << 5) + iMapOffsetX - 8, (iDestY << 5) + iMapOffsetY - 8, 4, 5));
+            m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, (iDest.x << 5) + iMapOffsetX - 8, (iDest.y << 5) + iMapOffsetY - 8, 4, 5));
 
             fUsedItem = true;
             ifSoundOnPlay(rm->sfx_transform);
         }
     } else if (iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8 && iState == -1) { //Door Keys
-        short iDoorsOpened = g_worldmap.UseKey(iPowerup - NUM_POWERUPS - 5, iPlayerCurrentTileX, iPlayerCurrentTileY, fUsingCloud);
+        short iDoorsOpened = g_worldmap.UseKey(iPowerup - NUM_POWERUPS - 5, iPlayerCurrentTile.x, iPlayerCurrentTile.y, fUsingCloud);
 
         if (iDoorsOpened > 0) {
             ifSoundOnPlay(rm->sfx_transform);
 
-            short iPlayerX = (iPlayerCurrentTileX << 5) + iMapOffsetX;
-            short iPlayerY = (iPlayerCurrentTileY << 5) + iMapOffsetY;
+            short iPlayerX = (iPlayerCurrentTile.x << 5) + iMapOffsetX;
+            short iPlayerY = (iPlayerCurrentTile.y << 5) + iMapOffsetY;
 
             if (iDoorsOpened & 0x1) {
                 m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX - TILESIZE, iPlayerY, 3, 8));
 
-                g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol - 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
-                g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol - 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+                g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTile.x - iMapDrawOffsetCol - 1, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+                g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTile.x - iMapDrawOffsetCol - 1, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             if (iDoorsOpened & 0x2) {
                 m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX + TILESIZE, iPlayerY, 3, 8));
 
-                g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol + 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
-                g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol + 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+                g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTile.x - iMapDrawOffsetCol + 1, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+                g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTile.x - iMapDrawOffsetCol + 1, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             if (iDoorsOpened & 0x4) {
                 m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX, iPlayerY - TILESIZE, 3, 8));
 
-                g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
-                g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+                g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+                g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             if (iDoorsOpened & 0x8) {
                 m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8));
 
-                g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
-                g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+                g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+                g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             fUsedItem = true;
@@ -1018,7 +1006,6 @@ void MI_World::UseCloud(bool fUseCloud)
     fUsingCloud = fUseCloud;
     ifSoundOnPlay(rm->sfx_transform);
 
-    short iPlayerX, iPlayerY;
-    g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
-    m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, iPlayerX + iMapOffsetX - 8, iPlayerY + iMapOffsetY - 8, 4, 5));
+    const Vec2s iPlayerDrawPos = g_worldmap.GetPlayerPosition();
+    m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, iPlayerDrawPos.x + iMapOffsetX - 8, iPlayerDrawPos.y + iMapOffsetY - 8, 4, 5));
 }
