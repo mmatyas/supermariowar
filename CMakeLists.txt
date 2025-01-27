@@ -23,6 +23,7 @@ option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet, ya
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" ON)
 option(SDL2_USE_MIXERX "(SDL2) Use SDL Mixer X instead of SDL Mixer" OFF)
 option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
+option(USE_BUNDLED_SDL "If ON, downloads and builds SDL, otherwise uses the system library" OFF)
 option(BUILD_TESTS "Build the unit tests" ON)
 
 set(SMW_INSTALL_PORTABLE_DEFAULT OFF)
@@ -79,6 +80,8 @@ endif()
 # Dependencies
 #
 #-----------------------------------------------------------------------------
+
+include(BundledDeps)
 
 if (NOT DISABLE_SYSLIB_CHECKS)
 	find_package(ZLIB REQUIRED)
@@ -284,10 +287,10 @@ if(NOT NO_NETWORK)
 endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTS)
-    include(CTest)
-    include(dependencies/doctest/doctest.cmake)
-    add_subdirectory(dependencies/doctest)
-    add_subdirectory(tests)
+	include(CTest)
+	include(dependencies/doctest/doctest.cmake)
+	add_subdirectory(dependencies/doctest)
+	add_subdirectory(tests)
 endif()
 
 #-----------------------------------------------------------------------------
