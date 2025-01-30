@@ -72,6 +72,8 @@
     #endif
 #endif
 
+#include "EditorWater.h"
+
 // TODO: Fix JS related problems.
 #ifdef __EMSCRIPTEN__
 #define SDL_Delay(n) ;
@@ -282,7 +284,6 @@ int resize_world();
 int editor_edit();
 int editor_warp();
 int editor_boundary();
-int editor_water();
 int	editor_background();
 int editor_stageforeground();
 int editor_structureforeground();
@@ -293,6 +294,10 @@ int editor_pathsprite();
 int editor_type();
 int editor_stage();
 int editor_start_items();
+
+EditorWater editorWater;
+EditorBase* currentEditor = nullptr;
+int enterEditor(EditorBase& editor);
 
 void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMouseY);
 
@@ -936,13 +941,16 @@ int main(int argc, char *argv[])
 	printf("entering world editor loop...\n");
 	done = false;
     while (!done) {
+    	currentEditor = nullptr;
+
         switch (state) {
 			case EDITOR_EDIT:
 				state = editor_edit();
 			break;
 
 			case EDITOR_WATER:
-				state = editor_water();
+                state = enterEditor(editorWater);
+                edit_mode = 7;
 			break;
 
 			case EDITOR_BACKGROUND:
@@ -1340,6 +1348,14 @@ int editor_edit()
 						short iRow = iButtonY / TILESIZE + draw_offset_row;
 
                     if (iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE) {
+                        WorldMapTile& tile = g_worldmap.tiles.at(iCol, iRow);
+                        if (currentEditor) {
+                            bool changed = false;
+                            currentEditor->onTileClicked(tile, event.button.button, changed);
+                            if (changed)
+                                updateworldsurface();
+                        }
+
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
                             if (edit_mode == 0) { //selected background
                                 if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile || fAutoPaint) {
@@ -1414,11 +1430,6 @@ int editor_edit()
 									AddVehicleToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 6) { //selected warp
 									AddWarpToTile(iCol, iRow, set_tile);
-                            } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != set_tile) {
-										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = set_tile;
-										updateworldsurface();
-									}
                             } else if (edit_mode == 8) { //boundary
 									g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = set_tile;
                             } else if (edit_mode == 9) {
@@ -1494,11 +1505,6 @@ int editor_edit()
 									iStageDisplay = -1;
                             } else if (edit_mode == 6) {
 									RemoveWarpFromTile(iCol, iRow);
-                            } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != 0) {
-										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = 0;
-										updateworldsurface();
-									}
                             } else if (edit_mode == 8) { //boundary
 									g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = 0;
                             } else if (edit_mode == 9) { //stage
@@ -1519,6 +1525,18 @@ int editor_edit()
 						short iRow = (iButtonY >> 5) + draw_offset_row;
 
                     if (iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE) {
+                        const bool isLeftPressed = event.motion.state & SDL_BUTTON_LMASK;
+                        const bool isRightPressed = event.motion.state & SDL_BUTTON_RMASK;
+
+                        WorldMapTile& tile = g_worldmap.tiles.at(iCol, iRow);
+                        if (currentEditor && (isLeftPressed || isRightPressed)) {
+                            const uint8_t button = isLeftPressed ? SDL_BUTTON_LEFT : SDL_BUTTON_RIGHT;  // Prefer left press if both are down
+                            bool changed = false;
+                            currentEditor->onTileClicked(tile, button, changed);
+                            if (changed)
+                                updateworldsurface();
+                        }
+
                         if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
                             if (edit_mode == 0) { //selected background
                                 if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile || fAutoPaint) {
@@ -1589,11 +1607,6 @@ int editor_edit()
 									AddVehicleToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 6) {
 									AddWarpToTile(iCol, iRow, set_tile);
-                            } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != set_tile) {
-										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = set_tile;
-										updateworldsurface();
-									}
                             } else if (edit_mode == 9) { //stage
 									//if the stage was placed on a start tile
                                 if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
@@ -1666,11 +1679,6 @@ int editor_edit()
 									iStageDisplay = -1;
                             } else if (edit_mode == 6) { //Warps
 									RemoveWarpFromTile(iCol, iRow);
-                            } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != 0) {
-										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = 0;
-										updateworldsurface();
-									}
                             } else if (edit_mode == 9) { //stage
 									g_worldmap.tiles.at(iCol, iRow).iType = 0;
 									iStageDisplay = -1;
@@ -2811,68 +2819,44 @@ int editor_type()
 	return EDITOR_QUIT;
 }
 
-int editor_water()
+int enterEditor(EditorBase& editor)
 {
-	bool done = false;
+    currentEditor = &editor;
+    editor.onEnter();
 
+    bool done = false;
     while (!done) {
-		int framestart = SDL_GetTicks();
+        int framestart = SDL_GetTicks();
 
-		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-					done = true;
-					break;
-				}
+            if (event.type == SDL_QUIT) {
+                done = true;
+                continue;
+            }
 
-            case SDL_KEYDOWN: {
-					edit_mode = 7;
-					return EDITOR_EDIT;
-				}
+            editor.input.handleEvent(event);
+        }
 
-            case SDL_MOUSEBUTTONDOWN: {
-                if (event.button.button == SDL_BUTTON_LEFT) {
-						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
-						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
+        if (editor.isReady())
+            return EDITOR_EDIT;
 
-                    if (iButtonY == 0) {
-                        if (iButtonX >= 0 && iButtonX <= 2) {
-								set_tile = iButtonX + 4;
-							}
-						}
+        SDL_FillRect(screen, NULL, 0x0);
 
-						ignoreclick = true;
-						edit_mode = 7;
-						return EDITOR_EDIT;
-					}
+        editor.render(*rm);
 
-					break;
-				}
+        DrawMessage();
+        gfx_flipscreen();
 
-				default:
-					break;
-			}
-		}
+        int delay = WAITTIME - (SDL_GetTicks() - framestart);
+        if (delay < 0)
+            delay = 0;
+        else if (delay > WAITTIME)
+            delay = WAITTIME;
 
-		SDL_FillRect(screen, NULL, 0x0);
+        SDL_Delay(delay);
+    }
 
-		for (short iWater = 0; iWater < 3; iWater++)
-			rm->spr_worldbackground[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
-
-		DrawMessage();
-		gfx_flipscreen();
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+    return EDITOR_QUIT;
 }
 
 int editor_background()
