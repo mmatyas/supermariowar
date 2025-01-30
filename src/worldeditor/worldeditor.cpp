@@ -28,7 +28,6 @@
 #include "path.h"
 #include "player.h"
 #include "ResourceManager.h"
-#include "sfx.h"
 #include "TilesetManager.h"
 #include "world.h"
 #include "WorldTourStop.h"
@@ -40,11 +39,8 @@
 #include "ui/MI_TextField.h"
 #include "objects/blocks/WeaponBreakableBlock.h"
 #include "objects/carriable/CO_Flag.h"
-#include "objects/carriable/CO_Spring.h"
-#include "objects/carriable/CO_Bomb.h"
 #include "objects/carriable/CO_Egg.h"
 #include "objects/carriable/CO_PhantoKey.h"
-#include "objects/carriable/CO_Shell.h"
 #include "objects/carriable/CO_Star.h"
 #include "objects/carriable/CO_ThrowBox.h"
 #include "objects/moving/MO_Coin.h"
@@ -210,20 +206,6 @@ bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDir
     return false;
 }
 
-gfxSprite		spr_awardsouls, spr_fireballexplosion;
-gfxSprite		spr_backmap[2];
-gfxSprite		spr_background;
-gfxSprite		spr_explosion;
-
-sfxSound		sfx_boomerang;
-sfxSound		sfx_bobombsound;
-sfxSound		sfx_bulletbillsound;
-sfxSound		sfx_flamecannon;
-sfxSound		sfx_hit;
-sfxSound		sfx_kicksound;
-sfxSound		sfx_mip;
-sfxSound		sfx_transform;
-
 gfxSprite		**spr_player[4];
 CGameMode		*gamemodes[GAMEMODE_LAST];
 
@@ -252,8 +234,6 @@ short LookupTeamID(short id)
 {
     return 0;
 }
-gfxSprite		spr_scoretext;
-gfxSprite		spr_poof;
 
 void CScore::AdjustScore(short iValue) {}
 ///////
