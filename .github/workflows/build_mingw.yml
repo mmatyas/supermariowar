@@ -35,7 +35,7 @@ jobs:
         run: |
           cmake --install build --prefix supermariowar --strip
           rm -rf supermariowar/include supermariowar/lib
-          cp /usr/lib/gcc/i686-w64-mingw32/10-posix/{libgcc_s_dw2-1,libstdc++-6}.dll supermariowar/
+          cp /usr/lib/gcc/i686-w64-mingw32/13-posix/{libgcc_s_dw2-1,libstdc++-6}.dll supermariowar/
           cp /usr/i686-w64-mingw32/lib/libwinpthread-1.dll supermariowar/
           cp /tmp/smwlibs/bin/{SDL2,SDL2_image,SDL2_mixer_ext}.dll supermariowar/
           zip -9 -r "supermariowar_$(date +%F)_windows.zip" supermariowar
