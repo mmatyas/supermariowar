@@ -3,7 +3,12 @@
 #include "EditorBase.h"
 
 
-class EditorWater : public EditorBase {
+class EditorBackground : public EditorBase {
+public:
+    void setAutoPaint(bool value) {
+        m_autopaint = value;
+    }
+
 protected:
     bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) override;
     void renderSetup(CResourceManager& rm) override;
@@ -12,5 +17,7 @@ protected:
     void onSetupMouseClick(const SDL_MouseButtonEvent& event) override;
 
 private:
-    short m_selectedTileId = 4;
+    short m_page = 0;
+    short m_selectedTileId = 0;
+    bool m_autopaint = false;
 };

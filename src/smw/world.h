@@ -165,6 +165,8 @@ public:
         *w = iWidth;
         *h = iHeight;
     }
+    short w() const { return iWidth; }
+    short h() const { return iHeight; }
 
     Vec2s GetPlayerCurrentTile() const { return player.currentTile; }
     Vec2s GetPlayerDestTile() const { return player.destTile; };
@@ -196,6 +198,9 @@ public:
 
     short GetMusicCategory() const { return iMusicCategory; }
     const std::string& GetWorldName() { return worldName; }
+
+    const Grid<WorldMapTile>& getTiles() const { return tiles; }
+    Grid<WorldMapTile>& getTiles() { return tiles; }
 
 private:
     void SetTileConnections(short iCol, short iRow);

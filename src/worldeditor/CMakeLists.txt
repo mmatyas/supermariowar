@@ -39,8 +39,12 @@ add_executable(smw-worldedit WIN32
 
 	EditorBase.h
 	EditorBase.cpp
+	EditorBackground.h
+	EditorBackground.cpp
 	EditorWater.h
 	EditorWater.cpp
+	Helpers.h
+	Helpers.cpp
 )
 if (WIN32)
 	# Add EXE icon on Windows
