@@ -73,6 +73,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 #endif
 
 #include "EditorBackground.h"
+#include "EditorStageMarkers.h"
 #include "EditorWater.h"
 #include "Helpers.h"
 
@@ -316,8 +317,6 @@ int resize_world();
 int editor_edit();
 int editor_warp();
 int editor_boundary();
-int editor_background();
-int editor_stageforeground();
 int editor_structureforeground();
 int editor_bridges();
 int editor_vehicles();
@@ -328,6 +327,7 @@ int editor_stage();
 int editor_start_items();
 
 EditorBackground editorBackground;
+EditorStageMarkers editorStageMarkers;
 EditorWater editorWater;
 EditorBase* currentEditor = nullptr;
 int enterEditor(EditorBase& editor);
@@ -997,7 +997,8 @@ int main(int argc, char* argv[])
             break;
 
         case EDITOR_STAGEFOREGROUND:
-            state = editor_stageforeground();
+            state = enterEditor(editorStageMarkers);
+            edit_mode = 1;
             break;
 
         case EDITOR_STRUCTUREFOREGROUND:
@@ -1395,15 +1396,7 @@ int editor_edit()
                         }
 
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
-                            if (edit_mode == 1) {  // selected foreground
-                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile;
-                                    updateworldsurface();
-
-                                    if (set_tile >= WORLD_BRIDGE_SPRITE_OFFSET && set_tile <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
-                                        g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile - WORLD_BRIDGE_SPRITE_OFFSET + 12;
-                                }
-                            } else if (edit_mode == 2) {  // selected connection
+                            if (edit_mode == 2) {  // selected connection
                                 g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile;
 
                                 if (fAutoPaint)
@@ -1464,12 +1457,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.button.button == SDL_BUTTON_RIGHT) {
-                            if (edit_mode == 1) {
-                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-                                    updateworldsurface();
-                                }
-                            } else if (edit_mode == 2) {
+                            if (edit_mode == 2) {
                                 g_worldmap.tiles.at(iCol, iRow).iConnectionType = 0;
 
                                 if (fAutoPaint)
@@ -1541,12 +1529,7 @@ int editor_edit()
                         }
 
                         if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
-                            if (edit_mode == 1) {
-                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile;
-                                    updateworldsurface();
-                                }
-                            } else if (edit_mode == 2) {
+                            if (edit_mode == 2) {
                                 g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile;
 
                                 if (fAutoPaint)
@@ -1604,12 +1587,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-                            if (edit_mode == 1) {
-                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-                                    updateworldsurface();
-                                }
-                            } else if (edit_mode == 2) {
+                            if (edit_mode == 2) {
                                 g_worldmap.tiles.at(iCol, iRow).iConnectionType = 0;
 
                                 if (fAutoPaint)
@@ -2624,87 +2602,6 @@ int enterEditor(EditorBase& editor)
     return EDITOR_QUIT;
 }
 
-int editor_stageforeground()
-{
-    bool done = false;
-    short iForegroundScreen = 0;
-
-    while (!done) {
-        int framestart = SDL_GetTicks();
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                done = true;
-                break;
-            }
-
-            case SDL_KEYDOWN: {
-#ifdef USE_SDL2
-                SDL_Keycode key = event.key.keysym.sym;
-#else
-                SDLKey key = event.key.keysym.sym;
-#endif
-
-                if (key >= SDLK_1 && key <= SDLK_4) {
-                    iForegroundScreen = key - SDLK_1;
-                } else {
-                    edit_mode = 1;
-                    return EDITOR_EDIT;
-                }
-
-                break;
-            }
-
-            case SDL_MOUSEBUTTONDOWN: {
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
-                    short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
-
-                    if (iButtonX >= 0 && iButtonX < 10) {
-                        if (iButtonY >= 0 && iButtonY < 10) {
-                            set_tile = WORLD_FOREGROUND_STAGE_OFFSET + iButtonY * 10 + iButtonX + iForegroundScreen * 100;
-
-                            ignoreclick = true;
-                            edit_mode = 1;
-                            return EDITOR_EDIT;
-                        }
-                    }
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
-
-        SDL_FillRect(screen, NULL, 0x0);
-
-        for (short iRow = 0; iRow < 10; iRow++) {
-            for (short iCol = 0; iCol < 10; iCol++) {
-                rm->spr_worldforegroundspecial[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
-            }
-        }
-
-        rm->spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
-
-        DrawMessage();
-        gfx_flipscreen();
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return EDITOR_QUIT;
-}
 
 int editor_bridges()
 {
