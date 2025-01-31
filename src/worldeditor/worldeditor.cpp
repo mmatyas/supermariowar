@@ -74,6 +74,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 
 #include "EditorBackground.h"
 #include "EditorStageMarkers.h"
+#include "EditorPaths.h"
 #include "EditorWater.h"
 #include "Helpers.h"
 
@@ -128,7 +129,6 @@ gfxSprite menu_shade;
 gfxSprite spr_largedialog;
 
 gfxSprite spr_warps[3];
-gfxSprite spr_path;
 
 gfxSprite spr_vehicleicons;
 
@@ -285,8 +285,6 @@ int display_help();
 void drawmap(bool fScreenshot, short iBlockSize);
 
 bool UpdateForeground(short iCol, short iRow);
-void UpdatePath(short iCol, short iRow);
-void AutoSetPath(short iCol, short iRow);
 bool UpdateCoastline(short iCol, short iRow);
 bool AutoSetTile(short iCol, short iRow);
 void UpdatePathSprite(short iCol, short iRow);
@@ -320,16 +318,22 @@ int editor_boundary();
 int editor_structureforeground();
 int editor_bridges();
 int editor_vehicles();
-int editor_path();
 int editor_pathsprite();
 int editor_type();
 int editor_stage();
 int editor_start_items();
 
 EditorBackground editorBackground;
+EditorPaths editorPaths;
 EditorStageMarkers editorStageMarkers;
 EditorWater editorWater;
 EditorBase* currentEditor = nullptr;
+constexpr std::array<EditorBase*, 4> allEditors {
+    &editorBackground,
+    &editorPaths,
+    &editorStageMarkers,
+    &editorWater,
+};
 int enterEditor(EditorBase& editor);
 
 void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMouseY);
@@ -543,8 +547,6 @@ int main(int argc, char* argv[])
     spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), colors::MAGENTA);
     spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), colors::MAGENTA);
 
-    spr_path.init(convertPath("gfx/leveleditor/leveleditor_world_path.png"), colors::MAGENTA);
-
     rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 128);
 
     spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA, 255);
@@ -554,6 +556,8 @@ int main(int argc, char* argv[])
     rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
     rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
 
+    for (EditorBase* editor : allEditors)
+        editor->loadAssets();
 
     printf("\n---------------- load world ----------------\n");
 
@@ -974,6 +978,7 @@ int main(int argc, char* argv[])
     printf("\n---------------- ready, steady, go! ----------------\n");
 
     editorBackground.setAutoPaint(fAutoPaint);
+    editorPaths.setAutoPaint(fAutoPaint);
 
     printf("entering world editor loop...\n");
     done = false;
@@ -1014,7 +1019,8 @@ int main(int argc, char* argv[])
             break;
 
         case EDITOR_PATH:
-            state = editor_path();
+            state = enterEditor(editorPaths);
+            edit_mode = 2;
             break;
 
         case EDITOR_PATHSPRITE:
@@ -1270,6 +1276,7 @@ int editor_edit()
                     if (event.key.keysym.sym == SDLK_a) {
                         fAutoPaint = !fAutoPaint;
                         editorBackground.setAutoPaint(fAutoPaint);
+                        editorPaths.setAutoPaint(fAutoPaint);
                     }
 
                     if (event.key.keysym.sym == SDLK_r) {
@@ -1396,12 +1403,7 @@ int editor_edit()
                         }
 
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
-                            if (edit_mode == 2) {  // selected connection
-                                g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile;
-
-                                if (fAutoPaint)
-                                    UpdatePath(iCol, iRow);
-                            } else if (edit_mode == 3) {  // selected type
+                            if (edit_mode == 3) {  // selected type
                                                           // start tiles
                                 if (set_tile <= 1) {
                                     if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
@@ -1457,12 +1459,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.button.button == SDL_BUTTON_RIGHT) {
-                            if (edit_mode == 2) {
-                                g_worldmap.tiles.at(iCol, iRow).iConnectionType = 0;
-
-                                if (fAutoPaint)
-                                    UpdatePath(iCol, iRow);
-                            } else if (edit_mode == 3) {  // selected start/door
+                            if (edit_mode == 3) {  // selected start/door
                                 if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
                                     g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
                                     updateworldsurface();
@@ -1529,12 +1526,7 @@ int editor_edit()
                         }
 
                         if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
-                            if (edit_mode == 2) {
-                                g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile;
-
-                                if (fAutoPaint)
-                                    UpdatePath(iCol, iRow);
-                            } else if (edit_mode == 3) {  // selected stage/door
+                            if (edit_mode == 3) {  // selected stage/door
                                 if (set_tile <= 1) {
                                     if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
                                         g_worldmap.tiles.at(iCol, iRow).iType = 1;
@@ -1587,12 +1579,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-                            if (edit_mode == 2) {
-                                g_worldmap.tiles.at(iCol, iRow).iConnectionType = 0;
-
-                                if (fAutoPaint)
-                                    UpdatePath(iCol, iRow);
-                            } else if (edit_mode == 3) {
+                            if (edit_mode == 3) {
                                 if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
                                     g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
                                     updateworldsurface();
@@ -1709,17 +1696,10 @@ int editor_edit()
 
             spr_dialog.draw(fSelectedYes ? 250 : 326, 250, 192, 0, 64, 32);
         } else {
-            // Draw Paths
-            if (edit_mode == 2) {
-                for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
-                    for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
-                        short iConnection = g_worldmap.tiles.at(iCol, iRow).iConnectionType;
-
-                        if (iConnection > 0)
-                            spr_path.draw((iCol - draw_offset_col) * TILESIZE + draw_offset_x, (iRow - draw_offset_row) * TILESIZE + draw_offset_y, (iConnection - 1) << 5, 0, TILESIZE, TILESIZE);
-                    }
-                }
-            } else if (edit_mode == 6) {  // draw warps
+            if (currentEditor) {
+                currentEditor->renderEdit(g_worldmap, {draw_offset_col, draw_offset_row}, {draw_offset_x, draw_offset_y});
+            }
+            if (edit_mode == 6) {  // draw warps
                 std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
                 while (itr != lim) {
                     WorldWarp* warp = *itr;
@@ -2138,59 +2118,6 @@ short AdjustForeground(short fgSprite, short iCol, short iRow)
 {
     const WorldMapTile& tile = g_worldmap.tiles.at(iCol, iRow);
     return adjustedForeground(fgSprite, tile.iBackgroundSprite);
-}
-
-
-void UpdatePath(short iCol, short iRow)
-{
-    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
-            if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-                AutoSetPath(iAutoCol, iAutoRow);
-            }
-        }
-    }
-}
-
-void AutoSetPath(short iCol, short iRow)
-{
-    short iPathTypes[16] = { 11, 1, 2, 3, 2, 4, 2, 8, 1, 1, 6, 7, 5, 9, 10, 11 };
-
-    short iPath = 0;
-    short iNeighborIndex = 0;
-
-    if (g_worldmap.tiles.at(iCol, iRow).iConnectionType == 0)
-        return;
-
-    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
-            if (iAutoCol == iCol && iAutoRow == iRow)
-                continue;
-
-            if ((iAutoCol == iCol && iAutoRow != iRow) || (iAutoCol != iCol && iAutoRow == iRow)) {
-                if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-                    if (g_worldmap.tiles.at(iAutoCol, iAutoRow).iConnectionType > 0)
-                        iPath += 1 << iNeighborIndex;
-                }
-
-                iNeighborIndex++;
-            }
-        }
-    }
-
-    // #1 == |  2 == -  3 == -!  4 == L  5 == ,-  6 == -,
-    // #7 == -|  8 == -`-  9 == |-  10 == -,-  11 == +
-
-    short iPathType = iPathTypes[iPath];
-    short iForegroundSprite = g_worldmap.tiles.at(iCol, iRow).iForegroundSprite;
-
-    if (iPathType == 2 && iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 1) {
-        iPathType = iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 12;
-    } else if (iPathType == 1 && iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET + 2 && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) {
-        iPathType = iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 12;
-    }
-
-    g_worldmap.tiles.at(iCol, iRow).iConnectionType = iPathType;
 }
 
 bool UpdateForeground(short iCol, short iRow)
@@ -2910,66 +2837,6 @@ int editor_vehicles()
         mCurrentMenu->Draw();
 
         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
-
-        DrawMessage();
-        gfx_flipscreen();
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return EDITOR_QUIT;
-}
-
-int editor_path()
-{
-    bool done = false;
-
-    while (!done) {
-        int framestart = SDL_GetTicks();
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                done = true;
-                break;
-            }
-
-            case SDL_KEYDOWN: {
-                edit_mode = 2;
-                return EDITOR_EDIT;
-            }
-
-            case SDL_MOUSEBUTTONDOWN: {
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
-                    short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
-
-                    if (iButtonX >= 0 && iButtonX <= 15 && iButtonY == 0) {
-                        set_tile = iButtonX + 1;
-
-                        ignoreclick = true;
-                        edit_mode = 2;
-                        return EDITOR_EDIT;
-                    }
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
-
-        SDL_FillRect(screen, NULL, 0x0);
-        spr_path.draw(0, 0, 0, 0, 480, 32);
 
         DrawMessage();
         gfx_flipscreen();

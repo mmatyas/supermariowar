@@ -28,11 +28,15 @@ public:
     /// The editor is ready for editing the world map.
     bool isReady() const { return !newlyEntered; }
 
+    virtual void loadAssets() {}
     virtual void onEnter();
     virtual bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) = 0;
 
     /// Render the setup screen of the editor mode.
     virtual void renderSetup(CResourceManager& rm) = 0;
+
+    /// Render during map editing
+    virtual void renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx) {}
 
 protected:
     bool newlyEntered = true;
