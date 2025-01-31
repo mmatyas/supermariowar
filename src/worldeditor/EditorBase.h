@@ -28,6 +28,10 @@ public:
     /// The editor is ready for editing the world map.
     bool isReady() const { return !newlyEntered; }
 
+    /// If transparent, will show the map behind the setup screen,
+    /// otherwise it is filled with black.
+    virtual bool isSetupTransparent() const { return false; }
+
     virtual void loadAssets() {}
     virtual void onEnter();
     virtual bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) = 0;

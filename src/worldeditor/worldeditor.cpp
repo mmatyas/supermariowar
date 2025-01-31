@@ -75,6 +75,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 #include "EditorBackground.h"
 #include "EditorStageMarkers.h"
 #include "EditorPaths.h"
+#include "EditorTileType.h"
 #include "EditorWater.h"
 #include "Helpers.h"
 
@@ -319,19 +320,20 @@ int editor_structureforeground();
 int editor_bridges();
 int editor_vehicles();
 int editor_pathsprite();
-int editor_type();
 int editor_stage();
 int editor_start_items();
 
 EditorBackground editorBackground;
 EditorPaths editorPaths;
 EditorStageMarkers editorStageMarkers;
+EditorTileType editorTileType;
 EditorWater editorWater;
 EditorBase* currentEditor = nullptr;
-constexpr std::array<EditorBase*, 4> allEditors {
+constexpr std::array<EditorBase*, 5> allEditors {
     &editorBackground,
     &editorPaths,
     &editorStageMarkers,
+    &editorTileType,
     &editorWater,
 };
 int enterEditor(EditorBase& editor);
@@ -1040,7 +1042,8 @@ int main(int argc, char* argv[])
             break;
 
         case EDITOR_TYPE:
-            state = editor_type();
+            state = enterEditor(editorTileType);
+            edit_mode = 3;
             break;
 
         case EDITOR_STAGE:
@@ -1403,25 +1406,7 @@ int editor_edit()
                         }
 
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
-                            if (edit_mode == 3) {  // selected type
-                                                          // start tiles
-                                if (set_tile <= 1) {
-                                    if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
-                                        g_worldmap.tiles.at(iCol, iRow).iType = 1;
-                                        g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
-                                        updateworldsurface();
-                                    }
-                                } else if (set_tile <= 5) {  // doors
-                                    if (g_worldmap.tiles.at(iCol, iRow).iType != set_tile) {
-                                        // if the door was placed on a start tile
-                                        if (g_worldmap.tiles.at(iCol, iRow).iType == 1)
-                                            g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-
-                                        g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
-                                        updateworldsurface();
-                                    }
-                                }
-                            } else if (edit_mode == 4) {  // selected path sprite
+                            if (edit_mode == 4) {  // selected path sprite
                                 short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
                                 bool fNeedUpdate = false;
 
@@ -1459,17 +1444,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.button.button == SDL_BUTTON_RIGHT) {
-                            if (edit_mode == 3) {  // selected start/door
-                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-                                    updateworldsurface();
-                                } else if (g_worldmap.tiles.at(iCol, iRow).iType <= 5) {
-                                    g_worldmap.tiles.at(iCol, iRow).iType = 0;
-                                    updateworldsurface();
-                                }
-
-                                g_worldmap.tiles.at(iCol, iRow).iType = 0;
-                            } else if (edit_mode == 4) {
+                            if (edit_mode == 4) {
                                 bool fNeedUpdate = false;
 
                                 if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
@@ -1526,24 +1501,7 @@ int editor_edit()
                         }
 
                         if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
-                            if (edit_mode == 3) {  // selected stage/door
-                                if (set_tile <= 1) {
-                                    if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
-                                        g_worldmap.tiles.at(iCol, iRow).iType = 1;
-                                        g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
-                                        updateworldsurface();
-                                    }
-                                } else if (set_tile <= 5) {
-                                    if (g_worldmap.tiles.at(iCol, iRow).iType != set_tile) {
-                                        // if the door was placed on a start tile
-                                        if (g_worldmap.tiles.at(iCol, iRow).iType == 1)
-                                            g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-
-                                        g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
-                                        updateworldsurface();
-                                    }
-                                }
-                            } else if (edit_mode == 4) {
+                            if (edit_mode == 4) {
                                 short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
                                 bool fNeedUpdate = false;
 
@@ -1579,17 +1537,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-                            if (edit_mode == 3) {
-                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-                                    updateworldsurface();
-                                } else if (g_worldmap.tiles.at(iCol, iRow).iType <= 5) {
-                                    g_worldmap.tiles.at(iCol, iRow).iType = 0;
-                                    updateworldsurface();
-                                }
-
-                                g_worldmap.tiles.at(iCol, iRow).iType = 0;
-                            } else if (edit_mode == 4) {
+                            if (edit_mode == 4) {
                                 bool fNeedUpdate = false;
 
                                 if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
@@ -2415,79 +2363,6 @@ int editor_boundary()
     return EDITOR_QUIT;
 }
 
-int editor_type()
-{
-    bool done = false;
-
-    while (!done) {
-        int framestart = SDL_GetTicks();
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                done = true;
-                break;
-            }
-
-            case SDL_KEYDOWN: {
-                edit_mode = 3;  // change to edit mode using doors/start
-                return EDITOR_EDIT;
-
-                break;
-            }
-
-            case SDL_MOUSEBUTTONDOWN: {
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
-                    short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
-
-                    // Start and doors
-                    if (iButtonX >= 0 && iButtonX <= 5 && iButtonY == 0) {
-                        set_tile = iButtonX;
-                    }
-
-                    edit_mode = 3;  // change to edit mode using warps
-
-                    // The user must release the mouse button before trying to add a tile
-                    ignoreclick = true;
-
-                    return EDITOR_EDIT;
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
-
-
-        drawmap(false, TILESIZE);
-        menu_shade.draw(0, 0);
-
-        rm->spr_worldforegroundspecial[0].draw(0, 0, 320, 128, 64, 32);
-        rm->spr_worldforegroundspecial[0].draw(64, 0, 320, 192, 128, 32);
-
-        rm->spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
-
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
-
-        DrawMessage();
-        gfx_flipscreen();
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return EDITOR_QUIT;
-}
 
 int enterEditor(EditorBase& editor)
 {
@@ -2510,7 +2385,12 @@ int enterEditor(EditorBase& editor)
         if (editor.isReady())
             return EDITOR_EDIT;
 
-        SDL_FillRect(screen, NULL, 0x0);
+        if (editor.isSetupTransparent()) {
+            drawmap(false, TILESIZE);
+            menu_shade.draw(0, 0);
+        } else {
+            SDL_FillRect(screen, NULL, 0x0);
+        }
 
         editor.renderSetup(*rm);
 
