@@ -75,6 +75,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 #include "EditorBackground.h"
 #include "EditorStageMarkers.h"
 #include "EditorPaths.h"
+#include "EditorPathSprites.h"
 #include "EditorTileType.h"
 #include "EditorWater.h"
 #include "Helpers.h"
@@ -288,12 +289,7 @@ void drawmap(bool fScreenshot, short iBlockSize);
 bool UpdateForeground(short iCol, short iRow);
 bool UpdateCoastline(short iCol, short iRow);
 bool AutoSetTile(short iCol, short iRow);
-void UpdatePathSprite(short iCol, short iRow);
-void AutoSetPathSprite(short iCol, short iRow);
 short AdjustForeground(short iSprite, short iCol, short iRow);
-
-void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9]);
-bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9]);
 
 void ReadVehiclesIntoEditor();
 void WriteVehiclesIntoWorld();
@@ -319,19 +315,20 @@ int editor_boundary();
 int editor_structureforeground();
 int editor_bridges();
 int editor_vehicles();
-int editor_pathsprite();
 int editor_stage();
 int editor_start_items();
 
 EditorBackground editorBackground;
 EditorPaths editorPaths;
+EditorPathSprites editorPathSprites;
 EditorStageMarkers editorStageMarkers;
 EditorTileType editorTileType;
 EditorWater editorWater;
 EditorBase* currentEditor = nullptr;
-constexpr std::array<EditorBase*, 5> allEditors {
+constexpr std::array<EditorBase*, 6> allEditors {
     &editorBackground,
     &editorPaths,
+    &editorPathSprites,
     &editorStageMarkers,
     &editorTileType,
     &editorWater,
@@ -981,6 +978,7 @@ int main(int argc, char* argv[])
 
     editorBackground.setAutoPaint(fAutoPaint);
     editorPaths.setAutoPaint(fAutoPaint);
+    editorPathSprites.setAutoPaint(fAutoPaint);
 
     printf("entering world editor loop...\n");
     done = false;
@@ -1026,7 +1024,8 @@ int main(int argc, char* argv[])
             break;
 
         case EDITOR_PATHSPRITE:
-            state = editor_pathsprite();
+            state = enterEditor(editorPathSprites);
+            edit_mode = 4;
             break;
 
         case EDITOR_WARP:
@@ -1280,6 +1279,7 @@ int editor_edit()
                         fAutoPaint = !fAutoPaint;
                         editorBackground.setAutoPaint(fAutoPaint);
                         editorPaths.setAutoPaint(fAutoPaint);
+                        editorPathSprites.setAutoPaint(fAutoPaint);
                     }
 
                     if (event.key.keysym.sym == SDLK_r) {
@@ -1406,29 +1406,7 @@ int editor_edit()
                         }
 
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
-                            if (edit_mode == 4) {  // selected path sprite
-                                short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
-                                bool fNeedUpdate = false;
-
-                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != iAdjustedTile) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
-                                    fNeedUpdate = true;
-                                }
-
-                                // Detect if there was a change so we can repaint the screen
-                                if (fAutoPaint) {
-                                    short iOldTiles[9];
-                                    GetForegroundTileValues(iCol, iRow, iOldTiles);
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
-                                    UpdatePathSprite(iCol, iRow);
-
-                                    if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
-                                        fNeedUpdate = true;
-                                }
-
-                                if (fNeedUpdate)
-                                    updateworldsurface();
-                            } else if (edit_mode == 5) {  // selected vehicle
+                            if (edit_mode == 5) {  // selected vehicle
                                 AddVehicleToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 6) {  // selected warp
                                 AddWarpToTile(iCol, iRow, set_tile);
@@ -1444,28 +1422,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.button.button == SDL_BUTTON_RIGHT) {
-                            if (edit_mode == 4) {
-                                bool fNeedUpdate = false;
-
-                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-                                    fNeedUpdate = true;
-                                }
-
-                                // Detect if there was a change so we can repaint the screen
-                                if (fAutoPaint) {
-                                    short iOldTiles[9];
-                                    GetForegroundTileValues(iCol, iRow, iOldTiles);
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-                                    UpdatePathSprite(iCol, iRow);
-
-                                    if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
-                                        fNeedUpdate = true;
-                                }
-
-                                if (fNeedUpdate)
-                                    updateworldsurface();
-                            } else if (edit_mode == 5) {
+                            if (edit_mode == 5) {
                                 RemoveVehicleFromTile(iCol, iRow);
                                 iStageDisplay = -1;
                             } else if (edit_mode == 6) {
@@ -1501,29 +1458,7 @@ int editor_edit()
                         }
 
                         if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
-                            if (edit_mode == 4) {
-                                short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
-                                bool fNeedUpdate = false;
-
-                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != iAdjustedTile) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
-                                    fNeedUpdate = true;
-                                }
-
-                                // Detect if there was a change so we can repaint the screen
-                                if (fAutoPaint) {
-                                    short iOldTiles[9];
-                                    GetForegroundTileValues(iCol, iRow, iOldTiles);
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
-                                    UpdatePathSprite(iCol, iRow);
-
-                                    if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
-                                        fNeedUpdate = true;
-                                }
-
-                                if (fNeedUpdate)
-                                    updateworldsurface();
-                            } else if (edit_mode == 5) {
+                            if (edit_mode == 5) {
                                 AddVehicleToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 6) {
                                 AddWarpToTile(iCol, iRow, set_tile);
@@ -1537,28 +1472,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-                            if (edit_mode == 4) {
-                                bool fNeedUpdate = false;
-
-                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-                                    fNeedUpdate = true;
-                                }
-
-                                // Detect if there was a change so we can repaint the screen
-                                if (fAutoPaint) {
-                                    short iOldTiles[9];
-                                    GetForegroundTileValues(iCol, iRow, iOldTiles);
-                                    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
-                                    UpdatePathSprite(iCol, iRow);
-
-                                    if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
-                                        fNeedUpdate = true;
-                                }
-
-                                if (fNeedUpdate)
-                                    updateworldsurface();
-                            } else if (edit_mode == 5) {  // vehicles
+                            if (edit_mode == 5) {  // vehicles
                                 RemoveVehicleFromTile(iCol, iRow);
                                 iStageDisplay = -1;
                             } else if (edit_mode == 6) {  // Warps
@@ -1806,21 +1720,6 @@ void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9])
         iOldTiles[i] = 0;
 }
 
-bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9])
-{
-    short iIndex = 0;
-    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
-            if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-                if (g_worldmap.tiles.at(iAutoCol, iAutoRow).iForegroundSprite != iOldTiles[iIndex++])
-                    return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 void ReadVehiclesIntoEditor()
 {
     std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
@@ -2004,61 +1903,6 @@ void RemoveWarpFromTile(short iCol, short iRow)
 
         itr++;
     }
-}
-
-void UpdatePathSprite(short iCol, short iRow)
-{
-    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
-            if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-                AutoSetPathSprite(iAutoCol, iAutoRow);
-            }
-        }
-    }
-}
-
-void AutoSetPathSprite(short iCol, short iRow)
-{
-    short iPathTypes[16] = { 6, 4, 3, 5, 6, 4, 1, 5, 6, 2, 3, 5, 6, 4, 3, 5 };
-
-    short iPath = 0;
-    short iNeighborIndex = 0;
-
-    short iForegroundSprite = g_worldmap.tiles.at(iCol, iRow).iForegroundSprite;
-    short iForegroundStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
-
-    if (iForegroundSprite == 0 || iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET)
-        return;
-
-    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
-            if (iAutoCol == iCol && iAutoRow == iRow)
-                continue;
-
-            if ((iAutoCol == iCol && iAutoRow != iRow) || (iAutoCol != iCol && iAutoRow == iRow)) {
-                if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-                    iForegroundSprite = g_worldmap.tiles.at(iAutoCol, iAutoRow).iForegroundSprite;
-
-                    if ((iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) || (iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399) ||
-                        /*(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 179) ||*/
-                        /*(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29) ||*/
-                        (iForegroundSprite >= WORLD_START_SPRITE_OFFSET && iForegroundSprite <= WORLD_START_SPRITE_OFFSET + 1)) {
-                        iPath += 1 << iNeighborIndex;
-                    } else if (iForegroundSprite >= 0 && iForegroundSprite < WORLD_FOREGROUND_STAGE_OFFSET) {
-                        short iPathSprite = iForegroundSprite % WORLD_PATH_SPRITE_SET_SIZE;
-
-                        if (iPathSprite >= 1 && iPathSprite <= 18)
-                            iPath += 1 << iNeighborIndex;
-                    }
-                }
-
-                iNeighborIndex++;
-            }
-        }
-    }
-
-    // #1 == -  2 == |  3 == -o  4 == !  5 == -`  6 == o
-    g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = AdjustForeground(iPathTypes[iPath] + iForegroundStyle * WORLD_PATH_SPRITE_SET_SIZE, iCol, iRow);
 }
 
 // Convert foreground sprite to match the background sprite
@@ -2531,70 +2375,6 @@ int editor_structureforeground()
 
         rm->spr_worldforeground[0].draw(0, 0, 0, 0, 416, 480);
         rm->spr_worldforeground[0].draw(416, 0, 512, 0, 32, 480);
-
-        DrawMessage();
-        gfx_flipscreen();
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return EDITOR_QUIT;
-}
-
-int editor_pathsprite()
-{
-    bool done = false;
-
-    while (!done) {
-        int framestart = SDL_GetTicks();
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                done = true;
-                break;
-            }
-
-            case SDL_KEYDOWN: {
-                edit_mode = 4;
-                return EDITOR_EDIT;
-            }
-
-            case SDL_MOUSEBUTTONDOWN: {
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
-                    short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
-
-                    if (iButtonX >= 0 && iButtonX < 8) {
-                        if (iButtonY >= 0 && iButtonY < 6)
-                            set_tile = iButtonY + 1 + iButtonX * WORLD_PATH_SPRITE_SET_SIZE;
-                    }
-
-                    ignoreclick = true;
-                    edit_mode = 4;
-                    return EDITOR_EDIT;
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
-
-        SDL_FillRect(screen, NULL, 0x0);
-
-        for (short iPath = 0; iPath < 8; iPath++) {
-            rm->spr_worldpaths[0].draw(iPath << 5, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);
-        }
 
         DrawMessage();
         gfx_flipscreen();
