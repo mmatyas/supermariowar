@@ -13,6 +13,7 @@ class gfxFont
 
 		bool init(const std::string& filename);
 		void draw(int x, int y, const std::string& s);
+		void drawC(int x, int y, const char* const s);
 		void drawf(int x, int y, const char *s, ...);
 
 		void drawCentered(int x, int y, const char *text);

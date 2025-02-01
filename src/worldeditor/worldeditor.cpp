@@ -3387,107 +3387,73 @@ int editor_stage()
 
 int display_help()
 {
-    // unsigned int currentChar = 0;
-
     drawmap(false, TILESIZE);
     menu_shade.draw(0, 0);
     rm->menu_font_large.drawCentered(320, 15, "Help");
 
+    constexpr std::array<const char* const, 24> column1 {
+        "Modes:",
+        "[1] - Water Mode",
+        "[2] - Land Mode",
+        "[3] - Stage Objects Mode",
+        "[4] - Path Mode",
+        "[5] - Objects Mode",
+        "[6] - Bridges Mode",
+        "[p] - Connection Mode",
+        "[w] - Warp Mode",
+        "[v] - Vehicle",
+        "      [c] - Copy Vehicle",
+        "[t] - Start and Doors",
+        "[b] - Vehicle Boundaries",
+        "[i] - Initial Powerups",
+        "[e] - Edit Stages",
+        "",
+        "File:",
+        "[n] - New World",
+        "[s] - Save World",
+        "[shift] + [s] - Save As",
+        "[f] - Find World",
+        "[shift] + [f] - New Search",
+        "[pageup] - Go To Previous World",
+        "[pagedown] - Go To Next World",
+    };
     int offsety = 55;
     int offsetx = 30;
-    rm->menu_font_small.draw(offsetx, offsety, "Modes:");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[1] - Water Mode");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[2] - Land Mode");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[3] - Stage Objects Mode");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[4] - Path Mode");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[5] - Objects Mode");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[6] - Bridges Mode");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[p] - Connection Mode");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[w] - Warp Mode");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[v] - Vehicle");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "      [c] - Copy Vehicle");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[t] - Start and Doors");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[b] - Vehicle Boundaries");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[i] - Initial Powerups");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[e] - Edit Stages");
-    offsety += rm->menu_font_small.getHeight() + 20;
+    for (const char* const line : column1) {
+        rm->menu_font_small.drawC(offsetx, offsety, line);
+        offsety += rm->menu_font_small.getHeight() + 2;
+    }
 
-    rm->menu_font_small.draw(offsetx, offsety, "File:");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[n] - New World");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[s] - Save World");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[shift] + [s] - Save As");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[f] - Find World");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[shift] + [f] - New Search");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[pageup] - Go To Previous World");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next World");
-
+    constexpr std::array<const char* const, 13> column2 {
+        "Place Tiles:",
+        "[Left Mouse Button] - Place Item",
+        "[Right Mouse Button] - Remove Item",
+        "",
+        // "Move Mode:",
+        // "[Right Mouse Button] - Select Area",
+        // "[Left Mouse Button] - Unselect Area",
+        // "Select And Drag - Move Selections",
+        // "Hold [shift] - Multiple Selections",
+        // "Hold [ctrl] - Freehand Selections",
+        // "[delete] - Delete Selection",
+        // "[c] - Copy Selection",
+        // "",
+        "Miscellaneous:",
+        "[r] - Change Music Category",
+        "[Arrow Keys] - Navigate World",
+        "[a] - Automatic Path/Land",
+        "[k] - Resize World",
+        "[ctrl] + [delete] - Clear All",
+        "[insert] - Screenshot",
+        "[alt] + [enter] - Full Screen/Window",
+        "[space] - Toggle Stage Previews",
+    };
     offsetx = 300;
     offsety = 55;
-
-    rm->menu_font_small.draw(offsetx, offsety, "Place Tiles:");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Place Item");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Remove Item");
-    offsety += rm->menu_font_small.getHeight() + 20;
-
-    /*
-    rm->menu_font_small.draw(offsetx, offsety, "Move Mode:");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Select Area");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Unselect Area");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "Select And Drag - Move Selections");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "Hold [shift] - Multiple Selections");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "Hold [ctrl] - Freehand Selections");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[delete] - Delete Selection");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[c] - Copy Selection");
-    offsety += rm->menu_font_small.getHeight() + 20;
-    */
-
-    rm->menu_font_small.draw(offsetx, offsety, "Miscellaneous:");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[r] - Change Music Category");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[Arrow Keys] - Navigate World");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[a] - Automatic Path/Land");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[k] - Resize World");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[insert] - Screenshot");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[alt] + [enter] - Full Screen/Window");
-    offsety += rm->menu_font_small.getHeight() + 2;
-    rm->menu_font_small.draw(offsetx, offsety, "[space] - Toggle Stage Previews");
+    for (const char* const line : column2) {
+        rm->menu_font_small.draw(offsetx, offsety, line);
+        offsety += rm->menu_font_small.getHeight() + 2;
+    }
 
     gfx_flipscreen();
 

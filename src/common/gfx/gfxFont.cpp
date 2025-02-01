@@ -46,12 +46,17 @@ bool gfxFont::init(const std::string& filename)
     return true;
 }
 
+void gfxFont::drawC(int x, int y, const char* const s)
+{
+    SFont_Write(blitdest, m_font, x, y, s);
+}
+
 void gfxFont::draw(int x, int y, const std::string& s)
 {
     //if (y + getHeight() < 0)
     //	return;
 
-    SFont_Write(blitdest, m_font, x, y, s.c_str());
+    drawC(x, y, s.c_str());
 }
 
 void gfxFont::drawChopRight(int x, int y, int width, const char *s)
