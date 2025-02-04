@@ -51,6 +51,8 @@ add_executable(smw-worldedit WIN32
 	EditorTileType.cpp
 	EditorWater.h
 	EditorWater.cpp
+	EditorWarps.h
+	EditorWarps.cpp
 	Helpers.h
 	Helpers.cpp
 )

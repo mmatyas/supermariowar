@@ -4,8 +4,6 @@
 #include "ResourceManager.h"
 #include "world.h"
 
-extern WorldList* worldlist;  // from global.cpp
-
 
 void EditorTileType::onSetupKeypress(const SDL_KeyboardEvent& event)
 {
@@ -37,7 +35,6 @@ void EditorTileType::renderSetup(CResourceManager& rm)
     rm.spr_worldforegroundspecial[0].draw(0, 0, 320, 128, 64, 32);
     rm.spr_worldforegroundspecial[0].draw(64, 0, 320, 192, 128, 32);
     rm.spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
-    rm.menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 }
 
 

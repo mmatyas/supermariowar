@@ -78,6 +78,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 #include "EditorPathSprites.h"
 #include "EditorTileType.h"
 #include "EditorWater.h"
+#include "EditorWarps.h"
 #include "Helpers.h"
 
 // TODO: Fix JS related problems.
@@ -129,8 +130,6 @@ SDL_Event event;
 gfxSprite spr_dialog;
 gfxSprite menu_shade;
 gfxSprite spr_largedialog;
-
-gfxSprite spr_warps[3];
 
 gfxSprite spr_vehicleicons;
 
@@ -296,8 +295,6 @@ void WriteVehiclesIntoWorld();
 void AddVehicleToTile(short iCol, short iRow, short iType);
 void RemoveVehicleFromTile(short iCol, short iRow);
 
-void ReadWarpsIntoEditor();
-void WriteWarpsIntoWorld();
 void AddWarpToTile(short iCol, short iRow, short iType);
 void RemoveWarpFromTile(short iCol, short iRow);
 
@@ -310,7 +307,6 @@ int new_world();
 int resize_world();
 
 int editor_edit();
-int editor_warp();
 int editor_boundary();
 int editor_structureforeground();
 int editor_bridges();
@@ -324,13 +320,15 @@ EditorPathSprites editorPathSprites;
 EditorStageMarkers editorStageMarkers;
 EditorTileType editorTileType;
 EditorWater editorWater;
+EditorWarps editorWarps;
 EditorBase* currentEditor = nullptr;
-constexpr std::array<EditorBase*, 6> allEditors {
+constexpr std::array<EditorBase*, 7> allEditors {
     &editorBackground,
     &editorPaths,
     &editorPathSprites,
     &editorStageMarkers,
     &editorTileType,
+    &editorWarps,
     &editorWater,
 };
 int enterEditor(EditorBase& editor);
@@ -384,9 +382,6 @@ extern SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS];
 
 // Vehicle stuff
 std::vector<WorldVehicle*> vehiclelist;
-
-// Warp stuff
-std::vector<WorldWarp*> warplist;
 
 bool g_fFullScreen = false;
 bool g_fShowStagePreviews = true;
@@ -541,10 +536,6 @@ int main(int argc, char* argv[])
     game_values.toplayer = true;
 
     printf("\n---------------- loading graphics ----------------\n");
-
-    spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), colors::MAGENTA);
-    spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), colors::MAGENTA);
-    spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), colors::MAGENTA);
 
     rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 128);
 
@@ -1029,7 +1020,8 @@ int main(int argc, char* argv[])
             break;
 
         case EDITOR_WARP:
-            state = editor_warp();
+            state = enterEditor(editorWarps);
+            edit_mode = 6;
             break;
 
         case EDITOR_START_ITEMS:
@@ -1092,7 +1084,6 @@ int main(int argc, char* argv[])
     printf("\n---------------- save world ----------------\n");
 
     WriteVehiclesIntoWorld();
-    WriteWarpsIntoWorld();
     g_worldmap.Save(convertPath("worlds/ZZworldeditor.txt").c_str());
 
     {
@@ -1408,8 +1399,6 @@ int editor_edit()
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
                             if (edit_mode == 5) {  // selected vehicle
                                 AddVehicleToTile(iCol, iRow, set_tile);
-                            } else if (edit_mode == 6) {  // selected warp
-                                AddWarpToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 8) {  // boundary
                                 g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = set_tile;
                             } else if (edit_mode == 9) {
@@ -1425,8 +1414,6 @@ int editor_edit()
                             if (edit_mode == 5) {
                                 RemoveVehicleFromTile(iCol, iRow);
                                 iStageDisplay = -1;
-                            } else if (edit_mode == 6) {
-                                RemoveWarpFromTile(iCol, iRow);
                             } else if (edit_mode == 8) {  // boundary
                                 g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = 0;
                             } else if (edit_mode == 9) {  // stage
@@ -1460,8 +1447,6 @@ int editor_edit()
                         if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
                             if (edit_mode == 5) {
                                 AddVehicleToTile(iCol, iRow, set_tile);
-                            } else if (edit_mode == 6) {
-                                AddWarpToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 9) {  // stage
                                                           // if the stage was placed on a start tile
                                 if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
@@ -1475,8 +1460,6 @@ int editor_edit()
                             if (edit_mode == 5) {  // vehicles
                                 RemoveVehicleFromTile(iCol, iRow);
                                 iStageDisplay = -1;
-                            } else if (edit_mode == 6) {  // Warps
-                                RemoveWarpFromTile(iCol, iRow);
                             } else if (edit_mode == 9) {  // stage
                                 g_worldmap.tiles.at(iCol, iRow).iType = 0;
                                 iStageDisplay = -1;
@@ -1561,30 +1544,7 @@ int editor_edit()
             if (currentEditor) {
                 currentEditor->renderEdit(g_worldmap, {draw_offset_col, draw_offset_row}, {draw_offset_x, draw_offset_y});
             }
-            if (edit_mode == 6) {  // draw warps
-                std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
-                while (itr != lim) {
-                    WorldWarp* warp = *itr;
-
-                    short ix, iy;
-
-                    if (warp->posA.x >= 0) {
-                        ix = (warp->posA.x - draw_offset_col) * TILESIZE + draw_offset_x;
-                        iy = (warp->posA.y - draw_offset_row) * TILESIZE + draw_offset_y;
-
-                        spr_warps[0].draw(ix, iy, warp->id << 5, 0, 32, 32);
-                    }
-
-                    if (warp->posB.x >= 0) {
-                        ix = (warp->posB.x - draw_offset_col) * TILESIZE + draw_offset_x;
-                        iy = (warp->posB.y - draw_offset_row) * TILESIZE + draw_offset_y;
-
-                        spr_warps[0].draw(ix, iy, warp->id << 5, 0, 32, 32);
-                    }
-
-                    itr++;
-                }
-            } else if (edit_mode == 8) {  // draw boundaries
+            if (edit_mode == 8) {  // draw boundaries
                 int color = SDL_MapRGB(blitdest->format, 255, 0, 255);
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
@@ -1818,93 +1778,6 @@ void RemoveVehicleFromTile(short iCol, short iRow)
     }
 }
 
-void ReadWarpsIntoEditor()
-{
-    std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
-    while (itr != lim) {
-        delete (*itr);
-        itr++;
-    }
-
-    warplist.clear();
-
-    for (const WorldWarp& warp : g_worldmap.warps) {
-        warplist.push_back(new WorldWarp(warp));
-    }
-}
-
-void WriteWarpsIntoWorld()
-{
-    // Cleanup old vehicles
-    g_worldmap.warps.clear();
-
-    // Insert new vehicles
-    g_worldmap.warps.reserve(warplist.size());
-
-    for (const WorldWarp* warp : warplist) {
-        g_worldmap.warps.emplace_back(*warp);
-    }
-}
-
-void AddWarpToTile(short iCol, short iRow, short iType)
-{
-    std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
-    WorldWarp* newwarp = NULL;
-    while (itr != lim) {
-        WorldWarp* warp = *itr;
-        if (warp->id == iType) {
-            newwarp = warp;
-            break;
-        }
-
-        itr++;
-    }
-
-    if (!newwarp) {
-        newwarp = new WorldWarp(iType, { iCol, iRow }, { -1, -1 });
-        warplist.push_back(newwarp);
-    } else {
-        if (newwarp->posA.x == -1) {
-            newwarp->posA = { iCol, iRow };
-        } else if (newwarp->posA.x != iCol || newwarp->posA.y != iRow) {
-            newwarp->posB = { iCol, iRow };
-        }
-    }
-}
-
-void RemoveWarpFromTile(short iCol, short iRow)
-{
-    std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
-    while (itr != lim) {
-        WorldWarp* warp = *itr;
-        if (warp->posA.x == iCol && warp->posA.y == iRow) {
-            if (warp->posB.x == -1 && warp->posB.y == -1) {
-                delete (*itr);
-
-                itr = warplist.erase(itr);
-                lim = warplist.end();
-
-                return;
-            } else {
-                warp->posA = { -1, -1 };
-            }
-        } else if (warp->posB.x == iCol && warp->posB.y == iRow) {
-            if (warp->posA.x == -1 && warp->posA.y == -1) {
-                delete (*itr);
-
-                itr = warplist.erase(itr);
-                lim = warplist.end();
-
-                return;
-            } else {
-                warp->posB = { -1, -1 };
-            }
-        }
-
-        itr++;
-    }
-}
-
 // Convert foreground sprite to match the background sprite
 short AdjustForeground(short fgSprite, short iCol, short iRow)
 {
@@ -1939,74 +1812,6 @@ void drawmap(bool fScreenshot, short iBlockSize)
         SDL_FillRect(screen, NULL, 0x0);
 
     SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
-}
-
-int editor_warp()
-{
-    bool done = false;
-
-    while (!done) {
-        int framestart = SDL_GetTicks();
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                done = true;
-                break;
-            }
-
-            case SDL_KEYDOWN: {
-                edit_mode = 6;  // change to edit mode using warps
-                return EDITOR_EDIT;
-            }
-
-            case SDL_MOUSEBUTTONDOWN: {
-                short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
-                short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
-
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    if (iButtonX >= 0 && iButtonX <= 9 && iButtonY == 0) {
-                        set_tile = iButtonX;
-
-                        edit_mode = 6;  // change to edit mode using warps
-
-                        // The user must release the mouse button before trying to add a tile
-                        ignoreclick = true;
-
-                        return EDITOR_EDIT;
-                    }
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
-
-
-        drawmap(false, TILESIZE);
-        menu_shade.draw(0, 0);
-
-        spr_warps[0].draw(0, 0, 0, 0, 320, 32);
-
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
-
-        DrawMessage();
-        gfx_flipscreen();
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return EDITOR_QUIT;
 }
 
 int editor_start_items()
@@ -3652,7 +3457,6 @@ void loadcurrentworld()
     game_values.worldindex = worldlist->currentIndex();
     g_worldmap = WorldMap(worldlist->at(game_values.worldindex), TILESIZE);
     ReadVehiclesIntoEditor();
-    ReadWarpsIntoEditor();
 
     draw_offset_col = 0;
     draw_offset_row = 0;
@@ -3692,7 +3496,6 @@ int savecurrentworld()
     SetDisplayMessage(60, "Saved", "Your world has", "been saved.", "");
 
     WriteVehiclesIntoWorld();
-    WriteWarpsIntoWorld();
     g_worldmap.Save(worldlist->at(game_values.worldindex));
     return 0;
 }
@@ -3746,14 +3549,6 @@ int new_world()
 
         vehiclelist.clear();
 
-        std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
-        while (itrWarp != limWarp) {
-            delete (*itrWarp);
-            itrWarp++;
-        }
-
-        warplist.clear();
-
         g_worldmap = WorldMap(iWidth, iHeight);
         worldlist->add(convertPath(strcat(worldLocation, strcat(fileName, ".txt"))).c_str());
         worldlist->find(fileName);
@@ -3790,13 +3585,6 @@ int resize_world()
             } else
                 itrVehicle++;
         }
-
-        std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
-        while (itrWarp != limWarp) {
-            delete (*itrWarp);
-            itrWarp++;
-        }
-        warplist.clear();
 
         g_worldmap.Resize(iWidth, iHeight);
 
@@ -3839,18 +3627,7 @@ void takescreenshot()
         }
 
         // Draw warps to screenshot
-        std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
-        while (itrWarp != limWarp) {
-            WorldWarp* warp = *itrWarp;
-
-            if (warp->posA.x >= 0)
-                spr_warps[iScreenshotSize].draw(warp->posA.x * iTileSize, warp->posA.y * iTileSize, warp->id * iTileSize, 0, iTileSize, iTileSize);
-
-            if (warp->posB.x >= 0)
-                spr_warps[iScreenshotSize].draw(warp->posB.x * iTileSize, warp->posB.y * iTileSize, warp->id * iTileSize, 0, iTileSize, iTileSize);
-
-            itrWarp++;
-        }
+        editorWarps.renderScreenshot(g_worldmap, iScreenshotSize);
 
         // Save the screenshot with the same name as the map file
         std::string szSaveFile("worlds/screenshots/");

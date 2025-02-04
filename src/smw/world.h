@@ -202,6 +202,9 @@ public:
     const Grid<WorldMapTile>& getTiles() const { return tiles; }
     Grid<WorldMapTile>& getTiles() { return tiles; }
 
+    const std::vector<WorldWarp>& getWarps() const { return warps; }
+    std::vector<WorldWarp>& getWarps() { return warps; }
+
 private:
     void SetTileConnections(short iCol, short iRow);
 
