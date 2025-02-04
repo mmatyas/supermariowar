@@ -973,6 +973,8 @@ void WorldMap::Resize(short w, short h)
 
     // Apply the new tiles
     tiles = std::move(newTiles);
+
+    // TODO: Update warps
 }
 
 bool WorldMap::Update(bool * fPlayerVehicleCollision)
