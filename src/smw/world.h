@@ -128,6 +128,8 @@ class WorldVehicle : public WorldMovingObject
 };
 
 struct WorldWarp {
+    static constexpr Vec2s NULL_POS {-1, -1};
+
     WorldWarp(short id, Vec2s posA, Vec2s posB);
 
     Vec2s getOtherSide(Vec2s target) const;

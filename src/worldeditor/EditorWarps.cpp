@@ -8,8 +8,6 @@
 
 
 namespace {
-constexpr Vec2s NULL_WARP_POS(-1, -1);
-
 void addWarpToTile(WorldMap& world, Vec2s pos, short newWarpId)
 {
     const auto it = std::find_if(
@@ -19,13 +17,13 @@ void addWarpToTile(WorldMap& world, Vec2s pos, short newWarpId)
 
     if (it != world.getWarps().cend()) {
         WorldWarp& warp = *it;
-        if (warp.posA == NULL_WARP_POS) {
+        if (warp.posA == WorldWarp::NULL_POS) {
             warp.posA = pos;
         } else if (warp.posA != pos) {
             warp.posB = pos;
         }
     } else {
-        world.getWarps().emplace_back(newWarpId, pos, NULL_WARP_POS);
+        world.getWarps().emplace_back(newWarpId, pos, WorldWarp::NULL_POS);
     }
 }
 
@@ -33,15 +31,15 @@ void removeWarpFromTile(WorldMap& world, Vec2s pos)
 {
     for (WorldWarp& warp : world.getWarps()) {
         if (warp.posA == pos)
-            warp.posA = NULL_WARP_POS;
+            warp.posA = WorldWarp::NULL_POS;
         if (warp.posB == pos)
-            warp.posB = NULL_WARP_POS;
+            warp.posB = WorldWarp::NULL_POS;
     }
 
     const auto erase_from = std::remove_if(
         world.getWarps().begin(),
         world.getWarps().end(),
-        [](const WorldWarp& warp) { return warp.posA == NULL_WARP_POS && warp.posB == NULL_WARP_POS; });
+        [](const WorldWarp& warp) { return warp.posA == WorldWarp::NULL_POS && warp.posB == WorldWarp::NULL_POS; });
     world.getWarps().erase(erase_from, world.getWarps().end());
 }
 }  // namespace
@@ -89,11 +87,11 @@ void EditorWarps::renderSetup(CResourceManager& rm)
 void EditorWarps::renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx)
 {
     for (const WorldWarp& warp : world.getWarps()) {
-        if (warp.posA.x >= 0) {
+        if (warp.posA != WorldWarp::NULL_POS) {
             const Vec2s pos = (warp.posA - offsetTile) * TILESIZE + offsetPx;
             m_sprWarps[0].draw(pos.x, pos.y, warp.id * 32, 0, 32, 32);
         }
-        if (warp.posB.x >= 0) {
+        if (warp.posB != WorldWarp::NULL_POS) {
             const Vec2s pos = (warp.posB - offsetTile) * TILESIZE + offsetPx;
             m_sprWarps[0].draw(pos.x, pos.y, warp.id * 32, 0, 32, 32);
         }
@@ -108,9 +106,9 @@ void EditorWarps::renderScreenshot(const WorldMap& world, short screenshotSize)
 
     const short tileSize = TILE_SIZES[screenshotSize];
     for (const WorldWarp& warp : world.getWarps()) {
-        if (warp.posA != NULL_WARP_POS)
+        if (warp.posA != WorldWarp::NULL_POS)
             m_sprWarps[screenshotSize].draw(warp.posA.x * tileSize, warp.posA.y * tileSize, warp.id * tileSize, 0, tileSize, tileSize);
-        if (warp.posB != NULL_WARP_POS)
+        if (warp.posB != WorldWarp::NULL_POS)
             m_sprWarps[screenshotSize].draw(warp.posB.x * tileSize, warp.posB.y * tileSize, warp.id * tileSize, 0, tileSize, tileSize);
     }
 }

@@ -974,7 +974,20 @@ void WorldMap::Resize(short w, short h)
     // Apply the new tiles
     tiles = std::move(newTiles);
 
-    // TODO: Update warps
+    // Clear warp ends outside the world
+    for (WorldWarp& warp : warps) {
+        if (iWidth <= warp.posA.x || iHeight <= warp.posA.y)
+            warp.posA = WorldWarp::NULL_POS;
+        if (iWidth <= warp.posB.x || iHeight <= warp.posB.y)
+            warp.posB = WorldWarp::NULL_POS;
+    }
+
+    // Remove warps fully outside the world
+    const auto erase_from = std::remove_if(
+        warps.begin(),
+        warps.end(),
+        [](const WorldWarp& warp) { return warp.posA == WorldWarp::NULL_POS && warp.posB == WorldWarp::NULL_POS; });
+    warps.erase(erase_from, warps.end());
 }
 
 bool WorldMap::Update(bool * fPlayerVehicleCollision)
