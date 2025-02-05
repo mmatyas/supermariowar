@@ -84,7 +84,7 @@ void EditorWarps::renderSetup(CResourceManager& rm)
 }
 
 
-void EditorWarps::renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx)
+void EditorWarps::renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx, CResourceManager& rm)
 {
     for (const WorldWarp& warp : world.getWarps()) {
         if (warp.posA != WorldWarp::NULL_POS) {

@@ -19,7 +19,7 @@ protected:
     void renderSetup(CResourceManager& rm) override;
 
     bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) override;
-    void renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx) override;
+    void renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx, CResourceManager& rm) override;
 
 private:
     gfxSprite m_sprPath;

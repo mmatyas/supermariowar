@@ -2,18 +2,9 @@
 
 #include "EditorBase.h"
 
-#include "gfx/gfxSprite.h"
 
-#include <array>
-
-
-class EditorWarps : public EditorBase {
-public:
-    void renderScreenshot(const WorldMap& world, short screenshotSize);
-
+class EditorVehicleBoundaries : public EditorBase {
 protected:
-    void loadAssets() override;
-
     bool isSetupTransparent() const override { return true; }
     void renderSetup(CResourceManager& rm) override;
     void onSetupKeypress(const SDL_KeyboardEvent& event) override;
@@ -23,6 +14,5 @@ protected:
     bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) override;
 
 private:
-    std::array<gfxSprite, 3> m_sprWarps;
     short m_selectedTileId = 0;
 };

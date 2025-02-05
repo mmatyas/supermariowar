@@ -40,7 +40,7 @@ public:
     virtual void renderSetup(CResourceManager& rm) = 0;
 
     /// Render during map editing
-    virtual void renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx) {}
+    virtual void renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx, CResourceManager& rm) {}
 
 protected:
     bool newlyEntered = true;

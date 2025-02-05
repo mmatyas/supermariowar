@@ -49,6 +49,8 @@ add_executable(smw-worldedit WIN32
 	EditorStageMarkers.cpp
 	EditorTileType.h
 	EditorTileType.cpp
+	EditorVehicleBoundaries.h
+	EditorVehicleBoundaries.cpp
 	EditorWater.h
 	EditorWater.cpp
 	EditorWarps.h

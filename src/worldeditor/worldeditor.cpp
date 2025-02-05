@@ -77,6 +77,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 #include "EditorPaths.h"
 #include "EditorPathSprites.h"
 #include "EditorTileType.h"
+#include "EditorVehicleBoundaries.h"
 #include "EditorWater.h"
 #include "EditorWarps.h"
 #include "Helpers.h"
@@ -307,7 +308,6 @@ int new_world();
 int resize_world();
 
 int editor_edit();
-int editor_boundary();
 int editor_structureforeground();
 int editor_bridges();
 int editor_vehicles();
@@ -319,18 +319,20 @@ EditorPaths editorPaths;
 EditorPathSprites editorPathSprites;
 EditorStageMarkers editorStageMarkers;
 EditorTileType editorTileType;
+EditorVehicleBoundaries editorVehicleBoundaries;
 EditorWater editorWater;
 EditorWarps editorWarps;
-EditorBase* currentEditor = nullptr;
-constexpr std::array<EditorBase*, 7> allEditors {
+constexpr std::array<EditorBase*, 8> allEditors {
     &editorBackground,
     &editorPaths,
     &editorPathSprites,
     &editorStageMarkers,
     &editorTileType,
+    &editorVehicleBoundaries,
     &editorWarps,
     &editorWater,
 };
+EditorBase* currentEditor = nullptr;
 int enterEditor(EditorBase& editor);
 
 void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMouseY);
@@ -1029,7 +1031,8 @@ int main(int argc, char* argv[])
             break;
 
         case EDITOR_BOUNDARY:
-            state = editor_boundary();
+            state = enterEditor(editorVehicleBoundaries);
+            edit_mode = 8;
             break;
 
         case EDITOR_TYPE:
@@ -1399,8 +1402,6 @@ int editor_edit()
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
                             if (edit_mode == 5) {  // selected vehicle
                                 AddVehicleToTile(iCol, iRow, set_tile);
-                            } else if (edit_mode == 8) {  // boundary
-                                g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = set_tile;
                             } else if (edit_mode == 9) {
                                 // if the stage was placed on a start tile
                                 if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
@@ -1414,8 +1415,6 @@ int editor_edit()
                             if (edit_mode == 5) {
                                 RemoveVehicleFromTile(iCol, iRow);
                                 iStageDisplay = -1;
-                            } else if (edit_mode == 8) {  // boundary
-                                g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = 0;
                             } else if (edit_mode == 9) {  // stage
                                 g_worldmap.tiles.at(iCol, iRow).iType = 0;
                                 iStageDisplay = -1;
@@ -1542,25 +1541,9 @@ int editor_edit()
             spr_dialog.draw(fSelectedYes ? 250 : 326, 250, 192, 0, 64, 32);
         } else {
             if (currentEditor) {
-                currentEditor->renderEdit(g_worldmap, {draw_offset_col, draw_offset_row}, {draw_offset_x, draw_offset_y});
+                currentEditor->renderEdit(g_worldmap, {draw_offset_col, draw_offset_row}, {draw_offset_x, draw_offset_y}, *rm);
             }
-            if (edit_mode == 8) {  // draw boundaries
-                int color = SDL_MapRGB(blitdest->format, 255, 0, 255);
-                for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
-                    for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
-                        short iBoundary = g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary - 1;
-
-                        if (iBoundary >= 0) {
-                            short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
-                            short iy = (iRow - draw_offset_row) * TILESIZE + draw_offset_y;
-                            SDL_Rect r = { ix, iy, 32, 32 };
-                            SDL_FillRect(blitdest, &r, color);
-
-                            rm->spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
-                        }
-                    }
-                }
-            } else if (edit_mode == 9) {  // draw stages
+            if (edit_mode == 9) {  // draw stages
                 int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
@@ -1922,78 +1905,6 @@ int editor_start_items()
             else
                 rm->spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
         }
-
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
-
-        DrawMessage();
-        gfx_flipscreen();
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return EDITOR_QUIT;
-}
-
-int editor_boundary()
-{
-    bool done = false;
-
-    while (!done) {
-        int framestart = SDL_GetTicks();
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                done = true;
-                break;
-            }
-
-            case SDL_KEYDOWN: {
-                edit_mode = 8;  // change to edit mode using warps
-                return EDITOR_EDIT;
-            }
-
-            case SDL_MOUSEBUTTONDOWN: {
-                short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
-                short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
-
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    if (iButtonX >= 0 && iButtonX <= 9 && iButtonY >= 0 && iButtonY <= 9) {
-                        set_tile = iButtonX + 10 * iButtonY + 1;
-
-                        edit_mode = 8;  // change to edit mode using warps
-
-                        // The user must release the mouse button before trying to add a tile
-                        ignoreclick = true;
-
-                        return EDITOR_EDIT;
-                    }
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
-
-
-        drawmap(false, TILESIZE);
-        menu_shade.draw(0, 0);
-
-        int color = SDL_MapRGB(blitdest->format, 255, 0, 255);
-        SDL_Rect r = { 0, 0, 320, 320 };
-        SDL_FillRect(blitdest, &r, color);
-
-        rm->spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
 
         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 

@@ -100,7 +100,7 @@ void EditorPaths::renderSetup(CResourceManager& rm)
 }
 
 
-void EditorPaths::renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx)
+void EditorPaths::renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx, CResourceManager& rm)
 {
     for (short row = offsetTile.y; row < offsetTile.y + 15 && row < world.h(); row++) {
         for (short col = offsetTile.x; col <= offsetTile.x + 20 && col < world.w(); col++) {
