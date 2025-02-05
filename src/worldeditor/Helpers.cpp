@@ -221,3 +221,16 @@ bool autoSetTile(WorldMap& world, Vec2s center)
 
     return false;
 }
+
+
+bool setTileFgWithConnection(WorldMapTile& tile, short newTileId)
+{
+    const bool changed = tile.iForegroundSprite != newTileId;
+    if (tile.iForegroundSprite != newTileId) {
+        tile.iForegroundSprite = newTileId;
+
+        if (WORLD_BRIDGE_SPRITE_OFFSET <= newTileId && newTileId <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
+            tile.iConnectionType = newTileId - WORLD_BRIDGE_SPRITE_OFFSET + 12;
+    }
+    return changed;
+}

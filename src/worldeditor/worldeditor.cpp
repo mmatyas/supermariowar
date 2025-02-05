@@ -73,6 +73,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 #endif
 
 #include "EditorBackground.h"
+#include "EditorBridges.h"
 #include "EditorStageMarkers.h"
 #include "EditorPaths.h"
 #include "EditorPathSprites.h"
@@ -309,12 +310,12 @@ int resize_world();
 
 int editor_edit();
 int editor_structureforeground();
-int editor_bridges();
 int editor_vehicles();
 int editor_stage();
 int editor_start_items();
 
 EditorBackground editorBackground;
+EditorBridges editorBridges;
 EditorPaths editorPaths;
 EditorPathSprites editorPathSprites;
 EditorStageMarkers editorStageMarkers;
@@ -322,8 +323,9 @@ EditorTileType editorTileType;
 EditorVehicleBoundaries editorVehicleBoundaries;
 EditorWater editorWater;
 EditorWarps editorWarps;
-constexpr std::array<EditorBase*, 8> allEditors {
+constexpr std::array<EditorBase*, 9> allEditors {
     &editorBackground,
+    &editorBridges,
     &editorPaths,
     &editorPathSprites,
     &editorStageMarkers,
@@ -1004,7 +1006,8 @@ int main(int argc, char* argv[])
             break;
 
         case EDITOR_BRIDGES:
-            state = editor_bridges();
+            state = enterEditor(editorBridges);
+            edit_mode = 1;
             break;
 
         case EDITOR_VEHICLES:
@@ -1953,72 +1956,6 @@ int enterEditor(EditorBase& editor)
         }
 
         editor.renderSetup(*rm);
-
-        DrawMessage();
-        gfx_flipscreen();
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return EDITOR_QUIT;
-}
-
-
-int editor_bridges()
-{
-    bool done = false;
-
-    while (!done) {
-        int framestart = SDL_GetTicks();
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                done = true;
-                break;
-            }
-
-            case SDL_KEYDOWN: {
-                edit_mode = 1;
-                return EDITOR_EDIT;
-
-                break;
-            }
-
-            case SDL_MOUSEBUTTONDOWN: {
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
-                    short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
-
-                    if (iButtonX >= 0 && iButtonX < 4) {
-                        if (iButtonY >= 0 && iButtonY < 1) {
-                            set_tile = WORLD_BRIDGE_SPRITE_OFFSET + iButtonX;
-
-                            ignoreclick = true;
-                            edit_mode = 1;
-                            return EDITOR_EDIT;
-                        }
-                    }
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
-
-        SDL_FillRect(screen, NULL, 0x0);
-
-        rm->spr_worldforegroundspecial[0].draw(0, 0, 320, 224, 128, 32);
 
         DrawMessage();
         gfx_flipscreen();

@@ -1,5 +1,6 @@
 #include "EditorStageMarkers.h"
 
+#include "Helpers.h"
 #include "ResourceManager.h"
 #include "world.h"
 
@@ -50,14 +51,5 @@ bool EditorStageMarkers::onTileClicked(WorldMap& world, Vec2s pos, uint8_t butto
 {
     WorldMapTile& tile = world.getTiles().at(pos.x, pos.y);
     const short newTileId = (button == SDL_BUTTON_LEFT) ? m_selectedTileId : 0;
-
-    bool changed = false;
-    if (tile.iForegroundSprite != newTileId) {
-        tile.iForegroundSprite = newTileId;
-        changed = true;
-
-        if (newTileId >= WORLD_BRIDGE_SPRITE_OFFSET && newTileId <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
-            tile.iConnectionType = newTileId - WORLD_BRIDGE_SPRITE_OFFSET + 12;
-    }
-    return changed;
+    return setTileFgWithConnection(tile, newTileId);
 }

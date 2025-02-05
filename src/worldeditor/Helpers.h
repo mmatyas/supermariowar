@@ -12,3 +12,4 @@ short adjustedForeground(short fgSprite, short bgSprite);
 bool updateForeground(WorldMapTile& tile);
 bool updateCoastline(WorldMap& world, Vec2s center);
 bool autoSetTile(WorldMap& world, Vec2s center);
+bool setTileFgWithConnection(WorldMapTile& tile, short newTileId);
