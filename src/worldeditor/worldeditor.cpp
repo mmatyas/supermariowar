@@ -1945,7 +1945,7 @@ int enterEditor(EditorBase& editor)
                 continue;
             }
 
-            editor.handleSetupInput(event);
+            editor.handleSetupInput(event, g_worldmap);
         }
 
         if (editor.isReady())
@@ -1958,7 +1958,7 @@ int enterEditor(EditorBase& editor)
             SDL_FillRect(screen, NULL, 0x0);
         }
 
-        editor.renderSetup(*rm);
+        editor.renderSetup(*rm, g_worldmap);
 
         DrawMessage();
         gfx_flipscreen();

@@ -6,7 +6,7 @@
 extern SDL_Surface* blitdest;
 
 
-void EditorVehicleBoundaries::onSetupKeypress(const SDL_KeyboardEvent& event)
+void EditorVehicleBoundaries::onSetupKeypress(const SDL_KeyboardEvent& event, WorldMap& world)
 {
     switch (event.keysym.sym) {
     case SDLK_ESCAPE:
@@ -16,7 +16,7 @@ void EditorVehicleBoundaries::onSetupKeypress(const SDL_KeyboardEvent& event)
 }
 
 
-void EditorVehicleBoundaries::onSetupMouseClick(const SDL_MouseButtonEvent& event)
+void EditorVehicleBoundaries::onSetupMouseClick(const SDL_MouseButtonEvent& event, WorldMap& world)
 {
     if (event.button != SDL_BUTTON_LEFT)
         return;
@@ -31,7 +31,7 @@ void EditorVehicleBoundaries::onSetupMouseClick(const SDL_MouseButtonEvent& even
 }
 
 
-void EditorVehicleBoundaries::renderSetup(CResourceManager& rm)
+void EditorVehicleBoundaries::renderSetup(CResourceManager& rm, const WorldMap& world)
 {
     const int magenta = SDL_MapRGB(blitdest->format, 255, 0, 255);
     SDL_Rect r = { 0, 0, 320, 320 };

@@ -5,7 +5,7 @@
 #include "world.h"
 
 
-void EditorBackground::onSetupKeypress(const SDL_KeyboardEvent& event)
+void EditorBackground::onSetupKeypress(const SDL_KeyboardEvent& event, WorldMap& world)
 {
     switch (event.keysym.sym) {
         case SDLK_ESCAPE:
@@ -19,7 +19,7 @@ void EditorBackground::onSetupKeypress(const SDL_KeyboardEvent& event)
 }
 
 
-void EditorBackground::onSetupMouseClick(const SDL_MouseButtonEvent& event)
+void EditorBackground::onSetupMouseClick(const SDL_MouseButtonEvent& event, WorldMap& world)
 {
     if (event.button != SDL_BUTTON_LEFT)
         return;
@@ -54,7 +54,7 @@ void EditorBackground::onSetupMouseClick(const SDL_MouseButtonEvent& event)
 }
 
 
-void EditorBackground::renderSetup(CResourceManager& rm)
+void EditorBackground::renderSetup(CResourceManager& rm, const WorldMap& world)
 {
     rm.spr_worldbackground[0].draw(0, 0, m_page * 640, 32, 640, 480);
 }

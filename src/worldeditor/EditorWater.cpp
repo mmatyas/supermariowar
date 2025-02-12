@@ -9,7 +9,7 @@ constexpr int TILE_COUNT = 3;
 }  // namespace
 
 
-void EditorWater::onSetupKeypress(const SDL_KeyboardEvent& event)
+void EditorWater::onSetupKeypress(const SDL_KeyboardEvent& event, WorldMap& world)
 {
     switch (event.keysym.sym) {
         case SDLK_ESCAPE:
@@ -19,7 +19,7 @@ void EditorWater::onSetupKeypress(const SDL_KeyboardEvent& event)
 }
 
 
-void EditorWater::onSetupMouseClick(const SDL_MouseButtonEvent& event)
+void EditorWater::onSetupMouseClick(const SDL_MouseButtonEvent& event, WorldMap& world)
 {
     const int tileX = event.x / TILESIZE;
     const int tileY = event.y / TILESIZE;
@@ -32,7 +32,7 @@ void EditorWater::onSetupMouseClick(const SDL_MouseButtonEvent& event)
 }
 
 
-void EditorWater::renderSetup(CResourceManager& rm)
+void EditorWater::renderSetup(CResourceManager& rm, const WorldMap& world)
 {
     for (int idx = 0; idx < TILE_COUNT; idx++)
         rm.spr_worldbackground[0].draw(idx * 32, 0, 512 + (idx * 128), 0, 32, 32);

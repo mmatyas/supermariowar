@@ -106,7 +106,7 @@ bool checkforegroundTileValuesChanged(WorldMap& world, Vec2s center, const std::
 }  // namespace
 
 
-void EditorPathSprites::onSetupKeypress(const SDL_KeyboardEvent& event)
+void EditorPathSprites::onSetupKeypress(const SDL_KeyboardEvent& event, WorldMap& world)
 {
     switch (event.keysym.sym) {
         case SDLK_ESCAPE:
@@ -116,7 +116,7 @@ void EditorPathSprites::onSetupKeypress(const SDL_KeyboardEvent& event)
 }
 
 
-void EditorPathSprites::onSetupMouseClick(const SDL_MouseButtonEvent& event)
+void EditorPathSprites::onSetupMouseClick(const SDL_MouseButtonEvent& event, WorldMap& world)
 {
     if (event.button != SDL_BUTTON_LEFT)
         return;
@@ -131,7 +131,7 @@ void EditorPathSprites::onSetupMouseClick(const SDL_MouseButtonEvent& event)
 }
 
 
-void EditorPathSprites::renderSetup(CResourceManager& rm)
+void EditorPathSprites::renderSetup(CResourceManager& rm, const WorldMap& world)
 {
     for (short iPath = 0; iPath < 8; iPath++) {
         rm.spr_worldpaths[0].draw(iPath * 32, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);

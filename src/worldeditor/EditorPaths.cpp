@@ -69,7 +69,7 @@ void EditorPaths::loadAssets()
 }
 
 
-void EditorPaths::onSetupKeypress(const SDL_KeyboardEvent& event)
+void EditorPaths::onSetupKeypress(const SDL_KeyboardEvent& event, WorldMap& world)
 {
     switch (event.keysym.sym) {
     case SDLK_ESCAPE:
@@ -79,7 +79,7 @@ void EditorPaths::onSetupKeypress(const SDL_KeyboardEvent& event)
 }
 
 
-void EditorPaths::onSetupMouseClick(const SDL_MouseButtonEvent& event)
+void EditorPaths::onSetupMouseClick(const SDL_MouseButtonEvent& event, WorldMap& world)
 {
     if (event.button != SDL_BUTTON_LEFT)
         return;
@@ -94,7 +94,7 @@ void EditorPaths::onSetupMouseClick(const SDL_MouseButtonEvent& event)
 }
 
 
-void EditorPaths::renderSetup(CResourceManager& rm)
+void EditorPaths::renderSetup(CResourceManager& rm, const WorldMap& world)
 {
     m_sprPath.draw(0, 0, 0, 0, 480, 32);
 }

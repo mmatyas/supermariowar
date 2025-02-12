@@ -14,9 +14,9 @@ public:
 protected:
     void loadAssets() override;
 
-    void onSetupKeypress(const SDL_KeyboardEvent& event) override;
-    void onSetupMouseClick(const SDL_MouseButtonEvent& event) override;
-    void renderSetup(CResourceManager& rm) override;
+    void onSetupKeypress(const SDL_KeyboardEvent& event, WorldMap& world) override;
+    void onSetupMouseClick(const SDL_MouseButtonEvent& event, WorldMap& world) override;
+    void renderSetup(CResourceManager& rm, const WorldMap& world) override;
 
     bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) override;
     void renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx, CResourceManager& rm) override;

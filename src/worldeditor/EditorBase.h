@@ -23,7 +23,7 @@ public:
     virtual ~EditorBase() = default;
 
     /// Input event during the setup stage of the editor mode.
-    void handleSetupInput(const SDL_Event& ev);
+    void handleSetupInput(const SDL_Event& ev, WorldMap& world);
 
     /// The editor is ready for editing the world map.
     bool isReady() const { return !newlyEntered; }
@@ -34,10 +34,10 @@ public:
 
     virtual void loadAssets() {}
     virtual void onEnter();
-    virtual bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) = 0;
+    virtual bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) { return false; };
 
     /// Render the setup screen of the editor mode.
-    virtual void renderSetup(CResourceManager& rm) = 0;
+    virtual void renderSetup(CResourceManager& rm, const WorldMap& world) = 0;
 
     /// Render during map editing
     virtual void renderEdit(WorldMap& world, Vec2s offsetTile, Vec2s offsetPx, CResourceManager& rm) {}
@@ -46,9 +46,9 @@ protected:
     bool newlyEntered = true;
 
     /// Key press event during the setup stage of the editor mode.
-    virtual void onSetupKeypress(const SDL_KeyboardEvent& event) {}
+    virtual void onSetupKeypress(const SDL_KeyboardEvent& event, WorldMap& world) {}
     /// Mouse click event during the setup stage of the editor mode.
-    virtual void onSetupMouseClick(const SDL_MouseButtonEvent& event) {}
+    virtual void onSetupMouseClick(const SDL_MouseButtonEvent& event, WorldMap& world) {}
     /// Mouse motion event during the setup stage of the editor mode.
-    virtual void onSetupMouseMotion(const SDL_MouseMotionEvent& event) {}
+    virtual void onSetupMouseMotion(const SDL_MouseMotionEvent& event, WorldMap& world) {}
 };

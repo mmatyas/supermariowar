@@ -5,7 +5,7 @@
 #include "world.h"
 
 
-void EditorStageMarkers::onSetupKeypress(const SDL_KeyboardEvent& event)
+void EditorStageMarkers::onSetupKeypress(const SDL_KeyboardEvent& event, WorldMap& world)
 {
     switch (event.keysym.sym) {
     case SDLK_ESCAPE:
@@ -19,7 +19,7 @@ void EditorStageMarkers::onSetupKeypress(const SDL_KeyboardEvent& event)
 }
 
 
-void EditorStageMarkers::onSetupMouseClick(const SDL_MouseButtonEvent& event)
+void EditorStageMarkers::onSetupMouseClick(const SDL_MouseButtonEvent& event, WorldMap& world)
 {
     if (event.button != SDL_BUTTON_LEFT)
         return;
@@ -35,7 +35,7 @@ void EditorStageMarkers::onSetupMouseClick(const SDL_MouseButtonEvent& event)
 }
 
 
-void EditorStageMarkers::renderSetup(CResourceManager& rm)
+void EditorStageMarkers::renderSetup(CResourceManager& rm, const WorldMap& world)
 {
     for (short row = 0; row < 10; row++) {
         for (short col = 0; col < 10; col++) {
