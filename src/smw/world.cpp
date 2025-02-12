@@ -646,7 +646,7 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
         } else if (iReadType == 16) { //initial bonus items
             std::list<std::string_view> tokens = tokenize(line, ',');
 
-            iNumInitialBonuses = 0;
+            m_initialBonuses.reserve(32);
 
             while (!tokens.empty()) {
                 std::string_view token = popNext(tokens);
@@ -665,10 +665,10 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
                 if (iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
                     iBonus = 0;
 
-                if (iNumInitialBonuses < 32)
-                    iInitialBonuses[iNumInitialBonuses++] = iBonus;
+                if (m_initialBonuses.size() < 32)
+                    m_initialBonuses.emplace_back(iBonus);
                 else
-                    iInitialBonuses[31] = iBonus;
+                    m_initialBonuses.back() = iBonus;
             }
 
             iReadType = 17;
@@ -893,11 +893,11 @@ bool WorldMap::Save(const std::string& szPath) const
 
     fprintf(file, "#Initial Items\n");
 
-    for (short iItem = 0; iItem < iNumInitialBonuses; iItem++) {
+    for (short iItem = 0; iItem < m_initialBonuses.size(); iItem++) {
         if (iItem != 0)
             fprintf(file, ",");
 
-        short iBonus = iInitialBonuses[iItem];
+        short iBonus = m_initialBonuses[iItem];
         char cBonusType = 'p';
         if (iBonus >= NUM_POWERUPS) {
             iBonus -= NUM_POWERUPS;
@@ -907,7 +907,7 @@ bool WorldMap::Save(const std::string& szPath) const
         fprintf(file, "%c%d", cBonusType, iBonus);
     }
 
-    if (iNumInitialBonuses == 0)
+    if (m_initialBonuses.empty())
         fprintf(file, "0");
 
     fprintf(file, "\n");
@@ -1524,9 +1524,9 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
 void WorldMap::SetInitialPowerups()
 {
     for (short iTeam = 0; iTeam < 4; iTeam++) {
-        game_values.worldpowerupcount[iTeam] = iNumInitialBonuses;
+        game_values.worldpowerupcount[iTeam] = m_initialBonuses.size();
 
-        for (short iItem = 0; iItem < iNumInitialBonuses; iItem++)
-            game_values.worldpowerups[iTeam][iItem] = iInitialBonuses[iItem];
+        for (short iItem = 0; iItem < m_initialBonuses.size(); iItem++)
+            game_values.worldpowerups[iTeam][iItem] = m_initialBonuses[iItem];  // TODO
     }
 }

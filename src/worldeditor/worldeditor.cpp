@@ -77,6 +77,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 #include "EditorPaths.h"
 #include "EditorPathSprites.h"
 #include "EditorStageMarkers.h"
+#include "EditorStartItems.h"
 #include "EditorStructures.h"
 #include "EditorTileType.h"
 #include "EditorVehicleBoundaries.h"
@@ -312,24 +313,25 @@ int resize_world();
 int editor_edit();
 int editor_vehicles();
 int editor_stage();
-int editor_start_items();
 
 EditorBackground editorBackground;
 EditorBridges editorBridges;
 EditorPaths editorPaths;
 EditorPathSprites editorPathSprites;
 EditorStageMarkers editorStageMarkers;
+EditorStartItems editorStartItems;
 EditorStructures editorStructures;
 EditorTileType editorTileType;
 EditorVehicleBoundaries editorVehicleBoundaries;
 EditorWater editorWater;
 EditorWarps editorWarps;
-constexpr std::array<EditorBase*, 10> allEditors {
+constexpr std::array<EditorBase*, 11> allEditors {
     &editorBackground,
     &editorBridges,
     &editorPaths,
     &editorPathSprites,
     &editorStageMarkers,
+    &editorStartItems,
     &editorStructures,
     &editorTileType,
     &editorVehicleBoundaries,
@@ -978,10 +980,13 @@ int main(int argc, char* argv[])
     editorPathSprites.setAutoPaint(fAutoPaint);
 
     printf("entering world editor loop...\n");
+    EditorBase* prevEditor = nullptr;
     done = false;
     while (!done) {
-        if (state != EDITOR_EDIT)
+        if (state != EDITOR_EDIT) {
+            prevEditor = currentEditor;
             currentEditor = nullptr;
+        }
 
         switch (state) {
         case EDITOR_EDIT:
@@ -1033,7 +1038,8 @@ int main(int argc, char* argv[])
             break;
 
         case EDITOR_START_ITEMS:
-            state = editor_start_items();
+            state = enterEditor(editorStartItems);
+            currentEditor = prevEditor;
             break;
 
         case EDITOR_BOUNDARY:
@@ -1801,132 +1807,6 @@ void drawmap(bool fScreenshot, short iBlockSize)
         SDL_FillRect(screen, NULL, 0x0);
 
     SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
-}
-
-int editor_start_items()
-{
-    bool done = false;
-
-    SDL_Rect rItemDst[NUM_POWERUPS + NUM_WORLD_POWERUPS];
-
-    SDL_Rect rPickedItemDst[32];
-
-    short iColCount = 0;
-    short iRowCount = 0;
-    for (short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++) {
-        rItemDst[iItem].x = 16 + iColCount * 48;
-        rItemDst[iItem].y = 16 + iRowCount * 48;
-        rItemDst[iItem].w = 32;
-        rItemDst[iItem].h = 32;
-
-        if (++iColCount > 12) {
-            iColCount = 0;
-            iRowCount++;
-        }
-    }
-
-    short iPickedItem = 0;
-    for (short iPickedItemY = 0; iPickedItemY < 4; iPickedItemY++) {
-        for (short iPickedItemX = 0; iPickedItemX < 8; iPickedItemX++) {
-            rPickedItemDst[iPickedItem].x = 122 + iPickedItemX * 52;
-            rPickedItemDst[iPickedItem].y = 240 + iPickedItemY * 64;
-            rPickedItemDst[iPickedItem].w = 32;
-            rPickedItemDst[iPickedItem].h = 32;
-
-            iPickedItem++;
-        }
-    }
-
-    while (!done) {
-        int framestart = SDL_GetTicks();
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                done = true;
-                break;
-            }
-
-            case SDL_KEYDOWN: {
-                return EDITOR_EDIT;
-            }
-
-            case SDL_MOUSEBUTTONDOWN: {
-                short iButtonX = bound_to_window_w(event.button.x);
-                short iButtonY = bound_to_window_h(event.button.y);
-
-                if (event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT) {
-                    if (g_worldmap.iNumInitialBonuses < 32) {
-                        for (short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++) {
-                            if (iButtonX >= rItemDst[iItem].x && iButtonX < rItemDst[iItem].w + rItemDst[iItem].x && iButtonY >= rItemDst[iItem].y && iButtonY < rItemDst[iItem].h + rItemDst[iItem].y) {
-                                g_worldmap.iInitialBonuses[g_worldmap.iNumInitialBonuses++] = iItem;
-                                break;
-                            }
-                        }
-                    }
-
-                    for (short iRemoveItem = 0; iRemoveItem < g_worldmap.iNumInitialBonuses; iRemoveItem++) {
-                        if (iButtonX >= rPickedItemDst[iRemoveItem].x && iButtonX < rPickedItemDst[iRemoveItem].w + rPickedItemDst[iRemoveItem].x && iButtonY >= rPickedItemDst[iRemoveItem].y && iButtonY < rPickedItemDst[iRemoveItem].h + rPickedItemDst[iRemoveItem].y) {
-                            for (short iAdjust = iRemoveItem; iAdjust < g_worldmap.iNumInitialBonuses - 1; iAdjust++) {
-                                g_worldmap.iInitialBonuses[iAdjust] = g_worldmap.iInitialBonuses[iAdjust + 1];
-                            }
-
-                            g_worldmap.iNumInitialBonuses--;
-
-                            break;
-                        }
-                    }
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
-
-
-        drawmap(false, TILESIZE);
-        menu_shade.draw(0, 0);
-
-        for (short iItem = 0; iItem < NUM_POWERUPS; iItem++) {
-            rm->spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
-        }
-
-        for (short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++) {
-            rm->spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
-        }
-
-        for (short iPopup = 0; iPopup < 4; iPopup++) {
-            rm->spr_worlditempopup.draw(0, 416 - (iPopup << 6), 0, 0, 320, 64);
-            rm->spr_worlditempopup.draw(320, 416 - (iPopup << 6), 192, 0, 320, 64);
-        }
-
-        for (short iPickedItem = 0; iPickedItem < g_worldmap.iNumInitialBonuses; iPickedItem++) {
-            short iPowerup = g_worldmap.iInitialBonuses[iPickedItem];
-            if (iPowerup >= NUM_POWERUPS)
-                rm->spr_worlditems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
-            else
-                rm->spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
-        }
-
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
-
-        DrawMessage();
-        gfx_flipscreen();
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return EDITOR_QUIT;
 }
 
 

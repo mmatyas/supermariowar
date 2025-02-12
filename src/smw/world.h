@@ -207,6 +207,9 @@ public:
     const std::vector<WorldWarp>& getWarps() const { return warps; }
     std::vector<WorldWarp>& getWarps() { return warps; }
 
+    const std::vector<short>& getInitialBonuses() const { return m_initialBonuses; }
+    std::vector<short>& getInitialBonuses() { return m_initialBonuses; }
+
 private:
     void SetTileConnections(short iCol, short iRow);
 
@@ -224,8 +227,7 @@ private:
     std::vector<WorldVehicle> vehicles;
     std::vector<WorldWarp> warps;
 
-    short iNumInitialBonuses;
-    short iInitialBonuses[32];
+    std::vector<short> m_initialBonuses;
 
     short iMusicCategory;
 
