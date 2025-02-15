@@ -288,11 +288,6 @@ bool dialog(const char* title, const char* instructions, char* input, int inputs
 
 void drawmap(bool fScreenshot, short iBlockSize);
 
-bool UpdateForeground(short iCol, short iRow);
-bool UpdateCoastline(short iCol, short iRow);
-bool AutoSetTile(short iCol, short iRow);
-short AdjustForeground(short iSprite, short iCol, short iRow);
-
 void ReadVehiclesIntoEditor();
 void WriteVehiclesIntoWorld();
 void AddVehicleToTile(short iCol, short iRow, short iType);
@@ -1770,29 +1765,6 @@ void RemoveVehicleFromTile(short iCol, short iRow)
 
         itr++;
     }
-}
-
-// Convert foreground sprite to match the background sprite
-short AdjustForeground(short fgSprite, short iCol, short iRow)
-{
-    const WorldMapTile& tile = g_worldmap.tiles.at(iCol, iRow);
-    return adjustedForeground(fgSprite, tile.iBackgroundSprite);
-}
-
-bool UpdateForeground(short iCol, short iRow)
-{
-    WorldMapTile& tile = g_worldmap.tiles.at(iCol, iRow);
-    return updateForeground(tile);
-}
-
-bool UpdateCoastline(short iCol, short iRow)
-{
-    return updateCoastline(g_worldmap, {iCol, iRow});
-}
-
-bool AutoSetTile(short iCol, short iRow)
-{
-    return autoSetTile(g_worldmap, {iCol, iRow});
 }
 
 void updateworldsurface()
