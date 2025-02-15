@@ -34,7 +34,7 @@ public:
 
     virtual void loadAssets() {}
     virtual void onEnter();
-    virtual bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) = 0;
+    virtual bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) { return false; }
 
     /// Render the setup screen of the editor mode.
     virtual void renderSetup(CResourceManager& rm) = 0;

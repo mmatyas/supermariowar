@@ -980,8 +980,10 @@ int main(int argc, char* argv[])
     editorPathSprites.setAutoPaint(fAutoPaint);
 
     printf("entering world editor loop...\n");
+    EditorBase* prevEditor = nullptr;
     done = false;
     while (!done) {
+        prevEditor = currentEditor;
         if (state != EDITOR_EDIT)
             currentEditor = nullptr;
 
