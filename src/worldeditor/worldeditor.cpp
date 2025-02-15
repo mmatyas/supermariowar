@@ -74,6 +74,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 
 #include "EditorBackground.h"
 #include "EditorBridges.h"
+#include "EditorDisplayHelp.h"
 #include "EditorPaths.h"
 #include "EditorPathSprites.h"
 #include "EditorStageMarkers.h"
@@ -284,7 +285,6 @@ int save_as();
 int find();
 int clear_world();
 bool dialog(const char* title, const char* instructions, char* input, int inputsize);
-int display_help();
 
 void drawmap(bool fScreenshot, short iBlockSize);
 
@@ -316,6 +316,7 @@ int editor_start_items();
 
 EditorBackground editorBackground;
 EditorBridges editorBridges;
+EditorDisplayHelp editorDisplayHelp;
 EditorPaths editorPaths;
 EditorPathSprites editorPathSprites;
 EditorStageMarkers editorStageMarkers;
@@ -324,9 +325,10 @@ EditorTileType editorTileType;
 EditorVehicleBoundaries editorVehicleBoundaries;
 EditorWater editorWater;
 EditorWarps editorWarps;
-constexpr std::array<EditorBase*, 10> allEditors {
+constexpr std::array<EditorBase*, 11> allEditors {
     &editorBackground,
     &editorBridges,
+    &editorDisplayHelp,
     &editorPaths,
     &editorPathSprites,
     &editorStageMarkers,
@@ -1055,7 +1057,8 @@ int main(int argc, char* argv[])
             break;
 
         case DISPLAY_HELP:
-            state = display_help();
+            state = enterEditor(editorDisplayHelp);
+            currentEditor = prevEditor;
             break;
 
         case SAVE_AS:
@@ -2969,108 +2972,6 @@ int editor_stage()
     return EDITOR_QUIT;
 }
 
-int display_help()
-{
-    drawmap(false, TILESIZE);
-    menu_shade.draw(0, 0);
-    rm->menu_font_large.drawCentered(320, 15, "Help");
-
-    constexpr std::array<const char* const, 24> column1 {
-        "Modes:",
-        "[1] - Water Mode",
-        "[2] - Land Mode",
-        "[3] - Stage Objects Mode",
-        "[4] - Path Mode",
-        "[5] - Objects Mode",
-        "[6] - Bridges Mode",
-        "[p] - Connection Mode",
-        "[w] - Warp Mode",
-        "[v] - Vehicle",
-        "      [c] - Copy Vehicle",
-        "[t] - Start and Doors",
-        "[b] - Vehicle Boundaries",
-        "[i] - Initial Powerups",
-        "[e] - Edit Stages",
-        "",
-        "File:",
-        "[n] - New World",
-        "[s] - Save World",
-        "[shift] + [s] - Save As",
-        "[f] - Find World",
-        "[shift] + [f] - New Search",
-        "[pageup] - Go To Previous World",
-        "[pagedown] - Go To Next World",
-    };
-    int offsety = 55;
-    int offsetx = 30;
-    for (const char* const line : column1) {
-        rm->menu_font_small.drawC(offsetx, offsety, line);
-        offsety += rm->menu_font_small.getHeight() + 2;
-    }
-
-    constexpr std::array<const char* const, 13> column2 {
-        "Place Tiles:",
-        "[Left Mouse Button] - Place Item",
-        "[Right Mouse Button] - Remove Item",
-        "",
-        // "Move Mode:",
-        // "[Right Mouse Button] - Select Area",
-        // "[Left Mouse Button] - Unselect Area",
-        // "Select And Drag - Move Selections",
-        // "Hold [shift] - Multiple Selections",
-        // "Hold [ctrl] - Freehand Selections",
-        // "[delete] - Delete Selection",
-        // "[c] - Copy Selection",
-        // "",
-        "Miscellaneous:",
-        "[r] - Change Music Category",
-        "[Arrow Keys] - Navigate World",
-        "[a] - Automatic Path/Land",
-        "[k] - Resize World",
-        "[ctrl] + [delete] - Clear All",
-        "[insert] - Screenshot",
-        "[alt] + [enter] - Full Screen/Window",
-        "[space] - Toggle Stage Previews",
-    };
-    offsetx = 300;
-    offsety = 55;
-    for (const char* const line : column2) {
-        rm->menu_font_small.draw(offsetx, offsety, line);
-        offsety += rm->menu_font_small.getHeight() + 2;
-    }
-
-    gfx_flipscreen();
-
-    while (true) {
-        int framestart = SDL_GetTicks();
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                return 0;
-                break;
-
-            case SDL_KEYDOWN:
-                return 0;
-                break;
-
-            default:
-                break;
-            }
-        }
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return 0;
-}
 
 int save_as()
 {
