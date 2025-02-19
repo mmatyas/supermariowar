@@ -80,6 +80,7 @@ extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
 #include "EditorStartItems.h"
 #include "EditorStructures.h"
 #include "EditorTileType.h"
+#include "EditorVehicles.h"
 #include "EditorVehicleBoundaries.h"
 #include "EditorWater.h"
 #include "EditorWarps.h"
@@ -135,7 +136,6 @@ gfxSprite spr_dialog;
 gfxSprite menu_shade;
 gfxSprite spr_largedialog;
 
-gfxSprite spr_vehicleicons;
 
 int set_tile = 0;
 bool fAutoPaint = true;
@@ -177,9 +177,6 @@ int bound_to_window_h(int y)
 {
     return std::max(0, std::min(y, 480));
 }
-
-// Vehicle structure that holds the current vehicle "stamp"
-WorldVehicle g_wvVehicleStamp;
 
 //// Global stuff that the map editor doesn't need, but has references to
 gfxSprite spr_warplock;
@@ -294,11 +291,6 @@ bool UpdateCoastline(short iCol, short iRow);
 bool AutoSetTile(short iCol, short iRow);
 short AdjustForeground(short iSprite, short iCol, short iRow);
 
-void ReadVehiclesIntoEditor();
-void WriteVehiclesIntoWorld();
-void AddVehicleToTile(short iCol, short iRow, short iType);
-void RemoveVehicleFromTile(short iCol, short iRow);
-
 void AddWarpToTile(short iCol, short iRow, short iType);
 void RemoveWarpFromTile(short iCol, short iRow);
 
@@ -322,10 +314,11 @@ EditorStageMarkers editorStageMarkers;
 EditorStartItems editorStartItems;
 EditorStructures editorStructures;
 EditorTileType editorTileType;
+EditorVehicles editorVehicles;
 EditorVehicleBoundaries editorVehicleBoundaries;
 EditorWater editorWater;
 EditorWarps editorWarps;
-constexpr std::array<EditorBase*, 11> allEditors {
+constexpr std::array<EditorBase*, 12> allEditors {
     &editorBackground,
     &editorBridges,
     &editorPaths,
@@ -334,6 +327,7 @@ constexpr std::array<EditorBase*, 11> allEditors {
     &editorStartItems,
     &editorStructures,
     &editorTileType,
+    &editorVehicles,
     &editorVehicleBoundaries,
     &editorWarps,
     &editorWater,
@@ -388,9 +382,6 @@ void DrawMessage();
 // Menu keys to use for menus
 extern SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS];
 
-// Vehicle stuff
-std::vector<WorldVehicle*> vehiclelist;
-
 bool g_fFullScreen = false;
 bool g_fShowStagePreviews = true;
 
@@ -421,18 +412,6 @@ MI_Text* miDeleteStageDialogAreYouText;
 MI_Text* miDeleteStageDialogSureText;
 MI_Button* miDeleteStageDialogYesButton;
 MI_Button* miDeleteStageDialogNoButton;
-
-// Vehicle Creation Menu
-UI_Menu mVehicleMenu;
-MI_ImageSelectField* miVehicleSpriteField;
-MI_ImageSelectField* miVehicleStageField;
-MI_SelectField<short>* miVehicleMinMovesField;
-MI_SelectField<short>* miVehicleMaxMovesField;
-MI_SelectField<bool>* miVehiclePacesField;
-MI_SelectField<short>* miVehicleDirectionField;
-MI_SelectField<short>* miVehicleBoundaryField;
-MI_Button* miVehicleCreateButton;
-MI_Text* miTitleText;
 
 UI_ModeOptionsMenu* mModeOptionsMenu;
 
@@ -601,8 +580,6 @@ int main(int argc, char* argv[])
 
     rm->menu_mode_small.init(convertPath("gfx/packs/Classic/menu/menu_mode_small.png"), colors::MAGENTA);
     rm->menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_large.png"), colors::MAGENTA);
-
-    spr_vehicleicons.init(convertPath("gfx/leveleditor/vehicle_icons.png"), colors::MAGENTA);
 
     rm->spr_thumbnail_warps[0].init(convertPath("gfx/packs/Classic/menu/menu_warp_preview.png"), colors::MAGENTA);
     rm->spr_thumbnail_warps[1].init(convertPath("gfx/packs/Classic/menu/menu_warp_thumbnail.png"), colors::MAGENTA);
@@ -868,107 +845,6 @@ int main(int argc, char* argv[])
 
     mModeOptionsMenu = new UI_ModeOptionsMenu();
 
-    g_wvVehicleStamp.iDrawSprite = 0;
-    g_wvVehicleStamp.iActionId = 0;
-    g_wvVehicleStamp.currentTile.x = 0;
-    g_wvVehicleStamp.currentTile.y = 0;
-    g_wvVehicleStamp.iMinMoves = 5;
-    g_wvVehicleStamp.iMaxMoves = 8;
-    g_wvVehicleStamp.fSpritePaces = true;
-    g_wvVehicleStamp.iDrawDirection = 0;
-    g_wvVehicleStamp.iBoundary = 0;
-
-    // Create Vehicle Menu
-    miVehicleSpriteField = new MI_ImageSelectField(&rm->spr_selectfield, &spr_vehicleicons, 70, 80, "Sprite", 500, 150, 16, 16);
-    miVehicleSpriteField->add("Hammer Brother", 0);
-    miVehicleSpriteField->add("Boomerang Brother", 1);
-    miVehicleSpriteField->add("Fire Brother", 2);
-    miVehicleSpriteField->add("Tank 1", 3);
-    miVehicleSpriteField->add("Boat 1", 4);
-    miVehicleSpriteField->add("Boat 2", 5);
-    miVehicleSpriteField->add("Airship 1", 6);
-    miVehicleSpriteField->add("Airship 2", 7);
-    miVehicleSpriteField->add("Tank 2", 8);
-    miVehicleSpriteField->setOutputPtr(&g_wvVehicleStamp.iDrawSprite);
-    miVehicleSpriteField->setCurrentValue(g_wvVehicleStamp.iDrawSprite);
-
-    miVehicleStageField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 120, "Stage", 500, 150, 16, 16);
-    miVehicleStageField->setOutputPtr(&g_wvVehicleStamp.iActionId);
-
-    miVehicleMinMovesField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 160, "Min Moves", 500, 150);
-
-    for (short iMinMoves = 0; iMinMoves <= 100; iMinMoves++) {
-        char szMinMoves[8];
-        sprintf(szMinMoves, "%d", iMinMoves);
-        miVehicleMinMovesField->add(szMinMoves, iMinMoves);
-    }
-
-    miVehicleMinMovesField->setOutputPtr(&g_wvVehicleStamp.iMinMoves);
-    miVehicleMinMovesField->setCurrentValue(g_wvVehicleStamp.iMinMoves);
-    miVehicleMinMovesField->setItemChangedCode(MENU_CODE_VEHICLE_MIN_MOVES_CHANGED);
-    miVehicleMinMovesField->allowWrap(false);
-    miVehicleMinMovesField->allowFastScroll(true);
-
-    miVehicleMaxMovesField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 200, "Max Moves", 500, 150);
-
-    for (short iMaxMoves = 0; iMaxMoves <= 100; iMaxMoves++) {
-        char szMaxMoves[8];
-        sprintf(szMaxMoves, "%d", iMaxMoves);
-        miVehicleMaxMovesField->add(szMaxMoves, iMaxMoves);
-    }
-
-    miVehicleMaxMovesField->setOutputPtr(&g_wvVehicleStamp.iMaxMoves);
-    miVehicleMaxMovesField->setCurrentValue(g_wvVehicleStamp.iMaxMoves);
-    miVehicleMaxMovesField->setItemChangedCode(MENU_CODE_VEHICLE_MAX_MOVES_CHANGED);
-    miVehicleMaxMovesField->allowWrap(false);
-    miVehicleMaxMovesField->allowFastScroll(true);
-
-    miVehiclePacesField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 240, "Paces", 500, 150);
-    miVehiclePacesField->add("No", false);
-    miVehiclePacesField->add("Yes", true);
-    miVehiclePacesField->setOutputPtr(&g_wvVehicleStamp.fSpritePaces);
-    miVehiclePacesField->setCurrentValue(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
-    miVehiclePacesField->setAutoAdvance(true);
-
-    miVehicleDirectionField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 280, "Direction", 500, 150);
-    miVehicleDirectionField->add("Left", false);
-    miVehicleDirectionField->add("Right", true);
-    miVehicleDirectionField->setOutputPtr(&g_wvVehicleStamp.iDrawDirection);
-    miVehicleDirectionField->setCurrentValue(g_wvVehicleStamp.iDrawDirection);
-    miVehicleDirectionField->setAutoAdvance(true);
-
-    miVehicleBoundaryField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 320, "Boundary", 500, 150);
-    miVehicleBoundaryField->add("No Boundary", 0);
-
-    for (short iBoundary = 1; iBoundary <= 100; iBoundary++) {
-        char szBoundary[8];
-        sprintf(szBoundary, "%d", iBoundary);
-        miVehicleBoundaryField->add(szBoundary, iBoundary);
-    }
-
-    miVehicleBoundaryField->setOutputPtr(&g_wvVehicleStamp.iBoundary);
-    miVehicleBoundaryField->setCurrentValue(g_wvVehicleStamp.iBoundary);
-    miVehicleBoundaryField->allowFastScroll(true);
-
-    miVehicleCreateButton = new MI_Button(&rm->spr_selectfield, 430, 360, "OK", 140, TextAlign::CENTER);
-    miVehicleCreateButton->SetCode(MENU_CODE_CREATE_VEHICLE);
-
-    miTitleText = new MI_Text("Clicking on the map will add the vehicle configured below", 320, 50, 640, true, TextAlign::CENTER);
-
-    mVehicleMenu.AddNonControl(miTitleText);
-
-    mVehicleMenu.AddControl(miVehicleSpriteField, miVehicleCreateButton, miVehicleStageField, NULL, NULL);
-    mVehicleMenu.AddControl(miVehicleStageField, miVehicleSpriteField, miVehicleMinMovesField, NULL, NULL);
-    mVehicleMenu.AddControl(miVehicleMinMovesField, miVehicleStageField, miVehicleMaxMovesField, NULL, NULL);
-    mVehicleMenu.AddControl(miVehicleMaxMovesField, miVehicleMinMovesField, miVehiclePacesField, NULL, NULL);
-    mVehicleMenu.AddControl(miVehiclePacesField, miVehicleMaxMovesField, miVehicleDirectionField, NULL, NULL);
-    mVehicleMenu.AddControl(miVehicleDirectionField, miVehiclePacesField, miVehicleBoundaryField, NULL, NULL);
-    mVehicleMenu.AddControl(miVehicleBoundaryField, miVehicleDirectionField, miVehicleCreateButton, NULL, NULL);
-    mVehicleMenu.AddControl(miVehicleCreateButton, miVehicleBoundaryField, miVehicleSpriteField, NULL, NULL);
-
-    mVehicleMenu.setInitialFocus(miVehicleSpriteField);
-    mVehicleMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);
-
 #ifndef USE_SDL2
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 #endif
@@ -1019,7 +895,13 @@ int main(int argc, char* argv[])
             break;
 
         case EDITOR_VEHICLES:
-            state = editor_vehicles();
+            if (g_worldmap.stageCount() <= 0) {
+                SetDisplayMessage(120, "No Stages", "You need to create", "stages before you", "can create vehicles");
+                state = EDITOR_EDIT;
+            } else {
+                state = enterEditor(editorVehicles);
+                edit_mode = 5;
+            }
             break;
 
         case EDITOR_PATH:
@@ -1098,7 +980,6 @@ int main(int argc, char* argv[])
 
     printf("\n---------------- save world ----------------\n");
 
-    WriteVehiclesIntoWorld();
     g_worldmap.Save(convertPath("worlds/ZZworldeditor.txt").c_str());
 
     {
@@ -1244,31 +1125,15 @@ int editor_edit()
                         short iButtonY = mouse_y - draw_offset_y;
                         short iCol = iButtonX / TILESIZE + draw_offset_col;
                         short iRow = iButtonY / TILESIZE + draw_offset_row;
+                        const Vec2s tilePos(iCol, iRow);
 
-                        std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-                        while (itr != lim) {
-                            WorldVehicle* vehicle = *itr;
-                            if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
-                                g_wvVehicleStamp.iDrawSprite = vehicle->iDrawSprite;
-                                g_wvVehicleStamp.iActionId = vehicle->iActionId;
-                                g_wvVehicleStamp.iMinMoves = vehicle->iMinMoves;
-                                g_wvVehicleStamp.iMaxMoves = vehicle->iMaxMoves;
-                                g_wvVehicleStamp.fSpritePaces = vehicle->fSpritePaces;
-                                g_wvVehicleStamp.iDrawDirection = vehicle->iDrawDirection;
-                                g_wvVehicleStamp.iBoundary = vehicle->iBoundary;
-
-                                miVehicleSpriteField->setCurrentValue(g_wvVehicleStamp.iDrawSprite);
-                                miVehicleStageField->setCurrentValue(g_wvVehicleStamp.iActionId);
-                                miVehicleMinMovesField->setCurrentValue(g_wvVehicleStamp.iMinMoves);
-                                miVehicleMaxMovesField->setCurrentValue(g_wvVehicleStamp.iMaxMoves);
-                                miVehiclePacesField->setCurrentValue(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
-                                miVehicleDirectionField->setCurrentValue(g_wvVehicleStamp.iDrawDirection);
-                                miVehicleBoundaryField->setCurrentValue(g_wvVehicleStamp.iBoundary);
-
-                                return EDITOR_VEHICLES;
-                            }
-
-                            itr++;
+                        const auto it = std::find_if(
+                            g_worldmap.getVehicles().cbegin(),
+                            g_worldmap.getVehicles().cend(),
+                            [tilePos](const WorldVehicle& vehicle) { return vehicle.getCurrentTile() == tilePos; });
+                        if (it != g_worldmap.getVehicles().end()) {
+                            editorVehicles.setStamp(*it);
+                            return EDITOR_VEHICLES;
                         }
                     }
 
@@ -1412,9 +1277,7 @@ int editor_edit()
                         }
 
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
-                            if (edit_mode == 5) {  // selected vehicle
-                                AddVehicleToTile(iCol, iRow, set_tile);
-                            } else if (edit_mode == 9) {
+                            if (edit_mode == 9) {
                                 // if the stage was placed on a start tile
                                 if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
                                     g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
@@ -1424,10 +1287,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.button.button == SDL_BUTTON_RIGHT) {
-                            if (edit_mode == 5) {
-                                RemoveVehicleFromTile(iCol, iRow);
-                                iStageDisplay = -1;
-                            } else if (edit_mode == 9) {  // stage
+                            if (edit_mode == 9) {  // stage
                                 g_worldmap.tiles.at(iCol, iRow).iType = 0;
                                 iStageDisplay = -1;
                             }
@@ -1443,6 +1303,7 @@ int editor_edit()
                     short iButtonY = bound_to_window_h(event.motion.y) - draw_offset_y;
                     short iCol = (iButtonX >> 5) + draw_offset_col;
                     short iRow = (iButtonY >> 5) + draw_offset_row;
+                    const Vec2s tilePos(iCol, iRow);
 
                     if (iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE) {
                         const bool isLeftPressed = event.motion.state & SDL_BUTTON_LMASK;
@@ -1450,15 +1311,13 @@ int editor_edit()
 
                         if (currentEditor && (isLeftPressed || isRightPressed)) {
                             const uint8_t button = isLeftPressed ? SDL_BUTTON_LEFT : SDL_BUTTON_RIGHT;  // Prefer left press if both are down
-                            const bool changed = currentEditor->onTileClicked(g_worldmap, {iCol, iRow}, button);
+                            const bool changed = currentEditor->onTileClicked(g_worldmap, tilePos, button);
                             if (changed)
                                 updateworldsurface();
                         }
 
                         if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
-                            if (edit_mode == 5) {
-                                AddVehicleToTile(iCol, iRow, set_tile);
-                            } else if (edit_mode == 9) {  // stage
+                            if (edit_mode == 9) {  // stage
                                                           // if the stage was placed on a start tile
                                 if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
                                     g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
@@ -1468,10 +1327,7 @@ int editor_edit()
                                 g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
                             }
                         } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-                            if (edit_mode == 5) {  // vehicles
-                                RemoveVehicleFromTile(iCol, iRow);
-                                iStageDisplay = -1;
-                            } else if (edit_mode == 9) {  // stage
+                            if (edit_mode == 9) {  // stage
                                 g_worldmap.tiles.at(iCol, iRow).iType = 0;
                                 iStageDisplay = -1;
                             }
@@ -1482,15 +1338,12 @@ int editor_edit()
                     if (edit_mode == 5) {
                         iStageDisplay = -1;
 
-                        std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-                        while (itr != lim) {
-                            WorldVehicle* vehicle = *itr;
-                            if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
-                                iStageDisplay = vehicle->iActionId;
-                                break;
-                            }
-
-                            itr++;
+                        const auto it = std::find_if(
+                            g_worldmap.getVehicles().cbegin(),
+                            g_worldmap.getVehicles().cend(),
+                            [tilePos](const WorldVehicle& vehicle) { return vehicle.getCurrentTile() == tilePos; });
+                        if (it != g_worldmap.getVehicles().cend()) {
+                            iStageDisplay = it->iActionId;
                         }
                     } else if (edit_mode == 9) {
                         iStageDisplay = -1;
@@ -1578,32 +1431,27 @@ int editor_edit()
             }
 
             if (edit_mode == 5 || edit_mode == 8) {  // draw vehicles
-                std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
                 int color = SDL_MapRGB(blitdest->format, 0, 0, 128);
-                while (itr != lim) {
-                    WorldVehicle* vehicle = *itr;
-
-                    short ix = (vehicle->currentTile.x - draw_offset_col) * TILESIZE + draw_offset_x;
-                    short iy = (vehicle->currentTile.y - draw_offset_row) * TILESIZE + draw_offset_y;
+                for (const WorldVehicle& vehicle : g_worldmap.getVehicles()) {
+                    short ix = (vehicle.currentTile.x - draw_offset_col) * TILESIZE + draw_offset_x;
+                    short iy = (vehicle.currentTile.y - draw_offset_row) * TILESIZE + draw_offset_y;
 
                     SDL_Rect r = { ix, iy, 32, 32 };
                     SDL_FillRect(blitdest, &r, color);
 
-                    rm->spr_worldvehicle[0].draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
+                    rm->spr_worldvehicle[0].draw(ix, iy, vehicle.iDrawDirection << 5, vehicle.iDrawSprite << 5, 32, 32);
 
                     if (edit_mode == 5) {
-                        rm->spr_worldforegroundspecial[0].draw(ix, iy, (vehicle->iActionId % 10) << 5, (vehicle->iActionId / 10) << 5, 32, 32);
+                        rm->spr_worldforegroundspecial[0].draw(ix, iy, (vehicle.iActionId % 10) << 5, (vehicle.iActionId / 10) << 5, 32, 32);
                     }
 
                     if (edit_mode == 8) {
-                        short iBoundary = vehicle->iBoundary - 1;
+                        short iBoundary = vehicle.iBoundary - 1;
                         if (iBoundary == -1)
                             rm->spr_worldforegroundspecial[0].draw(ix, iy, 288, 288, 32, 32);
                         else
                             rm->spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
                     }
-
-                    itr++;
                 }
 
                 if (edit_mode == 5) {
@@ -1675,104 +1523,6 @@ void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9])
         iOldTiles[i] = 0;
 }
 
-void ReadVehiclesIntoEditor()
-{
-    std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-    while (itr != lim) {
-        delete (*itr);
-        itr++;
-    }
-
-    vehiclelist.clear();
-
-    for (const WorldVehicle& vehicle : g_worldmap.vehicles) {
-        WorldVehicle* vehiclecopy = new WorldVehicle();
-
-        vehiclecopy->iDrawSprite = vehicle.iDrawSprite;
-        vehiclecopy->iActionId = vehicle.iActionId;
-        vehiclecopy->currentTile.x = vehicle.currentTile.x;
-        vehiclecopy->currentTile.y = vehicle.currentTile.y;
-        vehiclecopy->iMinMoves = vehicle.iMinMoves;
-        vehiclecopy->iMaxMoves = vehicle.iMaxMoves;
-        vehiclecopy->fSpritePaces = vehicle.fSpritePaces;
-        vehiclecopy->iDrawDirection = vehicle.iDrawDirection;
-        vehiclecopy->iBoundary = vehicle.iBoundary;
-
-        vehiclelist.push_back(vehiclecopy);
-    }
-}
-
-void WriteVehiclesIntoWorld()
-{
-    // Cleanup old vehicles
-    g_worldmap.vehicles.clear();
-
-    // Insert new vehicles
-    g_worldmap.vehicles.reserve(vehiclelist.size());
-
-    for (const WorldVehicle* vehicle : vehiclelist) {
-        WorldVehicle vehiclecopy;
-        vehiclecopy.iDrawSprite = vehicle->iDrawSprite;
-        vehiclecopy.iActionId = vehicle->iActionId;
-        vehiclecopy.currentTile.x = vehicle->currentTile.x;
-        vehiclecopy.currentTile.y = vehicle->currentTile.y;
-        vehiclecopy.iMinMoves = vehicle->iMinMoves;
-        vehiclecopy.iMaxMoves = vehicle->iMaxMoves;
-        vehiclecopy.fSpritePaces = vehicle->fSpritePaces;
-        vehiclecopy.iDrawDirection = vehicle->iDrawDirection;
-        vehiclecopy.iBoundary = vehicle->iBoundary;
-        g_worldmap.vehicles.emplace_back(std::move(vehiclecopy));
-    }
-}
-
-void AddVehicleToTile(short iCol, short iRow, short iType)
-{
-    std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-    WorldVehicle* newvehicle = NULL;
-    while (itr != lim) {
-        WorldVehicle* vehicle = *itr;
-        if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
-            newvehicle = vehicle;
-            break;
-        }
-
-        itr++;
-    }
-
-    if (!newvehicle) {
-        newvehicle = new WorldVehicle();
-        newvehicle->currentTile.x = iCol;
-        newvehicle->currentTile.y = iRow;
-        vehiclelist.push_back(newvehicle);
-    }
-
-    newvehicle->iDrawSprite = g_wvVehicleStamp.iDrawSprite;
-    newvehicle->iActionId = g_wvVehicleStamp.iActionId;
-    newvehicle->iMinMoves = g_wvVehicleStamp.iMinMoves;
-    newvehicle->iMaxMoves = g_wvVehicleStamp.iMaxMoves;
-    newvehicle->fSpritePaces = g_wvVehicleStamp.fSpritePaces;
-    newvehicle->iDrawDirection = g_wvVehicleStamp.iDrawDirection;
-    newvehicle->iBoundary = g_wvVehicleStamp.iBoundary;
-}
-
-void RemoveVehicleFromTile(short iCol, short iRow)
-{
-    std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-    while (itr != lim) {
-        WorldVehicle* vehicle = *itr;
-        if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
-            delete (*itr);
-
-            itr = vehiclelist.erase(itr);
-            lim = vehiclelist.end();
-
-            return;
-        }
-
-        itr++;
-    }
-}
-
 // Convert foreground sprite to match the background sprite
 short AdjustForeground(short fgSprite, short iCol, short iRow)
 {
@@ -1813,11 +1563,13 @@ void drawmap(bool fScreenshot, short iBlockSize)
 int enterEditor(EditorBase& editor)
 {
     currentEditor = &editor;
-    editor.onEnter();
+    editor.onEnter(g_worldmap);
 
     bool done = false;
     while (!done) {
         int framestart = SDL_GetTicks();
+
+        game_values.playerInput.ClearPressedKeys(1);
 
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
@@ -1826,10 +1578,15 @@ int enterEditor(EditorBase& editor)
             }
 
             editor.handleSetupInput(event, g_worldmap);
+            game_values.playerInput.Update(event, 1);
         }
 
-        if (editor.isReady())
+        editor.updateMenu();
+
+        if (editor.isReady()) {
+            game_values.playerInput.ResetKeys();
             return EDITOR_EDIT;
+        }
 
         if (editor.isSetupTransparent()) {
             drawmap(false, TILESIZE);
@@ -1839,128 +1596,6 @@ int enterEditor(EditorBase& editor)
         }
 
         editor.renderSetup(*rm, g_worldmap);
-
-        DrawMessage();
-        gfx_flipscreen();
-
-        int delay = WAITTIME - (SDL_GetTicks() - framestart);
-        if (delay < 0)
-            delay = 0;
-        else if (delay > WAITTIME)
-            delay = WAITTIME;
-
-        SDL_Delay(delay);
-    }
-
-    return EDITOR_QUIT;
-}
-
-// Display stages over vehicles
-// allow setting of stages on vehicles
-
-int editor_vehicles()
-{
-    if (g_worldmap.iNumStages <= 0) {
-        SetDisplayMessage(120, "No Stages", "You need to create", "stages before you", "can create vehicles");
-        return EDITOR_EDIT;
-    }
-
-    mCurrentMenu = &mVehicleMenu;
-    mCurrentMenu->ResetMenu();
-
-    bool done = false;
-
-    miVehicleStageField->clear();
-
-    for (short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
-        TourStop* ts = game_values.tourstops[iStage];
-        char szStageName[256];
-        sprintf(szStageName, "(%d) %s", iStage + 1, ts->szName);
-
-        SF_ListItem<short>& item = miVehicleStageField->add(szStageName, iStage);
-        item.iconOverride = ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode);
-    }
-
-    miVehicleStageField->setCurrentValue(g_wvVehicleStamp.iActionId);
-
-    while (!done) {
-        int framestart = SDL_GetTicks();
-
-        game_values.playerInput.ClearPressedKeys(1);
-
-        MenuCodeEnum code = MENU_CODE_NONE;
-
-        // handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
-                edit_mode = 5;
-                game_values.playerInput.ResetKeys();
-                return EDITOR_EDIT;
-            }
-
-            case SDL_KEYDOWN: {
-                if (event.key.keysym.sym == SDLK_v) {
-                    if (!mCurrentMenu->IsModifying()) {
-                        edit_mode = 5;
-                        game_values.playerInput.ResetKeys();
-                        return EDITOR_EDIT;
-                    }
-                }
-
-                break;
-            }
-
-            case SDL_MOUSEBUTTONDOWN: {
-                short iButtonX = bound_to_window_w(event.button.x);
-                short iButtonY = bound_to_window_h(event.button.y);
-
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    code = mCurrentMenu->MouseClick(iButtonX, iButtonY);
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
-
-            game_values.playerInput.Update(event, 1);
-        }
-
-        if (MENU_CODE_NONE == code) {
-            code = mCurrentMenu->SendInput(&game_values.playerInput);
-        }
-
-        if (MENU_CODE_EXIT_APPLICATION == code) {
-            edit_mode = 5;
-            game_values.playerInput.ResetKeys();
-            return EDITOR_EDIT;
-        } else if (MENU_CODE_VEHICLE_MIN_MOVES_CHANGED == code) {
-            short iMaxMoves = miVehicleMaxMovesField->currentValue();
-            if (miVehicleMinMovesField->currentValue() > iMaxMoves) {
-                miVehicleMinMovesField->setCurrentValue(iMaxMoves);
-            }
-        } else if (MENU_CODE_VEHICLE_MAX_MOVES_CHANGED == code) {
-            short iMinMoves = miVehicleMinMovesField->currentValue();
-            if (miVehicleMaxMovesField->currentValue() < iMinMoves) {
-                miVehicleMaxMovesField->setCurrentValue(iMinMoves);
-            }
-        } else if (MENU_CODE_CREATE_VEHICLE == code) {
-            edit_mode = 5;
-            ignoreclick = true;
-            game_values.playerInput.ResetKeys();
-            return EDITOR_EDIT;
-        }
-
-        drawmap(false, TILESIZE);
-        menu_shade.draw(0, 0);
-
-        mCurrentMenu->Update();
-        mCurrentMenu->Draw();
-
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
 
         DrawMessage();
         gfx_flipscreen();
@@ -2696,18 +2331,7 @@ int editor_stage()
                         }
                     }
 
-                    // Scan vehicles and remove references to deleted stage
-                    std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
-                    while (itrVehicle != limVehicle) {
-                        WorldVehicle* vehicle = *itrVehicle;
-                        if (vehicle->iActionId == iEditStage) {
-                            RemoveVehicleFromTile(vehicle->currentTile.x, vehicle->currentTile.y);
-                        } else if (vehicle->iActionId > iEditStage) {
-                            vehicle->iActionId--;
-                        }
-
-                        itrVehicle++;
-                    }
+                    editorVehicles.onStageDeleted(g_worldmap, iEditStage);
 
                     // Remove stage from tourstops vector
                     std::vector<TourStop*>::iterator itr = game_values.tourstops.begin(), lim = game_values.tourstops.end();
@@ -3115,7 +2739,6 @@ void loadcurrentworld()
 {
     game_values.worldindex = worldlist->currentIndex();
     g_worldmap = WorldMap(worldlist->at(game_values.worldindex), TILESIZE);
-    ReadVehiclesIntoEditor();
 
     draw_offset_col = 0;
     draw_offset_row = 0;
@@ -3154,7 +2777,6 @@ int savecurrentworld()
 {
     SetDisplayMessage(60, "Saved", "Your world has", "been saved.", "");
 
-    WriteVehiclesIntoWorld();
     g_worldmap.Save(worldlist->at(game_values.worldindex));
     return 0;
 }
@@ -3200,14 +2822,6 @@ int new_world()
         if (iHeight < 1)
             iHeight = 1;
 
-        std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
-        while (itrVehicle != limVehicle) {
-            delete (*itrVehicle);
-            itrVehicle++;
-        }
-
-        vehiclelist.clear();
-
         g_worldmap = WorldMap(iWidth, iHeight);
         worldlist->add(convertPath(strcat(worldLocation, strcat(fileName, ".txt"))).c_str());
         worldlist->find(fileName);
@@ -3233,17 +2847,6 @@ int resize_world()
 
         if (iHeight < 1)
             iHeight = 1;
-
-        std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
-        while (itrVehicle != limVehicle) {
-            if ((*itrVehicle)->currentTile.x >= iWidth || (*itrVehicle)->currentTile.y >= iHeight) {
-                RemoveVehicleFromTile((*itrVehicle)->currentTile.x, (*itrVehicle)->currentTile.y);
-                // List was modified, restart.
-                itrVehicle = vehiclelist.begin();
-                limVehicle = vehiclelist.end();
-            } else
-                itrVehicle++;
-        }
 
         g_worldmap.Resize(iWidth, iHeight);
 
@@ -3273,16 +2876,10 @@ void takescreenshot()
         g_worldmap.DrawMapToSurface(sScreenshot);
 
         // Draw vehicles to screenshot
-        std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-        while (itr != lim) {
-            WorldVehicle* vehicle = *itr;
-
-            short ix = vehicle->currentTile.x * iTileSize;
-            short iy = vehicle->currentTile.y * iTileSize;
-
-            rm->spr_worldvehicle[iScreenshotSize].draw(ix, iy, vehicle->iDrawDirection * iTileSize, vehicle->iDrawSprite * iTileSize, iTileSize, iTileSize);
-
-            itr++;
+        for (const WorldVehicle& vehicle : g_worldmap.getVehicles()) {
+            const short ix = vehicle.getCurrentTile().x * iTileSize;
+            const short iy = vehicle.getCurrentTile().y * iTileSize;
+            rm->spr_worldvehicle[iScreenshotSize].draw(ix, iy, vehicle.iDrawDirection * iTileSize, vehicle.iDrawSprite * iTileSize, iTileSize, iTileSize);
         }
 
         // Draw warps to screenshot

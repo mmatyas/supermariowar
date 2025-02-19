@@ -27,7 +27,7 @@ void EditorBase::handleSetupInput(const SDL_Event& event, WorldMap& world)
 }
 
 
-void EditorBase::onEnter()
+void EditorBase::onEnter(const WorldMap& world)
 {
     newlyEntered = true;
 }

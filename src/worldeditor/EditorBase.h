@@ -25,6 +25,9 @@ public:
     /// Input event during the setup stage of the editor mode.
     void handleSetupInput(const SDL_Event& ev, WorldMap& world);
 
+    /// Called on the setup screen after all input events have been processed.
+    virtual void updateMenu() {}
+
     /// The editor is ready for editing the world map.
     bool isReady() const { return !newlyEntered; }
 
@@ -33,7 +36,7 @@ public:
     virtual bool isSetupTransparent() const { return false; }
 
     virtual void loadAssets() {}
-    virtual void onEnter();
+    virtual void onEnter(const WorldMap& world);
     virtual bool onTileClicked(WorldMap& world, Vec2s pos, uint8_t button) { return false; };
 
     /// Render the setup screen of the editor mode.

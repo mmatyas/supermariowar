@@ -983,11 +983,22 @@ void WorldMap::Resize(short w, short h)
     }
 
     // Remove warps fully outside the world
-    const auto erase_from = std::remove_if(
-        warps.begin(),
-        warps.end(),
-        [](const WorldWarp& warp) { return warp.posA == WorldWarp::NULL_POS && warp.posB == WorldWarp::NULL_POS; });
-    warps.erase(erase_from, warps.end());
+    {
+        const auto eraseFrom = std::remove_if(
+            warps.begin(),
+            warps.end(),
+            [](const WorldWarp& warp) { return warp.posA == WorldWarp::NULL_POS && warp.posB == WorldWarp::NULL_POS; });
+        warps.erase(eraseFrom, warps.end());
+    }
+    // Remove vehicles fully outside the world
+    {
+        const Vec2s worldDim(iWidth, iHeight);
+        const auto eraseFrom = std::remove_if(
+            vehicles.begin(),
+            vehicles.end(),
+            [worldDim](const WorldVehicle& vehicle) { return vehicle.getCurrentTile().x >= worldDim.x || vehicle.getCurrentTile().y >= worldDim.y; });
+        vehicles.erase(eraseFrom, vehicles.end());
+    }
 }
 
 bool WorldMap::Update(bool * fPlayerVehicleCollision)

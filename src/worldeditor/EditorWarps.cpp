@@ -15,7 +15,7 @@ void addWarpToTile(WorldMap& world, Vec2s pos, short newWarpId)
         world.getWarps().end(),
         [newWarpId](const WorldWarp& warp){ return warp.id == newWarpId; });
 
-    if (it != world.getWarps().cend()) {
+    if (it != world.getWarps().end()) {
         WorldWarp& warp = *it;
         if (warp.posA == WorldWarp::NULL_POS) {
             warp.posA = pos;

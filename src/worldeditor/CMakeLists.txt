@@ -57,6 +57,8 @@ add_executable(smw-worldedit WIN32
 	EditorTileType.cpp
 	EditorVehicleBoundaries.h
 	EditorVehicleBoundaries.cpp
+	EditorVehicles.h
+	EditorVehicles.cpp
 	EditorWater.h
 	EditorWater.cpp
 	EditorWarps.h

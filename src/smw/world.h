@@ -53,6 +53,7 @@ public:
 
     void FaceDirection(short iDirection);
     void SetPosition(short iCol, short iRow);
+    Vec2s getCurrentTile() const { return currentTile; }
 
 protected:
     Vec2s pos;
@@ -100,21 +101,23 @@ class WorldVehicle : public WorldMovingObject
 
 		SDL_Rect srcRects[5];
 
-		short iMinMoves;
-		short iMaxMoves;
-		short iNumMoves;
+		short iMinMoves = 5;
+		short iMaxMoves = 8;
+		short iNumMoves = 0;
 
-		short iActionId;
+		short iActionId = 0;
 
-		bool fEnabled;
+		bool fEnabled = false;
 
-		bool fSpritePaces;
-		short iPaceOffset;
-		short iPaceTimer;
+		bool fSpritePaces = true;
+		short iPaceOffset = 0;
+		short iPaceTimer = 0;
 
-		short iBoundary;
+		short iBoundary = 0;
 
 	friend class WorldMap;
+	friend class EditorVehicles;
+
 	friend void AddVehicleToTile(short iCol, short iRow, short iType);
 	friend void RemoveVehicleFromTile(short iCol, short iRow);
 	friend void ReadVehiclesIntoEditor();
@@ -207,8 +210,13 @@ public:
     const std::vector<WorldWarp>& getWarps() const { return warps; }
     std::vector<WorldWarp>& getWarps() { return warps; }
 
+    const std::vector<WorldVehicle>& getVehicles() const { return vehicles; }
+    std::vector<WorldVehicle>& getVehicles() { return vehicles; }
+
     const std::vector<short>& getInitialBonuses() const { return m_initialBonuses; }
     std::vector<short>& getInitialBonuses() { return m_initialBonuses; }
+
+    short stageCount() const { return iNumStages; }
 
 private:
     void SetTileConnections(short iCol, short iRow);
