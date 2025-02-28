@@ -117,6 +117,7 @@ class WorldVehicle : public WorldMovingObject
 
 	friend class WorldMap;
 	friend class EditorVehicles;
+        friend class EditorStages;
 
 	friend void AddVehicleToTile(short iCol, short iRow, short iType);
 	friend void RemoveVehicleFromTile(short iCol, short iRow);
@@ -217,6 +218,7 @@ public:
     std::vector<short>& getInitialBonuses() { return m_initialBonuses; }
 
     short stageCount() const { return iNumStages; }
+    void setStageCount(short count) { iNumStages = count; }
 
 private:
     void SetTileConnections(short iCol, short iRow);

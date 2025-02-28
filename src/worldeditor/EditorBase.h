@@ -26,7 +26,7 @@ public:
     void handleSetupInput(const SDL_Event& ev, WorldMap& world);
 
     /// Called on the setup screen after all input events have been processed.
-    virtual void updateMenu() {}
+    virtual void updateMenu(WorldMap& world) {}
 
     /// The editor is ready for editing the world map.
     bool isReady() const { return !newlyEntered; }

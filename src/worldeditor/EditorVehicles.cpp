@@ -179,6 +179,9 @@ void EditorVehicles::onEnter(const WorldMap& world)
 
 void EditorVehicles::onSetupKeypress(const SDL_KeyboardEvent& event, WorldMap& world)
 {
+    if (event.state != SDL_PRESSED)
+        return;
+
     switch (event.keysym.sym) {
         case SDLK_v:
             if (!mVehicleMenu.IsModifying()) {
@@ -197,7 +200,7 @@ void EditorVehicles::onSetupMouseClick(const SDL_MouseButtonEvent& event, WorldM
 }
 
 
-void EditorVehicles::updateMenu()
+void EditorVehicles::updateMenu(WorldMap& world)
 {
     switch (mMenuCode) {
         case MENU_CODE_EXIT_APPLICATION:
@@ -243,12 +246,5 @@ bool EditorVehicles::onTileClicked(WorldMap& world, Vec2s pos, uint8_t button)
 
 void EditorVehicles::onStageDeleted(WorldMap& world, short stageId)
 {
-    // Scan vehicles and remove references to deleted stage
-    for (WorldVehicle& vehicle : world.getVehicles()) {
-        if (vehicle.iActionId == stageId) {
-            removeVehicle(world, vehicle.getCurrentTile());
-        } else if (vehicle.iActionId > stageId) {
-            vehicle.iActionId--;
-        }
-    }
+
 }

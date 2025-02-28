@@ -22,7 +22,7 @@ public:
 protected:
     void loadAssets() override;
     bool isSetupTransparent() const override { return true; }
-    void updateMenu() override;
+    void updateMenu(WorldMap& world) override;
 
     void onEnter(const WorldMap& world) override;
     void renderSetup(CResourceManager& rm, const WorldMap& world) override;

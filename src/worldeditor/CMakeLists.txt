@@ -47,6 +47,8 @@ add_executable(smw-worldedit WIN32
 	EditorPaths.cpp
 	EditorPathSprites.h
 	EditorPathSprites.cpp
+	EditorStages.h
+	EditorStages.cpp
 	EditorStageMarkers.h
 	EditorStageMarkers.cpp
 	EditorStartItems.h

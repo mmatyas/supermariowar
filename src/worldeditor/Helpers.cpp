@@ -1,6 +1,21 @@
 #include "Helpers.h"
 
+#include "GameMode.h"
+#include "GameValues.h"
+#include "map.h"
+#include "MapList.h"
+#include "path.h"
+#include "ResourceManager.h"
 #include "world.h"
+#include "WorldTourStop.h"
+
+#include "SDL_image.h"
+
+extern SDL_Surface* blitdest;
+extern CMap* g_map;
+extern MapList* maplist;
+extern CGameValues game_values;
+extern gfxSprite spr_largedialog;
 
 
 short adjustedForeground(short fgSprite, short bgSprite)
@@ -233,4 +248,128 @@ bool setTileFgWithConnection(WorldMapTile& tile, short newTileId)
             tile.iConnectionType = newTileId - WORLD_BRIDGE_SPRITE_OFFSET + 12;
     }
     return changed;
+}
+
+
+void DisplayStageDetails(short iStageId, short iMouseX, short iMouseY, CResourceManager& rm)
+{
+    static SDL_Surface* sMapThumbnail = nullptr;
+    static std::string sCachedMapPath;
+
+    TourStop* ts = game_values.tourstops[iStageId];
+
+    // If we're pointing to a new stage or no stage at all
+    if (ts->iStageType == 1) {
+        if (sMapThumbnail) {
+            SDL_FreeSurface(sMapThumbnail);
+            sMapThumbnail = NULL;
+        }
+        sCachedMapPath.clear();
+    } else {
+        if (!ts->pszMapFile.empty() && ts->pszMapFile != sCachedMapPath) {
+            if (sMapThumbnail) {
+                SDL_FreeSurface(sMapThumbnail);
+                sMapThumbnail = NULL;
+            }
+
+            if (maplist->findexact(ts->pszMapFile.c_str(), false)) {
+                g_map->loadMap(maplist->currentFilename(), read_type_preview);
+                sMapThumbnail = g_map->createThumbnailSurface(true);
+            } else {  // otherwise show a unknown map icon
+                sMapThumbnail = IMG_Load(convertPath("gfx/leveleditor/leveleditor_mapnotfound.png").c_str());
+            }
+
+            sCachedMapPath = ts->pszMapFile;
+        }
+    }
+
+    short iMode = ts->iMode;
+    if (ts->iStageType == 1)
+        iMode = 24;
+    else if (ts->iMode >= 1000)
+        iMode = ts->iMode - 975;  // Convert mode id from map file to internal id for special stage modes
+
+           // Make sure we're displaying it on the screen
+    if (iMouseX > 408)
+        iMouseX = 408;
+
+    if (iMode < GAMEMODE_LAST || (iMode >= 25 && iMode <= 27)) {
+        if (iMouseY > 248)
+            iMouseY = 248;
+
+        spr_largedialog.draw(iMouseX, iMouseY, 0, 0, 116, 116);
+        spr_largedialog.draw(iMouseX + 116, iMouseY, 140, 0, 116, 116);
+        spr_largedialog.draw(iMouseX, iMouseY + 116, 0, 108, 116, 116);
+        spr_largedialog.draw(iMouseX + 116, iMouseY + 116, 140, 108, 116, 116);
+    } else if (iMode == 24) {
+        // Make sure we're displaying it on the screen
+        if (iMouseY > 392)
+            iMouseY = 392;
+
+        spr_largedialog.draw(iMouseX, iMouseY, 0, 0, 116, 44);
+        spr_largedialog.draw(iMouseX + 116, iMouseY, 140, 0, 116, 44);
+        spr_largedialog.draw(iMouseX, iMouseY + 44, 0, 180, 116, 44);
+        spr_largedialog.draw(iMouseX + 116, iMouseY + 44, 140, 180, 116, 44);
+    }
+
+    rm.menu_mode_large.draw(iMouseX + 16, iMouseY + 16, iMode << 5, 0, 32, 32);
+
+    rm.menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 16, 164, ts->szName);
+
+    char szPrint[128];
+    if (iMode != 24) {
+        sprintf(szPrint, "Goal: %d", ts->iGoal);
+        rm.menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
+
+        sprintf(szPrint, "Points: %d", ts->iPoints);
+        rm.menu_font_small.drawChopRight(iMouseX + 16, iMouseY + 176, 100, szPrint);
+
+        sprintf(szPrint, "End: %s", ts->fEndStage ? "Yes" : "No");
+        rm.menu_font_small.drawChopRight(iMouseX + 126, iMouseY + 176, 80, szPrint);
+
+        for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
+            WorldStageBonus* wsb = &ts->wsbBonuses[iBonus];
+            rm.spr_worlditemsplace.draw(iMouseX + iBonus * 20 + 16, iMouseY + 194, wsb->iWinnerPlace * 20, 0, 20, 20);
+
+            short iBonusIcon = wsb->iBonus;
+            gfxSprite* spr_icon = iBonusIcon < NUM_POWERUPS ? &rm.spr_storedpowerupsmall : &rm.spr_worlditemssmall;
+            spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 196, (iBonusIcon < NUM_POWERUPS ? iBonusIcon : iBonusIcon - NUM_POWERUPS) << 4, 0, 16, 16);
+        }
+
+        if (sMapThumbnail) {
+            SDL_Rect rSrc = { 0, 0, 160, 120 };
+            SDL_Rect rDst = { iMouseX + 16, iMouseY + 52, 160, 120 };
+
+            SDL_BlitSurface(sMapThumbnail, &rSrc, blitdest, &rDst);
+        }
+    } else {
+        sprintf(szPrint, "Sort: %s", ts->iBonusType == 0 ? "Fixed" : "Random");
+        rm.menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
+
+        for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
+            short iBonusIcon = ts->wsbBonuses[iBonus].iBonus;
+            gfxSprite* spr_icon = NULL;
+            short iSrcX = 0, iSrcY = 0;
+
+            if (iBonusIcon < NUM_POWERUPS) {
+                spr_icon = &rm.spr_storedpowerupsmall;
+                iSrcX = iBonusIcon << 4;
+                iSrcY = 0;
+            } else if (iBonusIcon < NUM_POWERUPS + NUM_WORLD_POWERUPS) {
+                spr_icon = &rm.spr_worlditemssmall;
+                iSrcX = (iBonusIcon - NUM_POWERUPS) << 4;
+                iSrcY = 0;
+            } else if (iBonusIcon < NUM_POWERUPS + NUM_WORLD_POWERUPS + 10) {
+                spr_icon = &rm.spr_worlditemssmall;
+                iSrcX = (iBonusIcon - NUM_POWERUPS - NUM_WORLD_POWERUPS) << 4;
+                iSrcY = 16;
+            } else {
+                spr_icon = &rm.spr_worlditemssmall;
+                iSrcX = (iBonusIcon - NUM_POWERUPS - NUM_WORLD_POWERUPS - 10) << 4;
+                iSrcY = 32;
+            }
+
+            spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 52, iSrcX, iSrcY, 16, 16);
+        }
+    }
 }
