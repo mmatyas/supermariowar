@@ -11,6 +11,24 @@
 extern CGameValues game_values;
 extern std::vector<CPlayer*> players;
 
+namespace {
+Vec2f calcVelocity(float speed, float angle)
+{
+    Vec2f vel {
+        speed * cos(angle),
+        speed * sin(angle),
+    };
+
+    // Fix rounding errors
+    if (::fabs(vel.x) < 0.01f)
+        vel.x = 0.f;
+    if (::fabs(vel.y) < 0.01f)
+        vel.y = 0.f;
+
+    return vel;
+}
+} // namespace
+
 //------------------------------------------------------------------------------
 // Moving Platform Path base class
 //------------------------------------------------------------------------------
@@ -87,19 +105,11 @@ bool StraightPath::Move(short type)
 
 void StraightPath::SetVelocity(short type)
 {
-    m_velocity[type].x = m_speed * cos(m_angle);
-    m_velocity[type].y = m_speed * sin(m_angle);
+    m_velocity[type] = calcVelocity(m_speed, m_angle);
 
     if (m_goalPoint[type] == &m_startPos) {
         m_velocity[type] *= -1.f;
     }
-
-    // Fix rounding errors
-    if (::fabs(m_velocity[type].x) < 0.01f)
-        m_velocity[type].x = 0.f;
-
-    if (::fabs(m_velocity[type].y) < 0.01f)
-        m_velocity[type].y = 0.f;
 }
 
 void StraightPath::Reset()
@@ -120,8 +130,32 @@ void StraightPath::Reset()
 //------------------------------------------------------------------------------
 
 StraightPathContinuous::StraightPathContinuous(float speed, Vec2f startPos, float angle, bool preview)
-    : StraightPath(speed, std::move(startPos), Vec2f::zero(), preview)
+    : MovingPlatformPath(speed, std::move(startPos), Vec2f::zero(), preview)
 {
+    // FIXME: Duplication
+
+    float width = m_endPos.x - m_startPos.x;
+    float height = m_endPos.y - m_startPos.y;
+    float length = 0.f;
+
+    if (width == 0) {
+        // Lock angle to vertical
+        m_angle = (height > 0) ? HALF_PI : THREE_HALF_PI;
+        length = ::fabs(height);
+    } else if (height == 0) {
+        // Lock angle to horizontal
+        m_angle = (width > 0) ? 0.f : PI;
+        length = ::fabs(width);
+    } else {
+        m_angle = atan2(height, width);
+        length = ::sqrt(height * height + width * width);
+    }
+
+    m_steps = (short)(length / m_speed) + 1;
+
+    for (short type = 0; type < 2; type++)
+        SetVelocity(type);
+
     m_angle = angle;
 
     for (short type = 0; type < 2; type++) {
@@ -161,6 +195,17 @@ void StraightPathContinuous::Reset()
     }
 
     MovingPlatformPath::Reset();
+}
+
+void StraightPathContinuous::SetVelocity(short type)
+{
+    // FIXME: Duplicate
+
+    m_velocity[type] = calcVelocity(m_speed, m_angle);
+
+    if (m_goalPoint[type] == &m_startPos) {
+        m_velocity[type] *= -1.f;
+    }
 }
 
 //------------------------------------------------------------------------------

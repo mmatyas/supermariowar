@@ -54,20 +54,19 @@ public:
 
     const Vec2f& startPos() const { return m_startPos; }
     const Vec2f& endPos() const { return m_endPos; }
-    float angle() const { return m_angle; }
 
-protected:
+private:
     void SetVelocity(short type);
 
     float m_angle;
     short m_steps;
 
-    unsigned short m_currentStep[2] = {0, 0};
-    Vec2f* m_goalPoint[2] = {&m_startPos, &m_startPos};
+    unsigned short m_currentStep[2] {0, 0};
+    Vec2f* m_goalPoint[2] {&m_startPos, &m_startPos};
 };
 
 
-class StraightPathContinuous : public StraightPath {
+class StraightPathContinuous : public MovingPlatformPath {
 public:
     StraightPathContinuous(float speed, Vec2f startPos, float angle, bool preview);
 
@@ -75,8 +74,19 @@ public:
     bool Move(short type) override;
     void Reset() override;
 
+    const Vec2f& startPos() const { return m_startPos; }
+    const Vec2f& endPos() const { return m_endPos; }
+    float angle() const { return m_angle; }
+
 private:
+    void SetVelocity(short type);
+
+    float m_angle;
+    short m_steps;
     Vec2f m_edge;
+
+    unsigned short m_currentStep[2] {0, 0};
+    Vec2f* m_goalPoint[2] {&m_startPos, &m_startPos};
 };
 
 
