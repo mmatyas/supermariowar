@@ -356,12 +356,6 @@ std::string g_szMessageTitle = "";
 std::string g_szMessageLine[3];
 void DrawMessage();
 
-void CopyTilesetTile(TilesetTile& to, const TilesetTile& from)
-{
-	to.iID = from.iID;
-	to.iCol = from.iCol;
-	to.iRow = from.iRow;
-}
 
 void SetTilesetTile(TilesetTile * tile, short iTileset, short iCol, short iRow)
 {
@@ -2460,7 +2454,7 @@ int editor_platforms()
                         for (short iPlatform = iEditPlatform; iPlatform < g_iNumPlatforms - 1; iPlatform++) {
                             for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
                                 for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-										CopyTilesetTile(g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow], g_Platforms[iPlatform + 1].tiles[iCol * MAPHEIGHT + iRow]);
+										g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow] = g_Platforms[iPlatform + 1].tiles[iCol * MAPHEIGHT + iRow];
 										g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = g_Platforms[iPlatform + 1].types[iCol * MAPHEIGHT + iRow];
 									}
 								}
@@ -2602,7 +2596,7 @@ int editor_platforms()
                                     if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
 											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[(ix + i) * MAPHEIGHT + iy + j];
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-                                                                                        g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
+											g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
 										}
 									}
 								}
@@ -2891,7 +2885,7 @@ void CopyPlatform(MapPlatform * toPlatform, MapPlatform * fromPlatform)
 
     for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
-			CopyTilesetTile(toPlatform->tiles[iCol * MAPHEIGHT + iRow], fromPlatform->tiles[iCol * MAPHEIGHT + iRow]);
+			toPlatform->tiles[iCol * MAPHEIGHT + iRow] = fromPlatform->tiles[iCol * MAPHEIGHT + iRow];
 			toPlatform->types[iCol * MAPHEIGHT + iRow] = fromPlatform->types[iCol * MAPHEIGHT + iRow];
 		}
 	}
@@ -4826,7 +4820,7 @@ void loadcurrentmap()
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
             for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
                 if (iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight) {
-                    CopyTilesetTile(g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow], g_map->platforms[iPlatform]->tileAt(iCol, iRow));
+                    g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow] = g_map->platforms[iPlatform]->tileAt(iCol, iRow);
                     g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = g_map->platforms[iPlatform]->tileTypeAt(iCol, iRow);
                 } else {
 					ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
@@ -4913,8 +4907,9 @@ void insert_platforms_into_map()
 
         for (short iCol = 0; iCol < iWidth; iCol++) {
             for (short iRow = 0; iRow < iHeight; iRow++) {
-                CopyTilesetTile(tiles[iCol * iHeight + iRow], g_Platforms[iPlatform].tiles[(iCol + iLeft) * iHeight + iRow + iTop]);
-                types[iCol * iHeight + iRow] = g_Platforms[iPlatform].types[(iCol + iLeft) * iHeight + iRow + iTop];
+                const size_t cellIdx = (iCol + iLeft) * MAPHEIGHT + iRow + iTop;
+                tiles[iCol * iHeight + iRow] = g_Platforms[iPlatform].tiles[cellIdx];
+                types[iCol * iHeight + iRow] = g_Platforms[iPlatform].types[cellIdx];
             }
         }
 
@@ -5062,7 +5057,7 @@ bool copyselectedtiles()
             if (selectedtiles[j][k]) {
                 ret = true;
                 for (short iLayer = 0; iLayer < MAPLAYERS; iLayer++) {
-                    CopyTilesetTile(copiedtiles[j][k].tile[iLayer], g_map->mapdata[j][k][iLayer]);
+                    copiedtiles[j][k].tile[iLayer] = g_map->mapdata[j][k][iLayer];
                 }
 
 				copiedtiles[j][k].block.iType = g_map->objectdata[j][k].iType;
