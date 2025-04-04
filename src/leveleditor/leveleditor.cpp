@@ -195,16 +195,8 @@ int mouse_x, mouse_y;
 
 void update_mouse_coords()
 {
-    mouse_x = event.motion.x;
-    mouse_y = event.motion.y;
-    if (mouse_x < 0)
-        mouse_x = 0;
-    if (mouse_y < 0)
-        mouse_y = 0;
-    if (mouse_x > 640 - 1)
-        mouse_x = 640 - 1;
-    if (mouse_y > 480 - 1)
-        mouse_y = 480 - 1;
+    mouse_x = std::clamp(event.motion.x, 0, 640 - 1);
+    mouse_y = std::clamp(event.motion.y, 0, 480 - 1);
 }
 
 int bound_to_window_w(int x)
