@@ -131,9 +131,9 @@ struct MapHazard {
 };
 
 struct TilesetTile {
-	short iID;
-	short iCol;
-	short iRow;
+	short iID = TILESETNONE;
+	short iCol = 0;
+	short iRow = 0;
 };
 
 struct AnimatedTile {

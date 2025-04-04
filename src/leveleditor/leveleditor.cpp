@@ -394,11 +394,6 @@ void SetTilesetTile(TilesetTile* tile, short iTileset, short iCol, short iRow)
     tile->iRow = iRow;
 }
 
-void ClearTilesetTile(TilesetTile* tile)
-{
-    SetTilesetTile(tile, TILESETNONE, 0, 0);
-}
-
 short NewMapHazard();
 void DrawMapHazardControls(const MapHazard& hazard);
 void AdjustMapHazardRadius(MapHazard* hazard, short iClickX, short iClickY);
@@ -598,7 +593,7 @@ int main(int argc, char* argv[])
 
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
             for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-                ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
+                g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow] = TilesetTile();
                 g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = TileType::NonSolid;
             }
         }
@@ -2672,7 +2667,7 @@ int editor_platforms()
                     short iy = event.button.y / TILESIZE;
 
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState) {
-                        ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix * MAPHEIGHT + iy]);
+                        g_Platforms[iEditPlatform].tiles[ix * MAPHEIGHT + iy] = TilesetTile();
                         g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
                         g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
@@ -2713,7 +2708,7 @@ int editor_platforms()
                             }
                         }
                     } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-                        ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix * MAPHEIGHT + iy]);
+                        g_Platforms[iEditPlatform].tiles[ix * MAPHEIGHT + iy] = TilesetTile();
                         g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                     }
                 } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
@@ -4844,7 +4839,7 @@ void loadcurrentmap()
                     g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow] = g_map->platforms[iPlatform]->tileAt(iCol, iRow);
                     g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = g_map->platforms[iPlatform]->tileTypeAt(iCol, iRow);
                 } else {
-                    ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
+                    g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow] = TilesetTile();
                     g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = TileType::NonSolid;
                 }
             }
@@ -4881,7 +4876,7 @@ void SetPlatformToDefaults(short iPlatform)
 {
     for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
         for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-            ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
+            g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow] = TilesetTile();
             g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = TileType::NonSolid;
         }
     }
