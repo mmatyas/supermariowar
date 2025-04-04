@@ -23,6 +23,8 @@ IncludeCategories:
     CaseSensitive:   false
 
 SpaceInEmptyBlock: false
+IndentCaseLabels: true
+
 BreakBeforeBraces: Custom  # Based on WebKit
 BraceWrapping:
   AfterCaseLabel:  false
