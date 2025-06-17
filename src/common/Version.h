@@ -42,4 +42,4 @@ constexpr bool operator>(const Version& a, const Version& b) {
 /// 1.8.0.4 == final
 /// 1.9.0.0 == neagix work-in-progress, not released
 /// 2.0.0.0 == fluffypillow netplay code
-constexpr Version GAME_VERSION {2, 0, 0, 0};
+constexpr Version GAME_VERSION {2, 0, 0, 1};
