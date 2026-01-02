@@ -170,6 +170,31 @@ The Android port uses a different build system, you can find more details [here]
 
 SMW can be build to run in your browser using [Emscripten](https://kripken.github.io/emscripten-site/). You can find the build instructions in the [wiki](https://github.com/mmatyas/supermariowar/wiki/Building-the-Emscripten-port).
 
+### Web Preview Deployments (Vercel)
+
+Pull requests automatically get a playable web preview deployed to Vercel! When you open a PR, a bot will comment with a link to play your changes in the browser.
+
+**To set up Vercel deployments for your fork:**
+
+1. Create a [Vercel](https://vercel.com) account and install the Vercel CLI:
+   ```sh
+   npm install -g vercel
+   ```
+
+2. Link your project:
+   ```sh
+   vercel link
+   ```
+
+3. Get your credentials:
+   - **VERCEL_TOKEN**: Create at https://vercel.com/account/tokens
+   - **VERCEL_ORG_ID**: Found in `.vercel/project.json` after linking
+   - **VERCEL_PROJECT_ID**: Found in `.vercel/project.json` after linking
+
+4. Add these as GitHub repository secrets:
+   - Go to Settings → Secrets and variables → Actions
+   - Add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`
+
 ### Other devices
 
 You should be able to port SMW to any device where SDL (either 1.2 or 2.0) works. Generally, this involves the following steps:

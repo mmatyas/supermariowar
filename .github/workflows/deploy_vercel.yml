@@ -1,0 +1,117 @@
+name: Deploy Web Preview to Vercel
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - master
+      - main
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  build-and-deploy:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Install Emscripten
+        working-directory: /tmp
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git --depth=1
+          cd emsdk
+          ./emsdk install 3.1.43
+          ./emsdk activate 3.1.43
+
+      - name: Download SDL mixer
+        working-directory: dependencies
+        run: curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.4.tar.gz | tar xzf -
+
+      - name: Build Web Version
+        run: |
+          source /tmp/emsdk/emsdk_env.sh
+          emcc -v
+          sed -i 's|if (BUILD_STATIC_LIBS)|if (BUILD_STATIC_LIBS)\ninclude_directories(dependencies/SDL2_mixer-2.0.4)|' CMakeLists.txt
+          mkdir build_js && cd build_js
+          emcmake cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
+          emmake make smw
+
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p deploy
+          cp web/index.html deploy/index.html
+          cp build_js/smw.js deploy/
+          cp build_js/smw.wasm deploy/
+          cp build_js/smw.data deploy/
+          cp vercel.json deploy/
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: deploy
+
+      - name: Deploy to Vercel (Preview)
+        id: deploy-preview
+        if: github.event_name == 'pull_request'
+        run: |
+          DEPLOY_URL=$(vercel deploy --token=${{ secrets.VERCEL_TOKEN }} 2>&1 | grep -E '^https://' | tail -1)
+          echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "🎮 Deployed to: $DEPLOY_URL"
+        working-directory: deploy
+
+      - name: Deploy to Vercel (Production)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: deploy
+
+      - name: Comment PR with Preview Link
+        if: github.event_name == 'pull_request' && steps.deploy-preview.outputs.deploy_url
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deployUrl = '${{ steps.deploy-preview.outputs.deploy_url }}';
+            const body = `## 🎮 Super Mario War Web Preview
+
+            Your changes have been deployed! Play the game here:
+
+            **🕹️ [Play Now](${deployUrl})**
+
+            <sub>This preview will be available until the PR is closed or a new commit is pushed.</sub>`;
+
+            // Check if we already have a comment from this bot
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Super Mario War Web Preview')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+

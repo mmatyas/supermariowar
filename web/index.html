@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Mario War - Play Online</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: 'Press Start 2P', cursive;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      background: linear-gradient(180deg, #ff6b6b 0%, #ffd93d 50%, #6bcb77 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+      animation: rainbow 3s ease infinite;
+    }
+
+    @keyframes rainbow {
+      0%, 100% { filter: hue-rotate(0deg); }
+      50% { filter: hue-rotate(30deg); }
+    }
+
+    .subtitle {
+      font-size: 0.6rem;
+      color: #888;
+      letter-spacing: 2px;
+    }
+
+    .game-container {
+      position: relative;
+      background: #000;
+      border: 4px solid #ffd93d;
+      border-radius: 8px;
+      box-shadow:
+        0 0 20px rgba(255, 217, 61, 0.3),
+        inset 0 0 60px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    #canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 4px solid transparent;
+      border-top-color: #ff6b6b;
+      border-right-color: #ffd93d;
+      border-bottom-color: #6bcb77;
+      border-left-color: #4dabf7;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .progress-text {
+      font-size: 0.7rem;
+      color: #ffd93d;
+    }
+
+    .progress-bar {
+      width: 200px;
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      margin-top: 15px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77);
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 4px;
+    }
+
+    .controls {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .controls h3 {
+      font-size: 0.8rem;
+      color: #ffd93d;
+      margin-bottom: 15px;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      font-size: 0.5rem;
+    }
+
+    .control-group {
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .control-group h4 {
+      color: #6bcb77;
+      margin-bottom: 8px;
+      font-size: 0.55rem;
+    }
+
+    .key {
+      display: inline-block;
+      background: linear-gradient(180deg, #444 0%, #222 100%);
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 4px 8px;
+      margin: 2px;
+      font-size: 0.5rem;
+      box-shadow: 0 2px 0 #111;
+    }
+
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 0.5rem;
+      color: #666;
+    }
+
+    .footer a {
+      color: #4dabf7;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      color: #ffd93d;
+    }
+
+    .fullscreen-btn {
+      margin-top: 15px;
+      background: linear-gradient(180deg, #4dabf7 0%, #3b8bd4 100%);
+      border: none;
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.6rem;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #2a6cb0;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .fullscreen-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #2a6cb0;
+    }
+
+    .fullscreen-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #2a6cb0;
+    }
+
+    @media (max-width: 700px) {
+      .control-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🍄 Super Mario War 🍄</h1>
+    <p class="subtitle">Fan-made Multiplayer Deathmatch</p>
+  </div>
+
+  <div class="game-container">
+    <div class="loading-overlay" id="loading">
+      <div class="loader"></div>
+      <p class="progress-text" id="status">Downloading game data...</p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+      </div>
+    </div>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+  </div>
+
+  <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+
+  <div class="controls">
+    <h3>🎮 Controls</h3>
+    <div class="control-grid">
+      <div class="control-group">
+        <h4>Player 1</h4>
+        <span class="key">←</span><span class="key">→</span> Move<br>
+        <span class="key">↑</span> Jump<br>
+        <span class="key">↓</span> Duck<br>
+        <span class="key">.</span> Run/Use
+      </div>
+      <div class="control-group">
+        <h4>Player 2</h4>
+        <span class="key">A</span><span class="key">D</span> Move<br>
+        <span class="key">W</span> Jump<br>
+        <span class="key">S</span> Duck<br>
+        <span class="key">E</span> Run/Use
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>
+      <a href="https://github.com/mmatyas/supermariowar" target="_blank">GitHub</a> •
+      Built with Emscripten • 🍍 Pineapple approved
+    </p>
+  </div>
+
+  <script>
+    var Module = {
+      canvas: (function() {
+        var canvas = document.getElementById('canvas');
+        canvas.width = 640;
+        canvas.height = 480;
+        return canvas;
+      })(),
+      setStatus: function(text) {
+        var statusEl = document.getElementById('status');
+        var progressEl = document.getElementById('progress');
+        var loadingEl = document.getElementById('loading');
+
+        if (text) {
+          statusEl.textContent = text;
+
+          // Parse progress if available
+          var match = text.match(/Downloading data\.\.\. \((\d+)\/(\d+)\)/);
+          if (match) {
+            var percent = (parseInt(match[1]) / parseInt(match[2])) * 100;
+            progressEl.style.width = percent + '%';
+          }
+        } else {
+          // Loading complete
+          loadingEl.classList.add('hidden');
+        }
+      },
+      totalDependencies: 0,
+      monitorRunDependencies: function(left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : '');
+      }
+    };
+
+    Module.setStatus('Downloading...');
+    window.onerror = function(event) {
+      Module.setStatus('Error! See browser console.');
+    };
+
+    function toggleFullscreen() {
+      var container = document.querySelector('.game-container');
+      if (!document.fullscreenElement) {
+        container.requestFullscreen().catch(err => {
+          console.log('Fullscreen error:', err);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  </script>
+  <script async src="smw.js"></script>
+</body>
+</html>
+
