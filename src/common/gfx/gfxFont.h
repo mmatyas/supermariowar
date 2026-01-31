@@ -26,6 +26,9 @@ class gfxFont
     int getHeight() {
         return SFont_TextHeight(m_font);
     };
+    int getWidth(const std::string& text) {
+        return getWidth(text.c_str());
+    };
     int getWidth(const char *text) {
         return SFont_TextWidth(m_font, text);
     };

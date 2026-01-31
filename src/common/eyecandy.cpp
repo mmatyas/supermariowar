@@ -44,7 +44,7 @@ EC_StillImage::EC_StillImage(gfxSprite * nspr, short dstx, short dsty, short src
 
 }
 
-void EC_StillImage::draw()
+void EC_StillImage::draw() const
 {
     if (!dead)
         spr->draw(ix, iy, iSrcX, iSrcY, iw, ih);
@@ -96,7 +96,7 @@ void EC_Animated::update()
     animate();
 }
 
-void EC_Animated::draw()
+void EC_Animated::draw() const
 {
     if (!dead)
         spr->draw(ix, iy, iAnimationFrame, iAnimationY, iAnimationW, iAnimationH);
@@ -448,23 +448,15 @@ void EC_Corpse::update()
 // class EC_GravText
 //------------------------------------------------------------------------------
 
-EC_GravText::EC_GravText(gfxFont *nfont, short nx, short ny, const char *ntext, float nvely) :
-    CEyecandy()
+EC_GravText::EC_GravText(gfxFont *nfont, short nx, short ny, std::string ntext, float nvely)
+    : CEyecandy()
+    , font(nfont)
+    , vely(nvely)
+    , text(std::move(ntext))
 {
-    font = nfont;
-    x = (float)(nx - (font->getWidth(ntext) / 2));
+    x = (float)(nx - (font->getWidth(text) / 2));
     y = (float)ny;
-    w = (short)font->getWidth(ntext);
-
-    text = new char[strlen(ntext)+1];
-
-    //Test if we got the memory
-    if (text)
-        strcpy(text, ntext);
-    else
-        dead = true;
-
-    vely = nvely;
+    w = (short)font->getWidth(text);
 }
 
 
@@ -478,7 +470,7 @@ void EC_GravText::update()
 }
 
 
-void EC_GravText::draw()
+void EC_GravText::draw() const
 {
     font->draw((short)x, (short)y, text);
 
@@ -490,32 +482,18 @@ void EC_GravText::draw()
 }
 
 
-EC_GravText::~EC_GravText()
-{
-    delete [] text;
-    text = NULL;
-}
-
-
 //------------------------------------------------------------------------------
 // class EC_Announcement
 //------------------------------------------------------------------------------
 
-EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char *ntext, short icon, short time, short y) :
-    CEyecandy()
+EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, std::string ntext, short icon, short time, short y)
+    : CEyecandy()
+    , text(std::move(ntext))
 {
     font = nfont;
     sprite = nsprite;
 
     iy = y;
-
-    text = new char[strlen(ntext)+1];
-
-    //Test if we got the memory
-    if (text)
-        strcpy(text, ntext);
-    else
-        dead = true;
 
     iIcon = icon;
     iTime = time;
@@ -541,20 +519,13 @@ EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char 
     rSrcRect[3] = {static_cast<int>(App::screenWidth * 0.8f - iHalfWidth), static_cast<int>(App::screenHeight * 0.93f), iHalfWidth, 32};
 }
 
-
-EC_Announcement::~EC_Announcement()
-{
-    delete [] text;
-    text = NULL;
-}
-
 void EC_Announcement::update()
 {
     if (++iTimer >= iTime)
         dead = true;
 }
 
-void EC_Announcement::draw()
+void EC_Announcement::draw() const
 {
     for (short iRect = 0; iRect < 4; iRect++)
         rm->menu_dialog.draw(rDstRect[iRect].x, rDstRect[iRect].y, rSrcRect[iRect].x, rSrcRect[iRect].y, rSrcRect[iRect].w, rSrcRect[iRect].h);
@@ -705,7 +676,7 @@ void EC_ExplodingAward::update()
 }
 
 
-void EC_ExplodingAward::draw()
+void EC_ExplodingAward::draw() const
 {
     spr->draw((short)x, (short)y, id, 0, w, h);
 }
@@ -763,7 +734,7 @@ void EC_SwirlingAward::update()
 }
 
 
-void EC_SwirlingAward::draw()
+void EC_SwirlingAward::draw() const
 {
     short awardx = x + (short)(radius * cos(angle));
     short awardy = y + (short)(radius * sin(angle));
@@ -824,7 +795,7 @@ void EC_RocketAward::update()
 }
 
 
-void EC_RocketAward::draw()
+void EC_RocketAward::draw() const
 {
     spr->draw((short)x, (short)y, iAnimationFrame, iSrcY, w, h);
 }
@@ -863,7 +834,7 @@ void EC_FloatingObject::update()
 }
 
 
-void EC_FloatingObject::draw()
+void EC_FloatingObject::draw() const
 {
     spr->draw((short)x, (short)y, srcx, srcy, w, h);
 }
@@ -946,7 +917,7 @@ void EC_SoulsAward::update()
 }
 
 
-void EC_SoulsAward::draw()
+void EC_SoulsAward::draw() const
 {
     spawnspr->draw(x - 16, y - 16, frame * w, 0, w, h);
 }
@@ -1015,7 +986,7 @@ void EC_Door::update()
     }
 }
 
-void EC_Door::draw()
+void EC_Door::draw() const
 {
     spr->draw(x, y + offsety, 0, colorOffset, iw, ih - offsety);
 
@@ -1073,7 +1044,7 @@ void EC_BossPeeker::update()
 }
 
 
-void EC_BossPeeker::draw()
+void EC_BossPeeker::draw() const
 {
 	spr->draw(ix, iy, 192, iBossColorOffsetY, 48, 64);
 }
@@ -1104,7 +1075,7 @@ void EC_SuperStompExplosion::update()
     }
 }
 
-void EC_SuperStompExplosion::draw()
+void EC_SuperStompExplosion::draw() const
 {
     if (dead)
         return;
@@ -1129,7 +1100,7 @@ CEyecandyContainer::CEyecandyContainer()
 
 void CEyecandyContainer::cleanDeadObjects()
 {
-    auto erase_from = std::remove_if(eyecandies.begin(), eyecandies.end(), [](const auto& ec) { return ec->dead; });
+    auto erase_from = std::remove_if(eyecandies.begin(), eyecandies.end(), [](const auto& ec) { return ec->isDead(); });
     eyecandies.erase(erase_from, eyecandies.end());
 }
 
