@@ -157,7 +157,7 @@ bool RemoveTeam(short teamid)
 
     //Announce that a team was removed
     if (game_values.deadteamnotice && game_values.flags.teamdeadcounter < score_cnt - 1) {
-        eyecandy[2].add(new EC_Announcement(&rm->game_font_large, &rm->spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200));
+        eyecandy[2].emplace<EC_Announcement>(&rm->game_font_large, &rm->spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200);
         ifsoundonandreadyplay(rm->sfx_announcer[iAnnouncementColor + 16]);
     }
 

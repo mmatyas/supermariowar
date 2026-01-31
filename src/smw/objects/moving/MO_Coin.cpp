@@ -60,7 +60,7 @@ bool MO_Coin::collide(CPlayer* player)
         game_values.gamemode->CheckWinner(player);
     }
 
-    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_coinsparkle, ix, iy, 7, 4));
+    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_coinsparkle, ix, iy, 7, 4);
 
     ifSoundOnPlay(rm->sfx_coin);
 
@@ -95,7 +95,7 @@ void MO_Coin::update()
         iUncollectableTime--;
 
         if (iType == 1 && iUncollectableTime < -game_values.gamemodesettings.greed.coinlife) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, iy, 3, 8);
             dead = true;
         }
     }

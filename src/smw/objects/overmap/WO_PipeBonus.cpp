@@ -42,7 +42,7 @@ bool OMO_PipeBonus::collide(CPlayer* player)
     if (iType == 5) {
         if (!player->isShielded()) {
             dead = true;
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix - 1, iy - 1, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix - 1, iy - 1, 3, 8);
 
             if (!player->isInvincible()) {
                 return player->KillPlayerMapHazard(false, KillStyle::Environment, false) != PlayerKillType::NonKill;

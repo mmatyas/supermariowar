@@ -50,10 +50,10 @@ void PlayerJail::escape(CPlayer& player)
         timer = 0;
         owner_teamID = -1;
 
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof,
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof,
             player.centerX() - 24,
             player.centerY() - 24,
-            4, 5));
+            4, 5);
         ifSoundOnPlay(rm->sfx_transform);
     } else {
         ifSoundOnPlay(rm->sfx_hit);
@@ -64,10 +64,10 @@ void PlayerJail::free_by_teammate(CPlayer& player)
 {
     if (isActive()) {
         timer = 0;
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion,
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion,
             player.centerX() - 16,
             player.centerY() - 16,
-            3, 8));
+            3, 8);
         ifSoundOnPlay(rm->sfx_transform);
     }
 }
@@ -78,10 +78,10 @@ void PlayerJail::update(CPlayer& player)
         if (--timer <= 0) {
             timer = 0;
             owner_teamID = -1;
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion,
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion,
                 player.centerX() - 16,
                 player.centerY() - 16,
-                3, 8));
+                3, 8);
             ifSoundOnPlay(rm->sfx_transform);
         }
     }

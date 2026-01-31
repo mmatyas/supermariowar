@@ -89,7 +89,7 @@ void MO_CollectionCard::update()
     } else if (state == 3) {
         if (++timer > 200) {
             dead = true;
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, iy, 3, 8);
         }
     }
 
@@ -109,7 +109,7 @@ void MO_CollectionCard::update()
         IO_MovingObject::update();
 
         if (--uncollectabletime < -game_values.gamemodesettings.collection.cardlife) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, iy, 3, 8);
             dead = true;
         }
     }

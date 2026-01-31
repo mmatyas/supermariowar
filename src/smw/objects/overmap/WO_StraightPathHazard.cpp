@@ -42,7 +42,7 @@ void OMO_StraightPathHazard::update()
 bool OMO_StraightPathHazard::collide(CPlayer* player)
 {
     if (!player->isShielded()) {
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8);
         dead = true;
 
         if (!player->isInvincible() && !player->shyguy) {

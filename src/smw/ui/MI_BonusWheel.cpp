@@ -92,7 +92,7 @@ void MI_BonusWheel::Update()
             short iPoofX = m_pos.x + 152 + (short)(110.0f * cos(dSelectionSector[iDisplayPowerupIndex]));
             short iPoofY = m_pos.y + 200 + (short)(110.0f * sin(dSelectionSector[iDisplayPowerupIndex]));
 
-            m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, iPoofX, iPoofY, 4, 5));
+            m_parentMenu->AddEyeCandy<EC_SingleAnimation>(&rm->spr_poof, iPoofX, iPoofY, 4, 5);
 
             ifSoundOnPlay(rm->sfx_cannon);
 

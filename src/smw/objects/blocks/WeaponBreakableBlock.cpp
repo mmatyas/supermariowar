@@ -187,10 +187,10 @@ bool B_WeaponBreakableBlock::hitleft(IO_MovingObject * object)
 void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID)
 {
     if (state == 0) {
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokengrayblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokengrayblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokengrayblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokengrayblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokengrayblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokengrayblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokengrayblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokengrayblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
 
         state = 1;
         ifSoundOnPlay(rm->sfx_breakblock);

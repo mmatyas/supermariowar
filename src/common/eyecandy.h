@@ -1,9 +1,9 @@
-#ifndef EYECANDY_H
-#define EYECANDY_H
+#pragma once
 
 #include "gfx.h"
 #include "GlobalConstants.h"
 
+#include <memory>
 #include <vector>
 
 //this system is pretty cool ;)
@@ -419,28 +419,30 @@ class CEyecandyContainer
 {
 public:
     CEyecandyContainer();
-    ~CEyecandyContainer();
 
-    short add(CEyecandy *ec);
+    template<typename T, typename... Args>
+    void emplace(Args&&... args) {
+        auto ptr = std::make_unique<T>(std::forward<Args>(args)...);
+        eyecandies.emplace_back(std::move(ptr));
+    }
 
     void update() {
-        for (short i = 0; i < list_end; i++)
-            list[i]->update();
-    };
-    void draw() {
-        for (short i = 0; i < list_end; i++)
-            list[i]->draw();
-    };
+        for (auto& ec : eyecandies)
+            ec->update();
+    }
+    void draw() const {
+        for (const auto& ec : eyecandies)
+            ec->draw();
+    }
 
-    void clean();
+    void clean() {
+        eyecandies.clear();
+    }
 
     void cleanDeadObjects();
 
 public:
-    CEyecandy *list[MAXEYECANDY];
-    short		 list_end;
-
-    void remove(short i);
+    std::vector<std::unique_ptr<CEyecandy>> eyecandies;
 };
 
 class Spotlight
@@ -483,5 +485,3 @@ private:
     std::vector<Spotlight*> spotlightList;
 
 };
-
-#endif // EYECANDY_H

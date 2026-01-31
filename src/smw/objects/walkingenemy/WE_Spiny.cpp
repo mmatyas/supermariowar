@@ -69,7 +69,7 @@ void MO_Spiny::Die()
     }
 
     dead = true;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 64, 0, 32, 32));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 64, 0, 32, 32);
 }
 
 void MO_Spiny::DropShell(bool fBounce, bool fFlip)

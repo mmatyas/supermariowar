@@ -28,7 +28,7 @@ bool PU_MysteryMushroomPowerup::collide(CPlayer* player)
         dead = true;
 
         if (!SwapPlayers(player->localID)) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW)-16, player->iy + (HALFPH)-16, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->ix + (HALFPW)-16, player->iy + (HALFPH)-16, 3, 8);
             ifSoundOnPlay(rm->sfx_spit);
         }
     }

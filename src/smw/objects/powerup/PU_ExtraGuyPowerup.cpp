@@ -30,7 +30,7 @@ bool PU_ExtraGuyPowerup::collide(CPlayer* player)
         game_values.gamemode->playerextraguy(*player, iType);
         ifSoundOnPlay(rm->sfx_extraguysound);
 
-        eyecandy[2].add(new EC_FloatingObject(&rm->spr_extralife, player->ix + HALFPW - 19, player->iy - 16, 0.0f, -1.5f, 62, player->colorID * 38, (iType == 5 ? 3 : iType - 1) * 16, 38, 16));
+        eyecandy[2].emplace<EC_FloatingObject>(&rm->spr_extralife, player->ix + HALFPW - 19, player->iy - 16, 0.0f, -1.5f, 62, player->colorID * 38, (iType == 5 ? 3 : iType - 1) * 16, 38, 16);
 
         dead = true;
     }

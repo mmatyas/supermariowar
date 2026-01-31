@@ -49,7 +49,7 @@ bool PU_SecretPowerup::collide(CPlayer* player)
         game_values.windaffectsplayers = true;
 
         for (short i = 0; i < 15; i++)
-            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), RANDOM_INT(4) + 1));
+            eyecandy[2].emplace<EC_Snow>(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), RANDOM_INT(4) + 1);
     } else if (itemtype == 1) {
         game_values.spinscreen = true;
     } else if (itemtype == 2) {

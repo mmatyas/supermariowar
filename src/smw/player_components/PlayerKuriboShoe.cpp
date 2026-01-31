@@ -70,7 +70,7 @@ void PlayerKuriboShoe::update_gettingOutOfTheShoe(CPlayer& player, uint8_t keyma
             CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, {player.ix - PWOFFSET, player.iy - PHOFFSET - 2}, type == STICKY);
             shoe->collision_detection_checksides();
             objectcontainer[1].add(shoe);
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player.centerX() - 16, player.centerY() - 16, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player.centerX() - 16, player.centerY() - 16, 3, 8);
 
             exitIndex = 0;
             exitTimer = 0;

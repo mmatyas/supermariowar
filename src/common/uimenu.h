@@ -35,8 +35,9 @@ public:
     void Update();
     void Draw();
 
-    void AddEyeCandy(CEyecandy* ec) {
-        eyeCandy.add(ec);
+    template<typename T, typename... Args>
+    void AddEyeCandy(Args&&... args) {
+        eyeCandy.emplace<T>(std::forward<Args>(args)...);
     }
     void ClearEyeCandy() {
         eyeCandy.clean();

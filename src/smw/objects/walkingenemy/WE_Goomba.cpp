@@ -87,7 +87,7 @@ bool MO_Goomba::hittop(CPlayer* player)
 
         player->AddKillerAward(NULL, killStyle);
 
-        eyecandy[0].add(new EC_Corpse(&rm->spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
+        eyecandy[0].emplace<EC_Corpse>(&rm->spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0);
     }
 
     ifSoundOnPlay(rm->sfx_mip);
@@ -104,5 +104,5 @@ void MO_Goomba::Die()
     }
 
     dead = true;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_goombadeadflying, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, 0, 0, 0));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_goombadeadflying, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, 0, 0, 0);
 }

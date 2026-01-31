@@ -175,7 +175,7 @@ void MO_SledgeBrother::update()
                 //{
                 //	short iRandomX = RANDOM_INT(612);
                 //	short iRandomY = RANDOM_INT(442);
-                //	eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8));
+                //	eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8);
                 //	objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, RANDOM_INT(30) + 30));
                 // }
             } else if (iType == 2) {
@@ -478,7 +478,7 @@ void MO_SledgeBrother::collide(IO_MovingObject* object)
 void MO_SledgeBrother::Die()
 {
     dead = true;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_sledgebrothersdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iType * 64, iw, ih));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_sledgebrothersdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iType * 64, iw, ih);
 }
 
 void MO_SledgeBrother::Damage(short playerID)

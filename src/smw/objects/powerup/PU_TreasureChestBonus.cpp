@@ -50,7 +50,7 @@ void PU_TreasureChestBonus::update()
         if (--drawbonusitemtimer <= 0)
             state = 4;
     } else if (state == 4) {
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, drawbonusitemy, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, drawbonusitemy, 3, 8);
         dead = true;
     }
 }
@@ -85,7 +85,7 @@ bool PU_TreasureChestBonus::collide(CPlayer* player)
         drawbonusitemy = iy;
         drawbonusitemtimer = 60;
 
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, iy, 3, 8);
 
         game_values.flags.noexit = false;
     }

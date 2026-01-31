@@ -1662,7 +1662,7 @@ void MenuState::DisplayControllingTeamMessage(short iControlTeam)
     else
         sprintf(szMessage, "Team %d Is In Control", iControlTeam + 1);
 
-    mCurrentMenu->AddEyeCandy(new EC_Announcement(&rm->menu_font_large, &rm->spr_announcementicons, szMessage, iControlTeam < 0 ? 4 : game_values.colorids[game_values.teamids[iControlTeam][0]], 120, 100));
+    mCurrentMenu->AddEyeCandy<EC_Announcement>(&rm->menu_font_large, &rm->spr_announcementicons, szMessage, iControlTeam < 0 ? 4 : game_values.colorids[game_values.teamids[iControlTeam][0]], 120, 100);
 }
 
 void MenuState::Exit()

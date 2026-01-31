@@ -108,8 +108,8 @@ PlayerKillType CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, K
     if (&inflictor == m_tagged) {
         m_tagged = &other;
         inflictor.Shield().reset();
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, other.centerX(), other.bottomY(), "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, other.centerX() - 16, other.centerY() - 16, 3, 8));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, other.centerX(), other.bottomY(), "Tagged!", -VELJUMP*1.5);
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, other.centerX() - 16, other.centerY() - 16, 3, 8);
         ifSoundOnPlay(rm->sfx_transform);
     }
 

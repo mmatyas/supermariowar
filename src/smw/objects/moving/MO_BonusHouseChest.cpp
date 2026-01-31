@@ -38,7 +38,7 @@ void MO_BonusHouseChest::update()
         drawbonusitemy -= 2;
 
         if (--drawbonusitemtimer <= 0) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + 16, drawbonusitemy, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + 16, drawbonusitemy, 3, 8);
             state = 3;
         }
     }

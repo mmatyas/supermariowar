@@ -7,6 +7,7 @@
 #include "ResourceManager.h"
 #include "map.h"
 
+#include <algorithm>
 #include <cstring>
 #include <cmath>
 
@@ -699,7 +700,7 @@ void EC_ExplodingAward::update()
 
     if (++timer > ttl) {
         dead = true;
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8);
     }
 }
 
@@ -747,7 +748,7 @@ void EC_SwirlingAward::update()
     if (++timer > ttl) {
         short awardx = x + (short)(radius * cos(angle)) + (w >> 1) - 16;
         short awardy = y + (short)(radius * sin(angle)) + (h >> 1) - 16;
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, awardx, awardy, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, awardx, awardy, 3, 8);
 
         dead = true;
     }
@@ -809,7 +810,7 @@ void EC_RocketAward::update()
     x += velx;
 
     if (++timer > ttl) {
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8);
         dead = true;
     }
 
@@ -856,7 +857,7 @@ void EC_FloatingObject::update()
     x += velx;
 
     if (++timer > ttl) {
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8);
         dead = true;
     }
 }
@@ -924,7 +925,7 @@ void EC_SoulsAward::update()
         float velx = speed * cos(angle);
         float vely = speed * sin(angle);
 
-        eyecandy[2].add(new EC_RocketAward(&rm->spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 0, 16, 16));
+        eyecandy[2].emplace<EC_RocketAward>(&rm->spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 0, 16, 16);
 
         if (++count >= numSouls) {
             endmode = true;
@@ -1123,71 +1124,13 @@ void EC_SuperStompExplosion::draw()
 //------------------------------------------------------------------------------
 CEyecandyContainer::CEyecandyContainer()
 {
-    for (short i = 0; i < MAXEYECANDY; i++)
-        list[i] = NULL;
-
-    list_end = 0;
-}
-
-
-CEyecandyContainer::~CEyecandyContainer()
-{
-    clean();
-}
-
-
-void CEyecandyContainer::clean()
-{
-    for (short i = 0; i < list_end; i++) {
-        delete list[i];
-        list[i] = NULL;
-    }
-    list_end = 0;
-}
-
-
-short CEyecandyContainer::add(CEyecandy *ec)
-{
-    if (list_end < MAXEYECANDY) {
-        list[list_end] = ec;
-        ec->dead = false;
-        list_end++;
-
-        return list_end - 1;
-    } else {
-        delete ec;	//otherwise memory leak!
-        //printf("eyecandy list full!\n");
-    }
-
-    return -1;
-}
-
-
-void CEyecandyContainer::remove(short i)
-{
-    delete list[i];
-    list_end--;
-
-    if (i != list_end) {
-        //if we didn't remove the last element we move the last elemnt in the new free place in the eyecandy list
-        list[i] = list[list_end];
-    }
+    eyecandies.reserve(MAXEYECANDY);
 }
 
 void CEyecandyContainer::cleanDeadObjects()
 {
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->dead) {
-            delete list[i];
-            list_end--;
-
-            if (i != list_end) {
-                list[i] = list[list_end];
-            }
-
-            i--;
-        }
-    }
+    auto erase_from = std::remove_if(eyecandies.begin(), eyecandies.end(), [](const auto& ec) { return ec->dead; });
+    eyecandies.erase(erase_from, eyecandies.end());
 }
 
 static const short iSpotlightValues[8][4] = { {16, 8, 240, 96}, {32, 16, 336, 80}, {48, 24, 416, 64}, {64, 32, 416, 0}, {80, 40, 336, 0}, {96, 48, 240, 0}, {112, 56, 128, 0}, { 128, 64, 0, 0}};

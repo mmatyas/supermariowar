@@ -151,8 +151,8 @@ void CGM_ShyGuyTag::SetShyGuy(short iTeam)
     for (CPlayer* player : players) {
         if (player->getTeamID() == iTeam) {
             player->shyguy = true;
-            eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Shyguy!", -VELJUMP*1.5));
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
+            eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, player->centerX(), player->bottomY(), "Shyguy!", -VELJUMP*1.5);
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8);
 
             player->StripPowerups();
             player->ClearPowerupStates();
@@ -168,7 +168,7 @@ void CGM_ShyGuyTag::FreeShyGuys()
 
     for (CPlayer* player : players) {
         player->shyguy = false;
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8);
     }
 }
 

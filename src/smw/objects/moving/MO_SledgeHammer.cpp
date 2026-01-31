@@ -75,7 +75,7 @@ bool MO_SledgeHammer::collide(CPlayer* player)
 {
     if (!player->isShielded()) {
         dead = true;
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4);
         ifSoundOnPlay(rm->sfx_hit);
 
         if (!player->isInvincible() && !player->shyguy) {

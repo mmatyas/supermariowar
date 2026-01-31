@@ -74,7 +74,7 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
                     for (CPlayer* player : players) {
                         //If they weren't just the one killed and they were jailed, give them a transform cloud
                         if (player != &other && player->Jail().isActive()) {
-                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player->centerX() - 24, player->centerY() - 24, 4, 5));
+                            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, player->centerX() - 24, player->centerY() - 24, 4, 5);
                             ifSoundOnPlay(rm->sfx_transform);
                         }
 
@@ -157,7 +157,7 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
 
                             //If they weren't just the one killed and they were jailed, give them a transform cloud
                             if (player != &other && player->Jail().isActive()) {
-                                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player->centerX() - 24, player->centerY() - 24, 4, 5));
+                                eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, player->centerX() - 24, player->centerY() - 24, 4, 5);
                                 ifSoundOnPlay(rm->sfx_transform);
                             }
 

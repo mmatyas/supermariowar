@@ -133,7 +133,7 @@ void MI_World::DisplayTeamControlAnnouncement()
     else
         sprintf(szMessage, "Team %d Is In Control", iControllingTeam + 1);
 
-    m_parentMenu->AddEyeCandy(new EC_Announcement(&rm->menu_font_large, &rm->spr_announcementicons, szMessage, game_values.colorids[iControllingPlayerId], 120, 100));
+    m_parentMenu->AddEyeCandy<EC_Announcement>(&rm->menu_font_large, &rm->spr_announcementicons, szMessage, game_values.colorids[iControllingPlayerId], 120, 100);
 }
 
 void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
@@ -909,7 +909,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
             g_worldmap.UpdateTile(sMapSurface[0], iDest.x - iMapDrawOffsetCol, iDest.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             g_worldmap.UpdateTile(sMapSurface[1], iDest.x - iMapDrawOffsetCol, iDest.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 
-            m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, (iDest.x << 5) + iMapOffsetX - 8, (iDest.y << 5) + iMapOffsetY - 8, 4, 5));
+            m_parentMenu->AddEyeCandy<EC_SingleAnimation>(&rm->spr_poof, (iDest.x << 5) + iMapOffsetX - 8, (iDest.y << 5) + iMapOffsetY - 8, 4, 5);
 
             fUsedItem = true;
             ifSoundOnPlay(rm->sfx_transform);
@@ -924,28 +924,28 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
             short iPlayerY = (iPlayerCurrentTile.y << 5) + iMapOffsetY;
 
             if (iDoorsOpened & 0x1) {
-                m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX - TILESIZE, iPlayerY, 3, 8));
+                m_parentMenu->AddEyeCandy<EC_SingleAnimation>(&rm->spr_fireballexplosion, iPlayerX - TILESIZE, iPlayerY, 3, 8);
 
                 g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTile.x - iMapDrawOffsetCol - 1, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
                 g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTile.x - iMapDrawOffsetCol - 1, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             if (iDoorsOpened & 0x2) {
-                m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX + TILESIZE, iPlayerY, 3, 8));
+                m_parentMenu->AddEyeCandy<EC_SingleAnimation>(&rm->spr_fireballexplosion, iPlayerX + TILESIZE, iPlayerY, 3, 8);
 
                 g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTile.x - iMapDrawOffsetCol + 1, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
                 g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTile.x - iMapDrawOffsetCol + 1, iPlayerCurrentTile.y - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             if (iDoorsOpened & 0x4) {
-                m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX, iPlayerY - TILESIZE, 3, 8));
+                m_parentMenu->AddEyeCandy<EC_SingleAnimation>(&rm->spr_fireballexplosion, iPlayerX, iPlayerY - TILESIZE, 3, 8);
 
                 g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
                 g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             if (iDoorsOpened & 0x8) {
-                m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8));
+                m_parentMenu->AddEyeCandy<EC_SingleAnimation>(&rm->spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8);
 
                 g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
                 g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTile.x - iMapDrawOffsetCol, iPlayerCurrentTile.y - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
@@ -1007,5 +1007,5 @@ void MI_World::UseCloud(bool fUseCloud)
     ifSoundOnPlay(rm->sfx_transform);
 
     const Vec2s iPlayerDrawPos = g_worldmap.GetPlayerPosition();
-    m_parentMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, iPlayerDrawPos.x + iMapOffsetX - 8, iPlayerDrawPos.y + iMapOffsetY - 8, 4, 5));
+    m_parentMenu->AddEyeCandy<EC_SingleAnimation>(&rm->spr_poof, iPlayerDrawPos.x + iMapOffsetX - 8, iPlayerDrawPos.y + iMapOffsetY - 8, 4, 5);
 }

@@ -175,7 +175,7 @@ void CPlayer::updateFrozenStatus(int keymask)
 
             //Shield the player after becoming unfrozen to protect against being frozen again
             shield.turn_on();
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8);
         }
     }
 }
@@ -231,7 +231,7 @@ void CPlayer::accelerate(float direction)
         //If rain candy is turned on
         if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && fabs(velx) > VELMOVINGADD && ++rainsteptimer > 7) {
             rainsteptimer = 0;
-            eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+            eyecandy[1].emplace<EC_SingleAnimation>(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16);
         }
     }
 }
@@ -653,9 +653,9 @@ void CPlayer::update_waitingForRespawn()
             state = PlayerState::Spawning;
 
             if (game_values.spawnstyle == SpawnStyle::Instant) {
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+                eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8);
             } else if (game_values.spawnstyle == SpawnStyle::Door) {
-                eyecandy[0].add(new EC_Door(&rm->spr_spawndoor, sprites[sprite_state], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
+                eyecandy[0].emplace<EC_Door>(&rm->spr_spawndoor, sprites[sprite_state], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID);
             }
         }
     }
@@ -686,7 +686,7 @@ void CPlayer::update_respawning()
                 short iColorIdOffset = colorID << 5;
 
                 for (short iSwirl = 0; iSwirl < 4; iSwirl++)
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
+                    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32);
             }
             break;
     }
@@ -1489,7 +1489,7 @@ void CPlayer::updateSprite()
 
                     if (++frictionslidetimer > 3) {
                         frictionslidetimer = 0;
-                        eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 12, 4, 4, 0, 0, 16, 16));
+                        eyecandy[1].emplace<EC_SingleAnimation>(&rm->spr_frictionsmoke, ix, iy + PH - 12, 4, 4, 0, 0, 16, 16);
                     }
                 } else {
                     if (onice && !playerKeys->game_right.fDown && !playerKeys->game_left.fDown)
@@ -1528,7 +1528,7 @@ void CPlayer::updateSprite()
 
                     if (++frictionslidetimer > 3) {
                         frictionslidetimer = 0;
-                        eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4, 0, 0, 16, 16));
+                        eyecandy[1].emplace<EC_SingleAnimation>(&rm->spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4, 0, 0, 16, 16);
                     }
                 } else {
                     if (onice && !playerKeys->game_right.fDown && !playerKeys->game_left.fDown)
@@ -1641,16 +1641,16 @@ void CPlayer::die(PlayerDeathStyle deathStyle, bool fTeamRemoved, bool fKillCarr
 
         //Add eyecandy for the dead player
         if (deathStyle == PlayerDeathStyle::Shatter || frozen) {
-            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
-            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+            eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+            eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+            eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
+            eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
 
             game_values.unlocksecret2part2++;
         } else if (deathStyle == PlayerDeathStyle::Jump) {
-            eyecandy[2].add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
+            eyecandy[2].emplace<EC_FallingObject>(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32);
         } else if (deathStyle == PlayerDeathStyle::Squish) {
-            eyecandy[1].add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
+            eyecandy[1].emplace<EC_Corpse>(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX);
         }
     }
 
@@ -1802,7 +1802,7 @@ bool CPlayer::FindSpawnPoint()
 void CPlayer::spawnText(const char * szText)
 {
     if (++spawntext >= 20) {
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, ix + HALFPW, iy, szText, -VELJUMP));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, ix + HALFPW, iy, szText, -VELJUMP);
         spawntext = 0;	//spawn text every 20 frames
     }
 }
@@ -1917,14 +1917,14 @@ void CPlayer::TransferTag(CPlayer* o2)
     if (gmTag->tagged() == o1 && !o2->isShielded() && !o2->isInvincible()) {
         gmTag->setTagged(o2);
         o1->shield.turn_on();
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5);
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8);
         ifSoundOnPlay(rm->sfx_transform);
     } else if (gmTag->tagged() == o2 && !o1->isShielded() && !o1->isInvincible()) {
         gmTag->setTagged(o1);
         o2->shield.turn_on();
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5);
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8);
         ifSoundOnPlay(rm->sfx_transform);
     }
 }
@@ -2046,7 +2046,7 @@ void CPlayer::draw()
         //Add smoke to the top of the bomb
         if (++bobombsmoketimer > 2 && (velx != 0.0f || vely != GRAVITATION) && state == PlayerState::Ready) {
             bobombsmoketimer = 0;
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4);
         }
     } else if (chicken == this) { //draw him as chicken
         pScoreboardSprite = rm->spr_chocobo[colorID];
@@ -2795,7 +2795,7 @@ void CPlayer::makefrozen(short iTime)
         frozen = true;
         frozentimer = iTime;
 
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8);
     }
 }
 
@@ -2871,7 +2871,7 @@ void CPlayer::SetPowerup(short iPowerup)
             SetStoredPowerup(PowerupType::Bobomb);
         else {
             ifSoundOnPlay(rm->sfx_transform);
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5);
             bobomb = true;
         }
     } else if (iPowerup == 9) {
@@ -2892,7 +2892,7 @@ void CPlayer::SetPowerup(short iPowerup)
             SetStoredPowerup(iPowerup - 2); //Storing shells
     } else {
         if (iPowerup == 3 || iPowerup == 7 || iPowerup == 8) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8);
         }
 
         if (powerup != iPowerup) {

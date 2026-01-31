@@ -135,10 +135,10 @@ void B_ThrowBlock::triggerBehavior()
     g_map->UpdateTileGap(col, row);
 
     const int srcY = static_cast<int>(iType) * 16;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, srcY, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, srcY, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, srcY, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, srcY, 16, 16));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, srcY, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, srcY, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, srcY, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, srcY, 16, 16);
 
     ifSoundOnPlay(rm->sfx_breakblock);
 }

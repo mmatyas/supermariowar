@@ -60,7 +60,7 @@ bool B_DonutBlock::hittop(CPlayer * player, bool useBehavior)
 
 void B_DonutBlock::triggerBehavior(short iPlayerId)
 {
-    //eyecandy[2].add(new EC_FallingObject(&rm->spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0));
+    //eyecandy[2].emplace<EC_FallingObject>(&rm->spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0);
 
     TilesetTile tile;
     tile.iID = g_tilesetmanager->classicTilesetIndex();

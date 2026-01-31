@@ -33,6 +33,6 @@ void CO_KuriboShoe::hittop(CPlayer* player)
         dead = true;
         player->SetKuriboShoe(fSticky ? STICKY : NORMAL);
         ifSoundOnPlay(rm->sfx_transform);
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + HALFPW - 16, player->iy + HALFPH - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->ix + HALFPW - 16, player->iy + HALFPH - 16, 3, 8);
     }
 }

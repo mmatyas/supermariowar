@@ -295,7 +295,7 @@ void MO_PirhanaPlant::KillPlant()
     state = 0;
 
     ifSoundOnPlay(rm->sfx_kicksound);
-    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iDirection == 2 ? 0 : collisionWidth - 32), iy + (iDirection == 0 ? 0 : collisionHeight - 32), 3, 4));
+    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + (iDirection == 2 ? 0 : collisionWidth - 32), iy + (iDirection == 0 ? 0 : collisionHeight - 32), 3, 4);
 
     if (iDirection == 0)
         iy += collisionHeight;

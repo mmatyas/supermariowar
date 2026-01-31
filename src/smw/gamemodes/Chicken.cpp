@@ -74,9 +74,9 @@ PlayerKillType CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &othe
 {
     if (!m_chicken || &other == m_chicken) {
         m_chicken = &inflictor;
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, inflictor.centerX(), inflictor.bottomY(), "Chicken!", -VELJUMP*1.5));
-        //eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, inflictor.centerX() - 16, inflictor.centerY() - 16, 3, 8));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, inflictor.centerX() - 24, inflictor.centerY() - 24, 4, 5));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, inflictor.centerX(), inflictor.bottomY(), "Chicken!", -VELJUMP*1.5);
+        //eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, inflictor.centerX() - 16, inflictor.centerY() - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, inflictor.centerX() - 24, inflictor.centerY() - 24, 4, 5);
         ifSoundOnPlay(rm->sfx_transform);
 
         if (&other == m_chicken)

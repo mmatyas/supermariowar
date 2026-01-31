@@ -59,7 +59,7 @@ bool OMO_PipeCoin::collide(CPlayer* player)
         game_values.gamemode->CheckWinner(player);
     }
 
-    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_coinsparkle, ix, iy, 7, 4));
+    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_coinsparkle, ix, iy, 7, 4);
 
     dead = true;
     return false;

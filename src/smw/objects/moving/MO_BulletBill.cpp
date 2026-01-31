@@ -204,7 +204,7 @@ void MO_BulletBill::collide(IO_MovingObject* object)
 void MO_BulletBill::Die()
 {
     dead = true;
-    eyecandy[2].add(new EC_FallingObject(spr_dead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, velx > 0 ? 0 : 32, iColorID * 32, 32, 32));
+    eyecandy[2].emplace<EC_FallingObject>(spr_dead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, velx > 0 ? 0 : 32, iColorID * 32, 32, 32);
 }
 
 void MO_BulletBill::SetDirectionOffset()

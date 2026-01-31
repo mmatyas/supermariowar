@@ -134,7 +134,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
         		player->decreaseProjectilesCount();
 
             object->dead = true;
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, object->x() + (object->iw >> 1) - 16, object->y() + (object->ih >> 1) - 16, 3, 4));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, object->x() + (object->iw >> 1) - 16, object->y() + (object->ih >> 1) - 16, 3, 4);
         }
 
         if (playsound)
@@ -240,7 +240,7 @@ void CheckSecret(short id)
             IO_MovingObject * object = createpowerup(SECRET1_POWERUP, randomPos, true, false);
 
             if (object)
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->x() - 8, object->y() - 8, 4, 5));
+                eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, object->x() - 8, object->y() - 8, 4, 5);
         }
     } else if (id == 1 && !game_values.unlocksecretunlocked[1]) {
         if (game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3) {
@@ -250,7 +250,7 @@ void CheckSecret(short id)
             IO_MovingObject * object = createpowerup(SECRET2_POWERUP, randomPos, true, false);
 
             if (object)
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->x() - 8, object->y() - 8, 4, 5));
+                eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, object->x() - 8, object->y() - 8, 4, 5);
         }
     } else if (id == 2 && !game_values.unlocksecretunlocked[2]) {
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
@@ -262,7 +262,7 @@ void CheckSecret(short id)
                 IO_MovingObject * object = createpowerup(SECRET3_POWERUP, randomPos, true, false);
 
                 if (object)
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->x() - 8, object->y() - 8, 4, 5));
+                    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, object->x() - 8, object->y() - 8, 4, 5);
             }
         }
     } else if (id == 3 && !game_values.unlocksecretunlocked[3]) {
@@ -272,6 +272,6 @@ void CheckSecret(short id)
         IO_MovingObject * object = createpowerup(SECRET4_POWERUP, randomPos, true, false);
 
         if (object)
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->x() - 8, object->y() - 8, 4, 5));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, object->x() - 8, object->y() - 8, 4, 5);
     }
 }

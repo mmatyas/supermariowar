@@ -333,7 +333,7 @@ void SplashScreenState::update()
                     static int index = 0;
                     if (++timer >= 60)
                     {
-                        eyecandy[2].add(new EC_GravText(&rm->menu_font_large, App::screenWidth/2, App::screenHeight, contributors[contributorOrder[index]], -8.2f));
+                        eyecandy[2].emplace<EC_GravText>(&rm->menu_font_large, App::screenWidth/2, App::screenHeight, contributors[contributorOrder[index]], -8.2f);
                         timer = 0;
 
                         if (++index >= NUM_CONTRIBUTORS)

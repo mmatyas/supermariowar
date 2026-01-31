@@ -301,7 +301,7 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
     if (starPlayer[id]) {
         oldstar = starPlayer[id];
         oldstar->Shield().turn_on();
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, oldstar->centerX() - 16, oldstar->centerY() - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, oldstar->centerX() - 16, oldstar->centerY() - 16, 3, 8);
     }
 
     starPlayer[id] = player;
@@ -310,11 +310,11 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
         starItem[id]->setPlayerColor(starPlayer[id]->getColorID());
 
     if (starItem[id]->getType() == 1)
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), iCurrentModeType == StarStyle::Multi ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, player->centerX(), player->bottomY(), iCurrentModeType == StarStyle::Multi ? "Star Get!" : "Shine Get!", -VELJUMP*1.5);
     else
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Ztarred!", -VELJUMP*1.5));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, player->centerX(), player->bottomY(), "Ztarred!", -VELJUMP*1.5);
 
-    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
+    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8);
     ifSoundOnPlay(rm->sfx_transform);
 
     return oldstar;

@@ -379,7 +379,7 @@ void GameplayState::initEyeCandy()
                 velx = velx < 0.5f && velx > -0.5f ? 1 : velx;  //no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_clouds, (float)(RANDOM_INT(App::screenWidth)), (float)(RANDOM_INT(100)), velx, 0, srcy, w, h));
+                eyecandy[iEyeCandyLayer].emplace<EC_Cloud>(&rm->spr_clouds, (float)(RANDOM_INT(App::screenWidth)), (float)(RANDOM_INT(100)), velx, 0, srcy, w, h);
             }
         }
 
@@ -392,20 +392,20 @@ void GameplayState::initEyeCandy()
                 velx = velx < 0.5f && velx > -0.5f ? (RANDOM_INT(1) ? 1.0f : -1.0f) : velx; //no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
+                eyecandy[iEyeCandyLayer].emplace<EC_Ghost>(&rm->spr_ghosts, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32);
             }
         }
 
         //Leaves
         if (g_map->eyecandy[iEyeCandyLayer] & 4) {
             for (i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight)));
+                eyecandy[iEyeCandyLayer].emplace<EC_Leaf>(&rm->spr_leaves, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight));
         }
 
         //Snow
         if (g_map->eyecandy[iEyeCandyLayer] & 8) {
             for (i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), 0));
+                eyecandy[iEyeCandyLayer].emplace<EC_Snow>(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), 0);
         }
 
         //Fish
@@ -436,20 +436,20 @@ void GameplayState::initEyeCandy()
                 //add cloud to eyecandy array
                 short iPossibleY = (App::screenHeight - h) / 10;
                 float dDestY = (float)(RANDOM_INT(iPossibleY) + iPossibleY * i);
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_fish, (float)(RANDOM_INT(App::screenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
+                eyecandy[iEyeCandyLayer].emplace<EC_Cloud>(&rm->spr_fish, (float)(RANDOM_INT(App::screenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h);
             }
         }
 
         //Rain
         if (g_map->eyecandy[iEyeCandyLayer] & 32) {
             for (i = 0; i < 20; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Rain(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight)));
+                eyecandy[iEyeCandyLayer].emplace<EC_Rain>(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight));
         }
 
         //Bubbles
         if (g_map->eyecandy[iEyeCandyLayer] & 64) {
             for (i = 0; i < 10; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight)));
+                eyecandy[iEyeCandyLayer].emplace<EC_Bubble>(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight));
         }
     }
 }
@@ -1089,7 +1089,7 @@ void GameplayState::drawScreenFade()
 
                 short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
-                eyecandy[2].add(new EC_Announcement(&rm->game_font_large, &rm->menu_mode_large, szMode, iMode, 130, 90));
+                eyecandy[2].emplace<EC_Announcement>(&rm->game_font_large, &rm->menu_mode_large, szMode, iMode, 130, 90);
             }
         } else if (game_values.screenfade >= 255) {
             game_values.screenfadespeed = 0;
@@ -1169,7 +1169,7 @@ void GameplayState::drawPlayerSwap()
 
             if (game_values.swapstyle == 1) {
                 for (CPlayer* player : players)
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->leftX() + (HALFPW) - 16, player->topY() + (HALFPH) - 16, 3, 8));
+                    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->leftX() + (HALFPW) - 16, player->topY() + (HALFPH) - 16, 3, 8);
             }
         }
     }
@@ -2676,7 +2676,7 @@ bool SwapPlayers(short iUsingPlayerID)
         spots[iPlayer].GetPlayer(player, &game_values.gamepowerups[player->getGlobalID()]);
 
         if (game_values.swapstyle != 1)
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)player->fNewSwapX + (HALFPW) - 16, (short)player->fNewSwapY + (HALFPH) - 16, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, (short)player->fNewSwapX + (HALFPW) - 16, (short)player->fNewSwapY + (HALFPH) - 16, 3, 8);
 
         if (game_values.swapstyle == 2) {
             player->setXf(player->fNewSwapX);

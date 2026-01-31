@@ -62,7 +62,7 @@ void MO_BuzzyBeetle::Die()
     }
 
     dead = true;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 96, 0, 32, 32));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 96, 0, 32, 32);
 }
 
 void MO_BuzzyBeetle::DropShell(bool fBounce, bool fFlip)
