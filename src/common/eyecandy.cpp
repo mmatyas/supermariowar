@@ -1,15 +1,15 @@
 #include "eyecandy.h"
 
-#include "IO_Block.h"
 #include "Game.h"
 #include "GameValues.h"
+#include "IO_Block.h"
+#include "map.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "map.h"
 
 #include <algorithm>
-#include <cstring>
 #include <cmath>
+#include <cstring>
 
 extern CEyecandyContainer eyecandy[3];
 
@@ -23,7 +23,7 @@ extern SDL_Rect rectSuperStompRightSrc[8];
 extern SDL_Rect rectSuperStompLeftDst[8];
 extern SDL_Rect rectSuperStompRightDst[8];*/
 
-EC_StillImage::EC_StillImage(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h)
+EC_StillImage::EC_StillImage(gfxSprite* nspr, short dstx, short dsty, short srcx, short srcy, short w, short h)
 {
     spr = nspr;
 
@@ -41,7 +41,6 @@ EC_StillImage::EC_StillImage(gfxSprite * nspr, short dstx, short dsty, short src
 
     if (ih == 0)
         ih = (short)spr->getHeight();
-
 }
 
 void EC_StillImage::draw() const
@@ -54,7 +53,7 @@ void EC_StillImage::draw() const
 //------------------------------------------------------------------------------
 // base class animated
 //------------------------------------------------------------------------------
-EC_Animated::EC_Animated(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames)
+EC_Animated::EC_Animated(gfxSprite* nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames)
 {
     spr = nspr;
 
@@ -106,8 +105,8 @@ void EC_Animated::draw() const
 // base class OscillatingAnimation
 //------------------------------------------------------------------------------
 
-EC_OscillatingAnimation::EC_OscillatingAnimation(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames) :
-    EC_Animated(nspr, dstx, dsty, srcx, srcy, w, h, speed, frames)
+EC_OscillatingAnimation::EC_OscillatingAnimation(gfxSprite* nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames)
+    : EC_Animated(nspr, dstx, dsty, srcx, srcy, w, h, speed, frames)
 {
     fForward = true;
 }
@@ -134,8 +133,8 @@ void EC_OscillatingAnimation::animate()
 //------------------------------------------------------------------------------
 // class cloud
 //------------------------------------------------------------------------------
-EC_Cloud::EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx, short srcx, short srcy, short w, short h) :
-    EC_StillImage(nspr, (short)nx, (short)ny, srcx, srcy, w, h)
+EC_Cloud::EC_Cloud(gfxSprite* nspr, float nx, float ny, float nvelx, short srcx, short srcy, short w, short h)
+    : EC_StillImage(nspr, (short)nx, (short)ny, srcx, srcy, w, h)
 {
     dx = nx;
     dy = ny;
@@ -158,8 +157,8 @@ void EC_Cloud::update()
 //------------------------------------------------------------------------------
 // class ghost
 //------------------------------------------------------------------------------
-EC_Ghost::EC_Ghost(gfxSprite *nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes, short srcx, short srcy, short w, short h) :
-    EC_Animated(nspr, (short)nx, (short)ny, srcx, srcy, w, h, ianimationspeed, inumframes)
+EC_Ghost::EC_Ghost(gfxSprite* nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes, short srcx, short srcy, short w, short h)
+    : EC_Animated(nspr, (short)nx, (short)ny, srcx, srcy, w, h, ianimationspeed, inumframes)
 {
     dx = nx;
     dy = ny;
@@ -184,13 +183,13 @@ void EC_Ghost::update()
 //------------------------------------------------------------------------------
 // class leaf
 //------------------------------------------------------------------------------
-EC_Leaf::EC_Leaf(gfxSprite *nspr, float nx, float ny) :
-    EC_OscillatingAnimation(nspr, (short)nx, (short)ny, 0, 0, 16, 16, 16, 4)
+EC_Leaf::EC_Leaf(gfxSprite* nspr, float nx, float ny)
+    : EC_OscillatingAnimation(nspr, (short)nx, (short)ny, 0, 0, 16, 16, 16, 4)
 {
     dx = nx;
     dy = ny;
 
-    //Create random drag for each leaf to give the effect some variance
+    // Create random drag for each leaf to give the effect some variance
     NextLeaf();
 }
 
@@ -245,8 +244,8 @@ void EC_Leaf::NextLeaf()
 //------------------------------------------------------------------------------
 // class snow
 //------------------------------------------------------------------------------
-EC_Snow::EC_Snow(gfxSprite *nspr, float nx, float ny, short type) :
-    EC_StillImage(nspr, (short)nx, (short)ny, RANDOM_BOOL() << 4, type << 4, 16, 16)
+EC_Snow::EC_Snow(gfxSprite* nspr, float nx, float ny, short type)
+    : EC_StillImage(nspr, (short)nx, (short)ny, RANDOM_BOOL() << 4, type << 4, 16, 16)
 {
     dx = nx;
     dy = ny;
@@ -281,8 +280,8 @@ void EC_Snow::update()
 //------------------------------------------------------------------------------
 // class rain
 //------------------------------------------------------------------------------
-EC_Rain::EC_Rain(gfxSprite *nspr, float nx, float ny) :
-    EC_StillImage(nspr, (short)nx, (short)ny, 0, 16, 10, 10)
+EC_Rain::EC_Rain(gfxSprite* nspr, float nx, float ny)
+    : EC_StillImage(nspr, (short)nx, (short)ny, 0, 16, 10, 10)
 {
     NextRainDrop();
     dx = nx;
@@ -294,11 +293,11 @@ void EC_Rain::update()
     dx += velx;
     dy += vely;
 
-    //If rain is off left edge, wrap it
+    // If rain is off left edge, wrap it
     if (dx < 0.0f)
         dx += App::screenWidth;
 
-    //If rain is off bottom edge, change the rain gfx and start it from the top
+    // If rain is off bottom edge, change the rain gfx and start it from the top
     if (iy >= App::screenHeight)
         NextRainDrop();
 
@@ -321,8 +320,8 @@ void EC_Rain::NextRainDrop()
 //------------------------------------------------------------------------------
 // class bubble
 //------------------------------------------------------------------------------
-EC_Bubble::EC_Bubble(gfxSprite *nspr, float nx, float ny) :
-    EC_OscillatingAnimation(nspr, (short)nx, (short)ny, 0, 0, 16, 8, 4, 4)
+EC_Bubble::EC_Bubble(gfxSprite* nspr, float nx, float ny)
+    : EC_OscillatingAnimation(nspr, (short)nx, (short)ny, 0, 0, 16, 8, 4, 4)
 {
     NextBubble();
     dx = nx;
@@ -336,13 +335,13 @@ void EC_Bubble::update()
     dx += velx;
     dy += vely;
 
-    //If bubble is off the edges, wrap it
+    // If bubble is off the edges, wrap it
     if (dx < 0.0f)
         dx += App::screenWidth;
     else if (dx + iAnimationW >= App::screenWidth)
         dx -= App::screenWidth;
 
-    //If bubble is off top edge, move it back to the bottom to start again
+    // If bubble is off top edge, move it back to the bottom to start again
     if (iy + iAnimationH < 0)
         NextBubble();
 
@@ -364,8 +363,8 @@ void EC_Bubble::NextBubble()
 //------------------------------------------------------------------------------
 // class corpse
 //------------------------------------------------------------------------------
-EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
-    EC_StillImage(nspr, (short)nx, (short)ny, iSrcOffsetX, 0, 32, 32)
+EC_Corpse::EC_Corpse(gfxSprite* nspr, float nx, float ny, short iSrcOffsetX)
+    : EC_StillImage(nspr, (short)nx, (short)ny, iSrcOffsetX, 0, 32, 32)
 {
     dx = nx;
     dy = ny;
@@ -374,7 +373,7 @@ EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
     offsetx = iSrcOffsetX;
 
     if (ix + PWOFFSET < 0)
-		tx = (ix + App::screenWidth + PWOFFSET) / TILESIZE;
+        tx = (ix + App::screenWidth + PWOFFSET) / TILESIZE;
     else
         tx = (ix + PWOFFSET) / TILESIZE;
 
@@ -383,12 +382,16 @@ EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
     else
         tx2 = (ix + PWOFFSET + PW) / TILESIZE;
 
-    //Wrap around screen properly
+    // Wrap around screen properly
     short width = App::screenWidth / TILESIZE;
-    if (tx < 0) tx += width;
-    else if (tx >= width) tx -= width;
-    if (tx2 < 0) tx2 += width;
-    else if (tx2 >= width) tx2 -= width;
+    if (tx < 0)
+        tx += width;
+    else if (tx >= width)
+        tx -= width;
+    if (tx2 < 0)
+        tx2 += width;
+    else if (tx2 >= width)
+        tx2 -= width;
 }
 
 void EC_Corpse::update()
@@ -406,10 +409,10 @@ void EC_Corpse::update()
 
             // FIXME: This seems to be wrong
             if (g_map->map(tx, ty) == static_cast<int>(TileType::SolidOnTop) || g_map->map(tx2, ty) == static_cast<int>(TileType::SolidOnTop)) {
-                //on ground on tile solid_on_top
+                // on ground on tile solid_on_top
                 if ((dy + 32.0f - vely) / TILESIZE < ty) {
-                    //only if we were above the tile in the previous frame
-                    dy = (float) ((ty << 5) - TILESIZE);
+                    // only if we were above the tile in the previous frame
+                    dy = (float)((ty << 5) - TILESIZE);
                     vely = 0.0f;
                     iy = (short)dy;
 
@@ -417,13 +420,12 @@ void EC_Corpse::update()
                 }
             }
 
-            IO_Block * leftblock = g_map->block(tx, ty);
-            IO_Block * rightblock = g_map->block(tx2, ty);
+            IO_Block* leftblock = g_map->block(tx, ty);
+            IO_Block* rightblock = g_map->block(tx2, ty);
 
-            if ((g_map->map(tx, ty) & 0x13) > 0 || (g_map->map(tx2, ty) & 0x13) > 0 ||
-                    (leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) || (rightblock && !rightblock->isTransparent() && !rightblock->isHidden())) {
-                //on ground
-                dy = (float) ((ty << 5)  - TILESIZE);
+            if ((g_map->map(tx, ty) & 0x13) > 0 || (g_map->map(tx2, ty) & 0x13) > 0 || (leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) || (rightblock && !rightblock->isTransparent() && !rightblock->isHidden())) {
+                // on ground
+                dy = (float)((ty << 5) - TILESIZE);
                 vely = 0.0f;
                 iy = (short)dy;
 
@@ -431,7 +433,7 @@ void EC_Corpse::update()
             }
         }
 
-        //falling (in air)
+        // falling (in air)
         dy += vely;
         vely = CapFallingVelocity(GRAVITATION + vely);
     } else {
@@ -448,7 +450,7 @@ void EC_Corpse::update()
 // class EC_GravText
 //------------------------------------------------------------------------------
 
-EC_GravText::EC_GravText(gfxFont *nfont, short nx, short ny, std::string ntext, float nvely)
+EC_GravText::EC_GravText(gfxFont* nfont, short nx, short ny, std::string ntext, float nvely)
     : CEyecandy()
     , font(nfont)
     , vely(nvely)
@@ -465,7 +467,7 @@ void EC_GravText::update()
     y += vely;
     vely += GRAVITATION;
 
-	if (y > App::screenHeight)
+    if (y > App::screenHeight)
         dead = true;
 }
 
@@ -475,10 +477,9 @@ void EC_GravText::draw() const
     font->draw((short)x, (short)y, text);
 
     if (x < 0)
-		font->draw((short)x + App::screenWidth, (short)y, text);
+        font->draw((short)x + App::screenWidth, (short)y, text);
     else if (x + w > App::screenWidth - 1)
         font->draw((short)x - App::screenWidth, (short)y, text);
-
 }
 
 
@@ -486,7 +487,7 @@ void EC_GravText::draw() const
 // class EC_Announcement
 //------------------------------------------------------------------------------
 
-EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, std::string ntext, short icon, short time, short y)
+EC_Announcement::EC_Announcement(gfxFont* nfont, gfxSprite* nsprite, std::string ntext, short icon, short time, short y)
     : CEyecandy()
     , text(std::move(ntext))
 {
@@ -506,17 +507,17 @@ EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, std::string
     short iWidth = 16 + iFontOffsetX + font->getWidth(text);
     short iHalfWidth = iWidth >> 1;
 
-    ix = App::screenWidth/2 - iHalfWidth;
+    ix = App::screenWidth / 2 - iHalfWidth;
 
-    rDstRect[0] = {ix, iy, iHalfWidth, 32};
-    rDstRect[1] = {ix + iHalfWidth, iy, iHalfWidth, 32};
-    rDstRect[2] = {ix, iy + 32, iHalfWidth, 32};
-    rDstRect[3] = {ix + iHalfWidth, iy + 32, iHalfWidth, 32};
+    rDstRect[0] = { ix, iy, iHalfWidth, 32 };
+    rDstRect[1] = { ix + iHalfWidth, iy, iHalfWidth, 32 };
+    rDstRect[2] = { ix, iy + 32, iHalfWidth, 32 };
+    rDstRect[3] = { ix + iHalfWidth, iy + 32, iHalfWidth, 32 };
 
-    rSrcRect[0] = {0, 0, iHalfWidth, 32};
-    rSrcRect[1] = {static_cast<int>(App::screenWidth * 0.8f - iHalfWidth), 0, iHalfWidth, 32};
-    rSrcRect[2] = {0, static_cast<int>(App::screenHeight * 0.93f), iHalfWidth, 32};
-    rSrcRect[3] = {static_cast<int>(App::screenWidth * 0.8f - iHalfWidth), static_cast<int>(App::screenHeight * 0.93f), iHalfWidth, 32};
+    rSrcRect[0] = { 0, 0, iHalfWidth, 32 };
+    rSrcRect[1] = { static_cast<int>(App::screenWidth * 0.8f - iHalfWidth), 0, iHalfWidth, 32 };
+    rSrcRect[2] = { 0, static_cast<int>(App::screenHeight * 0.93f), iHalfWidth, 32 };
+    rSrcRect[3] = { static_cast<int>(App::screenWidth * 0.8f - iHalfWidth), static_cast<int>(App::screenHeight * 0.93f), iHalfWidth, 32 };
 }
 
 void EC_Announcement::update()
@@ -541,8 +542,8 @@ void EC_Announcement::draw() const
 // class EC_FallingObject
 //------------------------------------------------------------------------------
 
-EC_FallingObject::EC_FallingObject(gfxSprite *nspr, short x, short y, float nvelx, float nvely, short animationframes, short animationspeed, short srcOffsetX, short srcOffsetY, short w, short h) :
-    EC_Animated(nspr, x, y, srcOffsetX, srcOffsetY, w, h, animationspeed, animationframes)
+EC_FallingObject::EC_FallingObject(gfxSprite* nspr, short x, short y, float nvelx, float nvely, short animationframes, short animationspeed, short srcOffsetX, short srcOffsetY, short w, short h)
+    : EC_Animated(nspr, x, y, srcOffsetX, srcOffsetY, w, h, animationspeed, animationframes)
 {
     fx = (float)x;
     fy = (float)y;
@@ -574,19 +575,19 @@ void EC_FallingObject::update()
 // class EC_SingleAnimation
 //------------------------------------------------------------------------------
 
-EC_SingleAnimation::EC_SingleAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate) :
-    EC_Animated(nspr, x, y, 0, 0, (short)nspr->getWidth() / iframes, 0, irate, iframes)
+EC_SingleAnimation::EC_SingleAnimation(gfxSprite* nspr, short x, short y, short iframes, short irate)
+    : EC_Animated(nspr, x, y, 0, 0, (short)nspr->getWidth() / iframes, 0, irate, iframes)
 {}
 
-EC_SingleAnimation::EC_SingleAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short offsetx, short offsety, short w, short h) :
-    EC_Animated(nspr, x, y, offsetx, offsety, w, h, irate, iframes)
+EC_SingleAnimation::EC_SingleAnimation(gfxSprite* nspr, short x, short y, short iframes, short irate, short offsetx, short offsety, short w, short h)
+    : EC_Animated(nspr, x, y, offsetx, offsety, w, h, irate, iframes)
 {}
 
 void EC_SingleAnimation::update()
 {
     animate();
 
-    //This means that the animation wrapped and it is time to kill it
+    // This means that the animation wrapped and it is time to kill it
     if (iAnimationTimer == 0 && iAnimationFrame == iAnimationX)
         dead = true;
 }
@@ -595,8 +596,8 @@ void EC_SingleAnimation::update()
 // class EC_LoopingAnimation
 //------------------------------------------------------------------------------
 
-EC_LoopingAnimation::EC_LoopingAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short loops, short ioffsetx, short ioffsety, short w, short h) :
-    EC_Animated(nspr, x, y, ioffsetx, ioffsety, w, h, irate, iframes)
+EC_LoopingAnimation::EC_LoopingAnimation(gfxSprite* nspr, short x, short y, short iframes, short irate, short loops, short ioffsetx, short ioffsety, short w, short h)
+    : EC_Animated(nspr, x, y, ioffsetx, ioffsety, w, h, irate, iframes)
 {
     iCountLoops = 0;
     iLoops = loops;
@@ -617,27 +618,27 @@ void EC_LoopingAnimation::update()
 //------------------------------------------------------------------------------
 /*
 EC_Award::EC_Award(gfxSprite *nspr, short ix, short iy, short destx, short desty, short iframes, short irate) :
-	EC_LoopingAnimation(nspr, ix, iy, iframes, irate, 0)
+        EC_LoopingAnimation(nspr, ix, iy, iframes, irate, 0)
 {
-	dx = (float)destx;
-	dy = (float)desty;
+        dx = (float)destx;
+        dy = (float)desty;
 
-	velx = (dx - x) / 100.0f;
-	vely = (dy - y) / 100.0f;
+        velx = (dx - x) / 100.0f;
+        vely = (dy - y) / 100.0f;
 }
 
 
 void EC_Award::update()
 {
-	EC_LoopingAnimation::update();
+        EC_LoopingAnimation::update();
 
-	x += velx;
-	y += vely;
+        x += velx;
+        y += vely;
 
-	if ( fabsf(dx - x) < fabsf(velx) && fabsf(dy - y) < fabsf(vely))
-	{
-		dead = true;
-	}
+        if ( fabsf(dx - x) < fabsf(velx) && fabsf(dy - y) < fabsf(vely))
+        {
+                dead = true;
+        }
 }
 */
 
@@ -646,8 +647,8 @@ void EC_Award::update()
 // class EC_ExplodingAward
 //------------------------------------------------------------------------------
 
-EC_ExplodingAward::EC_ExplodingAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short awardID) :
-    CEyecandy()
+EC_ExplodingAward::EC_ExplodingAward(gfxSprite* nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short awardID)
+    : CEyecandy()
 {
     spr = nspr;
     x = (float)nx;
@@ -685,8 +686,8 @@ void EC_ExplodingAward::draw() const
 // class EC_SwirlingAward
 //------------------------------------------------------------------------------
 
-EC_SwirlingAward::EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate, short animationFrames) :
-    CEyecandy()
+EC_SwirlingAward::EC_SwirlingAward(gfxSprite* nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate, short animationFrames)
+    : CEyecandy()
 {
     spr = nspr;
     x = nx;
@@ -747,8 +748,8 @@ void EC_SwirlingAward::draw() const
 // class EC_RocketAward
 //------------------------------------------------------------------------------
 
-EC_RocketAward::EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate, short animationFrames) :
-    CEyecandy()
+EC_RocketAward::EC_RocketAward(gfxSprite* nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate, short animationFrames)
+    : CEyecandy()
 {
     spr = nspr;
     x = (float)nx;
@@ -804,8 +805,8 @@ void EC_RocketAward::draw() const
 // class EC_FloatingAward
 //------------------------------------------------------------------------------
 
-EC_FloatingObject::EC_FloatingObject(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short nsrcx, short nsrcy, short nwidth, short nheight) :
-    CEyecandy()
+EC_FloatingObject::EC_FloatingObject(gfxSprite* nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short nsrcx, short nsrcy, short nwidth, short nheight)
+    : CEyecandy()
 {
     spr = nspr;
     x = (float)nx;
@@ -843,8 +844,8 @@ void EC_FloatingObject::draw() const
 // class EC_SoulsAward
 //------------------------------------------------------------------------------
 
-EC_SoulsAward::EC_SoulsAward(gfxSprite *nspr, gfxSprite *nspr2, short nx, short ny, short timetolive, float nSpeed, short nSouls, short * nSoulArray) :
-    CEyecandy()
+EC_SoulsAward::EC_SoulsAward(gfxSprite* nspr, gfxSprite* nspr2, short nx, short ny, short timetolive, float nSpeed, short nSouls, short* nSoulArray)
+    : CEyecandy()
 {
     spr = nspr;
     spawnspr = nspr2;
@@ -876,12 +877,11 @@ EC_SoulsAward::EC_SoulsAward(gfxSprite *nspr, gfxSprite *nspr2, short nx, short 
 
     w = (short)nspr2->getWidth() / 7;
     h = (short)nspr2->getHeight();
-
 }
 
 EC_SoulsAward::~EC_SoulsAward()
 {
-    delete [] id;
+    delete[] id;
 }
 
 void EC_SoulsAward::update()
@@ -926,8 +926,8 @@ void EC_SoulsAward::draw() const
 // class EC_DoorFront
 //------------------------------------------------------------------------------
 
-EC_Door::EC_Door(gfxSprite *nspr, gfxSprite *nmariospr, short nx, short ny, short irate, short xOffset, short iColor) :
-    CEyecandy()
+EC_Door::EC_Door(gfxSprite* nspr, gfxSprite* nmariospr, short nx, short ny, short irate, short xOffset, short iColor)
+    : CEyecandy()
 {
     spr = nspr;
     mariospr = nmariospr;
@@ -945,7 +945,7 @@ EC_Door::EC_Door(gfxSprite *nspr, gfxSprite *nmariospr, short nx, short ny, shor
     frame = 0;
 
     offsetx = xOffset;
-    colorOffset = iColor << 5; //select which color door to use
+    colorOffset = iColor << 5;  // select which color door to use
 }
 
 
@@ -1000,19 +1000,19 @@ void EC_Door::draw() const
 // class EC_BossPeeker
 //------------------------------------------------------------------------------
 /*
-EC_BossPeeker::EC_BossPeeker(gfxSprite *nspr, short speed, short bossType) :
-	CEyecandy()
+EC_BossPeeker::EC_BossPeeker(gfxSprite *nspr, short speed, short bossType)
+    : CEyecandy()
 {
-	spr = nspr;
-	iSpeed = speed;
-	iBossColorOffsetY = bossType * 64;
+    spr = nspr;
+    iSpeed = speed;
+    iBossColorOffsetY = bossType * 64;
 
     timer = 0;
     state = 0;
     ix = 592;
     iy = App::screenHeight;
 
-	game_values.bosspeeking = bossType;
+    game_values.bosspeeking = bossType;
 }
 
 
@@ -1046,14 +1046,14 @@ void EC_BossPeeker::update()
 
 void EC_BossPeeker::draw() const
 {
-	spr->draw(ix, iy, 192, iBossColorOffsetY, 48, 64);
+    spr->draw(ix, iy, 192, iBossColorOffsetY, 48, 64);
 }
 */
 
 //------------------------------------------------------------------------------
 // class EC_SuperStompExplosion
 //------------------------------------------------------------------------------
-EC_SuperStompExplosion::EC_SuperStompExplosion(gfxSprite *nspr, short x, short y, short irate)
+EC_SuperStompExplosion::EC_SuperStompExplosion(gfxSprite* nspr, short x, short y, short irate)
 {
     spr = nspr;
     iRate = irate;
@@ -1080,11 +1080,11 @@ void EC_SuperStompExplosion::draw() const
     if (dead)
         return;
 
-    static const SDL_Rect rectSuperStompLeftSrc[8] = {{0,0,48,40},{0,40,54,42},{0,82,48,58},{0,140,42,70},{0,210,44,78},{108,0,44,82},{96,82,42,76},{88,158,34,74}};
-    static const SDL_Rect rectSuperStompRightSrc[8] = {{48,0,48,40},{54,40,54,42},{48,82,48,58},{42,140,42,70},{44,210,44,78},{152,0,44,82},{138,82,42,76},{122,158,34,74}};
+    static const SDL_Rect rectSuperStompLeftSrc[8] = { { 0, 0, 48, 40 }, { 0, 40, 54, 42 }, { 0, 82, 48, 58 }, { 0, 140, 42, 70 }, { 0, 210, 44, 78 }, { 108, 0, 44, 82 }, { 96, 82, 42, 76 }, { 88, 158, 34, 74 } };
+    static const SDL_Rect rectSuperStompRightSrc[8] = { { 48, 0, 48, 40 }, { 54, 40, 54, 42 }, { 48, 82, 48, 58 }, { 42, 140, 42, 70 }, { 44, 210, 44, 78 }, { 152, 0, 44, 82 }, { 138, 82, 42, 76 }, { 122, 158, 34, 74 } };
 
-    static const SDL_Rect rectSuperStompLeftDst[8] = {{-48,-40,48,40},{-56,-42,54,42},{-66,-58,48,58},{-68,-70,42,70},{-72,-78,44,78},{-74,-82,44,82},{-74,-76,42,76},{-70,-74,34,74}};
-    static const SDL_Rect rectSuperStompRightDst[8] = {{0,-40,48,40},{2,-42,54,42},{18,-58,48,58},{26,-70,42,70},{28,-78,44,78},{30,-82,44,82},{32,-76,42,76},{36,-74,34,74}};
+    static const SDL_Rect rectSuperStompLeftDst[8] = { { -48, -40, 48, 40 }, { -56, -42, 54, 42 }, { -66, -58, 48, 58 }, { -68, -70, 42, 70 }, { -72, -78, 44, 78 }, { -74, -82, 44, 82 }, { -74, -76, 42, 76 }, { -70, -74, 34, 74 } };
+    static const SDL_Rect rectSuperStompRightDst[8] = { { 0, -40, 48, 40 }, { 2, -42, 54, 42 }, { 18, -58, 48, 58 }, { 26, -70, 42, 70 }, { 28, -78, 44, 78 }, { 30, -82, 44, 82 }, { 32, -76, 42, 76 }, { 36, -74, 34, 74 } };
 
     spr->draw(rectSuperStompLeftDst[iAnimationFrame].x + ix, rectSuperStompLeftDst[iAnimationFrame].y + iy, rectSuperStompLeftSrc[iAnimationFrame].x, rectSuperStompLeftSrc[iAnimationFrame].y, rectSuperStompLeftSrc[iAnimationFrame].w, rectSuperStompLeftSrc[iAnimationFrame].h);
     spr->draw(rectSuperStompRightDst[iAnimationFrame].x + ix, rectSuperStompRightDst[iAnimationFrame].y + iy, rectSuperStompRightSrc[iAnimationFrame].x, rectSuperStompRightSrc[iAnimationFrame].y, rectSuperStompRightSrc[iAnimationFrame].w, rectSuperStompRightSrc[iAnimationFrame].h);
@@ -1104,7 +1104,7 @@ void CEyecandyContainer::cleanDeadObjects()
     eyecandies.erase(erase_from, eyecandies.end());
 }
 
-static const short iSpotlightValues[8][4] = { {16, 8, 240, 96}, {32, 16, 336, 80}, {48, 24, 416, 64}, {64, 32, 416, 0}, {80, 40, 336, 0}, {96, 48, 240, 0}, {112, 56, 128, 0}, { 128, 64, 0, 0}};
+static const short iSpotlightValues[8][4] = { { 16, 8, 240, 96 }, { 32, 16, 336, 80 }, { 48, 24, 416, 64 }, { 64, 32, 416, 0 }, { 80, 40, 336, 0 }, { 96, 48, 240, 0 }, { 112, 56, 128, 0 }, { 128, 64, 0, 0 } };
 Spotlight::Spotlight(short x, short y, short size)
 {
     ix = x;
@@ -1128,8 +1128,8 @@ Spotlight::Spotlight(short x, short y, short size)
 
 void Spotlight::Update()
 {
-    //If the spotlight's position wasn't updated this frame, that means the parent is dead and
-    //this spotlight needs to be removed
+    // If the spotlight's position wasn't updated this frame, that means the parent is dead and
+    // this spotlight needs to be removed
     if (!fUpdated)
         iState = 2;
 
@@ -1140,7 +1140,7 @@ void Spotlight::Update()
             iSizeCounter = 0;
             if (++iSize >= iEndSize) {
                 iSize = iEndSize;
-                iState = 1; //spotlight has reached it's full size
+                iState = 1;  // spotlight has reached it's full size
             }
 
             iWidth = iSpotlightValues[iSize][0];
@@ -1156,7 +1156,7 @@ void Spotlight::Update()
             iSizeCounter = 0;
             if (--iSize < 0) {
                 iSize = 0;
-                iState = 3; //stop drawing, spotlight is dead
+                iState = 3;  // stop drawing, spotlight is dead
             }
 
             iWidth = iSpotlightValues[iSize][0];
@@ -1180,18 +1180,18 @@ void Spotlight::UpdatePosition(short x, short y)
 
 void Spotlight::Draw()
 {
-    SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
+    SDL_Rect rDst = { ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth };
     SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDst);
 
     if (ix - iHalfWidth < 0) {
-		SDL_Rect rDstWrap = {ix - iHalfWidth + App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
+        SDL_Rect rDstWrap = { ix - iHalfWidth + App::screenWidth, iy - iHalfWidth, iWidth, iWidth };
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
-	} else if (ix + iHalfWidth >= App::screenWidth) {
-		SDL_Rect rDstWrap = {ix - iHalfWidth - App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
+    } else if (ix + iHalfWidth >= App::screenWidth) {
+        SDL_Rect rDstWrap = { ix - iHalfWidth - App::screenWidth, iy - iHalfWidth, iWidth, iWidth };
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
 
-#if	0
+#if 0
     //Transparency fade in effect. Unfortunately, the perf was too slow
     //Might be useful later if alpha fading perf is better
     short iWidth = iSpotlightValues[iSize][0];
@@ -1236,19 +1236,19 @@ void Spotlight::Draw()
 #endif
 }
 
-Spotlight * SpotlightManager::AddSpotlight(short ix, short iy, short iSize)
+Spotlight* SpotlightManager::AddSpotlight(short ix, short iy, short iSize)
 {
     if (!game_values.spotlights)
         return NULL;
 
-    Spotlight * s = new Spotlight(ix, iy, iSize);
+    Spotlight* s = new Spotlight(ix, iy, iSize);
     spotlightList.push_back(s);
     return s;
 }
 
 void SpotlightManager::DrawSpotlights()
 {
-    //Clear the overlay surface again with black
+    // Clear the overlay surface again with black
     SDL_FillRect(rm->spr_overlay.getSurface(), NULL, 0x0);
 
     std::vector<Spotlight*>::iterator iter = spotlightList.begin(), lim = spotlightList.end();
@@ -1267,7 +1267,7 @@ void SpotlightManager::DrawSpotlights()
         }
     }
 
-    //Draw the overlay
+    // Draw the overlay
     rm->spr_overlay.draw(0, 0);
 }
 
