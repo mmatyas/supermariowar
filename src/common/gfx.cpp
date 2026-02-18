@@ -489,9 +489,14 @@ bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, const RGB& rgb, 
     return success;
 }
 
-void gfx_setjoystickteamcolor(SDL_Joystick* joystick, unsigned short team, float brightness)
+void gfx_setjoystickteamcolor(SDL_Joystick* joystick, short team, float brightness)
 {
 #if SDL_VERSION_ATLEAST(2, 0, 14)
+    if (team < 0) {
+        // A non-playing user has no team
+        return;
+    }
+
     brightness = max(0.f, min(1.f, brightness));
     const RGB& color = gfx.getPalette().colorScheme(team, 0, 5);
     SDL_JoystickSetLED(joystick, (Uint8)(brightness * color.r), (Uint8)(brightness * color.g), (Uint8)(brightness * color.b));

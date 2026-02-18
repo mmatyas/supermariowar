@@ -63,7 +63,7 @@ bool gfx_loadimage(gfxSprite& sprite, const std::string& path, bool fWrap = true
 bool gfx_loadimage(gfxSprite& sprite, const std::string& path, Uint8 alpha, bool fWrap = true);
 bool gfx_loadimage(gfxSprite& sprite, const std::string& path, const RGB& rgb, bool fWrap = true);
 
-void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, float brightness);
+void gfx_setjoystickteamcolor(SDL_Joystick * joystick, short team, float brightness);
 
 
 RGB getRgb(SDL_Surface* surf, int x, int y);
