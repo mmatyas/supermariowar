@@ -437,7 +437,7 @@ void SMWServer::playerLeavesRoom(uint64_t playerID)
 
     player->currentRoomID = 0;
     player->isPlaying = false;
-    player->lastActivityTime = TIME_NOW();
+    player->lastActivityTime = time_now();
 }
 
 void SMWServer::hostChangesMap(uint64_t playerID, const void* data, size_t dataLength)
@@ -518,7 +518,7 @@ void SMWServer::playerSendsChatMsg(uint64_t playerID, const void* data, size_t d
     memcpy(&pkg, data, dataLength);
 
     rooms[roomID].sendChatMessage(player, pkg.message);
-    player->lastActivityTime = TIME_NOW();
+    player->lastActivityTime = time_now();
 }
 
 
@@ -543,7 +543,7 @@ void SMWServer::playerStartsRoom(uint64_t playerID)
         return;
 
     rooms[roomID].sendStartSignal();
-    player->lastActivityTime = TIME_NOW();
+    player->lastActivityTime = time_now();
     log("[info] Room #%d starting.", roomID);
 }
 
@@ -560,7 +560,7 @@ void SMWServer::startRoomIfEveryoneReady(uint64_t playerID)
         return;
 
     player->synchOK = true;
-    player->lastActivityTime = TIME_NOW();
+    player->lastActivityTime = time_now();
 
     Room* room = &rooms[player->currentRoomID];
     room->startGameIfEverybodyReady();*/

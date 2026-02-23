@@ -7,21 +7,20 @@
 class CGM_Chicken : public CGameMode {
 public:
     CGM_Chicken();
-    virtual ~CGM_Chicken() {}
 
     void init() override;
-    void think();
-    void draw_foreground();
-    PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-    PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-    void playerextraguy(CPlayer &player, short iType);
-    PlayerKillType CheckWinner(CPlayer * player);
+    void think() override;
+    void draw_foreground() override;
+    PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+    PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+    void playerextraguy(CPlayer &player, short iType) override;
+    PlayerKillType CheckWinner(CPlayer * player) override;
 
     CPlayer* chicken() const { return m_chicken; }
     void clearChicken();
 
 #ifdef _DEBUG
-    void setdebuggoal() {
+    void setdebuggoal() override {
         goal = 100;
     }
 #endif

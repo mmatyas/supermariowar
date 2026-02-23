@@ -9,24 +9,23 @@ struct TourStop;
 class CGM_Bonus : public CGameMode {
 public:
     CGM_Bonus();
-    virtual ~CGM_Bonus() {}
 
-    void init();
-    void draw_background();
+    void init() override;
+    void draw_background() override;
 
     //Override so it doesn't display winner text after you choose a powerup
-    void think() {}
+    void think() override {}
 
-    PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) {
+    PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override {
         return PlayerKillType::None;
     }
-    PlayerKillType playerkilledself(CPlayer &player, KillStyle style) {
+    PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override {
         return PlayerKillType::None;
     }
 
-    void playerextraguy(CPlayer &player, short iType) {}
+    void playerextraguy(CPlayer &player, short iType) override {}
 
-    bool HasStoredPowerups() {
+    bool HasStoredPowerups() override {
         return false;
     }
 

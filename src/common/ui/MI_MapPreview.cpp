@@ -52,8 +52,6 @@ MI_MapPreview::MI_MapPreview(gfxSprite * nspr, short x, short y, short width, sh
     memset(szMapName, 0, sizeof(szMapName));
 }
 
-MI_MapPreview::~MI_MapPreview() {}
-
 void MI_MapPreview::Update()
 {
     //Update hazards

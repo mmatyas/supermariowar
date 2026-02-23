@@ -13,14 +13,13 @@ class CGM_Star : public CGM_TimeLimit
 {
     public:
         CGM_Star();
-        virtual ~CGM_Star() {}
 
-        void init();
-        void think();
-        void draw_foreground();
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
+        void init() override;
+        void think() override;
+        void draw_foreground() override;
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
 
         bool isplayerstar(const CPlayer * player);
         CPlayer * swapplayer(short id, CPlayer * player);
@@ -33,7 +32,7 @@ class CGM_Star : public CGM_TimeLimit
     }
 
 #ifdef _DEBUG
-    void setdebuggoal() {
+    void setdebuggoal() override {
         goal = 1;
     }
 #endif

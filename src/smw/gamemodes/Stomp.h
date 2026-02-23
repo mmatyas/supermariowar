@@ -8,20 +8,19 @@ class CGM_Stomp : public CGameMode
 {
     public:
         CGM_Stomp();
-        virtual ~CGM_Stomp() {}
 
-        void init();
-        void think();
+        void init() override;
+        void think() override;
 
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
 
         char *getMenuString(char *buffer64);
 
     private:
         void ResetSpawnTimer();
-        PlayerKillType CheckWinner(CPlayer * player);
+        PlayerKillType CheckWinner(CPlayer * player) override;
 
         short spawntimer;
         short iSelectedEnemy;

@@ -3,6 +3,7 @@
 #include "gfx.h"
 #include "GlobalConstants.h"
 
+#include <array>
 #include <memory>
 #include <vector>
 
@@ -28,7 +29,7 @@ class EC_StillImage : public CEyecandy {
 public:
     EC_StillImage(gfxSprite* nspr, short dstx, short dsty, short srcx, short srcy, short w, short h);
 
-    virtual void draw() const;
+    void draw() const override;
 
 protected:
     gfxSprite* spr;
@@ -194,8 +195,8 @@ private:
 
     short iFontY, iFontOffsetX;
 
-    SDL_Rect rSrcRect[4];
-    SDL_Rect rDstRect[4];
+    std::array<SDL_Rect, 4> rSrcRect;
+    std::array<SDL_Rect, 4> rDstRect;
 };
 
 class EC_FallingObject : public EC_Animated {
@@ -419,7 +420,6 @@ public:
 class Spotlight {
 public:
     Spotlight(short x, short y, short size);
-    ~Spotlight() {}
 
     void Update();
     void UpdatePosition(short x, short y);

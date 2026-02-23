@@ -11,7 +11,6 @@ class MI_Image;
 class MI_MapField: public MI_MapPreview {
 public:
     MI_MapField(gfxSprite* nspr, short x, short y, std::string name, short width, short indent, bool showtags);
-    virtual ~MI_MapField() = default;
 
     //Called when user selects this control to change it's value
     MenuCodeEnum Modify(bool modify) override;

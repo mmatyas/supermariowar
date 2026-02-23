@@ -9,15 +9,14 @@ class CGM_Boss_MiniGame : public CGameMode
 {
     public:
         CGM_Boss_MiniGame();
-        virtual ~CGM_Boss_MiniGame() {}
 
-        void init();
-        void think();
-        void draw_foreground();
+        void init() override;
+        void think() override;
+        void draw_foreground() override;
 
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
 
         char *getMenuString(char *buffer64);
 
@@ -27,7 +26,7 @@ class CGM_Boss_MiniGame : public CGameMode
         return iBossType;
     }
 
-    bool HasStoredPowerups() {
+    bool HasStoredPowerups() override {
         return false;
     }
 

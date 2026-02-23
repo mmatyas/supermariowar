@@ -8,21 +8,20 @@ class CGM_Boxes_MiniGame : public CGameMode
 {
     public:
         CGM_Boxes_MiniGame();
-        virtual ~CGM_Boxes_MiniGame() {}
 
-        void init();
-        void think();
+        void init() override;
+        void think() override;
 
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
 
         char *getMenuString(char *buffer64);
 
-        PlayerKillType CheckWinner(CPlayer * player);
+        PlayerKillType CheckWinner(CPlayer * player) override;
         bool SetWinner(CPlayer * player);
 
-    bool HasStoredPowerups() {
+    bool HasStoredPowerups() override {
         return false;
     }
 

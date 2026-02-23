@@ -14,13 +14,12 @@ class MI_MapPreview : public UI_Control
 public:
 
     MI_MapPreview(gfxSprite* nspr, short x, short y, short width, short indent);
-    virtual ~MI_MapPreview();
 
     //Updates animations or other events every frame
-    virtual void Update();
+    void Update() override;
 
     //Draws every frame
-    virtual void Draw();
+    void Draw() override;
 
     void LoadCurrentMap();
     void LoadMap(const std::string& szMapPath);
