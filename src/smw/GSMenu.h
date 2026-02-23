@@ -71,8 +71,8 @@ enum DisplayError {
 class MenuState : public GameState
 {
 	public:
-        bool init();
-        void update();
+        bool init() override;
+        void update() override;
 
         static MenuState& instance();
 
@@ -97,7 +97,7 @@ class MenuState : public GameState
 		MenuState();
 		~MenuState();
 
-		void onEnterState();
+		void onEnterState() override;
 
 		void CreateMenu();
 		bool ReadTourFile();

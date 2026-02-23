@@ -7,5 +7,5 @@ public:
     CO_Spike(gfxSprite* nspr, Vec2s pos);
 
 private:
-    void hittop(CPlayer* player);
+    void hittop(CPlayer* player) override;
 };

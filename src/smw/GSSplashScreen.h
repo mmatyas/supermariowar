@@ -9,14 +9,13 @@
 class SplashScreenState : public GameState
 {
     public:
-        bool init();
-        void update();
+        bool init() override;
+        void update() override;
 
         static SplashScreenState& instance();
 
     private:
-        void onEnterState() {}
-        void onLeaveState();
+        void onLeaveState() override;
 
         //bool LoadStartGraphics();
         //bool LoadGameSounds();

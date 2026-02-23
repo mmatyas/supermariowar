@@ -6,14 +6,13 @@
 class MO_PirhanaPlant : public IO_MovingObject {
 public:
     MO_PirhanaPlant(Vec2s pos, short type, short freq, short direction, bool preview);
-    ~MO_PirhanaPlant() {}
 
-    void draw();
+    void draw() override;
     void draw(short iOffsetX, short iOffsetY);
-    void update();
+    void update() override;
 
-    bool collide(CPlayer* player);
-    void collide(IO_MovingObject*);
+    bool collide(CPlayer* player) override;
+    void collide(IO_MovingObject*) override;
 
     void KillPlant();
 

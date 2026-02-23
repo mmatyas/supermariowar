@@ -23,13 +23,13 @@ class MI_StringScroll : public UI_Control
 {
 	public:
 		MI_StringScroll(gfxSprite * nspr, short x, short y, short width, short numlines);
-		virtual ~MI_StringScroll();
+		~MI_StringScroll() override;
 
-		void Update();
-		void Draw();
+		void Update() override;
+		void Draw() override;
 
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		MenuCodeEnum Modify(bool modify);
+		MenuCodeEnum SendInput(CPlayerInput * playerInput) override;
+		MenuCodeEnum Modify(bool modify) override;
 
 		void Add(const std::string&);
 

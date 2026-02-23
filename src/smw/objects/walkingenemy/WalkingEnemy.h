@@ -7,7 +7,6 @@
 class MO_WalkingEnemy : public IO_MovingObject {
 public:
     MO_WalkingEnemy(gfxSprite* nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool fBouncing, bool fallOffLedges);
-    virtual ~MO_WalkingEnemy() {};
 
     void draw() override;
     void update() override;

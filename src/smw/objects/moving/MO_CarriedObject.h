@@ -12,9 +12,8 @@ public:
     MO_CarriedObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
     ~MO_CarriedObject();
 
-    virtual void update() {}
-    virtual void draw();
-    virtual bool collide(CPlayer*) { return false; }
+    void draw() override;
+    bool collide(CPlayer*) override { return false; }
 
     virtual void MoveToOwner();
 

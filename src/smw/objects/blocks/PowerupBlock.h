@@ -12,7 +12,7 @@ class B_PowerupBlock : public IO_Block {
 public:
     B_PowerupBlock(gfxSprite* nspr, Vec2s pos,
         short iNumSpr, short aniSpeed, bool fHidden, const short * piSettings);
-    virtual ~B_PowerupBlock();
+    ~B_PowerupBlock() override;
 
     void draw() override;
     void update() override;

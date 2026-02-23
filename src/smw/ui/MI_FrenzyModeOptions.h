@@ -13,22 +13,22 @@ class MI_FrenzyModeOptions : public UI_Control
 public:
 
     MI_FrenzyModeOptions(short x, short y, short width, short numlines);
-    virtual ~MI_FrenzyModeOptions();
+    ~MI_FrenzyModeOptions() override;
 
-    MenuCodeEnum Modify(bool modify);
-    MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    MenuCodeEnum Modify(bool modify) override;
+    MenuCodeEnum SendInput(CPlayerInput * playerInput) override;
 
-    void Update();
-    void Draw();
+    void Update() override;
+    void Draw() override;
 
     void MoveNext();
     void MovePrev();
 
     void SetRandomGameModeSettings();
 
-    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY) override;
 
-    void Refresh();
+    void Refresh() override;
 
 private:
 

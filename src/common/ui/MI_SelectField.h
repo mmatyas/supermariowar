@@ -35,7 +35,6 @@ class MI_SelectField : public UI_Control {
 public:
     MI_SelectField(gfxSprite* nspr, short x, short y, std::string name, short width, short indent);
     MI_SelectField(const MI_SelectField<T>&);
-    virtual ~MI_SelectField() = default;
 
     //! Set the displayed name.
     void setTitle(std::string name) {

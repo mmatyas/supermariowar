@@ -6,7 +6,7 @@
 class MI_SliderField : public MI_SelectField<short> {
 public:
     MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2);
-    virtual ~MI_SliderField();
+    ~MI_SliderField() override;
 
     void SetPosition(short x, short y);
 

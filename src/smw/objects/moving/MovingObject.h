@@ -8,14 +8,13 @@ class MovingPlatform;
 class IO_MovingObject : public CObject {
 public:
     IO_MovingObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth = -1, short iCollisionHeight = -1, short iCollisionOffsetX = -1, short iCollisionOffsetY = -1, short iAnimationOffsetX = -1, short iAnimationOffsetY = -1, short iAnimationHeight = -1, short iAnimationWidth = -1);
-    virtual ~IO_MovingObject() {};
 
-    virtual void draw();
-    virtual void update();
+    void draw() override;
+    void update() override;
     virtual void animate();
 
-    virtual bool collide(CPlayer* player);
-    void collide(IO_MovingObject*) {}
+    bool collide(CPlayer* player) override;
+    void collide(IO_MovingObject*) override {}
 
     MovingObjectType getMovingObjectType() const { return movingObjectType; }
 
