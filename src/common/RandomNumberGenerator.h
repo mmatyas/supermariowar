@@ -6,8 +6,7 @@
 
 class RandomNumberGeneratorType {
 public:
-    RandomNumberGeneratorType() {}
-    virtual ~RandomNumberGeneratorType() {}
+    virtual ~RandomNumberGeneratorType() = default;
 
     virtual void reseed(unsigned seed);
     virtual int getInteger(int min, int max) = 0;

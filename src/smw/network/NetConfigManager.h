@@ -11,8 +11,7 @@
 
 class NetConfigManager {
 public:
-    NetConfigManager() {}
-    virtual ~NetConfigManager() {}
+    virtual ~NetConfigManager() = default;
 
     void load();
     void save();

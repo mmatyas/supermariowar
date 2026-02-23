@@ -48,7 +48,6 @@ class ScriptOperation
     ScriptOperation() {
         iTimesExecuted = 0;
     }
-		~ScriptOperation() {}
 
 		short iController; //0 - 3 == specific, 4 == all, 5 == single random
 		bool fInput[8];

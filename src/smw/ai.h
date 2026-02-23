@@ -16,7 +16,6 @@ public:
     NearestObjects() {
         Reset();
     }
-    ~NearestObjects() {}
 
     void Reset() {
         player = NULL;
@@ -101,8 +100,6 @@ private:
 class CSimpleAI : public CPlayerAI
 {
 public:
-    CSimpleAI() {}
-    ~CSimpleAI() {}
     void Think(COutputControl * playerKeys);
 
 };

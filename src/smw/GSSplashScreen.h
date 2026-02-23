@@ -30,9 +30,6 @@ class SplashScreenState : public GameState
         bool firstFrame;
 
         SplashScreenState();
-        ~SplashScreenState() {}
-        SplashScreenState(SplashScreenState const&);
-        void operator=(SplashScreenState const&);
 };
 
 #endif // GAMESTATE_SPLASHSCREEN_H

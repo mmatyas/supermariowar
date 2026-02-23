@@ -11,8 +11,6 @@ public:
         fUsed = false;
     }
 
-    ~MysteryMushroomTempPlayer() {}
-
     void SetPlayer(CPlayer* player, short iPowerup);
     void GetPlayer(CPlayer* player, short* iPowerup);
 
