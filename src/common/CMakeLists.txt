@@ -69,6 +69,7 @@ add_library(CommonFiles STATIC
     Version.h
     WorldTourStop.cpp
     WorldTourStop.h
+    util/ContainerHelpers.h
     util/Grid.h
     util/DirIterator.cpp
     util/DirIterator.h
