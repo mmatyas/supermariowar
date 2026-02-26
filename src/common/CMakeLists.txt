@@ -1,8 +1,6 @@
 add_library(CommonFiles STATIC
     CmdArgs.cpp
     CmdArgs.h
-    dirlist.cpp
-    dirlist.h
     eyecandy.cpp
     eyecandy.h
     EyecandyStyles.h
