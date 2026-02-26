@@ -1,6 +1,5 @@
 #include "MapList.h"
 
-#include "dirlist.h"
 #include "FileList.h"
 #include "GameValues.h"
 #include "linfunc.h"
@@ -8,11 +7,16 @@
 #include "path.h"
 #include "RandomNumberGenerator.h"
 #include "Version.h"
+#include "util/DirIterator.h"
 
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+
+#ifdef __APPLE__
+#include <sys/stat.h>  // FIXME
+#endif
 
 extern CMap* g_map;
 extern FiltersList* filterslist;
@@ -22,11 +26,10 @@ extern CGameValues game_values;
 namespace {
 void addMapsFrom(const std::string& relDir, std::multimap<std::string, MapListNode>& container)
 {
-    DirectoryListing d(convertPath(relDir), ".map");
-    std::string curname;
-    while (d(curname)) {
-        MapListNode node(d.fullName(curname));
-        container.emplace(stripCreatorAndExt(curname), std::move(node));
+    FilesIterator dir(convertPath(relDir), {".map"});
+    while (auto path = dir.next()) {
+        MapListNode node(*path);
+        container.emplace(stripCreatorAndExt(path->filename()), std::move(node));
     }
 }
 } // namespace

@@ -1,10 +1,10 @@
 #include "FileList.h"
 
-#include "dirlist.h"
 #include "GlobalConstants.h"
 #include "linfunc.h"
 #include "path.h"
 #include "RandomNumberGenerator.h"
+#include "util/DirIterator.h"
 
 #include <algorithm>
 #include <fstream>
@@ -110,10 +110,9 @@ void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusicli
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SimpleFileList::SimpleFileList(const std::string& dirpath, const std::string& extension, bool fAlphabetize)
 {
-    DirectoryListing dir(dirpath, extension);
-    std::string curname;
-    while (dir(curname)) {
-        m_filelist.emplace_back(dir.fullName(curname));
+    FilesIterator dir(dirpath, {extension});
+    while (auto path = dir.next()) {
+        m_filelist.emplace_back(path->string());
     }
 
     if (m_filelist.empty()) {
@@ -249,20 +248,11 @@ FiltersList::FiltersList()
 ///////////// SkinList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SkinList::SkinList()
 {
-    DirectoryListing dir(convertPath("gfx/skins/"));
-    std::string curname;
-    while (dir(curname)) {
-        if (curname.length() < 5)
-            continue;
-
-        std::string file_ext = curname.substr(curname.length() - 4);
-        inPlaceLowerCase(file_ext);
-        if (file_ext != ".bmp" && file_ext != ".png") //Allow bmp and png skins
-            continue;
-
+    FilesIterator dir(convertPath("gfx/skins/"), {".bmp", ".png"});
+    while (auto path = dir.next()) {
         SkinListNode node {
-            stripCreatorAndExt(curname),
-            dir.fullName(curname),
+            stripCreatorAndExt(path->filename().string()),
+            path->string(),
         };
 
         auto it = m_skins.begin();
@@ -291,10 +281,9 @@ std::string SkinList::getName(size_t index) const
 ///////////// SimpleDirectoryList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
 {
-    DirectoryListing d(path);
-    std::string curname;
-    while (d.NextDirectory(curname)) {
-        m_filelist.insert(m_filelist.end(), d.fullName(curname));
+    SubdirsIterator dir(path);
+    while (auto path = dir.next()) {
+        m_filelist.emplace_back(*path);
     }
     if (m_filelist.empty()) {
         printf("ERROR: Empty directory.  %s\n", path.c_str());
@@ -308,12 +297,11 @@ SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
 ///////////// MusicList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MusicList::MusicList()
 {
-    DirectoryListing d(convertPath("music/game/"));
-    std::string currentdir;
-    while (d.NextDirectory(currentdir)) {
-        auto m = MusicEntry::load(d.fullName(currentdir));
+    SubdirsIterator dir(convertPath("music/game/"));
+    while (auto path = dir.next()) {
+        auto m = MusicEntry::load(path->string());
         if (m)
-            m_entries.push_back(std::move(m));
+            m_entries.emplace_back(std::move(m));
     }
 
     if (m_entries.empty()) {
@@ -647,12 +635,10 @@ void MusicEntry::updateWithOverrides()
 ///////////// MusicList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 WorldMusicList::WorldMusicList()
 {
-    DirectoryListing d(convertPath("music/world/"));
-    std::string currentdir;
-    while (d.NextDirectory(currentdir)) {
-        std::unique_ptr<WorldMusicEntry> m = std::make_unique<WorldMusicEntry>(d.fullName(currentdir));
-        if (m)
-            m_entries.push_back(std::move(m));
+    SubdirsIterator dir(convertPath("music/world/"));
+    while (auto path = dir.next()) {
+        auto m = std::make_unique<WorldMusicEntry>(path->string());
+        m_entries.emplace_back(std::move(m));
     }
 
     if (m_entries.empty()) {
