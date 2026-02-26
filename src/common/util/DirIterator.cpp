@@ -1,8 +1,7 @@
 #include "DirIterator.h"
 
 #include "linfunc.h"
-
-#include <algorithm>
+#include "util/ContainerHelpers.h"
 
 namespace fs = std::filesystem;
 
@@ -10,10 +9,6 @@ namespace fs = std::filesystem;
 namespace {
 std::string lowercaseExt(const fs::directory_entry& entry) {
     return lowercase(entry.path().extension().string());
-}
-
-bool contains(const std::vector<std::string>& list, const std::string& item) {
-    return std::find(list.cbegin(), list.cend(), item) != list.cend();
 }
 } // namespace
 
