@@ -72,6 +72,8 @@ add_library(CommonFiles STATIC
     WorldTourStop.cpp
     WorldTourStop.h
     util/Grid.h
+    util/DirIterator.cpp
+    util/DirIterator.h
 )
 
 add_subdirectory(ui)

@@ -54,6 +54,12 @@ void inPlaceLowerCase(std::string& str)
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
 
+std::string lowercase(std::string str)
+{
+    inPlaceLowerCase(str);
+    return str;
+}
+
 bool cstr_ci_equals(const char* const a, const char* const b)
 {
     if (a == b)
