@@ -31,6 +31,9 @@ jobs:
       - name: Build
         run: cmake --build build --verbose
 
+      - name: Test
+        run: ctest --test-dir build/tests --output-on-failure
+
       - name: Package
         run: |
           cmake --install build --prefix supermariowar --strip
