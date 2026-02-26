@@ -11,6 +11,8 @@
 #include <list>
 #include <cstring>
 
+namespace fs = std::filesystem;
+
 extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 
 namespace {
@@ -250,18 +252,13 @@ SkinList::SkinList()
 {
     FilesIterator dir(convertPath("gfx/skins/"), {".bmp", ".png"});
     while (auto path = dir.next()) {
-        SkinListNode node {
+        m_skins.emplace_back(SkinListNode {
             stripCreatorAndExt(path->filename().string()),
             path->string(),
-        };
-
-        auto it = m_skins.begin();
-        for (; it != m_skins.end(); it++) {
-            if (node.name.compare(it->name) < 0)
-                break;
-        }
-        m_skins.insert(it, std::move(node));
+        });
     }
+    std::sort(m_skins.begin(), m_skins.end(),
+        [](const SkinListNode& a, const SkinListNode& b){ return a.name < b.name; });
 }
 
 std::string SkinList::getPath(size_t index) const
@@ -283,7 +280,7 @@ SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
 {
     SubdirsIterator dir(path);
     while (auto path = dir.next()) {
-        m_filelist.emplace_back(*path);
+        m_filelist.emplace_back(path->string());
     }
     if (m_filelist.empty()) {
         printf("ERROR: Empty directory.  %s\n", path.c_str());
@@ -347,25 +344,18 @@ MusicEntry::MusicEntry(std::string name)
         numsongsforcategory[k] = 0;
 }
 
-std::unique_ptr<MusicEntry> MusicEntry::load(const std::string& musicdirectory)
+std::unique_ptr<MusicEntry> MusicEntry::load(const fs::path& musicdirectory)
 {
-    size_t separator_pos = musicdirectory.rfind(dirSeparator());
-    std::string name = separator_pos != std::string::npos
-        ? musicdirectory.substr(separator_pos + 1)
-        : musicdirectory;
-
-    name = name.substr(0, name.rfind("."));
-
-    const std::string musicfile = musicdirectory + dirSeparator() + std::string("Music.txt");
-    FILE* in = fopen(musicfile.c_str(), "r");
-    if (!in) {
+    const fs::path musicfile = musicdirectory / "Music.txt";
+    std::ifstream file(musicfile);
+    if (!file) {
         printf("Error: Could not open: %s\n", musicfile.c_str());
         return {};
     }
 
     int iNumFile = 0;
 
-    auto me = std::make_unique<MusicEntry>(std::move(name));
+    auto me = std::make_unique<MusicEntry>(musicdirectory.filename());
 
     //Run through the global overrides and add them to the map overrides of this music entry
     //if there are any overrides then for each override
@@ -381,55 +371,85 @@ std::unique_ptr<MusicEntry> MusicEntry::load(const std::string& musicdirectory)
         iNumFile++;
     }
     */
+    enum class Section : unsigned char {
+        None,
+        Header,
+        Land,
+        Underground,
+        Underwater,
+        Castle,
+        Platforms,
+        Ghost,
+        Bonus,
+        Battle,
+        Desert,
+        Clouds,
+        Snow,
+        MapSpecific,
+        BackgroundSpecific,
+    };
+    Section current_section = Section::Header;
+
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.empty())
+            continue;
+
+        if (line[0] == '#' || line[0] == '\r' || line[0] == ' ' || line[0] == '\t')
+            continue;
+
+        //Chop off line ending
+        line = line.substr(0, line.find('\r'));
+        line = line.substr(0, line.find('\n'));
+
+        if (line[0] == '[') {
+            std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+
+            if (line == "[land]") {
+                current_section = Section::Land;
+            } else if (line == "[underground]") {
+                current_section = Section::Underground;
+            } else if (line == "[underwater]") {
+                current_section = Section::Underwater;
+            } else if (line == "[castle]") {
+                current_section = Section::Castle;
+            } else if (line == "[platforms]") {
+                current_section = Section::Platforms;
+            } else if (line == "[ghost]") {
+                current_section = Section::Ghost;
+            } else if (line == "[bonus]") {
+                current_section = Section::Bonus;
+            } else if (line == "[battle]") {
+                current_section = Section::Battle;
+            } else if (line == "[desert]") {
+                current_section = Section::Desert;
+            } else if (line == "[clouds]") {
+                current_section = Section::Clouds;
+            } else if (line == "[snow]") {
+                current_section = Section::Snow;
+            } else if (line == "[maps]") {
+                current_section = Section::MapSpecific;
+            } else if (line == "[backgrounds]") {
+                current_section = Section::BackgroundSpecific;
+            } else {
+                current_section = Section::None;
+            }
+            continue;
+        }
+
+        //If we're not in a category, ignore this line
+        if (current_section == Section::None)
+            continue;
+
+        const std::list<std::string_view> tokens = tokenize(line, ',');
+        if (tokens.empty())
+            continue;
+
+
 
     int iAddToCategory = -1;
     char szBuffer[256];
     while (fgets(szBuffer, 256, in)) {
-        //Ignore comment lines
-        if (szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
-            continue;
-
-        //Chop off line ending
-        size_t stringLength = strlen(szBuffer);
-        for (size_t k = 0; k < stringLength; k++) {
-            if (szBuffer[k] == '\r' || szBuffer[k] == '\n') {
-                szBuffer[k] = '\0';
-                break;
-            }
-        }
-
-        //If we found a category header
-        if (szBuffer[0] == '[') {
-            if (cstr_ci_equals(szBuffer, "[land]"))
-                iAddToCategory = 0;
-            else if (cstr_ci_equals(szBuffer, "[underground]"))
-                iAddToCategory = 1;
-            else if (cstr_ci_equals(szBuffer, "[underwater]"))
-                iAddToCategory = 2;
-            else if (cstr_ci_equals(szBuffer, "[castle]"))
-                iAddToCategory = 3;
-            else if (cstr_ci_equals(szBuffer, "[platforms]"))
-                iAddToCategory = 4;
-            else if (cstr_ci_equals(szBuffer, "[ghost]"))
-                iAddToCategory = 5;
-            else if (cstr_ci_equals(szBuffer, "[bonus]"))
-                iAddToCategory = 6;
-            else if (cstr_ci_equals(szBuffer, "[battle]"))
-                iAddToCategory = 7;
-            else if (cstr_ci_equals(szBuffer, "[desert]"))
-                iAddToCategory = 8;
-            else if (cstr_ci_equals(szBuffer, "[clouds]"))
-                iAddToCategory = 9;
-            else if (cstr_ci_equals(szBuffer, "[snow]"))
-                iAddToCategory = 10;
-            else if (cstr_ci_equals(szBuffer, "[maps]"))
-                iAddToCategory = MAXMUSICCATEGORY;
-            else if (cstr_ci_equals(szBuffer, "[backgrounds]"))
-                iAddToCategory = MAXMUSICCATEGORY + 1;
-
-            continue;
-        }
-
         //Cap the number of songs at MAXCATEGORYTRACKS for a category
         if (iAddToCategory > -1 && iAddToCategory < MAXMUSICCATEGORY && me->numsongsforcategory[iAddToCategory] >= MAXCATEGORYTRACKS)
             continue;
