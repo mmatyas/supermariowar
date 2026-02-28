@@ -11,6 +11,7 @@
 #include <fstream>
 #include <list>
 #include <cstring>
+#include <variant>
 
 namespace fs = std::filesystem;
 
@@ -324,25 +325,14 @@ std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
         return {};
     }
 
-    enum class Section : unsigned char {
-        None,
-        Header,
-        Land,
-        Underground,
-        Underwater,
-        Castle,
-        Platforms,
-        Ghost,
-        Bonus,
-        Battle,
-        Desert,
-        Clouds,
-        Snow,
-        MapSpecific,
-        BackgroundSpecific,
-    };
+    struct HeaderSection {};
+    struct CategorySection { MusicCategory category; };
+    struct MapSpecificSection {};
+    struct BackgroundSpecificSection {};
+    using Section = std::variant<HeaderSection, CategorySection, MapSpecificSection, BackgroundSpecificSection>;
+
     // The file starts with four special songs
-    Section current_section = Section::Header;
+    Section current_section = HeaderSection {};
 
     std::string line;
     while (std::getline(file, line)) {
@@ -357,75 +347,63 @@ std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
         //If we found a category header
         if (line[0] == '[') {
             std::transform(line.begin(), line.end(), line.begin(), ::tolower);
-            current_section = [&line](){
-                if (line == "[land]") return Section::Land;
-                if (line == "[underground]") return Section::Underground;
-                if (line == "[underwater]") return Section::Underwater;
-                if (line == "[castle]") return Section::Castle;
-                if (line == "[platforms]") return Section::Platforms;
-                if (line == "[ghost]") return Section::Ghost;
-                if (line == "[bonus]") return Section::Bonus;
-                if (line == "[battle]") return Section::Battle;
-                if (line == "[desert]") return Section::Desert;
-                if (line == "[clouds]") return Section::Clouds;
-                if (line == "[snow]") return Section::Snow;
-                if (line == "[maps]") return Section::MapSpecific;
-                if (line == "[backgrounds]") return Section::BackgroundSpecific;
-                return Section::None;
+            current_section = [current_section, &line]() -> Section {
+                if (line == "[land]") return CategorySection { MusicCategory::Land };
+                if (line == "[underground]") return CategorySection { MusicCategory::Underground };
+                if (line == "[underwater]") return CategorySection { MusicCategory::Underwater };
+                if (line == "[castle]") return CategorySection { MusicCategory::Castle };
+                if (line == "[platforms]") return CategorySection { MusicCategory::Platforms };
+                if (line == "[ghost]") return CategorySection { MusicCategory::Ghost };
+                if (line == "[bonus]") return CategorySection { MusicCategory::Bonus };
+                if (line == "[battle]") return CategorySection { MusicCategory::Battle };
+                if (line == "[desert]") return CategorySection { MusicCategory::Desert };
+                if (line == "[clouds]") return CategorySection { MusicCategory::Clouds };
+                if (line == "[snow]") return CategorySection { MusicCategory::Snow };
+                if (line == "[maps]") return MapSpecificSection {};
+                if (line == "[backgrounds]") return BackgroundSpecificSection {};
+                return current_section;
             }();
             continue;
         }
 
-        if (current_section == Section::MapSpecific || current_section == Section::BackgroundSpecific) {
-            std::list<std::string_view> tokens = tokenize(line, ',');
-            if (tokens.size() < 2)
-                continue;
+        std::visit([&line, &self, &musicdirectory](auto const& section) {
+            using T = std::decay_t<decltype(section)>;
 
-            const auto mapname = std::string(tokens.front());
-            tokens.pop_front();
+            if constexpr (std::is_same_v<T, CategorySection>) {
+                //Cap the number of songs at MAXCATEGORYTRACKS for a category
+                if (self.m_category_songs[section.category].size() >= MAXCATEGORYTRACKS)
+                    return;
 
-            std::vector<size_t>& target_index_list = current_section == Section::MapSpecific
-                ? self.m_map_overrides[mapname]
-                : self.m_background_overrides[mapname];
+                fs::path path = musicdirectory / line;
+                if (!fs::exists(path))
+                    return;
 
-            for (std::string_view filename : tokens) {
-                fs::path path = musicdirectory / filename;
-                if (fs::exists(path)) {
-                    self.m_all_songs.emplace_back(std::move(path));
-                    target_index_list.emplace_back(self.m_all_songs.size() - 1);
+                self.m_all_songs.emplace_back(std::move(path));
+                self.m_category_songs[section.category].emplace_back(self.m_all_songs.size() - 1);
+                return;
+            }
+            if constexpr (std::is_same_v<T, MapSpecificSection> || std::is_same_v<T, BackgroundSpecificSection>) {
+                std::list<std::string_view> tokens = tokenize(line, ',');
+                if (tokens.size() < 2)
+                    return;
+
+                const auto mapname = std::string(tokens.front());
+                tokens.pop_front();
+
+                std::vector<size_t>& target_index_list = std::is_same_v<T, MapSpecificSection>
+                    ? self.m_map_overrides[mapname]
+                    : self.m_background_overrides[mapname];
+
+                for (std::string_view filename : tokens) {
+                    fs::path path = musicdirectory / filename;
+                    if (fs::exists(path)) {
+                        self.m_all_songs.emplace_back(std::move(path));
+                        target_index_list.emplace_back(self.m_all_songs.size() - 1);
+                    }
                 }
+                return;
             }
-            continue;
-        }
-
-        const auto category = [current_section]() constexpr -> std::optional<MusicCategory> {
-            switch (current_section) {
-                case Section::Land: return MusicCategory::Land;
-                case Section::Underground: return MusicCategory::Underground;
-                case Section::Underwater: return MusicCategory::Underwater;
-                case Section::Castle: return MusicCategory::Castle;
-                case Section::Platforms: return MusicCategory::Platforms;
-                case Section::Ghost: return MusicCategory::Ghost;
-                case Section::Bonus: return MusicCategory::Bonus;
-                case Section::Battle: return MusicCategory::Battle;
-                case Section::Desert: return MusicCategory::Desert;
-                case Section::Clouds: return MusicCategory::Clouds;
-                case Section::Snow: return MusicCategory::Snow;
-                default: return std::nullopt;
-            }
-        }();
-        if (category) {
-            //Cap the number of songs at MAXCATEGORYTRACKS for a category
-            if (self.m_category_songs[*category].size() >= MAXCATEGORYTRACKS)
-                continue;
-
-            fs::path path = musicdirectory / line;
-            if (!fs::exists(path))
-                continue;
-
-            self.m_all_songs.emplace_back(std::move(path));
-            self.m_category_songs[*category].emplace_back(self.m_all_songs.size() - 1);
-        }
+        }, current_section);
     }
 
     file.close();
@@ -621,24 +599,14 @@ std::optional<WorldMusicPack> WorldMusicPack::load(const fs::path& musicdirector
         return {};
     }
 
-    enum class Section : unsigned char {
-        None,
-        Header,
-        Grass,
-        Desert,
-        Water,
-        Giant,
-        Sky,
-        Ice,
-        Pipe,
-        Dark,
-        Space,
-        Bonus,
-        Sleep,
-        WorldSpecific,
-    };
+    struct HeaderSection {};
+    struct CategorySection { WorldMusicCategory category; };
+    struct WorldSpecificSection {};
+    struct BackgroundSpecificSection {};
+    using Section = std::variant<HeaderSection, CategorySection, WorldSpecificSection>;
+
     // The file starts with a version header
-    Section current_section = Section::Header;
+    Section current_section = HeaderSection {};
 
     std::string line;
     while (std::getline(file, line)) {
@@ -653,62 +621,51 @@ std::optional<WorldMusicPack> WorldMusicPack::load(const fs::path& musicdirector
         //If we found a category header
         if (line[0] == '[') {
             std::transform(line.begin(), line.end(), line.begin(), ::tolower);
-            current_section = [&line](){
-                if (line == "[grass]") return Section::Grass;
-                if (line == "[desert]") return Section::Desert;
-                if (line == "[water]") return Section::Water;
-                if (line == "[giant]") return Section::Giant;
-                if (line == "[sky]") return Section::Sky;
-                if (line == "[ice]") return Section::Ice;
-                if (line == "[pipe]") return Section::Pipe;
-                if (line == "[dark]") return Section::Dark;
-                if (line == "[space]") return Section::Space;
-                if (line == "[bonus]") return Section::Bonus;
-                if (line == "[sleep]") return Section::Sleep;
-                if (line == "[worlds]") return Section::WorldSpecific;
-                return Section::None;
+            current_section = [current_section, &line]() -> Section {
+                if (line == "[grass]") return CategorySection { WorldMusicCategory::Grass };
+                if (line == "[desert]") return CategorySection { WorldMusicCategory::Desert };
+                if (line == "[water]") return CategorySection { WorldMusicCategory::Water };
+                if (line == "[giant]") return CategorySection { WorldMusicCategory::Giant };
+                if (line == "[sky]") return CategorySection { WorldMusicCategory::Sky };
+                if (line == "[ice]") return CategorySection { WorldMusicCategory::Ice };
+                if (line == "[pipe]") return CategorySection { WorldMusicCategory::Pipe };
+                if (line == "[dark]") return CategorySection { WorldMusicCategory::Dark };
+                if (line == "[space]") return CategorySection { WorldMusicCategory::Space };
+                if (line == "[bonus]") return CategorySection { WorldMusicCategory::Bonus };
+                if (line == "[sleep]") return CategorySection { WorldMusicCategory::Sleep };
+                if (line == "[worlds]") return WorldSpecificSection {};
+                return current_section;
             }();
             continue;
         }
 
-        if (current_section == Section::WorldSpecific) {
-            std::list<std::string_view> tokens = tokenize(line, ',');
-            if (tokens.size() < 2)
-                continue;
+        std::visit([&line, &self, &musicdirectory](auto const& section) {
+            using T = std::decay_t<decltype(section)>;
 
-            const auto worldname = std::string(tokens.front());
-            tokens.pop_front();
-            const std::string_view filename = tokens.front();
+            if constexpr (std::is_same_v<T, CategorySection>) {
+                fs::path path = musicdirectory / line;
+                if (fs::exists(path)) {
+                    self.m_category_song[section.category] = std::move(path);
+                }
+                return;
+            }
+            if constexpr (std::is_same_v<T, WorldSpecificSection>) {
+                std::list<std::string_view> tokens = tokenize(line, ',');
+                if (tokens.size() < 2)
+                    return;
 
-            fs::path path = musicdirectory / filename;
-            if (fs::exists(path)) {
+                const auto worldname = std::string(tokens.front());
+                tokens.pop_front();
+                const std::string_view filename = tokens.front();
+
+                fs::path path = musicdirectory / filename;
+                if (!fs::exists(path))
+                    return;
+
                 self.m_world_overrides[worldname] = std::move(path);
+                return;
             }
-            continue;
-        }
-
-        const auto category = [current_section]() constexpr -> std::optional<WorldMusicCategory> {
-            switch (current_section) {
-                case Section::Grass: return WorldMusicCategory::Grass;
-                case Section::Desert: return WorldMusicCategory::Desert;
-                case Section::Water: return WorldMusicCategory::Water;
-                case Section::Giant: return WorldMusicCategory::Giant;
-                case Section::Sky: return WorldMusicCategory::Sky;
-                case Section::Ice: return WorldMusicCategory::Ice;
-                case Section::Pipe: return WorldMusicCategory::Pipe;
-                case Section::Dark: return WorldMusicCategory::Dark;
-                case Section::Space: return WorldMusicCategory::Space;
-                case Section::Bonus: return WorldMusicCategory::Bonus;
-                case Section::Sleep: return WorldMusicCategory::Sleep;
-                default: return std::nullopt;
-            }
-        }();
-        if (category) {
-            fs::path path = musicdirectory / line;
-            if (fs::exists(path)) {
-                self.m_category_song[*category] = std::move(path);
-            }
-        }
+        }, current_section);
     }
 
     file.close();
