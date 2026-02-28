@@ -1,6 +1,5 @@
 #include "FileList.h"
 
-#include "GlobalConstants.h"
 #include "linfunc.h"
 #include "path.h"
 #include "RandomNumberGenerator.h"
@@ -9,11 +8,11 @@
 
 #include <algorithm>
 #include <fstream>
-#include <list>
-#include <cstring>
 #include <variant>
 
 namespace fs = std::filesystem;
+
+#define MAXCATEGORYTRACKS 64
 
 
 void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusiclist)
@@ -96,7 +95,7 @@ void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusicli
 }
 
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SimpleFileList::SimpleFileList(const std::string& dirpath, const std::string& extension, bool fAlphabetize)
+SimpleFileList::SimpleFileList(const fs::path& dirpath, const std::string& extension, bool fAlphabetize)
 {
     FilesIterator dir(dirpath, {extension});
     while (auto path = dir.next()) {
@@ -117,7 +116,7 @@ SimpleFileList::SimpleFileList(const std::string& dirpath, const std::string& ex
         names.reserve(m_filelist.size());
 
         //Get only the names of the files, no author information
-        for (const std::string& filepath : m_filelist) {
+        for (const fs::path& filepath : m_filelist) {
             std::string name = stripPathAndExtension(filepath);
             std::transform(name.begin(), name.end(), name.begin(), ::tolower);
             names.emplace_back(std::move(name));
@@ -144,7 +143,7 @@ void SimpleFileList::setCurrentIndex(size_t index)
         m_index = index;
 }
 
-void SimpleFileList::setCurrentPath(const std::string& name)
+void SimpleFileList::setCurrentPath(const fs::path& name)
 {
     auto it = std::find(m_filelist.cbegin(), m_filelist.cend(), name);
     if (it != m_filelist.cend())
@@ -177,30 +176,27 @@ void SimpleFileList::random()
         m_index = RANDOM_INT(m_filelist.size());
 }
 
-std::string SimpleFileList::at(size_t index) const
-{
-    return index < m_filelist.size()
-        ? m_filelist[index]
-        : std::string();
-}
-
-void SimpleFileList::add(std::string path)
+void SimpleFileList::add(fs::path path)
 {
     m_filelist.emplace_back(std::move(path));
 }
 
 bool SimpleFileList::find(const std::string& name)
 {
-    bool fFound = false;
-    size_t oldCurrent = m_index;
+    if (m_filelist.empty())
+        return false;
+
+    const size_t start = m_index;
     do {
         next(); //sets us to the beginning if we hit the end -> loop through the maps
-        if (strstr(m_filelist[m_index].c_str(), name.c_str()))   //compare names after
-            fFound = true;
-    }
-    while (m_index != oldCurrent && !fFound);
 
-    return fFound;
+        const fs::path& path = m_filelist[m_index];
+        if (path.filename().string().starts_with(name))
+            return true;
+    }
+    while (m_index != start);
+
+    return false;
 }
 
 

@@ -58,7 +58,7 @@ MapList::MapList(bool fWorldEditor)
 
         SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
         for (size_t iDir = 0; iDir < worldeditormapdirs.count(); iDir++) {
-            std::string szName = worldeditormapdirs.currentPath() + '/';
+            std::string szName = worldeditormapdirs.currentPath().string() + '/';
             addMapsFrom(szName, maps);
             worldeditormapdirs.next();
         }
@@ -97,7 +97,7 @@ MapList::MapList(bool fWorldEditor)
     //Read all world map directories and load them into the world/tour only list
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
     for (size_t iDir = 0; iDir < worldmapdirs.count(); iDir++) {
-        std::string szName = worldmapdirs.currentPath() + '/';
+        std::string szName = worldmapdirs.currentPath().string() + '/';
         addMapsFrom(szName, worldmaps);
         worldmapdirs.next();
     }
@@ -110,7 +110,7 @@ void MapList::addWorldMaps()
 {
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
     for (size_t iDir = 0; iDir < worldmapdirs.count(); iDir++) {
-        std::string szName = worldmapdirs.currentPath() + '/';
+        std::string szName = worldmapdirs.currentPath().string() + '/';
         addMapsFrom(szName, maps);
         worldmapdirs.next();
     }

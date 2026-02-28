@@ -1,43 +1,37 @@
 #pragma once
 
-#include <array>
 #include <filesystem>
-#include <map>
 #include <memory>
 #include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-#define MAXMUSICCATEGORY        11
-#define MAXWORLDMUSICCATEGORY   9
-#define MAXCATEGORYTRACKS       64
-
 
 //it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
 class SimpleFileList {
 public:
     SimpleFileList() = default;
-    SimpleFileList(const std::string& dirpath, const std::string& extension, bool fAlphabetize = false);
+    SimpleFileList(const std::filesystem::path& dirpath, const std::string& extension, bool fAlphabetize = false);
     virtual ~SimpleFileList() = default;
 
-    std::string at(size_t index) const;
+    const std::filesystem::path& at(size_t index) const { return m_filelist.at(index); }
     size_t count() const { return m_filelist.size(); }
     size_t currentIndex() const { return m_index; }
-    std::string currentPath() const { return at(m_index); }
+    const std::filesystem::path& currentPath() const { return at(m_index); }
 
     void setCurrentIndex(size_t index);
-    void setCurrentPath(const std::string& path);
+    void setCurrentPath(const std::filesystem::path& path);
 
     void next();
     void prev();
     void random();
 
-    void add(std::string path);
+    void add(std::filesystem::path path);
     bool find(const std::string& name);
 
 protected:
-    std::vector<std::string> m_filelist;
+    std::vector<std::filesystem::path> m_filelist;
     size_t m_index = -1;
 };
 
