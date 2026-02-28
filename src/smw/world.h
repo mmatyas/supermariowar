@@ -18,6 +18,8 @@
 #define WORLD_FOREGROUND_SPRITE_OFFSET          700
 #define WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET 900
 
+enum class WorldMusicCategory : unsigned char;
+
 struct WorldMapTile {
 	//Id is used for searching for AI
 	short iID;
@@ -194,7 +196,7 @@ public:
 
     void SetInitialPowerups();
 
-    short GetMusicCategory() const { return iMusicCategory; }
+    WorldMusicCategory GetMusicCategory() const { return iMusicCategory; }
     const std::string& GetWorldName() { return worldName; }
 
 private:
@@ -217,7 +219,7 @@ private:
     short iNumInitialBonuses;
     short iInitialBonuses[32];
 
-    short iMusicCategory;
+    WorldMusicCategory iMusicCategory;
 
     short iTileSize;
     short iTileSizeShift;

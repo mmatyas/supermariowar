@@ -202,27 +202,59 @@ private:
 };
 
 
+enum class WorldMusicCategory : unsigned char {
+    Grass,
+    Desert,
+    Water,
+    Giant,
+    Sky,
+    Ice,
+    Pipe,
+    Dark,
+    Space,
+    Bonus,
+    Sleep,
+    COUNT,
+};
+constexpr std::string_view to_string(WorldMusicCategory category) noexcept {
+    switch (category) {
+        case WorldMusicCategory::Grass: return "Grass";
+        case WorldMusicCategory::Desert: return "Desert";
+        case WorldMusicCategory::Water: return "Water";
+        case WorldMusicCategory::Giant: return "Giant";
+        case WorldMusicCategory::Sky: return "Sky";
+        case WorldMusicCategory::Ice: return "Ice";
+        case WorldMusicCategory::Pipe: return "Pipe";
+        case WorldMusicCategory::Dark: return "Dark";
+        case WorldMusicCategory::Space: return "Space";
+        case WorldMusicCategory::Bonus: return "Bonus";
+        case WorldMusicCategory::Sleep: return "Sleep";
+        case WorldMusicCategory::COUNT: return "COUNT";
+    }
+}
+
+
 struct WorldMusicOverride {
     std::string worldname;
     std::filesystem::path song;
 };
 
 
-class WorldMusicEntry {
+class WorldMusicPack {
 public:
-    explicit WorldMusicEntry(std::string name);
+    explicit WorldMusicPack(std::string name);
 
-    static std::unique_ptr<WorldMusicEntry> load(const std::string& musicDirectory);
+    static std::optional<WorldMusicPack> load(const std::filesystem::path& musicDirectory);
 
-    const std::string& music(size_t musicID, const std::string& worldName) const;
+    const std::filesystem::path& music(WorldMusicCategory category, const std::string& worldName) const;
     const std::string& name() const { return m_name; }
 
     void updateWithOverrides(const std::vector<WorldMusicOverride>& overrides);
 
 private:
     std::string m_name;
-    std::map<std::string, std::string> m_worldOverrides;
-    std::array<std::string, MAXWORLDMUSICCATEGORY + 2> m_songFileNames;
+    std::unordered_map<std::string, std::filesystem::path> m_world_overrides;
+    std::unordered_map<WorldMusicCategory, std::filesystem::path> m_category_song;
 };
 
 
@@ -237,10 +269,10 @@ public:
         m_currentIndex = index < m_entries.size() ? index : 0;
     }
     const std::string& currentName() const {
-        return m_entries[m_currentIndex]->name();
+        return m_entries[m_currentIndex].name();
     }
-    const std::string& currentMusic(int musicID, const std::string& worldName) const {
-        return m_entries[m_currentIndex]->music(musicID, worldName);
+    const std::filesystem::path& currentMusic(WorldMusicCategory category, const std::string& worldName) const {
+        return m_entries[m_currentIndex].music(category, worldName);
     }
     size_t count() const {
         return m_entries.size();
@@ -253,7 +285,7 @@ public:
     void updateEntriesWithOverrides(const std::vector<WorldMusicOverride>& overrides);
 
 private:
-    std::vector<std::unique_ptr<WorldMusicEntry>> m_entries;
+    std::vector<WorldMusicPack> m_entries;
     size_t m_currentIndex = 0;
 };
 

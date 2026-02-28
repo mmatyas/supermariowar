@@ -333,17 +333,6 @@ bool ignoreclick = false;
 
 char findstring[FILEBUFSIZE] = "";
 
-const char* g_szWorldMusicCategoryNames[MAXWORLDMUSICCATEGORY] {
-	"Grass",
-	"Desert",
-	"Water",
-	"Giant",
-	"Sky",
-	"Ice",
-	"Pipe",
-	"Dark",
-	"Space",
-};
 short g_musiccategorydisplaytimer = 0;
 
 short g_messagedisplaytimer = 0;
@@ -1243,8 +1232,8 @@ int editor_edit()
 							fAutoPaint = !fAutoPaint;
 
                     if (event.key.keysym.sym == SDLK_r) {
-							if (g_musiccategorydisplaytimer > 0 && ++g_worldmap.iMusicCategory >= MAXWORLDMUSICCATEGORY)
-								g_worldmap.iMusicCategory = 0;
+							if (g_musiccategorydisplaytimer > 0 && g_worldmap.iMusicCategory == WorldMusicCategory::Sleep)  // FIXME
+								g_worldmap.iMusicCategory = WorldMusicCategory::Grass;
 
 							g_musiccategorydisplaytimer = 90;
 						}
@@ -1890,7 +1879,7 @@ int editor_edit()
             if (--g_musiccategorydisplaytimer > 0) {
 				spr_dialog.draw(224, 176, 0, 0, 192, 128);
 				rm->menu_font_small.drawCentered(320, 195, "Music Category");
-				rm->menu_font_large.drawCentered(320, 220, g_szWorldMusicCategoryNames[g_worldmap.iMusicCategory]);
+                                rm->menu_font_large.drawCentered(320, 220, to_string(g_worldmap.iMusicCategory).data());
 
 				rm->menu_font_small.drawCentered(320, 255, "Press 'R' Again");
 				rm->menu_font_small.drawCentered(320, 270, "To Change");

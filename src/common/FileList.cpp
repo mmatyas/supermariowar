@@ -317,6 +317,13 @@ std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
 {
     MusicPack self(musicdirectory.filename());
 
+    const fs::path file_path = musicdirectory / "Music.txt";
+    std::ifstream file(file_path);
+    if (!file) {
+        printf("Error: Could not open: %s\n", file_path.c_str());
+        return {};
+    }
+
     enum class Section : unsigned char {
         None,
         Header,
@@ -334,14 +341,6 @@ std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
         MapSpecific,
         BackgroundSpecific,
     };
-
-    const fs::path file_path = musicdirectory / "Music.txt";
-    std::ifstream file(file_path);
-    if (!file) {
-        printf("Error: Could not open: %s\n", file_path.c_str());
-        return {};
-    }
-
     // The file starts with four special songs
     Section current_section = Section::Header;
 
@@ -577,12 +576,12 @@ WorldMusicList::WorldMusicList()
 {
     SubdirsIterator dir(convertPath("music/world/"));
     while (auto path = dir.next()) {
-        auto m = std::make_unique<WorldMusicEntry>(path->string());
-        m_entries.emplace_back(std::move(m));
+        if (auto pack = WorldMusicPack::load(path->string())) {
+            m_entries.emplace_back(std::move(*pack));
+        }
     }
-
     if (m_entries.empty()) {
-        throw "Empty world music directory!";
+        throw "Could not load any world music!";
     }
 }
 
@@ -600,122 +599,146 @@ void WorldMusicList::random() {
 
 void WorldMusicList::updateEntriesWithOverrides(const std::vector<WorldMusicOverride>& overrides)
 {
-    for (std::unique_ptr<WorldMusicEntry>& entry : m_entries) {
-        entry->updateWithOverrides(overrides);
+    for (WorldMusicPack& entry : m_entries) {
+        entry.updateWithOverrides(overrides);
     }
 }
 
 
-///////////// WorldMusicEntry ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WorldMusicEntry::WorldMusicEntry(std::string name)
+///////////// WorldMusicPack ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+WorldMusicPack::WorldMusicPack(std::string name)
     : m_name(std::move(name))
 {}
 
-std::unique_ptr<WorldMusicEntry> WorldMusicEntry::load(const std::string& musicdirectory)
+std::optional<WorldMusicPack> WorldMusicPack::load(const fs::path& musicdirectory)
 {
-    const size_t separator_pos = musicdirectory.rfind(dirSeparator());
-    std::string name = separator_pos != std::string::npos
-        ? musicdirectory.substr(separator_pos + 1)
-        : musicdirectory;
+    WorldMusicPack self(musicdirectory.filename());
 
-    name = name.substr(0, name.rfind("."));
-
-    const std::string musicfile = musicdirectory + dirSeparator() + std::string("Music.txt");
-    FILE* in = fopen(musicfile.c_str(), "r");
-    if (!in) {
-        printf("Error: Could not open: %s\n", musicfile.c_str());
+    const fs::path file_path = musicdirectory / "Music.txt";
+    std::ifstream file(file_path);
+    if (!file) {
+        printf("Error: Could not open: %s\n", file_path.c_str());
         return {};
     }
 
-    auto wme = std::make_unique<WorldMusicEntry>(std::move(name));
+    enum class Section : unsigned char {
+        None,
+        Header,
+        Grass,
+        Desert,
+        Water,
+        Giant,
+        Sky,
+        Ice,
+        Pipe,
+        Dark,
+        Space,
+        Bonus,
+        Sleep,
+        WorldSpecific,
+    };
+    // The file starts with a version header
+    Section current_section = Section::Header;
 
-    int iAddToCategory = -1;
-    char szBuffer[256];
-    while (fgets(szBuffer, 256, in)) {
+    std::string line;
+    while (std::getline(file, line)) {
         //Ignore comment lines
-        if (szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
+        if (line.empty() || line[0] == '#' || line[0] == '\n' || line[0] == '\r' || line[0] == ' ' || line[0] == '\t')
             continue;
 
         //Chop off line ending
-        int stringLength = strlen(szBuffer);
-        for (int k = 0; k < stringLength; k++) {
-            if (szBuffer[k] == '\r' || szBuffer[k] == '\n') {
-                szBuffer[k] = '\0';
-                break;
-            }
-        }
+        if (line.ends_with('\r'))
+            line.pop_back();
 
         //If we found a category header
-        if (szBuffer[0] == '[') {
-            if (cstr_ci_equals(szBuffer, "[grass]"))
-                iAddToCategory = 0;
-            else if (cstr_ci_equals(szBuffer, "[desert]"))
-                iAddToCategory = 1;
-            else if (cstr_ci_equals(szBuffer, "[water]"))
-                iAddToCategory = 2;
-            else if (cstr_ci_equals(szBuffer, "[giant]"))
-                iAddToCategory = 3;
-            else if (cstr_ci_equals(szBuffer, "[sky]"))
-                iAddToCategory = 4;
-            else if (cstr_ci_equals(szBuffer, "[ice]"))
-                iAddToCategory = 5;
-            else if (cstr_ci_equals(szBuffer, "[pipe]"))
-                iAddToCategory = 6;
-            else if (cstr_ci_equals(szBuffer, "[dark]"))
-                iAddToCategory = 7;
-            else if (cstr_ci_equals(szBuffer, "[space]"))
-                iAddToCategory = 8;
-            else if (cstr_ci_equals(szBuffer, "[bonus]"))
-                iAddToCategory = WORLDMUSICBONUS;
-            else if (cstr_ci_equals(szBuffer, "[sleep]"))
-                iAddToCategory = WORLDMUSICSLEEP;
-            else if (cstr_ci_equals(szBuffer, "[worlds]"))
-                iAddToCategory = WORLDMUSICWORLDS;
-
+        if (line[0] == '[') {
+            std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+            current_section = [&line](){
+                if (line == "[grass]") return Section::Grass;
+                if (line == "[desert]") return Section::Desert;
+                if (line == "[water]") return Section::Water;
+                if (line == "[giant]") return Section::Giant;
+                if (line == "[sky]") return Section::Sky;
+                if (line == "[ice]") return Section::Ice;
+                if (line == "[pipe]") return Section::Pipe;
+                if (line == "[dark]") return Section::Dark;
+                if (line == "[space]") return Section::Space;
+                if (line == "[bonus]") return Section::Bonus;
+                if (line == "[sleep]") return Section::Sleep;
+                if (line == "[worlds]") return Section::WorldSpecific;
+                return Section::None;
+            }();
             continue;
         }
 
-        if (iAddToCategory > -1 && iAddToCategory <= WORLDMUSICSLEEP) {
-            std::string sPath = musicdirectory + dirSeparator() + szBuffer;
-            if (FileExists(sPath))
-                wme->m_songFileNames[iAddToCategory] = sPath;
-        } else if (iAddToCategory == WORLDMUSICWORLDS) {
-            char* pszName = strtok(szBuffer, ",\n");
-            if (!pszName)
+        if (current_section == Section::WorldSpecific) {
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < 2)
                 continue;
 
-            char* pszMusic = strtok(NULL, ",\n");
-            if (!pszMusic)
-                continue;
+            const auto worldname = std::string(tokens.front());
+            tokens.pop_front();
+            const std::string_view filename = tokens.front();
 
-            std::string sPath = musicdirectory + dirSeparator() + pszMusic;
-            if (!FileExists(sPath))
-                continue;
+            fs::path path = musicdirectory / filename;
+            if (fs::exists(path)) {
+                self.m_world_overrides[worldname] = std::move(path);
+            }
+            continue;
+        }
 
-            wme->m_worldOverrides[pszName] = sPath;
+        const auto category = [current_section]() constexpr -> std::optional<WorldMusicCategory> {
+            switch (current_section) {
+                case Section::Grass: return WorldMusicCategory::Grass;
+                case Section::Desert: return WorldMusicCategory::Desert;
+                case Section::Water: return WorldMusicCategory::Water;
+                case Section::Giant: return WorldMusicCategory::Giant;
+                case Section::Sky: return WorldMusicCategory::Sky;
+                case Section::Ice: return WorldMusicCategory::Ice;
+                case Section::Pipe: return WorldMusicCategory::Pipe;
+                case Section::Dark: return WorldMusicCategory::Dark;
+                case Section::Space: return WorldMusicCategory::Space;
+                case Section::Bonus: return WorldMusicCategory::Bonus;
+                case Section::Sleep: return WorldMusicCategory::Sleep;
+                default: return std::nullopt;
+            }
+        }();
+        if (category) {
+            fs::path path = musicdirectory / line;
+            if (fs::exists(path)) {
+                self.m_category_song[*category] = std::move(path);
+            }
         }
     }
 
-    fclose(in);
-    return wme;
+    file.close();
+
+#ifndef NDEBUG
+    printf("------ World Songlist for %s ------\n", self.m_name.c_str());
+    for (const auto& [category, song] : self.m_category_song) {
+        printf("%s: %s\n", to_string(category).data(), song.c_str());
+    }
+#endif
+    return self;
 }
 
-const std::string& WorldMusicEntry::music(size_t musicID, const std::string& worldName) const
+const fs::path& WorldMusicPack::music(WorldMusicCategory category, const std::string& worldName) const
 {
     //First check if there is specific map music
-    const auto iter = m_worldOverrides.find(worldName);
-    if (iter != m_worldOverrides.cend()) {
+    const auto iter = m_world_overrides.find(worldName);
+    if (iter != m_world_overrides.cend()) {
         return iter->second;
     }
 
-    return (musicID <= WORLDMUSICSLEEP)
-        ? m_songFileNames[musicID]
-        : m_songFileNames[0];
+    if (auto it = m_category_song.find(category); it != m_category_song.cend()) {
+        return it->second;
+    }
+    return m_category_song.at(WorldMusicCategory::Grass);
 }
 
-void WorldMusicEntry::updateWithOverrides(const std::vector<WorldMusicOverride>& overrides)
+void WorldMusicPack::updateWithOverrides(const std::vector<WorldMusicOverride>& overrides)
 {
     for (const WorldMusicOverride& override : overrides) {
-        m_worldOverrides[override.worldname] = override.song;
+        m_world_overrides[override.worldname] = override.song;
     }
 }

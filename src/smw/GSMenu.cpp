@@ -1300,7 +1300,7 @@ void MenuState::update()
                 LoadCurrentMapBackground();
 
                 if (game_values.music) {
-                    rm->backgroundmusic[0].load(worldmusiclist->currentMusic(WORLDMUSICBONUS, ""));
+                    rm->backgroundmusic[0].load(worldmusiclist->currentMusic(WorldMusicCategory::Bonus, ""));
                     rm->backgroundmusic[0].play(false, false);
                 }
             } else {

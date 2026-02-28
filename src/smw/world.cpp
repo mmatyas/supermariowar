@@ -413,7 +413,7 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
             version.build = popNextInt(tokens);
             iReadType = 1;
         } else if (iReadType == 1) { //music category
-            iMusicCategory = std::stoi(line);
+            iMusicCategory = static_cast<WorldMusicCategory>(std::stoi(line));  // FIXME
             iReadType = 2;
         } else if (iReadType == 2) { //world width
             iWidth = std::stoi(line);
