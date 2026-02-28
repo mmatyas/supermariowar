@@ -1374,7 +1374,7 @@ void MenuState::update()
                 game_values.singleplayermode = -1;
 
                 if (game_values.music) {
-                    musiclist->setRandomMusic(g_map->musicCategoryID, sShortMapName.c_str(), g_map->szBackgroundFile);
+                    musiclist->setRandomMusic(static_cast<MusicCategory>(g_map->musicCategoryID), sShortMapName.c_str(), g_map->szBackgroundFile);
                     rm->backgroundmusic[0].load(musiclist->currentMusic());
                     rm->backgroundmusic[0].play(game_values.playnextmusic, false);
                 }

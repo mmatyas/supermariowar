@@ -1864,7 +1864,7 @@ void playMusic()
     //If no background music is playing, then play some
     if (!rm->backgroundmusic[0].isPlaying() && !rm->sfx_invinciblemusic.isPlaying() && !rm->sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
         if (game_values.playnextmusic) {
-            musiclist->setNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
+            musiclist->setNextMusic(static_cast<MusicCategory>(g_map->musicCategoryID), maplist->currentShortmapname(), g_map->szBackgroundFile);
             rm->backgroundmusic[0].load(musiclist->currentMusic());
         }
 
@@ -1878,7 +1878,7 @@ void PlayNextMusicTrack()
         return;
 
     rm->backgroundmusic[0].stop();
-    musiclist->setNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
+    musiclist->setNextMusic(static_cast<MusicCategory>(g_map->musicCategoryID), maplist->currentShortmapname(), g_map->szBackgroundFile);
     rm->backgroundmusic[0].load(musiclist->currentMusic());
     rm->backgroundmusic[0].play(game_values.playnextmusic, false);
 }
@@ -2382,7 +2382,7 @@ void start_gameplay()
     //secretBoss();
 
     if (game_values.music) {
-        musiclist->setRandomMusic(g_map->musicCategoryID, "", "");
+        musiclist->setRandomMusic(static_cast<MusicCategory>(g_map->musicCategoryID), "", "");
         rm->backgroundmusic[0].load(musiclist->currentMusic());
         rm->backgroundmusic[0].play(game_values.playnextmusic, false);
     }
