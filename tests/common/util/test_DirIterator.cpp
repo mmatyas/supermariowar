@@ -59,8 +59,8 @@ TEST_CASE("FilesIterator filters by extension") {
     }
 
     CHECK(found.size() == 2);
-    CHECK(contains(found, "a.txt"));
-    CHECK(contains(found, "b.md"));
+    CHECK(utils::contains(found, "a.txt"));
+    CHECK(utils::contains(found, "b.md"));
 }
 
 
@@ -80,8 +80,8 @@ TEST_CASE("SubdirsIterator lists only subdirectories") {
     }
 
     CHECK(found.size() == 2);
-    CHECK(contains(found, "sub1"));
-    CHECK(contains(found, "sub2"));
+    CHECK(utils::contains(found, "sub1"));
+    CHECK(utils::contains(found, "sub2"));
 }
 
 

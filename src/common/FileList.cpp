@@ -4,6 +4,7 @@
 #include "linfunc.h"
 #include "path.h"
 #include "RandomNumberGenerator.h"
+#include "util/ContainerHelpers.h"
 #include "util/DirIterator.h"
 
 #include <algorithm>
@@ -250,33 +251,16 @@ SkinList::SkinList()
 {
     FilesIterator dir(convertPath("gfx/skins/"), {".bmp", ".png"});
     while (auto path = dir.next()) {
-        SkinListNode node {
+        m_skins.emplace_back(SkinListNode {
             stripCreatorAndExt(path->filename().string()),
             path->string(),
-        };
-
-        auto it = m_skins.begin();
-        for (; it != m_skins.end(); it++) {
-            if (node.name.compare(it->name) < 0)
-                break;
-        }
-        m_skins.insert(it, std::move(node));
+        });
     }
+    utils::sort(m_skins, [](const SkinListNode& lhs, const SkinListNode& rhs) {
+        return lhs.name < rhs.name;
+    });
 }
 
-std::string SkinList::getPath(size_t index) const
-{
-    return index < m_skins.size()
-        ? m_skins[index].path
-        : std::string();
-}
-
-std::string SkinList::getName(size_t index) const
-{
-    return index < m_skins.size()
-        ? m_skins[index].name
-        : std::string();
-}
 
 ///////////// SimpleDirectoryList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SimpleDirectoryList::SimpleDirectoryList(const std::string &path)

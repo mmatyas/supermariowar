@@ -87,7 +87,7 @@ void MI_TeamSelect::Draw()
             rm->spr_player_select_ready.draw(iTeam * 160 + 16, 368, 0, 0, 128, 96);
 
             rm->spr_menu_boxed_numbers.draw(iTeam * 160 + 32, 388, iTeam * 16, game_values.colorids[iTeam] * 16, 16, 16);
-            rm->menu_font_small.drawChopRight(iTeam * 160 + 52, 404 - rm->menu_font_small.getHeight(), 80, game_values.randomskin[iTeam] ? "Random" : skinlist->getName(game_values.skinids[iTeam]).c_str());
+            rm->menu_font_small.drawChopRight(iTeam * 160 + 52, 404 - rm->menu_font_small.getHeight(), 80, game_values.randomskin[iTeam] ? "Random" : skinlist->at(game_values.skinids[iTeam]).name.c_str());
 
             rm->spr_player_select_ready.draw(iTeam * 160 + 64, 408, 128, (!fReady[iTeam] ? 0 : (game_values.playercontrol[iTeam] == 1 ? 32 : 64)), 34, 32);
         }

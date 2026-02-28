@@ -20,7 +20,7 @@ extern CGameValues game_values;
 
 bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
-    return gfx_loadmenuskin(spr_player[playerID], skinlist->getPath(skinID), colors::MAGENTA, colorID, fLoadBothDirections);
+    return gfx_loadmenuskin(spr_player[playerID], skinlist->at(skinID).path, colors::MAGENTA, colorID, fLoadBothDirections);
 }
 
 bool CResourceManager::LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections)
@@ -35,7 +35,7 @@ bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, const std::string& fil
 
 bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID)
 {
-    return LoadFullSkin(sprites, skinlist->getPath(skinID), colorID);
+    return LoadFullSkin(sprites, skinlist->at(skinID).path, colorID);
 }
 
 void CResourceManager::LoadAllSprites() {

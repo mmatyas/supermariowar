@@ -41,7 +41,7 @@ FilesIterator::FilesIterator(const fs::path& path, std::vector<std::string> exte
 {}
 
 bool FilesIterator::isAccepted(const fs::directory_entry& entry) const {
-    return m_extensions.empty() || contains(m_extensions, lowercaseExt(entry));
+    return m_extensions.empty() || utils::contains(m_extensions, lowercaseExt(entry));
 }
 
 

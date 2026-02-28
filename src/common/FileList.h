@@ -92,9 +92,7 @@ public:
     SkinList();
 
     size_t count() const { return m_skins.size(); }
-
-    std::string getPath(size_t index) const;
-    std::string getName(size_t index) const;
+    const SkinListNode& at(size_t idx) const { return m_skins.at(idx); }
 
 private:
     std::vector<SkinListNode> m_skins;
