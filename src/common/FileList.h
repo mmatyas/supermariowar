@@ -125,6 +125,11 @@ constexpr std::string_view to_string(MusicCategory category) noexcept {
         case MusicCategory::Snow: return "Snow";
         case MusicCategory::COUNT: return "COUNT";
     }
+#if defined(_MSC_VER) && !defined(__clang__) // MSVC
+    __assume(false);
+#else // GCC, Clang
+    __builtin_unreachable();
+#endif
 }
 
 
@@ -225,6 +230,11 @@ constexpr std::string_view to_string(WorldMusicCategory category) noexcept {
         case WorldMusicCategory::Sleep: return "Sleep";
         case WorldMusicCategory::COUNT: return "COUNT";
     }
+#if defined(_MSC_VER) && !defined(__clang__) // MSVC
+    __assume(false);
+#else // GCC, Clang
+    __builtin_unreachable();
+#endif
 }
 
 
