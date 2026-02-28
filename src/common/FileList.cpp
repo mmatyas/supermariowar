@@ -117,7 +117,7 @@ SimpleFileList::SimpleFileList(const fs::path& dirpath, const std::string& exten
 
         //Get only the names of the files, no author information
         for (const fs::path& filepath : m_filelist) {
-            std::string name = stripPathAndExtension(filepath);
+            std::string name = stripPathAndExtension(filepath.filename().string());
             std::transform(name.begin(), name.end(), name.begin(), ::tolower);
             names.emplace_back(std::move(name));
         }
@@ -312,7 +312,7 @@ MusicPack::MusicPack(std::string name)
 
 std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
 {
-    MusicPack self(musicdirectory.filename());
+    MusicPack self(musicdirectory.filename().string());
 
     const fs::path file_path = musicdirectory / "Music.txt";
     std::ifstream file(file_path);
@@ -586,7 +586,7 @@ WorldMusicPack::WorldMusicPack(std::string name)
 
 std::optional<WorldMusicPack> WorldMusicPack::load(const fs::path& musicdirectory)
 {
-    WorldMusicPack self(musicdirectory.filename());
+    WorldMusicPack self(musicdirectory.filename().string());
 
     const fs::path file_path = musicdirectory / "Music.txt";
     std::ifstream file(file_path);

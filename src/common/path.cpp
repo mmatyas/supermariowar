@@ -4,6 +4,7 @@
 #include "SDL.h"
 #endif
 
+#include <array>
 #include <cassert>
 #include <cstring>
 #include <string>
@@ -15,6 +16,8 @@
 #else
 #include <stdlib.h>
 #endif
+
+namespace fs = std::filesystem;
 
 
 extern std::string RootDataDirectory;
@@ -153,35 +156,26 @@ std::string convertPath(const std::string& source)
     return SMW_Root_Data_Dir + source;
 }
 
-std::string convertPath(const std::string& source, const std::string& pack)
+std::string convertPath(std::string_view relpath, const std::filesystem::path& packdir)
 {
-    if (source.find("gfx/packs/") == 0) {
-                std::string trailingdir = source.substr(9);
+    constexpr std::array<std::string_view, 2> prefixes {
+        "gfx/packs/",
+        "sfx/packs/",
+    };
+    for (std::string_view prefix : prefixes) {
+        if (relpath.starts_with(prefix)) {
+            relpath.remove_prefix(prefix.length());
+        }
 
-                const std::string s = pack + trailingdir;
+        //If the file exists, return the path to it
+        fs::path path = packdir / relpath;
+        if (fs::exists(path))
+            return path.string();
 
-		//If the file exists, return the path to it
-                if (FileExists(s))
-			return s;
-
-		//If not, use the classic file
-		return convertPath("gfx/packs/Classic" + trailingdir);
-	}
-
-    if (source.find("sfx/packs/") == 0) {
-                std::string trailingdir = source.substr(9);
-
-                const std::string s = pack + trailingdir;
-
-		//If the file exists, return the path to it
-                if (FileExists(s))
-			return s;
-
-		//If not, use the classic file
-		return convertPath("sfx/packs/Classic" + trailingdir);
-	}
-
-	return convertPath(source);
+        //If not, use the classic file
+        return convertPath(std::string(prefix) + "Classic/" + std::string(relpath));  // FIXME
+    }
+    return convertPath(std::string(relpath));
 }
 
 std::string getFilenameFromPath(const std::string& path)
