@@ -205,7 +205,7 @@ void MI_WorldPreviewDisplay::Draw()
 
 void MI_WorldPreviewDisplay::SetWorld()
 {
-    g_worldmap = WorldMap(worldlist->at(game_values.worldindex), PREVIEWTILESIZE);
+    g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), PREVIEWTILESIZE);
 
     short w, h;
     g_worldmap.GetWorldSize(&w, &h);

@@ -85,7 +85,7 @@ void SplashScreenState::onLeaveState()
 
 bool LoadStartGraphics()
 {
-    std::string graphicspack = menugraphicspacklist->currentPath();
+    std::string graphicspack = menugraphicspacklist->currentPath().string();
 
     bool loadok = true;
 
@@ -349,7 +349,7 @@ void SplashScreenState::update()
 
     if (state == 7) {
         // load initial coin sound
-        rm->backgroundmusic[2].load(musiclist->music(1));
+        rm->backgroundmusic[2].load(musiclist->music(1).string());
 
         rm->LoadAllGraphics();
         rm->LoadGameSounds();

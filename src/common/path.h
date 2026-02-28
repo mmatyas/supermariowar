@@ -1,6 +1,8 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
+#include <string_view>
 
 #ifndef PATH_MAX
 #define PATH_MAX 4096
@@ -11,8 +13,9 @@
 bool FileExists(const std::string path);
 
 /* All filenames must go through this door */
+// TODO: Return fs::path
 std::string convertPath(const std::string& source);
-std::string convertPath(const std::string& source, const std::string& pack);
+std::string convertPath(std::string_view relpath, const std::filesystem::path& packdir);
 
 inline std::string concat(const std::string& a, const std::string& b) { return a + b; }
 

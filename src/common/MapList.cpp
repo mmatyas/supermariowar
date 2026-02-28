@@ -328,7 +328,7 @@ void MapList::WriteFilters()
         game_values.fNeedWriteFilters = false;
 
         for (size_t iFilter = 0; iFilter < filterslist->count(); iFilter++) {
-            FILE * fp = fopen(filterslist->at(iFilter).c_str(), "w");
+            FILE * fp = fopen(filterslist->at(iFilter).string().c_str(), "w");
 
             if (!fp)
                 continue;
@@ -408,7 +408,7 @@ void MapList::ReadFilters()
     current = maps.begin();
     //Get user defined filters from files in filters directory
     for (size_t iFilter = 0; iFilter < filterslist->count(); iFilter++) {
-        FILE * ffp = fopen(filterslist->at(iFilter).c_str(), "r");
+        FILE * ffp = fopen(filterslist->at(iFilter).string().c_str(), "r");
 
         if (!ffp)
             continue;

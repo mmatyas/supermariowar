@@ -48,7 +48,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
 
     miTourField = new MI_SelectField<short>(&rm->spr_selectfield, 130, 380, "Tour", 380, 100);
     for (size_t iTour = 0; iTour < tourlist->count(); iTour++) {
-        std::string szTemp = GetNameFromFileName(tourlist->at(iTour), true);
+        std::string szTemp = GetNameFromFileName(tourlist->at(iTour).string(), true);
         // strcat(szTemp, " Tour");
         miTourField->add(std::move(szTemp), iTour);
     }
@@ -58,7 +58,7 @@ UI_MatchSelectionMenu::UI_MatchSelectionMenu()
 
     miWorldField = new MI_SelectField<short>(&rm->spr_selectfield, 130, 380, "World", 380, 100);
     for (size_t iWorld = 0; iWorld < worldlist->count(); iWorld++) {
-        std::string szTemp = GetNameFromFileName(worldlist->at(iWorld), true);
+        std::string szTemp = GetNameFromFileName(worldlist->at(iWorld).string(), true);
         miWorldField->add(std::move(szTemp), iWorld);
     }
     miWorldField->setOutputPtr(&game_values.worldindex);

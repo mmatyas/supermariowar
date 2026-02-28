@@ -103,7 +103,7 @@ SimpleFileList::SimpleFileList(const fs::path& dirpath, const std::string& exten
     }
 
     if (m_filelist.empty()) {
-        printf("WARNING: The directory `%s` is empty\n", dirpath.c_str());
+        printf("WARNING: The directory `%s` is empty\n", dirpath.string().c_str());
         m_index = -1;
         return;
     }
@@ -117,7 +117,7 @@ SimpleFileList::SimpleFileList(const fs::path& dirpath, const std::string& exten
 
         //Get only the names of the files, no author information
         for (const fs::path& filepath : m_filelist) {
-            std::string name = stripPathAndExtension(filepath);
+            std::string name = stripPathAndExtension(filepath.filename().string());
             std::transform(name.begin(), name.end(), name.begin(), ::tolower);
             names.emplace_back(std::move(name));
         }
@@ -253,7 +253,7 @@ SimpleDirectoryList::SimpleDirectoryList(const fs::path& path)
         m_filelist.emplace_back(std::move(*subdir));
     }
     if (m_filelist.empty()) {
-        printf("ERROR: Empty directory.  %s\n", path.c_str());
+        printf("ERROR: Empty directory.  %s\n", path.string().c_str());
         //exit(0);
     }
 
@@ -312,12 +312,12 @@ MusicPack::MusicPack(std::string name)
 
 std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
 {
-    MusicPack self(musicdirectory.filename());
+    MusicPack self(musicdirectory.filename().string());
 
     const fs::path file_path = musicdirectory / "Music.txt";
     std::ifstream file(file_path);
     if (!file) {
-        printf("Error: Could not open: %s\n", file_path.c_str());
+        printf("Error: Could not open: %s\n", file_path.string().c_str());
         return {};
     }
 
@@ -421,7 +421,7 @@ std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
     }
 
     if (self.m_all_songs.empty()) {
-        printf("Error: No songs found in: %s\n", musicdirectory.c_str());
+        printf("Error: No songs found in: %s\n", musicdirectory.string().c_str());
         return {};
     }
 
@@ -586,12 +586,12 @@ WorldMusicPack::WorldMusicPack(std::string name)
 
 std::optional<WorldMusicPack> WorldMusicPack::load(const fs::path& musicdirectory)
 {
-    WorldMusicPack self(musicdirectory.filename());
+    WorldMusicPack self(musicdirectory.filename().string());
 
     const fs::path file_path = musicdirectory / "Music.txt";
     std::ifstream file(file_path);
     if (!file) {
-        printf("Error: Could not open: %s\n", file_path.c_str());
+        printf("Error: Could not open: %s\n", file_path.string().c_str());
         return {};
     }
 

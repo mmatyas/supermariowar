@@ -610,8 +610,8 @@ void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
 
 void NetClient::sendSkinChange()
 {
-    assert(skinlist->at(game_values.skinids[netplay.remotePlayerNumber]).path.length() > 4);
-    std::string skinpath(skinlist->at(game_values.skinids[netplay.remotePlayerNumber]).path);
+    std::string skinpath = skinlist->at(game_values.skinids[netplay.remotePlayerNumber]).path.string();
+    assert(skinpath.length() > 4);
     printf("[net] Sending skin: %s\n", skinpath.c_str());
 
     // NOTE: see sendMapChangeMessage() for similar code

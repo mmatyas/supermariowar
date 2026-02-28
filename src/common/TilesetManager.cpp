@@ -150,7 +150,7 @@ void CTilesetManager::init(const std::string& gfxPack)
         SimpleDirectoryList dirlist(s);
 
         for (size_t i = 0; i < dirlist.count(); i++) {
-            std::unique_ptr<CTileset> tileset = std::make_unique<CTileset>(dirlist.currentPath());
+            std::unique_ptr<CTileset> tileset = std::make_unique<CTileset>(dirlist.currentPath().string());
 
             //If the tileset is "classic" then keep it's index for common operations
             if (tileset->name() == "Classic")
@@ -163,7 +163,7 @@ void CTilesetManager::init(const std::string& gfxPack)
 
     //Add in tilesets from the classic tileset to fill the gaps
     for (size_t i = 0; i < m_filelist.size(); i++) {
-        const std::string tilesetName = getFilenameFromPath(m_filelist[i]);
+        const std::string tilesetName = getFilenameFromPath(m_filelist[i].string());
 
         //See if the new tileset already exists and if it does, skip it
         bool fFound = false;
@@ -176,7 +176,7 @@ void CTilesetManager::init(const std::string& gfxPack)
 
         //Add the tileset if another one by the same name isn't already in the tileset
         if (!fFound) {
-            std::unique_ptr<CTileset> tileset = std::make_unique<CTileset>(m_filelist[i]);
+            std::unique_ptr<CTileset> tileset = std::make_unique<CTileset>(m_filelist[i].string());
             if (tileset->name() == "Classic") {
                 m_classicTilesetIndex = i;
             }

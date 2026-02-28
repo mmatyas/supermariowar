@@ -722,7 +722,7 @@ void MenuState::update()
                 } else if (game_values.matchtype == MatchType::World) {
                     printf("  Match type: World\n");
                     try {
-                        g_worldmap = WorldMap(worldlist->at(game_values.worldindex), TILESIZE);
+                        g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), TILESIZE);
 
                         mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &rm->spr_tour_markers);
 
@@ -1300,7 +1300,7 @@ void MenuState::update()
                 LoadCurrentMapBackground();
 
                 if (game_values.music) {
-                    rm->backgroundmusic[0].load(worldmusiclist->currentMusic(WorldMusicCategory::Bonus, ""));
+                    rm->backgroundmusic[0].load(worldmusiclist->currentMusic(WorldMusicCategory::Bonus, "").string());
                     rm->backgroundmusic[0].play(false, false);
                 }
             } else {
@@ -1375,7 +1375,7 @@ void MenuState::update()
 
                 if (game_values.music) {
                     musiclist->setRandomMusic(static_cast<MusicCategory>(g_map->musicCategoryID), sShortMapName.c_str(), g_map->szBackgroundFile);
-                    rm->backgroundmusic[0].load(musiclist->currentMusic());
+                    rm->backgroundmusic[0].load(musiclist->currentMusic().string());
                     rm->backgroundmusic[0].play(game_values.playnextmusic, false);
                 }
             }
@@ -1401,7 +1401,7 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
 
             rm->backgroundmusic[2].stop();
-            rm->backgroundmusic[5].load(worldmusiclist->currentMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
+            rm->backgroundmusic[5].load(worldmusiclist->currentMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()).string());
             rm->backgroundmusic[5].play(false, false);
             fNeedMenuMusicReset = true;
 
@@ -1470,7 +1470,7 @@ bool MenuState::ReadTourFile()
 {
     ResetTourStops();
 
-    FILE * fp = fopen(tourlist->at(game_values.tourindex).c_str(), "r");
+    FILE * fp = fopen(tourlist->at(game_values.tourindex).string().c_str(), "r");
     const char* const ignorable_leads = " #\n\r\t";
 
     char buffer[256];
@@ -1573,7 +1573,7 @@ void MenuState::StartGame()
         for (int k = 0; k < PANNOUNCER_SOUND_LAST; k++)
             rm->sfx_announcer[k].reset();
 
-        FILE * announcerfile = fopen(announcerlist->currentPath().c_str(), "r");
+        FILE * announcerfile = fopen(announcerlist->currentPath().string().c_str(), "r");
 
         char szBuffer[256];
 
@@ -1605,9 +1605,9 @@ void MenuState::StartGame()
     //Load soundtrack music if changed
     if (game_values.loadedmusic != musiclist->currentIndex()) {
         game_values.loadedmusic = (short)musiclist->currentIndex();
-        rm->backgroundmusic[1].load(musiclist->music(0)); //Stage Clear
-        rm->backgroundmusic[3].load(musiclist->music(2)); //Tournament Menu
-        rm->backgroundmusic[4].load(musiclist->music(3)); //Tournament Over
+        rm->backgroundmusic[1].load(musiclist->music(0).string()); //Stage Clear
+        rm->backgroundmusic[3].load(musiclist->music(2).string()); //Tournament Menu
+        rm->backgroundmusic[4].load(musiclist->music(3).string()); //Tournament Over
     }
 
     rm->backgroundmusic[2].stop();

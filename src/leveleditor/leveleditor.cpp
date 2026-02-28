@@ -978,8 +978,8 @@ int editor_edit()
                     if (key == SDLK_g) {
                         backgroundlist->next();
 
-                        rm->spr_background.init(backgroundlist->currentPath());
-                        g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath());
+                        rm->spr_background.init(backgroundlist->currentPath().string());
+                        g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath().string());
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
 								//Set music to background default
@@ -4203,8 +4203,8 @@ int editor_backgrounds()
                             {
                                 backgroundlist->setCurrentIndex(iPage * 16 + iBackground);
 
-                                rm->spr_background.init(backgroundlist->currentPath());
-                                g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath());
+                                rm->spr_background.init(backgroundlist->currentPath().string());
+                                g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath().string());
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
 									//Set music to background default
@@ -4251,7 +4251,7 @@ int editor_backgrounds()
 		int iID = mouse_x / 160 + mouse_y / 120 * 4 + iPage * 16;
 
         if (iID < backgroundlist->count())
-            rm->menu_font_small.draw(0, 0, backgroundlist->at(iID));
+            rm->menu_font_small.draw(0, 0, backgroundlist->at(iID).string());
 
 		DrawMessage();
 		return EDITOR_BACKGROUNDS;
@@ -4442,7 +4442,7 @@ void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
 	SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
     for (short iIndex = 0; iIndex < 16; iIndex++) {
-            std::string szFileName = backgroundlist->at(iPage * 16 + iIndex);
+            std::string szFileName = backgroundlist->at(iPage * 16 + iIndex).string();
 
             if (szFileName.empty())
 			return;

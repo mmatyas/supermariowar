@@ -20,7 +20,7 @@ extern CGameValues game_values;
 
 bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
-    return gfx_loadmenuskin(spr_player[playerID], skinlist->at(skinID).path, colors::MAGENTA, colorID, fLoadBothDirections);
+    return gfx_loadmenuskin(spr_player[playerID], skinlist->at(skinID).path.string(), colors::MAGENTA, colorID, fLoadBothDirections);
 }
 
 bool CResourceManager::LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections)
@@ -35,11 +35,11 @@ bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, const std::string& fil
 
 bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID)
 {
-    return LoadFullSkin(sprites, skinlist->at(skinID).path, colorID);
+    return LoadFullSkin(sprites, skinlist->at(skinID).path.string(), colorID);
 }
 
 void CResourceManager::LoadAllSprites() {
-    std::string graphicspack = gamegraphicspacklist->currentPath();
+    std::string graphicspack = gamegraphicspacklist->currentPath().string();
 
     std::string shyguyPath = convertPath("gfx/packs/modeskins/shyguy.png", graphicspack);
     if (!FileExists(shyguyPath))
@@ -275,7 +275,7 @@ void CResourceManager::LoadAllSprites() {
 
 bool CResourceManager::LoadMenuGraphics()
 {
-    std::string graphicspack = menugraphicspacklist->currentPath();
+    std::string graphicspack = menugraphicspacklist->currentPath().string();
 
     gfx_loadimagenocolorkey(&menu_shade, convertPath("gfx/packs/menu/menu_shade.png", graphicspack));
     menu_shade.setalpha(App::menuTransparency);
@@ -322,7 +322,7 @@ bool CResourceManager::LoadMenuGraphics()
 
 bool CResourceManager::LoadWorldGraphics()
 {
-    std::string graphicspack = worldgraphicspacklist->currentPath();
+    std::string graphicspack = worldgraphicspacklist->currentPath().string();
 
     gfx_loadimage(spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack), false);
     gfx_loadimage(spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack), false);
@@ -350,7 +350,7 @@ bool CResourceManager::LoadWorldGraphics()
 
 bool CResourceManager::LoadGameGraphics()
 {
-    std::string graphicspack = gamegraphicspacklist->currentPath();
+    std::string graphicspack = gamegraphicspacklist->currentPath().string();
 
     g_tilesetmanager->init(graphicspack);
 
@@ -410,7 +410,7 @@ bool CResourceManager::LoadGameSounds()
     if (!sfx_canPlayAudio())
         return false;
 
-    std::string soundpack = soundpacklist->currentPath();
+    std::string soundpack = soundpacklist->currentPath().string();
 
     sfx_mip.init(convertPath("sfx/packs/mip.wav", soundpack));
     sfx_deathsound.init(convertPath("sfx/packs/death.wav", soundpack));

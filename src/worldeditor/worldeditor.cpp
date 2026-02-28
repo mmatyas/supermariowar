@@ -1055,7 +1055,7 @@ int main(int argc, char *argv[])
             editor_settings.write_i32(draw_offset_col);
             editor_settings.write_i32(draw_offset_row);
             editor_settings.write_bool(g_fFullScreen);
-            editor_settings.write_string_long(worldlist->currentPath().c_str());
+            editor_settings.write_string_long(worldlist->currentPath().string().c_str());
         }
     }
 
@@ -1873,7 +1873,7 @@ int editor_edit()
 			if (fAutoPaint)
 				rm->menu_font_small.draw(0, 16, "Auto Paint");
 
-                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 
             if (--g_musiccategorydisplaytimer > 0) {
@@ -2529,7 +2529,7 @@ int editor_warp()
 
 		spr_warps[0].draw(0, 0, 0, 0, 320, 32);
 
-                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2657,7 +2657,7 @@ int editor_start_items()
 				rm->spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
 		}
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2729,7 +2729,7 @@ int editor_boundary()
 
 		rm->spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
 
-                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2803,7 +2803,7 @@ int editor_type()
 
 		rm->spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3365,7 +3365,7 @@ int editor_vehicles()
 		mCurrentMenu->Update();
 		mCurrentMenu->Draw();
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -4300,7 +4300,7 @@ int editor_stage()
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[LMB] Select Items, [LMB] Remove Items");
 		}
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -4479,7 +4479,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 	spr_dialog.draw(224, 176, 0, 0, 192, 128);
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
-    rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+    rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 	gfx_flipscreen();
 
     while (true) {
@@ -4508,7 +4508,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 							gfx_flipscreen();
 
 							currentChar--;
@@ -4564,7 +4564,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().c_str());
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 							gfx_flipscreen();
 						}
 					}
@@ -4616,7 +4616,7 @@ int clear_world()
 void loadcurrentworld()
 {
 	game_values.worldindex = worldlist->currentIndex();
-	g_worldmap = WorldMap(worldlist->at(game_values.worldindex), TILESIZE);
+	g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), TILESIZE);
 	ReadVehiclesIntoEditor();
 	ReadWarpsIntoEditor();
 
@@ -4659,7 +4659,7 @@ int savecurrentworld()
 
 	WriteVehiclesIntoWorld();
 	WriteWarpsIntoWorld();
-	g_worldmap.Save(worldlist->at(game_values.worldindex));
+	g_worldmap.Save(worldlist->at(game_values.worldindex).string());
 	return 0;
 }
 
@@ -4784,7 +4784,7 @@ void takescreenshot()
 
     for (short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
 		short iTileSize = iTileSizes[iScreenshotSize];
-		g_worldmap = WorldMap(worldlist->at(game_values.worldindex), iTileSize);
+		g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), iTileSize);
 
 		short w, h;
 		g_worldmap.GetWorldSize(&w, &h);
@@ -4824,7 +4824,7 @@ void takescreenshot()
 
 		//Save the screenshot with the same name as the map file
 		std::string szSaveFile("worlds/screenshots/");
-		szSaveFile += GetNameFromFileName(worldlist->currentPath());
+		szSaveFile += GetNameFromFileName(worldlist->currentPath().string());
 
 		if (iTileSize == PREVIEWTILESIZE)
 			szSaveFile += "_preview";
@@ -4842,6 +4842,6 @@ void takescreenshot()
 		SDL_FreeSurface(sScreenshot);
 	}
 
-	g_worldmap = WorldMap(worldlist->at(game_values.worldindex), iTileSizes[0]);
+	g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), iTileSizes[0]);
 	blitdest = screen;
 }
