@@ -163,9 +163,10 @@ std::string convertPath(std::string_view relpath, const std::filesystem::path& p
         "sfx/packs/",
     };
     for (std::string_view prefix : prefixes) {
-        if (relpath.starts_with(prefix)) {
-            relpath.remove_prefix(prefix.length());
-        }
+        if (!relpath.starts_with(prefix))
+            continue;
+
+        relpath.remove_prefix(prefix.length());
 
         //If the file exists, return the path to it
         fs::path path = packdir / relpath;
