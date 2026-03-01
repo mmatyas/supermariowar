@@ -365,6 +365,12 @@ std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
         std::visit([&line, &self, &musicdirectory](auto const& section) {
             using T = std::decay_t<decltype(section)>;
 
+            if constexpr (std::is_same_v<T, HeaderSection>) {
+                fs::path path = musicdirectory / line;
+                if (fs::exists(path))
+                    self.m_all_songs.emplace_back(std::move(path));
+                return;
+            }
             if constexpr (std::is_same_v<T, CategorySection>) {
                 //Cap the number of songs at MAXCATEGORYTRACKS for a category
                 if (self.m_category_songs[section.category].size() >= MAXCATEGORYTRACKS)
