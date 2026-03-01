@@ -99,7 +99,7 @@ SimpleFileList::SimpleFileList(const fs::path& dirpath, const std::string& exten
 {
     FilesIterator dir(dirpath, {extension});
     while (auto path = dir.next()) {
-        m_filelist.emplace_back(path->string());
+        m_filelist.emplace_back(std::move(*path));
     }
 
     if (m_filelist.empty()) {
@@ -236,7 +236,7 @@ SkinList::SkinList()
     while (auto path = dir.next()) {
         m_skins.emplace_back(SkinListNode {
             stripCreatorAndExt(path->filename().string()),
-            path->string(),
+            std::move(*path),
         });
     }
     utils::sort(m_skins, [](const SkinListNode& lhs, const SkinListNode& rhs) {
@@ -246,11 +246,11 @@ SkinList::SkinList()
 
 
 ///////////// SimpleDirectoryList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
+SimpleDirectoryList::SimpleDirectoryList(const fs::path& path)
 {
     SubdirsIterator dir(path);
-    while (auto path = dir.next()) {
-        m_filelist.emplace_back(path->string());
+    while (auto subdir = dir.next()) {
+        m_filelist.emplace_back(std::move(*subdir));
     }
     if (m_filelist.empty()) {
         printf("ERROR: Empty directory.  %s\n", path.c_str());
@@ -266,7 +266,7 @@ MusicList::MusicList()
 {
     SubdirsIterator dir(convertPath("music/game/"));
     while (auto path = dir.next()) {
-        if (auto pack = MusicPack::load(path->string()))
+        if (auto pack = MusicPack::load(*path))
             m_entries.emplace_back(std::move(*pack));
     }
 
@@ -550,7 +550,7 @@ WorldMusicList::WorldMusicList()
 {
     SubdirsIterator dir(convertPath("music/world/"));
     while (auto path = dir.next()) {
-        if (auto pack = WorldMusicPack::load(path->string())) {
+        if (auto pack = WorldMusicPack::load(*path)) {
             m_entries.emplace_back(std::move(*pack));
         }
     }

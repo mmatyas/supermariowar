@@ -38,7 +38,7 @@ protected:
 
 class SimpleDirectoryList : public SimpleFileList {
 public:
-    SimpleDirectoryList(const std::string& dirpath);
+    SimpleDirectoryList(const std::filesystem::path& dirpath);
     virtual ~SimpleDirectoryList() = default;
 };
 
@@ -81,7 +81,7 @@ public:
 
 struct SkinListNode {
     std::string name;
-    std::string path;
+    std::filesystem::path path;
 };
 
 class SkinList {
