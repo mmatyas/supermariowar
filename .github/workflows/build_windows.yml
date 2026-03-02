@@ -45,3 +45,23 @@ jobs:
         with:
           name: supermariowar_windows
           path: supermariowar_*_windows.zip
+
+  msvc:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Configure
+        run: cmake -B build -DUSE_BUNDLED_SDL=ON -DSMW_INSTALL_PORTABLE=ON
+
+      - name: Build
+        run: cmake --build build --verbose --config Release
+
+      - name: Test
+        run: ctest --test-dir build/tests --output-on-failure --build-config Release
+
+      - name: Package
+        run: cmake --install build --prefix outdir --strip --config Release
