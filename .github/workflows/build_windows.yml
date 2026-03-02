@@ -54,11 +54,22 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - uses: mozilla/sccache-action@v0.0.9
+
       - name: Configure
-        run: cmake -B build -DUSE_BUNDLED_SDL=ON -DSMW_INSTALL_PORTABLE=ON
+        run: cmake
+          -B build
+          -DUSE_BUNDLED_SDL=ON
+          -DSMW_INSTALL_PORTABLE=ON
+          -DCMAKE_C_COMPILER_LAUNCHER=sccache
+          -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+        env:
+          SCCACHE_GHA_ENABLED: "true"
 
       - name: Build
         run: cmake --build build --verbose --config Release
+        env:
+          SCCACHE_GHA_ENABLED: "true"
 
       - name: Test
         run: ctest --test-dir build/tests --output-on-failure --build-config Release
