@@ -24,6 +24,7 @@ option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" ON)
 option(SDL2_USE_MIXERX "(SDL2) Use SDL Mixer X instead of SDL Mixer" OFF)
 option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
 option(USE_BUNDLED_SDL "If ON, downloads and builds SDL, otherwise uses the system library" OFF)
+option(USE_BUNDLED_ZLIB "If ON, downloads and builds Zlib, otherwise uses the system library" OFF)
 option(BUILD_TESTS "Build the unit tests" ON)
 
 set(SMW_INSTALL_PORTABLE_DEFAULT OFF)

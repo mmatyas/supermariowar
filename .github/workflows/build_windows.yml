@@ -60,6 +60,7 @@ jobs:
         run: cmake
           -B build
           -DUSE_BUNDLED_SDL=ON
+          -DUSE_BUNDLED_ZLIB=ON
           -DSMW_INSTALL_PORTABLE=ON
           -DCMAKE_C_COMPILER_LAUNCHER=sccache
           -DCMAKE_CXX_COMPILER_LAUNCHER=sccache

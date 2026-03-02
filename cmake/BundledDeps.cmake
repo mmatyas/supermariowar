@@ -44,3 +44,12 @@ if (USE_BUNDLED_SDL)
         release-2.8.0
     )
 endif()
+
+if (USE_BUNDLED_ZLIB)
+    message("Using bundled ZLIB")
+    smw_declare_gitrepo(
+        ZLIB
+        https://github.com/zlib-ng/zlib-ng.git
+        2.3.3
+    )
+endif()
