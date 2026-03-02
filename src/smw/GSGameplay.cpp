@@ -1814,7 +1814,7 @@ void updateScoreboardAnimation() // scrolling to center at the end of game
 void SetGameModeSettingsFromMenu()
 {
     //If this is a tour stop and the tour has settings in it, use those.  Otherwise use the menu settings.
-    if (game_values.tourstops[game_values.tourstopcurrent]->fUseSettings &&
+    if (game_values.tourstopcurrent < game_values.tourstops.size() && game_values.tourstops[game_values.tourstopcurrent]->fUseSettings &&
             (game_values.matchtype == MatchType::Tour || game_values.matchtype == MatchType::World))
         memcpy(&game_values.gamemodesettings, &game_values.tourstops[game_values.tourstopcurrent]->gmsSettings, sizeof(GameModeSettings));
     else

@@ -192,7 +192,7 @@ public:
     Minigame selectedminigame;
 
     short		tourindex;
-    short		tourstopcurrent;
+    size_t		tourstopcurrent;
     std::vector<TourStop*> tourstops;
 
     short		worldindex;
