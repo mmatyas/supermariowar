@@ -1,7 +1,7 @@
 #ifndef PLAYER_INVINCIBILITY
 #define PLAYER_INVINCIBILITY
 
-#include "gfx.h"
+#include "gfx/gfxPalette.h"
 
 class CPlayer;
 

@@ -1,26 +1,44 @@
 #pragma once
 
-#include "gfx.h"
+#include "Color.h"
 #include "GlobalConstants.h"
 
 #include <array>
-#include <vector>
+#include <filesystem>
+#include <optional>
+
+
+enum PlayerPalette {
+    normal,
+    invincibility_1,
+    invincibility_2,
+    invincibility_3,
+    shielded,
+    tagged,
+    ztarred,
+    got_shine,
+    frozen,
+    COUNT,
+};
+
+
+struct ColorSheet {
+    std::array<RGB, MAX_PLAYERS * PlayerPalette::COUNT> replacements;
+
+    RGB replacementFor(size_t teamIdx, PlayerPalette playerState) const {
+        const size_t idx = teamIdx * PlayerPalette::COUNT + playerState;
+        return replacements[idx];
+    }
+};
 
 
 class gfxPalette {
 public:
-    bool load(const std::string& path);
-    void clear();
+    bool load(const std::filesystem::path& path);
 
-    size_t colorCount() const { return m_colorCount; }
-    const std::vector<RGB>& colorCodes() const { return m_colorCodes; }
-    const RGB& colorScheme(size_t teamID, size_t schemeID, size_t colorID) const;
+    const std::unordered_map<RGB, ColorSheet>& colorSheets() const { return m_colorsheets; }
+    std::optional<RGB> replacementFor(RGB keyColor, size_t teamIndex, PlayerPalette playerState) const;
 
 private:
-    using ColorList = std::vector<RGB>;
-    using SchemeList = std::array<ColorList, PlayerPalette::NUM_PALETTES>;
-
-    size_t m_colorCount = 0;
-    std::vector<RGB> m_colorCodes;
-    std::array<SchemeList, MAX_PLAYERS> m_teamSchemes;
+    std::unordered_map<RGB, ColorSheet> m_colorsheets;
 };
