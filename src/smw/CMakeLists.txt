@@ -71,7 +71,7 @@ if(NOT EMSCRIPTEN)
 	target_link_libraries(smw ZLIB::ZLIB)
 endif()
 
-target_link_libraries(smw yaml-cpp)
+target_link_libraries(smw yaml-cpp::yaml-cpp)
 
 #
 # Installation

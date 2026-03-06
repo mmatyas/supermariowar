@@ -129,16 +129,11 @@ if (BUILD_STATIC_LIBS)
 		include_directories(dependencies/enet/include)
 		add_subdirectory(dependencies/enet)
 	endif()
-
-	# Use YAML for game config files
-	check_submodule_git(dependencies/yaml-cpp)
-	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
-	set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
-	add_subdirectory(dependencies/yaml-cpp)
 else()
 	find_package(ENet REQUIRED)
-	find_package(yaml-cpp REQUIRED)
 endif()
+
+find_package(yaml-cpp REQUIRED)
 
 #-----------------------------------------------------------------------------
 #

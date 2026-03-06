@@ -69,3 +69,15 @@ if (USE_BUNDLED_SDL)
         release-2.8.1
     )
 endif()
+
+
+if (BUILD_STATIC_LIBS)
+    # yaml-cpp
+    set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "")
+    set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "")
+    smw_declare_gitrepo(
+        yaml-cpp
+        https://github.com/jbeder/yaml-cpp.git
+        yaml-cpp-0.9.0
+    )
+endif()
