@@ -18,15 +18,15 @@ endfunction()
 if (USE_BUNDLED_SDL)
     message("Using bundled SDL")
 
-    # SDL2
+    # SDL
     set(SDL_STATIC OFF CACHE BOOL "")
     smw_declare_gitrepo(
         SDL2
         https://github.com/libsdl-org/SDL.git
-        release-2.30.11
+        release-2.32.10
     )
 
-    # SDL2 image
+    # SDL_image
     set(SDL2IMAGE_VENDORED ON CACHE BOOL "")
     set(SDL2IMAGE_DEPS_SHARED OFF CACHE BOOL "")
     set(SDL2IMAGE_ANI OFF CACHE BOOL "")
@@ -48,10 +48,10 @@ if (USE_BUNDLED_SDL)
     smw_declare_gitrepo(
         SDL2_image
         https://github.com/libsdl-org/SDL_image
-        release-2.8.4
+        release-2.8.8
     )
 
-    # SDL2 mixer
+    # SDL_mixer
     set(SDL2MIXER_VENDORED ON CACHE BOOL "")
     set(SDL2MIXER_DEPS_SHARED OFF CACHE BOOL "")
     set(SDL2MIXER_AIFF OFF CACHE BOOL "")
@@ -66,6 +66,6 @@ if (USE_BUNDLED_SDL)
     smw_declare_gitrepo(
         SDL2_mixer
         https://github.com/libsdl-org/SDL_mixer
-        release-2.8.0
+        release-2.8.1
     )
 endif()
