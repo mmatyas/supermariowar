@@ -393,7 +393,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
         miEggModeYoshiQuantityField[iYoshiField]->allowWrap(false);
     }
 
-    miEggModeExplosionTimeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 380, "Explosion Timer", 400, 180);
+    miEggModeExplosionTimeField = new MI_SelectField<short>(&rm->spr_selectfield, 120, 380, "Explosion Timer", 400, 220);
     miEggModeExplosionTimeField->add("Off", 0);
     miEggModeExplosionTimeField->add("3 Seconds", 3, false);
     miEggModeExplosionTimeField->add("5 Seconds", 5);
