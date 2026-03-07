@@ -1,33 +1,37 @@
 #include "gfxPalette.h"
 
+#include "gfx.h"
+
 #include "SDL_image.h"
 
+#include <algorithm>
 #include <cstdio>
 
+namespace fs = std::filesystem;
 
-void gfxPalette::clear()
+
+std::optional<RGB> gfxPalette::replacementFor(RGB keyColor, size_t teamIndex, PlayerPalette playerState) const
 {
-    m_colorCodes.clear();
-
-    for (size_t team = 0; team < m_teamSchemes.size(); team++) {
-        for (size_t row = 0; row < PlayerPalette::NUM_PALETTES; row++) {
-            m_teamSchemes[team][row].clear();
-        }
-    }
+    const auto it = std::ranges::find(m_colorsheets, keyColor, &ColorSheet::key);
+    return it != m_colorsheets.cend()
+        ? std::make_optional(it->replacementFor(teamIndex, playerState))
+        : std::nullopt;
 }
 
 
-const RGB& gfxPalette::colorScheme(size_t teamID, size_t schemeID, size_t colorID) const
+std::optional<RGB> gfxPalette::replacementFor(size_t sheetIndex, size_t teamIndex, PlayerPalette playerState) const
 {
-    return m_teamSchemes.at(teamID).at(schemeID).at(colorID);
+    return sheetIndex < m_colorsheets.size()
+        ? std::make_optional(m_colorsheets[sheetIndex].replacementFor(teamIndex, playerState))
+        : std::nullopt;
 }
 
 
-bool gfxPalette::load(const std::string& palettePath)
+bool gfxPalette::load(const fs::path& path)
 {
-    clear();
+    m_colorsheets.clear();
 
-    SDL_Surface* surf = IMG_Load(palettePath.c_str());
+    SDL_Surface* surf = IMG_Load(path.string().c_str());
     if (!surf) {
         printf("Couldn't load color palette: %s\n", SDL_GetError());
         return false;
@@ -36,21 +40,18 @@ bool gfxPalette::load(const std::string& palettePath)
     if (SDL_MUSTLOCK(surf))
         SDL_LockSurface(surf);
 
-    m_colorCount = surf->w;
-
-    m_colorCodes.reserve(m_colorCount);
     for (int x = 0; x < surf->w; x++) {
-        m_colorCodes.emplace_back(getRgb(surf, x, 0));
-    }
+        ColorSheet sheet {};
+        sheet.key = getRgb(surf, x, 0);
 
-    for (size_t team = 0; team < m_teamSchemes.size(); team++) {
-        for (size_t palette = 0; palette < PlayerPalette::NUM_PALETTES; palette++) {
-            m_teamSchemes[team][palette].reserve(m_colorCount);
-            for (int x = 0; x < surf->w; x++) {
-                const size_t y = 1 + team * PlayerPalette::NUM_PALETTES + palette;
-                m_teamSchemes[team][palette].emplace_back(getRgb(surf, x, y));
+        for (size_t team = 0; team < MAX_PLAYERS; team++) {
+            for (size_t playerState = 0; playerState < PlayerPalette::COUNT; playerState++) {
+                const size_t relativeY = team * PlayerPalette::COUNT + playerState;
+                sheet.replacements[relativeY] = getRgb(surf, x, 1 + relativeY);
             }
         }
+
+        m_colorsheets.emplace_back(std::move(sheet));
     }
 
     if (SDL_MUSTLOCK(surf))

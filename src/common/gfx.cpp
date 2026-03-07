@@ -109,7 +109,7 @@ SDL_Surface* createSkinSurface(
     bool mirrored)
 {
     //Take the loaded skin and colorize it for each state (normal, 3 frames of invincibility, shielded, tagged, ztarred, got shine, frozen)
-    const size_t outFrameCount = allStates ? PlayerPalette::NUM_PALETTES : 1;
+    const size_t outFrameCount = allStates ? PlayerPalette::COUNT : 1;
 
     SDL_Surface* out = SDL_CreateRGBSurface(
         screen->flags,
@@ -138,19 +138,13 @@ SDL_Surface* createSkinSurface(
 
             const RGB pixelColor = getRgb(source, startX + srcX, y);
 
-            bool found = false;
-            for (size_t keyIdx = 0; keyIdx < gfx.getPalette().colorCodes().size() && !found; keyIdx++) {
-                const RGB& key = gfx.getPalette().colorCodes()[keyIdx];
-                if (key == pixelColor) {
-                    for (size_t outFrame = 0; outFrame < outFrameCount; outFrame++) {
-                        const RGB& paletteColor = gfx.getPalette().colorScheme(team, outFrame, keyIdx);
-                        setRgb(out, outFrame * 32 + dstX, y, paletteColor);
-                    }
-                    found = true;
+            const auto it = std::ranges::find(gfx.getPalette().colorSheets(), pixelColor, &ColorSheet::key);
+            if (it != gfx.getPalette().colorSheets().cend()) {
+                for (size_t outFrame = 0; outFrame < outFrameCount; outFrame++) {
+                    const RGB paletteColor = it->replacementFor(team, static_cast<PlayerPalette>(outFrame));
+                    setRgb(out, outFrame * 32 + dstX, y, paletteColor);
                 }
-            }
-
-            if (!found) {
+            } else {
                 for (size_t outFrame = 0; outFrame < outFrameCount; outFrame++) {
                     setRgb(out, outFrame * 32 + dstX, y, pixelColor);
                 }
@@ -206,7 +200,7 @@ void gfx_take_screenshot() {
 }
 
 void gfx_close() {}
-bool gfx_loadpalette(const std::string& palette_path) {
+bool gfx_loadpalette(const std::filesystem::path& palette_path) {
     return gfx.getPalette().load(palette_path);
 }
 
@@ -496,9 +490,9 @@ void gfx_setjoystickteamcolor(SDL_Joystick* joystick, short team, float brightne
         // A non-playing user has no team
         return;
     }
-
     brightness = max(0.f, min(1.f, brightness));
-    const RGB& color = gfx.getPalette().colorScheme(team, 0, 5);
-    SDL_JoystickSetLED(joystick, (Uint8)(brightness * color.r), (Uint8)(brightness * color.g), (Uint8)(brightness * color.b));
+    if (std::optional<RGB> color = gfx.getPalette().replacementFor(5, team, PlayerPalette::normal)) {
+        SDL_JoystickSetLED(joystick, (Uint8)(brightness * color->r), (Uint8)(brightness * color->g), (Uint8)(brightness * color->b));
+    }
 #endif
 }
