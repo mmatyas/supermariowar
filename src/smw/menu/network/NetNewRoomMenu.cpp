@@ -55,7 +55,7 @@ UI_NetNewRoomMenu::UI_NetNewRoomMenu()
 
 void UI_NetNewRoomMenu::CreateInProgress()
 {
-    if (strlen(netplay.newroom_name) > 2) {
+    if (netplay.newroom_name.size() > 2) {
         netplay.client.sendCreateRoomMessage();
         netplay.operationInProgress = true;
 

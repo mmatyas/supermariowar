@@ -62,6 +62,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <string>
 #include <string.h>
 #include <ctype.h>
 
@@ -3280,7 +3281,7 @@ int editor_vehicles()
     for (short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
 		TourStop * ts = game_values.tourstops[iStage];
 		char szStageName[256];
-		sprintf(szStageName, "(%d) %s", iStage + 1, ts->szName);
+		snprintf(szStageName, sizeof(szStageName), "(%d) %s", iStage + 1, ts->szName.c_str());
 
 		SF_ListItem<short>& item = miVehicleStageField->add(szStageName, iStage);
 		item.iconOverride = ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode);
@@ -3503,7 +3504,7 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 
 	rm->menu_mode_large.draw(iMouseX + 16, iMouseY + 16, iMode << 5, 0, 32, 32);
 
-	rm->menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 16, 164, ts->szName);
+	rm->menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 16, 164, ts->szName.c_str());
 
 	char szPrint[128];
     if (iMode != 24) {
@@ -3567,7 +3568,7 @@ int g_iNumGameModeSettings[GAMEMODE_LAST] = {2,2,3,4,3,10,9,6,2,1,3,5,3,3,0,22,6
 
 SDL_Rect rItemDst[NUM_WORLD_ITEMS];
 
-void SetBonusString(char * szString, short iPlace, short iItem, short iStageType)
+void SetBonusString(std::string& szString, short iPlace, short iItem, short iStageType)
 {
 	char cType = 'p';
 
@@ -3579,11 +3580,13 @@ void SetBonusString(char * szString, short iPlace, short iItem, short iStageType
 		iItem -= NUM_POWERUPS;
 	}
 
+    char buf[32];
     if (iStageType == 0) {
-		sprintf(szString, "%d%c%d", iPlace, cType, iItem);
+		snprintf(buf, sizeof(buf), "%d%c%d", iPlace, cType, iItem);
     } else {
-		sprintf(szString, "%c%d", cType, iItem);
+		snprintf(buf, sizeof(buf), "%c%d", cType, iItem);
 	}
+    szString = buf;
 }
 
 void TestAndSetBonusItem(TourStop * ts, short iPlace, short iButtonX, short iButtonY)
@@ -3638,7 +3641,7 @@ void AdjustBonuses(TourStop * ts)
                 for (short iRemoveBonus = iBonus; iRemoveBonus < ts->iNumBonuses; iRemoveBonus++) {
 					ts->wsbBonuses[iRemoveBonus].iBonus = ts->wsbBonuses[iRemoveBonus + 1].iBonus;
 					ts->wsbBonuses[iRemoveBonus].iWinnerPlace = ts->wsbBonuses[iRemoveBonus + 1].iWinnerPlace;
-					strcpy(ts->wsbBonuses[iRemoveBonus].szBonusString, ts->wsbBonuses[iRemoveBonus + 1].szBonusString);
+					ts->wsbBonuses[iRemoveBonus].szBonusString = ts->wsbBonuses[iRemoveBonus + 1].szBonusString;
 				}
 			}
 		}
@@ -3799,11 +3802,11 @@ void NewStage(short * iEditStage)
 
 	ts->iStageType = 0;
 
-	ts->szBonusText[0][0] = 0;
-	ts->szBonusText[1][0] = 0;
-	ts->szBonusText[2][0] = 0;
-	ts->szBonusText[3][0] = 0;
-	ts->szBonusText[4][0] = 0;
+	ts->szBonusText[0].clear();
+	ts->szBonusText[1].clear();
+	ts->szBonusText[2].clear();
+	ts->szBonusText[3].clear();
+	ts->szBonusText[4].clear();
 
 	ts->pszMapFile = maplist->currentShortmapname();
 	ts->iMode = 0;
@@ -3817,7 +3820,7 @@ void NewStage(short * iEditStage)
 	ts->iBonusType = 0;
 	ts->iNumBonuses = 0;
 
-	sprintf(ts->szName, "Tour Stop %d", game_values.tourstops.size() + 1);
+	ts->szName = "Tour Stop " + std::to_string(game_values.tourstops.size() + 1);
 
 	ts->fEndStage = false;
 
@@ -3978,7 +3981,7 @@ int editor_stage()
                                 for (short iAdjust = iRemoveItem; iAdjust < ts->iNumBonuses - 1; iAdjust++) {
 										ts->wsbBonuses[iAdjust].iBonus = ts->wsbBonuses[iAdjust + 1].iBonus;
 										ts->wsbBonuses[iAdjust].iWinnerPlace = ts->wsbBonuses[iAdjust + 1].iWinnerPlace;
-										strcpy(ts->wsbBonuses[iAdjust].szBonusString, ts->wsbBonuses[iAdjust + 1].szBonusString);
+										ts->wsbBonuses[iAdjust].szBonusString = ts->wsbBonuses[iAdjust + 1].szBonusString;
 									}
 
 									ts->iNumBonuses--;
