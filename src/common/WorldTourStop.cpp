@@ -469,11 +469,11 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
         pszTemp = strtok(NULL, ",\n");
     }
 
-    ts.szBonusText[0][0] = 0;
-    ts.szBonusText[1][0] = 0;
-    ts.szBonusText[2][0] = 0;
-    ts.szBonusText[3][0] = 0;
-    ts.szBonusText[4][0] = 0;
+    ts.szBonusText[0].clear();
+    ts.szBonusText[1].clear();
+    ts.szBonusText[2].clear();
+    ts.szBonusText[3].clear();
+    ts.szBonusText[4].clear();
 
     if (ts.iStageType == 0) {
         char* szMap = new char[strlen(pszTemp) + 1];
@@ -572,7 +572,7 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
                     else if (iWinnerPlace < 1 || iWinnerPlace > 4)
                         iWinnerPlace = 1;
 
-                    strcpy(ts.wsbBonuses[ts.iNumBonuses].szBonusString, pszStart);
+                    ts.wsbBonuses[ts.iNumBonuses].szBonusString = pszStart;
 
                     ts.wsbBonuses[ts.iNumBonuses].iWinnerPlace = iWinnerPlace - 1;
 
@@ -606,15 +606,14 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
             pszTemp = strtok(NULL, ",\n");
 
             if (pszTemp) {
-                strncpy(ts.szName, pszTemp, 127);
-                ts.szName[127] = 0;
+                ts.szName = pszTemp;
             } else {
-                sprintf(ts.szName, "Tour Stop %d", game_values.tourstops.size() + 1);
+                ts.szName = "Tour Stop " + std::to_string(game_values.tourstops.size() + 1);
             }
         } else {
             ts.iPoints = 1;
             ts.iBonusType = 0;
-            sprintf(ts.szName, "Tour Stop %d", game_values.tourstops.size() + 1);
+            ts.szName = "Tour Stop " + std::to_string(game_values.tourstops.size() + 1);
         }
 
         if (version >= Version {1, 8, 0, 0}) {
@@ -637,10 +636,9 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
         }
     } else if (ts.iStageType == 1) { //Bonus House
         if (pszTemp) {
-            strncpy(ts.szName, pszTemp, 127);
-            ts.szName[127] = 0;
+            ts.szName = pszTemp;
         } else {
-            sprintf(ts.szName, "Bonus House %d", game_values.tourstops.size() + 1);
+            ts.szName = "Bonus House " + std::to_string(game_values.tourstops.size() + 1);
         }
 
         pszTemp = strtok(NULL, ",\n");
@@ -662,7 +660,7 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
             if (pszEnd)
                 *pszEnd = 0;
 
-            strcpy(ts.szBonusText[ts.iBonusTextLines], pszStart);
+            ts.szBonusText[ts.iBonusTextLines] = pszStart;
 
             if (++ts.iBonusTextLines >= 5 || !pszEnd)
                 break;
@@ -673,7 +671,7 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
         ts.iNumBonuses = 0;
         pszTemp = strtok(NULL, ",\n");
         while (pszTemp) {
-            strcpy(ts.wsbBonuses[ts.iNumBonuses].szBonusString, pszTemp);
+            ts.wsbBonuses[ts.iNumBonuses].szBonusString = pszTemp;
 
             short iPowerupOffset = 0;
             if (pszTemp[0] == 'w' || pszTemp[0] == 'W')

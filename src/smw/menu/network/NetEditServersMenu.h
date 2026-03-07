@@ -2,6 +2,8 @@
 
 #include "uimenu.h"
 
+#include <string>
+
 class MI_Button;
 class MI_Image;
 class MI_StringScroll;
@@ -48,7 +50,7 @@ private:
     MI_Button* miDialogOK;
     MI_Button* miDialogCancel;
 
-    char dialogTextData[128];
+    std::string dialogTextData;
 
     MI_Image* miLeftHeaderBar;
     MI_Image* miRightHeaderBar;

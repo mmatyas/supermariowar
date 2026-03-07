@@ -306,22 +306,22 @@ struct Networking {
 
     //
     NetClient client;
-    char myPlayerName[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
+    std::string myPlayerName;
 
     // Server list
     unsigned short selectedServerIndex;
     std::vector<ServerAddress> savedServers;
 
     // Room list
-    char roomFilter[NET_MAX_ROOM_NAME_LENGTH];
+    std::string roomFilter;
     unsigned short selectedRoomIndex;
     std::vector<RoomListEntry> currentRooms;
     Room currentRoom;
 
     // Current room
-    char newroom_name[NET_MAX_ROOM_NAME_LENGTH];
-    char newroom_password[NET_MAX_ROOM_PASSWORD_LENGTH];
-    char mychatmessage[NET_MAX_CHAT_MSG_LENGTH];
+    std::string newroom_name;
+    std::string newroom_password;
+    std::string mychatmessage;
     std::string mapfilepath;
 
     // In-game
