@@ -18,7 +18,7 @@ UI_NetEditServersMenu::UI_NetEditServersMenu()
     : UI_Menu()
 {
     currentState = DEFAULT;
-    std::fill(dialogTextData, dialogTextData + 128, 0);
+    dialogTextData.clear();
 
     miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
@@ -168,7 +168,7 @@ void UI_NetEditServersMenu::onEntrySelect()
 
     switch (currentState) {
     case EDIT:
-        strncpy(dialogTextData, netplay.savedServers[miServerScroll->CurrentIndex()].hostname.c_str(), 127);
+        dialogTextData = netplay.savedServers[miServerScroll->CurrentIndex()].hostname;
         miDialogTextField->Refresh();
         ShowDialog();
         setInitialFocus(miDialogTextField);
@@ -211,7 +211,7 @@ void UI_NetEditServersMenu::onDialogOk()
         assert(false);
     }
 
-    std::fill(dialogTextData, dialogTextData + 128, 0);
+    dialogTextData.clear();
     miDialogTextField->Refresh();
     Restore();
 }

@@ -16,17 +16,17 @@ public:
     void SetTitle(std::string name);
 
     // Gets the values of the currently selected item
-    char* GetValue() const {
-        return szOutValue;
+    const std::string& GetValue() const {
+        return *szOutValue;
     }
 
     //Called when user selects this control to change it's value
     MenuCodeEnum Modify(bool modify) override;
 
     void Clear() {
-        szOutValue[0] = 0;
+        szOutValue->clear();
         iCursorIndex = 0;
-        iNumChars = 1;
+        iNumChars = 0;
     }
 
     //Updates animations or other events every frame
@@ -47,7 +47,7 @@ public:
     }
 
     //Set where the data of this control is written to (some member of game_values probably)
-    void SetData(char* data, short maxchars);
+    void SetData(std::string& data, short maxchars);
 
     MenuCodeEnum MouseClick(short iMouseX, short iMouseY) override;
 
@@ -65,7 +65,7 @@ protected:
     gfxSprite* spr = nullptr;
     std::string szName;
     std::string szTempValue;
-    char* szOutValue = nullptr;
+    std::string* szOutValue = nullptr;
 
     short iWidth = 0;
     short iIndent = 0;
@@ -79,5 +79,5 @@ protected:
     short iStringWidth = 0;
     short iAllowedWidth = 0;
 
-    char szDisallowedChars[32];
+    std::string szDisallowedChars;
 };

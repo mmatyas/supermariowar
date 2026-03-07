@@ -1184,8 +1184,8 @@ void MenuState::update()
                 mCurrentMenu = mNetNewRoomMenu.get();
                 mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_NET_CHAT_SEND == code) {
-                if (strlen(netplay.mychatmessage) > 0)
-                    netplay.client.sendChatMessage(netplay.mychatmessage);
+                if (!netplay.mychatmessage.empty())
+                    netplay.client.sendChatMessage(netplay.mychatmessage.c_str());
                 else
                     code = MENU_CODE_TO_NET_ROOM_MENU;
             } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {

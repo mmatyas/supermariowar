@@ -2,6 +2,7 @@
 
 #include "GameModeSettings.h"
 
+#include <array>
 #include <string>
 
 struct TourStop;
@@ -11,7 +12,7 @@ struct Version;
 struct WorldStageBonus {
     short iWinnerPlace;
     short iBonus;
-    char szBonusString[8];
+    std::string szBonusString;
 };
 
 struct TourStop {
@@ -20,7 +21,7 @@ struct TourStop {
     short iGoal;
     short iPoints;
     short iBonusType;
-    char szName[128];
+    std::string szName;
 
     bool fEndStage;
     short iNumBonuses;
@@ -32,7 +33,7 @@ struct TourStop {
     GameModeSettings gmsSettings;
 
     short iBonusTextLines;
-    char szBonusText[5][128];
+    std::array<std::string, 5> szBonusText;
 };
 
 

@@ -142,15 +142,15 @@ bool net_init()
     netplay.joinSuccessful = false;
     netplay.gameRunning = false;
 
-    strcpy(netplay.myPlayerName, "Player");
+    netplay.myPlayerName = "Player";
     netplay.currentMenuChanged = false;
     netplay.theHostIsMe = false;
     netplay.selectedRoomIndex = 0;
     netplay.selectedServerIndex = 0;
-    netplay.roomFilter[0] = '\0';
-    netplay.newroom_name[0] = '\0';
-    netplay.newroom_password[0] = '\0';
-    netplay.mychatmessage[0] = '\0';
+    netplay.roomFilter.clear();
+    netplay.newroom_name.clear();
+    netplay.newroom_password.clear();
+    netplay.mychatmessage.clear();
     netplay.allowMapCollisionEvent = false;
 
     if (!networkHandler.init())
@@ -383,7 +383,7 @@ void NetClient::handleNewRoomListEntry(const uint8_t* data, size_t dataLength)
 
 void NetClient::sendCreateRoomMessage()
 {
-    NetPkgs::NewRoom msg(netplay.newroom_name, netplay.newroom_password);
+    NetPkgs::NewRoom msg(netplay.newroom_name.c_str(), netplay.newroom_password.c_str());
     msg.gamemodeID = currentgamemode;
     game_values.gamemode = gamemodes[currentgamemode];
     msg.gamemodeGoal = game_values.gamemode->goal;
@@ -398,8 +398,8 @@ void NetClient::handleRoomCreatedMessage(const uint8_t* data, size_t dataLength)
     NetPkgs::NewRoomCreated pkg;
     memcpy(&pkg, data, sizeof(NetPkgs::NewRoomCreated));
 
-    assert(strlen(netplay.myPlayerName) <= NET_MAX_PLAYER_NAME_LENGTH);
-    assert(strlen(netplay.newroom_name) <= NET_MAX_ROOM_NAME_LENGTH);
+    assert(netplay.myPlayerName.size() <= NET_MAX_PLAYER_NAME_LENGTH);
+    assert(netplay.newroom_name.size() <= NET_MAX_ROOM_NAME_LENGTH);
 
     netplay.currentRoom.roomID = pkg.roomID;
     netplay.currentRoom.hostPlayerNumber = 0;
@@ -1002,7 +1002,7 @@ void NetClient::onConnect(NetPeer* newPeer)
     if (!foreign_lobbyserver) {
         foreign_lobbyserver = newPeer;
 
-        NetPkgs::ClientConnection message(netplay.myPlayerName);
+        NetPkgs::ClientConnection message(netplay.myPlayerName.c_str());
         sendMessageToLobbyServer(&message, sizeof(NetPkgs::ClientConnection));
     }
     else if (!foreign_gamehost) {

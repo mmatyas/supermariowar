@@ -116,22 +116,14 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 
             //Check to see if this is an allowed character for this field
             bool fAllowed = true;
-            for (short iIndex = 0; iIndex < 32 && szDisallowedChars[iIndex] != 0; iIndex++) {
-                if (szDisallowedChars[iIndex] == key) {
-                    fAllowed = false;
-                    break;
-                }
+            if (szDisallowedChars.find(static_cast<char>(key)) != std::string::npos) {
+                fAllowed = false;
             }
 
             //If it is an allowed character, then add it to the field
             if (fAllowed) {
+                szOutValue->insert(iCursorIndex++, 1, static_cast<char>(key));
                 iNumChars++;
-
-                for (short iCopy = iNumChars - 1; iCopy >= iCursorIndex; iCopy--) {
-                    szOutValue[iCopy + 1] = szOutValue[iCopy];
-                }
-
-                szOutValue[iCursorIndex++] = (char)key;
 
                 UpdateCursor();
                 return mcItemChangedCode;
@@ -141,21 +133,15 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
         if (iCursorIndex > 0) {
             iCursorIndex--;
             iNumChars--;
-            for (short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++) {
-                szOutValue[iCopy] = szOutValue[iCopy + 1];
-            }
-            szOutValue[iNumChars] = 0;
+            szOutValue->erase(iCursorIndex, 1);
 
             UpdateCursor();
             return mcItemChangedCode;
         }
     } else if (key == SDLK_DELETE) {
         if (iCursorIndex < iNumChars) {
-            for (short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++) {
-                szOutValue[iCopy] = szOutValue[iCopy + 1];
-            }
-
-            szOutValue[--iNumChars] = 0;
+            szOutValue->erase(iCursorIndex, 1);
+            iNumChars--;
 
             UpdateCursor();
             return mcItemChangedCode;
@@ -194,7 +180,7 @@ void MI_TextField::Draw()
 
     if (szOutValue) {
         if (iStringWidth <= iAllowedWidth || !fModifying) {
-            rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iAllowedWidth, szOutValue);
+            rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iAllowedWidth, szOutValue->c_str());
         } else {
             rm->menu_font_large.drawChopLeft(m_pos.x + iWidth - 16, m_pos.y + 5, iAllowedWidth, szTempValue.c_str());
         }
@@ -203,11 +189,11 @@ void MI_TextField::Draw()
     miModifyCursor->Draw();
 }
 
-void MI_TextField::SetData(char* data, short maxchars)
+void MI_TextField::SetData(std::string& data, short maxchars)
 {
     iMaxChars = maxchars;
-    szOutValue = data;
-    iCursorIndex = strlen(szOutValue);
+    szOutValue = &data;
+    iCursorIndex = static_cast<short>(szOutValue->size());
     iNumChars = iCursorIndex;
 
     szTempValue.clear();
@@ -228,7 +214,7 @@ MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
         char szChar[2];
         szChar[1] = 0;
         for (short iChar = 0; iChar < iNumChars; iChar++) {
-            szChar[0] = szOutValue[iChar];
+            szChar[0] = (*szOutValue)[iChar];
             iPixelCount += rm->menu_font_large.getWidth(szChar);
 
             if (iPixelCount >= iMouseX - (m_pos.x + iIndent + 8)) {
@@ -241,7 +227,7 @@ MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
 
     //Otherwise just check to see if we clicked on the whole control
     if (iMouseX >= m_pos.x && iMouseX < m_pos.x + iWidth && iMouseY >= m_pos.y && iMouseY < m_pos.y + 32) {
-        iCursorIndex = strlen(szOutValue);
+        iCursorIndex = static_cast<short>(szOutValue->size());
         UpdateCursor();
         return MENU_CODE_CLICKED;
     }
@@ -256,7 +242,7 @@ void MI_TextField::Refresh()
     if (!szOutValue)
         return;
 
-    SetData(szOutValue, iMaxChars);
+    SetData(*szOutValue, iMaxChars);
 }
 
 void MI_TextField::UpdateCursor()
@@ -264,7 +250,7 @@ void MI_TextField::UpdateCursor()
     if (!szOutValue)
         return;
 
-    szTempValue = szOutValue;
+    szTempValue = *szOutValue;
     szTempValue.resize(iCursorIndex);
 
     iStringWidth = rm->menu_font_large.getWidth(szTempValue.c_str());
@@ -277,6 +263,5 @@ void MI_TextField::UpdateCursor()
 
 void MI_TextField::SetDisallowedChars(const char * chars)
 {
-    strncpy(szDisallowedChars, chars, 31);
-    szDisallowedChars[31] = 0;
+    szDisallowedChars = chars;
 }
