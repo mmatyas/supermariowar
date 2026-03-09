@@ -1,6 +1,7 @@
 #include "gfx.h"
 
 #include "gfx/Color.h"
+#include "gfx/gfxPalette.h"
 #include "gfx/gfxSDL.h"
 
 #include "SDL_image.h"
@@ -21,6 +22,7 @@ extern short x_shake;
 extern short y_shake;
 
 GraphicsSDL gfx;
+gfxPalette gfx_palette;
 
 
 namespace {
@@ -138,8 +140,8 @@ SDL_Surface* createSkinSurface(
 
             const RGB pixelColor = getRgb(source, startX + srcX, y);
 
-            const auto it = gfx.getPalette().colorSheets().find(pixelColor);
-            if (it != gfx.getPalette().colorSheets().cend()) {
+            const auto it = gfx_palette.colorSheets().find(pixelColor);
+            if (it != gfx_palette.colorSheets().cend()) {
                 const ColorSheet& sheet = it->second;
                 for (size_t outFrame = 0; outFrame < outFrameCount; outFrame++) {
                     const RGB paletteColor = sheet.replacementFor(team, static_cast<PlayerPalette>(outFrame));
@@ -177,15 +179,15 @@ RGB getRgb(SDL_Surface* surf, int x, int y)
 
 
 bool gfx_init(int w, int h, bool fullscreen) {
-    return gfx.Init(fullscreen);
+    return gfx.init(fullscreen);
 }
 
 void gfx_changefullscreen(bool fullscreen) {
-    gfx.ChangeFullScreen(fullscreen);
+    gfx.changeFullScreen(fullscreen);
 }
 
 void gfx_flipscreen() {
-    gfx.FlipScreen();
+    gfx.flipScreen();
 }
 
 void gfx_settitle(const char* title) {
@@ -202,7 +204,7 @@ void gfx_take_screenshot() {
 
 void gfx_close() {}
 bool gfx_loadpalette(const std::filesystem::path& palette_path) {
-    return gfx.getPalette().load(palette_path);
+    return gfx_palette.load(palette_path);
 }
 
 bool ValidSkinSurface(SDL_Surface* skin)
@@ -492,7 +494,7 @@ void gfx_setjoystickteamcolor(SDL_Joystick* joystick, short team, float brightne
         return;
     }
     brightness = max(0.f, min(1.f, brightness));
-    if (std::optional<RGB> color = gfx.getPalette().replacementFor(RGB {0x80, 0x00, 0x00}, team, PlayerPalette::normal)) {
+    if (std::optional<RGB> color = gfx_palette.replacementFor(RGB {0x80, 0x00, 0x00}, team, PlayerPalette::normal)) {
         SDL_JoystickSetLED(joystick, (Uint8)(brightness * color->r), (Uint8)(brightness * color->g), (Uint8)(brightness * color->b));
     }
 #endif
