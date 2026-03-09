@@ -6,12 +6,7 @@ jobs:
   linux:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        sdl: [1, 2]
-    name: X11 SDL${{ matrix.sdl }}
-    env:
-      COMMON_CMAKE_ARGS: -B build -G Ninja -DUSE_BUNDLED_ENET=ON -DUSE_BUNDLED_YAMLCPP=ON -DSMW_INSTALL_PORTABLE=ON
+    name: X11
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,27 +15,17 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y
           cmake
           g++
-          libsdl1.2-dev
-          libsdl-image1.2-dev
-          libsdl-mixer1.2-dev
           libsdl2-dev
           libsdl2-image-dev
           libsdl2-mixer-dev
-          libegl1-mesa-dev
-          libgles2-mesa-dev
           ninja-build
       - name: Version checks
         run: |
-          sdl-config --version
           sdl2-config --version
           cmake --version
 
-      - name: Configure with SDL1
-        if: matrix.sdl == 1
-        run: cmake $COMMON_CMAKE_ARGS -DUSE_SDL2_LIBS=OFF -DUSE_PNG_SAVE=OFF
-      - name: Configure with SDL2
-        if: matrix.sdl == 2
-        run: cmake $COMMON_CMAKE_ARGS -DUSE_SDL2_LIBS=ON
+      - name: Configure
+        run: cmake -B build -G Ninja -DUSE_BUNDLED_ENET=ON -DUSE_BUNDLED_YAMLCPP=ON -DSMW_INSTALL_PORTABLE=ON
 
       - name: Build
         run: cmake --build build --verbose
@@ -49,14 +34,12 @@ jobs:
         run: ctest --test-dir build/tests --output-on-failure
 
       - name: Package
-        if: matrix.sdl == 2
         run: |
           cmake --install build --prefix supermariowar --strip
           rm -rf supermariowar/include supermariowar/lib
           zip -9 -r "supermariowar_$(date +%F)_linux.zip" supermariowar
 
       - name: Upload artifacts
-        if: matrix.sdl == 2
         uses: actions/upload-artifact@v4
         with:
           name: supermariowar_linux
