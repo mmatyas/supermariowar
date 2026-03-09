@@ -10,12 +10,6 @@
 
 class gfxSprite {
 public:
-    gfxSprite();
-    ~gfxSprite();
-
-    void freeSurface();
-    void clearSurface();
-
     bool init(const std::string& filename); //non color keyed
     bool init(const std::string& filename, const RGB& key); //color keyed
     bool init(const std::string& filename, const RGB& key, Uint8 alpha); //color keyed + alpha
@@ -26,22 +20,21 @@ public:
 
     void setalpha(Uint8 alpha);
 
-    int getWidth();
-    int getHeight();
+    int getWidth() const { return m_picture->w; }
+    int getHeight() const { return m_picture->h; }
 
     void setSurface(SdlSurfacePtr surface);
     SDL_Surface* getSurface() const { return m_picture.get(); }
 
-    bool GetWrap();
-    void SetWrap(bool wrap);
-    void SetWrap(bool wrap, short wrapsize);
+    bool GetWrap() const { return fWrap; }
+    void SetWrap(bool wrap, short wrapsize = 640);
 
 private:
     SdlSurfacePtr m_picture;
-    SDL_Rect m_bltrect;
+    SDL_Rect m_bltrect {};
 
-    bool fWrap;
-    short iWrapSize;
+    bool fWrap = false;
+    short iWrapSize = 640;  // TODO: Get it from a global setting.
 };
 
 #endif // GFX_SPRITE

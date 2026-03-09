@@ -16,35 +16,6 @@ extern SDL_Surface * screen;
 extern short x_shake;
 extern short y_shake;
 
-gfxSprite::gfxSprite()
-{
-    clearSurface();
-    iWrapSize = 640; // TODO: Get it from a global setting.
-}
-
-gfxSprite::~gfxSprite()
-{
-    //free the allocated surface
-    freeSurface();
-}
-
-void gfxSprite::clearSurface()
-{
-    m_bltrect.x = 0;
-    m_bltrect.y = 0;
-    m_bltrect.w = 0;
-    m_bltrect.h = 0;
-    m_picture = NULL;
-
-    fWrap = false;
-}
-
-void gfxSprite::freeSurface()
-{
-    if (m_picture)
-        m_picture.reset();
-}
-
 //
 // Color keyed without alpha
 //
@@ -287,15 +258,6 @@ void gfxSprite::setalpha(Uint8 alpha)
     }
 }
 
-int gfxSprite::getWidth()
-{
-    return m_picture->w;
-}
-int gfxSprite::getHeight()
-{
-    return m_picture->h;
-}
-
 void gfxSprite::setSurface(SdlSurfacePtr surface)
 {
     m_picture = std::move(surface);
@@ -303,15 +265,8 @@ void gfxSprite::setSurface(SdlSurfacePtr surface)
     m_bltrect.h = (Uint16)m_picture->h;
 }
 
-bool gfxSprite::GetWrap() {
-    return fWrap;
-}
-
-void gfxSprite::SetWrap(bool wrap) {
-    fWrap = wrap;
-}
-
-void gfxSprite::SetWrap(bool wrap, short wrapsize) {
+void gfxSprite::SetWrap(bool wrap, short wrapsize)
+{
     fWrap = wrap;
     iWrapSize = wrapsize;
 }
