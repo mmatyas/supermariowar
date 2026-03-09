@@ -6,6 +6,9 @@ add_executable(smw-tests
     common/util/test_DirIterator.cpp
 )
 
-target_compile_definitions(smw-tests PRIVATE DOCTEST_CONFIG_USE_STD_HEADERS)
+if(MSVC)
+    target_compile_definitions(smw-tests PRIVATE DOCTEST_CONFIG_USE_STD_HEADERS)
+endif()
+
 target_link_libraries(smw-tests PRIVATE doctest CommonFiles)
 doctest_discover_tests(smw-tests)
