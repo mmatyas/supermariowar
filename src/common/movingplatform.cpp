@@ -71,7 +71,7 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
     for (short iSurface = 0; iSurface < 2; iSurface++) {
         sSurface[iSurface] = SDL_CreateRGBSurface(screen->flags, w * iTileSize, h * iTileSize, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
-        if ( SDL_SETCOLORKEY(sSurface[iSurface], SDL_FALSE, SDL_MapRGB(sSurface[iSurface]->format, 255, 0, 255)) < 0)
+        if (SDL_SetColorKey(sSurface[iSurface], SDL_TRUE, SDL_MapRGB(sSurface[iSurface]->format, 255, 0, 255)) < 0)
             printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
 
         SDL_FillRect(sSurface[iSurface], NULL, SDL_MapRGB(sSurface[iSurface]->format, 255, 0, 255));
