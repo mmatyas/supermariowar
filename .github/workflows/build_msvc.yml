@@ -1,0 +1,103 @@
+name: Build - Windows MSVC
+
+on:
+  workflow_call:
+
+jobs:
+  msvc:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    runs-on: windows-2022
+
+    env:
+      BASEDIR: C:\smwlibs
+      SDL2_VERSION: 2.0.14
+      SDL2_IMAGE_VERSION: 2.0.5
+      SDL2_MIXER_VERSION: 2.0.4
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up library directories
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:BASEDIR\include\SDL2" | Out-Null
+          New-Item -ItemType Directory -Force -Path "$env:BASEDIR\lib" | Out-Null
+          New-Item -ItemType Directory -Force -Path "$env:BASEDIR\bin" | Out-Null
+
+      - name: Download dependencies
+        shell: pwsh
+        run: |
+          Invoke-WebRequest "https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/zlib128-dll.zip" -OutFile zlib.zip
+          Invoke-WebRequest "https://www.libsdl.org/release/SDL2-devel-$env:SDL2_VERSION-VC.zip" -OutFile sdl2.zip
+          Invoke-WebRequest "https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-$env:SDL2_IMAGE_VERSION-VC.zip" -OutFile sdl2_image.zip
+          Invoke-WebRequest "https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-$env:SDL2_MIXER_VERSION-VC.zip" -OutFile sdl2_mixer.zip
+
+      - name: Extract dependencies
+        shell: pwsh
+        run: |
+          Expand-Archive zlib.zip -DestinationPath zlib
+          Expand-Archive sdl2.zip -DestinationPath sdl2
+          Expand-Archive sdl2_image.zip -DestinationPath sdl2_image
+          Expand-Archive sdl2_mixer.zip -DestinationPath sdl2_mixer
+
+      - name: Copy headers, libs, and DLLs
+        shell: pwsh
+        run: |
+          Copy-Item "zlib\include\*" "$env:BASEDIR\include" -Recurse -Force
+          Copy-Item "zlib\lib\*" "$env:BASEDIR\lib" -Recurse -Force
+          Copy-Item "SDL2\SDL2-$env:SDL2_VERSION\include\*" "$env:BASEDIR\include\SDL2" -Recurse -Force
+          Copy-Item "sdl2_image\SDL2_image-$env:SDL2_IMAGE_VERSION\include\*" "$env:BASEDIR\include\SDL2" -Recurse -Force
+          Copy-Item "sdl2_mixer\SDL2_mixer-$env:SDL2_MIXER_VERSION\include\*" "$env:BASEDIR\include\SDL2" -Recurse -Force
+
+          Copy-Item "SDL2\SDL2-$env:SDL2_VERSION\lib\x86\*" "$env:BASEDIR\lib" -Recurse -Force
+          Copy-Item "sdl2_image\SDL2_image-$env:SDL2_IMAGE_VERSION\lib\x86\*" "$env:BASEDIR\lib" -Recurse -Force
+          Copy-Item "sdl2_mixer\SDL2_mixer-$env:SDL2_MIXER_VERSION\lib\x86\*" "$env:BASEDIR\lib" -Recurse -Force
+
+          Copy-Item "SDL2\SDL2-$env:SDL2_VERSION\lib\x86\*.dll" "$env:BASEDIR\bin" -Force
+          Copy-Item "sdl2_image\SDL2_image-$env:SDL2_IMAGE_VERSION\lib\x86\*.dll" "$env:BASEDIR\bin" -Force
+          Copy-Item "sdl2_mixer\SDL2_mixer-$env:SDL2_MIXER_VERSION\lib\x86\*.dll" "$env:BASEDIR\bin" -Force
+
+      - name: Version checks
+        shell: pwsh
+        run: |
+          cmake --version
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -B build `
+            -G "Visual Studio 17 2022" `
+            -A Win32 `
+            -DCMAKE_PREFIX_PATH="$env:BASEDIR" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DUSE_SDL2_LIBS=ON `
+            -DUSE_PNG_SAVE=ON `
+            -DSMW_INSTALL_PORTABLE=ON
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --verbose
+
+      - name: Test
+        shell: pwsh
+        run: |
+          Copy-Item "$env:BASEDIR\bin\*.dll" "build\tests\Release" -Force -ErrorAction SilentlyContinue
+          ctest --test-dir build/tests -C Release --output-on-failure
+
+      - name: Package
+        shell: pwsh
+        run: |
+          cmake --install build --config Release --prefix supermariowar
+          Remove-Item "supermariowar\include" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item "supermariowar\lib" -Recurse -Force -ErrorAction SilentlyContinue
+          Copy-Item "$env:BASEDIR\bin\*.dll" "supermariowar" -Force
+          Compress-Archive -Path supermariowar -DestinationPath "supermariowar_windows_msvc.zip" -Force
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: supermariowar_windows_msvc
+          path: supermariowar_windows_msvc.zip

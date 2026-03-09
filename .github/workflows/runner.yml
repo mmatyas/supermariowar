@@ -19,6 +19,12 @@ jobs:
     name: macOS
     uses: ./.github/workflows/build_macos.yml
 
+  build-msvc:
+    name: Windows (MSVC)
+    uses: ./.github/workflows/build_msvc.yml  
+
   build-mingw:
     name: Windows
     uses: ./.github/workflows/build_mingw.yml
+
+
