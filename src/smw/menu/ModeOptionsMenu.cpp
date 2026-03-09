@@ -47,10 +47,29 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miClassicModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
     miClassicModeHeaderText = new MI_HeaderText("Classic Mode Menu", 320, 5);
 
-    mModeSettingsMenu[0].AddControl(miClassicModeStyleField, miClassicModeBackButton, miClassicModeScoringField, NULL, miClassicModeBackButton);
-    mModeSettingsMenu[0].AddControl(miClassicModeScoringField, miClassicModeStyleField, miClassicModeBackButton, NULL, miClassicModeBackButton);
-    mModeSettingsMenu[0].AddControl(miClassicModeHazardPenaltyField, miClassicModeScoringField, miClassicModeBackButton, NULL, miClassicModeBackButton);
-    mModeSettingsMenu[0].AddControl(miClassicModeBackButton, miClassicModeScoringField, miClassicModeStyleField, miClassicModeScoringField, NULL);
+    mModeSettingsMenu[0].AddControl(miClassicModeStyleField,
+        miClassicModeBackButton,
+        miClassicModeScoringField,
+        NULL,
+        miClassicModeBackButton);
+
+    mModeSettingsMenu[0].AddControl(miClassicModeScoringField,
+        miClassicModeStyleField,
+        miClassicModeHazardPenaltyField,
+        NULL,
+        miClassicModeBackButton);
+
+    mModeSettingsMenu[0].AddControl(miClassicModeHazardPenaltyField,
+        miClassicModeScoringField,
+        miClassicModeBackButton,
+        NULL,
+        miClassicModeBackButton);
+
+    mModeSettingsMenu[0].AddControl(miClassicModeBackButton,
+        miClassicModeHazardPenaltyField,
+        miClassicModeStyleField,
+        miClassicModeHazardPenaltyField,
+        NULL);
 
     mModeSettingsMenu[0].AddNonControl(miClassicModeLeftHeaderBar);
     mModeSettingsMenu[0].AddNonControl(miClassicModeRightHeaderBar);
@@ -90,10 +109,29 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miFragModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
     miFragModeHeaderText = new MI_HeaderText("Frag Mode Menu", 320, 5);
 
-    mModeSettingsMenu[1].AddControl(miFragModeStyleField, miFragModeBackButton, miFragModeScoringField, NULL, miFragModeBackButton);
-    mModeSettingsMenu[1].AddControl(miFragModeScoringField, miFragModeStyleField, miFragModeBackButton, NULL, miFragModeBackButton);
-    mModeSettingsMenu[1].AddControl(miFragModeHazardPenaltyField, miFragModeScoringField, miFragModeBackButton, NULL, miFragModeBackButton);
-    mModeSettingsMenu[1].AddControl(miFragModeBackButton, miFragModeScoringField, miFragModeStyleField, miFragModeScoringField, NULL);
+    mModeSettingsMenu[1].AddControl(miFragModeStyleField,
+        miFragModeBackButton,
+        miFragModeScoringField,
+        NULL,
+        miFragModeBackButton);
+
+    mModeSettingsMenu[1].AddControl(miFragModeScoringField,
+        miFragModeStyleField,
+        miFragModeHazardPenaltyField,
+        NULL,
+        miFragModeBackButton);
+
+    mModeSettingsMenu[1].AddControl(miFragModeHazardPenaltyField,
+        miFragModeScoringField,
+        miFragModeBackButton,
+        NULL,
+        miFragModeBackButton);
+
+    mModeSettingsMenu[1].AddControl(miFragModeBackButton,
+        miFragModeHazardPenaltyField,
+        miFragModeStyleField,
+        miFragModeHazardPenaltyField,
+        NULL);
 
     mModeSettingsMenu[1].AddNonControl(miFragModeLeftHeaderBar);
     mModeSettingsMenu[1].AddNonControl(miFragModeRightHeaderBar);

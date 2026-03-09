@@ -1,5 +1,5 @@
 #include "doctest.h"
-#include "common/PlayerKillStyles.h"
+#include "PlayerKillStyles.h"
 
 TEST_CASE("Hazard deaths are not penalized when the option is off")
 {
