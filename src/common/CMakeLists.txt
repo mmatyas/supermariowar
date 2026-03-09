@@ -73,6 +73,8 @@ add_library(CommonFiles STATIC
     util/Grid.h
     util/DirIterator.cpp
     util/DirIterator.h
+    util/SdlHelpers.cpp
+    util/SdlHelpers.h
 )
 
 add_subdirectory(ui)
