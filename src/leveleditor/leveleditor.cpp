@@ -4441,28 +4441,45 @@ void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
 	SDL_Rect srcRectBackground = {0, 0, 640, 480};
 	SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
-    for (short iIndex = 0; iIndex < 16; iIndex++) {
-            std::string szFileName = backgroundlist->at(iPage * 16 + iIndex).string();
+	for (short iIndex = 0; iIndex < 16; iIndex++) {
+		if (iPage * 16 + iIndex >= backgroundlist->count())
+			break;
 
-            if (szFileName.empty())
+		std::string szFileName = backgroundlist->at(iPage * 16 + iIndex).string();
+
+		if (szFileName.empty())
 			return;
 
-            SDL_Surface * temp = IMG_Load(szFileName.c_str());
+		SDL_Surface * temp = IMG_Load(szFileName.c_str());
+
+		if (!temp) {
+			printf("ERROR: Couldn't load thumbnail background: %s\n", SDL_GetError());
+			return;
+		}
 
 #ifdef USE_SDL2
 		SDL_Surface * sBackground = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_ARGB8888, 0);
 #else
 		SDL_Surface * sBackground = SDL_DisplayFormat(temp);
 #endif
-        if (!sBackground) {
-			printf("ERROR: Couldn't convert thumbnail background to diplay pixel format: %s\n", SDL_GetError());
+		SDL_FreeSurface(temp);
+
+		if (!sBackground) {
+			printf("ERROR: Couldn't convert thumbnail background to display pixel format: %s\n", SDL_GetError());
 			return;
 		}
 
-		SDL_FreeSurface(temp);
+		SDL_FillRect(sBackgrounds[iIndex], NULL, 0x0);
 
-        if (SDL_SCALEBLIT(sBackground, &srcRectBackground, sBackgrounds[iIndex], &dstRectBackground) < 0) {
+		// Skip backgrounds that are not the required native size
+		if (sBackground->w != 640 || sBackground->h != 480) {
+			SDL_FreeSurface(sBackground);
+			continue;
+		}
+
+		if (SDL_SCALEBLIT(sBackground, &srcRectBackground, sBackgrounds[iIndex], &dstRectBackground) < 0) {
 			fprintf(stderr, "SDL_SCALEBLIT error: %s\n", SDL_GetError());
+			SDL_FreeSurface(sBackground);
 			return;
 		}
 
