@@ -76,46 +76,25 @@ add_library(CommonFiles STATIC
 )
 
 add_subdirectory(ui)
-
-if (USE_PNG_SAVE AND NOT USE_SDL2_LIBS)
-    target_sources(CommonFiles PRIVATE savepng.cpp savepng.h)
-endif()
-
 target_compile_features(CommonFiles PUBLIC cxx_std_20)
 
-
-if (USE_SDL2_LIBS)
-    target_compile_definitions(CommonFiles PUBLIC USE_SDL2)
-
-    if (SDL2_FORCE_GLES)
-        target_compile_definitions(CommonFiles PUBLIC SDL2_FORCE_GLES)
-    endif()
-    if (SDL2_USE_MIXERX)
-        target_compile_definitions(CommonFiles PUBLIC SDL2_USE_MIXERX)
-    endif()
+target_compile_definitions(CommonFiles PUBLIC USE_SDL2 PNG_SAVE_FORMAT)  # TODO
+if (SDL2_FORCE_GLES)
+    target_compile_definitions(CommonFiles PUBLIC SDL2_FORCE_GLES)
 endif()
-if (USE_PNG_SAVE)
-    target_compile_definitions(CommonFiles PUBLIC PNG_SAVE_FORMAT)
+if (SDL2_USE_MIXERX)
+    target_compile_definitions(CommonFiles PUBLIC SDL2_USE_MIXERX)
 endif()
 
 
 if(NOT EMSCRIPTEN)
-    if (USE_SDL2_LIBS)
-        target_link_libraries(CommonFiles
-            SDL2::SDL2
-            SDL2_image::SDL2_image
-        )
-        if (SDL2_USE_MIXERX)
-            target_link_libraries(CommonFiles SDL2_mixer_ext::SDL2_mixer_ext)
-        else()
-            target_link_libraries(CommonFiles SDL2_mixer::SDL2_mixer)
-        endif()
+    target_link_libraries(CommonFiles
+        SDL2::SDL2
+        SDL2_image::SDL2_image
+    )
+    if (SDL2_USE_MIXERX)
+        target_link_libraries(CommonFiles SDL2_mixer_ext::SDL2_mixer_ext)
     else()
-        target_link_libraries(CommonFiles
-            ${SDL_LIBRARY}
-            ${SDLMIXER_LIBRARY}
-            ${SDLIMAGE_LIBRARY}
-            ${SDLMAIN_LIBRARY}
-        )
+        target_link_libraries(CommonFiles SDL2_mixer::SDL2_mixer)
     endif()
 endif()
