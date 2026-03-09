@@ -2,6 +2,8 @@
 #define GFX_SPRITE
 
 #include "gfx/Color.h"
+#include "util/SdlHelpers.h"
+
 #include "SDL.h"
 
 #include <string>
@@ -27,15 +29,15 @@ public:
     int getWidth();
     int getHeight();
 
-    void setSurface(SDL_Surface* surface);
-    SDL_Surface* getSurface() const { return m_picture; }
+    void setSurface(SdlSurfacePtr surface);
+    SDL_Surface* getSurface() const { return m_picture.get(); }
 
     bool GetWrap();
     void SetWrap(bool wrap);
     void SetWrap(bool wrap, short wrapsize);
 
 private:
-    SDL_Surface *m_picture;
+    SdlSurfacePtr m_picture;
     SDL_Rect m_bltrect;
 
     bool fWrap;
