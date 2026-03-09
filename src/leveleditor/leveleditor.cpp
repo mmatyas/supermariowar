@@ -4471,8 +4471,10 @@ void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
 
 		SDL_FillRect(sBackgrounds[iIndex], NULL, 0x0);
 
-		// Skip backgrounds that are not the required native size
 		if (sBackground->w != 640 || sBackground->h != 480) {
+			printf("WARNING: Background %s is %dx%d but must be 640x480. Skipping.\n",
+				szFileName.c_str(), sBackground->w, sBackground->h);
+
 			SDL_FreeSurface(sBackground);
 			continue;
 		}
