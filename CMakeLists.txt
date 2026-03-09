@@ -19,7 +19,6 @@ project(smw
 
 option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" ON)
 option(NO_NETWORK "Disable all network communication" OFF)
-option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" ON)
 option(SDL2_USE_MIXERX "(SDL2) Use SDL Mixer X instead of SDL Mixer" OFF)
 option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
 option(BUILD_TESTS "Build the unit tests" ON)
@@ -91,32 +90,12 @@ include(BundledDeps)
 
 if (NOT DISABLE_SYSLIB_CHECKS)
 	find_package(ZLIB REQUIRED)
-
-	if (USE_SDL2_LIBS)
-		# add all SDL2 dependencies
-		find_package(SDL2 REQUIRED)
-		find_package(SDL2_image REQUIRED)
-		if (SDL2_USE_MIXERX)
-			find_package(SDL2_mixer_ext REQUIRED)
-		else()
-			find_package(SDL2_mixer REQUIRED)
-		endif()
+	find_package(SDL2 REQUIRED)
+	find_package(SDL2_image REQUIRED)
+	if (SDL2_USE_MIXERX)
+		find_package(SDL2_mixer_ext REQUIRED)
 	else()
-		# add all SDL dependencies
-		find_package(SDL REQUIRED)
-		find_package(SDL_mixer REQUIRED)
-		find_package(SDL_image REQUIRED)
-
-		# location of SDL headers
-		include_directories(${SDL_INCLUDE_DIR})
-		include_directories(${SDL_IMAGE_INCLUDE_DIRS})
-		include_directories(${SDL_MIXER_INCLUDE_DIRS})
-
-		# the optional libpng package
-		if(USE_PNG_SAVE)
-			find_package(PNG REQUIRED)
-			include_directories(${PNG_INCLUDE_DIR})
-		endif()
+		find_package(SDL2_mixer REQUIRED)
 	endif()
 endif()
 
@@ -312,11 +291,7 @@ set(CPACK_SOURCE_GENERATOR "TGZ;TBZ2;ZIP")
 #
 set(CPACK_DEBIAN_PACKAGE_SECTION Games)
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "nobody")
-if(USE_SDL2_LIBS)
-	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl2-2.0-0, libsdl2-mixer-2.0-0, libsdl2-image-2.0-0")
-else()
-	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libsdl-mixer1.2, libsdl-image1.2")
-endif()
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl2-2.0-0, libsdl2-mixer-2.0-0, libsdl2-image-2.0-0")
 if (NOT BUILD_STATIC_LIBS)
 	if(NOT NO_NETWORK)
 		set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libenet2a")
@@ -329,12 +304,7 @@ endif()
 #
 set(CPACK_RPM_PACKAGE_GROUP Amusements/Games)
 set(CPACK_RPM_PACKAGE_LICENSE GPL-2.0)
-
-if(USE_SDL2_LIBS)
-	set(CPACK_RPM_PACKAGE_REQUIRES "SDL2, SDL2_image, SDL2_mixer")
-else()
-	set(CPACK_RPM_PACKAGE_REQUIRES "SDL, SDL_image, SDL_mixer")
-endif()
+set(CPACK_RPM_PACKAGE_REQUIRES "SDL2, SDL2_image, SDL2_mixer")
 if (NOT BUILD_STATIC_LIBS)
 	if(NOT NO_NETWORK)
 		set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, enet")
