@@ -270,12 +270,7 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 
         std::string szThumbnail("maps/cache/");
         szThumbnail += GetNameFromFileName((*itr).second.filename.c_str());
-
-#ifdef PNG_SAVE_FORMAT
         szThumbnail += ".png";
-#else
-        szThumbnail += ".bmp";
-#endif
 
         std::string sConvertedPath = convertPath(szThumbnail);
 

@@ -317,18 +317,10 @@ void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehicles
 {
     if (fVehiclesSleeping) {
         SDL_Rect rDst = {pos.x + iWorldOffsetX, pos.y + iWorldOffsetY, iTileSize, iTileSize};
-#ifdef USE_SDL2
         SDL_BlitSurface(rm->spr_worldvehicle[iTileSheet].getSurface(), &srcRects[4], blitdest, &rDst);
-#else  // SDL_BlitSurface uses a non-const source rect
-        SDL_BlitSurface(rm->spr_worldvehicle[iTileSheet].getSurface(), const_cast<SDL_Rect*>(&srcRects[4]), blitdest, &rDst);
-#endif
     } else {
         SDL_Rect rDst = {pos.x + iWorldOffsetX + iPaceOffset, pos.y + iWorldOffsetY, iTileSize, iTileSize};
-#ifdef USE_SDL2
         SDL_BlitSurface(rm->spr_worldvehicle[iTileSheet].getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
-#else  // SDL_BlitSurface uses a non-const source rect
-        SDL_BlitSurface(rm->spr_worldvehicle[iTileSheet].getSurface(), const_cast<SDL_Rect*>(&srcRects[iDrawDirection + iAnimationFrame]), blitdest, &rDst);
-#endif
     }
 }
 
