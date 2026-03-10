@@ -211,11 +211,7 @@ class MapPlatform
     void UpdatePreview() {
         if (!preview) {
 				preview = SDL_CreateRGBSurface(screen->flags, 160, 120, screen->format->BitsPerPixel, 0, 0, 0, 0);
-#ifdef USE_SDL2
 				SDL_SetColorKey(preview, SDL_TRUE, SDL_MapRGB(preview->format, 255, 0, 255));
-#else
-				SDL_SetColorKey(preview, SDL_SRCCOLORKEY, SDL_MapRGB(preview->format, 255, 0, 255));
-#endif
 			}
 
 			SDL_FillRect(preview, NULL, SDL_MapRGB(preview->format, 255, 0, 255));
@@ -514,31 +510,17 @@ int main(int argc, char *argv[])
 		rm->spr_hazard_flame[i].SetWrap(true, 640 >> i);
 		rm->spr_hazard_pirhanaplant[i].SetWrap(true, 640 >> i);
 	}
-#ifdef USE_SDL2
-    if ( SDL_SetColorKey(s_platform, SDL_TRUE, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
+    if (SDL_SetColorKey(s_platform, SDL_TRUE, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
+        printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
+    }
 
-    if ( SDL_SetColorKey(s_platformpathbuttons, SDL_TRUE, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
+    if (SDL_SetColorKey(s_platformpathbuttons, SDL_TRUE, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0) {
+        printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
+    }
 
-    if ( SDL_SetColorKey(s_maphazardbuttons, SDL_TRUE, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-#else
-    if ( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-
-    if ( SDL_SetColorKey(s_platformpathbuttons, SDL_SRCCOLORKEY, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-
-    if ( SDL_SetColorKey(s_maphazardbuttons, SDL_SRCCOLORKEY, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-#endif
+    if (SDL_SetColorKey(s_maphazardbuttons, SDL_TRUE, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0) {
+        printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
+    }
 
 	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
@@ -4450,11 +4432,7 @@ void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
 			return;
 		}
 
-#ifdef USE_SDL2
 		SDL_Surface * sBackground = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_ARGB8888, 0);
-#else
-		SDL_Surface * sBackground = SDL_DisplayFormat(temp);
-#endif
 		SDL_FreeSurface(temp);
 
 		if (!sBackground) {
