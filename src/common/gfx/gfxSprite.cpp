@@ -3,7 +3,6 @@
 #include "gfx.h"
 
 #include "SDL_image.h"
-#include "sdl12wrapper.h"
 
 #include <cassert>
 #include <cstdio>
@@ -226,8 +225,8 @@ bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, shor
 
     // Looks like SoftStretch doesn't respect transparent colors
     // I need to look into the actual SDL code to see if I can fix this
-    if (SDL_SCALEBLIT(m_picture.get(), &srcrect, blitdest, &m_bltrect) < 0) {
-        fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
+    if (SDL_BlitScaled(m_picture.get(), &srcrect, blitdest, &m_bltrect) < 0) {
+        fprintf(stderr, "SDL_BlitScaled error: %s\n", SDL_GetError());
         return false;
     }
 

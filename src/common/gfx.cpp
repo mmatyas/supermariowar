@@ -5,7 +5,6 @@
 #include "gfx/gfxSDL.h"
 
 #include "SDL_image.h"
-#include "sdl12wrapper.h"
 
 #include <algorithm>
 #include <cassert>

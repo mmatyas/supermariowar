@@ -51,7 +51,6 @@
 #include "objects/overmap/WO_Area.h"
 
 #include "SDL_image.h"
-#include "sdl12wrapper.h"
 
 #include <algorithm>
 #include <cstdlib>

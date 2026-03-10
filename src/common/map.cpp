@@ -14,7 +14,6 @@
 #include "map/MapReader.h"
 
 #include "SDL_image.h"
-#include "sdl12wrapper.h"
 
 #include <cmath>
 #include <iostream>
@@ -1315,7 +1314,7 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
     SDL_Rect srcRectBackground = {0, 0, App::screenWidth, App::screenHeight};
     SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
-    if (SDL_SCALEBLIT(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {
+    if (SDL_BlitScaled(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {
         fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
         return NULL;
     }
@@ -1778,7 +1777,7 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
         dstrect.h = App::screenHeight/2;
     }
 
-    if (SDL_SCALEBLIT(background->getSurface(), &srcrect, targetSurface, &dstrect) < 0) {
+    if (SDL_BlitScaled(background->getSurface(), &srcrect, targetSurface, &dstrect) < 0) {
         fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
         return;
     }
