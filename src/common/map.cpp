@@ -1306,25 +1306,13 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
             path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath());
     }
 
-    SDL_Surface * temp = IMG_Load(path.c_str());
-    if (!temp) {
+    SDL_Surface * sBackground = IMG_Load(path.c_str());
+    if (!sBackground) {
         printf("ERROR: Couldn't load thumbnail background: %s\n", IMG_GetError());
         return NULL;
     }
 
-#ifdef USE_SDL2
-    SDL_Surface * sBackground = temp;
-#else
-    SDL_Surface * sBackground = SDL_DisplayFormat(temp);
-    if (!sBackground) {
-        printf("ERROR: Couldn't convert thumbnail background to diplay pixel format: %s\n", SDL_GetError());
-        return NULL;
-    }
-
-    SDL_FreeSurface(temp);
-#endif
-
-	SDL_Rect srcRectBackground = {0, 0, App::screenWidth, App::screenHeight};
+    SDL_Rect srcRectBackground = {0, 0, App::screenWidth, App::screenHeight};
     SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
     if (SDL_SCALEBLIT(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {
