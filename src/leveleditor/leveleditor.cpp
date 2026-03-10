@@ -54,13 +54,6 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 #include "SDL_image.h"
 #include "sdl12wrapper.h"
 
-#ifdef PNG_SAVE_FORMAT
-	// this function was added to SDL2
-	#ifndef USE_SDL2
-	    #include "savepng.h"
-	#endif
-#endif
-
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -5307,13 +5300,8 @@ void takescreenshot()
 		else if (iTileSize == THUMBTILESIZE)
 			szSaveFile += "_thumb";
 
-#ifdef PNG_SAVE_FORMAT
 		szSaveFile += ".png";
 		IMG_SavePNG(screenshot, convertPath(szSaveFile).c_str());
-#else
-		szSaveFile += ".bmp";
-		SDL_SaveBMP(screenshot, convertPath(szSaveFile).c_str());
-#endif
 
 		SDL_FreeSurface(screenshot);
 

@@ -1449,12 +1449,7 @@ void MenuState::update()
         for (short iMap = 0; iMap < iMapCount; iMap++) {
             std::string szThumbnail("maps/cache/");
             szThumbnail += GetNameFromFileName(itr->second.filename);
-
-#ifdef PNG_SAVE_FORMAT
             szThumbnail += ".png";
-#else
-            szThumbnail += ".bmp";
-#endif
 
             g_map->loadMap((*itr).second.filename, read_type_preview);
             g_map->saveThumbnail(convertPath(szThumbnail), false);

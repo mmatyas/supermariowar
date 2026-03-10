@@ -14,13 +14,6 @@
 #define SMW_EDITOR
 //#include "global.h"
 
-#ifdef PNG_SAVE_FORMAT
-	// this function was added to SDL2
-	#ifndef USE_SDL2
-	    #include "savepng.h"
-	#endif
-#endif
-
 #include <string.h>
 #include <ctype.h>
 
@@ -359,13 +352,8 @@ void takescreenshot()
 		else if (iTileSize == THUMBTILESIZE)
 			szSaveFile += "_thumb";
 
-#ifdef PNG_SAVE_FORMAT
 		szSaveFile += ".png";
 		IMG_SavePNG(screenshot, szSaveFile.c_str());
-#else
-		szSaveFile += ".bmp";
-		SDL_SaveBMP(screenshot, szSaveFile.c_str());
-#endif
 
 		SDL_FreeSurface(screenshot);
 	}

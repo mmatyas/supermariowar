@@ -25,14 +25,6 @@ using std::endl;
 #include <sys/stat.h>
 #endif
 
-
-#ifdef PNG_SAVE_FORMAT
-    // this function was added to SDL2
-    #ifndef USE_SDL2
-        #include "savepng.h"
-    #endif
-#endif
-
 #ifndef __EMSCRIPTEN__
     inline void smallDelay() { SDL_Delay(10); }
 #else
@@ -1286,13 +1278,7 @@ void CMap::saveMap(const std::string& file)
     	//Save thumbnail
     	std::string szSaveThumbnail("maps/cache/");
     	szSaveThumbnail += GetNameFromFileName_STR(file);
-
-    #ifdef PNG_SAVE_FORMAT
     	szSaveThumbnail += ".png";
-    #else
-    	szSaveThumbnail += ".bmp";
-    #endif
-
     	saveThumbnail(convertPath(szSaveThumbnail), true);
     */
 }
@@ -1368,12 +1354,7 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
         return;
 
     //Save the screenshot with the same name as the map file
-
-#ifdef PNG_SAVE_FORMAT
     IMG_SavePNG(sThumbnail, sFile.c_str());
-#else
-    SDL_SaveBMP(sThumbnail, sFile.c_str());
-#endif
 
     SDL_FreeSurface(sThumbnail);
 }
