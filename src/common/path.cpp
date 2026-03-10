@@ -81,9 +81,9 @@ std::string GetRootDirectory()
     return "./";
 }
 
-bool FileExists(const std::string path)
+bool FileExists(const std::string& path)
 {
-    struct stat buffer;
+    struct stat buffer {};
     int i = stat(path.c_str(), &buffer);
     return i == 0;
 }

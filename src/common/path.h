@@ -10,7 +10,7 @@
 
 /* Call Initialize_Paths() when your application launches */
 
-bool FileExists(const std::string path);
+bool FileExists(const std::string& path);
 
 /* All filenames must go through this door */
 // TODO: Return fs::path
