@@ -7,50 +7,83 @@
 
 #include <cassert>
 #include <cstdio>
+#include <filesystem>
 #include <iostream>
+#include <optional>
 
-using namespace std;
+namespace fs = std::filesystem;
 
 extern SDL_Surface * blitdest;
 extern SDL_Surface * screen;
 extern short x_shake;
 extern short y_shake;
 
+namespace {
+SdlSurfacePtr loadImage(
+    const fs::path& path,
+    std::optional<RGB> color_key = std::nullopt,
+    std::optional<Uint8> alpha = std::nullopt)
+{
+    const std::string path_str = path.string();
+
+    std::cout << "loading sprite";
+    if (color_key) {
+        std::cout << " with key";
+        if (alpha) {
+            std::cout << "+alpha";
+        }
+        std::cout << " ";
+    }
+    std::cout << path_str << " ...";
+
+    auto raw = SdlSurfacePtr(IMG_Load(path_str.c_str()));
+    if (!raw) {
+        std::cout << "\nERROR: Couldn't load " << path << ": " << IMG_GetError() << std::endl;
+        return {};
+    }
+
+    if (color_key) {
+        const Uint32 key = SDL_MapRGB(raw->format, color_key->r, color_key->g, color_key->b);
+        if (SDL_SetColorKey(raw.get(), SDL_TRUE, key) < 0) {
+            std::cout << "\nERROR: Couldn't set color key for " << path << ": " << SDL_GetError() << std::endl;
+            return {};
+        }
+    }
+
+    auto img = SdlSurfacePtr(SDL_ConvertSurface(raw.get(), screen->format, 0));
+    if (!img) {
+        std::cout << "\nERROR: Couldn't convert " << path << " to the display's pixel format: " << SDL_GetError() << std::endl;
+        return {};
+    }
+
+    if (SDL_SetSurfaceRLE(img.get(), 1) < 0) {
+        std::cout << "\nERROR: Couldn't set RLE acceleration for " << path << ": " << SDL_GetError() << std::endl;
+        return {};
+    }
+
+    if (alpha) {
+        if (SDL_SetSurfaceAlphaMod(img.get(), *alpha) < 0) {
+            std::cout << "\nERROR: Couldn't set alpha modulation for " << path << ": " << SDL_GetError() << std::endl;
+            return {};
+        }
+    }
+
+    std::cout << " done" << std::endl;
+    return img;
+}
+} // namespace
+
 //
 // Color keyed without alpha
 //
 bool gfxSprite::init(const std::string& filename, const RGB& key)
 {
-    cout << "loading sprite (mode 1) " << filename << "...";
-
-    auto raw = SdlSurfacePtr(IMG_Load(filename.c_str()));
-    if (!raw) {
-        cout << endl << " ERROR: Couldn't load " << filename << ": " << IMG_GetError() << endl;
-        return false;
+    m_picture = loadImage(filename, key);
+    if (m_picture) {
+        m_bltrect.w = m_picture->w;
+        m_bltrect.h = m_picture->h;
     }
-
-    if (SDL_SetColorKey(raw.get(), SDL_TRUE, SDL_MapRGB(raw->format, key.r, key.g, key.b)) < 0) {
-        cout << endl << " ERROR: Couldn't set color key for " << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    auto img = SdlSurfacePtr(SDL_ConvertSurface(raw.get(), screen->format, 0));
-    if (!img) {
-        cout << endl << " ERROR: Couldn't convert " << filename << " to the display's pixel format: " << SDL_GetError() << endl;
-        return false;
-    }
-
-    if (SDL_SetSurfaceRLE(img.get(), 1) < 0) {
-        cout << endl << " ERROR: Couldn't set RLE acceleration for " << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    m_picture = std::move(img);
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-
-    cout << "done" << endl;
-    return true;
+    return m_picture.get();
 }
 
 //
@@ -58,41 +91,12 @@ bool gfxSprite::init(const std::string& filename, const RGB& key)
 //
 bool gfxSprite::init(const std::string& filename, const RGB& key, Uint8 alpha)
 {
-    cout << "Loading sprite (mode 2) " << filename << " ...";
-
-    auto raw = SdlSurfacePtr(IMG_Load(filename.c_str()));
-    if (!raw) {
-        cout << endl << " ERROR: Couldn't load " << filename << ": " << SDL_GetError() << endl;
-        return false;
+    m_picture = loadImage(filename, key, alpha);
+    if (m_picture) {
+        m_bltrect.w = m_picture->w;
+        m_bltrect.h = m_picture->h;
     }
-
-    if (SDL_SetColorKey(raw.get(), SDL_TRUE, SDL_MapRGB(raw->format, key.r, key.g, key.b)) < 0) {
-        cout << endl << " ERROR: Couldn't set color key for " << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    auto img = SdlSurfacePtr(SDL_ConvertSurface(raw.get(), screen->format, 0));
-    if (!img) {
-        cout << endl << " ERROR: Couldn't convert " << filename << " to the display's pixel format: " << SDL_GetError() << endl;
-        return false;
-    }
-
-    if (SDL_SetSurfaceAlphaMod(img.get(), alpha) < 0) {
-        cout << endl << " ERROR: Couldn't set alpha modulation for " << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    if (SDL_SetSurfaceRLE(img.get(), 1) < 0) {
-        cout << endl << " ERROR: Couldn't set RLE acceleration for " << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    m_picture = std::move(img);
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-
-    cout << "done" << endl;
-    return true;
+    return m_picture.get();
 }
 
 //
@@ -100,26 +104,12 @@ bool gfxSprite::init(const std::string& filename, const RGB& key, Uint8 alpha)
 //
 bool gfxSprite::init(const std::string& filename)
 {
-    cout << "loading sprite (mode 3) " << filename << "...";
-
-    auto raw = SdlSurfacePtr(IMG_Load(filename.c_str()));
-    if (!raw) {
-        cout << endl << " ERROR: Couldn't load " << filename << ": " << SDL_GetError() << endl;
-        return false;
+    m_picture = loadImage(filename);
+    if (m_picture) {
+        m_bltrect.w = m_picture->w;
+        m_bltrect.h = m_picture->h;
     }
-
-    auto img = SdlSurfacePtr(SDL_ConvertSurface(raw.get(), screen->format, 0));
-    if (!img) {
-        cout << endl << " ERROR: Couldn't convert " << filename << " to the display's pixel format: " << SDL_GetError() << endl;
-        return false;
-    }
-
-    m_picture = std::move(img);
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-
-    cout << "done" << endl;
-    return true;
+    return m_picture.get();
 }
 
 bool gfxSprite::draw(short x, short y)
@@ -261,8 +251,10 @@ void gfxSprite::setalpha(Uint8 alpha)
 void gfxSprite::setSurface(SdlSurfacePtr surface)
 {
     m_picture = std::move(surface);
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
+    if (m_picture) {
+        m_bltrect.w = m_picture->w;
+        m_bltrect.h = m_picture->h;
+    }
 }
 
 void gfxSprite::SetWrap(bool wrap, short wrapsize)
