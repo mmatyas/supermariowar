@@ -49,29 +49,20 @@ std::string GetHomeDirectory()
 
 #else // catch-all for Linux-based systems
     std::string result;
-#ifdef USE_SDL2
-    char* prefPath = SDL_GetPrefPath(nullptr, "supermariowar");
-    if (prefPath) {
-        result = prefPath;
-        SDL_free(prefPath);
+    if (char* sdl_path = SDL_GetPrefPath(nullptr, "supermariowar")) {
+        result = sdl_path;
+        SDL_free(sdl_path);
     }
-#else
-    char* home = getenv("HOME");
-    if (home) {
-        result = std::string(home) + "/.smw/";
-    }
-#endif
     return result;
 #endif
 }
 
 std::string GetRootDirectory()
 {
-#if !defined(_WIN32) && defined(USE_SDL2)
+#if !defined(_WIN32)
     // TODO: SDL_GetBasePath returns an UTF-8 string, which needs
     // some special treatment on Windows to work
-    char* const sdl_path = SDL_GetBasePath();
-    if (sdl_path) {
+    if (char* sdl_path = SDL_GetBasePath()) {
         std::string result = sdl_path;
         SDL_free(sdl_path);
         return result;
