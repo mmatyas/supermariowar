@@ -52,7 +52,6 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 
 #include "SDL.h"
 #include "SDL_image.h"
-#include "sdl12wrapper.h"
 
 #include <algorithm>
 #include <array>
@@ -1689,7 +1688,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		dstrect.w = iBlockSize * 20;
 		dstrect.h = iBlockSize * 15;
 
-        if (SDL_SCALEBLIT(rm->spr_background.getSurface(), &srcrect, blitdest, &dstrect) < 0) {
+        if (SDL_BlitScaled(rm->spr_background.getSurface(), &srcrect, blitdest, &dstrect) < 0) {
 			fprintf(stderr, "SDL_SCALEBLIT error: %s\n", SDL_GetError());
 			return;
 		}
@@ -4450,7 +4449,7 @@ void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
 			continue;
 		}
 
-		if (SDL_SCALEBLIT(sBackground, &srcRectBackground, sBackgrounds[iIndex], &dstRectBackground) < 0) {
+		if (SDL_BlitScaled(sBackground, &srcRectBackground, sBackgrounds[iIndex], &dstRectBackground) < 0) {
 			fprintf(stderr, "SDL_SCALEBLIT error: %s\n", SDL_GetError());
 			SDL_FreeSurface(sBackground);
 			return;

@@ -32,7 +32,6 @@
 #include <string.h>
 
 #include "SDL.h"
-#include "sdl12wrapper.h"
 
 extern short x_shake;
 extern short y_shake;

@@ -10,8 +10,6 @@
 #include "TilesetManager.h"
 #include "objects/moving/MovingObject.h"
 
-#include "sdl12wrapper.h"
-
 extern SDL_Surface* screen;
 extern SDL_Surface* blitdest;
 
