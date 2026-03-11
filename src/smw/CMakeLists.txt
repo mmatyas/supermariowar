@@ -1,4 +1,4 @@
-add_executable(smw WIN32
+add_executable(smw
 	main.cpp
 
 	ai.cpp
