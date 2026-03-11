@@ -321,6 +321,14 @@ int main(int argc, char *argv[])
     try {
         main_game();
     }
+    catch (const std::filesystem::filesystem_error& ex) {
+        auto msg = std::format("{}\npath1: {}\npath2: {}\ncval: {}\ncmsg: {}\nccat: {}",
+            ex.what(),
+            ex.path1().string(), ex.path2().string(),
+            ex.code().value(), ex.code().message(), ex.code().category().name());
+        show_catched_error(msg);
+        return 1;
+    }
     catch (const char* what) {
         show_catched_error(what);
         return 1;
