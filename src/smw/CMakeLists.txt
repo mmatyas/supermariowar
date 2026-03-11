@@ -68,7 +68,7 @@ if(NOT NO_NETWORK)
 endif()
 
 if(NOT EMSCRIPTEN)
-	target_link_libraries(smw ZLIB::ZLIB)
+	target_link_libraries(smw smw_zlib)
 endif()
 
 target_link_libraries(smw yaml-cpp::yaml-cpp)

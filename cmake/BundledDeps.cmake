@@ -88,3 +88,15 @@ if (BUILD_STATIC_LIBS)
         493c1b826b212a2d442c57b384cfe3101cfff3b7
     )
 endif()
+
+if (USE_BUNDLED_ZLIB)
+    message("Using bundled zlib")
+    set(ZLIB_BUILD_TESTING OFF CACHE BOOL "")
+    set(ZLIB_BUILD_SHARED OFF CACHE BOOL "")
+    set(ZLIB_INSTALL OFF CACHE BOOL "")
+    smw_declare_gitrepo(
+        zlib
+        https://github.com/madler/zlib.git
+        v1.3.2
+    )
+endif()
