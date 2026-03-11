@@ -114,26 +114,10 @@ if (NOT DISABLE_SYSLIB_CHECKS)
 	endif()
 endif()
 
-if (BUILD_STATIC_LIBS)
-	macro(check_submodule_git dir)
-		if (NOT EXISTS "${CMAKE_SOURCE_DIR}/${dir}/.git")
-			message(SEND_ERROR
-			"It seems you've forgot to clone the dependencies; ${dir} is not a git repository."
-			"Please run `git submodule update --init` first.")
-		endif()
-	endmacro()
-
-	# Use ENet for networking
-	if(NOT NO_NETWORK)
-		check_submodule_git(dependencies/enet)
-		include_directories(dependencies/enet/include)
-		add_subdirectory(dependencies/enet)
-	endif()
-else()
+find_package(yaml-cpp REQUIRED)
+if(NOT NO_NETWORK)
 	find_package(ENet REQUIRED)
 endif()
-
-find_package(yaml-cpp REQUIRED)
 
 #-----------------------------------------------------------------------------
 #

@@ -72,12 +72,19 @@ endif()
 
 
 if (BUILD_STATIC_LIBS)
-    # yaml-cpp
+    message("Using bundled yaml-cpp")
     set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "")
     set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "")
     smw_declare_gitrepo(
         yaml-cpp
         https://github.com/jbeder/yaml-cpp.git
         yaml-cpp-0.9.0
+    )
+
+    message("Using bundled enet")
+    smw_declare_gitrepo(
+        enet
+        https://github.com/mmatyas/enet.git
+        493c1b826b212a2d442c57b384cfe3101cfff3b7
     )
 endif()
