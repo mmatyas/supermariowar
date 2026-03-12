@@ -184,12 +184,19 @@ void create_globals()
     }
 
     std::cout << "globals 3" << std::endl;
+    std::cout << "  trying to load SkinList" << std::endl;
     skinlist = new SkinList();
+    std::cout << "  trying to load MusicList" << std::endl;
     musiclist = new MusicList();
+    std::cout << "  trying to load WorldMusicList" << std::endl;
     worldmusiclist = new WorldMusicList();
+    std::cout << "  trying to load SoundsList" << std::endl;
     soundpacklist = new SoundsList();
+    std::cout << "  trying to load AnnouncerList" << std::endl;
     announcerlist = new AnnouncerList();
+    std::cout << "  trying to load TourList" << std::endl;
     tourlist = new TourList();
+    std::cout << "  trying to load WorldList" << std::endl;
     worldlist = new WorldList();
 
     std::cout << "globals 4" << std::endl;
