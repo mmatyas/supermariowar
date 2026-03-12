@@ -1,8 +1,6 @@
 #include "path.h"
 
-#ifdef USE_SDL2
 #include "SDL.h"
-#endif
 
 #include <array>
 #include <cassert>

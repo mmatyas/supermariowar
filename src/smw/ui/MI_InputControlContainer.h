@@ -17,14 +17,14 @@ class MI_InputControlField : public UI_Control
 
 		void Draw();
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		void SetKey(SDL_KEYTYPE * iSetKey, SDL_KEYTYPE key, short device);
+		void SetKey(SDL_Keycode * iSetKey, SDL_Keycode key, short device);
 
 		MenuCodeEnum Modify(bool modify);
 
     void SetDevice(short device) {
         iDevice = device;
     }
-    void SetKey(SDL_KEYTYPE * key) {
+    void SetKey(SDL_Keycode * key) {
         iKey = key;
     }
     void SetType(short type) {
@@ -45,15 +45,12 @@ class MI_InputControlField : public UI_Control
 		short iWidth, iIndent;
 
 		short iDevice;
-		SDL_KEYTYPE * iKey;
+		SDL_Keycode * iKey;
 		short iType;
 		short iKeyIndex;
 		short iPlayerIndex;
 
 		static const char * Joynames[30];
-#ifndef USE_SDL2
-		static const char * Keynames[340];
-#endif
 };
 
 

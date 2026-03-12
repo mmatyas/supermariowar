@@ -107,7 +107,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 					}
 				}
 
-				iPressedKey = (SDL_KEYTYPE)event.key.keysym.sym;
+				iPressedKey = event.key.keysym.sym;
             } else if (SDL_KEYUP == event.type) {
                 for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if (inputControl->keys[iKey] == event.key.keysym.sym) {

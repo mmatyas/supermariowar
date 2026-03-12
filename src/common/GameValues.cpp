@@ -31,7 +31,7 @@ extern short joystickcount;
 
 
 //[Keyboard/Joystick][Game/Menu][NumPlayers][NumKeys]  left, right, jump, down, turbo, powerup, start, cancel
-SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RCTRL, SDLK_RSHIFT, SDLK_RETURN, SDLK_ESCAPE},
+SDL_Keycode controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RCTRL, SDLK_RSHIFT, SDLK_RETURN, SDLK_ESCAPE},
             {SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_e, SDLK_q, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_g, SDLK_j, SDLK_y, SDLK_h, SDLK_u, SDLK_t, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_l, SDLK_QUOTE, SDLK_p, SDLK_SEMICOLON, SDLK_LEFTBRACKET, SDLK_o, SDLK_UNKNOWN, SDLK_UNKNOWN}
@@ -406,11 +406,7 @@ void CGameConfig::ReadBinaryConfig() {
     }
 
     try {
-#ifdef USE_SDL2
         std::string controls_path(GetHomeDirectory() + "controls.sdl2.bin");
-#else
-        std::string controls_path(GetHomeDirectory() + "controls.sdl.bin");
-#endif
         BinaryFile controls(controls_path, "rb");
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);
@@ -542,11 +538,7 @@ void CGameConfig::WriteConfig() const
     }
 
     try {
-#ifdef USE_SDL2
         std::string controls_path(GetHomeDirectory() + "controls.sdl2.bin");
-#else
-        std::string controls_path(GetHomeDirectory() + "controls.sdl.bin");
-#endif
         BinaryFile controls(controls_path, "wb");
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);

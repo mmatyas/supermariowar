@@ -11,12 +11,6 @@
 //and then to use all the player input, just call
 //CPlayerInput.outputControls.{key}.{presstype} to get the key state you want
 
-#ifdef USE_SDL2
-    #define SDL_KEYTYPE SDL_Keycode
-#else
-    #define SDL_KEYTYPE short
-#endif
-
 #define NUM_KEYS 8
 
 #define DEVICE_KEYBOARD     -1
@@ -58,12 +52,12 @@ struct CKeyState {
 struct CInputControl {
     union {
         struct {
-			SDL_KEYTYPE menu_up, menu_down, menu_left, menu_right, menu_select, menu_cancel, menu_random, menu_scrollfast;
+			SDL_Keycode menu_up, menu_down, menu_left, menu_right, menu_select, menu_cancel, menu_random, menu_scrollfast;
 		};
         struct {
-			SDL_KEYTYPE game_left, game_right, game_jump, game_down, game_turbo, game_powerup, game_start, game_cancel;
+			SDL_Keycode game_left, game_right, game_jump, game_down, game_turbo, game_powerup, game_start, game_cancel;
 		};
-		SDL_KEYTYPE keys[NUM_KEYS];
+		SDL_Keycode keys[NUM_KEYS];
 	};
 };
 
@@ -121,7 +115,7 @@ class CPlayerInput
 		//Use these structures to see what input has been pressed
 		COutputControl outputControls[4];
 
-		SDL_KEYTYPE iPressedKey;
+		SDL_Keycode iPressedKey;
 };
 
 #endif // INPUT_H
