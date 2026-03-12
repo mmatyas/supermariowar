@@ -49,11 +49,7 @@ MenuCodeEnum MI_TextField::Modify(bool modify)
 
 MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 {
-#ifdef USE_SDL2
     const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-#else
-    Uint8 * keystate = SDL_GetKeyState(NULL);
-#endif
 
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         // NOTE: copied from UI_Menu::SendInput
@@ -78,17 +74,13 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 
     // TODO: check string conversion
     //Watch for characters typed in including delete and backspace
-    SDL_KEYTYPE key = playerInput->iPressedKey;
+    SDL_Keycode key = playerInput->iPressedKey;
     if ((key >= SDLK_a && key <= SDLK_z) || key == SDLK_SPACE || (key >= SDLK_0 && key <= SDLK_9) || key == SDLK_EQUALS ||
         key == SDLK_MINUS || key == SDLK_BACKQUOTE || (key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET) ||
         key == SDLK_SEMICOLON || key == SDLK_QUOTE || key == SDLK_COMMA || key == SDLK_PERIOD || key == SDLK_SLASH) {
         if (iNumChars < iMaxChars - 1) {
             //Take care of holding shift to shift the pressed key to another character
-#ifdef USE_SDL2
             if (keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT]) {
-#else
-            if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
-#endif
                 if (key >= SDLK_a && key <= SDLK_z) {
                     key -= 32;
                 } else if (key >= SDLK_0 && key <= SDLK_9) {

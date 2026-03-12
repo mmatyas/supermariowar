@@ -312,15 +312,9 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 void updateworldsurface();
 void takescreenshot();
 
-#if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
 bool CheckKey(const Uint8 * keystate, SDL_Keycode key) {
-	return keystate[SDL_GetScancodeFromKey(key)];
+    return keystate[SDL_GetScancodeFromKey(key)];
 }
-#else
-bool CheckKey(Uint8 * keystate, SDLKey key) {
-	return keystate[key];
-}
-#endif
 
 bool ignoreclick = false;
 
@@ -339,7 +333,7 @@ void SetDisplayMessage(short iTime,
 void DrawMessage();
 
 //Menu keys to use for menus
-extern SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS];
+extern SDL_Keycode controlkeys[2][2][4][NUM_KEYS];
 
 //Vehicle stuff
 std::vector<WorldVehicle*> vehiclelist;
@@ -929,10 +923,6 @@ int main(int argc, char *argv[])
 	mVehicleMenu.setInitialFocus(miVehicleSpriteField);
 	mVehicleMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);
 
-#ifndef USE_SDL2
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-#endif
-
 	printf("\n---------------- ready, steady, go! ----------------\n");
 
 	printf("entering world editor loop...\n");
@@ -1078,11 +1068,7 @@ int editor_edit()
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
                 case SDL_KEYDOWN: {
-#ifdef USE_SDL2
-						SDL_Keycode key = event.key.keysym.sym;
-#else
-						SDLKey key = event.key.keysym.sym;
-#endif
+                    const SDL_Keycode key = event.key.keysym.sym;
 
                     if (key == SDLK_LEFT) {
 							fSelectedYes = true;
@@ -1105,12 +1091,6 @@ int editor_edit()
         } else {
 			//handle messages
             while (SDL_PollEvent(&event)) {
-            #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
-                const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-            #else
-                Uint8 * keystate = SDL_GetKeyState(NULL);
-            #endif
-
                 switch (event.type) {
                 case SDL_QUIT: {
 						done = true;
@@ -1118,6 +1098,7 @@ int editor_edit()
 					}
 
                 case SDL_KEYDOWN: {
+                    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
 							if (g_musiccategorydisplaytimer > 0)
 								g_musiccategorydisplaytimer = 0;
@@ -2894,11 +2875,7 @@ int editor_background()
 				}
 
             case SDL_KEYDOWN: {
-#ifdef USE_SDL2
-					SDL_Keycode key = event.key.keysym.sym;
-#else
-					SDLKey key = event.key.keysym.sym;
-#endif
+                const SDL_Keycode key = event.key.keysym.sym;
                 if (key >= SDLK_1 && key <= SDLK_2) {
 						iPage = key - SDLK_1;
                 } else {
@@ -2987,11 +2964,7 @@ int editor_stageforeground()
 				}
 
             case SDL_KEYDOWN: {
-#ifdef USE_SDL2
-					SDL_Keycode key = event.key.keysym.sym;
-#else
-					SDLKey key = event.key.keysym.sym;
-#endif
+                const SDL_Keycode key = event.key.keysym.sym;
 
                 if (key >= SDLK_1 && key <= SDLK_4) {
 						iForegroundScreen = key - SDLK_1;
@@ -4517,11 +4490,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							//insert character into fileName and onScreenText and increment current char
 							Uint8 key = event.key.keysym.sym;
 
-                        #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
-                            const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                        #else
-                            Uint8 * keystate = SDL_GetKeyState(NULL);
-                        #endif
+                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
                         if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
 								if (event.key.keysym.sym == 45)
 									key = 95;
