@@ -59,6 +59,7 @@
 #include <ctime>
 #include <cmath>
 #include <cstdlib> // srand()
+#include <iostream>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -165,6 +166,7 @@ void gameloop_frame()
 
 void create_globals()
 {
+    std::cout << "globals 1" << std::endl;
     // this instance will contain the other relevant objects
     rm = new CResourceManager();
 #pragma warning ("delete these or use boost GC shared_ptr")
@@ -172,6 +174,7 @@ void create_globals()
     g_map = new CMap();
     g_tilesetmanager = new CTilesetManager();
 
+    std::cout << "globals 2" << std::endl;
     filterslist = new FiltersList();
     maplist = new MapList(false);
 
@@ -180,6 +183,7 @@ void create_globals()
         throw "Empty map directory!";
     }
 
+    std::cout << "globals 3" << std::endl;
     skinlist = new SkinList();
     musiclist = new MusicList();
     worldmusiclist = new WorldMusicList();
@@ -188,6 +192,7 @@ void create_globals()
     tourlist = new TourList();
     worldlist = new WorldList();
 
+    std::cout << "globals 4" << std::endl;
     menugraphicspacklist = new GraphicsList();
     worldgraphicspacklist = new GraphicsList();
     gamegraphicspacklist = new GraphicsList();
@@ -303,6 +308,7 @@ void show_catched_error(std::string error)
 
 int main(int argc, char *argv[])
 {
+    std::cout << "program start" << std::endl;
     const cmd::Args cmd = cmd::parse_args(argc, argv);
     if (!cmd.success) {
         return 1;
@@ -318,6 +324,8 @@ int main(int argc, char *argv[])
         RootDataDirectory = cmd.data_root;
 
 
+    std::cout << "data dir is " << RootDataDirectory << std::endl;
+    std::cout << "game start" << std::endl;
     try {
         main_game();
     }
@@ -349,6 +357,7 @@ void main_game()
 {
     ensureSettingsDir();
     create_globals();
+    std::cout << "title loading" << std::endl;
 
     printf("-------------------------------------------------------------------------------\n");
     printf(" %s %s %s\n", TITLESTRING, GIT_REVISION, GIT_DATE);
