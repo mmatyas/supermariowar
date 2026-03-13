@@ -339,13 +339,13 @@ int main(int argc, char *argv[])
 
 void main_game()
 {
-    ensureSettingsDir();
-    create_globals();
-
     printf("-------------------------------------------------------------------------------\n");
     printf(" %s %s %s\n", TITLESTRING, GIT_REVISION, GIT_DATE);
     printf("-------------------------------------------------------------------------------\n");
     printf("\n---------------- startup ----------------\n");
+
+    ensureSettingsDir();
+    create_globals();
 
 	gfx_init(App::screenWidth, App::screenHeight, false);		//initialize the graphics (SDL)
     blitdest = screen;
