@@ -21,4 +21,4 @@ jobs:
 
   build-mingw:
     name: Windows
-    uses: ./.github/workflows/build_mingw.yml
+    uses: ./.github/workflows/build_windows.yml

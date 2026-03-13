@@ -4,6 +4,7 @@ on:
 
 jobs:
   mingw-cross:
+    name: MinGW
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-latest
     steps:
@@ -45,3 +46,41 @@ jobs:
         with:
           name: supermariowar_windows
           path: supermariowar_*_windows.zip
+
+  msvc:
+    name: MSVC
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    runs-on: windows-latest
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: mozilla/sccache-action@v0.0.9
+
+      - name: Download dependencies
+        run: |
+          mkdir libs
+          curl -L https://www.libsdl.org/release/SDL2-devel-2.32.10-VC.zip | tar -x --strip-components=1 -C libs
+          curl -L https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.8.8-VC.zip | tar -x --strip-components=1 -C libs
+          curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.8.1-VC.zip | tar -x --strip-components=1 -C libs
+
+      - name: Configure
+        run: cmake
+          -B build
+          -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DUSE_BUNDLED_ZLIB=ON
+          -DSMW_INSTALL_PORTABLE=ON
+          -DCMAKE_PREFIX_PATH=libs
+          -DCMAKE_C_COMPILER_LAUNCHER=sccache
+          -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+
+      - name: Build
+        run: cmake --build build --verbose --config Release --parallel
+
+      - name: Test
+        run: ctest --test-dir build/tests --output-on-failure --build-config Release
+
+      - name: Package
+        run: cmake --install build --prefix outdir --strip --config Release
