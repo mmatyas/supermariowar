@@ -15,8 +15,8 @@ jobs:
         run: |
           git clone https://github.com/emscripten-core/emsdk.git --depth=1
           cd emsdk
-          ./emsdk install 3.1.43
-          ./emsdk activate 3.1.43
+          ./emsdk install 5.0.2
+          ./emsdk activate 5.0.2
       - name: Download SDL mixer
         working-directory: dependencies
         run: curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.4.tar.gz | tar xzf -
