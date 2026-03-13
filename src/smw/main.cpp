@@ -201,6 +201,12 @@ void create_globals()
     soundpacklist->setCurrentIndex(0);
 
     players.reserve(4);
+
+    try {
+        UpdateMusicWithOverrides(*musiclist, *worldmusiclist);
+    } catch (const std::exception& ex) {
+        throw std::format("ERROR: Could not load music overrides: {}", ex.what());
+    }
 }
 
 void init_joysticks()
@@ -381,8 +387,6 @@ void main_game()
         score[iScore] = new CScore(iScore);
 
     game_values.init();
-
-    UpdateMusicWithOverrides(*musiclist, *worldmusiclist);
 
     create_gamemodes();
 

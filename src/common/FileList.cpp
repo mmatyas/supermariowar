@@ -7,6 +7,7 @@
 #include "util/DirIterator.h"
 
 #include <algorithm>
+#include <format>
 #include <fstream>
 #include <variant>
 
@@ -266,8 +267,12 @@ MusicList::MusicList()
 {
     SubdirsIterator dir(convertPath("music/game/"));
     while (auto path = dir.next()) {
-        if (auto pack = MusicPack::load(*path))
-            m_entries.emplace_back(std::move(*pack));
+        try {
+            if (auto pack = MusicPack::load(*path))
+                m_entries.emplace_back(std::move(*pack));
+        } catch (const std::exception& ex) {
+            throw std::format("ERROR: Could not load music pack at {}\nReason: {}", path->string(), ex.what());
+        }
     }
 
     if (m_entries.empty()) {
@@ -556,8 +561,12 @@ WorldMusicList::WorldMusicList()
 {
     SubdirsIterator dir(convertPath("music/world/"));
     while (auto path = dir.next()) {
-        if (auto pack = WorldMusicPack::load(*path)) {
-            m_entries.emplace_back(std::move(*pack));
+        try {
+            if (auto pack = WorldMusicPack::load(*path)) {
+                m_entries.emplace_back(std::move(*pack));
+            }
+        } catch (const std::exception& ex) {
+            throw std::format("ERROR: Could not load world music pack at {}\nReason: {}", path->string(), ex.what());
         }
     }
     if (m_entries.empty()) {
