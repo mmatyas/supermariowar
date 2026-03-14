@@ -2,6 +2,11 @@ name: Build - Windows
 on:
   workflow_call:
 
+env:
+  SCCACHE_GHA_ENABLED: "true"
+  CMAKE_C_COMPILER_LAUNCHER: sccache
+  CMAKE_CXX_COMPILER_LAUNCHER: sccache
+
 jobs:
   mingw-cross:
     name: MinGW
@@ -11,6 +16,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
+      - uses: mozilla/sccache-action@v0.0.9
+
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -23,12 +30,10 @@ jobs:
         run: cmake
           -B build
           -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/mingw_toolchain.cmake
-          -DUSE_PNG_SAVE=ON
-          -DUSE_SDL2_LIBS=ON
           -DBUILD_TESTS=OFF
           -DSDL2_USE_MIXERX=ON
-          -DCMAKE_CXX_FLAGS=-fdiagnostics-color=always
       - name: Build
         run: cmake --build build --verbose
 
@@ -51,8 +56,6 @@ jobs:
     name: MSVC
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: windows-latest
-    env:
-      SCCACHE_GHA_ENABLED: "true"
     steps:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
@@ -71,10 +74,7 @@ jobs:
           -G Ninja
           -DCMAKE_BUILD_TYPE=Release
           -DUSE_BUNDLED_ZLIB=ON
-          -DSMW_INSTALL_PORTABLE=ON
           -DCMAKE_PREFIX_PATH=libs
-          -DCMAKE_C_COMPILER_LAUNCHER=sccache
-          -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
 
       - name: Build
         run: cmake --build build --verbose --config Release --parallel
