@@ -10,6 +10,7 @@
 struct ClassicGameModeSettings {
     DeathStyle style;		//on kill, either respawn the player or shield them and let them keep playing
     ScoringStyle scoring;	//When to credit a score, all kills or push kills only (sumo mode)
+    bool losepointsonhazarddeath; // Controls whether players lose a point when they die due to a stage hazard
 
     ClassicGameModeSettings();
 };
@@ -17,6 +18,7 @@ struct ClassicGameModeSettings {
 struct FragGameModeSettings {
     DeathStyle style;		//on kill, either respawn the player or shield them and let them keep playing
     ScoringStyle scoring;	//When to credit a score, all kills or push kills only (sumo mode)
+    bool losepointsonhazarddeath; // Controls whether players lose a point when they die due to a stage hazard
 
     FragGameModeSettings();
 };
