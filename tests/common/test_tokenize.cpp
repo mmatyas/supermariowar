@@ -1,3 +1,5 @@
+#include <ostream>  // MSVC workaround
+
 #include "doctest.h"
 
 #include "linfunc.h"
