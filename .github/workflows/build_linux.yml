@@ -10,6 +10,8 @@ jobs:
       matrix:
         sdl: [1, 2]
     name: X11 SDL${{ matrix.sdl }}
+    env:
+      COMMON_CMAKE_ARGS: -B build -G Ninja -DUSE_BUNDLED_ENET=ON -DUSE_BUNDLED_YAMLCPP=ON -DSMW_INSTALL_PORTABLE=ON
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,10 +37,10 @@ jobs:
 
       - name: Configure with SDL1
         if: matrix.sdl == 1
-        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=OFF -DUSE_PNG_SAVE=OFF -DSMW_INSTALL_PORTABLE=ON -DCMAKE_CXX_FLAGS=-fdiagnostics-color=always
+        run: cmake $COMMON_CMAKE_ARGS -DUSE_SDL2_LIBS=OFF -DUSE_PNG_SAVE=OFF
       - name: Configure with SDL2
         if: matrix.sdl == 2
-        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON -DSMW_INSTALL_PORTABLE=ON -DCMAKE_CXX_FLAGS=-fdiagnostics-color=always
+        run: cmake $COMMON_CMAKE_ARGS -DUSE_SDL2_LIBS=ON
 
       - name: Build
         run: cmake --build build --verbose

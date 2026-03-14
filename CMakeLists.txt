@@ -19,12 +19,9 @@ project(smw
 
 option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" ON)
 option(NO_NETWORK "Disable all network communication" OFF)
-option(BUILD_STATIC_LIBS "Build and link minor dependencies statically (enet, yaml-cpp)" ON)
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" ON)
 option(SDL2_USE_MIXERX "(SDL2) Use SDL Mixer X instead of SDL Mixer" OFF)
 option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
-option(USE_BUNDLED_SDL "If ON, downloads and builds SDL, otherwise uses the system library" OFF)
-option(USE_BUNDLED_ZLIB "If ON, downloads and builds ZLIB, otherwise uses the system library" OFF)
 option(BUILD_TESTS "Build the unit tests" ON)
 
 set(SMW_INSTALL_PORTABLE_DEFAULT OFF)
@@ -32,6 +29,14 @@ if(WIN32)
 	set(SMW_INSTALL_PORTABLE_DEFAULT ON)
 endif()
 option(SMW_INSTALL_PORTABLE "Install to a single directory" ${SMW_INSTALL_PORTABLE_DEFAULT})
+
+option(USE_BUNDLED_SDL "If ON, downloads and builds SDL, otherwise uses the system library" OFF)
+option(USE_BUNDLED_ZLIB "If ON, downloads and builds ZLIB, otherwise uses the system library" OFF)
+option(USE_BUNDLED_ENET "If ON, downloads and builds ENet, otherwise uses the system library" OFF)
+option(USE_BUNDLED_YAMLCPP "If ON, downloads and builds yaml-cpp, otherwise uses the system library" OFF)
+if (DEFINED BUILD_STATIC_LIBS)
+	message(DEPRECATION "BUILD_STATIC_LIBS is deprecated. Please use USE_BUNDLED_ENET and USE_BUNDLED_YAMLCPP instead.")
+endif()
 
 # Additional CMake search path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")

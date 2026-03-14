@@ -71,7 +71,7 @@ if (USE_BUNDLED_SDL)
 endif()
 
 
-if (BUILD_STATIC_LIBS)
+if (USE_BUNDLED_YAMLCPP)
     message("Using bundled yaml-cpp")
     set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "")
     set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "")
@@ -80,7 +80,10 @@ if (BUILD_STATIC_LIBS)
         https://github.com/jbeder/yaml-cpp.git
         yaml-cpp-0.9.0
     )
+endif()
 
+
+if (USE_BUNDLED_ENET)
     message("Using bundled enet")
     smw_declare_gitrepo(
         enet
@@ -88,6 +91,7 @@ if (BUILD_STATIC_LIBS)
         493c1b826b212a2d442c57b384cfe3101cfff3b7
     )
 endif()
+
 
 if (USE_BUNDLED_ZLIB)
     message("Using bundled zlib")

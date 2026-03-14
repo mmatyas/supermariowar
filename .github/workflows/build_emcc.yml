@@ -23,5 +23,12 @@ jobs:
         run: |
           source /tmp/emsdk/emsdk_env.sh
           emcc -v
-          emcmake cmake -B build -G Ninja -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
+          emcmake cmake \
+            -B build \
+            -G Ninja \
+            -DNO_NETWORK=1 \
+            -DDISABLE_SYSLIB_CHECKS=1 \
+            -DUSE_SDL2_LIBS=1 \
+            -DUSE_BUNDLED_ENET=ON \
+            -DUSE_BUNDLED_YAMLCPP=ON
           cmake --build build --target smw

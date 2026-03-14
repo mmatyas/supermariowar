@@ -2,6 +2,16 @@ name: Build - Windows
 on:
   workflow_call:
 
+env:
+  COMMON_CMAKE_ARGS: >
+    -B build
+    -G Ninja
+    -DCMAKE_BUILD_TYPE=Release
+    -DUSE_BUNDLED_ENET=ON
+    -DUSE_BUNDLED_YAMLCPP=ON
+    -DUSE_BUNDLED_ZLIB=ON
+    -DSMW_INSTALL_PORTABLE=ON
+
 jobs:
   mingw-cross:
     name: MinGW
@@ -20,15 +30,10 @@ jobs:
           cmake --version
 
       - name: Configure
-        run: cmake
-          -B build
-          -G Ninja
+        run: cmake $COMMON_CMAKE_ARGS
           -DCMAKE_TOOLCHAIN_FILE=../.github/workflows/mingw_toolchain.cmake
-          -DUSE_PNG_SAVE=ON
-          -DUSE_SDL2_LIBS=ON
           -DBUILD_TESTS=OFF
           -DSDL2_USE_MIXERX=ON
-          -DCMAKE_CXX_FLAGS=-fdiagnostics-color=always
       - name: Build
         run: cmake --build build --verbose
 
@@ -66,12 +71,8 @@ jobs:
           curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.8.1-VC.zip | tar -x --strip-components=1 -C libs
 
       - name: Configure
-        run: cmake
-          -B build
-          -G Ninja
-          -DCMAKE_BUILD_TYPE=Release
-          -DUSE_BUNDLED_ZLIB=ON
-          -DSMW_INSTALL_PORTABLE=ON
+        shell: bash
+        run: cmake $COMMON_CMAKE_ARGS
           -DCMAKE_PREFIX_PATH=libs
           -DCMAKE_C_COMPILER_LAUNCHER=sccache
           -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
