@@ -10,6 +10,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
+
       - name: Install Emscripten
         working-directory: /tmp
         run: |
@@ -17,15 +18,10 @@ jobs:
           cd emsdk
           ./emsdk install 5.0.2
           ./emsdk activate 5.0.2
-      - name: Download SDL mixer
-        working-directory: dependencies
-        run: curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.4.tar.gz | tar xzf -
 
       - name: Build
         run: |
           source /tmp/emsdk/emsdk_env.sh
           emcc -v
-          sed -i 's|if (BUILD_STATIC_LIBS)|if (BUILD_STATIC_LIBS)\ninclude_directories(dependencies/SDL2_mixer-2.0.4)|' CMakeLists.txt
-          mkdir build_js && cd build_js
-          emcmake cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
-          emmake make smw
+          emcmake cmake -B build -G Ninja -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
+          cmake --build build --target smw
