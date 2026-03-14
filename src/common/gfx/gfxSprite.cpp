@@ -61,6 +61,10 @@ SdlSurfacePtr loadImage(
     }
 
     if (alpha) {
+        if (SDL_SetSurfaceBlendMode(img.get(), SDL_BLENDMODE_BLEND) < 0) {
+            std::cout << "\nERROR: Couldn't set blend mode for " << path << ": " << SDL_GetError() << std::endl;
+            return {};
+        }
         if (SDL_SetSurfaceAlphaMod(img.get(), *alpha) < 0) {
             std::cout << "\nERROR: Couldn't set alpha modulation for " << path << ": " << SDL_GetError() << std::endl;
             return {};
