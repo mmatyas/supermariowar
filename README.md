@@ -82,35 +82,30 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 
 ### Requirements
 
-- C++11 supporting compiler (eg. gcc-4.8)
-- CMake (>= 2.6)
-- SDL (1.2 or 2.0), with
+- C++20 supporting compiler
+- CMake
+- SDL 2, with
     - SDL_image
     - SDL_mixer
 - zlib
-- yaml-cpp (included)
-- ENet (optional, included)
+- yaml-cpp
+- ENet (optional)
 
-You can use package managers for getting these dependencies:
+If you're using package managers, you can get them like this:
 
-- Debian-based: `apt-get install cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev zlib1g-dev`
-- Fedora/RPM: `yum install cmake SDL-devel SDL_image-devel SDL_mixer-devel zlib-devel`
-- Arch: `pacman -S cmake sdl sdl_image sdl_mixer zlib`
-- MSYS2: `pacman -S mingw-w64-x86_64-SDL mingw-w64-x86_64-SDL_image mingw-w64-x86_64-SDL_mixer mingw-w64-x86_64-zlib`
+- Debian-based: `apt install cmake libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev zlib1g-dev libyaml-cpp-dev libenet-dev`
+- Fedora/RPM: `yum install cmake SDL2-devel SDL2_image-devel SDL2_mixer-devel zlib-devel yaml-cpp-devel enet-devel`
+- Arch: `pacman -S cmake sdl2 sdl2_image sdl2_mixer zlib yaml-cpp enet`
 
-For other systems, you can download the development files manually from:
-
-- http://www.cmake.org/cmake/resources/software.html#latest
-- http://www.libsdl.org/download-1.2.php
-- http://www.libsdl.org/projects/SDL_image/release-1.2.html
-- http://www.libsdl.org/projects/SDL_mixer/release-1.2.html
-- http://zlib.net
+For all dependencies, you can choose to use a bundled version of them. This is useful if the dependencies are not available for your OS, are outdated, or you simply don't want to install them on your system. In this case, you can tell CMake to download and build the library along with the game come. Please see the [Build configuration](#build-configuration) for enabling this feature.
 
 ### Get the code
 
-This repository contains some submodules which you can use if the dependencies are not available for your OS, are outdated or you simply don't want to install them on your system. To use the included libraries, do a recursive cloning:
+The game assets are included as a Git submodule, so you'll likely want to do a recursive clone:
 
-`git clone --recursive https://github.com/mmatyas/supermariowar.git`
+```sh
+git clone --recursive https://github.com/mmatyas/supermariowar.git
+```
 
 Alternatively, you can also initialize the submodules manually:
 
@@ -186,12 +181,20 @@ You should be able to port SMW to any device where SDL (either 1.2 or 2.0) works
 
 ### Build configuration
 
-*TODO: expand this section*
-
 You can change the build configuration by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the `Build` directory. You can read a short description of an element by hovering the mouse on its name too.
 
-Alternatively, you can pass these options directly to CMake as `-DFLAGNAME=VALUE` (eg. `cmake .. -DUSE_SDL2_LIBS=1`).
+Alternatively, you can pass these options directly to CMake as `-DFLAGNAME=VALUE` (eg. `cmake .. -DUSE_BUNDLED_SDL=ON`).
 
+For using the bundled libraries, you can set the following parameters:
+
+Parameter           | Description
+--------------------|------------
+USE_BUNDLED_SDL     | If ON, downloads and builds SDL, otherwise uses the system library
+USE_BUNDLED_ZLIB    | If ON, downloads and builds ZLIB, otherwise uses the system library
+USE_BUNDLED_ENET    | If ON, downloads and builds ENet, otherwise uses the system library
+USE_BUNDLED_YAMLCPP | If ON, downloads and builds yaml-cpp, otherwise uses the system library
+
+*TODO: expand this section*
 
 ## How to play
 
