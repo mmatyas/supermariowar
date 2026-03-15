@@ -2107,7 +2107,6 @@ void GameplayState::handleInput()
                 } else if (event.key.keysym.sym == SDLK_RETURN) {
                     game_values.fullscreen = !game_values.fullscreen;
                     gfx_changefullscreen(game_values.fullscreen);
-                    blitdest = screen;
 
                     //Continue with input -> don't feed this event to the input
                     //otherwise it will pause the game when switching to full/windowed screen

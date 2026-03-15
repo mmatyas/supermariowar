@@ -194,7 +194,6 @@ void SplashScreenState::update()
                 if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                     game_values.fullscreen = !game_values.fullscreen;
                     gfx_changefullscreen(game_values.fullscreen);
-                    blitdest = screen;
                 }
                 break;
 
@@ -233,10 +232,7 @@ void SplashScreenState::update()
             //}
             //else
             {
-                blitdest = rm->menu_backdrop.getSurface();
                 rm->menu_shade.setalpha(App::menuTransparency);
-                rm->menu_shade.draw(0, 0);
-                blitdest = screen;
 
                 g_fLoadMessages = false;
                 eyecandy[2].clean();

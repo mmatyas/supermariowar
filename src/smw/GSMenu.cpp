@@ -420,9 +420,7 @@ void MenuState::update()
                 } //ALT + Enter = fullscreen/windowed toggle
                 else if (event.key.keysym.sym == SDLK_RETURN) {
                     game_values.fullscreen = !game_values.fullscreen;
-					gfx_changefullscreen(game_values.fullscreen);
-                    blitdest = screen;
-
+                    gfx_changefullscreen(game_values.fullscreen);
                     continue;
                 }
             }
@@ -633,8 +631,7 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
         }
         else if (MENU_CODE_TOGGLE_FULLSCREEN == code) {
-			gfx_changefullscreen(game_values.fullscreen);
-            blitdest = screen;
+            gfx_changefullscreen(game_values.fullscreen);
         }
         else if (MENU_CODE_TO_GAME_SETUP_MENU == code) {
             printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
@@ -977,11 +974,7 @@ void MenuState::update()
         } else if (MENU_CODE_MENU_GRAPHICS_PACK_CHANGED == code) {
             LoadStartGraphics();
             rm->LoadMenuGraphics();
-
-            blitdest = rm->menu_backdrop.getSurface();
             rm->menu_shade.setalpha(App::menuTransparency);
-            rm->menu_shade.draw(0, 0);
-            blitdest = screen;
         } else if (MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED == code) {
             rm->LoadWorldGraphics();
         } else if (MENU_CODE_GAME_GRAPHICS_PACK_CHANGED == code) {
@@ -1245,10 +1238,12 @@ void MenuState::update()
     //--------------- draw everything ----------------------
 
     //Don't draw backdrop for world
-    if (mCurrentMenu != mWorldMenu.get())
+    if (mCurrentMenu != mWorldMenu.get()) {
         rm->menu_backdrop.draw(0, 0);
-    else
-        SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+        rm->menu_shade.draw(0, 0);
+    } else {
+        SDL_FillRect(screen, NULL, 0x0);
+    }
 
     mCurrentMenu->Update();
     mCurrentMenu->Draw();

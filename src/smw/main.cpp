@@ -353,7 +353,7 @@ void main_game()
     ensureSettingsDir();
     create_globals();
 
-	gfx_init(App::screenWidth, App::screenHeight, false);		//initialize the graphics (SDL)
+    gfx_init(App::screenWidth, App::screenHeight, false);		//initialize the graphics (SDL)
     blitdest = screen;
 
 #if	0
@@ -399,7 +399,6 @@ void main_game()
 
     if (game_values.fullscreen) {
         gfx_changefullscreen(true);
-        blitdest = screen;
     }
 
     init_spawnlocations();
