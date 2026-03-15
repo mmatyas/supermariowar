@@ -1,6 +1,5 @@
 name: Build - Windows
-on:
-  workflow_call:
+on: workflow_call
 
 env:
   COMMON_CMAKE_ARGS: >
@@ -15,7 +14,6 @@ env:
 jobs:
   mingw-cross:
     name: MinGW
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +52,6 @@ jobs:
 
   msvc:
     name: MSVC
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: windows-latest
     env:
       SCCACHE_GHA_ENABLED: "true"

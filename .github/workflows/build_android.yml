@@ -1,6 +1,5 @@
 name: Build - Android
-on:
-  workflow_call:
+on: workflow_call
 
 jobs:
   android:
