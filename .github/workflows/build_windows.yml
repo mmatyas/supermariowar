@@ -16,7 +16,7 @@ jobs:
     name: MinGW
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: 'recursive'
       - name: Install dependencies
@@ -45,7 +45,7 @@ jobs:
           zip -9 -r "supermariowar_$(date +%F)_windows.zip" supermariowar
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: supermariowar_windows
           path: supermariowar_*_windows.zip
@@ -56,7 +56,7 @@ jobs:
     env:
       SCCACHE_GHA_ENABLED: "true"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: mozilla/sccache-action@v0.0.9
 
