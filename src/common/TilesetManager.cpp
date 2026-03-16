@@ -2,6 +2,7 @@
 
 #include "FileIO.h"
 #include "path.h"
+#include "util/ContainerHelpers.h"
 
 #include <algorithm>
 #include <cassert>
@@ -183,6 +184,10 @@ void CTilesetManager::init(const std::string& gfxPack)
             m_tilesetlist.emplace_back(std::move(tileset));
         }
     }
+
+    utils::sort(m_tilesetlist, [](const auto& a, const auto& b) {
+        return a->name() < b->name();
+    });
 
     initTilesetRects();
 }
