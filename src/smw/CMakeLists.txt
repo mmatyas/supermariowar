@@ -73,6 +73,10 @@ endif()
 
 target_link_libraries(smw yaml-cpp::yaml-cpp)
 
+if (TARGET SDL2::SDL2main)
+    target_link_libraries(smw SDL2::SDL2main)
+endif()
+
 #
 # Installation
 #

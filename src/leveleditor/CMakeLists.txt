@@ -10,6 +10,10 @@ endif()
 
 target_link_libraries(smw-leveledit CommonFiles)
 
+if (TARGET SDL2::SDL2main)
+    target_link_libraries(smw-leveledit SDL2::SDL2main)
+endif()
+
 #
 # Installation
 #
