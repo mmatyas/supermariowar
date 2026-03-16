@@ -14,6 +14,7 @@ jobs:
       - name: Configure
         run: cmake
           -B build
+          -G Ninja
           -DUSE_BUNDLED_ENET=ON
           -DUSE_BUNDLED_YAMLCPP=ON
           -DSMW_INSTALL_PORTABLE=ON
