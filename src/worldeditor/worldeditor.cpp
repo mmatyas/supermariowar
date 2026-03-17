@@ -20,6 +20,7 @@
 #include "FileIO.h"
 #include "FileList.h"
 #include "GameMode.h"
+#include "GameSystems.h"
 #include "GameValues.h"
 #include "map.h"
 #include "MapList.h"
@@ -466,7 +467,7 @@ int main(int argc, char *argv[])
         }
     }
 
-	gfx_init(640,480, g_fFullScreen);
+    Systems systems(g_fFullScreen);
 	blitdest = screen;
 
         rm = new CResourceManager();
@@ -484,7 +485,7 @@ int main(int argc, char *argv[])
 
 	char title[128];
 	sprintf(title, "%s %s", TITLESTRING, MAPTITLESTRING);
-	gfx_settitle(title);
+	systems.gfx.setTitle(title);
 
 	game_values.toplayer = true;
 
@@ -1107,7 +1108,7 @@ int editor_edit()
                     if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                         if (event.key.keysym.sym == SDLK_RETURN) {
 								g_fFullScreen = !g_fFullScreen;
-								gfx_changefullscreen(g_fFullScreen);
+								Graphics::get().changeFullScreen(g_fFullScreen);
 								blitdest = screen;
 							}
 						}
@@ -1855,7 +1856,7 @@ int editor_edit()
 			DrawMessage();
 		}
 
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2499,7 +2500,7 @@ int editor_warp()
                 rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2627,7 +2628,7 @@ int editor_start_items()
         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2699,7 +2700,7 @@ int editor_boundary()
                 rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2773,7 +2774,7 @@ int editor_type()
         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2837,7 +2838,7 @@ int editor_water()
 			rm->spr_worldbackground[0].draw(iWater << 5, 0, {512 + (iWater << 7), 0, 32, 32});
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -2926,7 +2927,7 @@ int editor_background()
 		rm->spr_worldbackground[0].draw(0, 0, {iPage * 640, 32, 640, 480});
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3004,7 +3005,7 @@ int editor_stageforeground()
 		rm->spr_worldforegroundspecial[0].draw(0, 0, {0, 0, 320, 320});
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3069,7 +3070,7 @@ int editor_bridges()
 		rm->spr_worldforegroundspecial[0].draw(0, 0, {320, 224, 128, 32});
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3141,7 +3142,7 @@ int editor_structureforeground()
 		rm->spr_worldforeground[0].draw(416, 0, {512, 0, 32, 480});
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3205,7 +3206,7 @@ int editor_pathsprite()
 		}
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3327,7 +3328,7 @@ int editor_vehicles()
         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -3387,7 +3388,7 @@ int editor_path()
 		spr_path.draw(0, 0, {0, 0, 480, 32});
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -4257,7 +4258,7 @@ int editor_stage()
         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
 		DrawMessage();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
 		if (delay < 0)
@@ -4375,7 +4376,7 @@ int display_help()
 	offsety += rm->menu_font_small.getHeight() + 2;
 	rm->menu_font_small.draw(offsetx, offsety, "[space] - Toggle Stage Previews");
 
-	gfx_flipscreen();
+	Graphics::get().flipScreen();
 
     while (true) {
 		int framestart = SDL_GetTicks();
@@ -4434,7 +4435,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
     rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
-	gfx_flipscreen();
+	Graphics::get().flipScreen();
 
     while (true) {
 		int framestart = SDL_GetTicks();
@@ -4463,7 +4464,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
                         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
-							gfx_flipscreen();
+							Graphics::get().flipScreen();
 
 							currentChar--;
 						}
@@ -4515,7 +4516,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
                         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
-							gfx_flipscreen();
+							Graphics::get().flipScreen();
 						}
 					}
 				break;

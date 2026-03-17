@@ -2,12 +2,15 @@
 
 #include "SDL.h"
 
+#include <cassert>
 
-class GraphicsSDL {
+
+class Graphics {
 public:
-    ~GraphicsSDL();
-
-    bool init(bool fullscreen);
+    static Graphics& get() {
+        assert(s_instance);
+        return *s_instance;
+    }
 
     void flipScreen() const;
     void changeFullScreen(bool fullcreen) const;
@@ -16,6 +19,11 @@ public:
     void takeScreenshot() const;
 
 private:
+    friend struct Systems;
+    Graphics(bool fullscreen);
+    ~Graphics();
+    inline static Graphics* s_instance = nullptr;
+
     // surface -> texture -> renderer -> window
     SDL_Window* sdl_window = nullptr;
     SDL_Renderer* sdl_renderer = nullptr;

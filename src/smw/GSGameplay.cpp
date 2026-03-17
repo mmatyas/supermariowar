@@ -2106,7 +2106,7 @@ void GameplayState::handleInput()
                     return;
                 } else if (event.key.keysym.sym == SDLK_RETURN) {
                     game_values.fullscreen = !game_values.fullscreen;
-                    gfx_changefullscreen(game_values.fullscreen);
+                    Graphics::get().changeFullScreen(game_values.fullscreen);
                     blitdest = screen;
 
                     //Continue with input -> don't feed this event to the input
@@ -2121,7 +2121,7 @@ void GameplayState::handleInput()
             } else if (event.key.keysym.sym == SDLK_TAB) {
                 PlayNextMusicTrack();
             } else if (event.key.keysym.sym == SDLK_INSERT) {
-                gfx_take_screenshot();
+                Graphics::get().takeScreenshot();
             }
 #ifdef _DEBUG
             else if (event.key.keysym.sym == SDLK_LEFTBRACKET) {

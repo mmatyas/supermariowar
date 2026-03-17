@@ -15,6 +15,7 @@ add_library(CommonFiles STATIC
     GameModeSettings.h
     GameValues.cpp
     GameValues.h
+    GameSystems.h
     gfx.cpp
     gfx.h
     gfx/Color.h

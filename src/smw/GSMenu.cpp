@@ -418,7 +418,7 @@ void MenuState::update()
                 } //ALT + Enter = fullscreen/windowed toggle
                 else if (event.key.keysym.sym == SDLK_RETURN) {
                     game_values.fullscreen = !game_values.fullscreen;
-					gfx_changefullscreen(game_values.fullscreen);
+                    Graphics::get().changeFullScreen(game_values.fullscreen);
                     blitdest = screen;
 
                     continue;
@@ -426,7 +426,7 @@ void MenuState::update()
             }
 
             if (event.key.keysym.sym == SDLK_INSERT) {
-                gfx_take_screenshot();
+                Graphics::get().takeScreenshot();
             }
 #ifdef _DEBUG
             //Pressing insert in debug mode turns on automated testing
@@ -631,7 +631,7 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
         }
         else if (MENU_CODE_TOGGLE_FULLSCREEN == code) {
-			gfx_changefullscreen(game_values.fullscreen);
+            Graphics::get().changeFullScreen(game_values.fullscreen);
             blitdest = screen;
         }
         else if (MENU_CODE_TO_GAME_SETUP_MENU == code) {

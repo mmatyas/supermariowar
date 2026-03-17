@@ -130,18 +130,9 @@ SDL_Texture* createScreenTexture(SDL_Renderer* renderer)
 } // namespace
 
 
-GraphicsSDL::~GraphicsSDL()
+Graphics::Graphics(bool fullscreen)
 {
-    SDL_DestroyTexture(sdl_screen_texture);
-    SDL_FreeSurface(sdl_screen_surface);
-    SDL_DestroyRenderer(sdl_renderer);
-    SDL_DestroyWindow(sdl_window);
-
-    quitSdl();
-}
-
-bool GraphicsSDL::init(bool fullscreen)
-{
+    s_instance = this;
     initSdl();
 
     sdl_window = createWindow(fullscreen);
@@ -155,20 +146,31 @@ bool GraphicsSDL::init(bool fullscreen)
         sdl_screen_surface->format->BitsPerPixel);
 
     screen = sdl_screen_surface;
-    return true;
 }
 
-void GraphicsSDL::showErrorBox(const char* message) const
+Graphics::~Graphics()
+{
+    SDL_DestroyTexture(sdl_screen_texture);
+    SDL_FreeSurface(sdl_screen_surface);
+    SDL_DestroyRenderer(sdl_renderer);
+    SDL_DestroyWindow(sdl_window);
+
+    quitSdl();
+
+    s_instance = nullptr;
+}
+
+void Graphics::showErrorBox(const char* message) const
 {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message, sdl_window);
 }
 
-void GraphicsSDL::setTitle(const char* title) const
+void Graphics::setTitle(const char* title) const
 {
     SDL_SetWindowTitle(sdl_window, title);
 }
 
-void GraphicsSDL::flipScreen() const
+void Graphics::flipScreen() const
 {
     SDL_UpdateTexture(sdl_screen_texture, nullptr, sdl_screen_surface->pixels, sdl_screen_surface->pitch);
     SDL_RenderClear(sdl_renderer);
@@ -176,7 +178,7 @@ void GraphicsSDL::flipScreen() const
     SDL_RenderPresent(sdl_renderer);
 }
 
-void GraphicsSDL::changeFullScreen(bool fullscreen) const
+void Graphics::changeFullScreen(bool fullscreen) const
 {
     Uint32 flags = SDL_GetWindowFlags(sdl_window);
     if (fullscreen) {
@@ -191,7 +193,7 @@ void GraphicsSDL::changeFullScreen(bool fullscreen) const
     }
 }
 
-void GraphicsSDL::takeScreenshot() const
+void Graphics::takeScreenshot() const
 {
     using std::chrono::system_clock;
 
