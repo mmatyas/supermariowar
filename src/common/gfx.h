@@ -25,6 +25,7 @@
 #include "gfx/Color.h"
 #include "gfx/gfxSprite.h"
 #include "gfx/gfxFont.h"
+#include "gfx/gfxSDL.h"
 
 #include "SDL.h"
 #include <filesystem>
@@ -33,14 +34,6 @@
 using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
 
 
-bool gfx_init(int w, int h, bool fullscreen);
-void gfx_changefullscreen(bool fullscreen);
-void gfx_flipscreen();
-void gfx_settitle(const char*);
-void gfx_show_error(const char*);
-void gfx_take_screenshot();
-
-void gfx_close();
 bool gfx_loadpalette(const std::filesystem::path& palette_path);
 
 void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h);

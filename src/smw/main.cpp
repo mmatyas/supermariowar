@@ -17,6 +17,7 @@
 #include "CmdArgs.h"
 #include "FileList.h"
 #include "GameMode.h"
+#include "GameSystems.h"
 #include "GameValues.h"
 #include "map.h"
 #include "MapList.h"
@@ -155,7 +156,7 @@ void gameloop_frame()
         GameStateManager::instance().currentState->update();
 
         FPSLimiter::instance().beforeFlip();
-        gfx_flipscreen();
+        Graphics::get().flipScreen();
         FPSLimiter::instance().afterFlip();
     }
 
@@ -304,7 +305,7 @@ void show_catched_error(const std::string& error)
     }
 
     fprintf(stderr, "\n%s\n", message.c_str());
-    gfx_show_error(message.c_str());
+    Graphics::get().showErrorBox(message.c_str());
 }
 
 int main(int argc, char *argv[])
@@ -357,7 +358,7 @@ void main_game()
     ensureSettingsDir();
     create_globals();
 
-	gfx_init(App::screenWidth, App::screenHeight, false);		//initialize the graphics (SDL)
+    Systems systems(false);
     blitdest = screen;
 
 #if	0
@@ -382,7 +383,7 @@ void main_game()
     //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
     char title[128];
     sprintf(title, "%s %s %s", TITLESTRING, GIT_REVISION, GIT_DATE);
-    gfx_settitle(title);
+    systems.gfx.setTitle(title);
     SDL_ShowCursor(SDL_DISABLE);
 
     printf("\n---------------- loading ----------------\n");
@@ -402,7 +403,7 @@ void main_game()
     }
 
     if (game_values.fullscreen) {
-        gfx_changefullscreen(true);
+        systems.gfx.changeFullScreen(true);
         blitdest = screen;
     }
 
@@ -443,7 +444,6 @@ void main_game()
         delete gamemodes[i];
 
     sfx_close();
-    gfx_close();
     net_close();
 
     //Delete player skins

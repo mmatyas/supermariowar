@@ -23,7 +23,6 @@ extern SDL_Surface * screen;
 extern short x_shake;
 extern short y_shake;
 
-GraphicsSDL gfx;
 gfxPalette gfx_palette;
 
 
@@ -183,31 +182,6 @@ RGB getRgb(SDL_Surface* surf, int x, int y)
 }
 
 
-bool gfx_init(int w, int h, bool fullscreen) {
-    return gfx.init(fullscreen);
-}
-
-void gfx_changefullscreen(bool fullscreen) {
-    gfx.changeFullScreen(fullscreen);
-}
-
-void gfx_flipscreen() {
-    gfx.flipScreen();
-}
-
-void gfx_settitle(const char* title) {
-    gfx.setTitle(title);
-}
-
-void gfx_show_error(const char* message) {
-    gfx.showErrorBox(message);
-}
-
-void gfx_take_screenshot() {
-    gfx.takeScreenshot();
-}
-
-void gfx_close() {}
 bool gfx_loadpalette(const std::filesystem::path& palette_path) {
     return gfx_palette.load(palette_path);
 }

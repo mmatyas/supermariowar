@@ -36,6 +36,7 @@
 #include "sfx.h"
 #include "TilesetManager.h"
 #include "GameValues.h"
+#include "GameSystems.h"
 
 // Included only for movingplatform
 // TODO: Remove and fix linker errors
@@ -407,7 +408,7 @@ int main(int argc, char *argv[])
         }
     }
 
-	gfx_init(640,480, g_fFullScreen);
+    Systems systems(g_fFullScreen);
 	blitdest = screen;
         g_tilesetmanager->init(convertPath("gfx/Classic/tilesets").c_str());
 
@@ -415,7 +416,7 @@ int main(int argc, char *argv[])
 	maplist->addWorldMaps();
 	char title[128];
 	sprintf(title, "%s %s", TITLESTRING, MAPTITLESTRING);
-	gfx_settitle(title);
+	systems.gfx.setTitle(title);
 
 	printf("\n---------------- loading graphics ----------------\n");
 
@@ -652,7 +653,7 @@ void gameloop_frame()
 		}
 
         FPSLimiter::instance().beforeFlip();
-        gfx_flipscreen();
+        Graphics::get().flipScreen();
         FPSLimiter::instance().afterFlip();
 
 #ifndef __EMSCRIPTEN__
@@ -854,7 +855,7 @@ int editor_edit()
                     if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                         if (event.key.keysym.sym == SDLK_RETURN) {
 								g_fFullScreen = !g_fFullScreen;
-								gfx_changefullscreen(g_fFullScreen);
+								Graphics::get().changeFullScreen(g_fFullScreen);
 								blitdest = screen;
 							}
 						}
@@ -2159,7 +2160,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 
 		DrawMessage();
 		FPSLimiter::instance().beforeFlip();
-		gfx_flipscreen();
+		Graphics::get().flipScreen();
 		FPSLimiter::instance().afterFlip();
 	}
 }
@@ -2355,7 +2356,7 @@ int editor_platforms()
 							FPSLimiter::instance().frameStart();
 							while (editor_tiles() == EDITOR_TILES) {
 								FPSLimiter::instance().beforeFlip();
-								gfx_flipscreen();
+								Graphics::get().flipScreen();
 								FPSLimiter::instance().afterFlip();
 								FPSLimiter::instance().frameStart();
 							}
@@ -2368,7 +2369,7 @@ int editor_platforms()
 							FPSLimiter::instance().frameStart();
 							while (editor_animation() == EDITOR_ANIMATION) {
 								FPSLimiter::instance().beforeFlip();
-								gfx_flipscreen();
+								Graphics::get().flipScreen();
 								FPSLimiter::instance().afterFlip();
 								FPSLimiter::instance().frameStart();
 							}
@@ -2379,7 +2380,7 @@ int editor_platforms()
 							FPSLimiter::instance().frameStart();
 							while (editor_tiletype() == EDITOR_TILETYPE) {
 								FPSLimiter::instance().beforeFlip();
-								gfx_flipscreen();
+								Graphics::get().flipScreen();
 								FPSLimiter::instance().afterFlip();
 								FPSLimiter::instance().frameStart();
 							}
@@ -4582,7 +4583,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
 	rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
-	gfx_flipscreen();
+	Graphics::get().flipScreen();
 
     while (true) {
 		int framestart = SDL_GetTicks();
@@ -4611,7 +4612,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
 							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
-							gfx_flipscreen();
+							Graphics::get().flipScreen();
 
 							currentChar--;
 						}
@@ -4663,7 +4664,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
 							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
-							gfx_flipscreen();
+							Graphics::get().flipScreen();
 						}
 					}
 				break;

@@ -125,7 +125,7 @@ void SplashScreenState::update()
             case SDLK_RETURN:
                 if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                     game_values.fullscreen = !game_values.fullscreen;
-                    gfx_changefullscreen(game_values.fullscreen);
+                    Graphics::get().changeFullScreen(game_values.fullscreen);
                     blitdest = screen;
                 }
                 break;
@@ -138,7 +138,7 @@ void SplashScreenState::update()
                 break;
 
             case SDLK_INSERT:
-                gfx_take_screenshot();
+                Graphics::get().takeScreenshot();
                 break;
 
             default:
