@@ -47,7 +47,7 @@ if (USE_BUNDLED_SDL)
     set(SDL2IMAGE_XV OFF CACHE BOOL "")
     smw_declare_gitrepo(
         SDL2_image
-        https://github.com/libsdl-org/SDL_image
+        https://github.com/libsdl-org/SDL_image.git
         release-2.8.8
     )
 
@@ -65,7 +65,7 @@ if (USE_BUNDLED_SDL)
     set(SDL2MIXER_WAVPACK OFF CACHE BOOL "")
     smw_declare_gitrepo(
         SDL2_mixer
-        https://github.com/libsdl-org/SDL_mixer
+        https://github.com/libsdl-org/SDL_mixer.git
         release-2.8.1
     )
 endif()
