@@ -56,9 +56,9 @@ CTileset::CTileset(const std::string& dir)
     : m_name(getFilenameFromPath(dir))
     , m_tilesetPath(dir + "/tileset.tls")
 {
-    gfx_loadimage(m_sprites[0], dir + "/large.png", false);
-    gfx_loadimage(m_sprites[1], dir + "/medium.png", false);
-    gfx_loadimage(m_sprites[2], dir + "/small.png", false);
+    m_sprites[0] = SpriteBuilder(dir + "/large.png").create();
+    m_sprites[1] = SpriteBuilder(dir + "/medium.png").create();
+    m_sprites[2] = SpriteBuilder(dir + "/small.png").create();
 
     m_width = std::min(m_sprites[0].getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
     m_height = std::min(m_sprites[0].getHeight() / TILESIZE, MAX_TILES_PER_AXIS);

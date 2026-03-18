@@ -973,20 +973,20 @@ void MenuState::update()
                 }
             }
         } else if (MENU_CODE_MENU_GRAPHICS_PACK_CHANGED == code) {
-            rm->LoadMenuGraphics();
+            rm->loadMenuGraphics();
 
             blitdest = rm->menu_backdrop.getSurface();
             rm->menu_shade.setalpha(App::menuTransparency);
             rm->menu_shade.draw(0, 0);
             blitdest = screen;
         } else if (MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED == code) {
-            rm->LoadWorldGraphics();
+            rm->loadWorldGraphics();
         } else if (MENU_CODE_GAME_GRAPHICS_PACK_CHANGED == code) {
             const bool pngPalette = gfx_loadpalette(convertPath("gfx/packs/palette.png", gamegraphicspacklist->currentPath()));
             if (!pngPalette) {
                 gfx_loadpalette(convertPath("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
             }
-            rm->LoadGameGraphics();
+            rm->loadGameGraphics();
         } else if (MENU_CODE_SOUND_PACK_CHANGED == code) {
             rm->LoadGameSounds();
 

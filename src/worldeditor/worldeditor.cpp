@@ -584,7 +584,7 @@ int main(int argc, char *argv[])
 	rm->spr_hazard_pirhanaplant[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), colors::MAGENTA);
 	rm->spr_hazard_pirhanaplant[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), colors::MAGENTA);
 
-	rm->LoadMenuGraphics();
+	rm->loadMenuGraphics();
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 

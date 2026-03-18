@@ -19,16 +19,16 @@ public:
 
 	bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 	bool LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections);
-	void LoadAllGraphics();
-	bool LoadMenuGraphics();
-	bool LoadGameGraphics();
-	bool LoadWorldGraphics();
+	void loadAllGraphics();
+	void loadMenuGraphics();
+	void loadGameGraphics();
+	void loadWorldGraphics();
 	void loadStartGraphics();
 
 	bool LoadGameSounds();
 
 private:
-	void LoadAllSprites();
+	void loadAllSprites();
 
 public:
 

@@ -91,7 +91,7 @@ bool SplashScreenState::init()
 //  gfx_loadimagenocolorkey(&rm->menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
 
     menu_credits = new gfxSprite();
-    gfx_loadimage(*menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->currentPath()), false);
+    *menu_credits = SpriteBuilder(convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->currentPath())).create();
 
 //	const char * contributors[] = {
 //	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",
@@ -321,7 +321,7 @@ void SplashScreenState::update()
         // load initial coin sound
         rm->backgroundmusic[2].load(musiclist->music(1).string());
 
-        rm->LoadAllGraphics();
+        rm->loadAllGraphics();
         rm->LoadGameSounds();
 
         if (!game_values.soundcapable) {
