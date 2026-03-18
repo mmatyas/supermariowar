@@ -980,7 +980,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                         if (player->ownerPlayerID > -1)
                             rm->spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
 
-                        player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
+                        player->GetScoreboardSprite()->at(iScoreboardSprite).draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
 
                         //Display jail if player is jailed
                         if (player->jail.isActive())
@@ -994,7 +994,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                         if (player->tanookisuit.isOn())
                             rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, App::screenWidth/2, 0, 16, 16);
                     } else {
-                        rm->spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
+                        rm->spr_player[globalID][iScoreboardSprite].draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
                     }
 
                     //give crown to player(s) with most kills

@@ -25,9 +25,12 @@
 #include <filesystem>
 #include <string>
 
+#include "GlobalConstants.h"
 #include "gfx/Color.h"
 #include "gfx/gfxSprite.h"
 #include "gfx/gfxFont.h"
+
+using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
 
 
 bool gfx_init(int w, int h, bool fullscreen);
@@ -44,8 +47,8 @@ void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, shor
 bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHiddenDirection, short iHiddenValue);
 void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, short srcY, short iw, short ih, short clipX, short clipY, short clipW, short clipH, bool wrap, short hiddenDirection = -1, short hiddenPlane = -1);
 
-bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const RGB& colorkey, short colorScheme);
-bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);
+bool gfx_loadfullskin(SpriteStrip& gSprites, const std::string& filename, const RGB& colorkey, short colorScheme);
+bool gfx_loadmenuskin(SpriteStrip& gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);
 
 bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f);
 bool gfx_loadimage(gfxSprite& sprite, const std::string& path, bool fWrap = true);

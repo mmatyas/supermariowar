@@ -177,7 +177,7 @@ WorldPlayer::WorldPlayer(short iCol, short iRow)
 
 void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY) const
 {
-    rm->spr_player[iDrawSprite][iAnimationFrame + iDrawDirection]->draw(pos.x + iMapOffsetX, pos.y + iMapOffsetY, 0, 0, 32, 32);
+    rm->spr_player[iDrawSprite][iAnimationFrame + iDrawDirection].draw(pos.x + iMapOffsetX, pos.y + iMapOffsetY, 0, 0, 32, 32);
 }
 
 void WorldPlayer::SetSprite(short iPlayer)

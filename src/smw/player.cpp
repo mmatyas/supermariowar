@@ -89,7 +89,7 @@ CPlayer * GetPlayerFromGlobalID(short iGlobalID)
 }
 
 CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID,
-    gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)
+    SpriteStrip& nsprites, CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)
     : shyguy(false)
     , globalID(iGlobalID)
     , teamID(iTeamID)
@@ -136,9 +136,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     }
 
     playerDevice = game_values.playerInput.inputControls[globalID]->iDevice;
-
-    for (short i = 0; i < PGFX_LAST; i++)
-        sprites[i] = nsprites[i];
+    sprites = &nsprites;
 
     //Do this so we have a valid x,y to say the player is so other items that init with the player will get valid positions
     //The actual choosing of a spawning position happens later
@@ -655,7 +653,7 @@ void CPlayer::update_waitingForRespawn()
             if (game_values.spawnstyle == SpawnStyle::Instant) {
                 eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8);
             } else if (game_values.spawnstyle == SpawnStyle::Door) {
-                eyecandy[0].emplace<EC_Door>(&rm->spr_spawndoor, sprites[sprite_state], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID);
+                eyecandy[0].emplace<EC_Door>(&rm->spr_spawndoor, &sprites->at(sprite_state), ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID);
             }
         }
     }
@@ -1628,16 +1626,16 @@ void CPlayer::die(PlayerDeathStyle deathStyle, bool fTeamRemoved, bool fKillCarr
     if (state >= PlayerState::Dead) {
         short iDeathSprite = deathStyle == PlayerDeathStyle::Jump ? PGFX_DEADFLYING : PGFX_DEAD;
 
-        gfxSprite * corpseSprite = sprites[iDeathSprite];
+        gfxSprite* corpseSprite = &sprites->at(iDeathSprite);
         auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
 
         //If the player was a bobomb or chicken, make sure their death sprite matches
         if (diedas == 1 || (gmChicken && gmChicken->chicken() == this))
-            corpseSprite = rm->spr_chocobo[colorID][iDeathSprite];
+            corpseSprite = &rm->spr_chocobo[colorID][iDeathSprite];
         else if (diedas == 2 || bobomb)
-            corpseSprite = rm->spr_bobomb[colorID][iDeathSprite];
+            corpseSprite = &rm->spr_bobomb[colorID][iDeathSprite];
         else if (diedas == 3 || shyguy)
-            corpseSprite = rm->spr_shyguy[colorID][iDeathSprite];
+            corpseSprite = &rm->spr_shyguy[colorID][iDeathSprite];
 
         //Add eyecandy for the dead player
         if (deathStyle == PlayerDeathStyle::Shatter || frozen) {
@@ -2031,17 +2029,17 @@ void CPlayer::draw()
     if (tanookisuit.isStatue()) {
         //Make sure the scoreboard still accurately represents the player
         if (bobomb)
-            pScoreboardSprite = rm->spr_bobomb[colorID];
+            pScoreboardSprite = &rm->spr_bobomb[colorID];
         else if (chicken == this)
-            pScoreboardSprite = rm->spr_chocobo[colorID];
+            pScoreboardSprite = &rm->spr_chocobo[colorID];
         else if (shyguy)
-            pScoreboardSprite = rm->spr_shyguy[colorID];
+            pScoreboardSprite = &rm->spr_shyguy[colorID];
 
         tanookisuit.drawStatue(*this);
 
         return;
     } else if (bobomb) { //draw him as bob-omb
-        pScoreboardSprite = rm->spr_bobomb[colorID];
+        pScoreboardSprite = &rm->spr_bobomb[colorID];
 
         //Add smoke to the top of the bomb
         if (++bobombsmoketimer > 2 && (velx != 0.0f || vely != GRAVITATION) && state == PlayerState::Ready) {
@@ -2049,9 +2047,9 @@ void CPlayer::draw()
             eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4);
         }
     } else if (chicken == this) { //draw him as chicken
-        pScoreboardSprite = rm->spr_chocobo[colorID];
+        pScoreboardSprite = &rm->spr_chocobo[colorID];
     } else if (shyguy) { //draw him as chicken
-        pScoreboardSprite = rm->spr_shyguy[colorID];
+        pScoreboardSprite = &rm->spr_shyguy[colorID];
         rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
     }
 
@@ -2081,9 +2079,9 @@ void CPlayer::draw()
     //Don't draw the player if he is frozen in a shoe
     if (!frozen || !kuriboshoe.is_on()) {
         if (iswarping())
-            pScoreboardSprite[sprite_state]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, GetWarpPlane());
+            pScoreboardSprite->at(sprite_state).draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, GetWarpPlane());
         else
-            pScoreboardSprite[sprite_state]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
+            pScoreboardSprite->at(sprite_state).draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
     }
 
     //Draw Kuribo's Shoe

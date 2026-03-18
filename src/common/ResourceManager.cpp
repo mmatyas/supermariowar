@@ -28,12 +28,12 @@ bool CResourceManager::LoadMenuSkin(short playerID, const std::string& filename,
     return gfx_loadmenuskin(spr_player[playerID], filename, colors::MAGENTA, colorID, fLoadBothDirections);
 }
 
-bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, const std::string& filename, short colorID)
+bool CResourceManager::LoadFullSkin(SpriteStrip& sprites, const std::string& filename, short colorID)
 {
     return gfx_loadfullskin(sprites, filename, colors::MAGENTA, colorID);
 }
 
-bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID)
+bool CResourceManager::LoadFullSkin(SpriteStrip& sprites, short skinID, short colorID)
 {
     return LoadFullSkin(sprites, skinlist->at(skinID).path.string(), colorID);
 }
@@ -370,24 +370,12 @@ bool CResourceManager::LoadGameGraphics()
 
 void CResourceManager::LoadAllGraphics()
 {
-
-    short k, j;
-    for (k = 0; k < MAX_PLAYERS; k++) {
-        spr_player[k] = new gfxSprite * [PGFX_LAST];
-        spr_shyguy[k] = new gfxSprite * [PGFX_LAST];
-        spr_chocobo[k] = new gfxSprite * [PGFX_LAST];
-        spr_bobomb[k] = new gfxSprite * [PGFX_LAST];
-
-        for (j = 0; j < PGFX_LAST; j++) {
-            spr_player[k][j] = new gfxSprite();
-            spr_shyguy[k][j] = new gfxSprite();
-            spr_chocobo[k][j] = new gfxSprite();
-            spr_bobomb[k][j] = new gfxSprite();
-
-            spr_player[k][j]->SetWrap(true);
-            spr_shyguy[k][j]->SetWrap(true);
-            spr_chocobo[k][j]->SetWrap(true);
-            spr_bobomb[k][j]->SetWrap(true);
+    for (size_t player = 0; player < MAX_PLAYERS; player++) {
+        for (size_t frame = 0; frame < PGFX_LAST; frame++) {
+            spr_player[player][frame].SetWrap(true);
+            spr_shyguy[player][frame].SetWrap(true);
+            spr_chocobo[player][frame].SetWrap(true);
+            spr_bobomb[player][frame].SetWrap(true);
         }
     }
 

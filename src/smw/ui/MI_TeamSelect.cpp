@@ -78,7 +78,7 @@ void MI_TeamSelect::Draw()
             if (game_values.randomskin[iPlayerID])
                 spr->draw(iTeam * 96 + 43 + m_pos.x, iTeamItem * 36 + 52 + m_pos.y, 416, fReady[iPlayerID] ? 0 : iRandomAnimationFrame, 42, 32);
             else
-                rm->spr_player[iPlayerID][fReady[iPlayerID] ? 0 : iAnimationFrame]->draw(iTeam * 96 + 48 + m_pos.x, iTeamItem * 36 + 52 + m_pos.y, 0, 0, 32, 32);
+                rm->spr_player[iPlayerID][fReady[iPlayerID] ? 0 : iAnimationFrame].draw(iTeam * 96 + 48 + m_pos.x, iTeamItem * 36 + 52 + m_pos.y, 0, 0, 32, 32);
 
             rm->spr_menu_boxed_numbers.draw(iTeam * 96 + 44 + m_pos.x, iTeamItem * 36 + 72 + m_pos.y, iPlayerID * 16, game_values.colorids[iPlayerID] * 16, 16, 16);
         }

@@ -6,12 +6,16 @@
 #include "GlobalConstants.h"
 #include "sfx.h"
 
+#include <array>
 #include <string>
+
+using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
+
 
 class CResourceManager {
 public:
-	bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID);
-	bool LoadFullSkin(gfxSprite ** sprites, const std::string& filename, short colorID);
+	bool LoadFullSkin(SpriteStrip& sprites, short skinID, short colorID);
+	bool LoadFullSkin(SpriteStrip& sprites, const std::string& filename, short colorID);
 
 	bool LoadWorldGraphics();
 	bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
@@ -27,10 +31,11 @@ private:
 
 public:
 
-	gfxSprite		** spr_player[4];	//all player sprites
-	gfxSprite		** spr_shyguy[4];
-	gfxSprite		** spr_chocobo[4];
-	gfxSprite		** spr_bobomb[4];
+	std::array<SpriteStrip, 4> spr_player;	//all player sprites
+	std::array<SpriteStrip, 4> spr_shyguy;
+	std::array<SpriteStrip, 4> spr_chocobo;
+	std::array<SpriteStrip, 4> spr_bobomb;
+
 	gfxSprite		spr_clouds;
 	gfxSprite		spr_ghosts;
 	gfxSprite		spr_fish;

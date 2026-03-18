@@ -448,18 +448,6 @@ void main_game()
 
     //Delete player skins
     for (short k = 0; k < MAX_PLAYERS; k++) {
-        for (short j = 0; j < PGFX_LAST; j++) {
-            delete rm->spr_player[k][j];
-            delete rm->spr_shyguy[k][j];
-            delete rm->spr_chocobo[k][j];
-            delete rm->spr_bobomb[k][j];
-        }
-
-        delete [] rm->spr_player[k];
-        delete [] rm->spr_shyguy[k];
-        delete [] rm->spr_chocobo[k];
-        delete [] rm->spr_bobomb[k];
-
         delete score[k];
     }
 

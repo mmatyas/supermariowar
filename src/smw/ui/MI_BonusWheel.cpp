@@ -264,7 +264,7 @@ void MI_BonusWheel::Reset(bool fTournament)
 
     short iPlayerX = m_pos.x + 160 - ((iNumPlayers - 1) * 17);
     for (short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++) {
-        miPlayerImages[iPlayer] = new MI_Image(rm->spr_player[game_values.teamids[iWinningTeam][iPlayer]][PGFX_JUMPING_R], iPlayerX, m_pos.y + 210, 0, 0, 32, 32, 1, 1, 0);
+        miPlayerImages[iPlayer] = new MI_Image(&rm->spr_player[game_values.teamids[iWinningTeam][iPlayer]][PGFX_JUMPING_R], iPlayerX, m_pos.y + 210, 0, 0, 32, 32, 1, 1, 0);
         iPlayerX += 34;
     }
 

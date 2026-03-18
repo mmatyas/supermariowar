@@ -72,9 +72,9 @@ void MI_NetRoomTeamSelect::Draw() {
 
     // if selected, animate
     if (fSelected)
-        rm->spr_player[owner_player][iAnimationFrame]->draw(x, y, 0, 0, 32, 32);
+        rm->spr_player[owner_player][iAnimationFrame].draw(x, y, 0, 0, 32, 32);
     else
-        rm->spr_player[owner_player][0]->draw(x, y, 0, 0, 32, 32);
+        rm->spr_player[owner_player][0].draw(x, y, 0, 0, 32, 32);
 }
 
 MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {

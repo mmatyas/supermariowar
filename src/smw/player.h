@@ -30,6 +30,8 @@
 
 #include <optional>
 
+using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
+
 namespace NetPkgs {
     struct MapCollision;
     struct P2PCollision;
@@ -82,7 +84,7 @@ class CPlayer
 public:
     CPlayer(short iGlobalID, short iLocalID,
             short iTeamID, short iSubTeamID, short iTeamColorID,
-            gfxSprite * nsprites[PGFX_LAST],
+            SpriteStrip& nsprites,
             CScore *nscore, short * respawnCounter, CPlayerAI * ai);
     ~CPlayer();
 
@@ -152,7 +154,7 @@ public:
     void DeathAwards();
     void AddKillerAward(CPlayer* killed, KillStyle style);
     void AddKillsInRowInAirAward();
-    gfxSprite ** GetScoreboardSprite() { return pScoreboardSprite; }
+    SpriteStrip* GetScoreboardSprite() { return pScoreboardSprite; }
 
     /* Map elements */
 
@@ -287,7 +289,7 @@ private:
 		float fNewSwapX, fNewSwapY; //For moving players around during player swap effect
 		float fOldSwapX, fOldSwapY;
 		short iSrcOffsetX;
-		gfxSprite ** pScoreboardSprite;
+		SpriteStrip* pScoreboardSprite;
 
 		short iNewPowerupX, iNewPowerupY;  //For moving powerups around during player swap effect
 		short iOldPowerupX, iOldPowerupY;
@@ -319,7 +321,7 @@ private:
 
 		CPlayerAI * pPlayerAI;
 
-		gfxSprite *sprites[PGFX_LAST];
+		SpriteStrip* sprites;
 
 		uint8_t sprite_state;
 		short sprswitch;

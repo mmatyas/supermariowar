@@ -312,7 +312,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
         }
 
         for (short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
-            miPlayerImages[iTeam][iPlayer] = new MI_Image(rm->spr_player[iTeamIDs[iTeam][iPlayer]][PGFX_STANDING_R], m_pos.x + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - (fTour ? 40 : 0), iTeamY + 16, 0, 0, 32, 32, 2, 1, 0);
+            miPlayerImages[iTeam][iPlayer] = new MI_Image(&rm->spr_player[iTeamIDs[iTeam][iPlayer]][PGFX_STANDING_R], m_pos.x + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - (fTour ? 40 : 0), iTeamY + 16, 0, 0, 32, 32, 2, 1, 0);
         }
 
         if (fNotTournament)
@@ -369,7 +369,7 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
         for (short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             static short iPlaceSprite[4] = {4, 0, 8, 9};
             miPlayerImages[iTeam][iPlayer]->SetPosition(m_pos.x + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
-            miPlayerImages[iTeam][iPlayer]->SetImageSource(rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
+            miPlayerImages[iTeam][iPlayer]->SetImageSource(&rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
         }
 
         tourScores[iTeam]->SetPosition(m_pos.x + 508, iTeamY + 24);
@@ -453,7 +453,7 @@ void MI_TournamentScoreboard::RefreshTourScores()
         for (short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             static short iPlaceSprite[4] = {4, 0, 8, 9};
             miPlayerImages[iTeam][iPlayer]->SetPosition(m_pos.x + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
-            miPlayerImages[iTeam][iPlayer]->SetImageSource(rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
+            miPlayerImages[iTeam][iPlayer]->SetImageSource(&rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
         }
 
         for (short iGame = 0; iGame < game_values.tourstopcurrent; iGame++) {
