@@ -7,18 +7,19 @@
 #include "sfx.h"
 
 #include <array>
-#include <string>
+#include <filesystem>
 
 using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
 
 
 class CResourceManager {
 public:
-	bool LoadFullSkin(SpriteStrip& sprites, short skinID, short colorID);
-	bool LoadFullSkin(SpriteStrip& sprites, const std::string& filename, short colorID);
+	SpriteStrip LoadFullSkin(short skinID, short colorID);
+	SpriteStrip LoadFullSkin(const std::filesystem::path& path, short colorID);
 
 	bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
-	bool LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections);
+	bool LoadMenuSkin(short playerID, const std::filesystem::path& path, short colorID, bool fLoadBothDirections);
+
 	void loadAllGraphics();
 	void loadMenuGraphics();
 	void loadGameGraphics();

@@ -29,7 +29,6 @@
 #include "SDL.h"
 #include <filesystem>
 #include <optional>
-#include <string>
 
 using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
 
@@ -60,8 +59,8 @@ void gfx_drawpreview(SDL_Surface * surface,
     bool wrap,
     std::optional<std::pair<ClipEdge, int>> clip = std::nullopt);
 
-bool gfx_loadfullskin(SpriteStrip& gSprites, const std::string& filename, const RGB& colorkey, short colorScheme);
-bool gfx_loadmenuskin(SpriteStrip& gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);
+SpriteStrip gfx_loadfullskin(const std::filesystem::path& path, short colorScheme);
+SpriteStrip gfx_loadmenuskin(const std::filesystem::path& path, short colorScheme, bool fLoadBothDirections);
 
 void gfx_setjoystickteamcolor(SDL_Joystick * joystick, short team, float brightness);
 

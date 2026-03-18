@@ -7,7 +7,7 @@
 #include "path.h"
 #include "gfx/Color.h"
 
-#include <filesystem>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -24,22 +24,34 @@ extern CGameValues game_values;
 
 bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
-    return gfx_loadmenuskin(spr_player[playerID], skinlist->at(skinID).path.string(), colors::MAGENTA, colorID, fLoadBothDirections);
+    try {
+        spr_player[playerID] = gfx_loadmenuskin(skinlist->at(skinID).path, colorID, fLoadBothDirections);
+        return true;
+    } catch (const std::string& what) {
+        std::cout << "ERROR: " << what << std::endl;
+        return false;
+    }
 }
 
-bool CResourceManager::LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections)
+bool CResourceManager::LoadMenuSkin(short playerID, const fs::path& filename, short colorID, bool fLoadBothDirections)
 {
-    return gfx_loadmenuskin(spr_player[playerID], filename, colors::MAGENTA, colorID, fLoadBothDirections);
+    try {
+        spr_player[playerID] = gfx_loadmenuskin(filename, colorID, fLoadBothDirections);
+        return true;
+    } catch (const std::string& what) {
+        std::cout << "ERROR: " << what << std::endl;
+        return false;
+    }
 }
 
-bool CResourceManager::LoadFullSkin(SpriteStrip& sprites, const std::string& filename, short colorID)
+SpriteStrip CResourceManager::LoadFullSkin(const fs::path& path, short colorID)
 {
-    return gfx_loadfullskin(sprites, filename, colors::MAGENTA, colorID);
+    return gfx_loadfullskin(path, colorID);
 }
 
-bool CResourceManager::LoadFullSkin(SpriteStrip& sprites, short skinID, short colorID)
+SpriteStrip CResourceManager::LoadFullSkin(short skinID, short colorID)
 {
-    return LoadFullSkin(sprites, skinlist->at(skinID).path.string(), colorID);
+    return gfx_loadfullskin(skinlist->at(skinID).path, colorID);
 }
 
 void CResourceManager::loadAllSprites() {
@@ -62,9 +74,9 @@ void CResourceManager::loadAllSprites() {
 
     //Just load menu skins for now (just standing right sprite)
     for (short k = 0; k < MAX_PLAYERS; k++) {
-        LoadFullSkin(spr_shyguy[k], shyguyPath, k);
-        LoadFullSkin(spr_chocobo[k], chickenPath, k);
-        LoadFullSkin(spr_bobomb[k], bobombPath, k);
+        spr_shyguy[k] = LoadFullSkin(shyguyPath, k);
+        spr_chocobo[k] = LoadFullSkin(chickenPath, k);
+        spr_bobomb[k] = LoadFullSkin(bobombPath, k);
     }
 
     menu_survival = builder("gfx/packs/modeobjects/menu_survival.png").create();
@@ -396,15 +408,6 @@ void CResourceManager::loadAllGraphics()
     const auto builder = [&graphicspack](std::string_view relpath) {
         return SpriteBuilder(convertPath(relpath, graphicspack));
     };
-
-    for (size_t player = 0; player < MAX_PLAYERS; player++) {
-        for (size_t frame = 0; frame < PGFX_LAST; frame++) {
-            spr_player[player][frame].SetWrap(true);
-            spr_shyguy[player][frame].SetWrap(true);
-            spr_chocobo[player][frame].SetWrap(true);
-            spr_bobomb[player][frame].SetWrap(true);
-        }
-    }
 
     loadMenuGraphics();
     loadWorldGraphics();

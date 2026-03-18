@@ -80,7 +80,11 @@ void blitSurface(SDL_Surface* src, const SDL_Rect* srcArea, SDL_Surface* dst, SD
 
 
 gfxSprite::gfxSprite(const fs::path& filename, std::optional<RGB> color_key, std::optional<Uint8> alpha, std::optional<int> wrap)
-    : m_picture(loadImage(filename, color_key, alpha))
+    : gfxSprite(loadImage(filename, color_key, alpha), wrap)
+{}
+
+gfxSprite::gfxSprite(SdlSurfacePtr image, std::optional<int> wrap)
+    : m_picture(std::move(image))
     , m_wrap_x(wrap)
 {}
 
@@ -182,12 +186,7 @@ void gfxSprite::setalpha(Uint8 alpha)
     }
 }
 
-void gfxSprite::SetWrap(short wrapsize)
+void gfxSprite::setWrap(short wrapsize)
 {
     m_wrap_x = wrapsize;
-}
-
-void gfxSprite::setSurface(SdlSurfacePtr surface)
-{
-    m_picture = std::move(surface);
 }

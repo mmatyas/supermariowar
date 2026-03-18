@@ -20,6 +20,7 @@ public:
         std::optional<RGB> color_key = colors::MAGENTA,
         std::optional<Uint8> alpha = std::nullopt,
         std::optional<int> wrap = std::nullopt);
+    gfxSprite(SdlSurfacePtr image, std::optional<int> wrap = 640);
 
     /// Draw the whole sprite at the given coordinate.
     void draw(int x, int y) const;
@@ -38,10 +39,9 @@ public:
     int getWidth() const { return m_picture->w; }
     int getHeight() const { return m_picture->h; }
 
-    void setSurface(SdlSurfacePtr surface);
     SDL_Surface* getSurface() const { return m_picture.get(); }
 
-    void SetWrap(short wrapsize = 640);  // TODO: Remove
+    void setWrap(short wrapsize = 640);
     bool isWrapping() const { return m_wrap_x.has_value(); }
 
 private:

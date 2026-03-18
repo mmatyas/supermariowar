@@ -9,10 +9,13 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
+#include <format>
 #include <iostream>
 #include <string>
 
 using namespace std;
+
+namespace fs = std::filesystem;
 
 extern SDL_Surface * blitdest;
 extern SDL_Surface * screen;
@@ -95,7 +98,6 @@ void setRgb(SDL_Surface* surf, int x, int y, const RGB& color)
  * Makes team-colored skin surface frame from a loaded sprite strip.
  * @param  source       skin sprite strip surface
  * @param  sourceFrame  frame index [0-5]
- * @param  colorKey     transparent color
  * @param  team         team index for color [0-3]
  * @param  allStates    render all player states
  * @param  mirrored     render horizontally mirrored
@@ -104,7 +106,6 @@ void setRgb(SDL_Surface* surf, int x, int y, const RGB& color)
 SdlSurfacePtr createSkinSurface(
     const SdlSurfacePtr& source,
     size_t sourceFrame,
-    const RGB& colorKey,
     size_t team,
     bool allStates,
     bool mirrored)
@@ -154,16 +155,20 @@ SdlSurfacePtr createSkinSurface(
     SDL_UnlockSurface(source.get());
     SDL_UnlockSurface(out.get());
 
-    if (SDL_SetColorKey(out.get(), SDL_TRUE, SDL_MapRGB(out->format, colorKey.r, colorKey.g, colorKey.b)) < 0) {
-        cout << endl << " ERROR: Couldn't set color key for new skin surface: " << SDL_GetError() << endl;
-        return nullptr;
+    const auto color_key = SDL_MapRGB(out->format, colors::MAGENTA.r, colors::MAGENTA.g, colors::MAGENTA.b);
+    if (SDL_SetColorKey(out.get(), SDL_TRUE, color_key) < 0) {
+        throw std::format("Couldn't set color key for new skin surface: {}", SDL_GetError());
     }
     if (SDL_SetSurfaceRLE(out.get(), 1) < 0) {
-        cout << endl << " ERROR: Couldn't set RLE acceleration for new skin surface: " << SDL_GetError() << endl;
-        return nullptr;
+        throw std::format("Couldn't set RLE acceleration for new skin surface: {}", SDL_GetError());
     }
 
     return out;
+}
+
+bool validSkinSurface(const SdlSurfacePtr& skin)
+{
+    return skin->w == 192 && skin->h == 32;
 }
 } // namespace
 
@@ -207,87 +212,59 @@ bool gfx_loadpalette(const std::filesystem::path& palette_path) {
     return gfx_palette.load(palette_path);
 }
 
-bool ValidSkinSurface(const SdlSurfacePtr& skin)
+SpriteStrip gfx_loadmenuskin(const fs::path& path, short colorScheme, bool fLoadBothDirections)
 {
-    return skin->w == 192 && skin->h == 32;
-}
+    auto skin = SdlSurfacePtr(IMG_Load(path.string().c_str()));
+    if (!skin)
+        throw std::format("Couldn't load {}: {}", path.string(), IMG_GetError());
 
+    if (!validSkinSurface(skin))
+        throw std::format("Invalid skin file: {} has incorrect dimensions", path.string());
 
-bool gfx_loadmenuskin(SpriteStrip& gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections)
-{
-    auto skin = SdlSurfacePtr(IMG_Load(filename.c_str()));
-    if (!skin) {
-        cout << endl << " ERROR: Couldn't load " << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
+    SpriteStrip strip;
 
-    if (!ValidSkinSurface(skin))
-        return false;
-
-    for (short iSprite = 0; iSprite < 2; iSprite++) {
-        SdlSurfacePtr skinSurface = createSkinSurface(skin, iSprite, colorkey, colorScheme, true, false);
-        if (!skinSurface) {
-            cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
-            return false;
-        }
-        gSprite[iSprite * 2].setSurface(std::move(skinSurface));
+    for (size_t i = 0; i < 2; i++) {
+        SdlSurfacePtr skinSurface = createSkinSurface(skin, i, colorScheme, true, false);
+        strip[i * 2] = gfxSprite(std::move(skinSurface));
     }
 
     if (fLoadBothDirections) {
-        for (short iSprite = 0; iSprite < 2; iSprite++) {
-            SdlSurfacePtr skinSurface = createSkinSurface(skin, iSprite, colorkey, colorScheme, true, true);
-            if (!skinSurface) {
-                cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
-                return false;
-            }
-            gSprite[iSprite * 2 + 1].setSurface(std::move(skinSurface));
+        for (size_t i = 0; i < 2; i++) {
+            SdlSurfacePtr skinSurface = createSkinSurface(skin, i, colorScheme, true, true);
+            strip[i * 2 + 1] = gfxSprite(std::move(skinSurface));
         }
     }
 
-    return true;
+    return strip;
 }
 
-
-bool gfx_loadfullskin(SpriteStrip& gSprites, const std::string& filename, const RGB& colorkey, short colorScheme)
+SpriteStrip gfx_loadfullskin(const fs::path& path, short colorScheme)
 {
-    // Load the BMP file into a surface
-    auto skin = SdlSurfacePtr(IMG_Load(filename.c_str()));
-    if (!skin) {
-        cout << endl << " ERROR: Couldn't load " << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
+    auto skin = SdlSurfacePtr(IMG_Load(path.string().c_str()));
+    if (!skin)
+        throw std::format("Couldn't load {}: {}", path.string(), IMG_GetError());
 
-    if (!ValidSkinSurface(skin))
-        return false;
+    if (!validSkinSurface(skin))
+        throw std::format("Invalid skin file: {} has incorrect dimensions", path.string());
 
-    for (short k = 0; k < 4; k++) {
-        for (short j = 0; j < 2; j++) {
-            SdlSurfacePtr skinSurface = createSkinSurface(skin, k, colorkey, colorScheme, true, j != 0);
-            if (!skinSurface) {
-                cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
-                return false;
-            }
-            gSprites[(k * 2) + j].setSurface(std::move(skinSurface));
+    SpriteStrip strip;
+
+    for (size_t k = 0; k < 4; k++) {
+        for (size_t j = 0; j < 2; j++) {
+            SdlSurfacePtr skinSurface = createSkinSurface(skin, k, colorScheme, true, j != 0);
+            strip[(k * 2) + j] = gfxSprite(std::move(skinSurface));
         }
     }
 
     //Dead Flying Sprite
-    SdlSurfacePtr skinSurface = createSkinSurface(skin, 4, colorkey, colorScheme, true, false);
-    if (!skinSurface) {
-        cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-    gSprites[8].setSurface(std::move(skinSurface));
+    SdlSurfacePtr skinSurface = createSkinSurface(skin, 4, colorScheme, true, false);
+    strip[8] = gfxSprite(std::move(skinSurface));
 
     //Dead Stomped Sprite
-    skinSurface = createSkinSurface(skin, 5, colorkey, colorScheme, true, false);
-    if (!skinSurface) {
-        cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-    gSprites[9].setSurface(std::move(skinSurface));
+    skinSurface = createSkinSurface(skin, 5, colorScheme, true, false);
+    strip[9] = gfxSprite(std::move(skinSurface));
 
-    return true;
+    return strip;
 }
 
 void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h)

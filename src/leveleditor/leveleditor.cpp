@@ -441,9 +441,9 @@ int main(int argc, char *argv[])
 	rm->spr_nospawntile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_nospawntile.png"), colors::BLACK, 128);
 	rm->spr_noitemspawntile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png"), colors::BLACK, 128);
 	rm->spr_platformstarttile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), colors::BLACK, 64);
+        rm->spr_platformstarttile.setWrap();
 	rm->spr_platformendtile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 64);
-	rm->spr_platformstarttile.SetWrap(true);
-	rm->spr_platformendtile.SetWrap(true);
+        rm->spr_platformendtile.setWrap();
 
 	rm->spr_mapitems[0] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_mapitems.png"), colors::MAGENTA);
 	rm->spr_mapitems[1] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png"), colors::MAGENTA);
@@ -494,10 +494,10 @@ int main(int argc, char *argv[])
 	rm->spr_number_icons = gfxSprite(convertPath("gfx/packs/Classic/awards/killsinrownumbers.png"), colors::MAGENTA);
 
     for (short i = 0; i < 3; i++) {
-		rm->spr_hazard_fireball[i].SetWrap(640 >> i);
-		rm->spr_hazard_rotodisc[i].SetWrap(640 >> i);
-		rm->spr_hazard_flame[i].SetWrap(640 >> i);
-		rm->spr_hazard_pirhanaplant[i].SetWrap(640 >> i);
+		rm->spr_hazard_fireball[i].setWrap(640 >> i);
+		rm->spr_hazard_rotodisc[i].setWrap(640 >> i);
+		rm->spr_hazard_flame[i].setWrap(640 >> i);
+		rm->spr_hazard_pirhanaplant[i].setWrap(640 >> i);
 	}
     if (SDL_SetColorKey(s_platform, SDL_TRUE, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
         printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
@@ -5198,7 +5198,7 @@ void takescreenshot()
 		short iTileSize = iTileSizes[iScreenshotSize];
 
 		//Allow wrapping of path dots
-		rm->spr_platformpath.SetWrap(640 >> iScreenshotSize);
+		rm->spr_platformpath.setWrap(640 >> iScreenshotSize);
 
 		//Create new screenshot surface
 		SDL_Surface * screenshot = SDL_CreateRGBSurface(old_screen->flags, iTileSize * 20, iTileSize * 15, old_screen->format->BitsPerPixel, 0, 0, 0, 0);

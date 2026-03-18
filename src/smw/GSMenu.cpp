@@ -1533,26 +1533,27 @@ void MenuState::StartGame()
             if (netplay.active) {
                 if (k == netplay.remotePlayerNumber) { // local player uses local skin
                     printf("  player %d -> local\n", k);
-                    rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
+                    rm->spr_player[k] = rm->LoadFullSkin(game_values.skinids[k], game_values.colorids[k]);
                 }
                 else {
                     std::ostringstream path;
                     path << GetHomeDirectory() << "net_skin" << k << ".bmp";
                     printf("  player %d -> %s\n", k, path.str().c_str());
 
-                    if (!rm->LoadFullSkin(rm->spr_player[k], path.str(), k)) {
+                    try {
+                        rm->spr_player[k] = rm->LoadFullSkin(path.str(), k);
+                    } catch (...) {
                         printf("[warning] Could not load netplay skin of player %d, using default\n", k);
-                        rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
+                        rm->spr_player[k] = rm->LoadFullSkin(game_values.skinids[k], game_values.colorids[k]);
                     }
                 }
             }
             else if (game_values.randomskin[k]) {
-                do {
-                    game_values.skinids[k] = RANDOM_INT( skinlist->count());
-                } while (!rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]));
+                game_values.skinids[k] = RANDOM_INT( skinlist->count());
+                rm->spr_player[k] = rm->LoadFullSkin(game_values.skinids[k], game_values.colorids[k]);
             }
             else {
-                rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
+                rm->spr_player[k] = rm->LoadFullSkin(game_values.skinids[k], game_values.colorids[k]);
             }
         }
     }
