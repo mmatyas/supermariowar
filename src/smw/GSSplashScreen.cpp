@@ -99,7 +99,7 @@ bool LoadStartGraphics()
     }
 
     //load basic stuff
-    loadok &= gfx_loadimagenocolorkey(&rm->menu_backdrop, convertPath("gfx/packs/menu/menu_background.png", graphicspack));
+    loadok &= gfx_loadimagenocolorkey(rm->menu_backdrop, convertPath("gfx/packs/menu/menu_background.png", graphicspack));
     loadok &= gfx_loadimage(rm->menu_smw, convertPath("gfx/packs/menu/menu_smw.png", graphicspack), false);
     loadok &= gfx_loadimage(rm->menu_version, convertPath("gfx/packs/menu/menu_version.png", graphicspack), false);
 

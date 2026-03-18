@@ -419,85 +419,85 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- loading graphics ----------------\n");
 
-	rm->spr_tiletypes.init(convertPath("gfx/leveleditor/leveleditor_tile_types.png"));
-	rm->spr_transparenttiles.init(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png"), colors::MAGENTA, 160);
+	rm->spr_tiletypes = gfxSprite(convertPath("gfx/leveleditor/leveleditor_tile_types.png"));
+	rm->spr_transparenttiles = gfxSprite(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png"), colors::MAGENTA, 160);
 
-	rm->spr_backgroundlevel.init(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), colors::MAGENTA);
-	rm->spr_tilesetlevel.init(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png"), colors::MAGENTA);
+	rm->spr_backgroundlevel = gfxSprite(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), colors::MAGENTA);
+	rm->spr_tilesetlevel = gfxSprite(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png"), colors::MAGENTA);
 
-        rm->spr_eyecandy.init(convertPath("gfx/leveleditor/leveleditor_eyecandy.png"), colors::MAGENTA);
+        rm->spr_eyecandy = gfxSprite(convertPath("gfx/leveleditor/leveleditor_eyecandy.png"), colors::MAGENTA);
 
         s_platform = IMG_Load(convertPath("gfx/leveleditor/leveleditor_platform.png").c_str());
         s_platformpathbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_pathtype_buttons.png").c_str());
         s_maphazardbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_maphazard_buttons.png").c_str());
 
-	rm->spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), colors::MAGENTA);
-	rm->spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), colors::MAGENTA);
-	rm->spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), colors::MAGENTA);
+	rm->spr_warps[0] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_warp.png"), colors::MAGENTA);
+	rm->spr_warps[1] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), colors::MAGENTA);
+	rm->spr_warps[2] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), colors::MAGENTA, 128);
+	rm->spr_platformpath = gfxSprite(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), colors::MAGENTA, 128);
 
-	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 128);
-	rm->spr_nospawntile.init(convertPath("gfx/leveleditor/leveleditor_nospawntile.png"), colors::BLACK, 128);
-	rm->spr_noitemspawntile.init(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png"), colors::BLACK, 128);
-	rm->spr_platformstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), colors::BLACK, 64);
-	rm->spr_platformendtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 64);
+	rm->spr_selectedtile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 128);
+	rm->spr_nospawntile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_nospawntile.png"), colors::BLACK, 128);
+	rm->spr_noitemspawntile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png"), colors::BLACK, 128);
+	rm->spr_platformstarttile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), colors::BLACK, 64);
+	rm->spr_platformendtile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 64);
 	rm->spr_platformstarttile.SetWrap(true);
 	rm->spr_platformendtile.SetWrap(true);
 
-	rm->spr_mapitems[0].init(convertPath("gfx/leveleditor/leveleditor_mapitems.png"), colors::MAGENTA);
-	rm->spr_mapitems[1].init(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png"), colors::MAGENTA);
-	rm->spr_mapitems[2].init(convertPath("gfx/leveleditor/leveleditor_mapitems_thumbnail.png"), colors::MAGENTA);
+	rm->spr_mapitems[0] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_mapitems.png"), colors::MAGENTA);
+	rm->spr_mapitems[1] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png"), colors::MAGENTA);
+	rm->spr_mapitems[2] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_mapitems_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA, 255);
-	rm->menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA, 128);
+	rm->spr_dialog = gfxSprite(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA, 255);
+	rm->menu_shade = gfxSprite(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA, 128);
 
-	rm->spr_tileanimation[0].init(convertPath("gfx/packs/Classic/tilesets/tile_animation.png"), colors::MAGENTA);
-	rm->spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), colors::MAGENTA);
-	rm->spr_tileanimation[2].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), colors::MAGENTA);
+	rm->spr_tileanimation[0] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/tile_animation.png"), colors::MAGENTA);
+	rm->spr_tileanimation[1] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), colors::MAGENTA);
+	rm->spr_tileanimation[2] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_blocks[0].init(convertPath("gfx/packs/Classic/tilesets/blocks.png"), colors::MAGENTA);
-	rm->spr_blocks[1].init(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), colors::MAGENTA);
-	rm->spr_blocks[2].init(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), colors::MAGENTA);
+	rm->spr_blocks[0] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/blocks.png"), colors::MAGENTA);
+	rm->spr_blocks[1] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), colors::MAGENTA);
+	rm->spr_blocks[2] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_unknowntile[0].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile.png"), colors::MAGENTA);
-	rm->spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), colors::MAGENTA);
-	rm->spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), colors::MAGENTA);
+	rm->spr_unknowntile[0] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/unknown_tile.png"), colors::MAGENTA);
+	rm->spr_unknowntile[1] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), colors::MAGENTA);
+	rm->spr_unknowntile[2] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_powerups.init(convertPath("gfx/packs/Classic/powerups/large.png"), colors::MAGENTA);
-	rm->spr_powerupselector.init(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), colors::MAGENTA, 128);
-	rm->spr_hidden_marker.init(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png"), colors::MAGENTA);
+	rm->spr_powerups = gfxSprite(convertPath("gfx/packs/Classic/powerups/large.png"), colors::MAGENTA);
+	rm->spr_powerupselector = gfxSprite(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), colors::MAGENTA, 128);
+	rm->spr_hidden_marker = gfxSprite(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png"), colors::MAGENTA);
 
-	rm->spr_flagbases.init(convertPath("gfx/packs/Classic/modeobjects/flagbases.png"), colors::MAGENTA);
-	rm->spr_racegoals.init(convertPath("gfx/packs/Classic/modeobjects/racegoal.png"), colors::MAGENTA);
+	rm->spr_flagbases = gfxSprite(convertPath("gfx/packs/Classic/modeobjects/flagbases.png"), colors::MAGENTA);
+	rm->spr_racegoals = gfxSprite(convertPath("gfx/packs/Classic/modeobjects/racegoal.png"), colors::MAGENTA);
 
-	rm->spr_hazard_fireball[0].init(convertPath("gfx/packs/Classic/hazards/fireball.png"), colors::MAGENTA);
-	rm->spr_hazard_fireball[1].init(convertPath("gfx/packs/Classic/hazards/fireball_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_fireball[2].init(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_fireball[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/fireball.png"), colors::MAGENTA);
+	rm->spr_hazard_fireball[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/fireball_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_fireball[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_hazard_rotodisc[0].init(convertPath("gfx/packs/Classic/hazards/rotodisc.png"), colors::MAGENTA);
-	rm->spr_hazard_rotodisc[1].init(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_rotodisc[2].init(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_rotodisc[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/rotodisc.png"), colors::MAGENTA);
+	rm->spr_hazard_rotodisc[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_rotodisc[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_hazard_bulletbill[0].init(convertPath("gfx/packs/Classic/hazards/bulletbill.png"), colors::MAGENTA);
-	rm->spr_hazard_bulletbill[1].init(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_bulletbill[2].init(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_bulletbill[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/bulletbill.png"), colors::MAGENTA);
+	rm->spr_hazard_bulletbill[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_bulletbill[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_hazard_flame[0].init(convertPath("gfx/packs/Classic/hazards/flame.png"), colors::MAGENTA);
-	rm->spr_hazard_flame[1].init(convertPath("gfx/packs/Classic/hazards/flame_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_flame[2].init(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_flame[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/flame.png"), colors::MAGENTA);
+	rm->spr_hazard_flame[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/flame_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_flame[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_hazard_pirhanaplant[0].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant.png"), colors::MAGENTA);
-	rm->spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_pirhanaplant[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/pirhanaplant.png"), colors::MAGENTA);
+	rm->spr_hazard_pirhanaplant[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), colors::MAGENTA);
+	rm->spr_hazard_pirhanaplant[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), colors::MAGENTA);
 
-	rm->spr_number_icons.init(convertPath("gfx/packs/Classic/awards/killsinrownumbers.png"), colors::MAGENTA);
+	rm->spr_number_icons = gfxSprite(convertPath("gfx/packs/Classic/awards/killsinrownumbers.png"), colors::MAGENTA);
 
     for (short i = 0; i < 3; i++) {
-		rm->spr_hazard_fireball[i].SetWrap(true, 640 >> i);
-		rm->spr_hazard_rotodisc[i].SetWrap(true, 640 >> i);
-		rm->spr_hazard_flame[i].SetWrap(true, 640 >> i);
-		rm->spr_hazard_pirhanaplant[i].SetWrap(true, 640 >> i);
+		rm->spr_hazard_fireball[i].SetWrap(640 >> i);
+		rm->spr_hazard_rotodisc[i].SetWrap(640 >> i);
+		rm->spr_hazard_flame[i].SetWrap(640 >> i);
+		rm->spr_hazard_pirhanaplant[i].SetWrap(640 >> i);
 	}
     if (SDL_SetColorKey(s_platform, SDL_TRUE, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
         printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
@@ -930,7 +930,7 @@ int editor_edit()
                     if (key == SDLK_g) {
                         backgroundlist->next();
 
-                        rm->spr_background.init(backgroundlist->currentPath().string());
+                        rm->spr_background = gfxSprite(backgroundlist->currentPath());
                         g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath().string());
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
@@ -4131,7 +4131,7 @@ int editor_backgrounds()
                             {
                                 backgroundlist->setCurrentIndex(iPage * 16 + iBackground);
 
-                                rm->spr_background.init(backgroundlist->currentPath().string());
+                                rm->spr_background = gfxSprite(backgroundlist->currentPath());
                                 g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath().string());
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
@@ -4751,7 +4751,7 @@ void loadcurrentmap()
         backgroundlist->setCurrentPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
 
-	rm->spr_background.init(path);
+	rm->spr_background = gfxSprite(path);
 
         g_iNumPlatforms = g_map->platforms.size();
 
@@ -5198,7 +5198,7 @@ void takescreenshot()
 		short iTileSize = iTileSizes[iScreenshotSize];
 
 		//Allow wrapping of path dots
-		rm->spr_platformpath.SetWrap(true, 640 >> iScreenshotSize);
+		rm->spr_platformpath.SetWrap(640 >> iScreenshotSize);
 
 		//Create new screenshot surface
 		SDL_Surface * screenshot = SDL_CreateRGBSurface(old_screen->flags, iTileSize * 20, iTileSize * 15, old_screen->format->BitsPerPixel, 0, 0, 0, 0);

@@ -446,10 +446,12 @@ void gfx_drawpreview(
     }
 }
 
-bool gfx_loadimagenocolorkey(gfxSprite* sprite, const std::string& path)
+bool gfx_loadimagenocolorkey(gfxSprite& sprite, const std::string& path)
 {
-    return sprite->init(path);
+    sprite = SpriteBuilder(path).withoutColorKey().create();
+    return true;
 }
+
 
 bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, bool fWrap)
 {
@@ -458,22 +460,22 @@ bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, bool fWrap)
 
 bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, Uint8 alpha, bool fWrap)
 {
-    bool success = gSprite.init(path, colors::MAGENTA, alpha);
+    auto builder = SpriteBuilder(path).withAlpha(alpha);
+    if (fWrap)
+        builder.withWrapping();
 
-    if (success)
-        gSprite.SetWrap(fWrap);
-
-    return success;
+    gSprite = builder.create();
+    return true;
 }
 
 bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, const RGB& rgb, bool fWrap)
 {
-    bool success = gSprite.init(path, rgb);
+    auto builder = SpriteBuilder(path).withColorKey(rgb);
+    if (fWrap)
+        builder.withWrapping();
 
-    if (success)
-        gSprite.SetWrap(fWrap);
-
-    return success;
+    gSprite = builder.create();
+    return true;
 }
 
 void gfx_setjoystickteamcolor(SDL_Joystick* joystick, short team, float brightness)

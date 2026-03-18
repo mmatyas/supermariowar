@@ -82,5 +82,5 @@ std::array<IO_Block*, 4> CObject::GetCollisionBlocks() const
 
 bool CObject::GetWrap() const
 {
-    return spr ? spr->GetWrap() : true;
+    return spr ? spr->isWrapping() : true;
 }

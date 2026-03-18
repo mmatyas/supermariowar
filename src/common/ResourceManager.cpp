@@ -277,7 +277,7 @@ bool CResourceManager::LoadMenuGraphics()
 {
     std::string graphicspack = menugraphicspacklist->currentPath().string();
 
-    gfx_loadimagenocolorkey(&menu_shade, convertPath("gfx/packs/menu/menu_shade.png", graphicspack));
+    gfx_loadimagenocolorkey(menu_shade, convertPath("gfx/packs/menu/menu_shade.png", graphicspack));
     menu_shade.setalpha(App::menuTransparency);
 
     gfx_loadimage(spr_scoreboard, convertPath("gfx/packs/menu/scoreboard.png", graphicspack), false);
@@ -383,10 +383,10 @@ void CResourceManager::LoadAllGraphics()
     LoadWorldGraphics();
     LoadGameGraphics();
 
-    gfx_loadimagenocolorkey(&spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
-    gfx_loadimagenocolorkey(&spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
-    gfx_loadimagenocolorkey(&spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
-    gfx_loadimagenocolorkey(&spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
+    gfx_loadimagenocolorkey(spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
+    gfx_loadimagenocolorkey(spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
+    gfx_loadimagenocolorkey(spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
+    gfx_loadimagenocolorkey(spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
 
     gfx_loadimage(spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist->currentPath()), false, false);
 }

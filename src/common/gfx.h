@@ -63,7 +63,7 @@ void gfx_drawpreview(SDL_Surface * surface,
 bool gfx_loadfullskin(SpriteStrip& gSprites, const std::string& filename, const RGB& colorkey, short colorScheme);
 bool gfx_loadmenuskin(SpriteStrip& gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);
 
-bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f);
+bool gfx_loadimagenocolorkey(gfxSprite& sprite, const std::string& f);
 bool gfx_loadimage(gfxSprite& sprite, const std::string& path, bool fWrap = true);
 bool gfx_loadimage(gfxSprite& sprite, const std::string& path, Uint8 alpha, bool fWrap = true);
 bool gfx_loadimage(gfxSprite& sprite, const std::string& path, const RGB& rgb, bool fWrap = true);

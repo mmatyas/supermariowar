@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cstdio>
 #include <filesystem>
+#include <format>
 #include <iostream>
 #include <optional>
 
@@ -37,37 +38,31 @@ SdlSurfacePtr loadImage(
 
     auto raw = SdlSurfacePtr(IMG_Load(path_str.c_str()));
     if (!raw) {
-        std::cout << "\nERROR: Couldn't load " << path << ": " << IMG_GetError() << std::endl;
-        return {};
+        throw std::format("Couldn't load {}: {}", path.string(), IMG_GetError());
     }
 
     if (color_key) {
         const Uint32 key = SDL_MapRGB(raw->format, color_key->r, color_key->g, color_key->b);
         if (SDL_SetColorKey(raw.get(), SDL_TRUE, key) < 0) {
-            std::cout << "\nERROR: Couldn't set color key for " << path << ": " << SDL_GetError() << std::endl;
-            return {};
+            throw std::format("Couldn't set color key for {}: {}", path.string(), SDL_GetError());
         }
     }
 
     auto img = SdlSurfacePtr(SDL_ConvertSurface(raw.get(), screen->format, 0));
     if (!img) {
-        std::cout << "\nERROR: Couldn't convert " << path << " to the display's pixel format: " << SDL_GetError() << std::endl;
-        return {};
+        throw std::format("Couldn't convert {} to the display's pixel format: {}", path.string(), SDL_GetError());
     }
 
     if (SDL_SetSurfaceRLE(img.get(), 1) < 0) {
-        std::cout << "\nERROR: Couldn't set RLE acceleration for " << path << ": " << SDL_GetError() << std::endl;
-        return {};
+        throw std::format("Couldn't set RLE acceleration for {}: {}", path.string(), SDL_GetError());
     }
 
     if (alpha) {
         if (SDL_SetSurfaceBlendMode(img.get(), SDL_BLENDMODE_BLEND) < 0) {
-            std::cout << "\nERROR: Couldn't set blend mode for " << path << ": " << SDL_GetError() << std::endl;
-            return {};
+            throw std::format("Couldn't set blend mode for {}: {}", path.string(), SDL_GetError());
         }
         if (SDL_SetSurfaceAlphaMod(img.get(), *alpha) < 0) {
-            std::cout << "\nERROR: Couldn't set alpha modulation for " << path << ": " << SDL_GetError() << std::endl;
-            return {};
+            throw std::format("Couldn't set alpha modulation for {}: {}", path.string(), SDL_GetError());
         }
     }
 
@@ -83,32 +78,11 @@ void blitSurface(SDL_Surface* src, const SDL_Rect* srcArea, SDL_Surface* dst, SD
 }
 } // namespace
 
-//
-// Color keyed without alpha
-//
-bool gfxSprite::init(const fs::path& filename, const RGB& key)
-{
-    m_picture = loadImage(filename, key);
-    return m_picture.get();
-}
 
-//
-// Color keyed + alpha
-//
-bool gfxSprite::init(const fs::path& filename, const RGB& key, Uint8 alpha)
-{
-    m_picture = loadImage(filename, key, alpha);
-    return m_picture.get();
-}
-
-//
-// Non color keyed
-//
-bool gfxSprite::init(const fs::path& filename)
-{
-    m_picture = loadImage(filename);
-    return m_picture.get();
-}
+gfxSprite::gfxSprite(const fs::path& filename, std::optional<RGB> color_key, std::optional<Uint8> alpha, std::optional<int> wrap)
+    : m_picture(loadImage(filename, color_key, alpha))
+    , m_wrap_x(wrap)
+{}
 
 void gfxSprite::draw(int x, int y) const
 {
@@ -117,12 +91,12 @@ void gfxSprite::draw(int x, int y) const
     SDL_Rect dstRect {x + x_shake, y + y_shake, getWidth(), getHeight()};
     blitSurface(m_picture.get(), NULL, blitdest, &dstRect);
 
-    if (fWrap) {
-        if (x + getWidth() >= iWrapSize) {
-            dstRect.x -= iWrapSize;
+    if (m_wrap_x) {
+        if (x + getWidth() >= *m_wrap_x) {
+            dstRect.x -= *m_wrap_x;
             blitSurface(m_picture.get(), NULL, blitdest, &dstRect);
         } else if (x < 0) {
-            dstRect.x += iWrapSize;
+            dstRect.x += *m_wrap_x;
             blitSurface(m_picture.get(), NULL, blitdest, &dstRect);
         }
     }
@@ -135,12 +109,12 @@ void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect) const
     SDL_Rect dstRect {x + x_shake, y + y_shake, srcRect.w, srcRect.h};
     blitSurface(m_picture.get(), &srcRect, blitdest, &dstRect);
 
-    if (fWrap) {
-        if (x + getWidth() >= iWrapSize) {
-            dstRect.x -= iWrapSize;
+    if (m_wrap_x) {
+        if (x + getWidth() >= *m_wrap_x) {
+            dstRect.x -= *m_wrap_x;
             blitSurface(m_picture.get(), &srcRect, blitdest, &dstRect);
         } else if (x < 0) {
-            dstRect.x += iWrapSize;
+            dstRect.x += *m_wrap_x;
             blitSurface(m_picture.get(), &srcRect, blitdest, &dstRect);
         }
     }
@@ -159,11 +133,11 @@ void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect, ClipEdge clipEdge, i
 
     blitSurface(m_picture.get(), &adjustedSrcRect, blitdest, &adjustedDstRect);
 
-    if (fWrap) {
-        if (x + srcRect.w >= iWrapSize) {
+    if (m_wrap_x) {
+        if (x + srcRect.w >= *m_wrap_x) {
             adjustedSrcRect = srcRect;
             adjustedDstRect = dstRect;
-            adjustedDstRect.x -= iWrapSize;
+            adjustedDstRect.x -= *m_wrap_x;
 
             if (gfx_adjusthiddenrects(adjustedSrcRect, adjustedDstRect, clipEdge, clipTreshold))
                 return;
@@ -172,7 +146,7 @@ void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect, ClipEdge clipEdge, i
         } else if (x < 0) {
             adjustedSrcRect = srcRect;
             adjustedDstRect = dstRect;
-            adjustedDstRect.x += iWrapSize;
+            adjustedDstRect.x += *m_wrap_x;
 
             if (gfx_adjusthiddenrects(adjustedSrcRect, adjustedDstRect, clipEdge, clipTreshold))
                 return;
@@ -208,13 +182,12 @@ void gfxSprite::setalpha(Uint8 alpha)
     }
 }
 
+void gfxSprite::SetWrap(short wrapsize)
+{
+    m_wrap_x = wrapsize;
+}
+
 void gfxSprite::setSurface(SdlSurfacePtr surface)
 {
     m_picture = std::move(surface);
-}
-
-void gfxSprite::SetWrap(bool wrap, short wrapsize)
-{
-    fWrap = wrap;
-    iWrapSize = wrapsize;
 }

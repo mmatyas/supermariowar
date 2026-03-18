@@ -7,15 +7,19 @@
 #include "SDL.h"
 
 #include <filesystem>
+#include <optional>
 
 enum class ClipEdge : unsigned char { Top, Right, Bottom, Left };
 
 
 class gfxSprite {
 public:
-    bool init(const std::filesystem::path& filename); //non color keyed
-    bool init(const std::filesystem::path& filename, const RGB& key); //color keyed
-    bool init(const std::filesystem::path& filename, const RGB& key, Uint8 alpha); //color keyed + alpha
+    gfxSprite() = default;
+    gfxSprite(
+        const std::filesystem::path& filename,
+        std::optional<RGB> color_key = colors::MAGENTA,
+        std::optional<Uint8> alpha = std::nullopt,
+        std::optional<int> wrap = std::nullopt);
 
     /// Draw the whole sprite at the given coordinate.
     void draw(int x, int y) const;
@@ -37,14 +41,50 @@ public:
     void setSurface(SdlSurfacePtr surface);
     SDL_Surface* getSurface() const { return m_picture.get(); }
 
-    bool GetWrap() const { return fWrap; }
-    void SetWrap(bool wrap, short wrapsize = 640);
+    void SetWrap(short wrapsize = 640);  // TODO: Remove
+    bool isWrapping() const { return m_wrap_x.has_value(); }
 
 private:
     SdlSurfacePtr m_picture;
+    std::optional<int> m_wrap_x = std::nullopt;
+};
 
-    bool fWrap = false;
-    short iWrapSize = 640;  // TODO: Get it from a global setting.
+
+class SpriteBuilder {
+public:
+    SpriteBuilder(std::filesystem::path path)
+        : m_path(std::move(path))
+    {}
+
+    SpriteBuilder& withColorKey(RGB key) {
+        m_color_key = key;
+        return *this;
+    }
+
+    SpriteBuilder& withoutColorKey() {
+        m_color_key = std::nullopt;
+        return *this;
+    }
+
+    SpriteBuilder& withAlpha(Uint8 alpha) {
+        m_alpha = alpha;
+        return *this;
+    }
+
+    SpriteBuilder& withWrapping(int wrap_x = 640) {
+        m_wrap_x = wrap_x;
+        return *this;
+    }
+
+    gfxSprite create() const {
+        return gfxSprite(m_path, m_color_key, m_alpha, m_wrap_x);
+    }
+
+private:
+    std::filesystem::path m_path;
+    std::optional<RGB> m_color_key = colors::MAGENTA;
+    std::optional<Uint8> m_alpha = std::nullopt;
+    std::optional<int> m_wrap_x = std::nullopt;
 };
 
 #endif // GFX_SPRITE
