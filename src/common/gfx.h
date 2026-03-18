@@ -64,7 +64,6 @@ bool gfx_loadfullskin(SpriteStrip& gSprites, const std::string& filename, const 
 bool gfx_loadmenuskin(SpriteStrip& gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);
 
 bool gfx_loadimage(gfxSprite& sprite, const std::string& path, bool fWrap);
-bool gfx_loadimage(gfxSprite& sprite, const std::string& path, Uint8 alpha, bool fWrap);
 
 void gfx_setjoystickteamcolor(SDL_Joystick * joystick, short team, float brightness);
 

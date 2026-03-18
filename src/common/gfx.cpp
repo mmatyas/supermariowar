@@ -457,16 +457,6 @@ bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, bool fWrap)
     return true;
 }
 
-bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, Uint8 alpha, bool fWrap)
-{
-    auto builder = SpriteBuilder(path).withAlpha(alpha);
-    if (fWrap)
-        builder.withWrapping();
-
-    gSprite = builder.create();
-    return true;
-}
-
 void gfx_setjoystickteamcolor(SDL_Joystick* joystick, short team, float brightness)
 {
 #if SDL_VERSION_ATLEAST(2, 0, 14)
