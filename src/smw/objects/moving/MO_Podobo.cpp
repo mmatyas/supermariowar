@@ -49,10 +49,11 @@ void MO_Podobo::update()
 
 void MO_Podobo::draw()
 {
+    const SDL_Rect srcRect {drawframe, iColorOffsetY + (vely > 0.0f ? 32 : 0), iw, ih};
     if (fIsSpawned && vely < 0.0f)
-        spr->draw(ix, iy, drawframe, iColorOffsetY + (vely > 0.0f ? 32 : 0), iw, ih, 2, iHiddenPlane);
+        spr->draw(ix, iy, srcRect, ClipEdge::Bottom, iHiddenPlane);
     else
-        spr->draw(ix, iy, drawframe, iColorOffsetY + (vely > 0.0f ? 32 : 0), iw, ih);
+        spr->draw(ix, iy, srcRect);
 }
 
 bool MO_Podobo::collide(CPlayer* player)

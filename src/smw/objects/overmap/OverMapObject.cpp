@@ -52,7 +52,7 @@ IO_OverMapObject::IO_OverMapObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, sh
 
 void IO_OverMapObject::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, animationOffsetY, iw, ih});
 }
 
 void IO_OverMapObject::draw(short iOffsetX, short iOffsetY)

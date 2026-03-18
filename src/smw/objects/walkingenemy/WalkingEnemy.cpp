@@ -74,13 +74,13 @@ void MO_WalkingEnemy::draw()
 
             displayangle += addangle;
 
-            rm->spr_awardsouls.draw(spawnX, spawnY, iSpawnIconOffset, 0, 16, 16);
+            rm->spr_awardsouls.draw(spawnX, spawnY, {iSpawnIconOffset, 0, 16, 16});
         }
     } else {
         IO_MovingObject::draw();
 
         if (frozen) {
-            rm->spr_iceblock.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, 0, 32, 32);
+            rm->spr_iceblock.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, {0, 0, 32, 32});
         }
     }
 }

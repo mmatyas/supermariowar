@@ -327,45 +327,54 @@ void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, shor
     }
 }
 
-bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHiddenDirection, short iHiddenValue)
+bool gfx_adjusthiddenrects(SDL_Rect& src, SDL_Rect& dst, ClipEdge edge, int threshold)
 {
-    if (iHiddenDirection == 0) {
-        if (dstRect->y <= iHiddenValue) {
-            if (dstRect->y + srcRect->h <= iHiddenValue)
+    switch (edge) {
+        case ClipEdge::Top: {
+            if (threshold < dst.y) // fully visible
+                break;
+            if (dst.y + dst.h <= threshold) // fully hidden
                 return true;
 
-            short iDiff = iHiddenValue - dstRect->y;
-            srcRect->y += iDiff;
-            srcRect->h -= iDiff;
-            dstRect->y = iHiddenValue + y_shake;
-            dstRect->h = srcRect->h;
+            const int diff = threshold - dst.y;
+            src.y += diff;
+            src.h -= diff;
+            dst.y = threshold + y_shake;
+            dst.h = src.h;
+            break;
         }
-    } else if (iHiddenDirection == 1) {
-        if (dstRect->x + srcRect->w >= iHiddenValue) {
-            if (dstRect->x >= iHiddenValue)
+        case ClipEdge::Right: {
+            if (dst.x + src.w < threshold) // fully visible
+                break;
+            if (threshold <= dst.x) // fully hidden
                 return true;
 
-            srcRect->w = iHiddenValue - dstRect->x;
-            dstRect->w = srcRect->w;
+            src.w = threshold - dst.x;
+            dst.w = src.w;
+            break;
         }
-    } else if (iHiddenDirection == 2) {
-        if (dstRect->y + srcRect->h >= iHiddenValue) {
-            if (dstRect->y >= iHiddenValue)
+        case ClipEdge::Bottom: {
+            if (dst.y + src.h < threshold) // fully visible
+                break;
+            if (threshold <= dst.y) // fully hidden
                 return true;
 
-            srcRect->h = iHiddenValue - dstRect->y;
-            dstRect->h = srcRect->h;
+            src.h = threshold - dst.y;
+            dst.h = src.h;
+            break;
         }
-    } else if (iHiddenDirection == 3) {
-        if (dstRect->x <= iHiddenValue) {
-            if (dstRect->x + srcRect->w <= iHiddenValue)
+        case ClipEdge::Left: {
+            if (threshold < dst.x) // fully visible
+                break;
+            if (dst.x + src.w <= threshold) // fully hidden
                 return true;
 
-            short iDiff = iHiddenValue - dstRect->x;
-            srcRect->x += iDiff;
-            srcRect->w -= iDiff;
-            dstRect->x = iHiddenValue + x_shake;
-            dstRect->w = srcRect->w;
+            int diff = threshold - dst.x;
+            src.x += diff;
+            src.w -= diff;
+            dst.x = threshold + x_shake;
+            dst.w = src.w;
+            break;
         }
     }
 
@@ -379,7 +388,7 @@ void gfx_drawpreview(
     short iw, short ih,
     short clipX, short clipY, short clipW, short clipH,
     bool wrap,
-    short hiddenDirection, short hiddenPlane)
+    std::optional<std::pair<ClipEdge, int>> clip)
 {
     //need to set source rect before each blit so it can be clipped correctly
     SDL_Rect rSrcRect = {srcX, srcY, iw, ih};
@@ -387,8 +396,11 @@ void gfx_drawpreview(
 
     gfx_cliprect(&rSrcRect, &rDstRect, clipX, clipY, clipW, clipH);
 
-    if (hiddenDirection > -1)
-        gfx_adjusthiddenrects(&rSrcRect, &rDstRect, hiddenDirection, hiddenPlane);
+    if (clip) {
+        auto [edge, threshold] = *clip;
+        if (gfx_adjusthiddenrects(rSrcRect, rDstRect, edge, threshold))
+            return;
+    }
 
     // Blit onto the screen surface
     if (SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0) {
@@ -420,8 +432,11 @@ void gfx_drawpreview(
 
             gfx_cliprect(&rSrcRect, &rDstRect, clipX, clipY, clipW, clipH);
 
-            if (hiddenDirection > -1)
-                gfx_adjusthiddenrects(&rSrcRect, &rDstRect, hiddenDirection, hiddenPlane);
+            if (clip) {
+                auto [edge, threshold] = *clip;
+                if (gfx_adjusthiddenrects(rSrcRect, rDstRect, edge, threshold))
+                    return;
+            }
 
             if (SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());

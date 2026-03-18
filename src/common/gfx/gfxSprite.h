@@ -8,6 +8,9 @@
 
 #include <filesystem>
 
+enum class ClipEdge : unsigned char { Top, Right, Bottom, Left };
+
+
 class gfxSprite {
 public:
     bool init(const std::filesystem::path& filename); //non color keyed
@@ -16,7 +19,13 @@ public:
 
     /// Draw the whole sprite at the given coordinate.
     void draw(int x, int y) const;
-    bool draw(short x, short y, short srcx, short srcy, short w, short h, short iHiddenDirection = -1, short iHiddenValue = -1);
+    /// Draw part of the sprite at the given coordinate.
+    void draw(int x, int y, const SDL_Rect& srcRect) const;
+    /// Draw part of the sprite at the given coordinate, clipped along a given direction.
+    /// Used mainly for warping and drawing previews.
+    /// TODO: Most of the caller sites don't use std::optional. By updating the code there
+    /// this function could be merged with the one without the clip parameters.
+    void draw(int x, int y, const SDL_Rect& srcRect, ClipEdge clipEdge, int clipTreshold) const;
     bool drawStretch(short x, short y, short w, short h, short srcx, short srcy, short srcw, short srch);
 
     void setalpha(Uint8 alpha);

@@ -75,16 +75,16 @@ void CGM_Bonus::init()
 void CGM_Bonus::draw_background()
 {
     //Draw Toad
-    rm->spr_worldbonushouse.draw(544, 256, players[0]->leftX() > 544 ? 224 : 192, 0, 32, 64);
+    rm->spr_worldbonushouse.draw(544, 256, {players[0]->leftX() > 544 ? 224 : 192, 0, 32, 64});
 
     //Draw Bonus House Title
-    rm->menu_plain_field.draw(0, 0, 0, 0, App::screenWidth/2, 32);
-    rm->menu_plain_field.draw(App::screenWidth/2, 0, 192, 0, App::screenWidth/2, 32);
+    rm->menu_plain_field.draw(0, 0, {0, 0, App::screenWidth/2, 32});
+    rm->menu_plain_field.draw(App::screenWidth/2, 0, {192, 0, App::screenWidth/2, 32});
     rm->game_font_large.drawCentered(App::screenWidth/2, 5, tsTourStop->szName.c_str());
 
     //Draw Bonus House Text
     if (tsTourStop->iBonusTextLines > 0) {
-        rm->spr_worldbonushouse.draw(128, 128, 0, 64, 384, 128);
+        rm->spr_worldbonushouse.draw(128, 128, {0, 64, 384, 128});
 
         for (short iTextLine = 0; iTextLine < tsTourStop->iBonusTextLines; iTextLine++)
             rm->game_font_large.drawChopCentered(App::screenWidth/2, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine].c_str());

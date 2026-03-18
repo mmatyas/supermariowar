@@ -430,11 +430,11 @@ void MI_World::Draw()
 
            //Draw the cloud if the player is one
     if (fUsingCloud && iState == -1)
-        rm->spr_worlditems.draw(iPlayerDrawPos.x + iMapOffsetX, iPlayerDrawPos.y + iMapOffsetY, 32, 0, 32, 32);
+        rm->spr_worlditems.draw(iPlayerDrawPos.x + iMapOffsetX, iPlayerDrawPos.y + iMapOffsetY, {32, 0, 32, 32});
 
            //If a points modifier is in place, display it
     if (game_values.worldpointsbonus >= 0) {
-        rm->spr_worlditems.draw(603, 5, (game_values.worldpointsbonus + 9) << 5, 0, 32, 32);
+        rm->spr_worlditems.draw(603, 5, {(game_values.worldpointsbonus + 9) << 5, 0, 32, 32});
     }
 
            //Draw the teleport/warp stars effect
@@ -444,7 +444,7 @@ void MI_World::Draw()
             short iStarX = (short)(dTeleportStarRadius * cos(dAngle));
             short iStarY = (short)(dTeleportStarRadius * sin(dAngle));
 
-            rm->spr_teleportstar.draw(iStarX + iPlayerDrawPos.x + iMapOffsetX, iStarY + iPlayerDrawPos.y + iMapOffsetY, iTeleportStarAnimationFrame, 0, 32, 32);
+            rm->spr_teleportstar.draw(iStarX + iPlayerDrawPos.x + iMapOffsetX, iStarY + iPlayerDrawPos.y + iMapOffsetY, {iTeleportStarAnimationFrame, 0, 32, 32});
         }
     }
 
@@ -461,9 +461,9 @@ void MI_World::Draw()
             for (short iMemberStore = 0; iMemberStore < game_values.teamcounts[iTeamStore]; iMemberStore++) {
                 short iPlayerId = game_values.teamids[iTeamStore][iMemberStore];
 
-                rm->spr_worlditempopup.draw(iStoredPowerupBoxX, iStoredItemPopupDrawY, game_values.colorids[iPlayerId] * 48, 256, 48, 48);
+                rm->spr_worlditempopup.draw(iStoredPowerupBoxX, iStoredItemPopupDrawY, {game_values.colorids[iPlayerId] * 48, 256, 48, 48});
 
-                rm->spr_storedpoweruplarge.draw(iStoredPowerupBoxX + 8, iStoredItemPopupDrawY + 8, game_values.storedpowerups[iPlayerId] << 5, 0, 32, 32);
+                rm->spr_storedpoweruplarge.draw(iStoredPowerupBoxX + 8, iStoredItemPopupDrawY + 8, {game_values.storedpowerups[iPlayerId] << 5, 0, 32, 32});
 
                 iStoredPowerupBoxX += 96;
             }
@@ -472,22 +472,22 @@ void MI_World::Draw()
         for (short iTeam = 0; iTeam < 4; iTeam++) {
             if (iStateTransition[iTeam] != 0) {
                 short iColorId = game_values.colorids[game_values.teamids[iTeam][0]];
-                rm->spr_worlditempopup.draw(0, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], 0, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
-                rm->spr_worlditempopup.draw(320, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], 192, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
+                rm->spr_worlditempopup.draw(0, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], {0, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1});
+                rm->spr_worlditempopup.draw(320, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], {192, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1});
 
                 if (iStateTransition[iTeam] == 3) {
                     short iNumPowerups = game_values.worldpowerupcount[iTeam];
 
                     if (iNumPowerups > 0)
-                        rm->spr_worlditempopup.draw(iItemCol[iTeam] * 52 + 114, 424 - iPopupOffsetsCurrent[iTeam], iColorId * 48, 256, 48, 48);
+                        rm->spr_worlditempopup.draw(iItemCol[iTeam] * 52 + 114, 424 - iPopupOffsetsCurrent[iTeam], {iColorId * 48, 256, 48, 48});
 
                     short iStartItem = iItemPage[iTeam] << 3;
                     for (short iItem = iStartItem; iItem < iStartItem + 8 && iItem < iNumPowerups; iItem++) {
                         short iPowerup = game_values.worldpowerups[iTeam][iItem];
                         if (iPowerup >= NUM_POWERUPS)
-                            rm->spr_worlditems.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
+                            rm->spr_worlditems.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], {(iPowerup - NUM_POWERUPS) << 5, 0, 32, 32});
                         else
-                            rm->spr_storedpoweruplarge.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], iPowerup << 5, 0, 32, 32);
+                            rm->spr_storedpoweruplarge.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], {iPowerup << 5, 0, 32, 32});
                     }
                 }
             }

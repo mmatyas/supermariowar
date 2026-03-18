@@ -64,7 +64,7 @@ bool MO_FlagBase::collide(CPlayer* player)
 
 void MO_FlagBase::draw()
 {
-    spr->draw(ix - 8, iy - 8, iGraphicOffsetX, 0, 48, 48);
+    spr->draw(ix - 8, iy - 8, {iGraphicOffsetX, 0, 48, 48});
 }
 
 

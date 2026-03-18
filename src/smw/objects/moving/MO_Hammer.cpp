@@ -111,5 +111,5 @@ bool MO_Hammer::collide(CPlayer* player)
 
 void MO_Hammer::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, colorOffset, iw, ih});
 }

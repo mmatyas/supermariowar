@@ -29,12 +29,10 @@ void PlayerWings::draw(CPlayer &player)
     if (player.iswarping())
         rm->spr_wings.draw(
             player.ix + (fPlayerFacingRight ? - 19 : 15), player.iy - 10,
-            iWingsFrame, fPlayerFacingRight ? 0 : 32,
-            26, 32,
-            (short)player.state % 4, player.GetWarpPlane());
+            {iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32},
+            static_cast<ClipEdge>((short)player.state % 4), player.GetWarpPlane());
     else
         rm->spr_wings.draw(
             player.ix + (fPlayerFacingRight ? - 19 : 15), player.iy - 10,
-            iWingsFrame, fPlayerFacingRight ? 0 : 32,
-            26, 32);
+            {iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32});
 }

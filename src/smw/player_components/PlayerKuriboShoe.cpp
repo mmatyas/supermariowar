@@ -109,13 +109,11 @@ void PlayerKuriboShoe::draw(CPlayer& player)
         if (player.iswarping())
             rm->spr_kuriboshoe.draw(
                 player.leftX() - PWOFFSET, player.topY() - PHOFFSET,
-                animationFrame + (type == STICKY ? 64 : 0), (player.sprite_state & 0x1) == 0 ? 0 : 32,
-                32, 32,
-                (short)player.state % 4, player.GetWarpPlane());
+                {animationFrame + (type == STICKY ? 64 : 0), (player.sprite_state & 0x1) == 0 ? 0 : 32, 32, 32},
+                static_cast<ClipEdge>((short)player.state % 4), player.GetWarpPlane());
         else
             rm->spr_kuriboshoe.draw(
                 player.leftX() - PWOFFSET, player.topY() - PHOFFSET,
-                animationFrame + (type == STICKY ? 64 : 0), (player.sprite_state & 0x1) == 0 ? 0 : 32,
-                32, 32);
+                {animationFrame + (type == STICKY ? 64 : 0), (player.sprite_state & 0x1) == 0 ? 0 : 32, 32, 32});
     }
 }

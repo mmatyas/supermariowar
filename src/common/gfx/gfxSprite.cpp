@@ -77,7 +77,7 @@ SdlSurfacePtr loadImage(
 
 void blitSurface(SDL_Surface* src, const SDL_Rect* srcArea, SDL_Surface* dst, SDL_Rect* dstArea)
 {
-    if (SDL_BlitSurface(src, nullptr, dst, dstArea) < 0) {
+    if (SDL_BlitSurface(src, srcArea, dst, dstArea) < 0) {
         fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
     }
 }
@@ -128,56 +128,58 @@ void gfxSprite::draw(int x, int y) const
     }
 }
 
-//TODO Perf Optimization: Set w/h once when sprite is initialized, set srcx/srcy just when animation frame advance happens
-bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h, short sHiddenDirection, short sHiddenValue)
+void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect) const
 {
     assert(m_picture);
 
-    SDL_Rect srcRect {srcx, srcy, w, h};
-    SDL_Rect dstRect {x + x_shake, y + y_shake, w, h};
-
-    if (sHiddenDirection > -1) {
-        if (gfx_adjusthiddenrects(&srcRect, &dstRect, sHiddenDirection, sHiddenValue))
-            return true;
-    }
-
-    // Blit onto the screen surface
-    if (SDL_BlitSurface(m_picture.get(), &srcRect, blitdest, &dstRect) < 0) {
-        fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-        return false;
-    }
+    SDL_Rect dstRect {x + x_shake, y + y_shake, srcRect.w, srcRect.h};
+    blitSurface(m_picture.get(), &srcRect, blitdest, &dstRect);
 
     if (fWrap) {
-        if (x + w >= iWrapSize) {
-            srcRect = {srcx, srcy, w, h};
-            dstRect = {x - iWrapSize + x_shake, y + y_shake, w, h};
-
-            if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&srcRect, &dstRect, sHiddenDirection, sHiddenValue))
-                    return true;
-            }
-
-            if (SDL_BlitSurface(m_picture.get(), &srcRect, blitdest, &dstRect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
+        if (x + getWidth() >= iWrapSize) {
+            dstRect.x -= iWrapSize;
+            blitSurface(m_picture.get(), &srcRect, blitdest, &dstRect);
         } else if (x < 0) {
-            srcRect = {srcx, srcy, w, h};
-            dstRect = {x + iWrapSize + x_shake, y + y_shake, w, h};
-
-            if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&srcRect, &dstRect, sHiddenDirection, sHiddenValue))
-                    return true;
-            }
-
-            if (SDL_BlitSurface(m_picture.get(), &srcRect, blitdest, &dstRect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
+            dstRect.x += iWrapSize;
+            blitSurface(m_picture.get(), &srcRect, blitdest, &dstRect);
         }
     }
+}
 
-    return true;
+void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect, ClipEdge clipEdge, int clipTreshold) const
+{
+    assert(m_picture);
+
+    const SDL_Rect dstRect {x + x_shake, y + y_shake, srcRect.w, srcRect.h};
+    SDL_Rect adjustedSrcRect = srcRect;
+    SDL_Rect adjustedDstRect = dstRect;
+
+    if (gfx_adjusthiddenrects(adjustedSrcRect, adjustedDstRect, clipEdge, clipTreshold))
+        return;
+
+    blitSurface(m_picture.get(), &adjustedSrcRect, blitdest, &adjustedDstRect);
+
+    if (fWrap) {
+        if (x + srcRect.w >= iWrapSize) {
+            adjustedSrcRect = srcRect;
+            adjustedDstRect = dstRect;
+            adjustedDstRect.x -= iWrapSize;
+
+            if (gfx_adjusthiddenrects(adjustedSrcRect, adjustedDstRect, clipEdge, clipTreshold))
+                return;
+
+            blitSurface(m_picture.get(), &adjustedSrcRect, blitdest, &adjustedDstRect);
+        } else if (x < 0) {
+            adjustedSrcRect = srcRect;
+            adjustedDstRect = dstRect;
+            adjustedDstRect.x += iWrapSize;
+
+            if (gfx_adjusthiddenrects(adjustedSrcRect, adjustedDstRect, clipEdge, clipTreshold))
+                return;
+
+            blitSurface(m_picture.get(), &adjustedSrcRect, blitdest, &adjustedDstRect);
+        }
+    }
 }
 
 bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, short srcy, short srcw, short srch)

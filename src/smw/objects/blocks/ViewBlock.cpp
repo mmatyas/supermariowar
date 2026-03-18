@@ -30,7 +30,7 @@ void B_ViewBlock::draw()
 
     //Draw powerup behind block
     if (state == 0 && !fNoPowerupsSelected)
-        rm->spr_storedpoweruplarge.draw(ix, iy, powerupindex * 32, 0, 32, 32);
+        rm->spr_storedpoweruplarge.draw(ix, iy, {powerupindex * 32, 0, 32, 32});
 
     B_PowerupBlock::draw();
 }

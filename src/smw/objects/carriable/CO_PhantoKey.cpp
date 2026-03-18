@@ -68,7 +68,7 @@ void CO_PhantoKey::draw()
 {
     MO_CarriedObject::draw();
 
-    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
 }
 
 void CO_PhantoKey::placeKey()

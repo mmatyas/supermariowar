@@ -1723,13 +1723,13 @@ int editor_edit()
 
 		//Ask if you are sure you want to exit
         if (fExiting) {
-			spr_dialog.draw(224, 176, 0, 0, 192, 128);
+			spr_dialog.draw(224, 176, {0, 0, 192, 128});
 			rm->menu_font_large.drawCentered(320, 195, "Exit");
 			rm->menu_font_large.drawCentered(320, 220, "Are You Sure?");
 			rm->menu_font_large.drawCentered(282, 254, "Yes");
 			rm->menu_font_large.drawCentered(356, 254, "No");
 
-			spr_dialog.draw(fSelectedYes ? 250 : 326, 250, 192, 0, 64, 32);
+			spr_dialog.draw(fSelectedYes ? 250 : 326, 250, {192, 0, 64, 32});
         } else {
 			//Draw Paths
             if (edit_mode == 2) {
@@ -1738,7 +1738,7 @@ int editor_edit()
 						short iConnection = g_worldmap.tiles.at(iCol, iRow).iConnectionType;
 
 						if (iConnection > 0)
-							spr_path.draw((iCol - draw_offset_col) * TILESIZE + draw_offset_x, (iRow - draw_offset_row) * TILESIZE + draw_offset_y, (iConnection - 1) << 5, 0, TILESIZE, TILESIZE);
+							spr_path.draw((iCol - draw_offset_col) * TILESIZE + draw_offset_x, (iRow - draw_offset_row) * TILESIZE + draw_offset_y, {(iConnection - 1) << 5, 0, TILESIZE, TILESIZE});
 					}
 				}
             } else if (edit_mode == 6) { //draw warps
@@ -1752,14 +1752,14 @@ int editor_edit()
 						ix = (warp->posA.x - draw_offset_col) * TILESIZE + draw_offset_x;
 						iy = (warp->posA.y - draw_offset_row) * TILESIZE + draw_offset_y;
 
-						spr_warps[0].draw(ix, iy, warp->id << 5, 0, 32, 32);
+						spr_warps[0].draw(ix, iy, {warp->id << 5, 0, 32, 32});
 					}
 
                     if (warp->posB.x >= 0) {
 						ix = (warp->posB.x - draw_offset_col) * TILESIZE + draw_offset_x;
 						iy = (warp->posB.y - draw_offset_row) * TILESIZE + draw_offset_y;
 
-						spr_warps[0].draw(ix, iy, warp->id << 5, 0, 32, 32);
+						spr_warps[0].draw(ix, iy, {warp->id << 5, 0, 32, 32});
 					}
 
 					itr++;
@@ -1776,7 +1776,7 @@ int editor_edit()
 							SDL_Rect r = {ix, iy, 32, 32};
 							SDL_FillRect(blitdest, &r, color);
 
-							rm->spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
+							rm->spr_worldforegroundspecial[0].draw(ix, iy, {(iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32});
 						}
 					}
 				}
@@ -1792,7 +1792,7 @@ int editor_edit()
 							SDL_Rect r = {ix, iy, 32, 32};
 							SDL_FillRect(blitdest, &r, color);
 
-							rm->spr_worldforegroundspecial[0].draw(ix, iy, (iType % 10) << 5, (iType / 10) << 5, 32, 32);
+							rm->spr_worldforegroundspecial[0].draw(ix, iy, {(iType % 10) << 5, (iType / 10) << 5, 32, 32});
 						}
 					}
 				}
@@ -1814,18 +1814,18 @@ int editor_edit()
 					SDL_Rect r = {ix, iy, 32, 32};
 					SDL_FillRect(blitdest, &r, color);
 
-					rm->spr_worldvehicle[0].draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
+					rm->spr_worldvehicle[0].draw(ix, iy, {vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32});
 
                     if (edit_mode == 5) {
-						rm->spr_worldforegroundspecial[0].draw(ix, iy, (vehicle->iActionId % 10) << 5, (vehicle->iActionId / 10) << 5, 32, 32);
+						rm->spr_worldforegroundspecial[0].draw(ix, iy, {(vehicle->iActionId % 10) << 5, (vehicle->iActionId / 10) << 5, 32, 32});
 					}
 
                     if (edit_mode == 8) {
 						short iBoundary = vehicle->iBoundary - 1;
 						if (iBoundary == -1)
-							rm->spr_worldforegroundspecial[0].draw(ix, iy, 288, 288, 32, 32);
+							rm->spr_worldforegroundspecial[0].draw(ix, iy, {288, 288, 32, 32});
 						else
-							rm->spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
+							rm->spr_worldforegroundspecial[0].draw(ix, iy, {(iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32});
 					}
 
 					itr++;
@@ -1847,7 +1847,7 @@ int editor_edit()
 
 
             if (--g_musiccategorydisplaytimer > 0) {
-				spr_dialog.draw(224, 176, 0, 0, 192, 128);
+				spr_dialog.draw(224, 176, {0, 0, 192, 128});
 				rm->menu_font_small.drawCentered(320, 195, "Music Category");
                                 rm->menu_font_large.drawCentered(320, 220, to_string(g_worldmap.iMusicCategory).data());
 
@@ -1877,7 +1877,7 @@ void DrawMessage()
     if (g_messagedisplaytimer > 0) {
 		--g_messagedisplaytimer;
 
-		spr_dialog.draw(224, 176, 0, 0, 192, 128);
+		spr_dialog.draw(224, 176, {0, 0, 192, 128});
 		rm->menu_font_large.drawCentered(320, 195, g_szMessageTitle.c_str());
 		rm->menu_font_large.drawCentered(320, 220, g_szMessageLine[0].c_str());
 		rm->menu_font_large.drawCentered(320, 240, g_szMessageLine[1].c_str());
@@ -2497,7 +2497,7 @@ int editor_warp()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
-		spr_warps[0].draw(0, 0, 0, 0, 320, 32);
+		spr_warps[0].draw(0, 0, {0, 0, 320, 32});
 
                 rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
@@ -2607,24 +2607,24 @@ int editor_start_items()
 		menu_shade.draw(0, 0);
 
         for (short iItem = 0; iItem < NUM_POWERUPS; iItem++) {
-			rm->spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
+			rm->spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, {iItem << 5, 0, 32, 32});
 		}
 
         for (short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++) {
-			rm->spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
+			rm->spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, {iWorldItem << 5, 0, 32, 32});
 		}
 
         for (short iPopup = 0; iPopup < 4; iPopup++) {
-			rm->spr_worlditempopup.draw(0, 416 - (iPopup << 6), 0, 0, 320, 64);
-			rm->spr_worlditempopup.draw(320, 416 - (iPopup << 6), 192, 0, 320, 64);
+			rm->spr_worlditempopup.draw(0, 416 - (iPopup << 6), {0, 0, 320, 64});
+			rm->spr_worlditempopup.draw(320, 416 - (iPopup << 6), {192, 0, 320, 64});
 		}
 
         for (short iPickedItem = 0; iPickedItem < g_worldmap.iNumInitialBonuses; iPickedItem++) {
 			short iPowerup = g_worldmap.iInitialBonuses[iPickedItem];
 			if (iPowerup >= NUM_POWERUPS)
-				rm->spr_worlditems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
+				rm->spr_worlditems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, {(iPowerup - NUM_POWERUPS) << 5, 0, 32, 32});
 			else
-				rm->spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
+				rm->spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, {iPowerup << 5, 0, 32, 32});
 		}
 
         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
@@ -2697,7 +2697,7 @@ int editor_boundary()
 		SDL_Rect r = {0, 0, 320, 320};
 		SDL_FillRect(blitdest, &r, color);
 
-		rm->spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
+		rm->spr_worldforegroundspecial[0].draw(0, 0, {0, 0, 320, 320});
 
                 rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
@@ -2768,10 +2768,10 @@ int editor_type()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
-		rm->spr_worldforegroundspecial[0].draw(0, 0, 320, 128, 64, 32);
-		rm->spr_worldforegroundspecial[0].draw(64, 0, 320, 192, 128, 32);
+		rm->spr_worldforegroundspecial[0].draw(0, 0, {320, 128, 64, 32});
+		rm->spr_worldforegroundspecial[0].draw(64, 0, {320, 192, 128, 32});
 
-		rm->spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
+		rm->spr_worldforegroundspecial[0].draw(64, 0, {448, 64, 128, 32});
 
         rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
 
@@ -2837,7 +2837,7 @@ int editor_water()
 		SDL_FillRect(screen, NULL, 0x0);
 
 		for (short iWater = 0; iWater < 3; iWater++)
-			rm->spr_worldbackground[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
+			rm->spr_worldbackground[0].draw(iWater << 5, 0, {512 + (iWater << 7), 0, 32, 32});
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2926,7 +2926,7 @@ int editor_background()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		rm->spr_worldbackground[0].draw(0, 0, iPage * 640, 32, 640, 480);
+		rm->spr_worldbackground[0].draw(0, 0, {iPage * 640, 32, 640, 480});
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3000,11 +3000,11 @@ int editor_stageforeground()
 
         for (short iRow = 0; iRow < 10; iRow++) {
             for (short iCol = 0; iCol < 10; iCol++) {
-				rm->spr_worldforegroundspecial[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
+				rm->spr_worldforegroundspecial[0].draw(iCol << 5, iRow << 5, {384, iForegroundScreen << 5, 32, 32});
 			}
 		}
 
-		rm->spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
+		rm->spr_worldforegroundspecial[0].draw(0, 0, {0, 0, 320, 320});
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3069,7 +3069,7 @@ int editor_bridges()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		rm->spr_worldforegroundspecial[0].draw(0, 0, 320, 224, 128, 32);
+		rm->spr_worldforegroundspecial[0].draw(0, 0, {320, 224, 128, 32});
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3140,8 +3140,8 @@ int editor_structureforeground()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		rm->spr_worldforeground[0].draw(0, 0, 0, 0, 416, 480);
-		rm->spr_worldforeground[0].draw(416, 0, 512, 0, 32, 480);
+		rm->spr_worldforeground[0].draw(0, 0, {0, 0, 416, 480});
+		rm->spr_worldforeground[0].draw(416, 0, {512, 0, 32, 480});
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3204,7 +3204,7 @@ int editor_pathsprite()
 		SDL_FillRect(screen, NULL, 0x0);
 
         for (short iPath = 0; iPath < 8; iPath++) {
-			rm->spr_worldpaths[0].draw(iPath << 5, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);
+			rm->spr_worldpaths[0].draw(iPath << 5, 0, {(iPath % 4) * 160, (iPath / 4) * 320, 32, 192});
 		}
 
 		DrawMessage();
@@ -3387,7 +3387,7 @@ int editor_path()
 		}
 
 		SDL_FillRect(screen, NULL, 0x0);
-		spr_path.draw(0, 0, 0, 0, 480, 32);
+		spr_path.draw(0, 0, {0, 0, 480, 32});
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3448,22 +3448,22 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 		if (iMouseY > 248)
 			iMouseY = 248;
 
-		spr_largedialog.draw(iMouseX, iMouseY, 0, 0, 116, 116);
-		spr_largedialog.draw(iMouseX + 116, iMouseY, 140, 0, 116, 116);
-		spr_largedialog.draw(iMouseX, iMouseY + 116, 0, 108, 116, 116);
-		spr_largedialog.draw(iMouseX + 116, iMouseY + 116, 140, 108, 116, 116);
+		spr_largedialog.draw(iMouseX, iMouseY, {0, 0, 116, 116});
+		spr_largedialog.draw(iMouseX + 116, iMouseY, {140, 0, 116, 116});
+		spr_largedialog.draw(iMouseX, iMouseY + 116, {0, 108, 116, 116});
+		spr_largedialog.draw(iMouseX + 116, iMouseY + 116, {140, 108, 116, 116});
     } else if (iMode == 24) {
 		//Make sure we're displaying it on the screen
 		if (iMouseY > 392)
 			iMouseY = 392;
 
-		spr_largedialog.draw(iMouseX, iMouseY, 0, 0, 116, 44);
-		spr_largedialog.draw(iMouseX + 116, iMouseY, 140, 0, 116, 44);
-		spr_largedialog.draw(iMouseX, iMouseY + 44, 0, 180, 116, 44);
-		spr_largedialog.draw(iMouseX + 116, iMouseY + 44, 140, 180, 116, 44);
+		spr_largedialog.draw(iMouseX, iMouseY, {0, 0, 116, 44});
+		spr_largedialog.draw(iMouseX + 116, iMouseY, {140, 0, 116, 44});
+		spr_largedialog.draw(iMouseX, iMouseY + 44, {0, 180, 116, 44});
+		spr_largedialog.draw(iMouseX + 116, iMouseY + 44, {140, 180, 116, 44});
 	}
 
-	rm->menu_mode_large.draw(iMouseX + 16, iMouseY + 16, iMode << 5, 0, 32, 32);
+	rm->menu_mode_large.draw(iMouseX + 16, iMouseY + 16, {iMode << 5, 0, 32, 32});
 
 	rm->menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 16, 164, ts->szName.c_str());
 
@@ -3480,11 +3480,11 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 
         for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
 			WorldStageBonus * wsb = &ts->wsbBonuses[iBonus];
-			rm->spr_worlditemsplace.draw(iMouseX + iBonus * 20 + 16, iMouseY + 194, wsb->iWinnerPlace * 20, 0, 20, 20);
+			rm->spr_worlditemsplace.draw(iMouseX + iBonus * 20 + 16, iMouseY + 194, {wsb->iWinnerPlace * 20, 0, 20, 20});
 
 			short iBonusIcon = wsb->iBonus;
 			gfxSprite * spr_icon = iBonusIcon < NUM_POWERUPS ? &rm->spr_storedpowerupsmall : &rm->spr_worlditemssmall;
-			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 196, (iBonusIcon < NUM_POWERUPS ? iBonusIcon : iBonusIcon - NUM_POWERUPS) << 4, 0, 16, 16);
+			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 196, {(iBonusIcon < NUM_POWERUPS ? iBonusIcon : iBonusIcon - NUM_POWERUPS) << 4, 0, 16, 16});
 		}
 
         if (sMapThumbnail) {
@@ -3520,7 +3520,7 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 				iSrcY = 32;
 			}
 
-			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 52, iSrcX, iSrcY, 16, 16);
+			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 52, {iSrcX, iSrcY, 16, 16});
 		}
 	}
 }
@@ -4181,7 +4181,7 @@ int editor_stage()
 				SDL_Rect r = {ix, iy, 32, 32};
 				SDL_FillRect(blitdest, &r, color);
 
-				rm->spr_worldforegroundspecial[0].draw(ix, iy, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
+				rm->spr_worldforegroundspecial[0].draw(ix, iy, {(iStage % 10) << 5, (iStage / 10) << 5, 32, 32});
 			}
 
             if (iStageDisplay >= 0) {
@@ -4190,8 +4190,8 @@ int editor_stage()
 			}
 
 			//Display New button
-			rm->spr_selectfield.draw(256, 420, 0, 0, 64, 32);
-			rm->spr_selectfield.draw(320, 420, 448, 0, 64, 32);
+			rm->spr_selectfield.draw(256, 420, {0, 0, 64, 32});
+			rm->spr_selectfield.draw(320, 420, {448, 0, 64, 32});
 
 			rm->menu_font_large.drawCentered(320, 425, "New Stage");
 
@@ -4207,7 +4207,7 @@ int editor_stage()
 				SDL_Rect r = {ix, iy, 32, 32};
 				SDL_FillRect(blitdest, &r, color);
 
-				rm->spr_worldforegroundspecial[0].draw(ix, iy, (iEditStage % 10) << 5, (iEditStage / 10) << 5, 32, 32);
+				rm->spr_worldforegroundspecial[0].draw(ix, iy, {(iEditStage % 10) << 5, (iEditStage / 10) << 5, 32, 32});
 			}
 		}
 
@@ -4216,24 +4216,24 @@ int editor_stage()
 
 			//Game powerups
             for (short iItem = 0; iItem < NUM_POWERUPS; iItem++) {
-				rm->spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
+				rm->spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, {iItem << 5, 0, 32, 32});
 			}
 
 			//World Powerups
             for (short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++) {
-				rm->spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
+				rm->spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, {iWorldItem << 5, 0, 32, 32});
 			}
 
 			//Score Bonuses
             if (ts->iStageType == 1) {
                 for (short iScoreBonus = 0; iScoreBonus < NUM_WORLD_SCORE_BONUSES; iScoreBonus++) {
-					rm->spr_worlditems.draw(rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].x, rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].y, iScoreBonus < 10 ? iScoreBonus << 5 : (iScoreBonus - 10) << 5, iScoreBonus < 10 ? 32 : 64, 32, 32);
+					rm->spr_worlditems.draw(rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].x, rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].y, {iScoreBonus < 10 ? iScoreBonus << 5 : (iScoreBonus - 10) << 5, iScoreBonus < 10 ? 32 : 64, 32, 32});
 				}
 			}
 
 			//Draw background container
-			rm->spr_worlditempopup.draw(0, 344, 0, 0, 320, 64);
-			rm->spr_worlditempopup.draw(320, 344, 192, 0, 320, 64);
+			rm->spr_worlditempopup.draw(0, 344, {0, 0, 320, 64});
+			rm->spr_worlditempopup.draw(320, 344, {192, 0, 320, 64});
 
 			SDL_Rect * rects = rStageBonusDst;
 
@@ -4246,15 +4246,15 @@ int editor_stage()
 
 				//Draw place behind bonus
 				if (ts->iStageType == 0)
-					rm->spr_worlditempopup.draw(rects[iPickedItem].x - 8, rects[iPickedItem].y - 8, iPlace * 48, 256, 48, 48);
+					rm->spr_worlditempopup.draw(rects[iPickedItem].x - 8, rects[iPickedItem].y - 8, {iPlace * 48, 256, 48, 48});
 
                 if (iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS) {
 					short iBonusIndex = iBonus - NUM_POWERUPS - NUM_WORLD_POWERUPS;
-					rm->spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, iBonusIndex < 10 ? iBonusIndex << 5 : (iBonusIndex - 10) << 5, iBonusIndex < 10 ? 32 : 64, 32, 32);
+					rm->spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, {iBonusIndex < 10 ? iBonusIndex << 5 : (iBonusIndex - 10) << 5, iBonusIndex < 10 ? 32 : 64, 32, 32});
                 } else if (iBonus >= NUM_POWERUPS) {
-					rm->spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, (iBonus - NUM_POWERUPS) << 5, 0, 32, 32);
+					rm->spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, {(iBonus - NUM_POWERUPS) << 5, 0, 32, 32});
                 } else {
-					rm->spr_storedpoweruplarge.draw(rects[iPickedItem].x, rects[iPickedItem].y, iBonus << 5, 0, 32, 32);
+					rm->spr_storedpoweruplarge.draw(rects[iPickedItem].x, rects[iPickedItem].y, {iBonus << 5, 0, 32, 32});
 				}
 			}
 
@@ -4440,7 +4440,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 	drawmap(false, TILESIZE);
 	menu_shade.draw(0, 0);
-	spr_dialog.draw(224, 176, 0, 0, 192, 128);
+	spr_dialog.draw(224, 176, {0, 0, 192, 128});
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
     rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
@@ -4468,7 +4468,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 							drawmap(false, TILESIZE);
 							menu_shade.draw(0, 0);
-							spr_dialog.draw(224, 176, 0, 0, 192, 128);
+							spr_dialog.draw(224, 176, {0, 0, 192, 128});
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
@@ -4520,7 +4520,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 							drawmap(false, TILESIZE);
 							menu_shade.draw(0, 0);
-							spr_dialog.draw(224, 176, 0, 0, 192, 128);
+							spr_dialog.draw(224, 176, {0, 0, 192, 128});
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
@@ -4763,7 +4763,7 @@ void takescreenshot()
 			short ix = vehicle->currentTile.x * iTileSize;
 			short iy = vehicle->currentTile.y * iTileSize;
 
-			rm->spr_worldvehicle[iScreenshotSize].draw(ix, iy, vehicle->iDrawDirection * iTileSize, vehicle->iDrawSprite * iTileSize, iTileSize, iTileSize);
+			rm->spr_worldvehicle[iScreenshotSize].draw(ix, iy, {vehicle->iDrawDirection * iTileSize, vehicle->iDrawSprite * iTileSize, iTileSize, iTileSize});
 
 			itr++;
 		}
@@ -4774,10 +4774,10 @@ void takescreenshot()
 			WorldWarp * warp = *itrWarp;
 
 			if (warp->posA.x >= 0)
-				spr_warps[iScreenshotSize].draw(warp->posA.x * iTileSize, warp->posA.y * iTileSize, warp->id * iTileSize, 0, iTileSize, iTileSize);
+				spr_warps[iScreenshotSize].draw(warp->posA.x * iTileSize, warp->posA.y * iTileSize, {warp->id * iTileSize, 0, iTileSize, iTileSize});
 
 			if (warp->posB.x >= 0)
-				spr_warps[iScreenshotSize].draw(warp->posB.x * iTileSize, warp->posB.y * iTileSize, warp->id * iTileSize, 0, iTileSize, iTileSize);
+				spr_warps[iScreenshotSize].draw(warp->posB.x * iTileSize, warp->posB.y * iTileSize, {warp->id * iTileSize, 0, iTileSize, iTileSize});
 
 			itrWarp++;
 		}

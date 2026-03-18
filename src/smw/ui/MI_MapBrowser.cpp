@@ -87,7 +87,7 @@ void MI_MapBrowser::Draw()
 
                 if (iType == 0) {
                     if (mapListNodes[iRow * 3 + iCol]->pfFilters[game_values.selectedmapfilter])
-                        rm->menu_map_filter.draw(rDst.x, rDst.y, iFilterTagAnimationFrame, 24, 24, 24);
+                        rm->menu_map_filter.draw(rDst.x, rDst.y, {iFilterTagAnimationFrame, 24, 24, 24});
                 }
 
                 rm->menu_font_large.drawChopRight(rDst.x, rDst.y + 120, 165, mapNames[iRow * 3 + iCol].c_str());
@@ -99,16 +99,16 @@ void MI_MapBrowser::Draw()
     rDst.y = iSelectedRow * 150 + 30;
     rDst.x = iSelectedCol * 200 + 40;
 
-    rm->menu_dialog.draw(rDst.x - 16, rDst.y - 16, 0, 0, 176, 148);
-    rm->menu_dialog.draw(rDst.x + 160, rDst.y - 16, 496, 0, 16, 148);
-    rm->menu_dialog.draw(rDst.x - 16, rDst.y + 132, 0, 464, 176, 16);
-    rm->menu_dialog.draw(rDst.x + 160, rDst.y + 132, 496, 464, 16, 16);
+    rm->menu_dialog.draw(rDst.x - 16, rDst.y - 16, {0, 0, 176, 148});
+    rm->menu_dialog.draw(rDst.x + 160, rDst.y - 16, {496, 0, 16, 148});
+    rm->menu_dialog.draw(rDst.x - 16, rDst.y + 132, {0, 464, 176, 16});
+    rm->menu_dialog.draw(rDst.x + 160, rDst.y + 132, {496, 464, 16, 16});
 
     SDL_BlitSurface(mapSurfaces[iSelectedRow * 3 + iSelectedCol], &rSrc, blitdest, &rDst);
 
     if (iType == 0) {
         if (mapListNodes[iSelectedRow * 3 + iSelectedCol]->pfFilters[game_values.selectedmapfilter])
-            rm->menu_map_filter.draw(rDst.x, rDst.y, iFilterTagAnimationFrame, 24, 24, 24);
+            rm->menu_map_filter.draw(rDst.x, rDst.y, {iFilterTagAnimationFrame, 24, 24, 24});
     }
 
     rm->menu_font_large.drawChopRight(rDst.x, rDst.y + 120, 165, mapNames[iSelectedRow * 3 + iSelectedCol].c_str());

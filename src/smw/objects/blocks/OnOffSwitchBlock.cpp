@@ -50,7 +50,7 @@ void B_OnOffSwitchBlock::update()
 
 void B_OnOffSwitchBlock::draw()
 {
-    spr->draw(ix, iy, iSrcX, (state == 0 ? 0 : 32), iw, ih);
+    spr->draw(ix, iy, {iSrcX, (state == 0 ? 0 : 32), iw, ih});
 }
 
 bool B_OnOffSwitchBlock::hittop(CPlayer * player, bool useBehavior)

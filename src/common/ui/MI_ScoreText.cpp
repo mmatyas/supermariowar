@@ -14,14 +14,14 @@ void MI_ScoreText::Draw()
     if (!m_visible)
         return;
 
-    rm->spr_scoretext.draw(iDigitRightDstX, m_pos.y, iDigitRightSrcX, 0, 16, 16);
+    rm->spr_scoretext.draw(iDigitRightDstX, m_pos.y, {iDigitRightSrcX, 0, 16, 16});
 
     if (iDigitLeftSrcX > 0) {
-        rm->spr_scoretext.draw(iDigitMiddleDstX, m_pos.y, iDigitMiddleSrcX, 0, 16, 16);
-        rm->spr_scoretext.draw(iDigitLeftDstX, m_pos.y, iDigitLeftSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, m_pos.y, {iDigitMiddleSrcX, 0, 16, 16});
+        rm->spr_scoretext.draw(iDigitLeftDstX, m_pos.y, {iDigitLeftSrcX, 0, 16, 16});
     }
     else if (iDigitMiddleSrcX > 0) {
-        rm->spr_scoretext.draw(iDigitMiddleDstX, m_pos.y, iDigitMiddleSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, m_pos.y, {iDigitMiddleSrcX, 0, 16, 16});
     }
 }
 

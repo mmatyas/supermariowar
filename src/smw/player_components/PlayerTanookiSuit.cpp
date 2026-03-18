@@ -177,13 +177,11 @@ void PlayerTanookiSuit::drawStatue(CPlayer& player)
         rm->spr_statue.draw(
             player.leftX() - PWOFFSET,
             player.topY() - 31,
-            player.getColorID() << 5,
-            0, 32, 58,
-            (short)player.state % 4, player.GetWarpPlane());
+            {player.getColorID() << 5, 0, 32, 58},
+            static_cast<ClipEdge>((short)player.state % 4), player.GetWarpPlane());
     else
         rm->spr_statue.draw(
             player.leftX() - PWOFFSET,
             player.topY() - 31,
-            player.getColorID() << 5,
-            0, 32, 58);
+            {player.getColorID() << 5, 0, 32, 58});
 }

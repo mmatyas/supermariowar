@@ -32,7 +32,7 @@ B_BreakableBlock::B_BreakableBlock(gfxSprite *nspr, Vec2s pos, short iNumSpr, sh
 void B_BreakableBlock::draw()
 {
     if (state == 0)
-        spr->draw(ix, iy, drawFrame, 0, iw, ih);
+        spr->draw(ix, iy, {drawFrame, 0, iw, ih});
 }
 
 void B_BreakableBlock::update()

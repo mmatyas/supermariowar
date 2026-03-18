@@ -77,7 +77,7 @@ B_PowerupBlock::~B_PowerupBlock()
 void B_PowerupBlock::draw()
 {
     if (!hidden)
-        spr->draw(ix, iy, drawFrame, state == 0 ? 0 : ih, iw, ih);
+        spr->draw(ix, iy, {drawFrame, state == 0 ? 0 : ih, iw, ih});
 }
 
 void B_PowerupBlock::update()

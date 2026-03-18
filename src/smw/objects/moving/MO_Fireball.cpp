@@ -72,5 +72,5 @@ bool MO_Fireball::collide(CPlayer* player)
 
 void MO_Fireball::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, (velx > 0 ? 0 : 18) + colorOffset, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, (velx > 0 ? 0 : 18) + colorOffset, iw, ih});
 }

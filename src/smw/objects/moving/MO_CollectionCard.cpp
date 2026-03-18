@@ -120,7 +120,7 @@ void MO_CollectionCard::draw()
     IO_MovingObject::draw();
 
     // Draw sparkles
-    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
 }
 
 void MO_CollectionCard::placeCard()

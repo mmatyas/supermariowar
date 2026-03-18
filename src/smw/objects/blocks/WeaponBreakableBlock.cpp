@@ -32,7 +32,7 @@ B_WeaponBreakableBlock::B_WeaponBreakableBlock(gfxSprite *nspr, Vec2s pos, Weapo
 void B_WeaponBreakableBlock::draw()
 {
     if (state == 0)
-        spr->draw(ix, iy, iDrawOffsetX, 0, iw, ih);
+        spr->draw(ix, iy, {iDrawOffsetX, 0, iw, ih});
 }
 
 void B_WeaponBreakableBlock::update()

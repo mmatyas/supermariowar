@@ -45,9 +45,9 @@ void MO_CarriedObject::init()
 void MO_CarriedObject::draw()
 {
     if (owner && owner->iswarping())
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, animationOffsetY, iw, ih}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
     else
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, animationOffsetY, iw, ih});
 }
 
 void MO_CarriedObject::MoveToOwner()

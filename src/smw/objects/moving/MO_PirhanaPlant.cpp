@@ -197,13 +197,13 @@ void MO_PirhanaPlant::draw()
     if (state > 0) {
         SDL_Rect* rect = &g_rPirhanaRects[iType][iDirection][iFrame];
         if (iDirection == 0)
-            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y, 32, collisionHeight);
+            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, {rect->x, rect->y, 32, collisionHeight});
         else if (iDirection == 1)
-            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y + ih - collisionHeight, 32, collisionHeight);
+            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, {rect->x, rect->y + ih - collisionHeight, 32, collisionHeight});
         else if (iDirection == 2)
-            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y, collisionWidth, 32);
+            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, {rect->x, rect->y, collisionWidth, 32});
         else
-            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x + iw - collisionWidth, rect->y, collisionWidth, 32);
+            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, {rect->x + iw - collisionWidth, rect->y, collisionWidth, 32});
 
         // SDL_Rect r = {ix, iy, collisionWidth, collisionHeight};
         // SDL_FillRect(blitdest, &r, 0xf000);

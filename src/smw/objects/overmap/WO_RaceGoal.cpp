@@ -77,17 +77,17 @@ bool OMO_RaceGoal::collide(CPlayer* player)
 void OMO_RaceGoal::draw()
 {
     if (isfinishline) {
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 54, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, 54, iw, ih});
     } else {
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, 0, iw, ih});
 
         for (short k = 0; k < score_cnt; k++) {
             if (tagged[k] > -1)
-                rm->spr_bonus.draw(ix - collisionOffsetX + flagpositions[score_cnt - 2][k][0], iy - collisionOffsetY + flagpositions[score_cnt - 2][k][1], 0, tagged[k] * 16, 16, 16);
+                rm->spr_bonus.draw(ix - collisionOffsetX + flagpositions[score_cnt - 2][k][0], iy - collisionOffsetY + flagpositions[score_cnt - 2][k][1], {0, tagged[k] * 16, 16, 16});
         }
     }
 
-    rm->spr_racetext.draw(ix - collisionOffsetX + 26, iy - collisionOffsetY, (goalID + 1) * 16, 0, 16, 16);
+    rm->spr_racetext.draw(ix - collisionOffsetX + 26, iy - collisionOffsetY, {(goalID + 1) * 16, 0, 16, 16});
 }
 
 void OMO_RaceGoal::update()

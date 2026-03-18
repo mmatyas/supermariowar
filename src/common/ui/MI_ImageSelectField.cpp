@@ -26,9 +26,9 @@ void MI_ImageSelectField::Draw()
     if (!m_visible)
         return;
 
-    m_spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0), m_indent - 16, 32);
-    m_spr->draw(m_pos.x + m_indent - 16, m_pos.y, 0, (fSelected ? 96 : 64), 32, 32);
-    m_spr->draw(m_pos.x + m_indent + 16, m_pos.y, 528 - m_width + m_indent, (fSelected ? 32 : 0), m_width - m_indent - 16, 32);
+    m_spr->draw(m_pos.x, m_pos.y, {0, (fSelected ? 32 : 0), m_indent - 16, 32});
+    m_spr->draw(m_pos.x + m_indent - 16, m_pos.y, {0, (fSelected ? 96 : 64), 32, 32});
+    m_spr->draw(m_pos.x + m_indent + 16, m_pos.y, {528 - m_width + m_indent, (fSelected ? 32 : 0), m_width - m_indent - 16, 32});
 
     rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, m_indent - 8, m_name.c_str());
 
@@ -36,7 +36,7 @@ void MI_ImageSelectField::Draw()
         rm->menu_font_large.drawChopRight(m_pos.x + m_indent + iImageWidth + 10, m_pos.y + 5, m_width - m_indent - 24, currentItem().name.c_str());
     }
 
-    spr_image->draw(m_pos.x + m_indent + 8, m_pos.y + 16 - (iImageHeight >> 1), (currentItem().iconOverride >= 0 ? currentItem().iconOverride : currentItem().value) * iImageWidth, 0, iImageWidth, iImageHeight);
+    spr_image->draw(m_pos.x + m_indent + 8, m_pos.y + 16 - (iImageHeight >> 1), {(currentItem().iconOverride >= 0 ? currentItem().iconOverride : currentItem().value) * iImageWidth, 0, iImageWidth, iImageHeight});
 
     miModifyImageRight->Draw();
     miModifyImageLeft->Draw();

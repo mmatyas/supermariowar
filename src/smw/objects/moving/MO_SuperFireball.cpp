@@ -69,5 +69,5 @@ bool MO_SuperFireball::collide(CPlayer* player)
 
 void MO_SuperFireball::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset + directionOffset, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, colorOffset + directionOffset, iw, ih});
 }

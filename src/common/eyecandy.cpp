@@ -46,7 +46,7 @@ EC_StillImage::EC_StillImage(gfxSprite* nspr, short dstx, short dsty, short srcx
 void EC_StillImage::draw() const
 {
     if (!dead)
-        spr->draw(ix, iy, iSrcX, iSrcY, iw, ih);
+        spr->draw(ix, iy, {iSrcX, iSrcY, iw, ih});
 }
 
 
@@ -98,7 +98,7 @@ void EC_Animated::update()
 void EC_Animated::draw() const
 {
     if (!dead)
-        spr->draw(ix, iy, iAnimationFrame, iAnimationY, iAnimationW, iAnimationH);
+        spr->draw(ix, iy, {iAnimationFrame, iAnimationY, iAnimationW, iAnimationH});
 }
 
 //------------------------------------------------------------------------------
@@ -529,12 +529,12 @@ void EC_Announcement::update()
 void EC_Announcement::draw() const
 {
     for (short iRect = 0; iRect < 4; iRect++)
-        rm->menu_dialog.draw(rDstRect[iRect].x, rDstRect[iRect].y, rSrcRect[iRect].x, rSrcRect[iRect].y, rSrcRect[iRect].w, rSrcRect[iRect].h);
+        rm->menu_dialog.draw(rDstRect[iRect].x, rDstRect[iRect].y, {rSrcRect[iRect].x, rSrcRect[iRect].y, rSrcRect[iRect].w, rSrcRect[iRect].h});
 
     font->draw(ix + iFontOffsetX, iFontY, text);
 
     if (sprite)
-        sprite->draw(ix + 16, iy + 16, iIcon << 5, 0, 32, 32);
+        sprite->draw(ix + 16, iy + 16, {iIcon << 5, 0, 32, 32});
 }
 
 
@@ -679,7 +679,7 @@ void EC_ExplodingAward::update()
 
 void EC_ExplodingAward::draw() const
 {
-    spr->draw((short)x, (short)y, id, 0, w, h);
+    spr->draw((short)x, (short)y, {id, 0, w, h});
 }
 
 //------------------------------------------------------------------------------
@@ -740,7 +740,7 @@ void EC_SwirlingAward::draw() const
     short awardx = x + (short)(radius * cos(angle));
     short awardy = y + (short)(radius * sin(angle));
 
-    spr->draw(awardx, awardy, iAnimationFrame, iSrcY, w, h);
+    spr->draw(awardx, awardy, {iAnimationFrame, iSrcY, w, h});
 }
 
 
@@ -798,7 +798,7 @@ void EC_RocketAward::update()
 
 void EC_RocketAward::draw() const
 {
-    spr->draw((short)x, (short)y, iAnimationFrame, iSrcY, w, h);
+    spr->draw((short)x, (short)y, {iAnimationFrame, iSrcY, w, h});
 }
 
 //------------------------------------------------------------------------------
@@ -837,7 +837,7 @@ void EC_FloatingObject::update()
 
 void EC_FloatingObject::draw() const
 {
-    spr->draw((short)x, (short)y, srcx, srcy, w, h);
+    spr->draw((short)x, (short)y, {srcx, srcy, w, h});
 }
 
 //------------------------------------------------------------------------------
@@ -919,7 +919,7 @@ void EC_SoulsAward::update()
 
 void EC_SoulsAward::draw() const
 {
-    spawnspr->draw(x - 16, y - 16, frame * w, 0, w, h);
+    spawnspr->draw(x - 16, y - 16, {frame * w, 0, w, h});
 }
 
 //------------------------------------------------------------------------------
@@ -988,12 +988,12 @@ void EC_Door::update()
 
 void EC_Door::draw() const
 {
-    spr->draw(x, y + offsety, 0, colorOffset, iw, ih - offsety);
+    spr->draw(x, y + offsety, {0, colorOffset, iw, ih - offsety});
 
     if (state == 1)
-        mariospr->draw(x + 16 - HALFPW - PWOFFSET, y + 16 - HALFPH - PHOFFSET + offsety, offsetx, 0, iw, ih - offsety);
+        mariospr->draw(x + 16 - HALFPW - PWOFFSET, y + 16 - HALFPH - PHOFFSET + offsety, {offsetx, 0, iw, ih - offsety});
 
-    spr->draw(x, y + offsety, frame * iw, colorOffset, iw, ih - offsety);
+    spr->draw(x, y + offsety, {frame * iw, colorOffset, iw, ih - offsety});
 }
 
 //------------------------------------------------------------------------------
@@ -1086,8 +1086,8 @@ void EC_SuperStompExplosion::draw() const
     static const SDL_Rect rectSuperStompLeftDst[8] = { { -48, -40, 48, 40 }, { -56, -42, 54, 42 }, { -66, -58, 48, 58 }, { -68, -70, 42, 70 }, { -72, -78, 44, 78 }, { -74, -82, 44, 82 }, { -74, -76, 42, 76 }, { -70, -74, 34, 74 } };
     static const SDL_Rect rectSuperStompRightDst[8] = { { 0, -40, 48, 40 }, { 2, -42, 54, 42 }, { 18, -58, 48, 58 }, { 26, -70, 42, 70 }, { 28, -78, 44, 78 }, { 30, -82, 44, 82 }, { 32, -76, 42, 76 }, { 36, -74, 34, 74 } };
 
-    spr->draw(rectSuperStompLeftDst[iAnimationFrame].x + ix, rectSuperStompLeftDst[iAnimationFrame].y + iy, rectSuperStompLeftSrc[iAnimationFrame].x, rectSuperStompLeftSrc[iAnimationFrame].y, rectSuperStompLeftSrc[iAnimationFrame].w, rectSuperStompLeftSrc[iAnimationFrame].h);
-    spr->draw(rectSuperStompRightDst[iAnimationFrame].x + ix, rectSuperStompRightDst[iAnimationFrame].y + iy, rectSuperStompRightSrc[iAnimationFrame].x, rectSuperStompRightSrc[iAnimationFrame].y, rectSuperStompRightSrc[iAnimationFrame].w, rectSuperStompRightSrc[iAnimationFrame].h);
+    spr->draw(rectSuperStompLeftDst[iAnimationFrame].x + ix, rectSuperStompLeftDst[iAnimationFrame].y + iy, rectSuperStompLeftSrc[iAnimationFrame]);
+    spr->draw(rectSuperStompRightDst[iAnimationFrame].x + ix, rectSuperStompRightDst[iAnimationFrame].y + iy, rectSuperStompRightSrc[iAnimationFrame]);
 }
 
 //------------------------------------------------------------------------------

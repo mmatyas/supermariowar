@@ -92,7 +92,7 @@ IO_MovingObject::IO_MovingObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, shor
 
 void IO_MovingObject::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, animationOffsetY, iw, ih});
 }
 
 

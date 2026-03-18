@@ -29,8 +29,8 @@ void MO_Koopa::draw()
 {
     // if frozen, just draw shell, not entire koopa
     if (frozen) {
-        rm->spr_shell.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, fRed ? 32 : 0, 32, 32);
-        rm->spr_iceblock.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, 0, 32, 32);
+        rm->spr_shell.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, {0, fRed ? 32 : 0, 32, 32});
+        rm->spr_iceblock.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, {0, 0, 32, 32});
     } else {
         MO_WalkingEnemy::draw();
     }

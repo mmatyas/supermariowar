@@ -132,7 +132,7 @@ void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter)
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 
-            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
+            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, {rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h});
             dAngle += TWO_PI / iNumDots;
         }
 
@@ -141,7 +141,7 @@ void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter)
             short x = (hazard.ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
             short y = (hazard.iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
 
-            rm->spr_hazard_fireball[iSize].draw(x, y, 0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]);
+            rm->spr_hazard_fireball[iSize].draw(x, y, {0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]});
         }
     } else if (hazard.itype == 1) { //rotodisc
         short iNumDots = 16;
@@ -152,7 +152,7 @@ void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter)
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 
-            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
+            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, {rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h});
             dAngle += TWO_PI / iNumDots;
         }
 
@@ -164,12 +164,12 @@ void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter)
             short x = rPathDst.x + (short)(dRadius * cos(dAngle));
             short y = rPathDst.y + (short)(dRadius * sin(dAngle));
 
-            rm->spr_hazard_rotodisc[iSize].draw(x, y, 0, 0, iTileSize, iTileSize);
+            rm->spr_hazard_rotodisc[iSize].draw(x, y, {0, 0, iTileSize, iTileSize});
 
             dAngle += dSector;
         }
     } else if (hazard.itype == 2) { //bullet bill
-        rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, 0, hazard.dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize);
+        rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, {0, hazard.dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize});
 
         short iBulletPathX = rPathDst.x - iPlatformPathDotSize[iSize];
         if (hazard.dparam[0] > 0.0f)
@@ -194,7 +194,7 @@ void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter)
             iOffsetY = -(iTileSize << 1);
         }
 
-        rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
+        rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, {rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize});
     } else if (hazard.itype >= 4 && hazard.itype <= 7) { //pirhana plants
         const SDL_Rect * rect = &g_rPirhanaRects[hazard.itype - 4][hazard.iparam[1]][0];
         short iOffsetX = 0;
@@ -212,7 +212,7 @@ void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter)
                 iOffsetX = -(iTileSize >> 1);
         }
 
-        rm->spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
+        rm->spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, {rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize});
     }
 }
 
@@ -288,14 +288,14 @@ void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& til
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if (tiles[iCol * iPlatformHeight + iRow].iID != -2)
-                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), {0, 0, iTileSize, iTileSize});
                 }
             }
 
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if (tiles[iCol * iPlatformHeight + iRow].iID != -2)
-                        rm->spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                        rm->spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), {0, 0, iTileSize, iTileSize});
                 }
             }
         }
@@ -325,7 +325,7 @@ void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& til
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if (tiles[iCol * iPlatformHeight + iRow].iID != -2)
-                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), {0, 0, iTileSize, iTileSize});
                 }
             }
         }
@@ -376,7 +376,7 @@ void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& til
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if (tiles[iCol * iPlatformHeight + iRow].iID != -2)
-                        rm->spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                        rm->spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), {0, 0, iTileSize, iTileSize});
                 }
             }
         }
@@ -2407,7 +2407,7 @@ bool CMap::IsInPlatformNoSpawnZone(short x, short y, short width, short height)
 void CMap::drawfrontlayer()
 {
     for (int k = 0; k < numdrawareas; k++)
-        rm->spr_frontmap[g_iCurrentDrawIndex].draw(drawareas[k].x, drawareas[k].y, drawareas[k].x, drawareas[k].y, drawareas[k].w, drawareas[k].h);
+        rm->spr_frontmap[g_iCurrentDrawIndex].draw(drawareas[k].x, drawareas[k].y, drawareas[k]);
 
     //Draw gaps in pink for debugging
     /*

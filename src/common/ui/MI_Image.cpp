@@ -93,5 +93,5 @@ void MI_Image::Draw()
     if (fPulse)
         spr->drawStretch(m_pos.x - iPulseValue + iXOffset, m_pos.y - iPulseValue + iYOffset, iw + (iPulseValue << 1), ih + (iPulseValue << 1), iXFrame, iYFrame, iw, ih);
     else
-        spr->draw(m_pos.x + iXOffset, m_pos.y + iYOffset, iXFrame, iYFrame, iw, ih);
+        spr->draw(m_pos.x + iXOffset, m_pos.y + iYOffset, {iXFrame, iYFrame, iw, ih});
 }

@@ -376,21 +376,21 @@ void CO_Shell::update()
 void CO_Shell::draw()
 {
     if (state == 0) {
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY, iw, (short)(ih - fy + iDestY));
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iColorOffsetY, iw, (short)(ih - fy + iDestY)});
     } else if (owner) {
         if (owner->iswarping())
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iColorOffsetY + iFlippedOffset, iw, ih}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
         else
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iColorOffsetY + iFlippedOffset, iw, ih});
     } else {
         if (state == 2)
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iColorOffsetY + iFlippedOffset, iw, ih});
         else if (state == 1)
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY + iFlippedOffset, iw, ih);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, iColorOffsetY + iFlippedOffset, iw, ih});
     }
 
     if (frozen) {
-        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
+        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, 0, 32, 32});
     } else if (fSmoking) {
         eyecandy[0].emplace<EC_SingleAnimation>(&rm->spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3);
     }

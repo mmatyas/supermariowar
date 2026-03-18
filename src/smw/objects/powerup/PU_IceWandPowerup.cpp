@@ -33,7 +33,7 @@ void PU_IceWandPowerup::draw()
 
     // Draw sparkles
     if (state == 1)
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
 }
 
 bool PU_IceWandPowerup::collide(CPlayer* player)

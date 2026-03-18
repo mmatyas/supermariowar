@@ -99,16 +99,17 @@ void CO_Flag::update()
 
 void CO_Flag::draw()
 {
+    const SDL_Rect srcRect {drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih};
     if (owner) {
         if (centerflag)
             animationOffsetY = owner->colorID << 6;
 
         if (owner->iswarping())
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, srcRect, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
         else
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, srcRect);
     } else {
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, srcRect);
     }
 }
 

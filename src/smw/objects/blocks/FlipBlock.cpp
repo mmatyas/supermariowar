@@ -49,7 +49,7 @@ void B_FlipBlock::draw()
         return;
 
     if (state == 0 || state == 1)
-        spr->draw(ix, iy, frame, 0, iw, ih);
+        spr->draw(ix, iy, {frame, 0, iw, ih});
 }
 
 void B_FlipBlock::update()

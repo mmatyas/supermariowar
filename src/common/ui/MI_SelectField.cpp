@@ -69,12 +69,12 @@ void MI_SelectField<T>::Draw()
 
     if (m_indent == 0) {
         short iHalfWidth = m_width / 2;
-        m_spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0) + m_adjustmentY, iHalfWidth, 32);
-        m_spr->draw(m_pos.x + iHalfWidth, m_pos.y, 512 - iHalfWidth, (fSelected ? 32 : 0) + m_adjustmentY, m_width - iHalfWidth, 32);
+        m_spr->draw(m_pos.x, m_pos.y, {0, (fSelected ? 32 : 0) + m_adjustmentY, iHalfWidth, 32});
+        m_spr->draw(m_pos.x + iHalfWidth, m_pos.y, {512 - iHalfWidth, (fSelected ? 32 : 0) + m_adjustmentY, m_width - iHalfWidth, 32});
     } else {
-        m_spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0) + m_adjustmentY, m_indent - 16, 32);
-        m_spr->draw(m_pos.x + m_indent - 16, m_pos.y, 0, (fSelected ? 96 : 64), 32, 32);
-        m_spr->draw(m_pos.x + m_indent + 16, m_pos.y, 528 - m_width + m_indent, (fSelected ? 32 : 0) + m_adjustmentY, m_width - m_indent - 16, 32);
+        m_spr->draw(m_pos.x, m_pos.y, {0, (fSelected ? 32 : 0) + m_adjustmentY, m_indent - 16, 32});
+        m_spr->draw(m_pos.x + m_indent - 16, m_pos.y, {0, (fSelected ? 96 : 64), 32, 32});
+        m_spr->draw(m_pos.x + m_indent + 16, m_pos.y, {528 - m_width + m_indent, (fSelected ? 32 : 0) + m_adjustmentY, m_width - m_indent - 16, 32});
     }
 
     if (m_indent> 0)

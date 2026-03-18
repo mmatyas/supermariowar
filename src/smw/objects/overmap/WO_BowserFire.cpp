@@ -40,7 +40,7 @@ void OMO_BowserFire::update()
 
 void OMO_BowserFire::draw()
 {
-    spr->draw(ix, iy, drawframe, (velx > 0.0f ? 32 : 0) + iColorOffsetY, iw, ih);
+    spr->draw(ix, iy, {drawframe, (velx > 0.0f ? 32 : 0) + iColorOffsetY, iw, ih});
 }
 
 bool OMO_BowserFire::collide(CPlayer* player)

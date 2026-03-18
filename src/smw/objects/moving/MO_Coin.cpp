@@ -107,7 +107,7 @@ void MO_Coin::draw()
 
     // Draw sparkles
     if (iType != 1)
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
 }
 
 void MO_Coin::placeCoin()

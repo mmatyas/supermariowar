@@ -215,12 +215,12 @@ void CO_ThrowBlock::draw()
 {
     const int srcY = static_cast<int>(iType) * 32;
     if (owner && owner->iswarping())
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, srcY, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, srcY, iw, ih}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
     else
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, srcY, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, srcY, iw, ih});
 
     if (frozen) {
-        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
+        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, 0, 32, 32});
     } else if (fSmoking) {
         eyecandy[0].emplace<EC_SingleAnimation>(&rm->spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3);
     }

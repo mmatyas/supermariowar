@@ -116,9 +116,9 @@ void CO_Egg::draw()
     // Display explosion timer
     if (game_values.gamemodesettings.egg.explode > 0 && explosiondrawframe < 5) {
         if (owner && owner->iswarping())
-            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32, owner->GetWarpState(), owner->GetWarpPlane());
+            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, {explosiondrawframe << 5, color << 5, 32, 32}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
         else
-            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32);
+            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, {explosiondrawframe << 5, color << 5, 32, 32});
     }
 }
 

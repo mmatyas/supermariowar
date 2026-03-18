@@ -46,7 +46,7 @@ bool OMO_Area::collide(CPlayer* player)
 
 void OMO_Area::draw()
 {
-    spr->draw(ix, iy, frame, 0, iw, ih);
+    spr->draw(ix, iy, {frame, 0, iw, ih});
 }
 
 void OMO_Area::update()

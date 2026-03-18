@@ -77,8 +77,9 @@ void OMO_PipeBonus::update()
 
 void OMO_PipeBonus::draw()
 {
+    const SDL_Rect srcRect {drawframe, animationOffsetY, iw, ih};
     if (iUncollectableTime > 0)
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih, 2, 256);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, srcRect, ClipEdge::Bottom, 256);
     else
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, srcRect);
 }

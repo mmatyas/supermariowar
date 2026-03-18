@@ -127,11 +127,11 @@ MO_SledgeBrother::MO_SledgeBrother(gfxSprite* nspr, short platformY, Boss type)
 
 void MO_SledgeBrother::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, leg_offset_x + arm_offset_x + (face_right ? 0 : 192), hit_offset_y, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {leg_offset_x + arm_offset_x + (face_right ? 0 : 192), hit_offset_y, iw, ih});
 
     if (hit_timer != 0) {
         for (short iHeart = 0; iHeart < hit_points; iHeart++)
-            rm->spr_scorehearts.draw(ix - collisionOffsetX + iHeart * 8, iy - collisionOffsetY - 18, 0, 0, 16, 16);
+            rm->spr_scorehearts.draw(ix - collisionOffsetX + iHeart * 8, iy - collisionOffsetY - 18, {0, 0, 16, 16});
     }
 }
 

@@ -1990,9 +1990,9 @@ void CPlayer::draw_powerupRing()
             displayangle += addangle;
 
             if (iswarping())
-                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, static_cast<short>(*powerupused) * 16, 0, 16, 16, (short)state %4, GetWarpPlane());
+                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, {static_cast<short>(*powerupused) * 16, 0, 16, 16}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
             else
-                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, static_cast<short>(*powerupused) * 16, 0, 16, 16);
+                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, {static_cast<short>(*powerupused) * 16, 0, 16, 16});
         }
     }
 }
@@ -2001,7 +2001,7 @@ void CPlayer::draw_winnerCrown()
 {
     if (game_values.showwinningcrown && g_iWinningPlayer == teamID) {
         if (iswarping())
-            rm->spr_crown.draw(ix + HALFPW - (isFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), 0, 0, 14, 14, (short)state % 4, GetWarpPlane());
+            rm->spr_crown.draw(ix + HALFPW - (isFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), {0, 0, 14, 14}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
         else
             rm->spr_crown.draw(ix + HALFPW - (isFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0));
     }
@@ -2050,14 +2050,14 @@ void CPlayer::draw()
         pScoreboardSprite = &rm->spr_chocobo[colorID];
     } else if (shyguy) { //draw him as chicken
         pScoreboardSprite = &rm->spr_shyguy[colorID];
-        rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
+        rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, {ownerColorOffsetX, 0, 48, 48});
     }
 
     if (ownerPlayerID > -1) {
         if (iswarping())
-            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48, (short)state % 4, GetWarpPlane());
+            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, {ownerColorOffsetX, 0, 48, 48}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
         else
-            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
+            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, {ownerColorOffsetX, 0, 48, 48});
     }
 
     //Don't allow cape, tail, wings to be used with shoe
@@ -2079,9 +2079,9 @@ void CPlayer::draw()
     //Don't draw the player if he is frozen in a shoe
     if (!frozen || !kuriboshoe.is_on()) {
         if (iswarping())
-            pScoreboardSprite->at(sprite_state).draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, GetWarpPlane());
+            pScoreboardSprite->at(sprite_state).draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, {iSrcOffsetX, 0, 32, 32}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
         else
-            pScoreboardSprite->at(sprite_state).draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
+            pScoreboardSprite->at(sprite_state).draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, {iSrcOffsetX, 0, 32, 32});
     }
 
     //Draw Kuribo's Shoe
@@ -2095,9 +2095,9 @@ void CPlayer::draw()
 
     if (frozen) {
         if (iswarping())
-            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32, (short)state % 4, GetWarpPlane());
+            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, {0, 0, 32, 32}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
         else
-            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32);
+            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, {0, 0, 32, 32});
     }
 
     jail.draw(*this);

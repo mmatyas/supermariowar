@@ -940,7 +940,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
             if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
                 rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
             else
-                rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
+                rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, {0, 0, 256, 41});
 
             for (short k = 0; k < game_values.teamcounts[i]; k++) {
                 short globalID = game_values.teamids[i][k];
@@ -957,8 +957,8 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
                     short scorex = score[i]->x + scoreoffsets[k];
                     short scorey = score[i]->y + 2;
-                    rm->spr_egg.draw(scorex, scorey, respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32);
-                    rm->spr_eggnumbers.draw(scorex, scorey, ((respawnCount[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
+                    rm->spr_egg.draw(scorex, scorey, {respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32});
+                    rm->spr_eggnumbers.draw(scorex, scorey, {((respawnCount[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32});
                 } else { //otherwise draw the player's skin in the scoreboard
                     short iScoreboardSprite;
                     if (game_values.gamemode->gameover) {
@@ -978,23 +978,23 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                         short iScoreOffsetY = score[i]->y + 2;
 
                         if (player->ownerPlayerID > -1)
-                            rm->spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
+                            rm->spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, {player->ownerColorOffsetX, 0, 48, 48});
 
-                        player->GetScoreboardSprite()->at(iScoreboardSprite).draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
+                        player->GetScoreboardSprite()->at(iScoreboardSprite).draw(iScoreOffsetX, iScoreOffsetY, {player->iSrcOffsetX, 0, 32, 32});
 
                         //Display jail if player is jailed
                         if (player->jail.isActive())
-                            rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jail.getColor() + 1) * 44, 0, 44, 44);
+                            rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, {(player->jail.getColor() + 1) * 44, 0, 44, 44});
 
                         //Display current powerup if player is using one
                         if (player->powerup > 0)
-                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
+                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, {g_iPowerupToIcon[player->powerup - 1], 0, 16, 16});
 
                         //Display tanooki powerup if player has it
                         if (player->tanookisuit.isOn())
-                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, App::screenWidth/2, 0, 16, 16);
+                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, {App::screenWidth/2, 0, 16, 16});
                     } else {
-                        rm->spr_player[globalID][iScoreboardSprite].draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
+                        rm->spr_player[globalID][iScoreboardSprite].draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, {0, 0, 32, 32});
                     }
 
                     //give crown to player(s) with most kills
@@ -1007,7 +1007,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                 //Draw stored powerup
                 if (storedpowerupid != -1) {
                     if (!game_values.flags.swapplayers) {
-                        rm->spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
+                        rm->spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, {storedpowerupid * 16, 0, 16, 16});
                     }
                 }
             }
@@ -1020,16 +1020,16 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
                 for (short iHeart = 0; iHeart < iLife; iHeart++) {
                     if (iHeart == iMax - 1 && iHeart % 2 == 0)
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, {32, 0, 8, 16});
                     else
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, (iHeart % 2) ? 8 : 0, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, {(iHeart % 2) ? 8 : 0, 0, 8, 16});
                 }
 
                 for (short iHeart = iLife; iHeart < iMax; iHeart++) {
                     if (iHeart == iMax - 1 && iHeart % 2 == 0)
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, {40, 0, 8, 16});
                     else
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, (iHeart % 2) ? 24 : 16, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, {(iHeart % 2) ? 24 : 16, 0, 8, 16});
                 }
             } else if (game_values.gamemode->gamemode == game_mode_collection) { //Draw cards for collection mode
                 //Flash collected cards if 3 have been collected
@@ -1039,7 +1039,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                     short iCardX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 20;
 
                     for (short iCard = 0; iCard < iNumCards; iCard++) {
-                        rm->spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, (iCardValues & 3) << 4, 0, 16, 16);
+                        rm->spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, {(iCardValues & 3) << 4, 0, 16, 16});
                         iCardValues >>= 2;
                     }
                 }
@@ -1050,20 +1050,20 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
                 short iCoin = 0;
                 for (; iCoin < iNumCoins; iCoin++) {
-                    rm->spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, 0, 0, 16, 16);
+                    rm->spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, {0, 0, 16, 16});
                 }
 
                 for (short iEmptyCoin = iCoin; iEmptyCoin < 5; iEmptyCoin++) {
-                    rm->spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, 16, 0, 16, 16);
+                    rm->spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, {16, 0, 16, 16});
                 }
             }
 
             short iScoreX = score[i]->x + iScoreTextOffset[i];
             short iScoreY = score[i]->y + 4;
 
-            rm->spr_scoretext.draw(iScoreX, iScoreY, score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16);
-            rm->spr_scoretext.draw(iScoreX + 18, iScoreY, score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16);
-            rm->spr_scoretext.draw(iScoreX + 36, iScoreY, score[i]->iDigitRight, 0, 16, 16);
+            rm->spr_scoretext.draw(iScoreX, iScoreY, {score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16});
+            rm->spr_scoretext.draw(iScoreX + 18, iScoreY, {score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16});
+            rm->spr_scoretext.draw(iScoreX + 36, iScoreY, {score[i]->iDigitRight, 0, 16, 16});
         }
     }
 }
@@ -1142,7 +1142,7 @@ void GameplayState::drawPlayerSwap()
                     iPowerupY = (short)((float)(player->iNewPowerupY - player->iOldPowerupY) * game_values.flags.swapplayersposition) + player->iOldPowerupY;
                 }
 
-                rm->spr_storedpowerupsmall.draw(iPowerupX, iPowerupY, storedpowerupid * 16, 0, 16, 16);
+                rm->spr_storedpowerupsmall.draw(iPowerupX, iPowerupY, {storedpowerupid * 16, 0, 16, 16});
             }
         }
 
@@ -1226,8 +1226,8 @@ void GameplayState::drawWindMeter()
 {
     if (game_values.windaffectsplayers) {
         short iDisplayWindMeterY = game_values.scoreboardstyle == ScoreboardStyle::Bottom ? 8 : 440;
-        rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
-        rm->spr_windmeter.draw((short)(game_values.flags.gamewindx * 20.0f) + App::screenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
+        rm->spr_windmeter.draw(210, iDisplayWindMeterY, {0, 0, 220, 32});
+        rm->spr_windmeter.draw((short)(game_values.flags.gamewindx * 20.0f) + App::screenWidth/2, iDisplayWindMeterY + 6, {220, 0, 12, 20});
     }
 }
 
@@ -1236,7 +1236,7 @@ void GameplayState::drawCountdown()
     //Draw countdown start timer
     if (iCountDownState > 0 && game_values.screenfade == 0) {
         const SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
-        rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
+        rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0]);
     }
 }
 
@@ -1278,7 +1278,7 @@ void drawExitPauseDialog()
         //menu_font_large.drawCentered(App::screenWidth/2, App::screenHeight/2, game_values.gamemode->GetModeName());
         short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
-        rm->menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
+        rm->menu_mode_large.draw(304, 224, {iMode << 5, 0, 32, 32});
 
         std::string szGoal = game_values.gamemode->GetGoalName() + ": ";
 
@@ -1294,8 +1294,8 @@ void drawExitPauseDialog()
         rm->spr_dialog.draw(App::screenWidth * 0.35f, App::screenHeight*0.37f);
         rm->menu_font_large.drawCentered(App::screenWidth * 0.5f, App::screenHeight*0.46f - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
 
-        rm->spr_dialogbutton.draw(App::screenWidth * 0.37f, App::screenHeight*0.52f, 0, (game_values.flags.exityes ? 34 : 0), 80, 34);
-        rm->spr_dialogbutton.draw(App::screenWidth * 0.51f, App::screenHeight*0.52f, 0, (game_values.flags.exityes ? 0 : 34), 80, 34);
+        rm->spr_dialogbutton.draw(App::screenWidth * 0.37f, App::screenHeight*0.52f, {0, (game_values.flags.exityes ? 34 : 0), 80, 34});
+        rm->spr_dialogbutton.draw(App::screenWidth * 0.51f, App::screenHeight*0.52f, {0, (game_values.flags.exityes ? 0 : 34), 80, 34});
 
         rm->menu_font_large.draw(App::screenWidth * 0.43f - (rm->menu_font_large.getWidth("Yes") >> 1),  App::screenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "Yes");
         rm->menu_font_large.draw(App::screenWidth * 0.57f - (rm->menu_font_large.getWidth("No") >> 1),  App::screenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "No");

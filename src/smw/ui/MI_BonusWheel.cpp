@@ -196,7 +196,7 @@ void MI_BonusWheel::Draw()
     short iSelectorY = m_pos.y + 190 + (short)(110.0f * sin(dSelectionAngle));
 
     if (iState > 0)
-        rm->spr_powerupselector.draw(iSelectorX, iSelectorY, iSelectorAnimation * 64, 0, 64, 64);
+        rm->spr_powerupselector.draw(iSelectorX, iSelectorY, {iSelectorAnimation * 64, 0, 64, 64});
 
     for (int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++) {
         if (iImage >= iDisplayPowerupIndex)

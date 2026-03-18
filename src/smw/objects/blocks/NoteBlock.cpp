@@ -36,7 +36,7 @@ void B_NoteBlock::draw()
     if (hidden)
         return;
 
-    spr->draw(ix, iy, drawFrame, iTypeOffsetY, iw, ih);
+    spr->draw(ix, iy, {drawFrame, iTypeOffsetY, iw, ih});
 }
 
 void B_NoteBlock::update()

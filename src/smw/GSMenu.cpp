@@ -1254,8 +1254,8 @@ void MenuState::update()
     mCurrentMenu->Draw();
 
     if (iDisplayError > DISPLAY_ERROR_NONE) {
-        rm->spr_selectfield.draw(70, 400, 0, 0, 484, 32);
-        rm->spr_selectfield.draw(554, 400, 496, 0, 16, 32);
+        rm->spr_selectfield.draw(70, 400, {0, 0, 484, 32});
+        rm->spr_selectfield.draw(554, 400, {496, 0, 16, 32});
 
         if (iDisplayError == DISPLAY_ERROR_READ_TOUR_FILE)
             rm->menu_font_large.drawCentered(320, 405, "Error Reading Tour File!");
@@ -1412,10 +1412,10 @@ void MenuState::update()
     }
 
     if (fGenerateMapThumbs) {
-        rm->menu_dialog.draw(160, 176, 0, 0, 160, 64);
-		rm->menu_dialog.draw(App::screenWidth/2, 176, 352, 0, 160, 64);
-        rm->menu_dialog.draw(160, 240, 0, 416, 160, 64);
-		rm->menu_dialog.draw(App::screenWidth/2, App::screenHeight/2, 352, 416, 160, 64);
+        rm->menu_dialog.draw(160, 176, {0, 0, 160, 64});
+		rm->menu_dialog.draw(App::screenWidth/2, 176, {352, 0, 160, 64});
+        rm->menu_dialog.draw(160, 240, {0, 416, 160, 64});
+		rm->menu_dialog.draw(App::screenWidth/2, App::screenHeight/2, {352, 416, 160, 64});
 		rm->menu_font_large.drawCentered(App::screenWidth/2, 215, "Refreshing Map Thumbnails");
 		rm->menu_font_large.drawCentered(App::screenWidth/2, 245, "Please Wait...");
     }

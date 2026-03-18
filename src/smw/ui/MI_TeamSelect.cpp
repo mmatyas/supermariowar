@@ -76,26 +76,26 @@ void MI_TeamSelect::Draw()
             short iPlayerID = iTeamIDs[iTeam][iTeamItem];
 
             if (game_values.randomskin[iPlayerID])
-                spr->draw(iTeam * 96 + 43 + m_pos.x, iTeamItem * 36 + 52 + m_pos.y, 416, fReady[iPlayerID] ? 0 : iRandomAnimationFrame, 42, 32);
+                spr->draw(iTeam * 96 + 43 + m_pos.x, iTeamItem * 36 + 52 + m_pos.y, {416, fReady[iPlayerID] ? 0 : iRandomAnimationFrame, 42, 32});
             else
-                rm->spr_player[iPlayerID][fReady[iPlayerID] ? 0 : iAnimationFrame].draw(iTeam * 96 + 48 + m_pos.x, iTeamItem * 36 + 52 + m_pos.y, 0, 0, 32, 32);
+                rm->spr_player[iPlayerID][fReady[iPlayerID] ? 0 : iAnimationFrame].draw(iTeam * 96 + 48 + m_pos.x, iTeamItem * 36 + 52 + m_pos.y, {0, 0, 32, 32});
 
-            rm->spr_menu_boxed_numbers.draw(iTeam * 96 + 44 + m_pos.x, iTeamItem * 36 + 72 + m_pos.y, iPlayerID * 16, game_values.colorids[iPlayerID] * 16, 16, 16);
+            rm->spr_menu_boxed_numbers.draw(iTeam * 96 + 44 + m_pos.x, iTeamItem * 36 + 72 + m_pos.y, {iPlayerID * 16, game_values.colorids[iPlayerID] * 16, 16, 16});
         }
 
         if (game_values.playercontrol[iTeam] > 0) {
-            rm->spr_player_select_ready.draw(iTeam * 160 + 16, 368, 0, 0, 128, 96);
+            rm->spr_player_select_ready.draw(iTeam * 160 + 16, 368, {0, 0, 128, 96});
 
-            rm->spr_menu_boxed_numbers.draw(iTeam * 160 + 32, 388, iTeam * 16, game_values.colorids[iTeam] * 16, 16, 16);
+            rm->spr_menu_boxed_numbers.draw(iTeam * 160 + 32, 388, {iTeam * 16, game_values.colorids[iTeam] * 16, 16, 16});
             rm->menu_font_small.drawChopRight(iTeam * 160 + 52, 404 - rm->menu_font_small.getHeight(), 80, game_values.randomskin[iTeam] ? "Random" : skinlist->at(game_values.skinids[iTeam]).name.c_str());
 
-            rm->spr_player_select_ready.draw(iTeam * 160 + 64, 408, 128, (!fReady[iTeam] ? 0 : (game_values.playercontrol[iTeam] == 1 ? 32 : 64)), 34, 32);
+            rm->spr_player_select_ready.draw(iTeam * 160 + 64, 408, {128, (!fReady[iTeam] ? 0 : (game_values.playercontrol[iTeam] == 1 ? 32 : 64)), 34, 32});
         }
     }
 
     if (fAllReady) {
-        rm->menu_plain_field.draw(m_pos.x + 108, m_pos.y + App::screenHeight * 0.47f, 0, 160, 100, 32);
-        rm->menu_plain_field.draw(m_pos.x + 208, m_pos.y + App::screenHeight * 0.47f, 412, 160, 100, 32);
+        rm->menu_plain_field.draw(m_pos.x + 108, m_pos.y + App::screenHeight * 0.47f, {0, 160, 100, 32});
+        rm->menu_plain_field.draw(m_pos.x + 208, m_pos.y + App::screenHeight * 0.47f, {412, 160, 100, 32});
         rm->menu_font_large.drawCentered(App::screenWidth/2, m_pos.y + App::screenHeight * 0.48f, "Continue");
     }
 }

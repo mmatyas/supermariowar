@@ -71,10 +71,10 @@ void MI_MapPreview::Draw()
     short iMapBoxX = m_pos.x + (iWidth >> 1) - 176 - iSlideListOut;
 
     //Draw the background for the map preview
-    rm->menu_dialog.draw(iMapBoxX, m_pos.y + 30, 0, 0, 336, 254);
-    rm->menu_dialog.draw(iMapBoxX + 336, m_pos.y + 30, 496, 0, 16, 254);
-    rm->menu_dialog.draw(iMapBoxX, m_pos.y + 284, 0, 464, 336, 16);
-    rm->menu_dialog.draw(iMapBoxX + 336, m_pos.y + 284, 496, 464, 16, 16);
+    rm->menu_dialog.draw(iMapBoxX, m_pos.y + 30, {0, 0, 336, 254});
+    rm->menu_dialog.draw(iMapBoxX + 336, m_pos.y + 30, {496, 0, 16, 254});
+    rm->menu_dialog.draw(iMapBoxX, m_pos.y + 284, {0, 464, 336, 16});
+    rm->menu_dialog.draw(iMapBoxX + 336, m_pos.y + 284, {496, 464, 16, 16});
 
     rectDst.x = iMapBoxX + 16;
 

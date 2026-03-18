@@ -107,15 +107,15 @@ void MI_PlayerSelect::Draw()
     if (!m_visible)
         return;
 
-    spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 64 : 0), iIndent - 16, 64);
-    spr->draw(m_pos.x + iIndent - 16, m_pos.y, 0, (fSelected ? 192 : 128), 32, 64);
-    spr->draw(m_pos.x + iIndent + 16, m_pos.y, 528 - iWidth + iIndent, (fSelected ? 64 : 0), iWidth - iIndent - 16, 64);
+    spr->draw(m_pos.x, m_pos.y, {0, (fSelected ? 64 : 0), iIndent - 16, 64});
+    spr->draw(m_pos.x + iIndent - 16, m_pos.y, {0, (fSelected ? 192 : 128), 32, 64});
+    spr->draw(m_pos.x + iIndent + 16, m_pos.y, {528 - iWidth + iIndent, (fSelected ? 64 : 0), iWidth - iIndent - 16, 64});
 
     rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 20, iIndent - 8, szName.c_str());
 
     miModifyImage->Draw();
 
     for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
-        spr->draw(m_pos.x + iPlayerPosition[iPlayer], m_pos.y + 16, game_values.playercontrol[iPlayer] * 34 + 32, 206, 34, 32);
+        spr->draw(m_pos.x + iPlayerPosition[iPlayer], m_pos.y + 16, {game_values.playercontrol[iPlayer] * 34 + 32, 206, 34, 32});
     }
 }

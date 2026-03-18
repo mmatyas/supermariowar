@@ -94,14 +94,12 @@ void PlayerJail::draw(CPlayer& player)
             rm->spr_jail.draw(
                 player.leftX() - PWOFFSET - 6,
                 player.topY() - PHOFFSET - 6,
-                (color + 1) * 44,
-                0, 44, 44,
-                (short)player.state % 4, player.GetWarpPlane());
+                {(color + 1) * 44, 0, 44, 44},
+                static_cast<ClipEdge>((short)player.state % 4), player.GetWarpPlane());
         else
             rm->spr_jail.draw(
                 player.leftX() - PWOFFSET - 6,
                 player.topY() - PHOFFSET - 6,
-                (color + 1) * 44,
-                0, 44, 44);
+                {(color + 1) * 44, 0, 44, 44});
     }
 }

@@ -40,7 +40,7 @@ void PU_SecretPowerup::draw()
     MO_Powerup::draw();
 
     // Draw sparkles
-    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
 }
 
 bool PU_SecretPowerup::collide(CPlayer* player)

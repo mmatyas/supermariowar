@@ -114,5 +114,5 @@ void MO_SledgeHammer::explode()
 
 void MO_SledgeHammer::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, colorOffset, iw, ih});
 }

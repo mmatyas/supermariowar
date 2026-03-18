@@ -29,7 +29,7 @@ B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, Vec2s pos, short iNumSpr, short aniS
 
 void B_ThrowBlock::draw()
 {
-    spr->draw(ix, iy, drawFrame, static_cast<short>(iType) * 32, iw, ih);
+    spr->draw(ix, iy, {drawFrame, static_cast<short>(iType) * 32, iw, ih});
 }
 
 void B_ThrowBlock::update()

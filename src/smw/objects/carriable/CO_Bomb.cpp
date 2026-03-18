@@ -97,9 +97,9 @@ void CO_Bomb::update()
 void CO_Bomb::draw()
 {
     if (owner && owner->iswarping())
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, iColorOffsetY, iw, ih}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
     else
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, iColorOffsetY, iw, ih});
 }
 
 void CO_Bomb::Die()

@@ -55,9 +55,9 @@ void PlayerAwardEffects::drawRingAward(CPlayer& player)
         short awardy = yoffset + (short)(30.0f * sin(angle));
 
         if (player.iswarping())
-            rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16, (short)player.state % 4, player.GetWarpPlane());
+            rm->spr_award.draw(awardx, awardy, {awards[k] * 16, 0, 16, 16}, static_cast<ClipEdge>((short)player.state % 4), player.GetWarpPlane());
         else
-            rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16);
+            rm->spr_award.draw(awardx, awardy, {awards[k] * 16, 0, 16, 16});
     }
 }
 

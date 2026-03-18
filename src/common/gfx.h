@@ -21,14 +21,15 @@
 #ifndef GFX_H
 #define GFX_H
 
-#include "SDL.h"
-#include <filesystem>
-#include <string>
-
 #include "GlobalConstants.h"
 #include "gfx/Color.h"
 #include "gfx/gfxSprite.h"
 #include "gfx/gfxFont.h"
+
+#include "SDL.h"
+#include <filesystem>
+#include <optional>
+#include <string>
 
 using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
 
@@ -44,8 +45,20 @@ void gfx_close();
 bool gfx_loadpalette(const std::filesystem::path& palette_path);
 
 void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h);
-bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHiddenDirection, short iHiddenValue);
-void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, short srcY, short iw, short ih, short clipX, short clipY, short clipW, short clipH, bool wrap, short hiddenDirection = -1, short hiddenPlane = -1);
+
+/// Clips a source and destination area pair, so that the destination area doesn't go past
+/// a certain threshold in a given direction.
+/// For example, if the clip edge is `ClipEdge::Right`, then `dstRect` is cut at `x = threshold`,
+/// and the width of `srcRect` shrinks accordingly.
+/// Returns true if the destination area is fully hidden.
+[[nodiscard]] bool gfx_adjusthiddenrects(SDL_Rect& srcRect, SDL_Rect& dstRect, ClipEdge edge, int threshold);
+
+void gfx_drawpreview(SDL_Surface * surface,
+    short dstX, short dstY,
+    short srcX, short srcY, short iw, short ih,
+    short clipX, short clipY, short clipW, short clipH,
+    bool wrap,
+    std::optional<std::pair<ClipEdge, int>> clip = std::nullopt);
 
 bool gfx_loadfullskin(SpriteStrip& gSprites, const std::string& filename, const RGB& colorkey, short colorScheme);
 bool gfx_loadmenuskin(SpriteStrip& gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);

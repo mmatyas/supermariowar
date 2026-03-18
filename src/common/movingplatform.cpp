@@ -234,7 +234,11 @@ void MovingPlatform::draw()
 //Draw path for map preview
 void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 {
-    gfx_drawpreview(sSurface[0], ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY, 0, 0, iWidth, iHeight, iOffsetX, iOffsetY, App::screenWidth/2, App::screenHeight/2, true);
+    gfx_drawpreview(sSurface[0],
+        ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY,
+        0, 0, iWidth, iHeight,
+        iOffsetX, iOffsetY, App::screenWidth/2, App::screenHeight/2,
+        true);
 }
 
 void MovingPlatform::update()

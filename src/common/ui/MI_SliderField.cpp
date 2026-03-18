@@ -34,9 +34,9 @@ void MI_SliderField::Draw()
     if (!m_visible)
         return;
 
-    m_spr->draw(m_pos.x, m_pos.y, 0, (fSelected ? 32 : 0) + m_adjustmentY, m_indent - 16, 32);
-    m_spr->draw(m_pos.x + m_indent - 16, m_pos.y, 0, (fSelected ? 96 : 64), 32, 32);
-    m_spr->draw(m_pos.x + m_indent + 16, m_pos.y, 528 - m_width + m_indent, (fSelected ? 32 : 0) + m_adjustmentY, m_width - m_indent - 16, 32);
+    m_spr->draw(m_pos.x, m_pos.y, {0, (fSelected ? 32 : 0) + m_adjustmentY, m_indent - 16, 32});
+    m_spr->draw(m_pos.x + m_indent - 16, m_pos.y, {0, (fSelected ? 96 : 64), 32, 32});
+    m_spr->draw(m_pos.x + m_indent + 16, m_pos.y, {528 - m_width + m_indent, (fSelected ? 32 : 0) + m_adjustmentY, m_width - m_indent - 16, 32});
 
     rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, m_indent - 8, m_name.c_str());
 
@@ -49,14 +49,14 @@ void MI_SliderField::Draw()
 
     for (unsigned int index = 0; index < m_items.size(); index++) {
         if (index < m_items.size() - 1)
-            m_sprSlider->draw(m_pos.x + m_indent + iSpot + 16, m_pos.y + 10, 0, 0, iSpacing, 13);
+            m_sprSlider->draw(m_pos.x + m_indent + iSpot + 16, m_pos.y + 10, {0, 0, iSpacing, 13});
         else
-            m_sprSlider->draw(m_pos.x + m_indent + iSpot + 16, m_pos.y + 10, 164, 0, 4, 13);
+            m_sprSlider->draw(m_pos.x + m_indent + iSpot + 16, m_pos.y + 10, {164, 0, 4, 13});
 
         iSpot += iSpacing;
     }
 
-    m_sprSlider->draw(m_pos.x + m_indent + (m_index * iSpacing) + 14, m_pos.y + 8, 168, 0, 8, 16);
+    m_sprSlider->draw(m_pos.x + m_indent + (m_index * iSpacing) + 14, m_pos.y + 8, {168, 0, 8, 16});
 
     const bool drawLeft = m_index > 0;
     if (m_wraps || drawLeft)

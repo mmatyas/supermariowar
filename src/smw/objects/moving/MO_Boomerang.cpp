@@ -309,5 +309,5 @@ bool MO_Boomerang::collide(CPlayer* player)
 
 void MO_Boomerang::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset + (fMoveToRight ? 0 : 32), iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, colorOffset + (fMoveToRight ? 0 : 32), iw, ih});
 }

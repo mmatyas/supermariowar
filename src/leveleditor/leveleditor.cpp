@@ -1456,13 +1456,13 @@ int editor_edit()
 
 		//Ask if you are sure you want to exit
         if (fExiting) {
-			rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+			rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 			rm->menu_font_large.drawCentered(320, 195, "Exit");
 			rm->menu_font_large.drawCentered(320, 220, "Are You Sure?");
 			rm->menu_font_large.drawCentered(282, 254, "Yes");
 			rm->menu_font_large.drawCentered(356, 254, "No");
 
-			rm->spr_dialog.draw(fSelectedYes ? 250 : 326, 250, 192, 0, 64, 32);
+			rm->spr_dialog.draw(fSelectedYes ? 250 : 326, 250, {192, 0, 64, 32});
         } else {
             if (edit_mode == 0) {
 				rm->menu_font_small.draw(0,0, "Block Mode");
@@ -1489,9 +1489,9 @@ int editor_edit()
 				rm->menu_font_small.draw(0,0, modestring);
 
 				if (view_only_layer)
-					rm->spr_backgroundlevel.draw(2, 18 + (3 - selected_layer) * 18, selected_layer * 16, (3 - selected_layer) * 18, 16, 16);
+					rm->spr_backgroundlevel.draw(2, 18 + (3 - selected_layer) * 18, {selected_layer * 16, (3 - selected_layer) * 18, 16, 16});
 				else
-					rm->spr_backgroundlevel.draw(2, 18, selected_layer * 16, 0, 16, 70);
+					rm->spr_backgroundlevel.draw(2, 18, {selected_layer * 16, 0, 16, 70});
             } else if (edit_mode == 2) {
 				rm->menu_font_small.draw(0,0, "Warp Mode");
             } else if (edit_mode == 3) {
@@ -1523,18 +1523,18 @@ int editor_edit()
 					rm->menu_font_small.draw(0,0, "Move Mode - Merge");
 
 				if (view_only_layer)
-					rm->spr_backgroundlevel.draw(2, 18 + (3 - selected_layer) * 18, selected_layer * 16, (3 - selected_layer) * 18, 16, 16);
+					rm->spr_backgroundlevel.draw(2, 18 + (3 - selected_layer) * 18, {selected_layer * 16, (3 - selected_layer) * 18, 16, 16});
 				else
-					rm->spr_backgroundlevel.draw(2, 18, selected_layer * 16, 0, 16, 70);
+					rm->spr_backgroundlevel.draw(2, 18, {selected_layer * 16, 0, 16, 70});
             } else if (edit_mode == 4) {
                 for (int k = 0; k < MAPHEIGHT; k++) {
                     for (int j = 0; j < MAPWIDTH; j++) {
 						if (g_map->nospawn[nospawn_mode][j][k])
-							rm->spr_nospawntile.draw(j * TILESIZE, k * TILESIZE, nospawn_mode * 32, 0, 32, 32);
+							rm->spr_nospawntile.draw(j * TILESIZE, k * TILESIZE, {nospawn_mode * 32, 0, 32, 32});
 
                         if (nospawn_mode > 0) {
 							if (g_map->nospawn[0][j][k])
-								rm->spr_nospawntile.draw(j * TILESIZE, k * TILESIZE, 0, 0, 32, 32);
+								rm->spr_nospawntile.draw(j * TILESIZE, k * TILESIZE, {0, 0, 32, 32});
 						}
 					}
 				}
@@ -1554,7 +1554,7 @@ int editor_edit()
                 for (int k = 0; k < MAPHEIGHT; k++) {
                     for (int j = 0; j < MAPWIDTH; j++) {
 						if (g_map->mapdatatop[j][k] != TileType::NonSolid)
-                            rm->spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, static_cast<int>(PrevTileType(g_map->mapdatatop[j][k])) * TILESIZE, 0, TILESIZE, TILESIZE);
+                            rm->spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, {static_cast<int>(PrevTileType(g_map->mapdatatop[j][k])) * TILESIZE, 0, TILESIZE, TILESIZE});
 					}
 				}
 
@@ -1569,7 +1569,7 @@ int editor_edit()
             if (g_musiccategorydisplaytimer > 0) {
 				--g_musiccategorydisplaytimer;
 
-				rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+				rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 				rm->menu_font_small.drawCentered(320, 195, "Music Category");
 				rm->menu_font_large.drawCentered(320, 220, g_szMusicCategoryNames[g_map->musicCategoryID]);
 
@@ -1588,7 +1588,7 @@ void DrawMessage()
     if (g_messagedisplaytimer > 0) {
 		--g_messagedisplaytimer;
 
-		rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+		rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 		rm->menu_font_large.drawCentered(320, 195, g_szMessageTitle.c_str());
 		rm->menu_font_large.drawCentered(320, 220, g_szMessageLine[0].c_str());
 		rm->menu_font_large.drawCentered(320, 240, g_szMessageLine[1].c_str());
@@ -1744,7 +1744,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 
     if (!view_only_layer || fScreenshot) {
         for (const MapItem& item : g_map->mapitems) {
-            rm->spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(item.ix * iBlockSize, item.iy * iBlockSize, item.itype * iBlockSize, 0, iBlockSize, iBlockSize);
+            rm->spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(item.ix * iBlockSize, item.iy * iBlockSize, {item.itype * iBlockSize, 0, iBlockSize, iBlockSize});
         }
 
         if (!fScreenshot) {
@@ -1757,7 +1757,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 						iNewY >= 0 && iNewY < MAPHEIGHT &&
                             selectedtiles[iNewX][iNewY]) {
 						if (copiedtiles[iNewX][iNewY].item >= 0)
-							rm->spr_mapitems[0].draw(i << 5, j << 5, copiedtiles[iNewX][iNewY].item << 5, 0, TILESIZE, TILESIZE);
+							rm->spr_mapitems[0].draw(i << 5, j << 5, {copiedtiles[iNewX][iNewY].item << 5, 0, TILESIZE, TILESIZE});
 					}
 				}
 			}
@@ -1933,11 +1933,11 @@ int editor_eyecandy()
 				short iy = k * 65 + 20;
 
 				if (mouse_x >= ix && mouse_x < ix + 90 && mouse_y >= iy && mouse_y < iy + 52)
-					rm->spr_powerupselector.draw(ix, iy, 0, 0, 90, 52);
+					rm->spr_powerupselector.draw(ix, iy, {0, 0, 90, 52});
 				else
-					rm->spr_powerupselector.draw(ix, iy, 0, 52, 90, 52);
+					rm->spr_powerupselector.draw(ix, iy, {0, 52, 90, 52});
 
-				rm->spr_eyecandy.draw(ix + 10, iy + 10, k << 5, 0, 32, 32);
+				rm->spr_eyecandy.draw(ix + 10, iy + 10, {k << 5, 0, 32, 32});
 
 				short mask = 1 << k;
 				if (g_map->eyecandy[iLayer] & mask)
@@ -2106,11 +2106,11 @@ int editor_properties(short iBlockCol, short iBlockRow)
 				short iy = (iSetting / 6) * 62 + 65;
 
 				if (mouse_x >= ix - 10 && mouse_x < ix + 80 && mouse_y >= iy - 10 && mouse_y < iy + 42 && !fUseGame)
-					rm->spr_powerupselector.draw(ix - 10, iy - 10, 0, 0, 90, 52);
+					rm->spr_powerupselector.draw(ix - 10, iy - 10, {0, 0, 90, 52});
 				else
-					rm->spr_powerupselector.draw(ix - 10, iy - 10, 0, 52, 90, 52);
+					rm->spr_powerupselector.draw(ix - 10, iy - 10, {0, 52, 90, 52});
 
-				rm->spr_powerups.draw(ix, iy, iSetting << 5, 0, 32, 32);
+				rm->spr_powerups.draw(ix, iy, {iSetting << 5, 0, 32, 32});
 
 				char szNum[8];
 				if (fUseGame)
@@ -2132,9 +2132,9 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		}
 
 		if (mouse_x >= 270 && mouse_x < 370 && mouse_y >= iHiddenCheckboxY && mouse_y < iHiddenCheckboxY + 52)
-			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, 90, 0, 100, 52);
+			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, {90, 0, 100, 52});
 		else
-			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, 90, 52, 100, 52);
+			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, {90, 52, 100, 52});
 
 		rm->menu_font_large.drawCentered(320, iHiddenCheckboxY + 3, "Hidden");
 
@@ -2144,9 +2144,9 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		//Display "Use Game" option
         if (iBlockType == 1 || iBlockType == 15) {
 			if (mouse_x >= 390 && mouse_x < 490 && mouse_y >= iHiddenCheckboxY && mouse_y < iHiddenCheckboxY + 52)
-				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, 90, 0, 100, 52);
+				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, {90, 0, 100, 52});
 			else
-				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, 90, 52, 100, 52);
+				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, {90, 52, 100, 52});
 
 			rm->menu_font_large.drawCentered(440, iHiddenCheckboxY + 3, "Use Game");
 
@@ -2751,7 +2751,7 @@ int editor_platforms()
 				rm->menu_font_small.draw(406, 10, "Fast");
 			}
 
-			rm->spr_number_icons.draw(619, 5, g_Platforms[iEditPlatform].iDrawLayer << 4, 48, 16, 16);
+			rm->spr_number_icons.draw(619, 5, {g_Platforms[iEditPlatform].iDrawLayer << 4, 48, 16, 16});
 
         } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
             if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
@@ -2945,7 +2945,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 
             if (fDrawTileTypes) {
 				TileType type = g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow];
-                rm->spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, static_cast<int>(PrevTileType(type)) * TILESIZE, 0, TILESIZE, TILESIZE);
+                rm->spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, {static_cast<int>(PrevTileType(type)) * TILESIZE, 0, TILESIZE, TILESIZE});
 			}
 		}
 	}
@@ -3665,7 +3665,7 @@ int editor_tiles()
             for (j = view_tileset_y; j < view_tileset_y + 15 && j < tileset->height(); j++) {
                                 TileType t = tileset->tileType(i, j);
 				if (t != TileType::NonSolid)
-                                    rm->spr_tiletypes.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5, static_cast<int>(PrevTileType(t)) << 3, 0, 8, 8);
+                                    rm->spr_tiletypes.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5, {static_cast<int>(PrevTileType(t)) << 3, 0, 8, 8});
 			}
 		}
 
@@ -3830,7 +3830,7 @@ int editor_mapitems()
 		drawmap(false, TILESIZE);
 		rm->menu_shade.draw(0, 0);
 
-		rm->spr_mapitems[0].draw(0, 0, 0, 0, 192, 32);
+		rm->spr_mapitems[0].draw(0, 0, {0, 0, 192, 32});
 
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 		rm->menu_font_small.drawRightJustified(0, 480 - rm->menu_font_small.getHeight(), "Map Items");
@@ -3977,7 +3977,7 @@ int editor_modeitems()
 				rm->menu_font_large.drawCentered(320, 220, "Press 'R' to manually set them.");
             } else {
                 for (short iGoal = 0; iGoal < g_map->iNumRaceGoals; iGoal++) {
-					rm->spr_racegoals.draw(g_map->racegoallocations[iGoal].x - 16, g_map->racegoallocations[iGoal].y - 18, 0, 0, 68, 54);
+					rm->spr_racegoals.draw(g_map->racegoallocations[iGoal].x - 16, g_map->racegoallocations[iGoal].y - 18, {0, 0, 68, 54});
 					char szNum[4];
 					sprintf(szNum, "%d", iGoal + 1);
 					rm->menu_font_large.drawCentered(g_map->racegoallocations[iGoal].x + 18, g_map->racegoallocations[iGoal].y + 6, szNum);
@@ -3991,7 +3991,7 @@ int editor_modeitems()
 				rm->menu_font_large.drawCentered(320, 220, "Press 'R' to manually set them.");
             } else {
                 for (short iBase = 0; iBase < g_map->iNumFlagBases; iBase++) {
-					rm->spr_flagbases.draw(g_map->flagbaselocations[iBase].x - 8, g_map->flagbaselocations[iBase].y - 8, iBase * 48, 0, 48, 48);
+					rm->spr_flagbases.draw(g_map->flagbaselocations[iBase].x - 8, g_map->flagbaselocations[iBase].y - 8, {iBase * 48, 0, 48, 48});
 				}
 			}
 
@@ -4340,11 +4340,11 @@ int editor_animation()
 				short iSrcX = iRow << 7;
 				short iSrcY = iCol << 5;
 
-				rm->spr_tileanimation[0].draw(iDestX, iDestY, iSrcX, iSrcY, TILESIZE, TILESIZE);
+				rm->spr_tileanimation[0].draw(iDestX, iDestY, {iSrcX, iSrcY, TILESIZE, TILESIZE});
 
 				TileType t = animatedtiletypes[iCol + (iRow << 5)];
 				if (t != TileType::NonSolid)
-					rm->spr_tiletypes.draw(iDestX, iDestY, static_cast<int>(PrevTileType(t)) << 3, 0, 8, 8);
+					rm->spr_tiletypes.draw(iDestX, iDestY, {static_cast<int>(PrevTileType(t)) << 3, 0, 8, 8});
 			}
 		}
 
@@ -4578,7 +4578,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 	drawmap(false, TILESIZE);
 	rm->menu_shade.draw(0, 0);
-	rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+	rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
 	rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
@@ -4606,7 +4606,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 							drawmap(false, TILESIZE);
 							rm->menu_shade.draw(0, 0);
-							rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+							rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
@@ -4658,7 +4658,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 							drawmap(false, TILESIZE);
 							rm->menu_shade.draw(0, 0);
-							rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+							rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);

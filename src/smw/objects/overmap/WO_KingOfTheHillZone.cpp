@@ -73,9 +73,9 @@ void OMO_KingOfTheHillZone::draw()
             short iRowX = iy + (iRow << 5);
 
             if (multiplier > 1)
-                rm->spr_awardkillsinrow.draw(iColX + 8, iRowX + 8, (multiplier - 1) << 4, colorID << 4, 16, 16);
+                rm->spr_awardkillsinrow.draw(iColX + 8, iRowX + 8, {(multiplier - 1) << 4, colorID << 4, 16, 16});
 
-            spr->draw(iColX, iRowX, iXPiece + frame, iYPiece, TILESIZE, TILESIZE);
+            spr->draw(iColX, iRowX, {iXPiece + frame, iYPiece, TILESIZE, TILESIZE});
         }
     }
 }

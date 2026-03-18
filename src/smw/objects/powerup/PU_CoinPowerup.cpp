@@ -39,11 +39,11 @@ void PU_CoinPowerup::draw()
 {
     if (state == 0) {
         short iHeight = (short)(32 - fy + desty);
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, 32, iHeight);
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, iHeight);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, iColorOffsetY, 32, iHeight});
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, iHeight});
     } else {
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, 32, 32);
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, iColorOffsetY, 32, 32});
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
     }
 }
 

@@ -84,16 +84,16 @@ void MO_BulletBill::update()
 void MO_BulletBill::draw()
 {
     if (fIsSpawned)
-        spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih, iHiddenDirection, iHiddenPlane);
+        spr->draw(ix, iy, {drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih}, static_cast<ClipEdge>(iHiddenDirection), iHiddenPlane);
     else
-        spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih);
+        spr->draw(ix, iy, {drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih});
 }
 
 // For preview drawing
 void MO_BulletBill::draw(short iOffsetX, short iOffsetY)
 {
     if (fIsSpawned)
-        gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false, iHiddenDirection, (iHiddenPlane >> 1) + iOffsetX);
+        gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false, {{static_cast<ClipEdge>(iHiddenDirection), (iHiddenPlane >> 1) + iOffsetX}});
     else
         gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false);
 }

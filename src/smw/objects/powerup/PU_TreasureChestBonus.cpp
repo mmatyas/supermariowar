@@ -61,12 +61,12 @@ void PU_TreasureChestBonus::draw()
         MO_Powerup::draw();
 
         // Draw sparkles
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
     } else {
         if (bonusitem >= NUM_POWERUPS)
-            rm->spr_worlditems.draw(drawbonusitemx, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
+            rm->spr_worlditems.draw(drawbonusitemx, drawbonusitemy, {(bonusitem - NUM_POWERUPS) << 5, 0, 32, 32});
         else
-            rm->spr_storedpoweruplarge.draw(drawbonusitemx, drawbonusitemy, bonusitem << 5, 0, 32, 32);
+            rm->spr_storedpoweruplarge.draw(drawbonusitemx, drawbonusitemy, {bonusitem << 5, 0, 32, 32});
     }
 }
 
