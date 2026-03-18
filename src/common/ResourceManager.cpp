@@ -43,7 +43,10 @@ bool CResourceManager::LoadFullSkin(SpriteStrip& sprites, short skinID, short co
 }
 
 void CResourceManager::LoadAllSprites() {
-    std::string graphicspack = gamegraphicspacklist->currentPath().string();
+    const fs::path graphicspack = gamegraphicspacklist->currentPath();
+    const auto builder = [&graphicspack](std::string_view relpath) {
+        return SpriteBuilder(convertPath(relpath, graphicspack));
+    };
 
     std::string shyguyPath = convertPath("gfx/packs/modeskins/shyguy.png", graphicspack);
     if (!FileExists(shyguyPath))
@@ -258,7 +261,7 @@ void CResourceManager::LoadAllSprites() {
     gfx_loadimage(spr_extralife, convertPath("gfx/packs/eyecandy/extralife.png", graphicspack), true);
 
     gfx_loadimage(spr_windmeter, convertPath("gfx/packs/eyecandy/wind_meter.png", graphicspack), 192, true);
-    gfx_loadimage(spr_overlayhole, convertPath("gfx/packs/eyecandy/overlayholes.png", graphicspack), {0, 255, 0}, true);
+    spr_overlayhole = builder("gfx/packs/eyecandy/overlayholes.png").withColorKey(RGB {0, 255, 0}).withWrapping().create();
 
     gfx_loadimage(spr_award, convertPath("gfx/packs/awards/killsinrow.png", graphicspack), 128, true);
     gfx_loadimage(spr_awardsolid, convertPath("gfx/packs/awards/killsinrow.png", graphicspack), true);

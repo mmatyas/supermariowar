@@ -449,12 +449,7 @@ void gfx_drawpreview(
 
 bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, bool fWrap)
 {
-    return gfx_loadimage(gSprite, path, colors::MAGENTA, fWrap);
-}
-
-bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, Uint8 alpha, bool fWrap)
-{
-    auto builder = SpriteBuilder(path).withAlpha(alpha);
+    auto builder = SpriteBuilder(path);
     if (fWrap)
         builder.withWrapping();
 
@@ -462,9 +457,9 @@ bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, Uint8 alpha, boo
     return true;
 }
 
-bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, const RGB& rgb, bool fWrap)
+bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, Uint8 alpha, bool fWrap)
 {
-    auto builder = SpriteBuilder(path).withColorKey(rgb);
+    auto builder = SpriteBuilder(path).withAlpha(alpha);
     if (fWrap)
         builder.withWrapping();
 
