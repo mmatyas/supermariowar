@@ -79,7 +79,7 @@ SdlSurfacePtr loadImage(
 //
 // Color keyed without alpha
 //
-bool gfxSprite::init(const std::string& filename, const RGB& key)
+bool gfxSprite::init(const fs::path& filename, const RGB& key)
 {
     m_picture = loadImage(filename, key);
     if (m_picture) {
@@ -92,7 +92,7 @@ bool gfxSprite::init(const std::string& filename, const RGB& key)
 //
 // Color keyed + alpha
 //
-bool gfxSprite::init(const std::string& filename, const RGB& key, Uint8 alpha)
+bool gfxSprite::init(const fs::path& filename, const RGB& key, Uint8 alpha)
 {
     m_picture = loadImage(filename, key, alpha);
     if (m_picture) {
@@ -105,7 +105,7 @@ bool gfxSprite::init(const std::string& filename, const RGB& key, Uint8 alpha)
 //
 // Non color keyed
 //
-bool gfxSprite::init(const std::string& filename)
+bool gfxSprite::init(const fs::path& filename)
 {
     m_picture = loadImage(filename);
     if (m_picture) {

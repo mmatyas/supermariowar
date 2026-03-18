@@ -6,13 +6,13 @@
 
 #include "SDL.h"
 
-#include <string>
+#include <filesystem>
 
 class gfxSprite {
 public:
-    bool init(const std::string& filename); //non color keyed
-    bool init(const std::string& filename, const RGB& key); //color keyed
-    bool init(const std::string& filename, const RGB& key, Uint8 alpha); //color keyed + alpha
+    bool init(const std::filesystem::path& filename); //non color keyed
+    bool init(const std::filesystem::path& filename, const RGB& key); //color keyed
+    bool init(const std::filesystem::path& filename, const RGB& key, Uint8 alpha); //color keyed + alpha
 
     bool draw(short x, short y);
     bool draw(short x, short y, short srcx, short srcy, short w, short h, short iHiddenDirection = -1, short iHiddenValue = -1);
