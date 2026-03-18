@@ -31,7 +31,6 @@ public:
 
 private:
     SdlSurfacePtr m_picture;
-    SDL_Rect m_bltrect {};
 
     bool fWrap = false;
     short iWrapSize = 640;  // TODO: Get it from a global setting.

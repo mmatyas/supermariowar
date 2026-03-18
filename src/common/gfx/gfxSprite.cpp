@@ -82,10 +82,6 @@ SdlSurfacePtr loadImage(
 bool gfxSprite::init(const fs::path& filename, const RGB& key)
 {
     m_picture = loadImage(filename, key);
-    if (m_picture) {
-        m_bltrect.w = m_picture->w;
-        m_bltrect.h = m_picture->h;
-    }
     return m_picture.get();
 }
 
@@ -95,10 +91,6 @@ bool gfxSprite::init(const fs::path& filename, const RGB& key)
 bool gfxSprite::init(const fs::path& filename, const RGB& key, Uint8 alpha)
 {
     m_picture = loadImage(filename, key, alpha);
-    if (m_picture) {
-        m_bltrect.w = m_picture->w;
-        m_bltrect.h = m_picture->h;
-    }
     return m_picture.get();
 }
 
@@ -108,10 +100,6 @@ bool gfxSprite::init(const fs::path& filename, const RGB& key, Uint8 alpha)
 bool gfxSprite::init(const fs::path& filename)
 {
     m_picture = loadImage(filename);
-    if (m_picture) {
-        m_bltrect.w = m_picture->w;
-        m_bltrect.h = m_picture->h;
-    }
     return m_picture.get();
 }
 
@@ -119,28 +107,27 @@ bool gfxSprite::draw(short x, short y)
 {
     assert(m_picture != NULL);
 
-    m_bltrect.x = x + x_shake;
-    m_bltrect.y = y + y_shake;
+    SDL_Rect dstRect {x + x_shake, y + y_shake, getWidth(), getHeight()};
 
-    if (SDL_BlitSurface(m_picture.get(), NULL, blitdest, &m_bltrect) < 0) {
+    if (SDL_BlitSurface(m_picture.get(), NULL, blitdest, &dstRect) < 0) {
         fprintf(stderr, "BlitSurface error: %s\n", SDL_GetError());
         return false;
     }
 
     if (fWrap) {
         if (x + m_picture->w >= iWrapSize) {
-            m_bltrect.x = x - iWrapSize + x_shake;
-            m_bltrect.y = y + y_shake;
+            dstRect.x = x - iWrapSize + x_shake;
+            dstRect.y = y + y_shake;
 
-            if (SDL_BlitSurface(m_picture.get(), NULL, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture.get(), NULL, blitdest, &dstRect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
         } else if (x < 0) {
-            m_bltrect.x = x + iWrapSize + x_shake;
-            m_bltrect.y = y + y_shake;
+            dstRect.x = x + iWrapSize + x_shake;
+            dstRect.y = y + y_shake;
 
-            if (SDL_BlitSurface(m_picture.get(), NULL, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture.get(), NULL, blitdest, &dstRect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
@@ -155,53 +142,44 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
 {
     assert(m_picture != NULL);
 
-    m_bltrect.x = x + x_shake;
-    m_bltrect.y = y + y_shake;
-    m_bltrect.w = w;
-    m_bltrect.h = h;
-
-    SDL_Rect srcrect {
-        srcx,
-        srcy,
-        w,
-        h,
-    };
+    SDL_Rect srcRect {srcx, srcy, w, h};
+    SDL_Rect dstRect {x + x_shake, y + y_shake, w, h};
 
     if (sHiddenDirection > -1) {
-        if (gfx_adjusthiddenrects(&srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
+        if (gfx_adjusthiddenrects(&srcRect, &dstRect, sHiddenDirection, sHiddenValue))
             return true;
     }
 
     // Blit onto the screen surface
-    if (SDL_BlitSurface(m_picture.get(), &srcrect, blitdest, &m_bltrect) < 0) {
+    if (SDL_BlitSurface(m_picture.get(), &srcRect, blitdest, &dstRect) < 0) {
         fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
         return false;
     }
 
     if (fWrap) {
         if (x + w >= iWrapSize) {
-            srcrect = {srcx, srcy, w, h};
-            m_bltrect = {x - iWrapSize + x_shake, y + y_shake, w, h};
+            srcRect = {srcx, srcy, w, h};
+            dstRect = {x - iWrapSize + x_shake, y + y_shake, w, h};
 
             if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
+                if (gfx_adjusthiddenrects(&srcRect, &dstRect, sHiddenDirection, sHiddenValue))
                     return true;
             }
 
-            if (SDL_BlitSurface(m_picture.get(), &srcrect, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture.get(), &srcRect, blitdest, &dstRect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
         } else if (x < 0) {
-            srcrect = {srcx, srcy, w, h};
-            m_bltrect = {x + iWrapSize + x_shake, y + y_shake, w, h};
+            srcRect = {srcx, srcy, w, h};
+            dstRect = {x + iWrapSize + x_shake, y + y_shake, w, h};
 
             if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
+                if (gfx_adjusthiddenrects(&srcRect, &dstRect, sHiddenDirection, sHiddenValue))
                     return true;
             }
 
-            if (SDL_BlitSurface(m_picture.get(), &srcrect, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture.get(), &srcRect, blitdest, &dstRect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
@@ -215,21 +193,12 @@ bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, shor
 {
     assert(m_picture != NULL);
 
-    m_bltrect.x = x + x_shake;
-    m_bltrect.y = y + y_shake;
-    m_bltrect.w = w;
-    m_bltrect.h = h;
-
-    SDL_Rect srcrect {
-        srcx,
-        srcy,
-        srcw,
-        srch,
-    };
+    const SDL_Rect srcRect {srcx, srcy, srcw, srch};
+    SDL_Rect dstRect {x + x_shake, y + y_shake, w, h};
 
     // Looks like SoftStretch doesn't respect transparent colors
     // I need to look into the actual SDL code to see if I can fix this
-    if (SDL_BlitScaled(m_picture.get(), &srcrect, blitdest, &m_bltrect) < 0) {
+    if (SDL_BlitScaled(m_picture.get(), &srcRect, blitdest, &dstRect) < 0) {
         fprintf(stderr, "SDL_BlitScaled error: %s\n", SDL_GetError());
         return false;
     }
@@ -254,10 +223,6 @@ void gfxSprite::setalpha(Uint8 alpha)
 void gfxSprite::setSurface(SdlSurfacePtr surface)
 {
     m_picture = std::move(surface);
-    if (m_picture) {
-        m_bltrect.w = m_picture->w;
-        m_bltrect.h = m_picture->h;
-    }
 }
 
 void gfxSprite::SetWrap(bool wrap, short wrapsize)
