@@ -26,7 +26,8 @@ public:
     /// TODO: Most of the caller sites don't use std::optional. By updating the code there
     /// this function could be merged with the one without the clip parameters.
     void draw(int x, int y, const SDL_Rect& srcRect, ClipEdge clipEdge, int clipTreshold) const;
-    bool drawStretch(short x, short y, short w, short h, short srcx, short srcy, short srcw, short srch);
+    /// Draw a part of the sprite scaled to a destination area.
+    void drawStretch(const SDL_Rect& dstRect, const SDL_Rect& srcRect) const;
 
     void setalpha(Uint8 alpha);
 

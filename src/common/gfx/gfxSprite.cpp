@@ -182,21 +182,16 @@ void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect, ClipEdge clipEdge, i
     }
 }
 
-bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, short srcy, short srcw, short srch)
+void gfxSprite::drawStretch(const SDL_Rect& dstRect, const SDL_Rect& srcRect) const
 {
-    assert(m_picture != NULL);
+    assert(m_picture);
 
-    const SDL_Rect srcRect {srcx, srcy, srcw, srch};
-    SDL_Rect dstRect {x + x_shake, y + y_shake, w, h};
+    // TODO: SDL2 requires dst to be writable. Fixed in SDL3.
+    SDL_Rect dstRect_w = dstRect;
 
-    // Looks like SoftStretch doesn't respect transparent colors
-    // I need to look into the actual SDL code to see if I can fix this
-    if (SDL_BlitScaled(m_picture.get(), &srcRect, blitdest, &dstRect) < 0) {
+    if (SDL_BlitScaled(m_picture.get(), &srcRect, blitdest, &dstRect_w) < 0) {
         fprintf(stderr, "SDL_BlitScaled error: %s\n", SDL_GetError());
-        return false;
     }
-
-    return true;
 }
 
 void gfxSprite::setalpha(Uint8 alpha)
