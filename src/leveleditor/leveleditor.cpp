@@ -165,21 +165,17 @@ short			y_shake = 0;
 
 int				mouse_x, mouse_y;
 
-void update_mouse_coords() {
-	mouse_x = event.motion.x;
-	mouse_y = event.motion.y;
-	if (mouse_x < 0) mouse_x = 0;
-	if (mouse_y < 0) mouse_y = 0;
-	if (mouse_x > 640 - 1) mouse_x = 640 - 1;
-	if (mouse_y > 480 - 1) mouse_y = 480 - 1;
-}
-
 int bound_to_window_w(int x) {
-	return std::max(0, std::min(x, 640));
+	return std::max(0, std::min(x, 640 - 1));
 }
 
 int bound_to_window_h(int y) {
-	return std::max(0, std::min(y, 480));
+	return std::max(0, std::min(y, 480 - 1));
+}
+
+void bound_mouse_motion_coords() {
+    mouse_x = bound_to_window_w(event.motion.x);
+    mouse_y = bound_to_window_h(event.motion.y);
 }
 
 CEyecandyContainer eyecandy[3];
@@ -1307,7 +1303,7 @@ int editor_edit()
 					}
 
                 case SDL_MOUSEMOTION: {
-						update_mouse_coords();
+						bound_mouse_motion_coords();
 						short iClickX = bound_to_window_w(event.motion.x) / TILESIZE;
 						short iClickY = bound_to_window_h(event.motion.y) / TILESIZE;
 
@@ -1918,7 +1914,7 @@ int editor_eyecandy()
 				}
 
 			case SDL_MOUSEMOTION: {
-				update_mouse_coords();
+				bound_mouse_motion_coords();
 				break;
 				}
 
@@ -2087,7 +2083,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 				}
 
 			case SDL_MOUSEMOTION: {
-				update_mouse_coords();
+				bound_mouse_motion_coords();
 				break;
 				}
 
@@ -2609,7 +2605,7 @@ int editor_platforms()
 					}
 				}
             case SDL_MOUSEMOTION: {
-					update_mouse_coords();
+					bound_mouse_motion_coords();
 					short ix = bound_to_window_w(event.motion.x) / TILESIZE;
 					short iy = bound_to_window_h(event.motion.y) / TILESIZE;
 
@@ -3242,7 +3238,7 @@ int editor_maphazards()
 					}
 				}
             case SDL_MOUSEMOTION: {
-					update_mouse_coords();
+					bound_mouse_motion_coords();
 					short iClickX = bound_to_window_w(event.motion.x);
 					short iClickY = bound_to_window_h(event.motion.y);
 
@@ -3596,7 +3592,7 @@ int editor_tiles()
 				}
 
             case SDL_MOUSEMOTION: {
-					update_mouse_coords();
+					bound_mouse_motion_coords();
 					short iCol = bound_to_window_w(event.motion.x) / TILESIZE + view_tileset_x;
 					short iRow = bound_to_window_h(event.motion.y) / TILESIZE + view_tileset_y;
 
@@ -3939,7 +3935,7 @@ int editor_modeitems()
 				}
 
             case SDL_MOUSEMOTION: {
-                update_mouse_coords();
+                bound_mouse_motion_coords();
                 if (dragmodeitem >= 0 && event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
                     const Uint8 * keystate = SDL_GetKeyboardState(NULL);
 						bool fShiftDown = CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT);
@@ -4159,7 +4155,7 @@ int editor_backgrounds()
 				break;
 
 				case SDL_MOUSEMOTION:
-					update_mouse_coords();
+					bound_mouse_motion_coords();
 				break;
 
 				default:
@@ -4293,7 +4289,7 @@ int editor_animation()
 				}
 
             case SDL_MOUSEMOTION: {
-                update_mouse_coords();
+                bound_mouse_motion_coords();
                 if (fInValidTile) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
 							if (iCol < set_tile_start_x)
