@@ -74,6 +74,13 @@ SdlSurfacePtr loadImage(
     std::cout << " done" << std::endl;
     return img;
 }
+
+void blitSurface(SDL_Surface* src, const SDL_Rect* srcArea, SDL_Surface* dst, SDL_Rect* dstArea)
+{
+    if (SDL_BlitSurface(src, nullptr, dst, dstArea) < 0) {
+        fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
+    }
+}
 } // namespace
 
 //
@@ -103,44 +110,28 @@ bool gfxSprite::init(const fs::path& filename)
     return m_picture.get();
 }
 
-bool gfxSprite::draw(short x, short y)
+void gfxSprite::draw(int x, int y) const
 {
-    assert(m_picture != NULL);
+    assert(m_picture);
 
     SDL_Rect dstRect {x + x_shake, y + y_shake, getWidth(), getHeight()};
-
-    if (SDL_BlitSurface(m_picture.get(), NULL, blitdest, &dstRect) < 0) {
-        fprintf(stderr, "BlitSurface error: %s\n", SDL_GetError());
-        return false;
-    }
+    blitSurface(m_picture.get(), NULL, blitdest, &dstRect);
 
     if (fWrap) {
-        if (x + m_picture->w >= iWrapSize) {
-            dstRect.x = x - iWrapSize + x_shake;
-            dstRect.y = y + y_shake;
-
-            if (SDL_BlitSurface(m_picture.get(), NULL, blitdest, &dstRect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
+        if (x + getWidth() >= iWrapSize) {
+            dstRect.x -= iWrapSize;
+            blitSurface(m_picture.get(), NULL, blitdest, &dstRect);
         } else if (x < 0) {
-            dstRect.x = x + iWrapSize + x_shake;
-            dstRect.y = y + y_shake;
-
-            if (SDL_BlitSurface(m_picture.get(), NULL, blitdest, &dstRect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
+            dstRect.x += iWrapSize;
+            blitSurface(m_picture.get(), NULL, blitdest, &dstRect);
         }
     }
-
-    return true;
 }
 
 //TODO Perf Optimization: Set w/h once when sprite is initialized, set srcx/srcy just when animation frame advance happens
 bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h, short sHiddenDirection, short sHiddenValue)
 {
-    assert(m_picture != NULL);
+    assert(m_picture);
 
     SDL_Rect srcRect {srcx, srcy, w, h};
     SDL_Rect dstRect {x + x_shake, y + y_shake, w, h};

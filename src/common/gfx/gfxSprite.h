@@ -14,7 +14,8 @@ public:
     bool init(const std::filesystem::path& filename, const RGB& key); //color keyed
     bool init(const std::filesystem::path& filename, const RGB& key, Uint8 alpha); //color keyed + alpha
 
-    bool draw(short x, short y);
+    /// Draw the whole sprite at the given coordinate.
+    void draw(int x, int y) const;
     bool draw(short x, short y, short srcx, short srcy, short w, short h, short iHiddenDirection = -1, short iHiddenValue = -1);
     bool drawStretch(short x, short y, short w, short h, short srcx, short srcy, short srcw, short srch);
 
