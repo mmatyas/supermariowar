@@ -83,39 +83,9 @@ void SplashScreenState::onLeaveState()
     delete menu_credits;
 }
 
-bool LoadStartGraphics()
-{
-    std::string graphicspack = menugraphicspacklist->currentPath().string();
-
-    bool loadok = true;
-
-    loadok &= rm->menu_font_small.init(convertPath("gfx/packs/menu/menu_font_small.png", graphicspack));
-    loadok &= rm->menu_font_large.init(convertPath("gfx/packs/menu/menu_font_large.png", graphicspack));
-
-    if (!loadok) {
-        _load_drawmsg("ERROR: error loading the fonts!\n");
-        _load_waitforkey();
-        return false;
-    }
-
-    //load basic stuff
-    loadok &= gfx_loadimagenocolorkey(rm->menu_backdrop, convertPath("gfx/packs/menu/menu_background.png", graphicspack));
-    loadok &= gfx_loadimage(rm->menu_smw, convertPath("gfx/packs/menu/menu_smw.png", graphicspack), false);
-    loadok &= gfx_loadimage(rm->menu_version, convertPath("gfx/packs/menu/menu_version.png", graphicspack), false);
-
-    if (!loadok) {
-        _load_drawmsg("ERROR: error loading the start graphics!\n");
-        _load_waitforkey();
-        return false;
-    }
-
-    return true;
-}
-
 bool SplashScreenState::init()
 {
-    if (!LoadStartGraphics())
-        return false;
+    rm->loadStartGraphics();
 
 //  gfx_loadimagenocolorkey(&rm->menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist->current_name()));
 //  gfx_loadimagenocolorkey(&rm->menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));

@@ -63,8 +63,6 @@
 #include <sstream>
 
 
-bool LoadStartGraphics();
-
 extern SDL_Surface* screen;
 extern SDL_Surface* blitdest;
 
@@ -975,7 +973,6 @@ void MenuState::update()
                 }
             }
         } else if (MENU_CODE_MENU_GRAPHICS_PACK_CHANGED == code) {
-            LoadStartGraphics();
             rm->LoadMenuGraphics();
 
             blitdest = rm->menu_backdrop.getSurface();

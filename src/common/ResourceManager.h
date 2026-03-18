@@ -17,12 +17,13 @@ public:
 	bool LoadFullSkin(SpriteStrip& sprites, short skinID, short colorID);
 	bool LoadFullSkin(SpriteStrip& sprites, const std::string& filename, short colorID);
 
-	bool LoadWorldGraphics();
 	bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 	bool LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections);
 	void LoadAllGraphics();
 	bool LoadMenuGraphics();
 	bool LoadGameGraphics();
+	bool LoadWorldGraphics();
+	void loadStartGraphics();
 
 	bool LoadGameSounds();
 

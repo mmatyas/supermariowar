@@ -17,9 +17,6 @@ class SplashScreenState : public GameState
     private:
         void onLeaveState() override;
 
-        //bool LoadStartGraphics();
-        //bool LoadGameSounds();
-
         SDL_Event loop_event;
         gfxSprite* menu_dpi_logo;
         gfxSprite* menu_contest_winners;

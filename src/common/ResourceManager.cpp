@@ -368,6 +368,24 @@ bool CResourceManager::LoadGameGraphics()
     return true;
 }
 
+void CResourceManager::loadStartGraphics()
+{
+    std::string graphicspack = menugraphicspacklist->currentPath().string();
+
+    bool loadok = true;
+    loadok &= menu_font_small.init(convertPath("gfx/packs/menu/menu_font_small.png", graphicspack));
+    loadok &= menu_font_large.init(convertPath("gfx/packs/menu/menu_font_large.png", graphicspack));
+    if (!loadok)
+        throw "ERROR: error loading the fonts!";
+
+    //load basic stuff
+    loadok &= gfx_loadimagenocolorkey(menu_backdrop, convertPath("gfx/packs/menu/menu_background.png", graphicspack));
+    loadok &= gfx_loadimage(menu_smw, convertPath("gfx/packs/menu/menu_smw.png", graphicspack), false);
+    loadok &= gfx_loadimage(menu_version, convertPath("gfx/packs/menu/menu_version.png", graphicspack), false);
+    if (!loadok)
+        throw "ERROR: error loading the start graphics!";
+}
+
 void CResourceManager::LoadAllGraphics()
 {
     for (size_t player = 0; player < MAX_PLAYERS; player++) {
