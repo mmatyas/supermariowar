@@ -446,12 +446,6 @@ void gfx_drawpreview(
     }
 }
 
-bool gfx_loadimagenocolorkey(gfxSprite& sprite, const std::string& path)
-{
-    sprite = SpriteBuilder(path).withoutColorKey().create();
-    return true;
-}
-
 
 bool gfx_loadimage(gfxSprite& gSprite, const std::string& path, bool fWrap)
 {

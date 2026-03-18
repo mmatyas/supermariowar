@@ -7,6 +7,10 @@
 #include "path.h"
 #include "gfx/Color.h"
 
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
 extern SkinList *skinlist;
 extern GraphicsList *menugraphicspacklist;
 extern GraphicsList *worldgraphicspacklist;
@@ -275,10 +279,12 @@ void CResourceManager::LoadAllSprites() {
 
 bool CResourceManager::LoadMenuGraphics()
 {
-    std::string graphicspack = menugraphicspacklist->currentPath().string();
+    const fs::path graphicspack = menugraphicspacklist->currentPath();
+    const auto builder = [&graphicspack](std::string_view relpath) {
+        return SpriteBuilder(convertPath(relpath, graphicspack));
+    };
 
-    gfx_loadimagenocolorkey(menu_shade, convertPath("gfx/packs/menu/menu_shade.png", graphicspack));
-    menu_shade.setalpha(App::menuTransparency);
+    menu_shade = builder("gfx/packs/menu/menu_shade.png").withAlpha(App::menuTransparency).withoutColorKey().create();
 
     gfx_loadimage(spr_scoreboard, convertPath("gfx/packs/menu/scoreboard.png", graphicspack), false);
     gfx_loadimage(menu_slider_bar, convertPath("gfx/packs/menu/menu_slider_bar.png", graphicspack), false);
@@ -370,7 +376,10 @@ bool CResourceManager::LoadGameGraphics()
 
 void CResourceManager::loadStartGraphics()
 {
-    std::string graphicspack = menugraphicspacklist->currentPath().string();
+    const fs::path graphicspack = menugraphicspacklist->currentPath();
+    const auto builder = [&graphicspack](std::string_view relpath) {
+        return SpriteBuilder(convertPath(relpath, graphicspack));
+    };
 
     bool loadok = true;
     loadok &= menu_font_small.init(convertPath("gfx/packs/menu/menu_font_small.png", graphicspack));
@@ -379,7 +388,7 @@ void CResourceManager::loadStartGraphics()
         throw "ERROR: error loading the fonts!";
 
     //load basic stuff
-    loadok &= gfx_loadimagenocolorkey(menu_backdrop, convertPath("gfx/packs/menu/menu_background.png", graphicspack));
+    menu_backdrop = builder("gfx/packs/menu/menu_background.png").withoutColorKey().create();
     loadok &= gfx_loadimage(menu_smw, convertPath("gfx/packs/menu/menu_smw.png", graphicspack), false);
     loadok &= gfx_loadimage(menu_version, convertPath("gfx/packs/menu/menu_version.png", graphicspack), false);
     if (!loadok)
@@ -388,6 +397,11 @@ void CResourceManager::loadStartGraphics()
 
 void CResourceManager::LoadAllGraphics()
 {
+    const fs::path graphicspack = gamegraphicspacklist->currentPath();
+    const auto builder = [&graphicspack](std::string_view relpath) {
+        return SpriteBuilder(convertPath(relpath, graphicspack));
+    };
+
     for (size_t player = 0; player < MAX_PLAYERS; player++) {
         for (size_t frame = 0; frame < PGFX_LAST; frame++) {
             spr_player[player][frame].SetWrap(true);
@@ -401,10 +415,10 @@ void CResourceManager::LoadAllGraphics()
     LoadWorldGraphics();
     LoadGameGraphics();
 
-    gfx_loadimagenocolorkey(spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
-    gfx_loadimagenocolorkey(spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
-    gfx_loadimagenocolorkey(spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
-    gfx_loadimagenocolorkey(spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath()));
+    spr_backmap[0] = builder("gfx/packs/backgrounds/Land_Classic.png").withoutColorKey().create();
+    spr_backmap[1] = builder("gfx/packs/backgrounds/Land_Classic.png").withoutColorKey().create();
+    spr_frontmap[0] = builder("gfx/packs/backgrounds/Land_Classic.png").withoutColorKey().create();
+    spr_frontmap[1] = builder("gfx/packs/backgrounds/Land_Classic.png").withoutColorKey().create();
 
     gfx_loadimage(spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist->currentPath()), false, false);
 }
