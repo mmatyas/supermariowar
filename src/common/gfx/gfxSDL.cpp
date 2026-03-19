@@ -24,13 +24,6 @@ template<typename... Args>
 namespace {
 void initSdl()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-        throw_error("SDL error: %s", SDL_GetError());
-
-    SDL_version sdl_version;
-    SDL_GetVersion(&sdl_version);
-    printf("[gfx] SDL %d.%d.%d loaded.\n", sdl_version.major, sdl_version.minor, sdl_version.patch);
-
     constexpr int IMG_FLAGS = IMG_INIT_PNG;
     if ((IMG_Init(IMG_FLAGS) & IMG_FLAGS) != IMG_FLAGS)
         throw_error("SDL_image error: {}", IMG_GetError());
@@ -42,7 +35,6 @@ void initSdl()
 void quitSdl()
 {
     IMG_Quit();
-    SDL_Quit();
 }
 
 SDL_Window* createWindow(bool fullscreen)

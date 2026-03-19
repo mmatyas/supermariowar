@@ -212,7 +212,6 @@ void create_globals()
 
 void init_joysticks()
 {
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
     joystickcount = (short)SDL_NumJoysticks();
     joysticks = new SDL_Joystick*[joystickcount];
 
