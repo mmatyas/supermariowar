@@ -38,31 +38,31 @@ SdlSurfacePtr loadImage(
 
     auto raw = SdlSurfacePtr(IMG_Load(path_str.c_str()));
     if (!raw) {
-        throw std::format("Couldn't load {}: {}", path.string(), IMG_GetError());
+        throw std::format("Couldn't load {}: {}", path_str, IMG_GetError());
     }
 
     if (color_key) {
         const Uint32 key = SDL_MapRGB(raw->format, color_key->r, color_key->g, color_key->b);
         if (SDL_SetColorKey(raw.get(), SDL_TRUE, key) < 0) {
-            throw std::format("Couldn't set color key for {}: {}", path.string(), SDL_GetError());
+            throw std::format("Couldn't set color key for {}: {}", path_str, SDL_GetError());
         }
     }
 
     auto img = SdlSurfacePtr(SDL_ConvertSurface(raw.get(), screen->format, 0));
     if (!img) {
-        throw std::format("Couldn't convert {} to the display's pixel format: {}", path.string(), SDL_GetError());
+        throw std::format("Couldn't convert {} to the display's pixel format: {}", path_str, SDL_GetError());
     }
 
     if (SDL_SetSurfaceRLE(img.get(), 1) < 0) {
-        throw std::format("Couldn't set RLE acceleration for {}: {}", path.string(), SDL_GetError());
+        throw std::format("Couldn't set RLE acceleration for {}: {}", path_str, SDL_GetError());
     }
 
     if (alpha) {
         if (SDL_SetSurfaceBlendMode(img.get(), SDL_BLENDMODE_BLEND) < 0) {
-            throw std::format("Couldn't set blend mode for {}: {}", path.string(), SDL_GetError());
+            throw std::format("Couldn't set blend mode for {}: {}", path_str, SDL_GetError());
         }
         if (SDL_SetSurfaceAlphaMod(img.get(), *alpha) < 0) {
-            throw std::format("Couldn't set alpha modulation for {}: {}", path.string(), SDL_GetError());
+            throw std::format("Couldn't set alpha modulation for {}: {}", path_str, SDL_GetError());
         }
     }
 
