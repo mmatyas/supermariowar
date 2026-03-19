@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    Systems systems(g_fFullScreen);
+    MinimalSystems systems(g_fFullScreen);
 	blitdest = screen;
 
         rm = new CResourceManager();

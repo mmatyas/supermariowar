@@ -3,9 +3,9 @@
 #include <format>
 
 
-Sdl::Sdl()
+Sdl::Sdl(unsigned int flags)
 {
-    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0)
+    if (SDL_Init(flags) < 0)
         throw std::format("Could not initialize SDL: {}", SDL_GetError());
 
     SDL_version sdl_version;
