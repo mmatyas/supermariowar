@@ -419,9 +419,6 @@ bool CResourceManager::LoadGameSounds()
 {
     game_values.soundcapable = false;
 
-    if (!sfx_canPlayAudio())
-        return false;
-
     const fs::path soundpack = soundpacklist->currentPath();
     const auto open = [&soundpack](std::string_view relpath) {
         return sfxSound(convertPath(relpath, soundpack));

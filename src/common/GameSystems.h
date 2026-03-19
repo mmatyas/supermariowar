@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gfx/gfxSDL.h"
+#include "sfx.h"
 
 
 struct Sdl {
@@ -19,4 +20,5 @@ struct Systems {
 
     Sdl sdl;
     Graphics gfx;
+    Audio sfx;
 };

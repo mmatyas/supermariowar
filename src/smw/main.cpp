@@ -372,7 +372,6 @@ void main_game()
     return 0;
 #endif
 
-    sfx_init();                     //init the sound system
     net_init();                     //init the networking
 
     init_joysticks();
@@ -441,7 +440,6 @@ void main_game()
     for (short i = 0; i < GAMEMODE_LAST; i++)
         delete gamemodes[i];
 
-    sfx_close();
     net_close();
 
     //Delete player skins

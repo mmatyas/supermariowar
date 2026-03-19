@@ -396,8 +396,8 @@ void CGameConfig::ReadBinaryConfig() {
         worldgraphicspacklist->setCurrentIndex(options.read_u8());
         gamegraphicspacklist->setCurrentIndex(options.read_u8());
 
-        sfx_setmusicvolume(musicvolume);
-        sfx_setsoundvolume(soundvolume);
+        Audio::get().setMusicVolume(musicvolume);
+        Audio::get().setEffectVolume(soundvolume);
     }
     catch (std::exception const& error)
     {

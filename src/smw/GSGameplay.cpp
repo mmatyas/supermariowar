@@ -1665,7 +1665,7 @@ void CleanUp()
     g_map->resetPlatforms();
 
     //Stop all game sounds
-    sfx_stopallsounds();
+    Audio::get().clearAllEffects();
     rm->sfx_invinciblemusic.stop();
     rm->sfx_slowdownmusic.stop();
 
