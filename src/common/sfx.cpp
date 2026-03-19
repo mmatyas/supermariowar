@@ -17,58 +17,46 @@ void MixDeleter::operator()(Mix_Chunk* ptr) const noexcept { Mix_FreeChunk(ptr);
 void MixDeleter::operator()(Mix_Music* ptr) const noexcept { Mix_FreeMusic(ptr); }
 
 
-bool sfx_init()
+Audio::Audio()
 {
-    Mix_OpenAudio(44100, AUDIO_S16, 2, 2048);
-    Mix_AllocateChannels(sfxSound::k_channels);
+    s_instance = this;
+    if (Mix_OpenAudio(44100, AUDIO_S16, 2, 2048) < 0)
+        throw std::format("Could not initialize SDL_mixer: %s\n", Mix_GetError());
 
+    Mix_AllocateChannels(sfxSound::k_channels);
     Mix_ChannelFinished(&sfxSound::onChannelFinished);
     Mix_HookMusicFinished(&musicfinished);
 
-#ifndef __EMSCRIPTEN__
-    const SDL_version* link_version = Mix_Linked_Version();
-    printf("[sfx] SDL_Mixer %d.%d.%d initialized.\n",
-        link_version->major, link_version->minor, link_version->patch);
+    const SDL_version* version = Mix_Linked_Version();
+#ifdef SDL2_USE_MIXERX
+    printf("[sfx] SDL Mixer X %d.%d.%d loaded.\n", version->major, version->minor, version->patch);
 #else
-    SDL_version ver_compiled;
-    SDL_MIXER_VERSION(&ver_compiled);
-    printf("[sfx] SDL_Mixer %d.%d.%d initialized.\n",
-        ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
+    printf("[sfx] SDL_mixer %d.%d.%d loaded.\n", version->major, version->minor, version->patch);
 #endif
-
-    return true;
 }
 
-void sfx_close()
+Audio::~Audio()
 {
     Mix_CloseAudio();
+    Mix_Quit();
+    s_instance = nullptr;
 }
 
-void sfx_stopallsounds()
+void Audio::clearAllEffects()
 {
     Mix_HaltChannel(-1);
 }
 
-void sfx_setmusicvolume(int volume)
+void Audio::setMusicVolume(int volume)
 {
     Mix_VolumeMusic(volume);
 }
 
-void sfx_setsoundvolume(int volume)
+void Audio::setEffectVolume(int volume)
 {
     Mix_Volume(-1, volume);
 }
 
-bool sfx_canPlayAudio()
-{
-#ifdef __EMSCRIPTEN__  // emscripten has sound capabilities
-    return true;
-#else
-    int frequency, channels;
-    Uint16 format;
-    return Mix_QuerySpec(&frequency, &format, &channels) != 0 /* error */;
-#endif
-}
 
 sfxSound::sfxSound(const fs::path& path)
 {

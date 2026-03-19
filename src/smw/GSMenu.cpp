@@ -875,10 +875,10 @@ void MenuState::update()
             }
         } else if (MENU_CODE_SOUND_VOLUME_CHANGED == code) {
             game_values.sound = game_values.soundvolume > 0;
-            sfx_setsoundvolume(game_values.soundvolume);
+            Audio::get().setEffectVolume(game_values.soundvolume);
             ifSoundOnPlay(rm->sfx_coin);
         } else if (MENU_CODE_MUSIC_VOLUME_CHANGED == code) {
-            sfx_setmusicvolume(game_values.musicvolume);
+            Audio::get().setMusicVolume(game_values.musicvolume);
 
             if (game_values.musicvolume == 0)
                 rm->backgroundmusic[2].stop();

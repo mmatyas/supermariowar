@@ -7,8 +7,10 @@
 #endif
 
 #include <array>
+#include <cassert>
 #include <bitset>
 #include <filesystem>
+
 
 struct MixDeleter {
     void operator()(Mix_Chunk* ptr) const noexcept;
@@ -18,12 +20,23 @@ using MixChunkPtr = std::unique_ptr<Mix_Chunk, MixDeleter>;
 using MixMusicPtr = std::unique_ptr<Mix_Music, MixDeleter>;
 
 
-bool sfx_init();
-void sfx_close();
-void sfx_stopallsounds();
-void sfx_setmusicvolume(int volume);
-void sfx_setsoundvolume(int volume);
-bool sfx_canPlayAudio();
+class Audio {
+public:
+    static Audio& get() {
+        assert(s_instance);
+        return *s_instance;
+    }
+
+    void clearAllEffects();
+    void setMusicVolume(int volume);
+    void setEffectVolume(int volume);
+
+private:
+    friend struct Systems;
+    Audio();
+    ~Audio();
+    inline static Audio* s_instance = nullptr;
+};
 
 
 class sfxSound {
@@ -34,7 +47,7 @@ public:
     sfxSound(const std::filesystem::path& path);
 
     bool play();
-    void playLoop(int iLoop);
+    void playLoop(int loops);
     void stop();
 
     bool isPlaying() const { return m_channels.any(); }
