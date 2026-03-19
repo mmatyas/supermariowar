@@ -94,14 +94,15 @@ SDL_Renderer* createRenderer(SDL_Window* window)
     return renderer;
 }
 
-SDL_Surface* createScreenSurface()
+SDL_Surface* createScreenSurface(SDL_Window* window)
 {
-    SDL_Surface* surface = SDL_CreateRGBSurface(0x0,
-        GFX_SCREEN_W, GFX_SCREEN_H, 32,
-        0x00FF0000,
-        0x0000FF00,
-        0x000000FF,
-        0xFF000000);
+    const Uint32 window_format = SDL_GetWindowPixelFormat(window);
+    if (window_format == SDL_PIXELFORMAT_UNKNOWN)
+        throw_error("Couldn't query the preferred pixel format: {}", SDL_GetError());
+
+    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0x0,
+        GFX_SCREEN_W, GFX_SCREEN_H,
+        32, window_format);
     if (!surface)
         throw_error("Couldn't create video buffer: {}", SDL_GetError());
 
@@ -129,7 +130,7 @@ Graphics::Graphics(bool fullscreen)
 
     sdl_window = createWindow(fullscreen);
     sdl_renderer = createRenderer(sdl_window);
-    sdl_screen_surface = createScreenSurface();
+    sdl_screen_surface = createScreenSurface(sdl_window);
     sdl_screen_texture = createScreenTexture(sdl_renderer);
 
     printf("[gfx] Game window initialized (%dx%d, %dbpp)\n",
