@@ -790,7 +790,7 @@ void MenuState::update()
                             game_values.appstate = AppState::StartWorld;
 
                             //Play enter world sound
-                            ifsoundonandreadyplay(rm->sfx_enterstage);
+                            rm->sfx_enterstage.play();
                         }
 
                     //Setup items on next menu
@@ -1297,7 +1297,7 @@ void MenuState::update()
                 LoadCurrentMapBackground();
 
                 if (game_values.music) {
-                    rm->backgroundmusic[0].load(worldmusiclist->currentMusic(WorldMusicCategory::Bonus, "").string());
+                    rm->backgroundmusic[0] = sfxMusic(worldmusiclist->currentMusic(WorldMusicCategory::Bonus, "").string());
                     rm->backgroundmusic[0].play(false, false);
                 }
             } else {
@@ -1372,7 +1372,7 @@ void MenuState::update()
 
                 if (game_values.music) {
                     musiclist->setRandomMusic(static_cast<MusicCategory>(g_map->musicCategoryID), sShortMapName.c_str(), g_map->szBackgroundFile);
-                    rm->backgroundmusic[0].load(musiclist->currentMusic().string());
+                    rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic());
                     rm->backgroundmusic[0].play(game_values.playnextmusic, false);
                 }
             }
@@ -1398,7 +1398,7 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
 
             rm->backgroundmusic[2].stop();
-            rm->backgroundmusic[5].load(worldmusiclist->currentMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()).string());
+            rm->backgroundmusic[5] = sfxMusic(worldmusiclist->currentMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
             rm->backgroundmusic[5].play(false, false);
             fNeedMenuMusicReset = true;
 
@@ -1564,7 +1564,7 @@ void MenuState::StartGame()
 
         //Delete the old sounds
         for (int k = 0; k < PANNOUNCER_SOUND_LAST; k++)
-            rm->sfx_announcer[k].reset();
+            rm->sfx_announcer[k] = {};
 
         FILE * announcerfile = fopen(announcerlist->currentPath().string().c_str(), "r");
 
@@ -1587,7 +1587,7 @@ void MenuState::StartGame()
 
             //If it is not "[none]", then add this announcer sound
             if (strcmp(szBuffer, "[none]"))
-                rm->sfx_announcer[announcerIndex].init(convertPath(szBuffer));
+                rm->sfx_announcer[announcerIndex] = sfxSound(convertPath(szBuffer));
 
             announcerIndex++;
         }
@@ -1598,13 +1598,13 @@ void MenuState::StartGame()
     //Load soundtrack music if changed
     if (game_values.loadedmusic != musiclist->currentIndex()) {
         game_values.loadedmusic = (short)musiclist->currentIndex();
-        rm->backgroundmusic[1].load(musiclist->music(0).string()); //Stage Clear
-        rm->backgroundmusic[3].load(musiclist->music(2).string()); //Tournament Menu
-        rm->backgroundmusic[4].load(musiclist->music(3).string()); //Tournament Over
+        rm->backgroundmusic[1] = sfxMusic(musiclist->music(0)); //Stage Clear
+        rm->backgroundmusic[3] = sfxMusic(musiclist->music(2)); //Tournament Menu
+        rm->backgroundmusic[4] = sfxMusic(musiclist->music(3)); //Tournament Over
     }
 
     rm->backgroundmusic[2].stop();
-    ifsoundonandreadyplay(rm->sfx_announcer[11]);
+    rm->sfx_announcer[11].play();
 
     game_values.screenfade = 8;
     game_values.screenfadespeed = 8;

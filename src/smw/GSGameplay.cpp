@@ -1163,7 +1163,7 @@ void GameplayState::drawPlayerSwap()
             game_values.screenfade = 0;
 
             if (game_values.swapstyle == 0)
-                ifsoundonstop(rm->sfx_skid);
+                rm->sfx_skid.stop();
 
             ifSoundOnPlay(rm->sfx_transform);
 
@@ -1666,8 +1666,8 @@ void CleanUp()
 
     //Stop all game sounds
     sfx_stopallsounds();
-    rm->sfx_invinciblemusic.resetPause();
-    rm->sfx_slowdownmusic.resetPause();
+    rm->sfx_invinciblemusic.stop();
+    rm->sfx_slowdownmusic.stop();
 
     x_shake = 0;
     y_shake = 0;
@@ -1699,7 +1699,7 @@ bool updateExitPauseDialog(short iCountDownState) // true on exit
 
                         //Stop the pwings sound if it is on
                         if (rm->sfx_flyingsound.isPlaying())
-                            ifsoundonstop(rm->sfx_flyingsound);
+                            rm->sfx_flyingsound.stop();
                     }
 
                     //ifsoundonpause(rm->sfx_invinciblemusic);
@@ -1829,7 +1829,7 @@ void playSFX()
             ifSoundOnPlay(rm->sfx_skid);
     } else {
         if (rm->sfx_skid.isPlaying())
-            ifsoundonstop(rm->sfx_skid);
+            rm->sfx_skid.stop();
     }
 
     //Play sound for players using PWings
@@ -1838,7 +1838,7 @@ void playSFX()
             ifSoundOnPlay(rm->sfx_flyingsound);
     } else {
         if (rm->sfx_flyingsound.isPlaying())
-            ifsoundonstop(rm->sfx_flyingsound);
+            rm->sfx_flyingsound.stop();
     }
 }
 
@@ -1850,7 +1850,7 @@ void playMusic()
             ifSoundOnPlay(rm->sfx_slowdownmusic);
     } else {
         if (rm->sfx_slowdownmusic.isPlaying())
-            ifsoundonstop(rm->sfx_slowdownmusic);
+            rm->sfx_slowdownmusic.stop();
     }
 
     if (game_values.flags.playinvinciblesound && game_values.musicvolume > 0) {
@@ -1858,14 +1858,14 @@ void playMusic()
             ifSoundOnPlay(rm->sfx_invinciblemusic);
     } else {
         if (rm->sfx_invinciblemusic.isPlaying())
-            ifsoundonstop(rm->sfx_invinciblemusic);
+            rm->sfx_invinciblemusic.stop();
     }
 
     //If no background music is playing, then play some
     if (!rm->backgroundmusic[0].isPlaying() && !rm->sfx_invinciblemusic.isPlaying() && !rm->sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
         if (game_values.playnextmusic) {
             musiclist->setNextMusic(static_cast<MusicCategory>(g_map->musicCategoryID), maplist->currentShortmapname(), g_map->szBackgroundFile);
-            rm->backgroundmusic[0].load(musiclist->currentMusic().string());
+            rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic().string());
         }
 
         rm->backgroundmusic[0].play(game_values.playnextmusic, false);
@@ -1879,7 +1879,7 @@ void PlayNextMusicTrack()
 
     rm->backgroundmusic[0].stop();
     musiclist->setNextMusic(static_cast<MusicCategory>(g_map->musicCategoryID), maplist->currentShortmapname(), g_map->szBackgroundFile);
-    rm->backgroundmusic[0].load(musiclist->currentMusic().string());
+    rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic().string());
     rm->backgroundmusic[0].play(game_values.playnextmusic, false);
 }
 
@@ -2383,7 +2383,7 @@ void start_gameplay()
 
     if (game_values.music) {
         musiclist->setRandomMusic(static_cast<MusicCategory>(g_map->musicCategoryID), "", "");
-        rm->backgroundmusic[0].load(musiclist->currentMusic().string());
+        rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic().string());
         rm->backgroundmusic[0].play(game_values.playnextmusic, false);
     }
 }
@@ -2410,7 +2410,7 @@ void GameplayState::update_countdown_timer()
 
             short countDownAnnounce = iCountDownAnnounce[28 - iCountDownState];
             if (countDownAnnounce >= 0)
-                ifsoundonandreadyplay(rm->sfx_announcer[countDownAnnounce]);
+                rm->sfx_announcer[countDownAnnounce].play();
         }
     }
 }

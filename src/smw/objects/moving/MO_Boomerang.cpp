@@ -274,7 +274,7 @@ void MO_Boomerang::update()
 void MO_Boomerang::forcedead()
 {
     removeifprojectile(this, false, true);
-    ifsoundonstop(rm->sfx_boomerang);
+    rm->sfx_boomerang.stop();
 
     if (game_values.boomeranglimit == 0)
         return;

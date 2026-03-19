@@ -280,7 +280,7 @@ void SplashScreenState::update()
 
     if (state == 7) {
         // load initial coin sound
-        rm->backgroundmusic[2].load(musiclist->music(1).string());
+        rm->backgroundmusic[2] = sfxMusic(musiclist->music(1));
 
         rm->loadAllGraphics();
         rm->LoadGameSounds();

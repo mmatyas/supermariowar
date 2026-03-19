@@ -127,9 +127,9 @@ void ShowScoreBoard()
     }
 
     if (game_values.music) {
-        ifsoundonstop(rm->sfx_invinciblemusic);
-        ifsoundonstop(rm->sfx_timewarning);
-        ifsoundonstop(rm->sfx_slowdownmusic);
+        rm->sfx_invinciblemusic.stop();
+        rm->sfx_timewarning.stop();
+        rm->sfx_slowdownmusic.stop();
 
         rm->backgroundmusic[1].play(true, false);
     }
@@ -158,7 +158,7 @@ bool RemoveTeam(short teamid)
     //Announce that a team was removed
     if (game_values.deadteamnotice && game_values.flags.teamdeadcounter < score_cnt - 1) {
         eyecandy[2].emplace<EC_Announcement>(&rm->game_font_large, &rm->spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200);
-        ifsoundonandreadyplay(rm->sfx_announcer[iAnnouncementColor + 16]);
+        rm->sfx_announcer[iAnnouncementColor + 16].play();
     }
 
     return game_values.flags.teamdeadcounter == score_cnt - 1;
@@ -219,7 +219,7 @@ void CGameMode::playwarningsound()
         return;
 
     playedwarningsound = true;
-    ifsoundonstop(rm->sfx_invinciblemusic);
+    rm->sfx_invinciblemusic.stop();
 
     if (game_values.music && game_values.sound)
         rm->backgroundmusic[0].stop();

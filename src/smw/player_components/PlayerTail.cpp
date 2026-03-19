@@ -23,7 +23,7 @@ bool PlayerTail::isInUse() const {
 }
 
 void PlayerTail::shake(CPlayer& player) {
-    ifsoundonstop(rm->sfx_tailspin);
+    rm->sfx_tailspin.stop();
     ifSoundOnPlay(rm->sfx_tailspin);
     player.lockjump = true;
 

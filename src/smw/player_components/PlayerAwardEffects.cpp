@@ -172,12 +172,12 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
     //Play announcer
     bool fSoundPlayed = false;
     if (killer.killsinrowinair > 1) {
-        if (ifsoundonandreadyplay(rm->sfx_announcer[9]) > -1)
+        if (rm->sfx_announcer[9].play())
             fSoundPlayed = true;
     }
 
     if (killed && killed->killsinrow >= 2 && !fSoundPlayed) {
-        if (ifsoundonandreadyplay(rm->sfx_announcer[10]) > -1)
+        if (rm->sfx_announcer[10].play())
             fSoundPlayed = true;
     }
 
@@ -186,7 +186,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
         awardIndex = (killer.killsinrow - 2) >= PAWARD_LAST ? PAWARD_LAST -1 : (killer.killsinrow - 2);
 
         if (!fSoundPlayed) {
-            if (ifsoundonandreadyplay(rm->sfx_announcer[awardIndex]) > -1)
+            if (rm->sfx_announcer[awardIndex].play())
                 fSoundPlayed = true;
         }
 

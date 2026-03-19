@@ -41,7 +41,7 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
         if (playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
             musiclist->next();
             rm->backgroundmusic[2].stop();
-            rm->backgroundmusic[2].load(musiclist->music(1).string());
+            rm->backgroundmusic[2] = sfxMusic(musiclist->music(1));
 
             if (game_values.music)
                 rm->backgroundmusic[2].play(false, false);
@@ -52,7 +52,7 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
         if (playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed) {
             musiclist->prev();
             rm->backgroundmusic[2].stop();
-            rm->backgroundmusic[2].load(musiclist->music(1).string());
+            rm->backgroundmusic[2] = sfxMusic(musiclist->music(1));
 
             if (game_values.music)
                 rm->backgroundmusic[2].play(false, false);
@@ -63,7 +63,7 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
         if (playerInput->outputControls[iPlayer].menu_random.fPressed) {
             musiclist->random();
             rm->backgroundmusic[2].stop();
-            rm->backgroundmusic[2].load(musiclist->music(1).string());
+            rm->backgroundmusic[2] = sfxMusic(musiclist->music(1));
 
             if (game_values.music)
                 rm->backgroundmusic[2].play(false, false);

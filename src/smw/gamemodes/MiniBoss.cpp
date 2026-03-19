@@ -48,9 +48,9 @@ void CGM_Boss_MiniGame::think()
         gameover = true;
 
         if (game_values.music) {
-            ifsoundonstop(rm->sfx_invinciblemusic);
-            ifsoundonstop(rm->sfx_timewarning);
-            ifsoundonstop(rm->sfx_slowdownmusic);
+            rm->sfx_invinciblemusic.stop();
+            rm->sfx_timewarning.stop();
+            rm->sfx_slowdownmusic.stop();
             ifSoundOnPlay(rm->sfx_gameover);
 
             rm->backgroundmusic[1].stop();
@@ -179,9 +179,9 @@ bool CGM_Boss_MiniGame::SetWinner(CPlayer * player)
     ShowScoreBoard();
 
     if (game_values.music) {
-        ifsoundonstop(rm->sfx_invinciblemusic);
-        ifsoundonstop(rm->sfx_timewarning);
-        ifsoundonstop(rm->sfx_slowdownmusic);
+        rm->sfx_invinciblemusic.stop();
+        rm->sfx_timewarning.stop();
+        rm->sfx_slowdownmusic.stop();
 
         rm->backgroundmusic[1].play(true, false);
     }

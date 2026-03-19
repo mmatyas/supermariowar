@@ -16,11 +16,6 @@ class CGameMode;
 struct TourStop;
 
 void ifSoundOnPlay(sfxSound&);
-#define ifsoundonandreadyplay(x) (x.isReady() && game_values.sound ? x.play() : -1)
-#define ifSoundOnPlayLoop(x,y) (game_values.sound ? x.playLoop(y) : -1)
-#define ifsoundonstop(x) (game_values.sound ? x.stop() : void(NULL))
-#define ifsoundonpause(x) (game_values.sound ? x.togglePause() : void(NULL))
-#define ifmusiconplay(x) (game_values.music ? x.play() : -1)
 
 short defaultPowerupSetting(size_t presetIdx, size_t powerupIdx);
 

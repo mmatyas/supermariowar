@@ -362,7 +362,7 @@ void MO_SledgeBrother::taunt()
 {
     SetLastAction(2);
 
-    ifSoundOnPlayLoop(rm->sfx_boomerang, 3);
+    rm->sfx_boomerang.playLoop(3);
     taunt_timer = 60;
     iActionState = 5;
 
