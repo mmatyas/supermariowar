@@ -20,6 +20,7 @@ public:
 
 private:
     friend struct Systems;
+    friend struct MinimalSystems;
     Graphics(bool fullscreen);
     ~Graphics();
     inline static Graphics* s_instance = nullptr;

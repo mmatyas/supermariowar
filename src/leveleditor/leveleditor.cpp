@@ -408,7 +408,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    Systems systems(g_fFullScreen);
+    MinimalSystems systems(g_fFullScreen);
 	blitdest = screen;
         g_tilesetmanager->init(convertPath("gfx/Classic/tilesets").c_str());
 

@@ -4,15 +4,19 @@
 #include "sfx.h"
 
 
-struct Sdl {
-    Sdl();
+class Sdl {
+    friend struct Systems;
+    friend struct MinimalSystems;
+
+    Sdl(unsigned int flags);
     ~Sdl();
 };
 
 
 struct Systems {
     Systems(bool fullscreen)
-        : gfx(fullscreen)
+        : sdl(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)
+        , gfx(fullscreen)
     {}
 
     Systems(const Systems&) = delete;
@@ -21,4 +25,18 @@ struct Systems {
     Sdl sdl;
     Graphics gfx;
     Audio sfx;
+};
+
+
+struct MinimalSystems {
+    MinimalSystems(bool fullscreen)
+        : sdl(SDL_INIT_VIDEO)
+        , gfx(fullscreen)
+    {}
+
+    MinimalSystems(const MinimalSystems&) = delete;
+    MinimalSystems& operator=(const MinimalSystems&) = delete;
+
+    Sdl sdl;
+    Graphics gfx;
 };
