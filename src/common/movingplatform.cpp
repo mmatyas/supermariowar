@@ -88,12 +88,12 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
                 if (tile.iID >= 0) {
                     g_tilesetmanager->Draw(sSurface[iSurface], tile.iID, drawsize, tile.iCol, tile.iRow, iCol, iRow);
                 } else if (tile.iID == TILESETANIMATED) {
-                    const SDL_Rect& srcRect = g_tilesetmanager->rect(drawsize, tile.iCol * 4, tile.iRow);
-                    const SDL_Rect& dstRect = g_tilesetmanager->rect(drawsize, iCol, iRow);
+                    const SDL_Rect& srcRect = CTilesetManager::rect(drawsize, tile.iCol * 4, tile.iRow);
+                    const SDL_Rect& dstRect = CTilesetManager::rect(drawsize, iCol, iRow);
                     rm->spr_tileanimation[static_cast<size_t>(drawsize)].draw(srcRect, sSurface[iSurface], dstRect);
                 } else if (tile.iID == TILESETUNKNOWN) {
-                    const SDL_Rect& srcRect = g_tilesetmanager->rect(drawsize, 0, 0);
-                    const SDL_Rect& dstRect = g_tilesetmanager->rect(drawsize, iCol, iRow);
+                    const SDL_Rect& srcRect = CTilesetManager::rect(drawsize, 0, 0);
+                    const SDL_Rect& dstRect = CTilesetManager::rect(drawsize, iCol, iRow);
                     rm->spr_unknowntile[static_cast<size_t>(drawsize)].draw(srcRect, sSurface[iSurface], dstRect);
                 }
             }

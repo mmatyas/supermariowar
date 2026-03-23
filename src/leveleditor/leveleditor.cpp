@@ -218,12 +218,12 @@ class MapPlatform
 
                 SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
                 if (tile->iID >= 0) {
-                    g_tilesetmanager->tileset(tile->iID)->draw(DrawSize::Thumbnail, g_tilesetmanager->rect(DrawSize::Thumbnail, tile->iCol, tile->iRow), preview, bltrect);
+                    g_tilesetmanager->tileset(tile->iID)->draw(DrawSize::Thumbnail, CTilesetManager::rect(DrawSize::Thumbnail, tile->iCol, tile->iRow), preview, bltrect);
                 } else if (tile->iID == TILESETANIMATED) {
-                    rm->spr_tileanimation[2].draw(g_tilesetmanager->rect(DrawSize::Thumbnail, tile->iCol * 4, tile->iRow), preview, bltrect);
+                    rm->spr_tileanimation[2].draw(CTilesetManager::rect(DrawSize::Thumbnail, tile->iCol * 4, tile->iRow), preview, bltrect);
                 } else if (tile->iID == TILESETUNKNOWN) {
                     //Draw unknown tile
-                    rm->spr_unknowntile[2].draw(g_tilesetmanager->rect(DrawSize::Thumbnail, 0, 0), preview, bltrect);
+                    rm->spr_unknowntile[2].draw(CTilesetManager::rect(DrawSize::Thumbnail, 0, 0), preview, bltrect);
                 }
             }
         }
@@ -1643,9 +1643,9 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 					iSrcRow = 0;
 				}
 
-                rm->spr_tileanimation[static_cast<size_t>(drawsize)].draw(g_tilesetmanager->rect(drawsize, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(drawsize, i, j));
+                rm->spr_tileanimation[static_cast<size_t>(drawsize)].draw(CTilesetManager::rect(drawsize, iSrcCol, iSrcRow), screen, CTilesetManager::rect(drawsize, i, j));
             } else if (tile->iID == TILESETUNKNOWN) {
-                rm->spr_unknowntile[static_cast<size_t>(drawsize)].draw(g_tilesetmanager->rect(drawsize, 0, 0), screen, g_tilesetmanager->rect(drawsize, i, j));
+                rm->spr_unknowntile[static_cast<size_t>(drawsize)].draw(CTilesetManager::rect(drawsize, 0, 0), screen, CTilesetManager::rect(drawsize, i, j));
 			}
 		}
 	}
@@ -1730,7 +1730,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 						rSrc.y = iBlockSize << 1;
 					}
 
-                    rm->spr_blocks[static_cast<size_t>(drawsize)].draw(rSrc, screen, g_tilesetmanager->rect(drawsize, i, j));
+                    rm->spr_blocks[static_cast<size_t>(drawsize)].draw(rSrc, screen, CTilesetManager::rect(drawsize, i, j));
 				}
 			}
 		}
@@ -2925,7 +2925,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 
             if (tile->iID >= 0) {
 				g_tilesetmanager->Draw(screen, tile->iID, DrawSize::Ingame, tile->iCol, tile->iRow, iCol, iRow);
-				//g_tilesetmanager->tileset(tile->iID)->draw(g_tilesetmanager->rect(0, tile->iCol, tile->iRow), screen, bltrect);
+				//g_tilesetmanager->tileset(tile->iID)->draw(CTilesetManager::rect(0, tile->iCol, tile->iRow), screen, bltrect);
             } else if (tile->iID == TILESETANIMATED) {
 				short iSrcCol = tile->iCol << 2;
 				short iSrcRow = tile->iRow;
@@ -2935,9 +2935,9 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 					iSrcRow = 0;
 				}
 
-                rm->spr_tileanimation[0].draw(g_tilesetmanager->rect(DrawSize::Ingame, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(DrawSize::Ingame, iCol, iRow));
+                rm->spr_tileanimation[0].draw(CTilesetManager::rect(DrawSize::Ingame, iSrcCol, iSrcRow), screen, CTilesetManager::rect(DrawSize::Ingame, iCol, iRow));
             } else if (tile->iID == TILESETUNKNOWN) {
-                rm->spr_unknowntile[0].draw(g_tilesetmanager->rect(DrawSize::Ingame, 0, 0), screen, g_tilesetmanager->rect(DrawSize::Ingame, iCol, iRow));
+                rm->spr_unknowntile[0].draw(CTilesetManager::rect(DrawSize::Ingame, 0, 0), screen, CTilesetManager::rect(DrawSize::Ingame, iCol, iRow));
 			}
 
             if (fDrawTileTypes) {

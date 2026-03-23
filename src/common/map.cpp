@@ -1617,7 +1617,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
                     animatedtiles.push_back(animatedtile);
                 }
             } else if (tile->iID == TILESETUNKNOWN) { //Draw red X where tile should be
-                rm->spr_unknowntile[0].draw(g_tilesetmanager->rect(DrawSize::Ingame, 0, 0), targetSurface, bltrect);
+                rm->spr_unknowntile[0].draw(CTilesetManager::rect(DrawSize::Ingame, 0, 0), targetSurface, bltrect);
             }
         }
 
@@ -2007,7 +2007,7 @@ void CMap::SetupAnimatedTiles()
                         } else if (tilesetTile->iID == TILESETANIMATED) {
                             rm->spr_tileanimation[0].draw(tile->rSrc[iLayer][sTileAnimationFrame], animatedTilesSurface, rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
-                            rm->spr_unknowntile[0].draw(g_tilesetmanager->rect(DrawSize::Ingame, 0, 0), animatedTilesSurface, rDst);
+                            rm->spr_unknowntile[0].draw(CTilesetManager::rect(DrawSize::Ingame, 0, 0), animatedTilesSurface, rDst);
                         }
                     }
 
@@ -2043,7 +2043,7 @@ void CMap::SetupAnimatedTiles()
                         } else if (tilesetTile->iID == TILESETANIMATED) {
                             rm->spr_tileanimation[0].draw(tile->rSrc[iLayer][sTileAnimationFrame], animatedTilesSurface, rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
-                            rm->spr_unknowntile[0].draw(g_tilesetmanager->rect(DrawSize::Ingame, 0, 0), animatedTilesSurface, rDst);
+                            rm->spr_unknowntile[0].draw(CTilesetManager::rect(DrawSize::Ingame, 0, 0), animatedTilesSurface, rDst);
                         }
                     }
 
