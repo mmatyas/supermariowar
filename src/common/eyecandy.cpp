@@ -1181,14 +1181,14 @@ void Spotlight::UpdatePosition(short x, short y)
 void Spotlight::Draw()
 {
     SDL_Rect rDst = { ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth };
-    SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDst);
+    rm->spr_overlayhole.draw(rSrc, rm->spr_overlay.getSurface(), rDst);
 
     if (ix - iHalfWidth < 0) {
         SDL_Rect rDstWrap = { ix - iHalfWidth + App::screenWidth, iy - iHalfWidth, iWidth, iWidth };
-        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
+        rm->spr_overlayhole.draw(rSrc, rm->spr_overlay.getSurface(), rDstWrap);
     } else if (ix + iHalfWidth >= App::screenWidth) {
         SDL_Rect rDstWrap = { ix - iHalfWidth - App::screenWidth, iy - iHalfWidth, iWidth, iWidth };
-        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
+        rm->spr_overlayhole.draw(rSrc, rm->spr_overlay.getSurface(), rDstWrap);
     }
 
 #if 0
@@ -1201,17 +1201,17 @@ void Spotlight::Draw()
 
     SDL_Rect rSrc = {iSpotlightValues[iSize][2], 0, iWidth, iWidth};
     SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
-    SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDst);
+    rm->spr_overlayhole.draw(rSrc, rm->spr_overlay.getSurface(), rDst);
 
     if (ix - iHalfWidth < 0)
     {
         SDL_Rect rDstWrap = {ix - iHalfWidth + App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
-        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
+        rm->spr_overlayhole.draw(rSrc, rm->spr_overlay.getSurface(), rDstWrap);
     }
     else if (ix + iHalfWidth >= App::screenWidth)
     {
         SDL_Rect rDstWrap = {ix - iHalfWidth - App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
-        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
+        rm->spr_overlayhole.draw(rSrc, rm->spr_overlay.getSurface(), rDstWrap);
     }
 
     if (iTransparency <= 255 && iTransparency > 0)
@@ -1220,17 +1220,17 @@ void Spotlight::Draw()
 
         SDL_Rect rTransSrc = {iSpotlightValues[iSize][2], 128, iWidth, iWidth};
         SDL_Rect rTransDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
-        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDst);
+        rm->spr_overlayhole.draw(rTransSrc, blitdest, rTransDst);
 
         if (ix - iHalfWidth < 0)
         {
             SDL_Rect rTransDstWrap = {ix - iHalfWidth + App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
-            SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
+            rm->spr_overlayhole.draw(rTransSrc, blitdest, rTransDstWrap);
         }
-		else if (ix + iHalfWidth >= App::screenWidth)
+        else if (ix + iHalfWidth >= App::screenWidth)
         {
             SDL_Rect rTransDstWrap = {ix - iHalfWidth - App::screenWidth, iy - iHalfWidth, iWidth, iWidth};
-            SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
+            rm->spr_overlayhole.draw(rTransSrc, blitdest, rTransDstWrap);
         }
     }
 #endif

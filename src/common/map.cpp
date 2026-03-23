@@ -120,7 +120,7 @@ void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter)
 
     if (fDrawCenter) {
         if (hazard.itype <= 1) {
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            rm->spr_platformpath.draw(rPathSrc, blitdest, rPathDst);
         }
     }
 
@@ -179,7 +179,7 @@ void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter)
         short iBulletPathSpacing = (short)(hazard.dparam[0] * dBulletBillFrequency[iSize]);
         while (iBulletPathX >= 0 && iBulletPathX < GetScreenWidth(iSize)) {
             rDotDst = {iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
+            rm->spr_platformpath.draw(rDotSrc, blitdest, rDotDst);
 
             iBulletPathX += hazard.iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
         }
@@ -323,7 +323,7 @@ void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& til
 
         for (short iSpot = 0; iSpot < iNumSpots + 1; iSpot++) {
             rPathDst = {(short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            rm->spr_platformpath.draw(rPathSrc, blitdest, rPathDst);
 
             dX += dIncrementX;
             dY += dIncrementY;
@@ -346,7 +346,7 @@ void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& til
 
         for (short iSpot = 0; iSpot < 50; iSpot++) {
             rPathDst = {(short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            rm->spr_platformpath.draw(rPathSrc, blitdest, rPathDst);
 
             short iWrapX = (short)dX;
             short iWrapY = (short)dY;
@@ -369,7 +369,7 @@ void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& til
 
             if (fNeedWrap) {
                 rPathDst = {iWrapX, iWrapY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+                rm->spr_platformpath.draw(rPathSrc, blitdest, rPathDst);
             }
 
             dX += dIncrementX;
@@ -395,14 +395,14 @@ void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& til
             short iY = (short)(fRadiusY * sin(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartY;
 
             rPathDst = {iX, iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            rm->spr_platformpath.draw(rPathSrc, blitdest, rPathDst);
 
             if (iX + iPlatformPathDotSize[iSize] >= GetScreenWidth(iSize)) {
                 rPathDst = {iX - GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+                rm->spr_platformpath.draw(rPathSrc, blitdest, rPathDst);
             } else if (iX < 0) {
                 rPathDst = {iX + GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+                rm->spr_platformpath.draw(rPathSrc, blitdest, rPathDst);
             }
 
             fAngle += TWO_PI / 32.0f;
@@ -1564,7 +1564,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
             //If this is an animated tile, then setup an animated tile struct for use in drawing
             if (tile->iID >= 0) {
                 g_tilesetmanager->Draw(targetSurface, tile->iID, DrawSize::Ingame, tile->iCol, tile->iRow, i, j);
-                //SDL_BlitSurface(rm->spr_maptiles[0].getSurface(), &g_tilesetmanager->rRects[0][tile->iCol][tile->iRow], targetSurface, &bltrect);
+                //rm->spr_maptiles[0].draw(g_tilesetmanager->rRects[0][tile->iCol][tile->iRow], targetSurface, bltrect);
             } else if (tile->iID == TILESETANIMATED) {
                 //See if we already have this tile
                 bool fNeedNewAnimatedTile = true;
@@ -1722,7 +1722,7 @@ void CMap::preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail)
                 SDL_Rect rSrc = {wWarp->connection * iTileSize, wWarp->direction * iTileSize, iTileSize, iTileSize};
                 SDL_Rect rDst = {i * iTileSize, j * iTileSize, iTileSize, iTileSize};
 
-                SDL_BlitSurface(rm->spr_thumbnail_warps[iScreenshotSize].getSurface(), &rSrc, targetSurface, &rDst);
+                rm->spr_thumbnail_warps[iScreenshotSize].draw(rSrc, targetSurface, rDst);
             }
         }
     }
@@ -1742,7 +1742,7 @@ void CMap::preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail)
         SDL_Rect rSrc = {item.itype * iTileSize, 0, iTileSize, iTileSize};
         SDL_Rect rDst = {item.ix * iTileSize, item.iy * iTileSize, iTileSize, iTileSize};
 
-        SDL_BlitSurface(rm->spr_thumbnail_mapitems[iScreenshotSize].getSurface(), &rSrc, targetSurface, &rDst);
+        rm->spr_thumbnail_mapitems[iScreenshotSize].draw(rSrc, targetSurface, rDst);
     }
 }
 
@@ -1785,10 +1785,7 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
         dstrect.h = App::screenHeight/2;
     }
 
-    if (SDL_BlitScaled(background->getSurface(), &srcrect, targetSurface, &dstrect) < 0) {
-        fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
-        return;
-    }
+    background->drawStretch(srcrect, targetSurface, dstrect);
 
     smallDelay();
     preDrawPreviewBackground(targetSurface, fThumbnail);
@@ -1904,9 +1901,9 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
             }
 
             if (fThumbnail)
-                SDL_BlitSurface(rm->spr_blocks[2].getSurface(), &rectSrc, targetSurface, &rectDst);
+                rm->spr_blocks[2].draw(rectSrc, targetSurface, rectDst);
             else
-                SDL_BlitSurface(rm->spr_blocks[1].getSurface(), &rectSrc, targetSurface, &rectDst);
+                rm->spr_blocks[1].draw(rectSrc, targetSurface, rectDst);
         }
 
         rectDst.x += iBlockSize;
@@ -1921,7 +1918,7 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 	r.w = App::screenWidth;
 	r.h = App::screenHeight;
 
-    SDL_BlitSurface(background.getSurface(), NULL, mapspr.getSurface(), &r);
+    background.draw(mapspr.getSurface(), r);
 
     draw(mapspr.getSurface(), 0);
     draw(mapspr.getSurface(), 1);
@@ -1981,9 +1978,6 @@ void CMap::SetupAnimatedTiles()
     }
 
     if (iAnimatedTileCount > 0) {
-        SDL_Surface * backgroundSurface = rm->spr_background.getSurface();
-        SDL_Surface * animatedTileSrcSurface = rm->spr_tileanimation[0].getSurface();
-
         animatedFrontmapSurface = rm->spr_frontmap[g_iCurrentDrawIndex].getSurface();
         animatedBackmapSurface = rm->spr_backmap[g_iCurrentDrawIndex].getSurface();
         animatedTilesSurface = SDL_CreateRGBSurface(screen->flags, 1024, 1024, screen->format->BitsPerPixel, 0, 0, 0, 0);
@@ -1997,7 +1991,6 @@ void CMap::SetupAnimatedTiles()
         SDL_Rect rDst = {0, 0, 32, 32};
         while (iter != lim && !fSrcSurfaceFull) {
             AnimatedTile * tile = *iter;
-            SDL_Rect * rSrc = &(tile->rDest);
 
             //If the background layer has an animated tile, then create the set of 4 images that will be
             //drawn to this tile during the gameplay (gfx optimization by only drawing from animatedTilesSurface)
@@ -2005,14 +1998,14 @@ void CMap::SetupAnimatedTiles()
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     tile->rAnimationSrc[0][sTileAnimationFrame] = rDst;
 
-                    SDL_BlitSurface(backgroundSurface, rSrc, animatedTilesSurface, &rDst);
+                    rm->spr_background.draw(tile->rDest, animatedTilesSurface, rDst);
 
                     for (short iLayer = 0; iLayer < iAnimatedBackgroundLayers; iLayer++) {
                         TilesetTile * tilesetTile = &tile->layers[iLayer];
                         if (tilesetTile->iID >= 0) {
                             g_tilesetmanager->tileset(tilesetTile->iID)->draw(DrawSize::Ingame, tile->rSrc[iLayer][0], animatedTilesSurface, rDst);
                         } else if (tilesetTile->iID == TILESETANIMATED) {
-                            SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
+                            rm->spr_tileanimation[0].draw(tile->rSrc[iLayer][sTileAnimationFrame], animatedTilesSurface, rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
                             rm->spr_unknowntile[0].draw(g_tilesetmanager->rect(DrawSize::Ingame, 0, 0), animatedTilesSurface, rDst);
                         }
@@ -2048,7 +2041,7 @@ void CMap::SetupAnimatedTiles()
                         if (tilesetTile->iID >= 0) {
                             g_tilesetmanager->tileset(tilesetTile->iID)->draw(DrawSize::Ingame, tile->rSrc[iLayer][0], animatedTilesSurface, rDst);
                         } else if (tilesetTile->iID == TILESETANIMATED) {
-                            SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
+                            rm->spr_tileanimation[0].draw(tile->rSrc[iLayer][sTileAnimationFrame], animatedTilesSurface, rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
                             rm->spr_unknowntile[0].draw(g_tilesetmanager->rect(DrawSize::Ingame, 0, 0), animatedTilesSurface, rDst);
                         }
@@ -2080,7 +2073,7 @@ void CMap::SetupAnimatedTiles()
 
                     TilesetTile * tilesetTile = &tile->layers[0];
                     if (tilesetTile->iID == TILESETANIMATED) {
-                        SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[0][sTileAnimationFrame]), animatedTilesSurface, &rDst);
+                        rm->spr_tileanimation[0].draw(tile->rSrc[0][sTileAnimationFrame], animatedTilesSurface, rDst);
                     } else {
                         cout << endl << " ERROR: A nonanimated platform tile was added to the animated tile list" << endl;
                     }

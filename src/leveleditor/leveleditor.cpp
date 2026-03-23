@@ -1666,10 +1666,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		dstrect.w = iBlockSize * 20;
 		dstrect.h = iBlockSize * 15;
 
-        if (SDL_BlitScaled(rm->spr_background.getSurface(), &srcrect, blitdest, &dstrect) < 0) {
-			fprintf(stderr, "SDL_SCALEBLIT error: %s\n", SDL_GetError());
-			return;
-		}
+                rm->spr_background.drawStretch(srcrect, blitdest, dstrect);
     } else {
 		rm->spr_background.draw(0,0);
 	}
@@ -1802,7 +1799,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 					SDL_Rect rSrc = {warp->connection * iBlockSize, warp->direction * iBlockSize, iBlockSize, iBlockSize};
 					SDL_Rect rDst = {i * iBlockSize, j * iBlockSize, iBlockSize, iBlockSize};
 
-					SDL_BlitSurface(rm->spr_warps[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].getSurface(), &rSrc, screen, &rDst);
+					rm->spr_warps[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(rSrc, screen, rDst);
 				}
 			}
 		}
@@ -1817,7 +1814,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		SDL_Rect rSrc = {g_map->warpexits[k].connection * TILESIZE, g_map->warpexits[k].direction * TILESIZE, TILESIZE, TILESIZE};
 		SDL_Rect rDst = {g_map->warpexits[k].x, g_map->warpexits[k].y, TILESIZE, TILESIZE};
 
-		SDL_BlitSurface(rm->spr_warps[0].getSurface(), &rSrc, screen, &rDst);
+		rm->spr_warps[0].draw(rSrc, screen, rDst);
 	}
 	*/
 }
@@ -1867,7 +1864,7 @@ int editor_warp()
         r.w = 640;
         r.h = 480;
 
-		SDL_BlitSurface(rm->spr_warps[0].getSurface(), NULL, screen, &r);
+		rm->spr_warps[0].draw(screen, r);
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
@@ -2928,7 +2925,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 
             if (tile->iID >= 0) {
 				g_tilesetmanager->Draw(screen, tile->iID, DrawSize::Ingame, tile->iCol, tile->iRow, iCol, iRow);
-				//SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(0), g_tilesetmanager->GetRect(0, tile->iCol, tile->iRow), screen, &bltrect);
+				//g_tilesetmanager->tileset(tile->iID)->draw(g_tilesetmanager->rect(0, tile->iCol, tile->iRow), screen, bltrect);
             } else if (tile->iID == TILESETANIMATED) {
 				short iSrcCol = tile->iCol << 2;
 				short iSrcRow = tile->iRow;
@@ -3762,27 +3759,27 @@ int editor_blocks()
 		SDL_Rect rSrc = {0, 0, 224, 32};
 		SDL_Rect rDst = {0, 0, 224, 32};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rSrc, screen, &rDst);
+		rm->spr_blocks[0].draw(rSrc, screen, rDst);
 
 		SDL_Rect rOnOffSrc = {224, 0, 128, 64};
 		SDL_Rect rOnOffDst = {0, 32, 128, 64};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rOnOffSrc, screen, &rOnOffDst);
+		rm->spr_blocks[0].draw(rOnOffSrc, screen, rOnOffDst);
 
 		SDL_Rect rOnOffBlockSrc = {352, 0, 128, 64};
 		SDL_Rect rOnOffBlockDst = {128, 32, 128, 64};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rOnOffBlockSrc, screen, &rOnOffBlockDst);
+		rm->spr_blocks[0].draw(rOnOffBlockSrc, screen, rOnOffBlockDst);
 
 		SDL_Rect rBlocksRow2Src = {0, 32, 160, 32};
 		SDL_Rect rBlocksRow2Dst = {224, 0, 160, 32};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rBlocksRow2Src, screen, &rBlocksRow2Dst);
+		rm->spr_blocks[0].draw(rBlocksRow2Src, screen, rBlocksRow2Dst);
 
 		SDL_Rect rBlocksRow3Src = {0, 64, 320, 32};
 		SDL_Rect rBlocksRow3Dst = {0, 96, 320, 32};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rBlocksRow3Src, screen, &rBlocksRow3Dst);
+		rm->spr_blocks[0].draw(rBlocksRow3Src, screen, rBlocksRow3Dst);
 
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 

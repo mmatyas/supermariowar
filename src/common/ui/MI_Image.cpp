@@ -4,6 +4,8 @@
 
 #include <cmath>
 
+extern SDL_Surface * blitdest;
+
 
 MI_Image::MI_Image(
         gfxSprite * nspr,
@@ -90,8 +92,16 @@ void MI_Image::Draw()
         iYOffset = (short)(dSwirlRadius * sin(dSwirlAngle));
     }
 
-    if (fPulse)
-        spr->drawStretch({m_pos.x - iPulseValue + iXOffset, m_pos.y - iPulseValue + iYOffset, iw + (iPulseValue << 1), ih + (iPulseValue << 1)}, {iXFrame, iYFrame, iw, ih});
-    else
-        spr->draw(m_pos.x + iXOffset, m_pos.y + iYOffset, {iXFrame, iYFrame, iw, ih});
+    const SDL_Rect srcRect {iXFrame, iYFrame, iw, ih};
+    if (fPulse) {
+        const SDL_Rect dstRect {
+            m_pos.x - iPulseValue + iXOffset,
+            m_pos.y - iPulseValue + iYOffset,
+            iw + (iPulseValue << 1),
+            ih + (iPulseValue << 1),
+        };
+        spr->drawStretch(srcRect, blitdest, dstRect);
+    } else {
+        spr->draw(m_pos.x + iXOffset, m_pos.y + iYOffset, srcRect);
+    }
 }

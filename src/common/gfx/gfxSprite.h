@@ -51,7 +51,7 @@ public:
     }
 
     /// Draw a part of the sprite scaled to a destination area.
-    void drawStretch(const SDL_Rect& dstRect, const SDL_Rect& srcRect) const;
+    void drawStretch(const SDL_Rect& srcRect, SDL_Surface* dst, const SDL_Rect& dstRect) const;
 
     void setalpha(Uint8 alpha);
 

@@ -152,14 +152,14 @@ void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect, ClipEdge clipEdge, i
     }
 }
 
-void gfxSprite::drawStretch(const SDL_Rect& dstRect, const SDL_Rect& srcRect) const
+void gfxSprite::drawStretch(const SDL_Rect& srcRect, SDL_Surface* dst, const SDL_Rect& dstRect) const
 {
     assert(m_picture);
 
     // TODO: SDL2 requires dst to be writable. Fixed in SDL3.
     SDL_Rect dstRect_w = dstRect;
 
-    if (SDL_BlitScaled(m_picture.get(), &srcRect, blitdest, &dstRect_w) < 0) {
+    if (SDL_BlitScaled(m_picture.get(), &srcRect, dst, &dstRect_w) < 0) {
         fprintf(stderr, "SDL_BlitScaled error: %s\n", SDL_GetError());
     }
 }
