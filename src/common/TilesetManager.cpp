@@ -159,8 +159,8 @@ CTilesetManager::CTilesetManager(const fs::path& gfxPack)
 
     SubdirsIterator dir(convertPath("gfx/packs/tilesets", gfxPack) + '/');
     while (auto path = dir.next()) {
-        auto tileset = std::make_unique<CTileset>(std::move(*path));
-        found_tileset_names.insert(tileset->name());
+        CTileset tileset(*path);
+        found_tileset_names.insert(tileset.name());
         m_tilesets.emplace_back(std::move(tileset));
     }
 
@@ -169,19 +169,17 @@ CTilesetManager::CTilesetManager(const fs::path& gfxPack)
         dir = SubdirsIterator(convertPath("gfx/packs/Classic/tilesets/"));
         while (auto path = dir.next()) {
             if (!found_tileset_names.contains(path->filename().string())) {
-                auto tileset = std::make_unique<CTileset>(std::move(*path));
+                CTileset tileset(*path);
                 m_tilesets.emplace_back(std::move(tileset));
             }
         }
     }
 
-    utils::sort(m_tilesets, [](const auto& a, const auto& b) {
-        return a->name() < b->name();
+    utils::sort(m_tilesets, [](const CTileset& a, const CTileset& b) {
+        return a.name() < b.name();
     });
 
-    const auto it = utils::find_if(
-        m_tilesets,
-        [](const std::unique_ptr<CTileset>& tileset){ return tileset->name() == "Classic"; });
+    const auto it = utils::find_if(m_tilesets, [](const CTileset& tileset){ return tileset.name() == "Classic"; });
     if (it != m_tilesets.cend()) {
         m_classicTilesetIndex = std::distance(m_tilesets.cbegin(), it);
     }
@@ -191,7 +189,7 @@ CTilesetManager::CTilesetManager(const fs::path& gfxPack)
 size_t CTilesetManager::indexFromName(const std::string& name) const
 {
     for (size_t i = 0; i < m_tilesets.size(); i++) {
-        if (m_tilesets[i]->name() == name)
+        if (m_tilesets[i].name() == name)
             return i;
     }
 
@@ -202,9 +200,9 @@ size_t CTilesetManager::indexFromName(const std::string& name) const
 void CTilesetManager::Draw(
     SDL_Surface* dstSurface, size_t iTilesetID, DrawSize drawsize,
     short iSrcTileCol, short iSrcTileRow,
-    short iDstTileCol, short iDstTileRow) const
+    short iDstTileCol, short iDstTileRow)
 {
-    CTileset* tileset_ptr = tileset(iTilesetID);
+    const CTileset* tileset_ptr = tileset(iTilesetID);
     if (!tileset_ptr)
         return;
 
@@ -215,12 +213,11 @@ void CTilesetManager::Draw(
 }
 
 
-CTileset* CTilesetManager::tileset(size_t index) const
+CTileset* CTilesetManager::tileset(size_t index)
 {
     if (index < m_tilesets.size()) {
-        CTileset* tileset = m_tilesets[index].get();
-        tileset->ensureLoaded();
-        return tileset;
+        m_tilesets[index].ensureLoaded();
+        return &m_tilesets[index];
     }
     return nullptr;
 }
@@ -246,6 +243,6 @@ const SDL_Rect& CTilesetManager::rect(DrawSize size, size_t idx)
 
 void CTilesetManager::saveTilesets() const
 {
-    for (const std::unique_ptr<CTileset>& tileset : m_tilesets)
-        tileset->saveTileset();
+    for (const CTileset& tileset : m_tilesets)
+        tileset.saveTileset();
 }

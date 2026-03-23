@@ -5,7 +5,6 @@
 
 #include <array>
 #include <filesystem>
-#include <memory>
 #include <vector>
 
 
@@ -66,18 +65,18 @@ public:
     CTilesetManager(const std::filesystem::path& gfxPack);
 
     size_t indexFromName(const std::string& name) const;
-    CTileset* tileset(size_t index) const;
+    CTileset* tileset(size_t index);
     size_t count() const { return m_tilesets.size(); }
 
     void Draw(SDL_Surface* dstSurface, size_t iTilesetID, DrawSize iTileSize,
         short iSrcTileCol, short iSrcTileRow,
-        short iDstTileCol, short iDstTileRow) const;
+        short iDstTileCol, short iDstTileRow);
     void saveTilesets() const;
 
     size_t classicTilesetIndex() const {
         return m_classicTilesetIndex;
     }
-    CTileset* classicTileset() const {
+    CTileset* classicTileset() {
         return tileset(classicTilesetIndex());
     }
 
@@ -85,7 +84,7 @@ public:
     static const SDL_Rect& rect(DrawSize size, size_t idx);
 
 private:
-    std::vector<std::unique_ptr<CTileset>> m_tilesets;  // TODO: Store objects
+    std::vector<CTileset> m_tilesets;
     size_t m_classicTilesetIndex = SIZE_MAX;
 
     static std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_ingame;
