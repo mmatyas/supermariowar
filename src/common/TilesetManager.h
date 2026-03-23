@@ -61,8 +61,8 @@ public:
     size_t classicTilesetIndex() const {
         return m_classicTilesetIndex;
     }
-    const CTileset& classicTileset() const {
-        return *m_tilesetlist.at(classicTilesetIndex());
+    CTileset* classicTileset() const {
+        return tileset(classicTilesetIndex());
     }
 
     CTileset* tileset(size_t index) const;

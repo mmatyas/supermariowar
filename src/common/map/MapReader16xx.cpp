@@ -90,7 +90,7 @@ void MapReader1600::read_tiles(CMap& map, BinaryFile& mapfile)
 
             for (short k = MAPLAYERS - 1; k >= 0; k--) {
                 TilesetTile * tile = &map.mapdata[i][j][k];
-                TileType type = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
+                TileType type = g_tilesetmanager->classicTileset()->tileType(tile->iCol, tile->iRow);
                 if (type != TileType::NonSolid) {
                     map.mapdatatop[i][j] = type;
                     break;

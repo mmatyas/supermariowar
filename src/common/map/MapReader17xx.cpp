@@ -48,7 +48,7 @@ void MapReader1702::read_autofilters(CMap& map, BinaryFile& mapfile)
 
 void MapReader1700::read_tiles(CMap& map, BinaryFile& mapfile)
 {
-    short iClassicTilesetID = g_tilesetmanager->indexFromName("Classic");
+    short iClassicTilesetID = g_tilesetmanager->classicTilesetIndex();
 
     unsigned short i, j, k;
     for (j = 0; j < MAPHEIGHT; j++) {
@@ -274,7 +274,7 @@ MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile, short iWidth,
                 tile.iCol = iTile % TILESETWIDTH;
                 tile.iRow = iTile / TILESETWIDTH;
 
-                type = g_tilesetmanager->classicTileset().tileType(tile.iCol, tile.iRow);
+                type = g_tilesetmanager->classicTileset()->tileType(tile.iCol, tile.iRow);
             }
 
             tiles.emplace_back(std::move(tile));
