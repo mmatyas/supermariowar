@@ -32,6 +32,7 @@
 #include "movingplatform.h"
 #include "path.h"
 #include "FileIO.h"
+#include "FileList.h"
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"

@@ -36,17 +36,17 @@ constexpr std::array<SDL_Rect, CTileset::MAX_TILES> generateTilesetRects(int til
     return rects;
 }
 
-std::vector<TileType> readTileTypeFile(const std::string& path)
+std::vector<TileType> readTileTypeFile(const fs::path& path)
 {
     constexpr int MAX_TILES = CTileset::MAX_TILES_PER_AXIS * CTileset::MAX_TILES_PER_AXIS;
 
     //Detect if the tiletype file already exists, if not create it
-    if (!FileExists(path))
+    if (!fs::exists(path))
         return {};
 
     BinaryFile tsf(path, "rb");
     if (!tsf.is_open()) {
-        printf("ERROR: couldn't open tileset file: %s\n", path.c_str());
+        printf("ERROR: couldn't open tileset file: %s\n", path.string().c_str());
         return {};
     }
 
@@ -70,14 +70,21 @@ std::vector<TileType> readTileTypeFile(const std::string& path)
 CTileset::CTileset(const std::filesystem::path& dir)
     : m_name(dir.filename().string())
     , m_tileset_path(dir / "tileset.tls")
+    , m_tiletypes(readTileTypeFile(m_tileset_path))
+{}
+
+
+void CTileset::ensureLoaded()
 {
-    m_sprite_large = SpriteBuilder(dir / "large.png").create();
-    m_sprite_medium = SpriteBuilder(dir / "medium.png").create();
-    m_sprite_small = SpriteBuilder(dir / "small.png").create();
+    if (m_sprite_large.getSurface())
+        return;
+
+    m_sprite_large = SpriteBuilder(m_tileset_path.parent_path() / "large.png").create();
+    m_sprite_medium = SpriteBuilder(m_tileset_path.parent_path() / "medium.png").create();
+    m_sprite_small = SpriteBuilder(m_tileset_path.parent_path() / "small.png").create();
 
     m_width = std::min(m_sprite_large.getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
     m_height = std::min(m_sprite_large.getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
-    m_tiletypes = readTileTypeFile(m_tileset_path, m_width * m_height);
 }
 
 
@@ -224,9 +231,12 @@ void CTilesetManager::Draw(SDL_Surface* dstSurface, size_t iTilesetID, DrawSize 
 
 CTileset* CTilesetManager::tileset(size_t index) const
 {
-    return index < m_tilesetlist.size()
-        ? m_tilesetlist[index].get()
-        : nullptr;
+    if (index < m_tilesetlist.size()) {
+        CTileset* tileset = m_tilesetlist[index].get();
+        tileset->ensureLoaded();
+        return tileset;
+    }
+    return nullptr;
 }
 
 

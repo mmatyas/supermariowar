@@ -3,12 +3,14 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string>
+#include <filesystem>
 
 
 class BinaryFile {
 public:
     BinaryFile(const char* path, const char* options);
     BinaryFile(const std::string& path, const char* options);
+    BinaryFile(const std::filesystem::path& path, const char* options);
     ~BinaryFile();
 
     bool is_open() const { return fp; };

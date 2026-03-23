@@ -5,6 +5,7 @@
 #include "GlobalConstants.h"
 #include "Game.h"
 #include "FileIO.h"
+#include "FileList.h"
 #include "movingplatform.h"
 #include "path.h"
 #include "RandomNumberGenerator.h"

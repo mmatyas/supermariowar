@@ -16,6 +16,10 @@ BinaryFile::BinaryFile(const std::string& path, const char* options)
     : BinaryFile(path.c_str(), options)
 {}
 
+BinaryFile::BinaryFile(const std::filesystem::path& path, const char* options)
+    : BinaryFile(path.string().c_str(), options)
+{}
+
 BinaryFile::~BinaryFile()
 {
     if (fp)

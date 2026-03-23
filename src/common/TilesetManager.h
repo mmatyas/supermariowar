@@ -1,7 +1,7 @@
 #pragma once
 
-#include "FileList.h"
-#include "map.h"
+#include "gfx.h"
+#include "TileTypes.h"
 
 #include <array>
 #include <filesystem>
@@ -23,6 +23,7 @@ public:
     static constexpr int MAX_TILES = MAX_TILES_PER_AXIS * MAX_TILES_PER_AXIS;
 
     CTileset(const std::filesystem::path& dir);
+    void ensureLoaded();
 
     void saveTileset() const;
 
