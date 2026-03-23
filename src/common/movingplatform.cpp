@@ -38,11 +38,11 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
     iPlayerId = -1;
 
     short iTileSize = TILESIZE;
-    short iTileSizeIndex = 0;
+    DrawSize drawsize = DrawSize::Ingame;
 
     if (fPreview) {
         iTileSize = PREVIEWTILESIZE;
-        iTileSizeIndex = 1;
+        drawsize = DrawSize::Preview;
     }
 
     iTileData = std::move(tiledata);
@@ -86,11 +86,15 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
                     continue;
 
                 if (tile.iID >= 0) {
-                    g_tilesetmanager->Draw(sSurface[iSurface], tile.iID, static_cast<DrawSize>(iTileSizeIndex), tile.iCol, tile.iRow, iCol, iRow);
+                    g_tilesetmanager->Draw(sSurface[iSurface], tile.iID, drawsize, tile.iCol, tile.iRow, iCol, iRow);
                 } else if (tile.iID == TILESETANIMATED) {
-                    SDL_BlitSurface(rm->spr_tileanimation[iTileSizeIndex].getSurface(), g_tilesetmanager->rect(static_cast<DrawSize>(iTileSizeIndex), tile.iCol * 4, tile.iRow), sSurface[iSurface], g_tilesetmanager->rect(static_cast<DrawSize>(iTileSizeIndex), iCol, iRow));
+                    const SDL_Rect& srcRect = g_tilesetmanager->rect(drawsize, tile.iCol * 4, tile.iRow);
+                    const SDL_Rect& dstRect = g_tilesetmanager->rect(drawsize, iCol, iRow);
+                    rm->spr_tileanimation[static_cast<size_t>(drawsize)].draw(srcRect, sSurface[iSurface], dstRect);
                 } else if (tile.iID == TILESETUNKNOWN) {
-                    SDL_BlitSurface(rm->spr_unknowntile[iTileSizeIndex].getSurface(), g_tilesetmanager->rect(static_cast<DrawSize>(iTileSizeIndex), 0, 0), sSurface[iSurface], g_tilesetmanager->rect(static_cast<DrawSize>(iTileSizeIndex), iCol, iRow));
+                    const SDL_Rect& srcRect = g_tilesetmanager->rect(drawsize, 0, 0);
+                    const SDL_Rect& dstRect = g_tilesetmanager->rect(drawsize, iCol, iRow);
+                    rm->spr_unknowntile[static_cast<size_t>(drawsize)].draw(srcRect, sSurface[iSurface], dstRect);
                 }
             }
         }

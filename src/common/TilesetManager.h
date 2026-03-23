@@ -32,12 +32,20 @@ public:
     TileType incrementTileType(size_t iTileCol, size_t iTileRow);
     TileType decrementTileType(size_t iTileCol, size_t iTileRow);
 
-    void Draw(SDL_Surface* dstSurface, DrawSize tileSize, SDL_Rect* srcRect, SDL_Rect* dstRect) const;
+    void draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect) const;
 
     const std::string& name() const { return m_name; }
     short height() const { return m_height; }
     short width() const { return m_width; }
-    SDL_Surface* surface(DrawSize size) const;
+
+    const gfxSprite& sprite(DrawSize size) const {
+        switch (size) {
+            case DrawSize::Ingame: return m_sprite_large;
+            case DrawSize::Preview: return m_sprite_medium;
+            case DrawSize::Thumbnail: return m_sprite_small;
+        }
+        return m_sprite_large;
+    }
 
 private:
     std::string m_name;
@@ -58,9 +66,12 @@ public:
     CTilesetManager(const std::filesystem::path& gfxPack);
 
     size_t indexFromName(const std::string& name) const;
+    CTileset* tileset(size_t index) const;
+    size_t count() const { return m_tilesets.size(); }
 
-    void Draw(SDL_Surface* dstSurface, size_t iTilesetID, DrawSize iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow);
-
+    void Draw(SDL_Surface* dstSurface, size_t iTilesetID, DrawSize iTileSize,
+        short iSrcTileCol, short iSrcTileRow,
+        short iDstTileCol, short iDstTileRow) const;
     void saveTilesets() const;
 
     size_t classicTilesetIndex() const {
@@ -70,13 +81,11 @@ public:
         return tileset(classicTilesetIndex());
     }
 
-    CTileset* tileset(size_t index) const;
-    SDL_Rect* rect(DrawSize size, short col, short row);
-    SDL_Rect* rect(DrawSize size, size_t idx);
-    size_t count() const { return m_tilesetlist.size(); }
+    static const SDL_Rect& rect(DrawSize size, size_t col, size_t row);
+    static const SDL_Rect& rect(DrawSize size, size_t idx);
 
 private:
-    std::vector<std::unique_ptr<CTileset>> m_tilesetlist;  // TODO: Store objects
+    std::vector<std::unique_ptr<CTileset>> m_tilesets;  // TODO: Store objects
     size_t m_classicTilesetIndex = SIZE_MAX;
 
     static std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_ingame;

@@ -214,20 +214,20 @@ class MapPlatform
 
         for (short iPlatformX = 0; iPlatformX < MAPWIDTH; iPlatformX++) {
             for (short iPlatformY = 0; iPlatformY < MAPHEIGHT; iPlatformY++) {
-					TilesetTile * tile = &tiles[iPlatformX * MAPHEIGHT + iPlatformY];
+                TilesetTile * tile = &tiles[iPlatformX * MAPHEIGHT + iPlatformY];
 
-					SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
+                SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
                 if (tile->iID >= 0) {
-                                            SDL_BlitSurface(g_tilesetmanager->tileset(tile->iID)->surface(DrawSize::Thumbnail), g_tilesetmanager->rect(DrawSize::Thumbnail, tile->iCol, tile->iRow), preview, &bltrect);
+                    g_tilesetmanager->tileset(tile->iID)->draw(DrawSize::Thumbnail, g_tilesetmanager->rect(DrawSize::Thumbnail, tile->iCol, tile->iRow), preview, bltrect);
                 } else if (tile->iID == TILESETANIMATED) {
-                    SDL_BlitSurface(rm->spr_tileanimation[2].getSurface(), g_tilesetmanager->rect(DrawSize::Thumbnail, tile->iCol * 4, tile->iRow), preview, &bltrect);
+                    rm->spr_tileanimation[2].draw(g_tilesetmanager->rect(DrawSize::Thumbnail, tile->iCol * 4, tile->iRow), preview, bltrect);
                 } else if (tile->iID == TILESETUNKNOWN) {
-						//Draw unknown tile
-                    SDL_BlitSurface(rm->spr_unknowntile[2].getSurface(), g_tilesetmanager->rect(DrawSize::Thumbnail, 0, 0), preview, &bltrect);
-					}
-				}
-			}
-		}
+                    //Draw unknown tile
+                    rm->spr_unknowntile[2].draw(g_tilesetmanager->rect(DrawSize::Thumbnail, 0, 0), preview, bltrect);
+                }
+            }
+        }
+    }
 
     std::vector<TilesetTile> tiles;
     std::vector<TileType> types;
@@ -1643,9 +1643,9 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 					iSrcRow = 0;
 				}
 
-                SDL_BlitSurface(rm->spr_tileanimation[static_cast<size_t>(drawsize)].getSurface(), g_tilesetmanager->rect(drawsize, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(drawsize, i, j));
+                rm->spr_tileanimation[static_cast<size_t>(drawsize)].draw(g_tilesetmanager->rect(drawsize, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(drawsize, i, j));
             } else if (tile->iID == TILESETUNKNOWN) {
-                SDL_BlitSurface(rm->spr_unknowntile[static_cast<size_t>(drawsize)].getSurface(), g_tilesetmanager->rect(drawsize, 0, 0), screen, g_tilesetmanager->rect(drawsize, i, j));
+                rm->spr_unknowntile[static_cast<size_t>(drawsize)].draw(g_tilesetmanager->rect(drawsize, 0, 0), screen, g_tilesetmanager->rect(drawsize, i, j));
 			}
 		}
 	}
@@ -1733,7 +1733,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 						rSrc.y = iBlockSize << 1;
 					}
 
-                    SDL_BlitSurface(rm->spr_blocks[static_cast<size_t>(drawsize)].getSurface(), &rSrc, screen, g_tilesetmanager->rect(drawsize, i, j));
+                    rm->spr_blocks[static_cast<size_t>(drawsize)].draw(rSrc, screen, g_tilesetmanager->rect(drawsize, i, j));
 				}
 			}
 		}
@@ -2938,9 +2938,9 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 					iSrcRow = 0;
 				}
 
-                SDL_BlitSurface(rm->spr_tileanimation[0].getSurface(), g_tilesetmanager->rect(DrawSize::Ingame, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(DrawSize::Ingame, iCol, iRow));
+                rm->spr_tileanimation[0].draw(g_tilesetmanager->rect(DrawSize::Ingame, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(DrawSize::Ingame, iCol, iRow));
             } else if (tile->iID == TILESETUNKNOWN) {
-                SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->rect(DrawSize::Ingame, 0, 0), screen, g_tilesetmanager->rect(DrawSize::Ingame, iCol, iRow));
+                rm->spr_unknowntile[0].draw(g_tilesetmanager->rect(DrawSize::Ingame, 0, 0), screen, g_tilesetmanager->rect(DrawSize::Ingame, iCol, iRow));
 			}
 
             if (fDrawTileTypes) {
@@ -3656,7 +3656,7 @@ int editor_tiles()
         r.w = 640;
         r.h = 480;
 
-        SDL_BlitSurface(g_tilesetmanager->tileset(set_tile_tileset)->surface(DrawSize::Ingame), &rectSrc, screen, &r);
+        g_tilesetmanager->tileset(set_tile_tileset)->draw(DrawSize::Ingame, rectSrc, screen, r);
 		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
                 rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), tileset->name());
 
