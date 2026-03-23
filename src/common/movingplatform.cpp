@@ -86,11 +86,11 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
                     continue;
 
                 if (tile.iID >= 0) {
-                    g_tilesetmanager->Draw(sSurface[iSurface], tile.iID, iTileSizeIndex, tile.iCol, tile.iRow, iCol, iRow);
+                    g_tilesetmanager->Draw(sSurface[iSurface], tile.iID, static_cast<DrawSize>(iTileSizeIndex), tile.iCol, tile.iRow, iCol, iRow);
                 } else if (tile.iID == TILESETANIMATED) {
-                    SDL_BlitSurface(rm->spr_tileanimation[iTileSizeIndex].getSurface(), g_tilesetmanager->rect(iTileSizeIndex, tile.iCol * 4, tile.iRow), sSurface[iSurface], g_tilesetmanager->rect(iTileSizeIndex, iCol, iRow));
+                    SDL_BlitSurface(rm->spr_tileanimation[iTileSizeIndex].getSurface(), g_tilesetmanager->rect(static_cast<DrawSize>(iTileSizeIndex), tile.iCol * 4, tile.iRow), sSurface[iSurface], g_tilesetmanager->rect(static_cast<DrawSize>(iTileSizeIndex), iCol, iRow));
                 } else if (tile.iID == TILESETUNKNOWN) {
-                    SDL_BlitSurface(rm->spr_unknowntile[iTileSizeIndex].getSurface(), g_tilesetmanager->rect(iTileSizeIndex, 0, 0), sSurface[iSurface], g_tilesetmanager->rect(iTileSizeIndex, iCol, iRow));
+                    SDL_BlitSurface(rm->spr_unknowntile[iTileSizeIndex].getSurface(), g_tilesetmanager->rect(static_cast<DrawSize>(iTileSizeIndex), 0, 0), sSurface[iSurface], g_tilesetmanager->rect(static_cast<DrawSize>(iTileSizeIndex), iCol, iRow));
                 }
             }
         }

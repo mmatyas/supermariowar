@@ -170,7 +170,6 @@ void create_globals()
 #pragma warning ("delete these or use boost GC shared_ptr")
 
     g_map = new CMap();
-    g_tilesetmanager = new CTilesetManager();
 
     filterslist = new FiltersList();
     maplist = new MapList(false);

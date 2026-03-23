@@ -372,7 +372,7 @@ void CResourceManager::loadGameGraphics()
 {
     std::string graphicspack = gamegraphicspacklist->currentPath().string();
 
-    g_tilesetmanager->init(graphicspack);
+    g_tilesetmanager = new CTilesetManager(graphicspack);
 
     bool loadok = true;
     loadok &= game_font_small.init(convertPath("gfx/packs/fonts/font_small.png", graphicspack));

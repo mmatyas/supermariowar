@@ -444,19 +444,6 @@ int main(int argc, char *argv[])
 
     ensureSettingsDir();
 
-    rm = new CResourceManager();
-
-	g_map = new CMap();
-	g_tilesetmanager = new CTilesetManager();
-	filterslist = new FiltersList();
-	maplist = new MapList(true);
-    menugraphicspacklist = new GraphicsList;
-    gamegraphicspacklist = new GraphicsList;
-    worldlist = new WorldList;
-
-	game_values.sound = false;
-	game_values.music = false;
-
     /* This must occur before any data files are loaded */
     Initialize_Paths();
 
@@ -481,7 +468,19 @@ int main(int argc, char *argv[])
 
 	gfx_init(640,480, g_fFullScreen);
 	blitdest = screen;
-	g_tilesetmanager->init(convertPath("gfx/Classic/tilesets").c_str());
+
+        rm = new CResourceManager();
+
+        g_map = new CMap();
+        g_tilesetmanager = new CTilesetManager(convertPath("gfx/Classic/tilesets"));
+        filterslist = new FiltersList();
+        maplist = new MapList(true);
+        menugraphicspacklist = new GraphicsList;
+        gamegraphicspacklist = new GraphicsList;
+        worldlist = new WorldList;
+
+        game_values.sound = false;
+        game_values.music = false;
 
 	char title[128];
 	sprintf(title, "%s %s", TITLESTRING, MAPTITLESTRING);

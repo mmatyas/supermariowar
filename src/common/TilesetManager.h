@@ -4,13 +4,21 @@
 #include "map.h"
 
 #include <array>
+#include <filesystem>
 #include <memory>
 #include <vector>
 
 
+enum class DrawSize {
+    Ingame,
+    Preview,
+    Thumbnail,
+};
+
+
 class CTileset {
 public:
-    CTileset(const std::string& dir);
+    CTileset(const std::filesystem::path& dir);
 
     void saveTileset() const;
 
@@ -19,18 +27,20 @@ public:
     TileType incrementTileType(size_t iTileCol, size_t iTileRow);
     TileType decrementTileType(size_t iTileCol, size_t iTileRow);
 
-    void Draw(SDL_Surface* dstSurface, short tileSize, SDL_Rect* srcRect, SDL_Rect* dstRect) const;
+    void Draw(SDL_Surface* dstSurface, DrawSize tileSize, SDL_Rect* srcRect, SDL_Rect* dstRect) const;
 
     const std::string& name() const { return m_name; }
     short height() const { return m_height; }
     short width() const { return m_width; }
-    SDL_Surface* surface(size_t index) const;
+    SDL_Surface* surface(DrawSize size) const;
 
 private:
     std::string m_name;
-    std::string m_tilesetPath;
+    std::filesystem::path m_tilesetPath;
 
-    std::array<gfxSprite, 3> m_sprites;
+    gfxSprite m_sprite_large;
+    gfxSprite m_sprite_medium;
+    gfxSprite m_sprite_small;
 
     short m_width = 0;
     short m_height = 0;
@@ -38,16 +48,13 @@ private:
 };
 
 
-//it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
-class CTilesetManager : public SimpleDirectoryList {
+class CTilesetManager {
 public:
-    CTilesetManager();
-
-    void init(const std::string& gfxPack);
+    CTilesetManager(const std::filesystem::path& gfxPack);
 
     size_t indexFromName(const std::string& name) const;
 
-    void Draw(SDL_Surface * dstSurface, short iTilesetID, short iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow);
+    void Draw(SDL_Surface* dstSurface, size_t iTilesetID, DrawSize iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow);
 
     void saveTilesets() const;
 
@@ -58,9 +65,10 @@ public:
         return *m_tilesetlist.at(classicTilesetIndex());
     }
 
-    CTileset* tileset(size_t index);
-    SDL_Rect* rect(short size_id, short col, short row);
-    SDL_Rect* rect(short size_id, size_t idx);
+    CTileset* tileset(size_t index) const;
+    SDL_Rect* rect(DrawSize size, short col, short row);
+    SDL_Rect* rect(DrawSize size, size_t idx);
+    size_t count() const { return m_tilesetlist.size(); }
 
 private:
     std::vector<std::unique_ptr<CTileset>> m_tilesetlist;  // TODO: Store objects
