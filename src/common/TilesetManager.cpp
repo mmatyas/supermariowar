@@ -19,13 +19,26 @@
 namespace fs = std::filesystem;
 
 
-// The map format supports tilesets with up to 128x128 tiles
-constexpr int MAX_TILES_PER_AXIS = 128;
-
 namespace {
-std::vector<TileType> readTileTypeFile(const std::string& path, int expectedCount)
+constexpr std::array<SDL_Rect, CTileset::MAX_TILES> generateTilesetRects(int tilesize)
 {
-    constexpr int MAX_TILES = MAX_TILES_PER_AXIS * MAX_TILES_PER_AXIS;
+    std::array<SDL_Rect, CTileset::MAX_TILES> rects;
+    for (int row = 0; row < CTileset::MAX_TILES_PER_AXIS; row++) {
+        for (int col = 0; col < CTileset::MAX_TILES_PER_AXIS; col++) {
+            rects[row * CTileset::MAX_TILES_PER_AXIS + col] = SDL_Rect {
+                col * tilesize,
+                row * tilesize,
+                tilesize,
+                tilesize,
+            };
+        }
+    }
+    return rects;
+}
+
+std::vector<TileType> readTileTypeFile(const std::string& path)
+{
+    constexpr int MAX_TILES = CTileset::MAX_TILES_PER_AXIS * CTileset::MAX_TILES_PER_AXIS;
 
     //Detect if the tiletype file already exists, if not create it
     if (!FileExists(path))
@@ -40,8 +53,6 @@ std::vector<TileType> readTileTypeFile(const std::string& path, int expectedCoun
     int tiletype_count = tsf.read_i32();
     if (tiletype_count <= 0 || tiletype_count > MAX_TILES)
         return {};
-
-    tiletype_count = std::min<int>(tiletype_count, expectedCount);
 
     std::vector<TileType> tiletypes;
     tiletypes.reserve(tiletype_count);
@@ -58,7 +69,7 @@ std::vector<TileType> readTileTypeFile(const std::string& path, int expectedCoun
 *********************************/
 CTileset::CTileset(const std::filesystem::path& dir)
     : m_name(dir.filename().string())
-    , m_tilesetPath(dir / "tileset.tls")
+    , m_tileset_path(dir / "tileset.tls")
 {
     m_sprite_large = SpriteBuilder(dir / "large.png").create();
     m_sprite_medium = SpriteBuilder(dir / "medium.png").create();
@@ -66,7 +77,7 @@ CTileset::CTileset(const std::filesystem::path& dir)
 
     m_width = std::min(m_sprite_large.getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
     m_height = std::min(m_sprite_large.getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
-    m_tiletypes = readTileTypeFile(m_tilesetPath, m_width * m_height);
+    m_tiletypes = readTileTypeFile(m_tileset_path, m_width * m_height);
 }
 
 
@@ -121,9 +132,9 @@ void CTileset::Draw(SDL_Surface* dstSurface, DrawSize tileSize, SDL_Rect* srcRec
 
 void CTileset::saveTileset() const
 {
-    BinaryFile tsf(m_tilesetPath, "wb");
+    BinaryFile tsf(m_tileset_path, "wb");
     if (!tsf.is_open()) {
-        printf("ERROR: couldn't open tileset file to save tile types: %s\n", m_tilesetPath.c_str());
+        printf("ERROR: couldn't open tileset file to save tile types: %s\n", m_tileset_path.string().c_str());
         return;
     }
 
@@ -133,7 +144,7 @@ void CTileset::saveTileset() const
         tsf.write_i32(static_cast<int>(tiletype));
 
 #if defined(__APPLE__)
-    chmod(m_tilesetPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH);
+    chmod(m_tileset_path.string().c_str(), S_IRWXU | S_IRWXG | S_IROTH);
 #endif
 }
 
@@ -141,6 +152,10 @@ void CTileset::saveTileset() const
 /*********************************
 *  CTilesetManager
 *********************************/
+
+std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_ingame = generateTilesetRects(TILESIZE);
+std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_preview = generateTilesetRects(PREVIEWTILESIZE);
+std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_thumb = generateTilesetRects(THUMBTILESIZE);
 
 CTilesetManager::CTilesetManager(const fs::path& gfxPack)
 {
@@ -174,41 +189,6 @@ CTilesetManager::CTilesetManager(const fs::path& gfxPack)
     if (it != m_tilesetlist.cend()) {
         m_classicTilesetIndex = std::distance(m_tilesetlist.cbegin(), it);
     }
-
-    initTilesetRects();
-}
-
-
-void CTilesetManager::initTilesetRects()
-{
-    size_t max_tileset_rows = 0;
-    for (const std::unique_ptr<CTileset>& tileset : m_tilesetlist) {
-        max_tileset_rows = std::max<size_t>(max_tileset_rows, tileset->height());
-        m_max_tileset_cols = std::max<size_t>(m_max_tileset_cols, tileset->width());
-    }
-
-    const size_t tile_count = max_tileset_rows * m_max_tileset_cols;
-    m_rects_ingame.reserve(tile_count);
-    m_rects_preview.reserve(tile_count);
-    m_rects_thumb.reserve(tile_count);
-
-    short y1 = 0, y2 = 0, y3 = 0;
-    for (size_t row = 0; row < max_tileset_rows; row++) {
-        short x1 = 0, x2 = 0, x3 = 0;
-        for (size_t col = 0; col < m_max_tileset_cols; col++) {
-            m_rects_ingame.emplace_back(SDL_Rect { x1, y1, TILESIZE, TILESIZE });
-            m_rects_preview.emplace_back(SDL_Rect { x2, y2, PREVIEWTILESIZE, PREVIEWTILESIZE });
-            m_rects_thumb.emplace_back(SDL_Rect { x3, y3, THUMBTILESIZE, THUMBTILESIZE });
-
-            x1 += TILESIZE;
-            x2 += PREVIEWTILESIZE;
-            x3 += THUMBTILESIZE;
-        }
-
-        y1 += TILESIZE;
-        y2 += PREVIEWTILESIZE;
-        y3 += THUMBTILESIZE;
-    }
 }
 
 
@@ -232,8 +212,8 @@ void CTilesetManager::Draw(SDL_Surface* dstSurface, size_t iTilesetID, DrawSize 
     assert(iSrcTileCol >= 0 && iSrcTileRow >= 0);
     assert(iDstTileCol >= 0 && iDstTileRow >= 0);
 
-    const size_t src_rect_idx = iSrcTileRow * m_max_tileset_cols + iSrcTileCol;
-    const size_t dst_rect_idx = iDstTileRow * m_max_tileset_cols + iDstTileCol;
+    const size_t src_rect_idx = iSrcTileRow * CTileset::MAX_TILES_PER_AXIS + iSrcTileCol;
+    const size_t dst_rect_idx = iDstTileRow * CTileset::MAX_TILES_PER_AXIS + iDstTileCol;
 
     SDL_Rect* src_rect = rect(iTileSize, src_rect_idx);
     SDL_Rect* dst_rect = rect(iTileSize, dst_rect_idx);
@@ -252,19 +232,17 @@ CTileset* CTilesetManager::tileset(size_t index) const
 
 SDL_Rect* CTilesetManager::rect(DrawSize size, short col, short row)
 {
-    const size_t rect_idx = row * m_max_tileset_cols + col;
+    const size_t rect_idx = row * CTileset::MAX_TILES_PER_AXIS + col;
     return rect(size, rect_idx);
 }
 
 
 SDL_Rect* CTilesetManager::rect(DrawSize size, size_t idx)
 {
-    assert(idx < m_rects_ingame.size());
-
     switch (size) {
-        case DrawSize::Ingame: return &m_rects_ingame[idx];
-        case DrawSize::Preview: return &m_rects_preview[idx];
-        case DrawSize::Thumbnail: return &m_rects_thumb[idx];
+        case DrawSize::Ingame: return &s_rects_ingame.at(idx);
+        case DrawSize::Preview: return &s_rects_preview.at(idx);
+        case DrawSize::Thumbnail: return &s_rects_thumb.at(idx);
         default: return nullptr;
     }
 }

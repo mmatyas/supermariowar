@@ -18,6 +18,10 @@ enum class DrawSize {
 
 class CTileset {
 public:
+    // The map format supports tilesets with up to 128x128 tiles
+    static constexpr int MAX_TILES_PER_AXIS = 128;
+    static constexpr int MAX_TILES = MAX_TILES_PER_AXIS * MAX_TILES_PER_AXIS;
+
     CTileset(const std::filesystem::path& dir);
 
     void saveTileset() const;
@@ -36,7 +40,8 @@ public:
 
 private:
     std::string m_name;
-    std::filesystem::path m_tilesetPath;
+    std::filesystem::path m_tileset_path;
+    std::vector<TileType> m_tiletypes;
 
     gfxSprite m_sprite_large;
     gfxSprite m_sprite_medium;
@@ -44,7 +49,6 @@ private:
 
     short m_width = 0;
     short m_height = 0;
-    std::vector<TileType> m_tiletypes;
 };
 
 
@@ -74,10 +78,7 @@ private:
     std::vector<std::unique_ptr<CTileset>> m_tilesetlist;  // TODO: Store objects
     size_t m_classicTilesetIndex = SIZE_MAX;
 
-    std::vector<SDL_Rect> m_rects_ingame;
-    std::vector<SDL_Rect> m_rects_preview;
-    std::vector<SDL_Rect> m_rects_thumb;
-    size_t m_max_tileset_cols = 0;
-
-    void initTilesetRects();
+    static std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_ingame;
+    static std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_preview;
+    static std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_thumb;
 };
