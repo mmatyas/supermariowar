@@ -90,36 +90,28 @@ gfxSprite::gfxSprite(SdlSurfacePtr image, std::optional<int> wrap)
 
 void gfxSprite::draw(int x, int y) const
 {
-    assert(m_picture);
-
-    SDL_Rect dstRect {x + x_shake, y + y_shake, getWidth(), getHeight()};
-    blitSurface(m_picture.get(), NULL, blitdest, &dstRect);
-
-    if (m_wrap_x) {
-        if (x + getWidth() >= *m_wrap_x) {
-            dstRect.x -= *m_wrap_x;
-            blitSurface(m_picture.get(), NULL, blitdest, &dstRect);
-        } else if (x < 0) {
-            dstRect.x += *m_wrap_x;
-            blitSurface(m_picture.get(), NULL, blitdest, &dstRect);
-        }
-    }
+    blit(nullptr, blitdest, {x + x_shake, y + y_shake});
 }
 
 void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect) const
 {
+    blit(&srcRect, blitdest, {x + x_shake, y + y_shake});
+}
+
+void gfxSprite::blit(const SDL_Rect* srcRect, SDL_Surface* dst, Vec2i dstPos) const
+{
     assert(m_picture);
 
-    SDL_Rect dstRect {x + x_shake, y + y_shake, srcRect.w, srcRect.h};
-    blitSurface(m_picture.get(), &srcRect, blitdest, &dstRect);
+    SDL_Rect dstRect { dstPos.x, dstPos.y, 0, 0 };
+    blitSurface(m_picture.get(), srcRect, dst, &dstRect);
 
     if (m_wrap_x) {
-        if (x + getWidth() >= *m_wrap_x) {
+        if (dstRect.x + getWidth() >= *m_wrap_x) {
             dstRect.x -= *m_wrap_x;
-            blitSurface(m_picture.get(), &srcRect, blitdest, &dstRect);
-        } else if (x < 0) {
+            blitSurface(m_picture.get(), srcRect, dst, &dstRect);
+        } else if (dstRect.x < 0) {
             dstRect.x += *m_wrap_x;
-            blitSurface(m_picture.get(), &srcRect, blitdest, &dstRect);
+            blitSurface(m_picture.get(), srcRect, dst, &dstRect);
         }
     }
 }

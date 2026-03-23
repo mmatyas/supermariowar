@@ -76,3 +76,4 @@ template<typename T, typename Scalar> constexpr Vec2<T> operator/(const Vec2<T>&
 
 using Vec2f = Vec2<float>;
 using Vec2s = Vec2<short>;
+using Vec2i = Vec2<int>;
