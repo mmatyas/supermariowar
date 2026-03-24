@@ -382,7 +382,7 @@ MI_Text * miTitleText;
 
 UI_ModeOptionsMenu* mModeOptionsMenu;
 
-SDL_Surface * sMapThumbnail = NULL;
+gfxSprite sMapThumbnail;
 short iOldStageId = -1;
 
 //Sets up default mode options
@@ -3407,29 +3407,23 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 {
 	TourStop * ts = game_values.tourstops[iStageId];
 
-	//If we're pointing to a new stage or no stage at all
+    //If we're pointing to a new stage or no stage at all
     if (iStageId != iOldStageId || fForce) {
         if (ts->iStageType == 1) {
-            if (sMapThumbnail) {
-				SDL_FreeSurface(sMapThumbnail);
-				sMapThumbnail = NULL;
-			}
+            sMapThumbnail = gfxSprite();
         } else {
             if (!ts->pszMapFile.empty()) {
-                if (sMapThumbnail) {
-					SDL_FreeSurface(sMapThumbnail);
-					sMapThumbnail = NULL;
-				}
+                sMapThumbnail = gfxSprite();
 
                 if (maplist->findexact(ts->pszMapFile.c_str(), false)) {
-					g_map->loadMap(maplist->currentFilename(), read_type_preview);
-					sMapThumbnail = g_map->createThumbnailSurface(true);
+                    g_map->loadMap(maplist->currentFilename(), read_type_preview);
+                    sMapThumbnail = g_map->createThumbnailSurface(true);
                 } else { //otherwise show a unknown map icon
-					sMapThumbnail = IMG_Load(convertPath("gfx/leveleditor/leveleditor_mapnotfound.png").c_str());
-				}
-			}
-		}
-	}
+                    sMapThumbnail = gfxSprite(convertPath("gfx/leveleditor/leveleditor_mapnotfound.png"));
+                }
+            }
+        }
+    }
 
 	iOldStageId = iStageId;
 
@@ -3487,11 +3481,10 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 		}
 
         if (sMapThumbnail) {
-			SDL_Rect rSrc = {0, 0, 160, 120};
-			SDL_Rect rDst = {iMouseX + 16, iMouseY + 52, 160, 120};
-
-			SDL_BlitSurface(sMapThumbnail, &rSrc, blitdest, &rDst);
-		}
+            const SDL_Rect rSrc {0, 0, 160, 120};
+            const SDL_Rect rDst {iMouseX + 16, iMouseY + 52, 160, 120};
+            sMapThumbnail.draw(rSrc, blitdest, rDst);
+        }
     } else {
 		sprintf(szPrint, "Sort: %s", ts->iBonusType == 0 ? "Fixed" : "Random");
 		rm->menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);

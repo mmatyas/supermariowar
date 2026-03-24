@@ -2753,19 +2753,19 @@ int editor_platforms()
         } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
             if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
-				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
+				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true, blitdest);
 
 				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Edit Path");
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[esc] Exit  [LMB] Set Start Point  [RMB] Set End Point [t] Path Type");
             } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous) {
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
-				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
+				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true, blitdest);
 
 				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Edit Path: [esc] Exit  [LMB] Set Start Point  [RMB] Set Angle");
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[SHIFT + LMB] Location Snap [SHIFT + RMB] Angle Snap [t] Path Type");
             } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
-				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
+				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true, blitdest);
 
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 4, "Edit Path: [esc] Exit  [LMB] Set Center [SHIFT + LMB] Center Snap");
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 3, "[X + LMB] Set X Radius [SHIFT + X + LMB] X Radius Snap");
@@ -3301,13 +3301,13 @@ int editor_maphazards()
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Choose Hazard Type");
         } else if (MAPHAZARD_EDIT_STATE_LOCATION == iEditState) {
 			const MapHazard& hazard = g_map->maphazards[iEditMapHazard];
-			DrawMapHazard(hazard, 0, true);
+			DrawMapHazard(hazard, 0, true, blitdest);
 			DrawMapHazardControls(hazard);
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Location: [esc] Exit, [p] Properties, [LMB] Set Location");
         } else if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
             const MapHazard& hazard = g_map->maphazards[iEditMapHazard];
-            DrawMapHazard(hazard, 0, true);
+            DrawMapHazard(hazard, 0, true, blitdest);
             DrawMapHazardControls(hazard);
 
             if (hazard.itype == 0 || hazard.itype == 1) {
@@ -5208,12 +5208,12 @@ void takescreenshot()
 		//Draw platforms to screenshot
         for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
 			MapPlatform * platform = &g_Platforms[iPlatform];
-			DrawPlatform(platform->iPathType, platform->tiles, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, iScreenshotSize, g_map->platforms[iPlatform]->iTileWidth, g_map->platforms[iPlatform]->iTileHeight, true, true);
+			DrawPlatform(platform->iPathType, platform->tiles, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, iScreenshotSize, g_map->platforms[iPlatform]->iTileWidth, g_map->platforms[iPlatform]->iTileHeight, true, true, blitdest);
 		}
 
 		//Draw map hazards
                 for (const MapHazard& hazard : g_map->maphazards)
-                    DrawMapHazard(hazard, iScreenshotSize, false);
+                    DrawMapHazard(hazard, iScreenshotSize, false, blitdest);
 
 		//Save the screenshot with the same name as the map file
 		std::string szSaveFile("maps/screenshots/");

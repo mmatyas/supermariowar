@@ -155,12 +155,12 @@ struct MapBlock {
 
 class IO_Block;
 
-void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter);
+void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter, SDL_Surface* dst);
 void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& tiles,
 	short startX, short startY, short endX, short endY,
 	float angle, float radiusX, float radiusY,
 	short iSize, short iPlatformWidth, short iPlatformHeight,
-	bool fDrawPlatform, bool fDrawShadow);
+	bool fDrawPlatform, bool fDrawShadow, SDL_Surface* dst);
 
 class CMap
 {
@@ -174,7 +174,7 @@ class CMap
 		void loadMap(const std::string& file, ReadType iReadType);
 		void saveMap(const std::string& file);
 
-		SDL_Surface * createThumbnailSurface(bool fUseClassicPack);
+		gfxSprite createThumbnailSurface(bool fUseClassicPack);
 		void saveThumbnail(const std::string &file, bool fUseClassicPack);
 
 		void UpdateAllTileGaps();
@@ -189,12 +189,12 @@ class CMap
 
 		void SetupAnimatedTiles();
 
-		void preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail);
+		void preDrawPreviewBackground(gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewBackground(const gfxSprite& spr_background, gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewBlocks(gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewForeground(gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewWarps(gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewMapItems(gfxSprite& targetSurface, bool fThumbnail);
 
 		void drawfrontlayer();
 
@@ -310,7 +310,7 @@ class CMap
 
 		short iAnimatedBackgroundLayers = 0;
 		SDL_Surface * animatedFrontmapSurface = nullptr;
-		SDL_Surface * animatedTilesSurface = nullptr;
+		gfxSprite animatedTilesSurface;
 
 		short iAnimatedTileCount = 0;
 		short iAnimatedVectorIndices[NUM_FRAMES_BETWEEN_TILE_ANIMATION + 1];
@@ -321,11 +321,11 @@ class CMap
 		void AnimateTiles(short iFrame);
 		void ClearAnimatedTiles();
 
-		void draw(SDL_Surface *targetsurf, int layer);
-		void drawThumbnailHazards(SDL_Surface * targetSurface);
-		void drawThumbnailPlatforms(SDL_Surface * targetSurface);
-		void drawPreview(SDL_Surface * targetsurf, int layer, bool fThumbnail);
-		void drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
+		void draw(gfxSprite& targetsurf, int layer);
+		void drawThumbnailHazards(gfxSprite& targetSurface);
+                void drawThumbnailPlatforms(gfxSprite& targetSurface);
+		void drawPreview(gfxSprite& targetsurf, int layer, bool fThumbnail);
+		void drawPreviewBlocks(gfxSprite& targetSurface, bool fThumbnail);
 
 		void addPlatformAnimatedTiles();
 

@@ -126,19 +126,19 @@ void MI_MapPreview::LoadMap(const std::string& szMapPath)
     LoadCurrentMapBackground();
     smallDelay();
 
-    g_map->preDrawPreviewBackground(&rm->spr_background, surfaceMapBackground.getSurface(), false);
+    g_map->preDrawPreviewBackground(rm->spr_background, surfaceMapBackground, false);
     smallDelay();
 
-    g_map->preDrawPreviewBlocks(surfaceMapBlockLayer.getSurface(), false);
+    g_map->preDrawPreviewBlocks(surfaceMapBlockLayer, false);
     smallDelay();
 
-    g_map->preDrawPreviewMapItems(surfaceMapBackground.getSurface(), false);
+    g_map->preDrawPreviewMapItems(surfaceMapBackground, false);
     smallDelay();
 
-    g_map->preDrawPreviewForeground(surfaceMapForeground.getSurface(), false);
+    g_map->preDrawPreviewForeground(surfaceMapForeground, false);
     smallDelay();
 
-    g_map->preDrawPreviewWarps((game_values.toplayer ? surfaceMapForeground : surfaceMapBackground).getSurface(), false);
+    g_map->preDrawPreviewWarps(game_values.toplayer ? surfaceMapForeground : surfaceMapBackground, false);
     smallDelay();
 
     LoadMapHazards(true);
