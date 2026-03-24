@@ -17,10 +17,7 @@ bool FileExists(const std::string& path);
 std::string convertPath(const std::string& source);
 std::string convertPath(std::string_view relpath, const std::filesystem::path& packdir);
 
-inline std::string concat(const std::string& a, const std::string& b) { return a + b; }
-
 constexpr char dirSeparator() { return '/'; }
-std::string getFilenameFromPath(const std::string& path);
 
 std::string GetHomeDirectory();
 std::string GetRootDirectory();

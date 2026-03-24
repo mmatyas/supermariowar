@@ -168,14 +168,6 @@ std::string convertPath(std::string_view relpath, const std::filesystem::path& p
     return convertPath(std::string(relpath));
 }
 
-std::string getFilenameFromPath(const std::string& path)
-{
-    size_t pos = path.find_last_of(dirSeparator());
-    return pos != std::string::npos
-        ? path.substr(pos + 1)
-        : path;
-}
-
 // Takes a path to a file and gives you back the file name (with or without author) as a char *
 std::string GetNameFromFileName(const std::string& path, bool stripAuthor)
 {

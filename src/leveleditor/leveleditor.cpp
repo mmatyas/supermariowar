@@ -931,7 +931,7 @@ int editor_edit()
                         backgroundlist->next();
 
                         rm->spr_background = gfxSprite(backgroundlist->currentPath());
-                        g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath().string());
+                        g_map->szBackgroundFile = backgroundlist->currentPath().filename().string();
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
 								//Set music to background default
@@ -4129,7 +4129,7 @@ int editor_backgrounds()
                                 backgroundlist->setCurrentIndex(iPage * 16 + iBackground);
 
                                 rm->spr_background = gfxSprite(backgroundlist->currentPath());
-                                g_map->szBackgroundFile = getFilenameFromPath(backgroundlist->currentPath().string());
+                                g_map->szBackgroundFile = backgroundlist->currentPath().filename().string();
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
 									//Set music to background default
@@ -4739,7 +4739,7 @@ void loadcurrentmap()
 		}
 	}
 
-	std::string filename = concat("gfx/packs/Classic/backgrounds/", g_map->szBackgroundFile);
+	std::string filename = "gfx/packs/Classic/backgrounds/" + g_map->szBackgroundFile;
 	std::string path = convertPath(filename);
     backgroundlist->setCurrentPath(filename);
 
