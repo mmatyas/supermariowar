@@ -67,12 +67,15 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
     ResetPath();
 
     for (short iSurface = 0; iSurface < 2; iSurface++) {
-        sSurface[iSurface] = SDL_CreateRGBSurface(screen->flags, w * iTileSize, h * iTileSize, screen->format->BitsPerPixel, 0, 0, 0, 0);
+        auto surf = SdlSurfacePtr(SDL_CreateRGBSurface(0x0, w * iTileSize, h * iTileSize, screen->format->BitsPerPixel, 0, 0, 0, 0));
 
-        if (SDL_SetColorKey(sSurface[iSurface], SDL_TRUE, SDL_MapRGB(sSurface[iSurface]->format, 255, 0, 255)) < 0)
+        if (SDL_SetColorKey(surf.get(), SDL_TRUE, SDL_MapRGB(surf->format, 255, 0, 255)) < 0)
             printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
 
-        SDL_FillRect(sSurface[iSurface], NULL, SDL_MapRGB(sSurface[iSurface]->format, 255, 0, 255));
+        SDL_FillRect(surf.get(), NULL, SDL_MapRGB(surf->format, 255, 0, 255));
+
+        sprites[iSurface] = gfxSprite(std::move(surf));
+        sprites[iSurface].setWrap();
     }
 
     //Run through all tiles in the platform, detect unknown and blank tiles,
@@ -86,15 +89,15 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
                     continue;
 
                 if (tile.iID >= 0) {
-                    g_tilesetmanager->Draw(sSurface[iSurface], tile.iID, drawsize, tile.iCol, tile.iRow, iCol, iRow);
+                    g_tilesetmanager->Draw(sprites[iSurface].getSurface(), tile.iID, drawsize, tile.iCol, tile.iRow, iCol, iRow);
                 } else if (tile.iID == TILESETANIMATED) {
                     const SDL_Rect& srcRect = CTilesetManager::rect(drawsize, tile.iCol * 4, tile.iRow);
                     const SDL_Rect& dstRect = CTilesetManager::rect(drawsize, iCol, iRow);
-                    rm->spr_tileanimation[static_cast<size_t>(drawsize)].draw(srcRect, sSurface[iSurface], dstRect);
+                    rm->spr_tileanimation[static_cast<size_t>(drawsize)].draw(srcRect, sprites[iSurface].getSurface(), dstRect);
                 } else if (tile.iID == TILESETUNKNOWN) {
                     const SDL_Rect& srcRect = CTilesetManager::rect(drawsize, 0, 0);
                     const SDL_Rect& dstRect = CTilesetManager::rect(drawsize, iCol, iRow);
-                    rm->spr_unknowntile[static_cast<size_t>(drawsize)].draw(srcRect, sSurface[iSurface], dstRect);
+                    rm->spr_unknowntile[static_cast<size_t>(drawsize)].draw(srcRect, sprites[iSurface].getSurface(), dstRect);
                 }
             }
         }
@@ -120,9 +123,6 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
 MovingPlatform::~MovingPlatform()
 {
     delete pPath;
-
-    SDL_FreeSurface(sSurface[0]);
-    SDL_FreeSurface(sSurface[1]);
 }
 
 const TilesetTile& MovingPlatform::tileAt(size_t col, size_t row) const
@@ -146,87 +146,7 @@ void MovingPlatform::draw()
     rDstRect.w = iWidth;
     rDstRect.h = iHeight;
 
-    // Blit onto the screen surface
-    if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0) {
-        fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-        return;
-    }
-
-    //Deal with wrapping over sides of screen
-    bool fBlitSide = false;
-    if (ix - iHalfWidth < 0) {
-        rDstRect.x = ix - iHalfWidth + App::screenWidth + x_shake;
-        fBlitSide = true;
-    } else if (ix + iHalfWidth >= App::screenWidth) {
-        rDstRect.x = ix - iHalfWidth - App::screenWidth + x_shake;
-        fBlitSide = true;
-    }
-
-    if (fBlitSide) {
-        rDstRect.y = iy - iHalfHeight + y_shake;
-        rDstRect.w = iWidth;
-        rDstRect.h = iHeight;
-
-        if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0) {
-            fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-        }
-
-        //rDstRect.x = ix - iHalfWidth;
-    }
-
-    /*
-    if (iy - iHalfHeight < 0)
-    {
-    	rDstRect.y = iy - iHalfHeight + App::screenHeight;
-    	rDstRect.x = ix - iHalfWidth;
-
-        if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
-    	{
-    		fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-    	}
-
-    	rDstRect.y = iy - iHalfHeight;
-    }
-    else if (iy + iHalfHeight >= App::screenHeight)
-    {
-    	rDstRect.y = iy - iHalfHeight - App::screenHeight;
-    	rDstRect.x = ix - iHalfWidth;
-
-        if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
-    	{
-    		fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-    	}
-
-    	rDstRect.y = iy - iHalfHeight;
-    }
-
-    if (ix - iHalfWidth < 0 && iy - iHalfHeight < 0)
-    {
-    	rDstRect.x = ix - iHalfWidth + App::screenWidth;
-    	rDstRect.y = iy - iHalfHeight + App::screenHeight;
-
-        if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
-    	{
-    		fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-    	}
-
-    	rDstRect.x = ix - iHalfWidth;
-    	rDstRect.y = iy - iHalfHeight;
-    }
-    else if (ix + iHalfWidth >= App::screenWidth && iy + iHalfHeight >= App::screenHeight)
-    {
-    	rDstRect.x = ix - iHalfWidth - App::screenWidth;
-    	rDstRect.y = iy - iHalfHeight - App::screenHeight;
-
-        if (SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
-    	{
-    		fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-    	}
-
-    	rDstRect.x = ix - iHalfWidth;
-    	rDstRect.y = iy - iHalfHeight;
-    }
-    */
+    sprites[1 - g_iCurrentDrawIndex].draw(rSrcRect, blitdest, rDstRect);
 
     /*
     char szVel[256];
@@ -238,7 +158,7 @@ void MovingPlatform::draw()
 //Draw path for map preview
 void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 {
-    gfx_drawpreview(sSurface[0],
+    gfx_drawpreview(sprites[0].getSurface(),
         ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY,
         0, 0, iWidth, iHeight,
         iOffsetX, iOffsetY, App::screenWidth/2, App::screenHeight/2,

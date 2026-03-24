@@ -4,6 +4,8 @@
 #include "map.h"
 #include "MovingPlatformPaths.h"
 
+#include <array>
+
 class CPlayer;
 class IO_MovingObject;
 
@@ -79,7 +81,7 @@ class MovingPlatform
 		short iSteps;
 		short iOnStep;
 
-		SDL_Surface	* sSurface[2];
+		std::array<gfxSprite, 2> sprites;
 
 		SDL_Rect	rSrcRect;
 		SDL_Rect    rDstRect;

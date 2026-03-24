@@ -1538,7 +1538,7 @@ void CMap::AnimateTiles(short iFrame)
         }
 
         if (tile->pPlatform) {
-            SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), tile->pPlatform->sSurface[g_iCurrentDrawIndex], rDst);
+            SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), tile->pPlatform->sprites[g_iCurrentDrawIndex].getSurface(), rDst);
         }
     }
 }
