@@ -15,13 +15,15 @@ enum class ClipEdge : unsigned char { Top, Right, Bottom, Left };
 
 class gfxSprite {
 public:
-    gfxSprite() = default;
-    gfxSprite(
+    explicit gfxSprite() = default;
+    explicit gfxSprite(
         const std::filesystem::path& filename,
         std::optional<RGB> color_key = colors::MAGENTA,
         std::optional<Uint8> alpha = std::nullopt,
         std::optional<int> wrap = std::nullopt);
-    gfxSprite(SdlSurfacePtr image, std::optional<int> wrap = 640);
+    explicit gfxSprite(SdlSurfacePtr image, std::optional<int> wrap = 640);
+
+    static gfxSprite blank(unsigned w, unsigned h);
 
     /// Draw the whole sprite at the given coordinate. Applies camera shaking.
     void draw(int x, int y) const;
@@ -63,6 +65,8 @@ public:
     void setWrap(short wrapsize = 640);
     bool isWrapping() const { return m_wrap_x.has_value(); }
 
+    explicit operator bool() const { return getSurface(); }
+
 private:
     SdlSurfacePtr m_picture;
     std::optional<int> m_wrap_x = std::nullopt;
@@ -73,7 +77,7 @@ private:
 
 class SpriteBuilder {
 public:
-    SpriteBuilder(std::filesystem::path path)
+    explicit SpriteBuilder(std::filesystem::path path)
         : m_path(std::move(path))
     {}
 

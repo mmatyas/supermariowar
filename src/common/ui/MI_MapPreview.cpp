@@ -39,9 +39,9 @@ MI_MapPreview::MI_MapPreview(gfxSprite * nspr, short x, short y, short width, sh
     , iIndent(indent)
     , iSlideListOut(0)
 {
-    surfaceMapBackground = gfxSprite(SdlSurfacePtr(SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0)));
-    surfaceMapBlockLayer = gfxSprite(SdlSurfacePtr(SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0)));
-    surfaceMapForeground = gfxSprite(SdlSurfacePtr(SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0)));
+    surfaceMapBackground = gfxSprite::blank(App::screenWidth/2, App::screenHeight/2);
+    surfaceMapBlockLayer = gfxSprite::blank(App::screenWidth/2, App::screenHeight/2);
+    surfaceMapForeground = gfxSprite::blank(App::screenWidth/2, App::screenHeight/2);
     LoadCurrentMap();
 
     rectDst.x = x + 16;

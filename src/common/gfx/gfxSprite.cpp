@@ -88,6 +88,15 @@ gfxSprite::gfxSprite(SdlSurfacePtr image, std::optional<int> wrap)
     , m_wrap_x(wrap)
 {}
 
+gfxSprite gfxSprite::blank(unsigned w, unsigned h)
+{
+    auto surf = SdlSurfacePtr(SDL_CreateRGBSurfaceWithFormat(0x0, w, h, screen->format->BitsPerPixel, screen->format->format));
+    if (!surf)
+        throw std::format("Couldn't create blank surface: {}", SDL_GetError());
+
+    return gfxSprite(std::move(surf));
+}
+
 void gfxSprite::draw(int x, int y) const
 {
     blit(nullptr, blitdest, {x + x_shake, y + y_shake});
