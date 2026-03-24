@@ -39,9 +39,9 @@ MI_MapPreview::MI_MapPreview(gfxSprite * nspr, short x, short y, short width, sh
     , iIndent(indent)
     , iSlideListOut(0)
 {
-    surfaceMapBackground = SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0);
-    surfaceMapBlockLayer = SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0);
-    surfaceMapForeground = SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0);
+    surfaceMapBackground = gfxSprite(SdlSurfacePtr(SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0)));
+    surfaceMapBlockLayer = gfxSprite(SdlSurfacePtr(SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0)));
+    surfaceMapForeground = gfxSprite(SdlSurfacePtr(SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0)));
     LoadCurrentMap();
 
     rectDst.x = x + 16;
@@ -78,11 +78,11 @@ void MI_MapPreview::Draw()
 
     rectDst.x = iMapBoxX + 16;
 
-    SDL_BlitSurface(surfaceMapBackground, NULL, blitdest, &rectDst);
+    surfaceMapBackground.draw(blitdest, rectDst);
 
     g_map->drawPlatforms(rectDst.x, rectDst.y, 0);
 
-    SDL_BlitSurface(surfaceMapBlockLayer, NULL, blitdest, &rectDst);
+    surfaceMapBlockLayer.draw(blitdest, rectDst);
 
     g_map->drawPlatforms(rectDst.x, rectDst.y, 1);
 
@@ -104,7 +104,7 @@ void MI_MapPreview::Draw()
     g_map->drawPlatforms(rectDst.x, rectDst.y, 2);
 
     if (game_values.toplayer)
-        SDL_BlitSurface(surfaceMapForeground, NULL, blitdest, &rectDst);
+        surfaceMapForeground.draw(blitdest, rectDst);
 
     g_map->drawPlatforms(rectDst.x, rectDst.y, 3);
     g_map->drawPlatforms(rectDst.x, rectDst.y, 4);
@@ -126,19 +126,19 @@ void MI_MapPreview::LoadMap(const std::string& szMapPath)
     LoadCurrentMapBackground();
     smallDelay();
 
-    g_map->preDrawPreviewBackground(&rm->spr_background, surfaceMapBackground, false);
+    g_map->preDrawPreviewBackground(&rm->spr_background, surfaceMapBackground.getSurface(), false);
     smallDelay();
 
-    g_map->preDrawPreviewBlocks(surfaceMapBlockLayer, false);
+    g_map->preDrawPreviewBlocks(surfaceMapBlockLayer.getSurface(), false);
     smallDelay();
 
-    g_map->preDrawPreviewMapItems(surfaceMapBackground, false);
+    g_map->preDrawPreviewMapItems(surfaceMapBackground.getSurface(), false);
     smallDelay();
 
-    g_map->preDrawPreviewForeground(surfaceMapForeground, false);
+    g_map->preDrawPreviewForeground(surfaceMapForeground.getSurface(), false);
     smallDelay();
 
-    g_map->preDrawPreviewWarps(game_values.toplayer ? surfaceMapForeground : surfaceMapBackground, false);
+    g_map->preDrawPreviewWarps((game_values.toplayer ? surfaceMapForeground : surfaceMapBackground).getSurface(), false);
     smallDelay();
 
     LoadMapHazards(true);

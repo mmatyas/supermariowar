@@ -1,12 +1,12 @@
 #ifndef UI_MAP_PREVIEW
 #define UI_MAP_PREVIEW
 
-#include "SDL.h"
+#include "gfx/gfxSprite.h"
 #include "uicontrol.h"
 
-#include <string>
+#include "SDL.h"
 
-class gfxSprite;
+#include <string>
 
 
 class MI_MapPreview : public UI_Control
@@ -36,9 +36,9 @@ protected:
 
     gfxSprite * spr;
 
-    SDL_Surface * surfaceMapBackground;
-    SDL_Surface * surfaceMapBlockLayer;
-    SDL_Surface * surfaceMapForeground;
+    gfxSprite surfaceMapBackground;
+    gfxSprite surfaceMapBlockLayer;
+    gfxSprite surfaceMapForeground;
     SDL_Rect rectDst;
 
     short iWidth, iIndent;
