@@ -21,7 +21,7 @@ public:
     static constexpr int MAX_TILES_PER_AXIS = 128;
     static constexpr int MAX_TILES = MAX_TILES_PER_AXIS * MAX_TILES_PER_AXIS;
 
-    CTileset(const std::filesystem::path& dir);
+    explicit CTileset(const std::filesystem::path& dir);
     void ensureLoaded();
 
     void saveTileset() const;
@@ -62,7 +62,7 @@ private:
 
 class CTilesetManager {
 public:
-    CTilesetManager(const std::filesystem::path& gfxPack);
+    explicit CTilesetManager(const std::filesystem::path& gfxPack);
 
     size_t indexFromName(const std::string& name) const;
     CTileset* tileset(size_t index);

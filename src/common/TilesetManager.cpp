@@ -9,7 +9,6 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
-#include <memory>
 #include <unordered_set>
 
 #if defined(__APPLE__)
@@ -22,7 +21,7 @@ namespace fs = std::filesystem;
 namespace {
 constexpr std::array<SDL_Rect, CTileset::MAX_TILES> generateTilesetRects(int tilesize)
 {
-    std::array<SDL_Rect, CTileset::MAX_TILES> rects;
+    std::array<SDL_Rect, CTileset::MAX_TILES> rects {};
     for (int row = 0; row < CTileset::MAX_TILES_PER_AXIS; row++) {
         for (int col = 0; col < CTileset::MAX_TILES_PER_AXIS; col++) {
             rects[row * CTileset::MAX_TILES_PER_AXIS + col] = SDL_Rect {
@@ -38,8 +37,6 @@ constexpr std::array<SDL_Rect, CTileset::MAX_TILES> generateTilesetRects(int til
 
 std::vector<TileType> readTileTypeFile(const fs::path& path)
 {
-    constexpr int MAX_TILES = CTileset::MAX_TILES_PER_AXIS * CTileset::MAX_TILES_PER_AXIS;
-
     //Detect if the tiletype file already exists, if not create it
     if (!fs::exists(path))
         return {};
@@ -51,7 +48,7 @@ std::vector<TileType> readTileTypeFile(const fs::path& path)
     }
 
     int tiletype_count = tsf.read_i32();
-    if (tiletype_count <= 0 || tiletype_count > MAX_TILES)
+    if (tiletype_count <= 0 || tiletype_count > CTileset::MAX_TILES)
         return {};
 
     std::vector<TileType> tiletypes;
