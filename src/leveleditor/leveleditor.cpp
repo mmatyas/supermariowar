@@ -252,9 +252,9 @@ bool CheckKey(const Uint8 * keystate, SDL_Keycode key) {
     return keystate[SDL_GetScancodeFromKey(key)];
 }
 
-SDL_Surface * s_platform;
-SDL_Surface * s_platformpathbuttons;
-SDL_Surface * s_maphazardbuttons;
+gfxSprite s_platform;
+gfxSprite s_platformpathbuttons;
+gfxSprite s_maphazardbuttons;
 
 int save_as();
 int find();
@@ -422,9 +422,9 @@ int main(int argc, char *argv[])
 
         rm->spr_eyecandy = ImageLoader(convertPath("gfx/leveleditor/leveleditor_eyecandy.png")).create();
 
-        s_platform = IMG_Load(convertPath("gfx/leveleditor/leveleditor_platform.png").c_str());
-        s_platformpathbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_pathtype_buttons.png").c_str());
-        s_maphazardbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_maphazard_buttons.png").c_str());
+        s_platform = ImageLoader(convertPath("gfx/leveleditor/leveleditor_platform.png")).create();
+        s_platformpathbuttons = ImageLoader(convertPath("gfx/leveleditor/leveleditor_pathtype_buttons.png")).create();
+        s_maphazardbuttons = ImageLoader(convertPath("gfx/leveleditor/leveleditor_maphazard_buttons.png")).create();
 
 	rm->spr_warps[0] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_warp.png")).create();
 	rm->spr_warps[1] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_warp_preview.png")).create();
@@ -492,17 +492,6 @@ int main(int argc, char *argv[])
 		rm->spr_hazard_flame[i].setWrap(640 >> i);
 		rm->spr_hazard_pirhanaplant[i].setWrap(640 >> i);
 	}
-    if (SDL_SetColorKey(s_platform, SDL_TRUE, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
-        printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-    }
-
-    if (SDL_SetColorKey(s_platformpathbuttons, SDL_TRUE, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0) {
-        printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-    }
-
-    if (SDL_SetColorKey(s_maphazardbuttons, SDL_TRUE, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0) {
-        printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-    }
 
 	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
@@ -1626,7 +1615,6 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 
             if (tile->iID >= 0) {
 				g_tilesetmanager->Draw(screen, tile->iID, drawsize, tile->iCol, tile->iRow, i, j);
-				//SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(drawsize), g_tilesetmanager->GetRect(drawsize, tile->iCol, tile->iRow), screen, &bltrect);
             } else if (tile->iID == TILESETANIMATED) {
 				short iSrcCol = tile->iCol << 2;
 				short iSrcRow = tile->iRow;
@@ -2245,7 +2233,7 @@ void editor_platforms_draw_background_section(const SDL_Rect& src_area, const SD
 
             SDL_Rect src { src_area.x, src_area.y, w, h };
             SDL_Rect dst { dst_area.x + offset_x, dst_area.y + offset_y, w, h };
-            SDL_BlitSurface(s_platform, &src, screen, &dst);
+            s_platform.draw(src, screen, dst);
 
             offset_x += w;
         }
@@ -2683,10 +2671,10 @@ int editor_platforms()
 			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 			for (int iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
-				SDL_BlitSurface(s_platform, &g_Platforms[iPlatform].rIcon[0], screen, &g_Platforms[iPlatform].rIcon[1]);
+				s_platform.draw(g_Platforms[iPlatform].rIcon[0], screen, g_Platforms[iPlatform].rIcon[1]);
 
 			if (g_iNumPlatforms < MAX_PLATFORMS && PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
-				SDL_BlitSurface(s_platform, &rNewButton[0], screen, &rNewButton[1]);
+				s_platform.draw(rNewButton[0], screen, rNewButton[1]);
 
             if (PLATFORM_EDIT_STATE_MOVE == iPlatformEditState) {
                 if (iPlatformSwitchState == 0) {
@@ -2704,8 +2692,8 @@ int editor_platforms()
         } else if (PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState) {
 			//Draw path options
             for (short iType = 0; iType < 3; iType++) {
-				SDL_BlitSurface(s_platformpathbuttons, &rTypeButton[iType][0], screen, &rTypeButton[iType][1]);
-				SDL_BlitSurface(s_platformpathbuttons, &rTypeButton[iType][2], screen, &rTypeButton[iType][3]);
+				s_platformpathbuttons.draw(rTypeButton[iType][0], screen, rTypeButton[iType][1]);
+				s_platformpathbuttons.draw(rTypeButton[iType][2], screen, rTypeButton[iType][3]);
 
 				rm->menu_font_large.draw(rTypeButton[iType][1].x + 36, rTypeButton[iType][1].y + 6, szPathNames[iType]);
 			}
@@ -2721,10 +2709,10 @@ int editor_platforms()
 				short iVelMarkerX = 198 + (g_Platforms[iEditPlatform].iVelocity + 10) * 12;
 
 				SDL_Rect rVel[2] = {{0, 400, 244, 17},{198, 10, 244, 17}};
-				SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
+				s_platform.draw(rVel[0], screen, rVel[1]);
 
 				SDL_Rect rMarker[2] = {{244,400,8,18},{iVelMarkerX,10,8,18}};
-				SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
+				s_platform.draw(rMarker[0], screen, rMarker[1]);
 
 				rm->menu_font_small.drawRightJustified(198, 10, "Counter");
 				rm->menu_font_small.draw(442, 10, "Clockwise");
@@ -2732,10 +2720,10 @@ int editor_platforms()
 				short iVelMarkerX = 220 + (g_Platforms[iEditPlatform].iVelocity - 1) * 12;
 
 				SDL_Rect rVel[2] = {{12, 384, 172, 13},{234, 10, 172, 13}};
-				SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
+				s_platform.draw(rVel[0], screen, rVel[1]);
 
 				SDL_Rect rMarker[2] = {{184, 384, 8, 16},{iVelMarkerX, 8, 8, 16}};
-				SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
+				s_platform.draw(rMarker[0], screen, rMarker[1]);
 
 				rm->menu_font_small.drawRightJustified(234, 10, "Slow");
 				rm->menu_font_small.draw(406, 10, "Fast");
@@ -3269,24 +3257,24 @@ int editor_maphazards()
 		rm->menu_shade.draw(0, 0);
 
         if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
-			SDL_BlitSurface(s_platform, &rBackground[0], screen, &rBackground[1]);
+			s_platform.draw(rBackground[0], screen, rBackground[1]);
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Map Hazard Mode: [esc] Exit");
 
 			for (int iMapHazard = 0; iMapHazard < g_map->maphazards.size(); iMapHazard++)
-				SDL_BlitSurface(s_platform, &rIconRects[iMapHazard][0], screen, &rIconRects[iMapHazard][1]);
+				s_platform.draw(rIconRects[iMapHazard][0], screen, rIconRects[iMapHazard][1]);
 
 			if (g_map->maphazards.size() < MAXMAPHAZARDS)
-				SDL_BlitSurface(s_platform, &rNewButton[0], screen, &rNewButton[1]);
+				s_platform.draw(rNewButton[0], screen, rNewButton[1]);
 
 			rm->menu_font_small.drawCentered(320, rBackground[1].y - 18, "Hazards");
         } else if (MAPHAZARD_EDIT_STATE_TYPE == iEditState) {
-			//SDL_BlitSurface(s_platform, &rBackground[0], screen, &rBackground[1]);
+			//s_platform.draw(rBackground[0], screen, &rBackground[1]);
 
 			//Draw map hazard options
             for (short iType = 0; iType < 8; iType++) {
-				SDL_BlitSurface(s_maphazardbuttons, &rTypeButton[iType][0], screen, &rTypeButton[iType][1]);
-				SDL_BlitSurface(s_maphazardbuttons, &rTypeButton[iType][2], screen, &rTypeButton[iType][3]);
+				s_maphazardbuttons.draw(rTypeButton[iType][0], screen, rTypeButton[iType][1]);
+				s_maphazardbuttons.draw(rTypeButton[iType][2], screen, rTypeButton[iType][3]);
 
 				rm->menu_font_large.draw(rTypeButton[iType][1].x + 36, rTypeButton[iType][1].y + 6, szHazardNames[iType]);
 			}
@@ -3356,10 +3344,10 @@ void DrawMapHazardControls(const MapHazard& hazard)
 			iVelMarkerX = (short)((hazard.dparam[0] + 0.05f) / 0.005f) * 12 + 196;
 
 		SDL_Rect rVel[2] = {{0, 400, 244, 17},{198, 420, 244, 17}};
-		SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
+		s_platform.draw(rVel[0], screen, rVel[1]);
 
 		SDL_Rect rMarker[2] = {{244,400,8,18},{iVelMarkerX,418,8,18}};
-		SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
+		s_platform.draw(rMarker[0], screen, rMarker[1]);
 
         if (hazard.itype == 2) {
 			rm->menu_font_small.drawRightJustified(190, 420, "Left");
@@ -3374,10 +3362,10 @@ void DrawMapHazardControls(const MapHazard& hazard)
 		short iFreqMarkerX = ((hazard.iparam[0] / 30) - 1) * 12 + 196;
 
 		SDL_Rect rVel[2] = {{0, 384, 184, 13},{198, 390, 184, 13}};
-		SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
+		s_platform.draw(rVel[0], screen, rVel[1]);
 
 		SDL_Rect rMarker[2] = {{244,400,8,18},{iFreqMarkerX,388,8,18}};
-		SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
+		s_platform.draw(rMarker[0], screen, rMarker[1]);
 
 		rm->menu_font_small.drawRightJustified(190, 390, "More Frequent");
 		rm->menu_font_small.draw(388, 390, "Less Frequent");
