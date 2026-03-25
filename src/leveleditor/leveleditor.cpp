@@ -199,18 +199,13 @@ class MapPlatform
         , types(MAPWIDTH * MAPHEIGHT)
     {}
 
-    ~MapPlatform() {
-        if (preview)
-            SDL_FreeSurface(preview);
-    }
-
     void UpdatePreview() {
         if (!preview) {
-				preview = SDL_CreateRGBSurface(screen->flags, 160, 120, screen->format->BitsPerPixel, 0, 0, 0, 0);
-				SDL_SetColorKey(preview, SDL_TRUE, SDL_MapRGB(preview->format, 255, 0, 255));
-			}
+            preview = gfxSprite::blank(160, 120);
+            SDL_SetColorKey(preview.getSurface(), SDL_TRUE, SDL_MapRGB(preview.getSurface()->format, 255, 0, 255));
+        }
 
-			SDL_FillRect(preview, NULL, SDL_MapRGB(preview->format, 255, 0, 255));
+        SDL_FillRect(preview.getSurface(), NULL, SDL_MapRGB(preview.getSurface()->format, 255, 0, 255));
 
         for (short iPlatformX = 0; iPlatformX < MAPWIDTH; iPlatformX++) {
             for (short iPlatformY = 0; iPlatformY < MAPHEIGHT; iPlatformY++) {
@@ -218,12 +213,12 @@ class MapPlatform
 
                 SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
                 if (tile->iID >= 0) {
-                    g_tilesetmanager->tileset(tile->iID)->draw(DrawSize::Thumbnail, CTilesetManager::rect(DrawSize::Thumbnail, tile->iCol, tile->iRow), preview, bltrect);
+                    g_tilesetmanager->tileset(tile->iID)->draw(DrawSize::Thumbnail, CTilesetManager::rect(DrawSize::Thumbnail, tile->iCol, tile->iRow), preview.getSurface(), bltrect);
                 } else if (tile->iID == TILESETANIMATED) {
-                    rm->spr_tileanimation[2].draw(CTilesetManager::rect(DrawSize::Thumbnail, tile->iCol * 4, tile->iRow), preview, bltrect);
+                    rm->spr_tileanimation[2].draw(CTilesetManager::rect(DrawSize::Thumbnail, tile->iCol * 4, tile->iRow), preview.getSurface(), bltrect);
                 } else if (tile->iID == TILESETUNKNOWN) {
                     //Draw unknown tile
-                    rm->spr_unknowntile[2].draw(CTilesetManager::rect(DrawSize::Thumbnail, 0, 0), preview, bltrect);
+                    rm->spr_unknowntile[2].draw(CTilesetManager::rect(DrawSize::Thumbnail, 0, 0), preview.getSurface(), bltrect);
                 }
             }
         }
@@ -246,7 +241,7 @@ class MapPlatform
 		short iDrawLayer;
 
 		SDL_Rect rIcon[2];
-		SDL_Surface * preview = nullptr;
+		gfxSprite preview;
 };
 
 TileType * animatedtiletypes;
@@ -282,7 +277,7 @@ int newmap();
 void save_map(const std::string &file);
 void insert_platforms_into_map();
 void CalculatePlatformDims(short iPlatform, short * ix, short * iy, short * iw, short * ih);
-void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage);
+void LoadBackgroundPage(std::array<gfxSprite, 16>& sBackgrounds, short iPage);
 
 int editor_edit();
 int editor_warp();
@@ -2787,7 +2782,7 @@ void DisplayPlatformPreview(short iPlatformId, short iMouseX, short iMouseY)
 {
 	SDL_Rect srcRect = {0, 0, 160, 120};
 	SDL_Rect dstRect = {iMouseX, iMouseY, 160, 120};
-	SDL_BlitSurface(g_Platforms[iPlatformId].preview, &srcRect, screen, &dstRect);
+	g_Platforms[iPlatformId].preview.draw(srcRect, screen, dstRect);
 }
 
 void SwitchPlatforms(short iPlatformId1, short iPlatformId2)
@@ -4050,7 +4045,7 @@ int editor_tiletype()
 }
 
 short iPage;
-SDL_Surface * sBackgrounds[16];
+std::array<gfxSprite, 16> sBackgrounds;
 SDL_Rect rSrc = {0, 0, 160, 120};
 SDL_Rect rDst[16];
 
@@ -4072,7 +4067,7 @@ void init_editor_backgrounds()
     }
 
     for (short iSurface = 0; iSurface < 16; iSurface++)
-        sBackgrounds[iSurface] = SDL_CreateRGBSurface(screen->flags, 160, 120, 16, 0, 0, 0, 0);
+        sBackgrounds[iSurface] = gfxSprite::blank(160, 120);
 
     LoadBackgroundPage(sBackgrounds, iPage);
 
@@ -4084,20 +4079,20 @@ int editor_backgrounds()
     init_editor_backgrounds();
 
 		//handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-				case SDL_QUIT:
-                    for (short iSurface = 0; iSurface < 16; iSurface++)
-                        SDL_FreeSurface(sBackgrounds[iSurface]);
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+            case SDL_QUIT:
+                for (short iSurface = 0; iSurface < 16; iSurface++)
+                    sBackgrounds[iSurface] = gfxSprite();
 
-                    editor_backgrounds_initialized = false;
-                    return EDITOR_EDIT;
-				break;
+                editor_backgrounds_initialized = false;
+                return EDITOR_EDIT;
+                break;
 
-				case SDL_KEYDOWN:
+            case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
-					for (short iSurface = 0; iSurface < 16; iSurface++)
-                        SDL_FreeSurface(sBackgrounds[iSurface]);
+                    for (short iSurface = 0; iSurface < 16; iSurface++)
+                        sBackgrounds[iSurface] = gfxSprite();
 
                     editor_backgrounds_initialized = false;
                     return EDITOR_EDIT;
@@ -4140,7 +4135,7 @@ int editor_backgrounds()
 								}
 
                                 for (short iSurface = 0; iSurface < 16; iSurface++)
-                                    SDL_FreeSurface(sBackgrounds[iSurface]);
+                                    sBackgrounds[iSurface] = gfxSprite();
 
                                 editor_backgrounds_initialized = false;
                                 return EDITOR_EDIT;
@@ -4165,7 +4160,7 @@ int editor_backgrounds()
             if (iPage * 16 + iBackground >= backgroundlist->count())
 				break;
 
-			SDL_BlitSurface(sBackgrounds[iBackground], &rSrc, screen, &rDst[iBackground]);
+			sBackgrounds[iBackground].draw(rSrc, screen, rDst[iBackground]);
 		}
 
 		rm->menu_font_small.draw(0,480-rm->menu_font_small.getHeight() * 2, "[Page Up] next page, [Page Down] previous page");
@@ -4359,7 +4354,7 @@ int editor_animation()
 		return EDITOR_ANIMATION;
 }
 
-void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
+void LoadBackgroundPage(std::array<gfxSprite, 16>& sBackgrounds, short iPage)
 {
 	SDL_Rect srcRectBackground = {0, 0, 640, 480};
 	SDL_Rect dstRectBackground = {0, 0, 160, 120};
@@ -4368,43 +4363,21 @@ void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
 		if (iPage * 16 + iIndex >= backgroundlist->count())
 			break;
 
-		std::string szFileName = backgroundlist->at(iPage * 16 + iIndex).string();
-
-		if (szFileName.empty())
+		const std::filesystem::path& path = backgroundlist->at(iPage * 16 + iIndex);
+		if (path.empty())
 			return;
 
-		SDL_Surface * temp = IMG_Load(szFileName.c_str());
+		gfxSprite temp = ImageLoader(path).withoutColorKey().create();
 
-		if (!temp) {
-			printf("ERROR: Couldn't load thumbnail background: %s\n", SDL_GetError());
-			return;
-		}
+		SDL_FillRect(sBackgrounds[iIndex].getSurface(), NULL, 0x0);
 
-		SDL_Surface * sBackground = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_ARGB8888, 0);
-		SDL_FreeSurface(temp);
-
-		if (!sBackground) {
-			printf("ERROR: Couldn't convert thumbnail background to display pixel format: %s\n", SDL_GetError());
-			return;
-		}
-
-		SDL_FillRect(sBackgrounds[iIndex], NULL, 0x0);
-
-		if (sBackground->w != 640 || sBackground->h != 480) {
+		if (temp.getWidth() != 640 || temp.getHeight() != 480) {
 			printf("WARNING: Background %s is %dx%d but must be 640x480. Skipping.\n",
-				szFileName.c_str(), sBackground->w, sBackground->h);
-
-			SDL_FreeSurface(sBackground);
+				path.string().c_str(), temp.getWidth(), temp.getHeight());
 			continue;
 		}
 
-		if (SDL_BlitScaled(sBackground, &srcRectBackground, sBackgrounds[iIndex], &dstRectBackground) < 0) {
-			fprintf(stderr, "SDL_SCALEBLIT error: %s\n", SDL_GetError());
-			SDL_FreeSurface(sBackground);
-			return;
-		}
-
-		SDL_FreeSurface(sBackground);
+		temp.drawStretch(srcRectBackground, sBackgrounds[iIndex].getSurface(), dstRectBackground);
 	}
 }
 
@@ -5196,9 +5169,9 @@ void takescreenshot()
 		rm->spr_platformpath.setWrap(640 >> iScreenshotSize);
 
 		//Create new screenshot surface
-		SDL_Surface * screenshot = SDL_CreateRGBSurface(old_screen->flags, iTileSize * 20, iTileSize * 15, old_screen->format->BitsPerPixel, 0, 0, 0, 0);
-		blitdest = screenshot;
-		screen = screenshot;
+		auto screenshot = gfxSprite::blank(iTileSize * 20, iTileSize * 15);
+		blitdest = screenshot.getSurface();
+		screen = screenshot.getSurface();
 
 		//Draw map to screenshot
 		drawmap(true, iTileSize);
@@ -5223,9 +5196,7 @@ void takescreenshot()
 			szSaveFile += "_thumb";
 
 		szSaveFile += ".png";
-		IMG_SavePNG(screenshot, convertPath(szSaveFile).c_str());
-
-		SDL_FreeSurface(screenshot);
+                IMG_SavePNG(screenshot.getSurface(), convertPath(szSaveFile).c_str());
 
 		printf("Screenshot taken: %s\n", szSaveFile.c_str());
 	}

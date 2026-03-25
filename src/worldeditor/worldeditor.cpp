@@ -83,7 +83,7 @@ const char * szEditModes[10] = {"Background Mode", "Foreground Mode", "Path Spri
 
 SDL_Surface		*screen;
 SDL_Surface		*blitdest;
-SDL_Surface		*sMapSurface;
+gfxSprite		sMapSurface;
 
 SDL_Rect		rectSrcSurface = {0, 0, 768, 608};
 SDL_Rect		rectDstSurface = {0, 0, 640, 480};
@@ -585,7 +585,7 @@ int main(int argc, char *argv[])
 
 	rm->loadMenuGraphics();
 
-	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
+	sMapSurface = gfxSprite::blank(768, 608);
 
     worldlist->find(findstring);
     game_values.worldindex = worldlist->currentIndex();
@@ -1017,8 +1017,6 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
-
-	SDL_FreeSurface(sMapSurface);
 
 	printf("\n---------------- save world ----------------\n");
 
@@ -2436,7 +2434,7 @@ bool AutoSetTile(short iCol, short iRow)
 
 void updateworldsurface()
 {
-	g_worldmap.DrawMapToSurface(-1, true, sMapSurface, draw_offset_col, draw_offset_row, 0);
+	g_worldmap.DrawMapToSurface(-1, true, sMapSurface.getSurface(), draw_offset_col, draw_offset_row, 0);
 }
 
 void drawmap(bool fScreenshot, short iBlockSize)
@@ -2444,7 +2442,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 	if (fNeedBlackBackground)
 		SDL_FillRect(screen, NULL, 0x0);
 
-	SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
+	sMapSurface.draw(rectSrcSurface, blitdest, rectDstSurface);
 }
 
 int editor_warp()
@@ -4742,10 +4740,10 @@ void takescreenshot()
 		g_worldmap.GetWorldSize(&w, &h);
 
 		//Draw most of the world to screenshot
-		SDL_Surface * sScreenshot = SDL_CreateRGBSurface(screen->flags, iTileSize * w, iTileSize * h, screen->format->BitsPerPixel, 0, 0, 0, 0);
-		blitdest = sScreenshot;
+		auto sScreenshot = gfxSprite::blank(iTileSize * w, iTileSize * h);
+		blitdest = sScreenshot.getSurface();
 
-		g_worldmap.DrawMapToSurface(sScreenshot);
+		g_worldmap.DrawMapToSurface(sScreenshot.getSurface());
 
 		//Draw vehicles to screenshot
 		std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
@@ -4784,9 +4782,7 @@ void takescreenshot()
 			szSaveFile += "_thumb";
 
 		szSaveFile += ".png";
-		IMG_SavePNG(sScreenshot, convertPath(szSaveFile).c_str());
-
-		SDL_FreeSurface(sScreenshot);
+		IMG_SavePNG(sScreenshot.getSurface(), convertPath(szSaveFile).c_str());
 	}
 
 	g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), iTileSizes[0]);
