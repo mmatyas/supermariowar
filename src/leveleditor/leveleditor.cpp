@@ -51,8 +51,8 @@ void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard(short playerID) {}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 
-#include "SDL.h"
-#include "SDL_image.h"
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 #include <algorithm>
 #include <array>
@@ -202,10 +202,10 @@ class MapPlatform
     void UpdatePreview() {
         if (!preview) {
             preview = gfxSprite::blank(160, 120);
-            SDL_SetColorKey(preview.getSurface(), SDL_TRUE, SDL_MapRGB(preview.getSurface()->format, 255, 0, 255));
+            SDL_SetSurfaceColorKey(preview.getSurface(), true, SDL_MapSurfaceRGB(preview.getSurface(), 255, 0, 255));
         }
 
-        SDL_FillRect(preview.getSurface(), NULL, SDL_MapRGB(preview.getSurface()->format, 255, 0, 255));
+        SDL_FillSurfaceRect(preview.getSurface(), NULL, SDL_MapSurfaceRGB(preview.getSurface(), 255, 0, 255));
 
         for (short iPlatformX = 0; iPlatformX < MAPWIDTH; iPlatformX++) {
             for (short iPlatformY = 0; iPlatformY < MAPHEIGHT; iPlatformY++) {
@@ -248,8 +248,8 @@ TileType * animatedtiletypes;
 bool ReadAnimatedTileTypeFile(const char * szFile);
 bool WriteAnimatedTileTypeFile(const char * szFile);
 
-bool CheckKey(const Uint8 * keystate, SDL_Keycode key) {
-    return keystate[SDL_GetScancodeFromKey(key)];
+bool CheckKey(const bool* keystate, SDL_Keycode key) {
+    return false; //keystate[SDL_GetScancodeFromKey(key)];
 }
 
 gfxSprite s_platform;
@@ -789,21 +789,21 @@ int editor_edit()
 			//handle messages
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
-                    case SDL_KEYDOWN: {
-                        const SDL_Keycode key = event.key.keysym.sym;
+                    case SDL_EVENT_KEY_DOWN: {
+                        const SDL_Keycode key = event.key.key;
 
                         if (key == SDLK_LEFT) {
                             fSelectedYes = true;
                         } else if (key == SDLK_RIGHT) {
                             fSelectedYes = false;
-                        } else if (event.key.keysym.sym == SDLK_KP_ENTER || event.key.keysym.sym == SDLK_RETURN) {
+                        } else if (event.key.key == SDLK_KP_ENTER || event.key.key == SDLK_RETURN) {
                             if (fSelectedYes)
                                 return EDITOR_QUIT;
 
                             fExiting = false;
                         }
 				#ifdef _DEBUG
-                        else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                        else if (event.key.key == SDLK_ESCAPE) {
                             return EDITOR_QUIT;
                         }
 				#endif
@@ -813,14 +813,14 @@ int editor_edit()
         } else {
 			//handle messages
             while (SDL_PollEvent(&event)) {
-                const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                const bool* keystate = SDL_GetKeyboardState(NULL);
 
                 switch (event.type) {
-                case SDL_QUIT:
+                case SDL_EVENT_QUIT:
 					return EDITOR_QUIT;
 
-                case SDL_KEYDOWN: {
-                    const SDL_Keycode key = event.key.keysym.sym;
+                case SDL_EVENT_KEY_DOWN: {
+                    const SDL_Keycode key = event.key.key;
 
                     if (key == SDLK_ESCAPE) {
 							if (g_musiccategorydisplaytimer > 0)
@@ -833,8 +833,8 @@ int editor_edit()
 							}
 						}
 
-                    if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
-                        if (event.key.keysym.sym == SDLK_RETURN) {
+                    if (event.key.mod & (SDL_KMOD_LALT | SDL_KMOD_RALT)) {
+                        if (event.key.key == SDLK_RETURN) {
 								g_fFullScreen = !g_fFullScreen;
 								gfx_changefullscreen(g_fFullScreen);
 								blitdest = screen;
@@ -850,12 +850,12 @@ int editor_edit()
 					if (key == SDLK_INSERT)
 						takescreenshot();
 
-					if (key == SDLK_t) {
+					if (key == SDLK_T) {
                         editor_edit_initialized = false;
 						return EDITOR_TILES;
                     }
 
-					if (key == SDLK_i) {
+					if (key == SDLK_I) {
                         if (edit_mode == 4) {
 								for (short iRow = 0; iRow < MAPHEIGHT; iRow++)
 									for (short iCol = 0; iCol < MAPWIDTH; iCol++)
@@ -866,7 +866,7 @@ int editor_edit()
 						}
 					}
 
-                    if (key == SDLK_a) {
+                    if (key == SDLK_A) {
                         if (edit_mode == 4) {
 								for (short iRow = 0; iRow < MAPHEIGHT; iRow++)
 									for (short iCol = 0; iCol < MAPWIDTH; iCol++)
@@ -877,22 +877,22 @@ int editor_edit()
 							}
 						}
 
-						if (key == SDLK_o) {
+						if (key == SDLK_O) {
                             editor_edit_initialized = false;
 							return EDITOR_MAPITEMS;
                         }
 
-						if (key == SDLK_j) {
+						if (key == SDLK_J) {
                             editor_edit_initialized = false;
 							return EDITOR_MODEITEMS;
                         }
 
-						if (key == SDLK_h) {
+						if (key == SDLK_H) {
                             editor_edit_initialized = false;
 							return EDITOR_MAPHAZARDS;
                         }
 
-                    if (key == SDLK_k) {
+                    if (key == SDLK_K) {
 							int iMouseX, iMouseY;
 							iMouseX = mouse_x / TILESIZE;
 							iMouseY = mouse_y / TILESIZE;
@@ -904,12 +904,12 @@ int editor_edit()
 						}
 
 						//if 'B' is pressed, rotate backgrounds
-						if (key == SDLK_b) {
+						if (key == SDLK_B) {
                             editor_edit_initialized = false;
 							return EDITOR_BACKGROUNDS;
                         }
 
-                    if (key == SDLK_g) {
+                    if (key == SDLK_G) {
                         backgroundlist->next();
 
                         rm->spr_background = ImageLoader(backgroundlist->currentPath()).withoutColorKey().create();
@@ -926,21 +926,21 @@ int editor_edit()
 							}
 						}
 
-                    if (key == SDLK_r) {
+                    if (key == SDLK_R) {
 							if (g_musiccategorydisplaytimer > 0 && ++g_map->musicCategoryID >= MAXMUSICCATEGORY)
 								g_map->musicCategoryID = 0;
 
 							g_musiccategorydisplaytimer = 90;
 						}
 
-                    if (key == SDLK_s ) {
+                    if (key == SDLK_S ) {
 							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT))
 								return SAVE_AS;
 
 							return SAVE;
 						}
 
-                    if (key == SDLK_f ) {
+                    if (key == SDLK_F ) {
 							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT) || findstring[0] == '\0')
 								return FIND;
 
@@ -962,7 +962,7 @@ int editor_edit()
 							}
 						}
 
-                    if (key == SDLK_n) {
+                    if (key == SDLK_N) {
                         if (edit_mode == 4) {
 								for (short iRow = 0; iRow < MAPHEIGHT; iRow++)
 									for (short iCol = 0; iCol < MAPWIDTH; iCol++)
@@ -972,20 +972,20 @@ int editor_edit()
 							}
 						}
 
-						if (key == SDLK_v)
+						if (key == SDLK_V)
 							viewblocks = !viewblocks;
 
-						if (key == SDLK_e) {
+						if (key == SDLK_E) {
                             editor_edit_initialized = false;
 							return EDITOR_EYECANDY;
                         }
 
-						if (key == SDLK_w) {
+						if (key == SDLK_W) {
                             editor_edit_initialized = false;
 							return EDITOR_WARP;
                         }
 
-						if (key == SDLK_l) {
+						if (key == SDLK_L) {
                             editor_edit_initialized = false;
 							return EDITOR_TILETYPE;
                         }
@@ -1043,12 +1043,12 @@ int editor_edit()
 							*/
 						}
 
-                    if (key == SDLK_y) {
+                    if (key == SDLK_Y) {
 							if (++selected_layer >= MAPLAYERS)
 								selected_layer = 0;
 						}
 
-                    if (key == SDLK_u) {
+                    if (key == SDLK_U) {
 							view_only_layer = !view_only_layer;
 						}
 
@@ -1086,30 +1086,30 @@ int editor_edit()
 						//if (key == SDLK_END)
 							//g_map->optimize();
 
-                    if (key == SDLK_m) {
+                    if (key == SDLK_M) {
 							if (edit_mode == 3)
 								move_replace = !move_replace;
 
 							edit_mode = 3;
 						}
 
-                    if (key == SDLK_x) {
+                    if (key == SDLK_X) {
 							edit_mode = 4;
 							nospawn_mode = 0;
 						}
 
-						if (key == SDLK_z)
+						if (key == SDLK_Z)
 							edit_mode = 5;
 
 						if (key == SDLK_LCTRL)
 							move_nodrag = true;
 
-						if (key == SDLK_p) {
+						if (key == SDLK_P) {
                             editor_edit_initialized = false;
 							return EDITOR_PLATFORM;
                         }
 
-                    if (key == SDLK_c) {
+                    if (key == SDLK_C) {
                         if (edit_mode == 3) {
                             if (copyselectedtiles()) {
 									move_mode = 3;
@@ -1121,13 +1121,13 @@ int editor_edit()
 						break;
 					}
 
-                case SDL_KEYUP: {
-						if (event.key.keysym.sym == SDLK_LCTRL)
+                case SDL_EVENT_KEY_UP: {
+						if (event.key.key == SDLK_LCTRL)
 							move_nodrag = false;
 						break;
 					}
 
-                case SDL_MOUSEBUTTONDOWN: {
+                case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 						short iClickX = event.button.x / TILESIZE;
 						short iClickY = event.button.y / TILESIZE;
 
@@ -1284,12 +1284,12 @@ int editor_edit()
 						break;
 					}
 
-                case SDL_MOUSEMOTION: {
+                case SDL_EVENT_MOUSE_MOTION: {
 						bound_mouse_motion_coords();
 						short iClickX = bound_to_window_w(event.motion.x) / TILESIZE;
 						short iClickY = bound_to_window_h(event.motion.y) / TILESIZE;
 
-                    if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
+                    if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT) && !ignoreclick) {
                         if (edit_mode == 0) {
 								g_map->objectdata[iClickX][iClickY].iType = set_block;
 								g_map->objectdata[iClickX][iClickY].fHidden = false;
@@ -1352,7 +1352,7 @@ int editor_edit()
 									}
 								}
 							}
-                    } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+                    } else if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) {
 							if (edit_mode == 0)
 								g_map->objectdata[iClickX][iClickY].iType = -1;
                         else if (edit_mode == 1 || edit_mode == 8) {
@@ -1379,7 +1379,7 @@ int editor_edit()
 						break;
 					}
 
-                case SDL_MOUSEBUTTONUP: {
+                case SDL_EVENT_MOUSE_BUTTON_UP: {
 						short iClickX = event.button.x / TILESIZE;
 						short iClickY = event.button.y / TILESIZE;
 
@@ -1432,7 +1432,7 @@ int editor_edit()
         if (maplist->isValid()) {
 			drawmap(false, TILESIZE);
         } else {
-			SDL_FillRect(screen, NULL, 0x0);
+			SDL_FillSurfaceRect(screen, NULL, 0x0);
 			rm->menu_font_large.drawCentered(320, 200, "Map has been deleted.");
 		}
 
@@ -1807,15 +1807,15 @@ int editor_warp()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					return EDITOR_QUIT;
 
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					edit_mode = 2;  //change to edit mode using warps
 					return EDITOR_EDIT;
 				break;
 
-				case SDL_MOUSEBUTTONDOWN:
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (event.button.x / TILESIZE < 10 && event.button.y / TILESIZE < 4) {
 							set_direction = event.button.y / TILESIZE;
@@ -1860,16 +1860,16 @@ int editor_eyecandy()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
 				return EDITOR_QUIT;
 
-            case SDL_KEYDOWN: {
-                if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_e) {
+            case SDL_EVENT_KEY_DOWN: {
+                if (event.key.key == SDLK_ESCAPE || event.key.key == SDLK_E) {
 						return EDITOR_EDIT;
 					}
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short ix = 165;
                     for (short iLayer = 0; iLayer < 3; iLayer++) {
@@ -1891,7 +1891,7 @@ int editor_eyecandy()
 					break;
 				}
 
-			case SDL_MOUSEMOTION: {
+			case SDL_EVENT_MOUSE_MOTION: {
 				bound_mouse_motion_coords();
 				break;
 				}
@@ -1978,31 +1978,31 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
 				return EDITOR_QUIT;
 
-            case SDL_KEYDOWN: {
-                if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_k) {
+            case SDL_EVENT_KEY_DOWN: {
+                if (event.key.key == SDLK_ESCAPE || event.key.key == SDLK_K) {
                     editor_properties_initialized = false;
 					return EDITOR_EDIT;
-                } else if ((iBlockType == 1 || iBlockType == 15) && ((event.key.keysym.sym >= SDLK_0 && event.key.keysym.sym <= SDLK_9) || event.key.keysym.sym == SDLK_BACKQUOTE || event.key.keysym.sym == SDLK_d)) {
+                } else if ((iBlockType == 1 || iBlockType == 15) && ((event.key.key >= SDLK_0 && event.key.key <= SDLK_9) || event.key.key == SDLK_GRAVE || event.key.key == SDLK_D)) {
 						short iSettingIndex = 0;
 						short * piSetting = GetBlockProperty(mouse_x, mouse_y, iBlockCol, iBlockRow, &iSettingIndex);
 
 						//If shift is held, set all powerups to this setting
-						short iValue = event.key.keysym.sym - SDLK_0;
+						short iValue = event.key.key - SDLK_0;
 
-						if (event.key.keysym.sym == SDLK_0)
+						if (event.key.key == SDLK_0)
 							iValue = 10;
-						else if (event.key.keysym.sym == SDLK_BACKQUOTE)
+						else if (event.key.key == SDLK_GRAVE)
 							iValue = 0;
-						else if (event.key.keysym.sym == SDLK_d)
+						else if (event.key.key == SDLK_D)
 							iValue = defaultPowerupSetting(0, iSettingIndex);
 
-                    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                    const bool* keystate = SDL_GetKeyboardState(NULL);
                     if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
                         for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++) {
-								if (event.key.keysym.sym == SDLK_d)
+								if (event.key.key == SDLK_D)
                                 iValue = defaultPowerupSetting(0, iSetting);
 
 								g_map->objectdata[iBlockCol][iBlockRow].iSettings[iSetting] = iValue;
@@ -2013,7 +2013,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 					}
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 					short iHiddenCheckboxY = 0;
                 if (iBlockType == 1 || iBlockType == 15) {
 						short iSettingIndex;
@@ -2060,7 +2060,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 					break;
 				}
 
-			case SDL_MOUSEMOTION: {
+			case SDL_EVENT_MOUSE_MOTION: {
 				bound_mouse_motion_coords();
 				break;
 				}
@@ -2283,18 +2283,18 @@ int editor_platforms()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
 				return EDITOR_QUIT;
 
-            case SDL_KEYDOWN: {
-                if (event.key.keysym.sym == SDLK_s) {
+            case SDL_EVENT_KEY_DOWN: {
+                if (event.key.key == SDLK_S) {
 						savecurrentmap();
-                } else if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9) {
-                    if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState && event.key.keysym.sym - SDLK_1 < g_iNumPlatforms) {
-							iEditPlatform = event.key.keysym.sym - SDLK_1;
+                } else if (event.key.key >= SDLK_1 && event.key.key <= SDLK_9) {
+                    if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState && event.key.key - SDLK_1 < g_iNumPlatforms) {
+							iEditPlatform = event.key.key - SDLK_1;
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
-                    } else if ((PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState) && event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_3) {
-							g_Platforms[iEditPlatform].iPathType = static_cast<PlatformPathType>(event.key.keysym.sym - SDLK_1);
+                    } else if ((PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState) && event.key.key >= SDLK_1 && event.key.key <= SDLK_3) {
+							g_Platforms[iEditPlatform].iPathType = static_cast<PlatformPathType>(event.key.key - SDLK_1);
 
                         if (PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState) {
 								iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
@@ -2302,9 +2302,9 @@ int editor_platforms()
                         } else {
 								iPlatformEditState = PLATFORM_EDIT_STATE_PATH;
 							}
-                    } else if (PLATFORM_EDIT_STATE_MOVE == iPlatformEditState && event.key.keysym.sym - SDLK_1 < g_iNumPlatforms) {
+                    } else if (PLATFORM_EDIT_STATE_MOVE == iPlatformEditState && event.key.key - SDLK_1 < g_iNumPlatforms) {
                         if (iPlatformSwitchState == 1) {
-								SwitchPlatforms(iPlatformSwitchIndex, event.key.keysym.sym - SDLK_1);
+								SwitchPlatforms(iPlatformSwitchIndex, event.key.key - SDLK_1);
 
 								iPlatformPreview = -1;
 
@@ -2312,23 +2312,23 @@ int editor_platforms()
 								iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
                         } else {
 								iPlatformSwitchState = 1;
-								iPlatformSwitchIndex = event.key.keysym.sym - SDLK_1;
+								iPlatformSwitchIndex = event.key.key - SDLK_1;
 							}
 						}
-                } else if (event.key.keysym.sym == SDLK_n) {
+                } else if (event.key.key == SDLK_N) {
                     if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState && g_iNumPlatforms < MAX_PLATFORMS) {
 							iEditPlatform = g_iNumPlatforms;
 							g_iNumPlatforms++;
 							editor_platforms_update_layout();
 							iPlatformEditState = PLATFORM_EDIT_STATE_PATH_TYPE;
 						}
-                } else if (event.key.keysym.sym == SDLK_m) {
+                } else if (event.key.key == SDLK_M) {
                     if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState) {
 							iPlatformPreview = -1;
 							iPlatformEditState = PLATFORM_EDIT_STATE_MOVE;
 							iPlatformSwitchState = 0;
 						}
-                } else if (event.key.keysym.sym == SDLK_t) {
+                } else if (event.key.key == SDLK_T) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							FPSLimiter::instance().frameStart();
 							while (editor_tiles() == EDITOR_TILES) {
@@ -2341,7 +2341,7 @@ int editor_platforms()
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
 							iPlatformEditState = PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE;
 						}
-                } else if (event.key.keysym.sym == SDLK_a) {
+                } else if (event.key.key == SDLK_A) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							FPSLimiter::instance().frameStart();
 							while (editor_animation() == EDITOR_ANIMATION) {
@@ -2352,7 +2352,7 @@ int editor_platforms()
 							}
 							iPlatformEditState = PLATFORM_EDIT_STATE_ANIMATED;
 						}
-                } else if (event.key.keysym.sym == SDLK_l) {
+                } else if (event.key.key == SDLK_L) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							FPSLimiter::instance().frameStart();
 							while (editor_tiletype() == EDITOR_TILETYPE) {
@@ -2363,18 +2363,18 @@ int editor_platforms()
 							}
 							iPlatformEditState = PLATFORM_EDIT_STATE_TILETYPE;
 						}
-                } else if (event.key.keysym.sym == SDLK_y) { //Change the draw layer
+                } else if (event.key.key == SDLK_Y) { //Change the draw layer
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							if (++g_Platforms[iEditPlatform].iDrawLayer > 4)
 								g_Platforms[iEditPlatform].iDrawLayer = 0;
 						}
-                } else if (event.key.keysym.sym == SDLK_c) {
+                } else if (event.key.key == SDLK_C) {
                     if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState) {
 							iPlatformEditState = PLATFORM_EDIT_STATE_TEST;
 							insert_platforms_into_map();
 							g_map->resetPlatforms();
 						}
-                } else if (event.key.keysym.sym == SDLK_DELETE) {
+                } else if (event.key.key == SDLK_DELETE) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							//Copy platforms into empty spot
                         for (short iPlatform = iEditPlatform; iPlatform < g_iNumPlatforms - 1; iPlatform++) {
@@ -2403,7 +2403,7 @@ int editor_platforms()
 							g_iNumPlatforms--;
 							iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 						}
-                } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                } else if (event.key.key == SDLK_ESCAPE) {
                     if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState) {
                             editor_platforms_initialized = false;
 							return EDITOR_EDIT;
@@ -2416,7 +2416,7 @@ int editor_platforms()
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
 						}
-                } else if (event.key.keysym.sym == SDLK_KP_MINUS || event.key.keysym.sym == SDLK_MINUS) {
+                } else if (event.key.key == SDLK_KP_MINUS || event.key.key == SDLK_MINUS) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
                         if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								if (g_Platforms[iEditPlatform].iVelocity > -10)
@@ -2429,7 +2429,7 @@ int editor_platforms()
 									g_Platforms[iEditPlatform].iVelocity--;
 							}
 						}
-                } else if (event.key.keysym.sym == SDLK_KP_PLUS || event.key.keysym.sym == SDLK_EQUALS) {
+                } else if (event.key.key == SDLK_KP_PLUS || event.key.key == SDLK_EQUALS) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
                         if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								if (g_Platforms[iEditPlatform].iVelocity < 10)
@@ -2442,7 +2442,7 @@ int editor_platforms()
 									g_Platforms[iEditPlatform].iVelocity++;
 							}
 						}
-                } else if (event.key.keysym.sym == SDLK_p) {
+                } else if (event.key.key == SDLK_P) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							iPlatformEditState = PLATFORM_EDIT_STATE_PATH;
 							CalculatePlatformDims(iEditPlatform, &iPlatformLeft, &iPlatformTop, &iPlatformWidth, &iPlatformHeight);
@@ -2452,7 +2452,7 @@ int editor_platforms()
 
 					break;
 				}
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
                     if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState || PLATFORM_EDIT_STATE_MOVE == iPlatformEditState) {
 							//check clicks on existing platforms
@@ -2550,8 +2550,8 @@ int editor_platforms()
 								g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = set_tiletype;
 							}
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
+                        const bool* keystate = SDL_GetKeyboardState(NULL);
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse && (CheckKey(keystate, SDLK_Z) || CheckKey(keystate, SDLK_X) || CheckKey(keystate, SDLK_C))) {
 								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT), CheckKey(keystate, SDLK_z) != 0, CheckKey(keystate, SDLK_c) != 0);
                         } else {
 								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
@@ -2569,11 +2569,7 @@ int editor_platforms()
                     } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
-                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                    #else
-                        Uint8 * keystate = SDL_GetKeyState(NULL);
-                    #endif
+                        const bool* keystate = SDL_GetKeyboardState(NULL);
                         if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
                         } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous || g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
@@ -2582,13 +2578,13 @@ int editor_platforms()
 						}
 					}
 				}
-            case SDL_MOUSEMOTION: {
+            case SDL_EVENT_MOUSE_MOTION: {
 					bound_mouse_motion_coords();
 					short ix = bound_to_window_w(event.motion.x) / TILESIZE;
 					short iy = bound_to_window_h(event.motion.y) / TILESIZE;
 
                 if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState) {
-                    if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
+                    if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT) && !ignoreclick) {
                         for (short i = 0; i < set_tile_cols; i++) {
                             for (short j = 0; j < set_tile_rows; j++) {
                                 if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
@@ -2604,25 +2600,25 @@ int editor_platforms()
 									}
 								}
 							}
-                    } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+                    } else if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) {
 							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix * MAPHEIGHT + iy]);
 							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
 						}
                 } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-						if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
+						if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT) && !ignoreclick)
 							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = set_tiletype;
-						else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
+						else if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_RIGHT))
 							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                 } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-                    if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
-                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
+                    if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) {
+                        const bool* keystate = SDL_GetKeyboardState(NULL);
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse && (CheckKey(keystate, SDLK_Z) || CheckKey(keystate, SDLK_X) || CheckKey(keystate, SDLK_C))) {
                             UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT), CheckKey(keystate, SDLK_z) != 0, CheckKey(keystate, SDLK_c) != 0);
                         } else {
                             UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
                         }
-                    } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                    } else if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) {
+                        const bool* keystate = SDL_GetKeyboardState(NULL);
                         if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
                         } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous || g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
@@ -2644,7 +2640,7 @@ int editor_platforms()
 
 					break;
 				}
-            case SDL_MOUSEBUTTONUP: {
+            case SDL_EVENT_MOUSE_BUTTON_UP: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						ignoreclick = false;
 					}
@@ -3012,23 +3008,23 @@ int editor_maphazards()
         //handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
 				return EDITOR_QUIT;
 
-            case SDL_KEYDOWN: {
-                if (event.key.keysym.sym == SDLK_s) {
+            case SDL_EVENT_KEY_DOWN: {
+                if (event.key.key == SDLK_S) {
 						savecurrentmap();
-                } else if (event.key.keysym.sym == SDLK_l) {
+                } else if (event.key.key == SDLK_L) {
                     if (MAPHAZARD_EDIT_STATE_SELECT != iEditState) {
 							iEditState = MAPHAZARD_EDIT_STATE_LOCATION;
 						}
-                } else if (event.key.keysym.sym == SDLK_p) {
+                } else if (event.key.key == SDLK_P) {
                     if (MAPHAZARD_EDIT_STATE_SELECT != iEditState) {
 							iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
 						}
-                } else if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9) {
+                } else if (event.key.key >= SDLK_1 && event.key.key <= SDLK_9) {
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
-                        short iHazard = event.key.keysym.sym - SDLK_1;
+                        short iHazard = event.key.key - SDLK_1;
                         if (iHazard < static_cast<short>(g_map->maphazards.size())) {
                             iEditMapHazard = iHazard;
                             iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
@@ -3037,9 +3033,9 @@ int editor_maphazards()
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
 							if (hazard->itype == 0 || hazard->itype == 1)
-								hazard->iparam[0] = event.key.keysym.sym - SDLK_1 + 1;
+								hazard->iparam[0] = event.key.key - SDLK_1 + 1;
 						}
-                } else if (event.key.keysym.sym == SDLK_DELETE) {
+                } else if (event.key.key == SDLK_DELETE) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState || MAPHAZARD_EDIT_STATE_LOCATION == iEditState) {
                         //Copy platforms into empty spot
                         for (short iMapHazard = iEditMapHazard; iMapHazard < g_map->maphazards.size() - 1; iMapHazard++) {
@@ -3056,14 +3052,14 @@ int editor_maphazards()
                         g_map->maphazards.pop_back();
                         iEditState = MAPHAZARD_EDIT_STATE_SELECT;
                     }
-                } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                } else if (event.key.key == SDLK_ESCAPE) {
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
                             editor_maphazards_initialized = false;
 							return EDITOR_EDIT;
                     } else if (MAPHAZARD_EDIT_STATE_LOCATION == iEditState || MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							iEditState = MAPHAZARD_EDIT_STATE_SELECT;
 						}
-                } else if (event.key.keysym.sym == SDLK_KP_MINUS || event.key.keysym.sym == SDLK_MINUS) {
+                } else if (event.key.key == SDLK_KP_MINUS || event.key.key == SDLK_MINUS) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
@@ -3078,7 +3074,7 @@ int editor_maphazards()
 									g_map->maphazards[iEditMapHazard].dparam[0] -= 1.0f;
 							}
 						}
-                } else if (event.key.keysym.sym == SDLK_KP_PLUS || event.key.keysym.sym == SDLK_EQUALS) {
+                } else if (event.key.key == SDLK_KP_PLUS || event.key.key == SDLK_EQUALS) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
@@ -3093,7 +3089,7 @@ int editor_maphazards()
 									g_map->maphazards[iEditMapHazard].dparam[0] += 1.0f;
 							}
 						}
-                } else if (event.key.keysym.sym == SDLK_COMMA || event.key.keysym.sym == SDLK_LEFTBRACKET) {
+                } else if (event.key.key == SDLK_COMMA || event.key.key == SDLK_LEFTBRACKET) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
@@ -3102,7 +3098,7 @@ int editor_maphazards()
 									g_map->maphazards[iEditMapHazard].iparam[0] -= 30;
 							}
 						}
-                } else if (event.key.keysym.sym == SDLK_PERIOD || event.key.keysym.sym == SDLK_RIGHTBRACKET) {
+                } else if (event.key.key == SDLK_PERIOD || event.key.key == SDLK_RIGHTBRACKET) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
@@ -3111,7 +3107,7 @@ int editor_maphazards()
 									g_map->maphazards[iEditMapHazard].iparam[0] += 30;
 							}
 						}
-                } else if (event.key.keysym.sym == SDLK_d) {
+                } else if (event.key.key == SDLK_D) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
@@ -3122,7 +3118,7 @@ int editor_maphazards()
 								g_map->maphazards[iEditMapHazard].dparam[0] = -g_map->maphazards[iEditMapHazard].dparam[0];
 							}
 						}
-                } else if (event.key.keysym.sym == SDLK_n) {
+                } else if (event.key.key == SDLK_N) {
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
 							iEditMapHazard = NewMapHazard();
 							iEditState = MAPHAZARD_EDIT_STATE_TYPE;
@@ -3131,7 +3127,7 @@ int editor_maphazards()
 
 					break;
 				}
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
 						short iClickX = event.button.x;
 						short iClickY = event.button.y;
@@ -3215,12 +3211,12 @@ int editor_maphazards()
 						}
 					}
 				}
-            case SDL_MOUSEMOTION: {
+            case SDL_EVENT_MOUSE_MOTION: {
 					bound_mouse_motion_coords();
 					short iClickX = bound_to_window_w(event.motion.x);
 					short iClickY = bound_to_window_h(event.motion.y);
 
-                if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
+                if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT) && !ignoreclick) {
                     if (MAPHAZARD_EDIT_STATE_LOCATION == iEditState && !ignoreclick) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 							hazard->ix = iClickX / 16;
@@ -3238,7 +3234,7 @@ int editor_maphazards()
 
 					break;
 				}
-            case SDL_MOUSEBUTTONUP: {
+            case SDL_EVENT_MOUSE_BUTTON_UP: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						ignoreclick = false;
 					}
@@ -3383,7 +3379,7 @@ void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
 	if (angle < 0.0f)
 		angle += TWO_PI;
 
-    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+    const bool* keystate = SDL_GetKeyboardState(NULL);
     if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
 		float dSector = TWO_PI / 16;
 		angle += TWO_PI / 32;
@@ -3456,49 +3452,49 @@ int editor_tiles()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					return EDITOR_QUIT;
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
                 if (!set_tile_drag) {
-                    if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9 && event.key.keysym.sym < SDLK_1 + g_tilesetmanager->count()) {
-							set_tile_tileset = event.key.keysym.sym - SDLK_1;
+                    if (event.key.key >= SDLK_1 && event.key.key <= SDLK_9 && event.key.key < SDLK_1 + g_tilesetmanager->count()) {
+							set_tile_tileset = event.key.key - SDLK_1;
                         tileset = g_tilesetmanager->tileset(set_tile_tileset);
 							view_tileset_x = 0;
 							view_tileset_y = 0;
-                    } else if (event.key.keysym.sym == SDLK_PAGEUP) {
+                    } else if (event.key.key == SDLK_PAGEUP) {
                         if (set_tile_tileset > 0) {
 								set_tile_tileset--;
                             tileset = g_tilesetmanager->tileset(set_tile_tileset);
 								view_tileset_x = 0;
 								view_tileset_y = 0;
 							}
-                    } else if (event.key.keysym.sym == SDLK_PAGEDOWN) {
+                    } else if (event.key.key == SDLK_PAGEDOWN) {
                         if (set_tile_tileset < g_tilesetmanager->count() - 1) {
 								set_tile_tileset++;
                             tileset = g_tilesetmanager->tileset(set_tile_tileset);
 								view_tileset_x = 0;
 								view_tileset_y = 0;
 							}
-                    } else if (event.key.keysym.sym == SDLK_UP) {
+                    } else if (event.key.key == SDLK_UP) {
                         if (view_tileset_y > 0) {
 								view_tileset_y--;
 								view_tileset_repeat_direction = 0;
 								view_tileset_repeat_timer = 30;
 							}
-                    } else if (event.key.keysym.sym == SDLK_DOWN) {
+                    } else if (event.key.key == SDLK_DOWN) {
                         if (view_tileset_y < g_tilesetmanager->tileset(set_tile_tileset)->height() - 15) {
 								view_tileset_y++;
 								view_tileset_repeat_direction = 1;
 								view_tileset_repeat_timer = 30;
 							}
-                    } else if (event.key.keysym.sym == SDLK_LEFT) {
+                    } else if (event.key.key == SDLK_LEFT) {
                         if (view_tileset_x > 0) {
 								view_tileset_x--;
 								view_tileset_repeat_direction = 2;
 								view_tileset_repeat_timer = 30;
 							}
-                    } else if (event.key.keysym.sym == SDLK_RIGHT) {
+                    } else if (event.key.key == SDLK_RIGHT) {
                         if (view_tileset_x < g_tilesetmanager->tileset(set_tile_tileset)->width() - 20) {
 								view_tileset_x++;
 								view_tileset_repeat_direction = 3;
@@ -3515,9 +3511,9 @@ int editor_tiles()
 					break;
 				}
 
-            case SDL_KEYUP: {
-					if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN ||
-                        event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_RIGHT) {
+            case SDL_EVENT_KEY_UP: {
+					if (event.key.key == SDLK_UP || event.key.key == SDLK_DOWN ||
+                        event.key.key == SDLK_LEFT || event.key.key == SDLK_RIGHT) {
 						view_tileset_repeat_direction = -1;
 						view_tileset_repeat_timer = 0;
 					}
@@ -3525,7 +3521,7 @@ int editor_tiles()
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 					short iCol = event.button.x / TILESIZE + view_tileset_x;
 					short iRow = event.button.y / TILESIZE + view_tileset_y;
 
@@ -3549,7 +3545,7 @@ int editor_tiles()
 				break;
 			}
 
-            case SDL_MOUSEBUTTONUP: {
+            case SDL_EVENT_MOUSE_BUTTON_UP: {
 					short iCol = event.button.x / TILESIZE + view_tileset_x;
 					short iRow = event.button.y / TILESIZE + view_tileset_y;
 
@@ -3569,13 +3565,13 @@ int editor_tiles()
 					break;
 				}
 
-            case SDL_MOUSEMOTION: {
+            case SDL_EVENT_MOUSE_MOTION: {
 					bound_mouse_motion_coords();
 					short iCol = bound_to_window_w(event.motion.x) / TILESIZE + view_tileset_x;
 					short iRow = bound_to_window_h(event.motion.y) / TILESIZE + view_tileset_y;
 
                 if (iCol < tileset->width() && iRow < tileset->height()) {
-                    if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
+                    if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) {
 							if (iCol < set_tile_start_x)
 								set_tile_start_x = iCol;
 
@@ -3587,7 +3583,7 @@ int editor_tiles()
 
 							if (iRow > set_tile_end_y)
 								set_tile_end_y = iRow;
-                    } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT) || event.motion.state == SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
+                    } else if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_RIGHT) || event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) {
                         tileset->setTileType(iCol, iRow, set_type);
 					}
 				}
@@ -3621,7 +3617,7 @@ int editor_tiles()
 
 		//drawmap(false, TILESIZE);
 		//rm->menu_shade.draw(0, 0);
-		SDL_FillRect(screen, NULL, 0xFF888888);
+		SDL_FillSurfaceRect(screen, NULL, 0xFF888888);
 
 		SDL_Rect rectSrc;
 		rectSrc.x = view_tileset_x << 5;
@@ -3687,15 +3683,15 @@ int editor_blocks()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					return EDITOR_QUIT;
 
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					edit_mode = 0;
 					return EDITOR_EDIT;
 				break;
 
-				case SDL_MOUSEBUTTONDOWN:
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short set_block_x = event.button.x / TILESIZE;
 						short set_block_y = event.button.y / TILESIZE;
@@ -3774,15 +3770,15 @@ int editor_mapitems()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					return EDITOR_QUIT;
 
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					edit_mode = 7;
 					return EDITOR_EDIT;
 				break;
 
-				case SDL_MOUSEBUTTONDOWN:
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short set_item_x = event.button.x / TILESIZE;
 						short set_item_y = event.button.y / TILESIZE;
@@ -3843,20 +3839,20 @@ int editor_modeitems()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
 				return EDITOR_QUIT;
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					dragmodeitem = -1;
 
-                if (event.key.keysym.sym == SDLK_s) {
+                if (event.key.key == SDLK_S) {
 						savecurrentmap();
-                } else if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_j) {
+                } else if (event.key.key == SDLK_ESCAPE || event.key.key == SDLK_J) {
                     editor_modeitems_initialized = false;
 					return EDITOR_EDIT;
-                } else if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_2) {
-						modeitemmode = event.key.keysym.sym - SDLK_1;
-                } else if (event.key.keysym.sym == SDLK_r) {
+                } else if (event.key.key >= SDLK_1 && event.key.key <= SDLK_2) {
+						modeitemmode = event.key.key - SDLK_1;
+                } else if (event.key.key == SDLK_R) {
 						//Set this mode item set to random
                     if (modeitemmode == 0) {
 							if (g_map->iNumRaceGoals == 0)
@@ -3872,7 +3868,7 @@ int editor_modeitems()
 					}
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iMouseX = event.button.x;
 						short iMouseY = event.button.y;
@@ -3904,7 +3900,7 @@ int editor_modeitems()
 					break;
 				}
 
-            case SDL_MOUSEBUTTONUP: {
+            case SDL_EVENT_MOUSE_BUTTON_UP: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						dragmodeitem = -1;
 					}
@@ -3912,10 +3908,10 @@ int editor_modeitems()
 					break;
 				}
 
-            case SDL_MOUSEMOTION: {
+            case SDL_EVENT_MOUSE_MOTION: {
                 bound_mouse_motion_coords();
-                if (dragmodeitem >= 0 && event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
-                    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                if (dragmodeitem >= 0 && event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) {
+                    const bool* keystate = SDL_GetKeyboardState(NULL);
 						bool fShiftDown = CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT);
 
                     if (modeitemmode == 0) {
@@ -3923,16 +3919,16 @@ int editor_modeitems()
 							g_map->racegoallocations[dragmodeitem].y = event.motion.y - dragoffsety;
 
                         if (fShiftDown) {
-								g_map->racegoallocations[dragmodeitem].x = (event.motion.x >> 5) << 5;
-								g_map->racegoallocations[dragmodeitem].y = (event.motion.y >> 5) << 5;
+								g_map->racegoallocations[dragmodeitem].x = int(event.motion.x / 32.f) * 32.f;
+								g_map->racegoallocations[dragmodeitem].y = int(event.motion.y / 32.f) * 32.f;
 							}
                     } else if (modeitemmode == 1) {
 							g_map->flagbaselocations[dragmodeitem].x = event.motion.x - dragoffsetx;
 							g_map->flagbaselocations[dragmodeitem].y = event.motion.y - dragoffsety;
 
                         if (fShiftDown) {
-								g_map->flagbaselocations[dragmodeitem].x = (event.motion.x >> 5) << 5;
-								g_map->flagbaselocations[dragmodeitem].y = (event.motion.y >> 5) << 5;
+								g_map->flagbaselocations[dragmodeitem].x = int(event.motion.x / 32.f) * 32.f;
+								g_map->flagbaselocations[dragmodeitem].y = int(event.motion.y / 32.f) * 32.f;
 							}
 						}
 					}
@@ -3988,17 +3984,17 @@ int editor_tiletype()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					return EDITOR_QUIT;
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					edit_mode = 6;
 					return EDITOR_EDIT;
 
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iCol = event.button.x / TILESIZE;
 						short iRow = event.button.y / TILESIZE;
@@ -4069,7 +4065,7 @@ int editor_backgrounds()
 		//handle messages
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
                 for (short iSurface = 0; iSurface < 16; iSurface++)
                     sBackgrounds[iSurface] = gfxSprite();
 
@@ -4077,19 +4073,19 @@ int editor_backgrounds()
                 return EDITOR_EDIT;
                 break;
 
-            case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
+            case SDL_EVENT_KEY_DOWN:
+                if (event.key.key == SDLK_ESCAPE) {
                     for (short iSurface = 0; iSurface < 16; iSurface++)
                         sBackgrounds[iSurface] = gfxSprite();
 
                     editor_backgrounds_initialized = false;
                     return EDITOR_EDIT;
-                } else if (event.key.keysym.sym == SDLK_PAGEDOWN || event.key.keysym.sym == SDLK_DOWN) {
+                } else if (event.key.key == SDLK_PAGEDOWN || event.key.key == SDLK_DOWN) {
                     if ((iPage + 1) * 16 < backgroundlist->count()) {
 							iPage++;
 							LoadBackgroundPage(sBackgrounds, iPage);
 						}
-                } else if (event.key.keysym.sym == SDLK_PAGEUP || event.key.keysym.sym == SDLK_UP) {
+                } else if (event.key.key == SDLK_PAGEUP || event.key.key == SDLK_UP) {
                     if ((iPage - 1) * 16 >= 0) {
 							iPage--;
 							LoadBackgroundPage(sBackgrounds, iPage);
@@ -4098,7 +4094,7 @@ int editor_backgrounds()
 
 				break;
 
-				case SDL_MOUSEBUTTONDOWN:
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 if (event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT) {
                     for (short iBackground = 0; iBackground < 16; iBackground++) {
                         if (iPage * 16 + iBackground >= backgroundlist->count())
@@ -4132,7 +4128,7 @@ int editor_backgrounds()
 					}
 				break;
 
-				case SDL_MOUSEMOTION:
+				case SDL_EVENT_MOUSE_MOTION:
 					bound_mouse_motion_coords();
 				break;
 
@@ -4142,7 +4138,7 @@ int editor_backgrounds()
 		}
 
 		SDL_Rect rect = {0, 0, 640, 480};
-		SDL_FillRect(screen, &rect, 0x0);
+		SDL_FillSurfaceRect(screen, &rect, 0x0);
 
         for (short iBackground = 0; iBackground < 16; iBackground++) {
             if (iPage * 16 + iBackground >= backgroundlist->count())
@@ -4191,23 +4187,23 @@ int editor_animation()
 			bool fInValidTile = iRow >= 0 && iRow <= 7;
 
             switch (event.type) {
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
                 return EDITOR_QUIT;
 
-            case SDL_KEYDOWN: {
-                if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_a) {
+            case SDL_EVENT_KEY_DOWN: {
+                if (event.key.key == SDLK_ESCAPE || event.key.key == SDLK_A) {
                     if (!set_tile_drag) {
 							edit_mode = 8;
                             editor_animation_initialized = false;
 							return EDITOR_EDIT;
 						}
-                } else if (event.key.keysym.sym == SDLK_LEFT) {
+                } else if (event.key.key == SDLK_LEFT) {
                     if (view_animated_tileset_x > 0) {
 							view_animated_tileset_x--;
 							view_tileset_repeat_direction = 2;
 							view_tileset_repeat_timer = 30;
 						}
-                } else if (event.key.keysym.sym == SDLK_RIGHT) {
+                } else if (event.key.key == SDLK_RIGHT) {
                     if (view_animated_tileset_x < 12) {
 							view_animated_tileset_x++;
 							view_tileset_repeat_direction = 3;
@@ -4218,8 +4214,8 @@ int editor_animation()
 					break;
 				}
 
-            case SDL_KEYUP: {
-                if (event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_RIGHT) {
+            case SDL_EVENT_KEY_UP: {
+                if (event.key.key == SDLK_LEFT || event.key.key == SDLK_RIGHT) {
 						view_tileset_repeat_direction = -1;
 						view_tileset_repeat_timer = 0;
 					}
@@ -4227,7 +4223,7 @@ int editor_animation()
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (fInValidTile) {
 							set_tile_start_x = iCol;
@@ -4249,7 +4245,7 @@ int editor_animation()
 				break;
 			}
 
-            case SDL_MOUSEBUTTONUP: {
+            case SDL_EVENT_MOUSE_BUTTON_UP: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (fInValidTile) {
 							set_tile_cols = set_tile_end_x - set_tile_start_x + 1;
@@ -4266,10 +4262,10 @@ int editor_animation()
 					break;
 				}
 
-            case SDL_MOUSEMOTION: {
+            case SDL_EVENT_MOUSE_MOTION: {
                 bound_mouse_motion_coords();
                 if (fInValidTile) {
-                    if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
+                    if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) {
 							if (iCol < set_tile_start_x)
 								set_tile_start_x = iCol;
 
@@ -4281,7 +4277,7 @@ int editor_animation()
 
 							if (iRow > set_tile_end_y)
 								set_tile_end_y = iRow;
-                    } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT) || event.motion.state == SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
+                    } else if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_RIGHT) || event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) {
 						animatedtiletypes[iCol + (iRow << 5)] = set_type;
 					}
 				}
@@ -4309,7 +4305,7 @@ int editor_animation()
 
 		//drawmap(false, TILESIZE);
 		//rm->menu_shade.draw(0, 0);
-		SDL_FillRect(screen, NULL, 0xFF888888);
+		SDL_FillSurfaceRect(screen, NULL, 0xFF888888);
 
         for (short iCol = view_animated_tileset_x; iCol < view_animated_tileset_x + 20; iCol++) {
             for (short iRow = 0; iRow < 8; iRow++) {
@@ -4357,7 +4353,7 @@ void LoadBackgroundPage(std::array<gfxSprite, 16>& sBackgrounds, short iPage)
 
 		gfxSprite temp = ImageLoader(path).withoutColorKey().create();
 
-		SDL_FillRect(sBackgrounds[iIndex].getSurface(), NULL, 0x0);
+		SDL_FillSurfaceRect(sBackgrounds[iIndex].getSurface(), NULL, 0x0);
 
 		if (temp.getWidth() != 640 || temp.getHeight() != 480) {
 			printf("WARNING: Background %s is %dx%d but must be 640x480. Skipping.\n",
@@ -4493,11 +4489,11 @@ int display_help()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					return 0;
 				break;
 
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					return 0;
 				break;
 
@@ -4546,17 +4542,17 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					return false;
 				break;
 
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 
-                if (event.key.keysym.sym == SDLK_KP_ENTER || event.key.keysym.sym == SDLK_RETURN) {
+                if (event.key.key == SDLK_KP_ENTER || event.key.key == SDLK_RETURN) {
 						return true;
-                } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                } else if (event.key.key == SDLK_ESCAPE) {
 						return false;
-                } else if (event.key.keysym.sym == SDLK_BACKSPACE) {
+                } else if (event.key.key == SDLK_BACKSPACE) {
                     if (currentChar > 0) {
 							input[currentChar-1] = '\0';
 
@@ -4574,37 +4570,37 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
                 } else {
 
 						/* I realize the if statement below is long and can be substituted with
-						the function isalnum(event.key.keysym.sym) but I did it this way because
+						the function isalnum(event.key.key) but I did it this way because
 						isalnum acts funny (ie wrong) when the number pad is pressed. */
-                    if ((isdigit(event.key.keysym.sym) || event.key.keysym.sym == 45 || event.key.keysym.sym == 32 || event.key.keysym.sym == 61 || (event.key.keysym.sym >= 95 && event.key.keysym.sym <= 122)) && currentChar < (unsigned)inputsize - 1) {
+                    if ((isdigit(event.key.key) || event.key.key == 45 || event.key.key == 32 || event.key.key == 61 || (event.key.key >= 95 && event.key.key <= 122)) && currentChar < (unsigned)inputsize - 1) {
 							//insert character into fileName and onScreenText and increment current char
-							Uint8 key = event.key.keysym.sym;
+							Uint8 key = event.key.key;
 
-                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                        const bool* keystate = SDL_GetKeyboardState(NULL);
                         if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
-								if (event.key.keysym.sym == 45)
+								if (event.key.key == 45)
 									key = 95;
-								else if (event.key.keysym.sym >= 95 && event.key.keysym.sym <= 122)
+								else if (event.key.key >= 95 && event.key.key <= 122)
 									key-= 32;  //Capitalize
-								else if (event.key.keysym.sym == 48)
+								else if (event.key.key == 48)
 									key = 41;
-								else if (event.key.keysym.sym == 49)
+								else if (event.key.key == 49)
 									key = 33;
-								else if (event.key.keysym.sym == 50)
+								else if (event.key.key == 50)
 									key = 64;
-								else if (event.key.keysym.sym == 51)
+								else if (event.key.key == 51)
 									key = 35;
-								else if (event.key.keysym.sym == 52)
+								else if (event.key.key == 52)
 									key = 36;
-								else if (event.key.keysym.sym == 53)
+								else if (event.key.key == 53)
 									key = 37;
-								else if (event.key.keysym.sym == 54)
+								else if (event.key.key == 54)
 									key = 94;
-								else if (event.key.keysym.sym == 55)
+								else if (event.key.key == 55)
 									key = 38;
-								else if (event.key.keysym.sym == 57)
+								else if (event.key.key == 57)
 									key = 40;
-								else if (event.key.keysym.sym == 61)
+								else if (event.key.key == 61)
 									key = 43;
 							}
 

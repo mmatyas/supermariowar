@@ -5,7 +5,7 @@
 #include "math/Vec2.h"
 #include "util/SdlHelpers.h"
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 #include <filesystem>
 #include <optional>

@@ -2,7 +2,7 @@
 
 #include "path.h"
 
-#include "SDL_image.h"
+#include <SDL3_image/SDL_image.h>
 
 #include <chrono>
 #include <iomanip>
@@ -24,24 +24,24 @@ template<typename... Args>
 namespace {
 void initSdl()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (!SDL_Init(SDL_INIT_VIDEO))
         throw_error("SDL error: %s", SDL_GetError());
 
-    SDL_version sdl_version;
-    SDL_GetVersion(&sdl_version);
-    printf("[gfx] SDL %d.%d.%d loaded.\n", sdl_version.major, sdl_version.minor, sdl_version.patch);
+    const auto sdl_version = SDL_GetVersion();
+    printf("[gfx] SDL %d.%d.%d loaded.\n",
+        SDL_VERSIONNUM_MAJOR(sdl_version),
+        SDL_VERSIONNUM_MINOR(sdl_version),
+        SDL_VERSIONNUM_MICRO(sdl_version));
 
-    constexpr int IMG_FLAGS = IMG_INIT_PNG;
-    if ((IMG_Init(IMG_FLAGS) & IMG_FLAGS) != IMG_FLAGS)
-        throw_error("SDL_image error: %s\n", IMG_GetError());
-
-    const SDL_version* img_version = IMG_Linked_Version();
-    printf("[gfx] SDL_image %d.%d.%d loaded.\n", img_version->major, img_version->minor, img_version->patch);
+    const auto img_version = IMG_Version();
+    printf("[gfx] SDL_image %d.%d.%d loaded.\n",
+        SDL_VERSIONNUM_MAJOR(img_version),
+        SDL_VERSIONNUM_MINOR(img_version),
+        SDL_VERSIONNUM_MICRO(img_version));
 }
 
 void quitSdl()
 {
-    IMG_Quit();
     SDL_Quit();
 }
 
@@ -49,10 +49,9 @@ SDL_Window* createWindow(bool fullscreen)
 {
     Uint32 window_flags = SDL_WINDOW_RESIZABLE;
     if (fullscreen)
-        window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        window_flags |= SDL_WINDOW_FULLSCREEN;
 
     SDL_Window* window = SDL_CreateWindow("smw",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         GFX_SCREEN_W, GFX_SCREEN_H,
         window_flags);
     if (!window)
@@ -61,55 +60,29 @@ SDL_Window* createWindow(bool fullscreen)
     return window;
 }
 
-int findPreferredRendererIndex() {
+const char* findPreferredRendererIndex() {
 #ifdef SDL2_FORCE_GLES
-    const int render_driver_count = SDL_GetNumRenderDrivers();
-    if (render_driver_count < 1) {
-        printf("[gfx][warning] Couldn't access renderers, fallback to default: %s\n", SDL_GetError());
-        return -1;
-    }
-
-    for (int i = 0; i < render_driver_count; i++) {
-        SDL_RendererInfo renderer_info;
-        SDL_GetRenderDriverInfo(i, &renderer_info);
-        if (strncmp(renderer_info.name, "opengles", strlen("opengles")) == 0)
-            return i;
-    }
-
-    printf("[gfx][warning] No GLES renderer found, fallback to default");
+    return "opengles";
+#else
+    return nullptr;
 #endif
-    return -1;
 }
 
 SDL_Renderer* createRenderer(SDL_Window* window)
 {
-    constexpr Uint32 rendering_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE;
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, findPreferredRendererIndex(), rendering_flags);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, findPreferredRendererIndex());
     if (!renderer)
         throw_error("Couldn't create renderer: %s\n", SDL_GetError());
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-    SDL_RenderSetLogicalSize(renderer, GFX_SCREEN_W, GFX_SCREEN_H);
-
-    SDL_RendererInfo renderer_info;
-    SDL_GetRendererInfo(renderer, &renderer_info);
-    printf("[gfx] Renderer: %s, %s\n",
-        renderer_info.name,
-        (renderer_info.flags & SDL_RENDERER_ACCELERATED) ? "accelerated" : "software");
-
+    SDL_SetRenderLogicalPresentation(renderer, GFX_SCREEN_W, GFX_SCREEN_H, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    printf("[gfx] Renderer: %s\n", SDL_GetRendererName(renderer));
     return renderer;
 }
 
 SDL_Surface* createScreenSurface()
 {
-    SDL_Surface* surface = SDL_CreateRGBSurface(0x0,
-        GFX_SCREEN_W, GFX_SCREEN_H, 32,
-        0x00FF0000,
-        0x0000FF00,
-        0x000000FF,
-        0xFF000000);
+    SDL_Surface* surface = SDL_CreateSurface(GFX_SCREEN_W, GFX_SCREEN_H, SDL_PIXELFORMAT_ARGB8888);
     if (!surface)
         throw_error("Couldn't create video buffer: %s\n", SDL_GetError());
 
@@ -125,6 +98,9 @@ SDL_Texture* createScreenTexture(SDL_Renderer* renderer)
     if (!texture)
         throw_error("Couldn't create video texture: %s\n", SDL_GetError());
 
+    if (!SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST))
+        throw_error("Couldn't set up texture scaling mode: %s\n", SDL_GetError());
+
     return texture;
 }
 } // namespace
@@ -133,7 +109,7 @@ SDL_Texture* createScreenTexture(SDL_Renderer* renderer)
 GraphicsSDL::~GraphicsSDL()
 {
     SDL_DestroyTexture(sdl_screen_texture);
-    SDL_FreeSurface(sdl_screen_surface);
+    SDL_DestroySurface(sdl_screen_surface);
     SDL_DestroyRenderer(sdl_renderer);
     SDL_DestroyWindow(sdl_window);
 
@@ -152,7 +128,7 @@ bool GraphicsSDL::init(bool fullscreen)
     printf("[gfx] Game window initialized (%dx%d, %dbpp)\n",
         sdl_screen_surface->w,
         sdl_screen_surface->h,
-        sdl_screen_surface->format->BitsPerPixel);
+        SDL_BITSPERPIXEL(sdl_screen_surface->format));
 
     screen = sdl_screen_surface;
     return true;
@@ -172,20 +148,13 @@ void GraphicsSDL::flipScreen() const
 {
     SDL_UpdateTexture(sdl_screen_texture, nullptr, sdl_screen_surface->pixels, sdl_screen_surface->pitch);
     SDL_RenderClear(sdl_renderer);
-    SDL_RenderCopy(sdl_renderer, sdl_screen_texture, nullptr, nullptr);
+    SDL_RenderTexture(sdl_renderer, sdl_screen_texture, nullptr, nullptr);
     SDL_RenderPresent(sdl_renderer);
 }
 
 void GraphicsSDL::changeFullScreen(bool fullscreen) const
 {
-    Uint32 flags = SDL_GetWindowFlags(sdl_window);
-    if (fullscreen) {
-        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-    } else {
-        flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
-    }
-
-    if (SDL_SetWindowFullscreen(sdl_window, flags) < 0) {
+    if (!SDL_SetWindowFullscreen(sdl_window, fullscreen)) {
         fprintf(stderr, "[gfx] Couldn't toggle fullscreen mode: %s\n", SDL_GetError());
         return;
     }

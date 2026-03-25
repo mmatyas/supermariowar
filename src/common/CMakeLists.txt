@@ -91,12 +91,12 @@ endif()
 
 if(NOT EMSCRIPTEN)
     target_link_libraries(CommonFiles
-        SDL2::SDL2
-        SDL2_image::SDL2_image
+        SDL3::SDL3
+        SDL3_image::SDL3_image
     )
     if (SDL2_USE_MIXERX)
         target_link_libraries(CommonFiles SDL2_mixer_ext::SDL2_mixer_ext)
     else()
-        target_link_libraries(CommonFiles SDL2_mixer::SDL2_mixer)
+        target_link_libraries(CommonFiles SDL3_mixer::SDL3_mixer)
     endif()
 endif()

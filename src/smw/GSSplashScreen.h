@@ -2,9 +2,9 @@
 #define GAMESTATE_SPLASHSCREEN_H
 
 #include "GameState.h"
-
-#include "SDL.h"
 #include "gfx.h"
+
+#include <SDL3/SDL.h>
 
 class SplashScreenState : public GameState
 {

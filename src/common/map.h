@@ -1,12 +1,11 @@
 #ifndef SMW_MAP_H
 #define SMW_MAP_H
 
+#include "gfx.h"
 #include "GlobalConstants.h"
 #include "TileTypes.h"
 
-#include "SDL.h"
-
-#include "gfx.h"
+#include <SDL3/SDL.h>
 
 #include <array>
 #include <list>

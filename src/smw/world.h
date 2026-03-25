@@ -1,9 +1,10 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include "SDL.h"
 #include "math/Vec2.h"
 #include "util/Grid.h"
+
+#include <SDL3/SDL.h>
 
 #include <string>
 #include <vector>

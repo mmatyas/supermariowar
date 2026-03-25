@@ -70,10 +70,10 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
         sprites[iSurface] = gfxSprite::blank(w * iTileSize, h * iTileSize);
         sprites[iSurface].setWrap();
 
-        if (SDL_SetColorKey(sprites[iSurface].getSurface(), SDL_TRUE, SDL_MapRGB(sprites[iSurface].getSurface()->format, 255, 0, 255)) < 0)
+        if (SDL_SetSurfaceColorKey(sprites[iSurface].getSurface(), true, SDL_MapSurfaceRGB(sprites[iSurface].getSurface(), 255, 0, 255)) < 0)
             printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
 
-        SDL_FillRect(sprites[iSurface].getSurface(), NULL, SDL_MapRGB(sprites[iSurface].getSurface()->format, 255, 0, 255));
+        SDL_FillSurfaceRect(sprites[iSurface].getSurface(), NULL, SDL_MapSurfaceRGB(sprites[iSurface].getSurface(), 255, 0, 255));
     }
 
     //Run through all tiles in the platform, detect unknown and blank tiles,

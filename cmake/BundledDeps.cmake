@@ -21,52 +21,52 @@ if (USE_BUNDLED_SDL)
     # SDL
     set(SDL_STATIC OFF CACHE BOOL "")
     smw_declare_gitrepo(
-        SDL2
+        SDL3
         https://github.com/libsdl-org/SDL.git
-        release-2.32.10
+        release-3.4.2
     )
 
     # SDL_image
     set(SDL2IMAGE_VENDORED ON CACHE BOOL "")
     set(SDL2IMAGE_DEPS_SHARED OFF CACHE BOOL "")
-    set(SDL2IMAGE_ANI OFF CACHE BOOL "")
-    set(SDL2IMAGE_AVIF OFF CACHE BOOL "")
-    set(SDL2IMAGE_GIF OFF CACHE BOOL "")
-    set(SDL2IMAGE_JPG OFF CACHE BOOL "")
-    set(SDL2IMAGE_JXL OFF CACHE BOOL "")
-    set(SDL2IMAGE_LBM OFF CACHE BOOL "")
-    set(SDL2IMAGE_PCX OFF CACHE BOOL "")
-    set(SDL2IMAGE_PNM OFF CACHE BOOL "")
-    set(SDL2IMAGE_QOI OFF CACHE BOOL "")
-    set(SDL2IMAGE_SVG OFF CACHE BOOL "")
-    set(SDL2IMAGE_TGA OFF CACHE BOOL "")
-    set(SDL2IMAGE_TIF OFF CACHE BOOL "")
-    set(SDL2IMAGE_WEBP OFF CACHE BOOL "")
-    set(SDL2IMAGE_XCF OFF CACHE BOOL "")
-    set(SDL2IMAGE_XPM OFF CACHE BOOL "")
-    set(SDL2IMAGE_XV OFF CACHE BOOL "")
+    set(SDLIMAGE_ANI OFF CACHE BOOL "")
+    set(SDLIMAGE_AVIF OFF CACHE BOOL "")
+    set(SDLIMAGE_GIF OFF CACHE BOOL "")
+    set(SDLIMAGE_JPG OFF CACHE BOOL "")
+    set(SDLIMAGE_JXL OFF CACHE BOOL "")
+    set(SDLIMAGE_LBM OFF CACHE BOOL "")
+    set(SDLIMAGE_PCX OFF CACHE BOOL "")
+    set(SDLIMAGE_PNM OFF CACHE BOOL "")
+    set(SDLIMAGE_QOI OFF CACHE BOOL "")
+    set(SDLIMAGE_SVG OFF CACHE BOOL "")
+    set(SDLIMAGE_TGA OFF CACHE BOOL "")
+    set(SDLIMAGE_TIF OFF CACHE BOOL "")
+    set(SDLIMAGE_WEBP OFF CACHE BOOL "")
+    set(SDLIMAGE_XCF OFF CACHE BOOL "")
+    set(SDLIMAGE_XPM OFF CACHE BOOL "")
+    set(SDLIMAGE_XV OFF CACHE BOOL "")
     smw_declare_gitrepo(
-        SDL2_image
+        SDL3_image
         https://github.com/libsdl-org/SDL_image.git
-        release-2.8.8
+        release-3.4.0
     )
 
     # SDL_mixer
-    set(SDL2MIXER_VENDORED ON CACHE BOOL "")
-    set(SDL2MIXER_DEPS_SHARED OFF CACHE BOOL "")
-    set(SDL2MIXER_AIFF OFF CACHE BOOL "")
-    set(SDL2MIXER_VOC OFF CACHE BOOL "")
-    set(SDL2MIXER_AU OFF CACHE BOOL "")
-    set(SDL2MIXER_FLAC OFF CACHE BOOL "")
-    set(SDL2MIXER_GME OFF CACHE BOOL "")
-    set(SDL2MIXER_MOD OFF CACHE BOOL "")
-    set(SDL2MIXER_MP3 OFF CACHE BOOL "")
-    set(SDL2MIXER_MIDI OFF CACHE BOOL "")
-    set(SDL2MIXER_WAVPACK OFF CACHE BOOL "")
+    set(SDLMIXER_VENDORED ON CACHE BOOL "")
+    set(SDLMIXER_DEPS_SHARED OFF CACHE BOOL "")
+    set(SDLMIXER_AIFF OFF CACHE BOOL "")
+    set(SDLMIXER_VOC OFF CACHE BOOL "")
+    set(SDLMIXER_AU OFF CACHE BOOL "")
+    set(SDLMIXER_FLAC OFF CACHE BOOL "")
+    set(SDLMIXER_GME OFF CACHE BOOL "")
+    set(SDLMIXER_MOD OFF CACHE BOOL "")
+    set(SDLMIXER_MP3 OFF CACHE BOOL "")
+    set(SDLMIXER_MIDI OFF CACHE BOOL "")
+    set(SDLMIXER_WAVPACK OFF CACHE BOOL "")
     smw_declare_gitrepo(
-        SDL2_mixer
+        SDL3_mixer
         https://github.com/libsdl-org/SDL_mixer.git
-        release-2.8.1
+        release-3.2.0
     )
 endif()
 

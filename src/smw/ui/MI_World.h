@@ -3,7 +3,7 @@
 #include "uicontrol.h"
 #include "gfx/gfxSprite.h"
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 struct COutputControl;
 

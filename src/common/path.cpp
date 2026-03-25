@@ -1,12 +1,12 @@
 #include "path.h"
 
-#include "SDL.h"
-
 #include <array>
 #include <cassert>
 #include <cstring>
 #include <string>
 #include <sys/stat.h>
+
+#include <SDL3/SDL.h>
 
 #ifdef _WIN32
 #include <shlobj.h>
@@ -60,9 +60,8 @@ std::string GetRootDirectory()
 #if !defined(_WIN32)
     // TODO: SDL_GetBasePath returns an UTF-8 string, which needs
     // some special treatment on Windows to work
-    if (char* sdl_path = SDL_GetBasePath()) {
+    if (const char* sdl_path = SDL_GetBasePath()) {
         std::string result = sdl_path;
-        SDL_free(sdl_path);
         return result;
     }
 #endif

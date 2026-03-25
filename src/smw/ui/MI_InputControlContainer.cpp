@@ -89,10 +89,10 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
         #endif
 
         /*
-        if (event.type == SDL_KEYDOWN)
+        if (event.type == SDL_EVENT_KEY_DOWN)
         {
             printf("*********** Key Down ***********\n");
-            printf("Keysym: %d\n", event.key.keysym.sym);
+            printf("Keysym: %d\n", event.key.key);
             printf("State: %d\n", event.key.state);
             printf("Type: %d\n", event.key.type);
             printf("Which: %d\n\n", event.key.which);
@@ -106,7 +106,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
             printf("Type: %d\n", event.motion.type);
             printf("Which: %d\n\n", event.motion.which);
         }
-        else if (event.type == SDL_MOUSEBUTTONDOWN)
+        else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
         {
             printf("*********** Mouse Button ***********\n");
             printf("Button: %d\n", event.button.button);
@@ -114,14 +114,14 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
             printf("Type: %d\n", event.button.type);
             printf("Which: %d\n\n", event.button.which);
         }
-        else if (event.type == SDL_JOYHATMOTION)
+        else if (event.type == SDL_EVENT_JOYSTICK_HAT_MOTION)
         {
             printf("*********** Joystick Hat ***********\n");
             printf("Value: %d\n", event.jhat.value);
             printf("Type: %d\n", event.jhat.type);
             printf("Which: %d\n\n", event.jhat.which);
         }
-        else if (event.type == SDL_JOYAXISMOTION)
+        else if (event.type == SDL_EVENT_JOYSTICK_AXIS_MOTION)
         {
             printf("*********** Joystick Motion ***********\n");
             printf("Value: %d\n", event.jaxis.value);
@@ -129,7 +129,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
             printf("Type: %d\n", event.jaxis.type);
             printf("Which: %d\n\n", event.jaxis.which);
         }
-        else if (event.type == SDL_JOYBUTTONDOWN)
+        else if (event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN)
         {
             printf("*********** Joystick Button ***********\n");
             printf("Button: %d\n", event.jbutton.button);
@@ -159,12 +159,12 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
         */
 
         if (iDevice == DEVICE_KEYBOARD) {
-            if (event.type == SDL_KEYDOWN) {
-                const SDL_Keycode key = event.key.keysym.sym;
+            if (event.type == SDL_EVENT_KEY_DOWN) {
+                const SDL_Keycode key = event.key.key;
 
                 SetKey(iKey, key, iDevice);
                 done = true;
-            } else if (event.type == SDL_MOUSEMOTION) {
+            } else if (event.type == SDL_EVENT_MOUSE_MOTION) {
                 short xmag = (short)abs(event.motion.xrel);
                 short ymag = (short)abs(event.motion.yrel);
 
@@ -188,17 +188,17 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                     SetKey(iKey, key, iDevice);
                     done = true;
                 }
-            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            } else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
                 const SDL_Keycode key = event.button.button + MOUSE_BUTTON_START;
                 SetKey(iKey, key, iDevice);
                 done = true;
             }
         } else {
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
+            if (event.type == SDL_EVENT_KEY_DOWN) {
+                if (event.key.key == SDLK_ESCAPE) {
                     done = true;
                 }
-            } else if (event.type == SDL_JOYHATMOTION) {
+            } else if (event.type == SDL_EVENT_JOYSTICK_HAT_MOTION) {
                 SDL_Keycode key = KEY_NONE;
 
                 if (event.jhat.value & SDL_HAT_UP) {
@@ -215,7 +215,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                     SetKey(iKey, key, iDevice);
                     done = true;
                 }
-            } else if (event.type == SDL_JOYAXISMOTION) {
+            } else if (event.type == SDL_EVENT_JOYSTICK_AXIS_MOTION) {
                 SDL_Keycode key = KEY_NONE;
 
                 if (event.jaxis.axis == 0) {
@@ -248,8 +248,8 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                     SetKey(iKey, key, iDevice);
                     done = true;
                 }
-            } else if (event.type == SDL_JOYBUTTONDOWN) {
-                if (event.jbutton.state == SDL_PRESSED) {
+            } else if (event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN) {
+                if (event.jbutton.down) {
                     const SDL_Keycode key = event.jbutton.button + JOY_BUTTON_START;
                     SetKey(iKey, key, iDevice);
                     done = true;
@@ -343,7 +343,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
     miDeviceSelectField->add("Keyboard", -1);
 
     for (short iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
-        miDeviceSelectField->add(SDL_JoystickNameForIndex(iJoystick), iJoystick, false);
+        miDeviceSelectField->add(SDL_GetJoystickNameForID(iJoystick), iJoystick, false);
     }
 
     //If the device is not found, default to the keyboard

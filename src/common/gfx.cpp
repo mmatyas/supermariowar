@@ -4,8 +4,6 @@
 #include "gfx/gfxPalette.h"
 #include "gfx/gfxSDL.h"
 
-#include "SDL_image.h"
-
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
@@ -34,7 +32,7 @@ Uint32 getRawPixel(SDL_Surface* surf, int x, int y)
     assert(0 <= x && x < surf->w);
     assert(0 <= y && y < surf->h);
 
-    const Uint8 bpp = surf->format->BytesPerPixel;
+    const Uint8 bpp = SDL_BYTESPERPIXEL(surf->format);
     const size_t idx = y * surf->pitch + x * bpp;
     const auto* pixel8 = static_cast<Uint8*>(surf->pixels) + idx;
 
@@ -56,7 +54,7 @@ void setRawPixel(SDL_Surface* surf, int x, int y, Uint32 value)
     assert(0 <= x && x < surf->w);
     assert(0 <= y && y < surf->h);
 
-    const Uint8 bpp = surf->format->BytesPerPixel;
+    const Uint8 bpp = SDL_BYTESPERPIXEL(surf->format);
     const size_t idx = y * surf->pitch + x * bpp;
     auto* pixel8 = static_cast<Uint8*>(surf->pixels) + idx;
 
@@ -90,7 +88,7 @@ void setRawPixel(SDL_Surface* surf, int x, int y, Uint32 value)
 void setRgb(SDL_Surface* surf, int x, int y, const RGB& color)
 {
     assert(surf);
-    const Uint32 rawPixel = SDL_MapRGB(surf->format, color.r, color.g, color.b);
+    const Uint32 rawPixel = SDL_MapSurfaceRGB(surf, color.r, color.g, color.b);
     setRawPixel(surf, x, y, rawPixel);
 }
 
@@ -147,11 +145,11 @@ gfxSprite createSkinSurface(
     SDL_UnlockSurface(source.getSurface());
     SDL_UnlockSurface(out.getSurface());
 
-    const auto color_key = SDL_MapRGB(out.getSurface()->format, colors::MAGENTA.r, colors::MAGENTA.g, colors::MAGENTA.b);
-    if (SDL_SetColorKey(out.getSurface(), SDL_TRUE, color_key) < 0) {
+    const auto color_key = SDL_MapSurfaceRGB(out.getSurface(), colors::MAGENTA.r, colors::MAGENTA.g, colors::MAGENTA.b);
+    if (!SDL_SetSurfaceColorKey(out.getSurface(), true, color_key)) {
         throw std::format("Couldn't set color key for new skin surface: {}", SDL_GetError());
     }
-    if (SDL_SetSurfaceRLE(out.getSurface(), 1) < 0) {
+    if (!SDL_SetSurfaceRLE(out.getSurface(), 1)) {
         throw std::format("Couldn't set RLE acceleration for new skin surface: {}", SDL_GetError());
     }
 
@@ -170,7 +168,7 @@ RGB getRgb(SDL_Surface* surf, int x, int y)
     assert(surf);
     const Uint32 rawPixel = getRawPixel(surf, x, y);
     RGB color;
-    SDL_GetRGB(rawPixel, surf->format, &color.r, &color.g, &color.b);
+    SDL_GetRGB(rawPixel, SDL_GetPixelFormatDetails(surf->format), SDL_GetSurfacePalette(surf), &color.r, &color.g, &color.b);
     return color;
 }
 
@@ -403,14 +401,12 @@ void gfx_drawpreview(
 
 void gfx_setjoystickteamcolor(SDL_Joystick* joystick, short team, float brightness)
 {
-#if SDL_VERSION_ATLEAST(2, 0, 14)
     if (team < 0) {
         // A non-playing user has no team
         return;
     }
     brightness = max(0.f, min(1.f, brightness));
     if (std::optional<RGB> color = gfx_palette.replacementFor(RGB {0x80, 0x00, 0x00}, team, PlayerPalette::normal)) {
-        SDL_JoystickSetLED(joystick, (Uint8)(brightness * color->r), (Uint8)(brightness * color->g), (Uint8)(brightness * color->b));
+        SDL_SetJoystickLED(joystick, (Uint8)(brightness * color->r), (Uint8)(brightness * color->g), (Uint8)(brightness * color->b));
     }
-#endif
 }

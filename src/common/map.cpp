@@ -14,7 +14,7 @@
 #include "Version.h"
 #include "map/MapReader.h"
 
-#include "SDL_image.h"
+#include <SDL3_image/SDL_image.h>
 
 #include <cmath>
 #include <iostream>
@@ -1778,8 +1778,8 @@ void CMap::preDrawPreviewBackground(const gfxSprite& background, gfxSprite& targ
 void CMap::preDrawPreviewBlocks(gfxSprite& targetSurface, bool fThumbnail)
 {
     if (!fThumbnail) {
-        SDL_FillRect(targetSurface.getSurface(), NULL, SDL_MapRGB(targetSurface.getSurface()->format, 255, 0, 255));
-        SDL_SetColorKey(targetSurface.getSurface(), SDL_TRUE, SDL_MapRGB(targetSurface.getSurface()->format, 255, 0, 255));
+        SDL_FillSurfaceRect(targetSurface.getSurface(), NULL, SDL_MapSurfaceRGB(targetSurface.getSurface(), 255, 0, 255));
+        SDL_SetSurfaceColorKey(targetSurface.getSurface(), true, SDL_MapSurfaceRGB(targetSurface.getSurface(), 255, 0, 255));
         smallDelay();
     }
 
@@ -1790,8 +1790,8 @@ void CMap::preDrawPreviewBlocks(gfxSprite& targetSurface, bool fThumbnail)
 void CMap::preDrawPreviewForeground(gfxSprite& targetSurface, bool fThumbnail)
 {
     if (!fThumbnail) {
-        SDL_FillRect(targetSurface.getSurface(), NULL, SDL_MapRGB(targetSurface.getSurface()->format, 255, 0, 255));
-        SDL_SetColorKey(targetSurface.getSurface(), SDL_TRUE, SDL_MapRGB(targetSurface.getSurface()->format, 255, 0, 255));
+        SDL_FillSurfaceRect(targetSurface.getSurface(), NULL, SDL_MapSurfaceRGB(targetSurface.getSurface(), 255, 0, 255));
+        SDL_SetSurfaceColorKey(targetSurface.getSurface(), true, SDL_MapSurfaceRGB(targetSurface.getSurface(), 255, 0, 255));
         smallDelay();
     }
 
@@ -1933,15 +1933,15 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
         //int color = 0x00 << 24 | RANDOM_INT(256) << 16 | RANDOM_INT(256) << 8 | RANDOM_INT(256);
     	int color = 0x128 << 24 | 0x255 << 8;
 
-    	SDL_FillRect(mapspr.getSurface(), &dest, color);		//fill empty area with black
+    	SDL_FillSurfaceRect(mapspr.getSurface(), &dest, color);		//fill empty area with black
     }
     */
 }
 
 void CMap::predrawforeground(gfxSprite &foregroundspr)
 {
-    SDL_FillRect(foregroundspr.getSurface(), NULL, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
-    SDL_SetColorKey(foregroundspr.getSurface(), SDL_TRUE, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
+    SDL_FillSurfaceRect(foregroundspr.getSurface(), NULL, SDL_MapSurfaceRGB(foregroundspr.getSurface(), 255, 0, 255));
+    SDL_SetSurfaceColorKey(foregroundspr.getSurface(), true, SDL_MapSurfaceRGB(foregroundspr.getSurface(), 255, 0, 255));
     draw(foregroundspr, 2);
     draw(foregroundspr, 3);
 }
@@ -1962,7 +1962,7 @@ void CMap::SetupAnimatedTiles()
         animatedBackmapSurface = rm->spr_backmap[g_iCurrentDrawIndex].getSurface();
         animatedTilesSurface = gfxSprite::blank(1024, 1024);
 
-        int iTransparentColor = SDL_MapRGB(animatedTilesSurface.getSurface()->format, 255, 0, 255);
+        int iTransparentColor = SDL_MapSurfaceRGB(animatedTilesSurface.getSurface(), 255, 0, 255);
 
         std::vector<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
 
@@ -2014,7 +2014,7 @@ void CMap::SetupAnimatedTiles()
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     tile->rAnimationSrc[1][sTileAnimationFrame] = rDst;
 
-                    SDL_FillRect(animatedTilesSurface.getSurface(), &rDst, iTransparentColor);
+                    SDL_FillSurfaceRect(animatedTilesSurface.getSurface(), &rDst, iTransparentColor);
 
                     for (short iLayer = 2; iLayer < 4; iLayer++) {
                         TilesetTile * tilesetTile = &tile->layers[iLayer];
@@ -2049,7 +2049,7 @@ void CMap::SetupAnimatedTiles()
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     tile->rAnimationSrc[0][sTileAnimationFrame] = rDst;
 
-                    SDL_FillRect(animatedTilesSurface.getSurface(), &rDst, iTransparentColor);
+                    SDL_FillSurfaceRect(animatedTilesSurface.getSurface(), &rDst, iTransparentColor);
 
                     TilesetTile * tilesetTile = &tile->layers[0];
                     if (tilesetTile->iID == TILESETANIMATED) {
@@ -2400,7 +2400,7 @@ void CMap::drawfrontlayer()
             if (mapdatatop[j][i].iType == TileType::gap)
     		{
     			SDL_Rect r = {j << 5, i << 5, TILESIZE, TILESIZE};
-    			SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 255, 0, 255));
+    			SDL_FillSurfaceRect(blitdest, &r, SDL_MapSurfaceRGB(blitdest, 255, 0, 255));
     		}
     	}
     }*/

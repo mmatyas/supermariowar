@@ -3,7 +3,7 @@
 #ifdef SDL2_USE_MIXERX
 #include "SDL_mixer_ext.h"
 #else
-#include "SDL_mixer.h"
+#include <SDL3_mixer/SDL_mixer.h>
 #endif
 
 #include <array>
@@ -11,11 +11,9 @@
 #include <filesystem>
 
 struct MixDeleter {
-    void operator()(Mix_Chunk* ptr) const noexcept;
-    void operator()(Mix_Music* ptr) const noexcept;
+    void operator()(MIX_Audio* ptr) const noexcept;
 };
-using MixChunkPtr = std::unique_ptr<Mix_Chunk, MixDeleter>;
-using MixMusicPtr = std::unique_ptr<Mix_Music, MixDeleter>;
+using MixAudioPtr = std::unique_ptr<MIX_Audio, MixDeleter>;
 
 
 bool sfx_init();
@@ -42,7 +40,7 @@ public:
     static void onChannelFinished(int channel);
 
 private:
-    MixChunkPtr m_sfx;
+    MixAudioPtr m_sfx;
     std::bitset<k_channels> m_channels;
     size_t m_last_start_time = 0;
 
@@ -63,6 +61,6 @@ public:
     bool isPlaying() const;
 
 private:
-    MixMusicPtr m_music;
+    MixAudioPtr m_music;
     bool m_paused = false;
 };

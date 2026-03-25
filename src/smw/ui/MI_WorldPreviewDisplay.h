@@ -3,7 +3,7 @@
 #include "gfx/gfxSprite.h"
 #include "uicontrol.h"
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 
 class MI_WorldPreviewDisplay : public UI_Control {

@@ -1249,7 +1249,7 @@ Spotlight* SpotlightManager::AddSpotlight(short ix, short iy, short iSize)
 void SpotlightManager::DrawSpotlights()
 {
     // Clear the overlay surface again with black
-    SDL_FillRect(rm->spr_overlay.getSurface(), NULL, 0x0);
+    SDL_FillSurfaceRect(rm->spr_overlay.getSurface(), NULL, 0x0);
 
     std::vector<Spotlight*>::iterator iter = spotlightList.begin(), lim = spotlightList.end();
 

@@ -1,6 +1,6 @@
 #include "gfxFont.h"
 
-#include "SDL_image.h"
+#include <SDL3_image/SDL_image.h>
 
 #include <cstdio>
 #include <cassert>
@@ -115,11 +115,11 @@ void gfxFont::drawf(int x, int y, const char *s, ...)
 
 void gfxFont::setalpha(Uint8 alpha)
 {
-    if (SDL_SetSurfaceBlendMode(m_font->Surface, SDL_BLENDMODE_BLEND) < 0) {
+    if (!SDL_SetSurfaceBlendMode(m_font->Surface, SDL_BLENDMODE_BLEND)) {
         fprintf(stderr, "\n ERROR: couldn't set blend mode on font surface: %s\n", SDL_GetError());
         return;
     }
-    if (SDL_SetSurfaceAlphaMod(m_font->Surface, alpha) < 0) {
+    if (!SDL_SetSurfaceAlphaMod(m_font->Surface, alpha)) {
         fprintf(stderr, "\n ERROR: couldn't set alpha on font surface: %s\n", SDL_GetError());
         return;
     }

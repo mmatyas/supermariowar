@@ -2,7 +2,7 @@
 
 #include "gfx.h"
 
-#include "SDL_image.h"
+#include <SDL3_image/SDL_image.h>
 
 #include <cstdio>
 

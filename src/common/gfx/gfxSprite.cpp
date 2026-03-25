@@ -2,7 +2,7 @@
 
 #include "gfx.h"
 
-#include "SDL_image.h"
+#include <SDL3_image/SDL_image.h>
 
 #include <cassert>
 #include <cstdio>
@@ -39,32 +39,32 @@ SdlSurfacePtr loadImage(
 
     auto raw = SdlSurfacePtr(IMG_Load(path_str.c_str()));
     if (!raw) {
-        throw std::format("Couldn't load {}: {}", path_str, IMG_GetError());
+        throw std::format("Couldn't load {}: {}", path_str, SDL_GetError());
     }
 
     if (color_key) {
-        const Uint32 key = SDL_MapRGB(raw->format, color_key->r, color_key->g, color_key->b);
-        if (SDL_SetColorKey(raw.get(), SDL_TRUE, key) < 0) {
+        const Uint32 key = SDL_MapSurfaceRGB(raw.get(), color_key->r, color_key->g, color_key->b);
+        if (!SDL_SetSurfaceColorKey(raw.get(), true, key)) {
             throw std::format("Couldn't set color key for {}: {}", path_str, SDL_GetError());
         }
     }
 
-    auto img = SdlSurfacePtr(SDL_ConvertSurface(raw.get(), screen->format, 0));
+    auto img = SdlSurfacePtr(SDL_ConvertSurface(raw.get(), screen->format));
     if (!img) {
         throw std::format("Couldn't convert {} to the display's pixel format: {}", path_str, SDL_GetError());
     }
 
     if (optimize) {
-        if (SDL_SetSurfaceRLE(img.get(), 1) < 0) {
+        if (!SDL_SetSurfaceRLE(img.get(), 1)) {
             throw std::format("Couldn't set RLE acceleration for {}: {}", path_str, SDL_GetError());
         }
     }
 
     if (alpha) {
-        if (SDL_SetSurfaceBlendMode(img.get(), SDL_BLENDMODE_BLEND) < 0) {
+        if (!SDL_SetSurfaceBlendMode(img.get(), SDL_BLENDMODE_BLEND)) {
             throw std::format("Couldn't set blend mode for {}: {}", path_str, SDL_GetError());
         }
-        if (SDL_SetSurfaceAlphaMod(img.get(), *alpha) < 0) {
+        if (!SDL_SetSurfaceAlphaMod(img.get(), *alpha)) {
             throw std::format("Couldn't set alpha modulation for {}: {}", path_str, SDL_GetError());
         }
     }
@@ -75,7 +75,7 @@ SdlSurfacePtr loadImage(
 
 void blitSurface(SDL_Surface* src, const SDL_Rect* srcArea, SDL_Surface* dst, SDL_Rect* dstArea)
 {
-    if (SDL_BlitSurface(src, srcArea, dst, dstArea) < 0) {
+    if (!SDL_BlitSurface(src, srcArea, dst, dstArea)) {
         fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
     }
 }
@@ -89,11 +89,11 @@ gfxSprite::gfxSprite(SdlSurfacePtr image, std::optional<int> wrap)
 
 gfxSprite gfxSprite::blank(unsigned w, unsigned h)
 {
-    auto surf = SdlSurfacePtr(SDL_CreateRGBSurfaceWithFormat(0x0, w, h, screen->format->BitsPerPixel, screen->format->format));
+    auto surf = SdlSurfacePtr(SDL_CreateSurface(w, h, SDL_PIXELFORMAT_ARGB8888));
     if (!surf)
         throw std::format("Couldn't create blank surface: {}", SDL_GetError());
 
-    if (SDL_SetSurfaceBlendMode(surf.get(), SDL_BLENDMODE_NONE) < 0)
+    if (!SDL_SetSurfaceBlendMode(surf.get(), SDL_BLENDMODE_NONE))
         throw std::format("Couldn't set blend mode for blank surface: {}", SDL_GetError());
 
     return gfxSprite(std::move(surf));
@@ -170,7 +170,7 @@ void gfxSprite::drawStretch(const SDL_Rect& srcRect, SDL_Surface* dst, const SDL
     // TODO: SDL2 requires dst to be writable. Fixed in SDL3.
     SDL_Rect dstRect_w = dstRect;
 
-    if (SDL_BlitScaled(m_picture.get(), &srcRect, dst, &dstRect_w) < 0) {
+    if (!SDL_BlitSurfaceScaled(m_picture.get(), &srcRect, dst, &dstRect_w, SDL_SCALEMODE_PIXELART)) {
         fprintf(stderr, "SDL_BlitScaled error: %s\n", SDL_GetError());
     }
 }
@@ -179,11 +179,11 @@ void gfxSprite::setalpha(Uint8 alpha)
 {
     assert(m_picture != NULL);
 
-    if (SDL_SetSurfaceBlendMode(m_picture.get(), SDL_BLENDMODE_BLEND) < 0) {
+    if (!SDL_SetSurfaceBlendMode(m_picture.get(), SDL_BLENDMODE_BLEND)) {
         fprintf(stderr, "\n ERROR: couldn't set blend mode on sprite: %s\n", SDL_GetError());
         return;
     }
-    if (SDL_SetSurfaceAlphaMod(m_picture.get(), alpha) < 0) {
+    if (!SDL_SetSurfaceAlphaMod(m_picture.get(), alpha)) {
         fprintf(stderr, "\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
         return;
     }
