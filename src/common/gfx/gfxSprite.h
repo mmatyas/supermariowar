@@ -16,11 +16,6 @@ enum class ClipEdge : unsigned char { Top, Right, Bottom, Left };
 class gfxSprite {
 public:
     explicit gfxSprite() = default;
-    explicit gfxSprite(
-        const std::filesystem::path& filename,
-        std::optional<RGB> color_key = colors::MAGENTA,
-        std::optional<Uint8> alpha = std::nullopt,
-        std::optional<int> wrap = std::nullopt);
     explicit gfxSprite(SdlSurfacePtr image, std::optional<int> wrap = 640);
 
     static gfxSprite blank(unsigned w, unsigned h);
@@ -75,35 +70,28 @@ private:
 };
 
 
-class SpriteBuilder {
+class ImageLoader {
 public:
-    explicit SpriteBuilder(std::filesystem::path path)
+    explicit ImageLoader(std::filesystem::path path)
         : m_path(std::move(path))
     {}
-
-    SpriteBuilder& withColorKey(RGB key) {
+    ImageLoader& withColorKey(RGB key) {
         m_color_key = key;
         return *this;
     }
-
-    SpriteBuilder& withoutColorKey() {
+    ImageLoader& withoutColorKey() {
         m_color_key = std::nullopt;
         return *this;
     }
-
-    SpriteBuilder& withAlpha(Uint8 alpha) {
+    ImageLoader& withAlpha(Uint8 alpha) {
         m_alpha = alpha;
         return *this;
     }
-
-    SpriteBuilder& withWrapping(int wrap_x = 640) {
+    ImageLoader& withWrapping(int wrap_x = 640) {
         m_wrap_x = wrap_x;
         return *this;
     }
-
-    gfxSprite create() const {
-        return gfxSprite(m_path, m_color_key, m_alpha, m_wrap_x);
-    }
+    gfxSprite create() const;
 
 private:
     std::filesystem::path m_path;

@@ -63,5 +63,5 @@ void LoadCurrentMapBackground()
     if (!FileExists(path))
         path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath());
 
-    rm->spr_background = SpriteBuilder(path).withoutColorKey().create();
+    rm->spr_background = ImageLoader(path).withoutColorKey().create();
 }

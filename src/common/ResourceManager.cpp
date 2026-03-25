@@ -57,7 +57,7 @@ SpriteStrip CResourceManager::LoadFullSkin(short skinID, short colorID)
 void CResourceManager::loadAllSprites() {
     const fs::path graphicspack = gamegraphicspacklist->currentPath();
     const auto builder = [&graphicspack](std::string_view relpath) {
-        return SpriteBuilder(convertPath(relpath, graphicspack));
+        return ImageLoader(convertPath(relpath, graphicspack));
     };
 
     std::string shyguyPath = convertPath("gfx/packs/modeskins/shyguy.png", graphicspack);
@@ -296,7 +296,7 @@ void CResourceManager::loadMenuGraphics()
 {
     const fs::path graphicspack = menugraphicspacklist->currentPath();
     const auto builder = [&graphicspack](std::string_view relpath) {
-        return SpriteBuilder(convertPath(relpath, graphicspack));
+        return ImageLoader(convertPath(relpath, graphicspack));
     };
 
     menu_shade = builder("gfx/packs/menu/menu_shade.png").withAlpha(App::menuTransparency).withoutColorKey().create();
@@ -343,7 +343,7 @@ void CResourceManager::loadWorldGraphics()
 {
     const fs::path graphicspack = worldgraphicspacklist->currentPath();
     const auto builder = [&graphicspack](std::string_view relpath) {
-        return SpriteBuilder(convertPath(relpath, graphicspack));
+        return ImageLoader(convertPath(relpath, graphicspack));
     };
 
     spr_worldbackground[0] = builder("gfx/packs/world/world_background.png").create();
@@ -387,7 +387,7 @@ void CResourceManager::loadStartGraphics()
 {
     const fs::path graphicspack = menugraphicspacklist->currentPath();
     const auto builder = [&graphicspack](std::string_view relpath) {
-        return SpriteBuilder(convertPath(relpath, graphicspack));
+        return ImageLoader(convertPath(relpath, graphicspack));
     };
 
     bool loadok = true;
@@ -406,7 +406,7 @@ void CResourceManager::loadAllGraphics()
 {
     const fs::path graphicspack = gamegraphicspacklist->currentPath();
     const auto builder = [&graphicspack](std::string_view relpath) {
-        return SpriteBuilder(convertPath(relpath, graphicspack));
+        return ImageLoader(convertPath(relpath, graphicspack));
     };
 
     loadMenuGraphics();

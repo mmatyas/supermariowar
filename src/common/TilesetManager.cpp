@@ -76,9 +76,9 @@ void CTileset::ensureLoaded()
     if (m_sprite_large.getSurface())
         return;
 
-    m_sprite_large = SpriteBuilder(m_tileset_path.parent_path() / "large.png").create();
-    m_sprite_medium = SpriteBuilder(m_tileset_path.parent_path() / "medium.png").create();
-    m_sprite_small = SpriteBuilder(m_tileset_path.parent_path() / "small.png").create();
+    m_sprite_large = ImageLoader(m_tileset_path.parent_path() / "large.png").create();
+    m_sprite_medium = ImageLoader(m_tileset_path.parent_path() / "medium.png").create();
+    m_sprite_small = ImageLoader(m_tileset_path.parent_path() / "small.png").create();
 
     m_width = std::min(m_sprite_large.getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
     m_height = std::min(m_sprite_large.getHeight() / TILESIZE, MAX_TILES_PER_AXIS);

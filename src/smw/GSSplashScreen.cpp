@@ -53,7 +53,7 @@ bool SplashScreenState::init()
 //  gfx_loadimagenocolorkey(&rm->menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
 
     menu_credits = new gfxSprite();
-    *menu_credits = SpriteBuilder(convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->currentPath())).create();
+    *menu_credits = ImageLoader(convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->currentPath())).create();
 
 //	const char * contributors[] = {
 //	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",

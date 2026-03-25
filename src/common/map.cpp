@@ -1321,7 +1321,7 @@ gfxSprite CMap::createThumbnailSurface(bool fUseClassicPack)
             path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath());
     }
     {
-        gfxSprite sBackground(path);
+        gfxSprite sBackground = ImageLoader(path).withoutColorKey().create();
         SDL_Rect srcRectBackground = {0, 0, App::screenWidth, App::screenHeight};
         SDL_Rect dstRectBackground = {0, 0, 160, 120};
         sBackground.drawStretch(srcRectBackground, sThumbnail.getSurface(), dstRectBackground);

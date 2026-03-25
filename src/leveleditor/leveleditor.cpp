@@ -419,79 +419,77 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- loading graphics ----------------\n");
 
-	rm->spr_tiletypes = gfxSprite(convertPath("gfx/leveleditor/leveleditor_tile_types.png"));
-	rm->spr_transparenttiles = gfxSprite(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png"), colors::MAGENTA, 160);
+	rm->spr_tiletypes = ImageLoader(convertPath("gfx/leveleditor/leveleditor_tile_types.png")).withoutColorKey().create();
+	rm->spr_transparenttiles = ImageLoader(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png")).withAlpha(160).create();
 
-	rm->spr_backgroundlevel = gfxSprite(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), colors::MAGENTA);
-	rm->spr_tilesetlevel = gfxSprite(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png"), colors::MAGENTA);
+	rm->spr_backgroundlevel = ImageLoader(convertPath("gfx/leveleditor/leveleditor_background_levels.png")).create();
+	rm->spr_tilesetlevel = ImageLoader(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png")).create();
 
-        rm->spr_eyecandy = gfxSprite(convertPath("gfx/leveleditor/leveleditor_eyecandy.png"), colors::MAGENTA);
+        rm->spr_eyecandy = ImageLoader(convertPath("gfx/leveleditor/leveleditor_eyecandy.png")).create();
 
         s_platform = IMG_Load(convertPath("gfx/leveleditor/leveleditor_platform.png").c_str());
         s_platformpathbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_pathtype_buttons.png").c_str());
         s_maphazardbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_maphazard_buttons.png").c_str());
 
-	rm->spr_warps[0] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_warp.png"), colors::MAGENTA);
-	rm->spr_warps[1] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), colors::MAGENTA);
-	rm->spr_warps[2] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), colors::MAGENTA);
+	rm->spr_warps[0] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_warp.png")).create();
+	rm->spr_warps[1] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_warp_preview.png")).create();
+	rm->spr_warps[2] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png")).create();
 
-	rm->spr_platformpath = gfxSprite(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), colors::MAGENTA, 128);
+	rm->spr_platformpath = ImageLoader(convertPath("gfx/leveleditor/leveleditor_platform_path.png")).withAlpha(128).create();
 
-	rm->spr_selectedtile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 128);
-	rm->spr_nospawntile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_nospawntile.png"), colors::BLACK, 128);
-	rm->spr_noitemspawntile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png"), colors::BLACK, 128);
-	rm->spr_platformstarttile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), colors::BLACK, 64);
-        rm->spr_platformstarttile.setWrap();
-	rm->spr_platformendtile = gfxSprite(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 64);
-        rm->spr_platformendtile.setWrap();
+	rm->spr_selectedtile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_selectedtile.png")).withColorKey(colors::BLACK).withAlpha(128).create();
+	rm->spr_nospawntile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_nospawntile.png")).withColorKey(colors::BLACK).withAlpha(128).create();
+	rm->spr_noitemspawntile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png")).withColorKey(colors::BLACK).withAlpha(128).create();
+	rm->spr_platformstarttile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png")).withColorKey(colors::BLACK).withAlpha(64).withWrapping().create();
+	rm->spr_platformendtile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_selectedtile.png")).withColorKey(colors::BLACK).withAlpha(64).withWrapping().create();
 
-	rm->spr_mapitems[0] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_mapitems.png"), colors::MAGENTA);
-	rm->spr_mapitems[1] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png"), colors::MAGENTA);
-	rm->spr_mapitems[2] = gfxSprite(convertPath("gfx/leveleditor/leveleditor_mapitems_thumbnail.png"), colors::MAGENTA);
+	rm->spr_mapitems[0] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_mapitems.png")).create();
+	rm->spr_mapitems[1] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png")).create();
+	rm->spr_mapitems[2] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_mapitems_thumbnail.png")).create();
 
-	rm->spr_dialog = gfxSprite(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA, 255);
-	rm->menu_shade = gfxSprite(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA, 128);
+	rm->spr_dialog = ImageLoader(convertPath("gfx/leveleditor/leveleditor_dialog.png")).withAlpha(255).create();
+	rm->menu_shade = ImageLoader(convertPath("gfx/leveleditor/leveleditor_shade.png")).withAlpha(128).create();
 
-	rm->spr_tileanimation[0] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/tile_animation.png"), colors::MAGENTA);
-	rm->spr_tileanimation[1] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), colors::MAGENTA);
-	rm->spr_tileanimation[2] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), colors::MAGENTA);
+	rm->spr_tileanimation[0] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/tile_animation.png")).create();
+	rm->spr_tileanimation[1] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png")).create();
+	rm->spr_tileanimation[2] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png")).create();
 
-	rm->spr_blocks[0] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/blocks.png"), colors::MAGENTA);
-	rm->spr_blocks[1] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), colors::MAGENTA);
-	rm->spr_blocks[2] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), colors::MAGENTA);
+	rm->spr_blocks[0] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/blocks.png")).create();
+	rm->spr_blocks[1] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png")).create();
+	rm->spr_blocks[2] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png")).create();
 
-	rm->spr_unknowntile[0] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/unknown_tile.png"), colors::MAGENTA);
-	rm->spr_unknowntile[1] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), colors::MAGENTA);
-	rm->spr_unknowntile[2] = gfxSprite(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), colors::MAGENTA);
+	rm->spr_unknowntile[0] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/unknown_tile.png")).create();
+	rm->spr_unknowntile[1] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png")).create();
+	rm->spr_unknowntile[2] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png")).create();
 
-	rm->spr_powerups = gfxSprite(convertPath("gfx/packs/Classic/powerups/large.png"), colors::MAGENTA);
-	rm->spr_powerupselector = gfxSprite(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), colors::MAGENTA, 128);
-	rm->spr_hidden_marker = gfxSprite(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png"), colors::MAGENTA);
+	rm->spr_powerups = ImageLoader(convertPath("gfx/packs/Classic/powerups/large.png")).create();
+	rm->spr_powerupselector = ImageLoader(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png")).withAlpha(128).create();
+	rm->spr_hidden_marker = ImageLoader(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png")).create();
 
-	rm->spr_flagbases = gfxSprite(convertPath("gfx/packs/Classic/modeobjects/flagbases.png"), colors::MAGENTA);
-	rm->spr_racegoals = gfxSprite(convertPath("gfx/packs/Classic/modeobjects/racegoal.png"), colors::MAGENTA);
+	rm->spr_flagbases = ImageLoader(convertPath("gfx/packs/Classic/modeobjects/flagbases.png")).create();
+	rm->spr_racegoals = ImageLoader(convertPath("gfx/packs/Classic/modeobjects/racegoal.png")).create();
 
-	rm->spr_hazard_fireball[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/fireball.png"), colors::MAGENTA);
-	rm->spr_hazard_fireball[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/fireball_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_fireball[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_fireball[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/fireball.png")).create();
+	rm->spr_hazard_fireball[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/fireball_preview.png")).create();
+	rm->spr_hazard_fireball[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png")).create();
 
-	rm->spr_hazard_rotodisc[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/rotodisc.png"), colors::MAGENTA);
-	rm->spr_hazard_rotodisc[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_rotodisc[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_rotodisc[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/rotodisc.png")).create();
+	rm->spr_hazard_rotodisc[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png")).create();
+	rm->spr_hazard_rotodisc[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png")).create();
 
-	rm->spr_hazard_bulletbill[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/bulletbill.png"), colors::MAGENTA);
-	rm->spr_hazard_bulletbill[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_bulletbill[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_bulletbill[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/bulletbill.png")).create();
+	rm->spr_hazard_bulletbill[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png")).create();
+	rm->spr_hazard_bulletbill[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png")).create();
 
-	rm->spr_hazard_flame[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/flame.png"), colors::MAGENTA);
-	rm->spr_hazard_flame[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/flame_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_flame[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_flame[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/flame.png")).create();
+	rm->spr_hazard_flame[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/flame_preview.png")).create();
+	rm->spr_hazard_flame[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png")).create();
 
-	rm->spr_hazard_pirhanaplant[0] = gfxSprite(convertPath("gfx/packs/Classic/hazards/pirhanaplant.png"), colors::MAGENTA);
-	rm->spr_hazard_pirhanaplant[1] = gfxSprite(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_pirhanaplant[2] = gfxSprite(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_pirhanaplant[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/pirhanaplant.png")).create();
+	rm->spr_hazard_pirhanaplant[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png")).create();
+	rm->spr_hazard_pirhanaplant[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png")).create();
 
-	rm->spr_number_icons = gfxSprite(convertPath("gfx/packs/Classic/awards/killsinrownumbers.png"), colors::MAGENTA);
+	rm->spr_number_icons = ImageLoader(convertPath("gfx/packs/Classic/awards/killsinrownumbers.png")).create();
 
     for (short i = 0; i < 3; i++) {
 		rm->spr_hazard_fireball[i].setWrap(640 >> i);
@@ -930,7 +928,7 @@ int editor_edit()
                     if (key == SDLK_g) {
                         backgroundlist->next();
 
-                        rm->spr_background = gfxSprite(backgroundlist->currentPath());
+                        rm->spr_background = ImageLoader(backgroundlist->currentPath()).withoutColorKey().create();
                         g_map->szBackgroundFile = backgroundlist->currentPath().filename().string();
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
@@ -4128,7 +4126,7 @@ int editor_backgrounds()
                             {
                                 backgroundlist->setCurrentIndex(iPage * 16 + iBackground);
 
-                                rm->spr_background = gfxSprite(backgroundlist->currentPath());
+                                rm->spr_background = ImageLoader(backgroundlist->currentPath()).withoutColorKey().create();
                                 g_map->szBackgroundFile = backgroundlist->currentPath().filename().string();
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
@@ -4748,7 +4746,7 @@ void loadcurrentmap()
         backgroundlist->setCurrentPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
 
-	rm->spr_background = gfxSprite(path);
+    rm->spr_background = ImageLoader(path).withoutColorKey().create();
 
         g_iNumPlatforms = g_map->platforms.size();
 
