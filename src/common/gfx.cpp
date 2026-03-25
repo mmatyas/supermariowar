@@ -103,8 +103,8 @@ void setRgb(SDL_Surface* surf, int x, int y, const RGB& color)
  * @param  mirrored     render horizontally mirrored
  * @return              team-colored surface
  */
-SdlSurfacePtr createSkinSurface(
-    const SdlSurfacePtr& source,
+gfxSprite createSkinSurface(
+    const gfxSprite& source,
     size_t sourceFrame,
     size_t team,
     bool allStates,
@@ -113,21 +113,13 @@ SdlSurfacePtr createSkinSurface(
     //Take the loaded skin and colorize it for each state (normal, 3 frames of invincibility, shielded, tagged, ztarred, got shine, frozen)
     const size_t outFrameCount = allStates ? PlayerPalette::COUNT : 1;
 
-    auto out = SdlSurfacePtr(SDL_CreateRGBSurface(
-        0x0,
-        32 * outFrameCount,
-        32,
-        screen->format->BitsPerPixel,
-        screen->format->Rmask,
-        screen->format->Gmask,
-        screen->format->Bmask,
-        0x0 /* no alpha */));
+    auto out = gfxSprite::blank(32 * outFrameCount, 32);
 
-    if (SDL_MUSTLOCK(out.get()))
-        SDL_LockSurface(out.get());
+    if (SDL_MUSTLOCK(out.getSurface()))
+        SDL_LockSurface(out.getSurface());
 
-    if (SDL_MUSTLOCK(source.get()))
-        SDL_LockSurface(source.get());
+    if (SDL_MUSTLOCK(source.getSurface()))
+        SDL_LockSurface(source.getSurface());
 
     const int startX = sourceFrame * 32;
 
@@ -135,40 +127,40 @@ SdlSurfacePtr createSkinSurface(
         for (int srcX = 0; srcX < 32; srcX++) {
             const int dstX = mirrored ? (31 - srcX) : srcX;
 
-            const RGB pixelColor = getRgb(source.get(), startX + srcX, y);
+            const RGB pixelColor = getRgb(source.getSurface(), startX + srcX, y);
 
             const auto it = gfx_palette.colorSheets().find(pixelColor);
             if (it != gfx_palette.colorSheets().cend()) {
                 const ColorSheet& sheet = it->second;
                 for (size_t outFrame = 0; outFrame < outFrameCount; outFrame++) {
                     const RGB paletteColor = sheet.replacementFor(team, static_cast<PlayerPalette>(outFrame));
-                    setRgb(out.get(), outFrame * 32 + dstX, y, paletteColor);
+                    setRgb(out.getSurface(), outFrame * 32 + dstX, y, paletteColor);
                 }
             } else {
                 for (size_t outFrame = 0; outFrame < outFrameCount; outFrame++) {
-                    setRgb(out.get(), outFrame * 32 + dstX, y, pixelColor);
+                    setRgb(out.getSurface(), outFrame * 32 + dstX, y, pixelColor);
                 }
             }
         }
     }
 
-    SDL_UnlockSurface(source.get());
-    SDL_UnlockSurface(out.get());
+    SDL_UnlockSurface(source.getSurface());
+    SDL_UnlockSurface(out.getSurface());
 
-    const auto color_key = SDL_MapRGB(out->format, colors::MAGENTA.r, colors::MAGENTA.g, colors::MAGENTA.b);
-    if (SDL_SetColorKey(out.get(), SDL_TRUE, color_key) < 0) {
+    const auto color_key = SDL_MapRGB(out.getSurface()->format, colors::MAGENTA.r, colors::MAGENTA.g, colors::MAGENTA.b);
+    if (SDL_SetColorKey(out.getSurface(), SDL_TRUE, color_key) < 0) {
         throw std::format("Couldn't set color key for new skin surface: {}", SDL_GetError());
     }
-    if (SDL_SetSurfaceRLE(out.get(), 1) < 0) {
+    if (SDL_SetSurfaceRLE(out.getSurface(), 1) < 0) {
         throw std::format("Couldn't set RLE acceleration for new skin surface: {}", SDL_GetError());
     }
 
     return out;
 }
 
-bool validSkinSurface(const SdlSurfacePtr& skin)
+bool validSkinSurface(const gfxSprite& skin)
 {
-    return skin->w == 192 && skin->h == 32;
+    return skin.getWidth() == 192 && skin.getHeight() == 32;
 }
 } // namespace
 
@@ -214,9 +206,7 @@ bool gfx_loadpalette(const std::filesystem::path& palette_path) {
 
 SpriteStrip gfx_loadmenuskin(const fs::path& path, short colorScheme, bool fLoadBothDirections)
 {
-    auto skin = SdlSurfacePtr(IMG_Load(path.string().c_str()));
-    if (!skin)
-        throw std::format("Couldn't load {}: {}", path.string(), IMG_GetError());
+    const gfxSprite skin = ImageLoader(path).withoutColorKey().withoutOptimization().create();
 
     if (!validSkinSurface(skin))
         throw std::format("Invalid skin file: {} has incorrect dimensions", path.string());
@@ -224,14 +214,12 @@ SpriteStrip gfx_loadmenuskin(const fs::path& path, short colorScheme, bool fLoad
     SpriteStrip strip;
 
     for (size_t i = 0; i < 2; i++) {
-        SdlSurfacePtr skinSurface = createSkinSurface(skin, i, colorScheme, true, false);
-        strip[i * 2] = gfxSprite(std::move(skinSurface));
+        strip[i * 2] = createSkinSurface(skin, i, colorScheme, true, false);
     }
 
     if (fLoadBothDirections) {
         for (size_t i = 0; i < 2; i++) {
-            SdlSurfacePtr skinSurface = createSkinSurface(skin, i, colorScheme, true, true);
-            strip[i * 2 + 1] = gfxSprite(std::move(skinSurface));
+            strip[i * 2 + 1] = createSkinSurface(skin, i, colorScheme, true, true);
         }
     }
 
@@ -240,9 +228,7 @@ SpriteStrip gfx_loadmenuskin(const fs::path& path, short colorScheme, bool fLoad
 
 SpriteStrip gfx_loadfullskin(const fs::path& path, short colorScheme)
 {
-    auto skin = SdlSurfacePtr(IMG_Load(path.string().c_str()));
-    if (!skin)
-        throw std::format("Couldn't load {}: {}", path.string(), IMG_GetError());
+    const gfxSprite skin = ImageLoader(path).withoutColorKey().withoutOptimization().create();
 
     if (!validSkinSurface(skin))
         throw std::format("Invalid skin file: {} has incorrect dimensions", path.string());
@@ -251,18 +237,15 @@ SpriteStrip gfx_loadfullskin(const fs::path& path, short colorScheme)
 
     for (size_t k = 0; k < 4; k++) {
         for (size_t j = 0; j < 2; j++) {
-            SdlSurfacePtr skinSurface = createSkinSurface(skin, k, colorScheme, true, j != 0);
-            strip[(k * 2) + j] = gfxSprite(std::move(skinSurface));
+            strip[(k * 2) + j] = createSkinSurface(skin, k, colorScheme, true, j != 0);
         }
     }
 
     //Dead Flying Sprite
-    SdlSurfacePtr skinSurface = createSkinSurface(skin, 4, colorScheme, true, false);
-    strip[8] = gfxSprite(std::move(skinSurface));
+    strip[8] = createSkinSurface(skin, 4, colorScheme, true, false);
 
     //Dead Stomped Sprite
-    skinSurface = createSkinSurface(skin, 5, colorScheme, true, false);
-    strip[9] = gfxSprite(std::move(skinSurface));
+    strip[9] = createSkinSurface(skin, 5, colorScheme, true, false);
 
     return strip;
 }

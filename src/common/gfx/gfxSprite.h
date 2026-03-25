@@ -91,10 +91,15 @@ public:
         m_wrap_x = wrap_x;
         return *this;
     }
+    ImageLoader& withoutOptimization() {
+        m_optimize = false;
+        return *this;
+    }
     gfxSprite create() const;
 
 private:
     std::filesystem::path m_path;
+    bool m_optimize = true;
     std::optional<RGB> m_color_key = colors::MAGENTA;
     std::optional<Uint8> m_alpha = std::nullopt;
     std::optional<int> m_wrap_x = std::nullopt;

@@ -21,6 +21,7 @@ extern short y_shake;
 namespace {
 SdlSurfacePtr loadImage(
     const fs::path& path,
+    bool optimize = true,
     std::optional<RGB> color_key = std::nullopt,
     std::optional<Uint8> alpha = std::nullopt)
 {
@@ -53,8 +54,10 @@ SdlSurfacePtr loadImage(
         throw std::format("Couldn't convert {} to the display's pixel format: {}", path_str, SDL_GetError());
     }
 
-    if (SDL_SetSurfaceRLE(img.get(), 1) < 0) {
-        throw std::format("Couldn't set RLE acceleration for {}: {}", path_str, SDL_GetError());
+    if (optimize) {
+        if (SDL_SetSurfaceRLE(img.get(), 1) < 0) {
+            throw std::format("Couldn't set RLE acceleration for {}: {}", path_str, SDL_GetError());
+        }
     }
 
     if (alpha) {
@@ -89,6 +92,9 @@ gfxSprite gfxSprite::blank(unsigned w, unsigned h)
     auto surf = SdlSurfacePtr(SDL_CreateRGBSurfaceWithFormat(0x0, w, h, screen->format->BitsPerPixel, screen->format->format));
     if (!surf)
         throw std::format("Couldn't create blank surface: {}", SDL_GetError());
+
+    if (SDL_SetSurfaceBlendMode(surf.get(), SDL_BLENDMODE_NONE) < 0)
+        throw std::format("Couldn't set blend mode for blank surface: {}", SDL_GetError());
 
     return gfxSprite(std::move(surf));
 }
@@ -191,5 +197,5 @@ void gfxSprite::setWrap(short wrapsize)
 
 gfxSprite ImageLoader::create() const
 {
-    return gfxSprite(loadImage(m_path, m_color_key, m_alpha), m_wrap_x);
+    return gfxSprite(loadImage(m_path, m_optimize, m_color_key, m_alpha), m_wrap_x);
 }
