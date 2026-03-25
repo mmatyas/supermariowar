@@ -45,13 +45,5 @@ public:
     short iDigitLeft = 0;
 
 private:
-    void SetDigitCounters() {
-        short iDigits = score;
-        while (iDigits > 999)
-            iDigits -= 1000;
-
-        iDigitLeft = iDigits / 100 * 16;
-        iDigitMiddle = iDigits % 100 / 10 * 16;
-        iDigitRight = iDigits % 10 * 16;
-    }
+    void SetDigitCounters();
 };

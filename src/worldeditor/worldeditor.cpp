@@ -244,7 +244,6 @@ short LookupTeamID(short id)
 gfxSprite		spr_scoretext;
 gfxSprite		spr_poof;
 
-void CScore::AdjustScore(short iValue) {}
 ///////
 
 CObjectContainer noncolcontainer;

@@ -48,19 +48,6 @@ extern short x_shake;
 extern short y_shake;
 
 
-void CScore::AdjustScore(short iValue)
-{
-    if (game_values.gamemode->gameover)
-        return;
-
-    score += iValue;
-
-    if (score < 0)
-        score = 0;
-
-    SetDigitCounters();
-}
-
 void CMap::movingPlatformCollision(CPlayer * player)
 {
     //Collide player with normal moving platforms

@@ -25,6 +25,8 @@ add_executable(smw WIN32
 	objecthazard.h
 	player.cpp
 	player.h
+	Score.cpp
+	Score.h
 	world.cpp
 	world.h
 
