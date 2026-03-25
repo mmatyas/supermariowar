@@ -50,10 +50,6 @@ short joystickcount = 0;
 //0,10,0,1,0,10,6,0,0,0,2,0,8,4,2,4,0,10,0,5,2,0,0
 
 
-//Conversion from backgrounds to music categories created by NMcCoy
-const char * g_szMusicCategoryNames[MAXMUSICCATEGORY] = {"Land", "Underground", "Underwater", "Castle", "Platforms", "Ghost", "Bonus", "Battle", "Desert", "Clouds", "Snow"};
-
-
 void LoadCurrentMapBackground()
 {
     std::string path = "gfx/packs/backgrounds/" + g_map->szBackgroundFile;

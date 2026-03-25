@@ -322,7 +322,6 @@ short g_iNumPlatforms = 0;
 MapPlatform g_Platforms[MAX_PLATFORMS];
 
 BackgroundList *backgroundlist;
-extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 short g_musiccategorydisplaytimer = 0;
 
 short g_messagedisplaytimer = 0;
@@ -917,8 +916,8 @@ int editor_edit()
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
 								//Set music to background default
-                            for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
-                                if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile.c_str(), strlen(g_szMusicCategoryNames[iCategory]))) {
+                            for (short iCategory = 0; iCategory < static_cast<short>(MusicCategory::COUNT); iCategory++) {
+                                if (to_string(static_cast<MusicCategory>(iCategory)) == g_map->szBackgroundFile) {
 										g_map->musicCategoryID = iCategory;
 										break;
 									}
@@ -1553,7 +1552,7 @@ int editor_edit()
 
 				rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 				rm->menu_font_small.drawCentered(320, 195, "Music Category");
-				rm->menu_font_large.drawCentered(320, 220, g_szMusicCategoryNames[g_map->musicCategoryID]);
+                                rm->menu_font_large.drawCentered(320, 220, to_string(static_cast<MusicCategory>(g_map->musicCategoryID)).data());
 
 				rm->menu_font_small.drawCentered(320, 255, "Press 'R' Again");
 				rm->menu_font_small.drawCentered(320, 270, "To Change");
@@ -4114,8 +4113,8 @@ int editor_backgrounds()
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
 									//Set music to background default
-                                    for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
-                                        if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile.c_str(), strlen(g_szMusicCategoryNames[iCategory]))) {
+                                    for (short iCategory = 0; iCategory < static_cast<short>(MusicCategory::COUNT); iCategory++) {
+                                        if (to_string(static_cast<MusicCategory>(iCategory)) == g_map->szBackgroundFile) {
 											g_map->musicCategoryID = iCategory;
 											break;
 										}
