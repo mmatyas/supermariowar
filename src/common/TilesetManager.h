@@ -87,7 +87,7 @@ private:
     std::vector<CTileset> m_tilesets;
     size_t m_classicTilesetIndex = SIZE_MAX;
 
-    static std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_ingame;
-    static std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_preview;
-    static std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_thumb;
+    static const std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_ingame;
+    static const std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_preview;
+    static const std::array<SDL_Rect, CTileset::MAX_TILES> s_rects_thumb;
 };

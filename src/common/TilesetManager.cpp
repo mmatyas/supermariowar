@@ -146,9 +146,9 @@ void CTileset::saveTileset() const
 *  CTilesetManager
 *********************************/
 
-std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_ingame = generateTilesetRects(TILESIZE);
-std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_preview = generateTilesetRects(PREVIEWTILESIZE);
-std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_thumb = generateTilesetRects(THUMBTILESIZE);
+const std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_ingame = generateTilesetRects(TILESIZE);
+const std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_preview = generateTilesetRects(PREVIEWTILESIZE);
+const std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_thumb = generateTilesetRects(THUMBTILESIZE);
 
 CTilesetManager::CTilesetManager(const fs::path& gfxPack)
 {
