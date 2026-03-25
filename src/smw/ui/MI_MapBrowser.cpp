@@ -7,8 +7,6 @@
 #include "path.h"
 #include "ResourceManager.h"
 
-#include "SDL_image.h"
-
 extern CGameValues game_values;
 extern CResourceManager* rm;
 extern CMap* g_map;
@@ -30,9 +28,6 @@ inline void smallDelay() {}
 MI_MapBrowser::MI_MapBrowser()
     : UI_Control(0, 0)
 {
-    for (short iSurface = 0; iSurface < 9; iSurface++)
-        mapSurfaces[iSurface] = nullptr;
-
     srcRectBackground.x = 0;
     srcRectBackground.y = 0;
     srcRectBackground.w = App::screenWidth;
@@ -42,16 +37,6 @@ MI_MapBrowser::MI_MapBrowser()
     dstRectBackground.y = 0;
     dstRectBackground.w = 160;
     dstRectBackground.h = 120;
-}
-
-MI_MapBrowser::~MI_MapBrowser()
-{
-    for (short iSurface = 0; iSurface < 9; iSurface++) {
-        if (mapSurfaces[iSurface]) {
-            SDL_FreeSurface(mapSurfaces[iSurface]);
-            mapSurfaces[iSurface] = nullptr;
-        }
-    }
 }
 
 void MI_MapBrowser::Update()
@@ -83,7 +68,7 @@ void MI_MapBrowser::Draw()
 
                 rDst.x = iCol * 200 + 40;
 
-                SDL_BlitSurface(mapSurfaces[iRow * 3 + iCol], &rSrc, blitdest, &rDst);
+                mapSurfaces[iRow * 3 + iCol].draw(rSrc, blitdest, rDst);
 
                 if (iType == 0) {
                     if (mapListNodes[iRow * 3 + iCol]->pfFilters[game_values.selectedmapfilter])
@@ -104,7 +89,7 @@ void MI_MapBrowser::Draw()
     rm->menu_dialog.draw(rDst.x - 16, rDst.y + 132, {0, 464, 176, 16});
     rm->menu_dialog.draw(rDst.x + 160, rDst.y + 132, {496, 464, 16, 16});
 
-    SDL_BlitSurface(mapSurfaces[iSelectedRow * 3 + iSelectedCol], &rSrc, blitdest, &rDst);
+    mapSurfaces[iSelectedRow * 3 + iSelectedCol].draw(rSrc, blitdest, rDst);
 
     if (iType == 0) {
         if (mapListNodes[iSelectedRow * 3 + iSelectedCol]->pfFilters[game_values.selectedmapfilter])
@@ -281,11 +266,7 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
             smallDelay();
         }
 
-        if (mapSurfaces[iMap])
-            SDL_FreeSurface(mapSurfaces[iMap]);
-
-        mapSurfaces[iMap] = IMG_Load(sConvertedPath.c_str());
-
+        mapSurfaces[iMap] = ImageLoader(sConvertedPath.c_str()).withoutColorKey().create();
         mapListNodes[iMap] = &(*itr).second;
         mapNames[iMap] = (*itr).first.c_str();
         mapListItr[iMap] = itr;
