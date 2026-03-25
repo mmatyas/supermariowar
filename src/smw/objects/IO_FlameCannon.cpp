@@ -97,7 +97,12 @@ void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 {
     if (state > 0) {
         const SDL_Rect& rect = g_rFlameRects[iDirection][iFrame];
-        gfx_drawpreview(rm->spr_hazard_flame[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect.x >> 1, rect.y >> 1, rect.w >> 1, rect.h >> 1, iOffsetX, iOffsetY, 320, 240, true);
+        gfx_drawpreview(rm->spr_hazard_flame[1],
+            (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+            rect.x >> 1, rect.y >> 1,
+            rect.w >> 1, rect.h >> 1,
+            {iOffsetX, iOffsetY, 320, 240},
+            true);
     }
 }
 

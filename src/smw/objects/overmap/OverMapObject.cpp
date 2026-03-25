@@ -57,7 +57,12 @@ void IO_OverMapObject::draw()
 
 void IO_OverMapObject::draw(short iOffsetX, short iOffsetY)
 {
-    gfx_drawpreview(spr->getSurface(), ((ix - collisionOffsetX) >> 1) + iOffsetX, ((iy - collisionOffsetY) >> 1) + iOffsetY, drawframe >> 1, animationOffsetY >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, true);
+    gfx_drawpreview(*spr,
+        ((ix - collisionOffsetX) >> 1) + iOffsetX, ((iy - collisionOffsetY) >> 1) + iOffsetY,
+        drawframe >> 1, animationOffsetY >> 1,
+        iw >> 1, ih >> 1,
+        {iOffsetX, iOffsetY, 320, 240},
+        true);
 }
 
 void IO_OverMapObject::update()

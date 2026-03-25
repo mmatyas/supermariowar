@@ -250,40 +250,40 @@ SpriteStrip gfx_loadfullskin(const fs::path& path, short colorScheme)
     return strip;
 }
 
-void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h)
+void gfx_cliprect(SDL_Rect& srcRect, SDL_Rect& dstRect, const SDL_Rect& clipArea)
 {
-    if (dstRect->x >= x + w || dstRect->x + dstRect->w < x || dstRect->y >= y + h || dstRect->y + dstRect->h < y) {
-        srcRect->w = 0;
-        srcRect->h = 0;
+    if (dstRect.x >= clipArea.x + clipArea.w
+        || dstRect.x + dstRect.w < clipArea.x
+        || dstRect.y >= clipArea.y + clipArea.h
+        || dstRect.y + dstRect.h < clipArea.y)
+    {
+        srcRect.w = 0;
+        srcRect.h = 0;
         return;
     }
 
-    if (dstRect->x < x) {
-        short iDiffX = x - dstRect->x;
-        srcRect->x += iDiffX;
-        srcRect->w -= iDiffX;
-        dstRect->x = x;
-        //dstRect->w -= iDiffX;
+    if (dstRect.x < clipArea.x) {
+        int iDiffX = clipArea.x - dstRect.x;
+        srcRect.x += iDiffX;
+        srcRect.w -= iDiffX;
+        dstRect.x = clipArea.x;
     }
 
-    if (dstRect->x + dstRect->w >= x + w) {
-        short iDiffX = dstRect->x + dstRect->w - x - w;
-        srcRect->w -= iDiffX;
-        //dstRect->w -= iDiffX;
+    if (dstRect.x + dstRect.w >= clipArea.x + clipArea.w) {
+        int iDiffX = dstRect.x + dstRect.w - clipArea.x - clipArea.w;
+        srcRect.w -= iDiffX;
     }
 
-    if (dstRect->y < y) {
-        short iDiffY = y - dstRect->y;
-        srcRect->y += iDiffY;
-        srcRect->h -= iDiffY;
-        dstRect->y = y;
-        //dstRect->h -= iDiffY;
+    if (dstRect.y < clipArea.y) {
+        int iDiffY = clipArea.y - dstRect.y;
+        srcRect.y += iDiffY;
+        srcRect.h -= iDiffY;
+        dstRect.y = clipArea.y;
     }
 
-    if (dstRect->y + dstRect->h >= y + h) {
-        short iDiffY = dstRect->y + dstRect->h - y - h;
-        srcRect->h -= iDiffY;
-        //dstRect->h -= iDiffY;
+    if (dstRect.y + dstRect.h >= clipArea.y + clipArea.h) {
+        int iDiffY = dstRect.y + dstRect.h - clipArea.y - clipArea.h;
+        srcRect.h -= iDiffY;
     }
 }
 
@@ -342,11 +342,11 @@ bool gfx_adjusthiddenrects(SDL_Rect& src, SDL_Rect& dst, ClipEdge edge, int thre
 }
 
 void gfx_drawpreview(
-    SDL_Surface * surface,
+    gfxSprite& sprite,
     short dstX, short dstY,
     short srcX, short srcY,
     short iw, short ih,
-    short clipX, short clipY, short clipW, short clipH,
+    const SDL_Rect& clipRect,
     bool wrap,
     std::optional<std::pair<ClipEdge, int>> clip)
 {
@@ -354,7 +354,7 @@ void gfx_drawpreview(
     SDL_Rect rSrcRect = {srcX, srcY, iw, ih};
     SDL_Rect rDstRect = {dstX, dstY, iw, ih};
 
-    gfx_cliprect(&rSrcRect, &rDstRect, clipX, clipY, clipW, clipH);
+    gfx_cliprect(rSrcRect, rDstRect, clipRect);
 
     if (clip) {
         auto [edge, threshold] = *clip;
@@ -363,18 +363,15 @@ void gfx_drawpreview(
     }
 
     // Blit onto the screen surface
-    if (SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0) {
-        fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-        return;
-    }
+    sprite.draw(rSrcRect, blitdest, rDstRect);
 
     if (wrap) {
         //Deal with wrapping over sides of screen
         bool fBlitSide = false;
-        if (dstX < clipX) {
+        if (dstX < clipRect.x) {
             rDstRect.x = dstX + 320; // TODO: Get it from a global setting.
             fBlitSide = true;
-        } else if (dstX + iw >= clipX + clipW) {
+        } else if (dstX + iw >= clipRect.x + clipRect.w) {
             rDstRect.x = dstX - 320; // TODO: Get it from a global setting.
             fBlitSide = true;
         }
@@ -390,7 +387,7 @@ void gfx_drawpreview(
             rDstRect.w = iw;
             rDstRect.h = ih;
 
-            gfx_cliprect(&rSrcRect, &rDstRect, clipX, clipY, clipW, clipH);
+            gfx_cliprect(rSrcRect, rDstRect, clipRect);
 
             if (clip) {
                 auto [edge, threshold] = *clip;
@@ -398,10 +395,7 @@ void gfx_drawpreview(
                     return;
             }
 
-            if (SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return;
-            }
+            sprite.draw(rSrcRect, blitdest, rDstRect);
         }
     }
 }

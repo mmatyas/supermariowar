@@ -92,10 +92,22 @@ void MO_BulletBill::draw()
 // For preview drawing
 void MO_BulletBill::draw(short iOffsetX, short iOffsetY)
 {
-    if (fIsSpawned)
-        gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false, {{static_cast<ClipEdge>(iHiddenDirection), (iHiddenPlane >> 1) + iOffsetX}});
-    else
-        gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false);
+    if (fIsSpawned) {
+        gfx_drawpreview(*spr,
+            (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+            drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1,
+            iw >> 1, ih >> 1,
+            {iOffsetX, iOffsetY, 320, 240},
+            false,
+            {{static_cast<ClipEdge>(iHiddenDirection), (iHiddenPlane >> 1) + iOffsetX}});
+    } else {
+        gfx_drawpreview(*spr,
+            (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+            drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1,
+            iw >> 1, ih >> 1,
+            {iOffsetX, iOffsetY, 320, 240},
+            false);
+    }
 }
 
 bool MO_BulletBill::collide(CPlayer* player)

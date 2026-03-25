@@ -43,7 +43,7 @@ void gfx_take_screenshot();
 void gfx_close();
 bool gfx_loadpalette(const std::filesystem::path& palette_path);
 
-void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h);
+void gfx_cliprect(SDL_Rect& srcRect, SDL_Rect& dstRect, const SDL_Rect& clipRect);
 
 /// Clips a source and destination area pair, so that the destination area doesn't go past
 /// a certain threshold in a given direction.
@@ -52,10 +52,10 @@ void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, shor
 /// Returns true if the destination area is fully hidden.
 [[nodiscard]] bool gfx_adjusthiddenrects(SDL_Rect& srcRect, SDL_Rect& dstRect, ClipEdge edge, int threshold);
 
-void gfx_drawpreview(SDL_Surface * surface,
+void gfx_drawpreview(gfxSprite& sprite,
     short dstX, short dstY,
     short srcX, short srcY, short iw, short ih,
-    short clipX, short clipY, short clipW, short clipH,
+    const SDL_Rect& clipRect,
     bool wrap,
     std::optional<std::pair<ClipEdge, int>> clip = std::nullopt);
 

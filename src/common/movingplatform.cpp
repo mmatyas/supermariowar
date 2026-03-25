@@ -156,10 +156,10 @@ void MovingPlatform::draw()
 //Draw path for map preview
 void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 {
-    gfx_drawpreview(sprites[0].getSurface(),
+    gfx_drawpreview(sprites[0],
         ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY,
         0, 0, iWidth, iHeight,
-        iOffsetX, iOffsetY, App::screenWidth/2, App::screenHeight/2,
+        {iOffsetX, iOffsetY, App::screenWidth/2, App::screenHeight/2},
         true);
 }
 

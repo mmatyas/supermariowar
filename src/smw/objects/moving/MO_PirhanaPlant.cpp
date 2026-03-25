@@ -214,15 +214,36 @@ void MO_PirhanaPlant::draw()
 void MO_PirhanaPlant::draw(short iOffsetX, short iOffsetY)
 {
     if (state > 0) {
-        SDL_Rect* rect = &g_rPirhanaRects[iType][iDirection][iFrame];
-        if (iDirection == 0)
-            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
-        else if (iDirection == 1)
-            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, (rect->y + ih - collisionHeight) >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
-        else if (iDirection == 2)
-            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, collisionWidth >> 1, 16, iOffsetX, iOffsetY, 320, 240, true);
-        else
-            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, (rect->x + iw - collisionWidth) >> 1, rect->y >> 1, collisionWidth >> 1, 16, iOffsetX, iOffsetY, 320, 240, true);
+        const SDL_Rect& rect = g_rPirhanaRects[iType][iDirection][iFrame];
+        const SDL_Rect clipRect { iOffsetX, iOffsetY, 320, 240 };
+        if (iDirection == 0) {
+            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1],
+                (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+                rect.x >> 1, rect.y >> 1,
+                16, collisionHeight >> 1,
+                clipRect, true);
+        }
+        else if (iDirection == 1) {
+            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1],
+                (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+                rect.x >> 1, (rect.y + ih - collisionHeight) >> 1,
+                16, collisionHeight >> 1,
+                clipRect, true);
+        }
+        else if (iDirection == 2) {
+            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1],
+                (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+                rect.x >> 1, rect.y >> 1,
+                collisionWidth >> 1, 16,
+                clipRect, true);
+        }
+        else {
+            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1],
+                (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+                (rect.x + iw - collisionWidth) >> 1, rect.y >> 1,
+                collisionWidth >> 1, 16,
+                clipRect, true);
+        }
     }
 }
 
