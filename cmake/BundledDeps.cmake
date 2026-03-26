@@ -45,10 +45,14 @@ if (USE_BUNDLED_SDL)
     set(SDL2IMAGE_XCF OFF CACHE BOOL "")
     set(SDL2IMAGE_XPM OFF CACHE BOOL "")
     set(SDL2IMAGE_XV OFF CACHE BOOL "")
-    smw_declare_gitrepo(
+    FetchContent_Declare(
         SDL2_image
-        https://github.com/libsdl-org/SDL_image.git
-        release-2.8.8
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
+        GIT_TAG release-2.8.8
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+        GIT_SUBMODULES "external/libpng" "external/zlib"
+        OVERRIDE_FIND_PACKAGE
     )
 
     # SDL_mixer
@@ -62,11 +66,16 @@ if (USE_BUNDLED_SDL)
     set(SDL2MIXER_MOD OFF CACHE BOOL "")
     set(SDL2MIXER_MP3 OFF CACHE BOOL "")
     set(SDL2MIXER_MIDI OFF CACHE BOOL "")
+    set(SDL2MIXER_OPUS OFF CACHE BOOL "")
     set(SDL2MIXER_WAVPACK OFF CACHE BOOL "")
-    smw_declare_gitrepo(
+    FetchContent_Declare(
         SDL2_mixer
-        https://github.com/libsdl-org/SDL_mixer.git
-        release-2.8.1
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
+        GIT_TAG release-2.8.1
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+        GIT_SUBMODULES "external/ogg" "external/vorbis"
+        OVERRIDE_FIND_PACKAGE
     )
 endif()
 
