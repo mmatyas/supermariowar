@@ -27,9 +27,9 @@ SdlSurfacePtr loadImage(
 {
     const std::string path_str = path.string();
 
-    std::cout << "loading sprite";
+    std::cout << "loading sprite ";
     if (color_key) {
-        std::cout << " with key";
+        std::cout << "with key";
         if (alpha) {
             std::cout << "+alpha";
         }
