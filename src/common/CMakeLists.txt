@@ -26,8 +26,6 @@ add_library(CommonFiles STATIC
     gfx/gfxSDL.h
     gfx/gfxSprite.cpp
     gfx/gfxSprite.h
-    gfx/SFont.cpp
-    gfx/SFont.h
     global.cpp
     input.cpp
     input.h

@@ -1,40 +1,50 @@
-#ifndef GFX_FONT
-#define GFX_FONT
+#pragma once
 
-#include "SFont.h"
+#include "gfx/gfxSprite.h"
 
-#include <string>
+#include <filesystem>
+#include <limits>
+#include <string_view>
+#include <vector>
 
-class gfxFont
-{
-	public:
-		gfxFont();
-		~gfxFont();
 
-		bool init(const std::string& filename);
-		void draw(int x, int y, const std::string& s);
-		void drawf(int x, int y, const char *s, ...);
+class gfxFont {
+public:
+    explicit gfxFont() = default;
+    explicit gfxFont(const std::filesystem::path& path);
 
-		void drawCentered(int x, int y, const char *text);
-		void drawChopCentered(int x, int y, int width, const char *text);
-		void drawRightJustified(int x, int y, const char *s, ...);
-		void drawChopRight(int x, int y, int width, const char *s);
-		void drawChopLeft(int x, int y, int width, const char *s);
+    void draw(int x, int y, std::string_view text,
+        int dst_min_x = std::numeric_limits<int>::min(),
+        int dst_max_x = std::numeric_limits<int>::max()) const;
 
-		void setalpha(Uint8 alpha);
+    void drawCentered(int x, int y, std::string_view text) const {
+        draw(x - getWidth(text) / 2, y, text);
+    }
+    void drawChopCentered(int x, int y, int width, std::string_view text) const {
+        width /= 2;
+        draw(x - getWidth(text) / 2, y, text, x - width, x + width);
+    }
+    void drawRightJustified(int x, int y, std::string_view text) const {
+        draw(x - getWidth(text), y, text);
+    }
+    void drawChopRight(int x, int y, int width, std::string_view text) const {
+        draw(x, y, text, x, x + width);
+    }
+    void drawChopLeft(int x, int y, int width, std::string_view text) const {
+        draw(x - getWidth(text), y, text, x - width, x);
+    }
 
-    int getHeight() {
-        return SFont_TextHeight(m_font);
+    void setAlpha(Uint8 alpha);
+
+    int getHeight() const;
+    int getWidth(std::string_view text) const;
+
+private:
+    gfxSprite m_sprite;
+
+    struct GlyphArea {
+        int x = 0;
+        int w = 0;
     };
-    int getWidth(const std::string& text) {
-        return getWidth(text.c_str());
-    };
-    int getWidth(const char *text) {
-        return SFont_TextWidth(m_font, text);
-    };
-
-	private:
-		SFont_Font *m_font;
+    std::vector<GlyphArea> m_glyph_areas;
 };
-
-#endif // GFX_FONT

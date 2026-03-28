@@ -64,7 +64,7 @@ SpriteStrip gfx_loadmenuskin(const std::filesystem::path& path, short colorSchem
 
 void gfx_setjoystickteamcolor(SDL_Joystick * joystick, short team, float brightness);
 
-
+Uint32 getRawPixel(SDL_Surface* surf, int x, int y);
 RGB getRgb(SDL_Surface* surf, int x, int y);
 
 #endif // GFX_H

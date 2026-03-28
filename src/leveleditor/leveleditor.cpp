@@ -493,8 +493,8 @@ int main(int argc, char *argv[])
 		rm->spr_hazard_pirhanaplant[i].setWrap(640 >> i);
 	}
 
-	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
-	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
+	rm->menu_font_small = gfxFont(convertPath("gfx/packs/Classic/fonts/font_small.png"));
+	rm->menu_font_large = gfxFont(convertPath("gfx/packs/Classic/fonts/font_large.png"));
 
 	printf("\n---------------- load map ----------------\n");
 

@@ -374,11 +374,8 @@ void CResourceManager::loadGameGraphics()
 
     g_tilesetmanager = new CTilesetManager(graphicspack);
 
-    bool loadok = true;
-    loadok &= game_font_small.init(convertPath("gfx/packs/fonts/font_small.png", graphicspack));
-    loadok &= game_font_large.init(convertPath("gfx/packs/fonts/font_large.png", graphicspack));
-    if (!loadok)
-        throw "ERROR: error loading the fonts!";
+    game_font_small = gfxFont(convertPath("gfx/packs/fonts/font_small.png", graphicspack));
+    game_font_large = gfxFont(convertPath("gfx/packs/fonts/font_large.png", graphicspack));
 
     loadAllSprites();
 }
@@ -390,11 +387,8 @@ void CResourceManager::loadStartGraphics()
         return ImageLoader(convertPath(relpath, graphicspack));
     };
 
-    bool loadok = true;
-    loadok &= menu_font_small.init(convertPath("gfx/packs/menu/menu_font_small.png", graphicspack));
-    loadok &= menu_font_large.init(convertPath("gfx/packs/menu/menu_font_large.png", graphicspack));
-    if (!loadok)
-        throw "ERROR: error loading the fonts!";
+    menu_font_small = gfxFont(convertPath("gfx/packs/menu/menu_font_small.png", graphicspack));
+    menu_font_large = gfxFont(convertPath("gfx/packs/menu/menu_font_large.png", graphicspack));
 
     //load basic stuff
     menu_backdrop = builder("gfx/packs/menu/menu_background.png").withoutColorKey().create();

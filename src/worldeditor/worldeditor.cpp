@@ -502,8 +502,8 @@ int main(int argc, char *argv[])
 	menu_shade = ImageLoader(convertPath("gfx/leveleditor/leveleditor_shade.png")).withAlpha(128).create();
 	spr_largedialog = ImageLoader(convertPath("gfx/leveleditor/leveleditor_platform.png")).withAlpha(255).create();
 
-	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
-	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
+	rm->menu_font_small = gfxFont(convertPath("gfx/packs/Classic/fonts/font_small.png"));
+	rm->menu_font_large = gfxFont(convertPath("gfx/packs/Classic/fonts/font_large.png"));
 
 
 	printf("\n---------------- load world ----------------\n");
