@@ -25,7 +25,7 @@ namespace {
 void initSdl()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
-        throw_error("SDL error: %s", SDL_GetError());
+        throw_error("SDL error: {}", SDL_GetError());
 
     SDL_version sdl_version;
     SDL_GetVersion(&sdl_version);
@@ -33,7 +33,7 @@ void initSdl()
 
     constexpr int IMG_FLAGS = IMG_INIT_PNG;
     if ((IMG_Init(IMG_FLAGS) & IMG_FLAGS) != IMG_FLAGS)
-        throw_error("SDL_image error: %s\n", IMG_GetError());
+        throw_error("SDL_image error: {}", IMG_GetError());
 
     const SDL_version* img_version = IMG_Linked_Version();
     printf("[gfx] SDL_image %d.%d.%d loaded.\n", img_version->major, img_version->minor, img_version->patch);
@@ -56,7 +56,7 @@ SDL_Window* createWindow(bool fullscreen)
         GFX_SCREEN_W, GFX_SCREEN_H,
         window_flags);
     if (!window)
-        throw_error("Couldn't create window: %s\n", SDL_GetError());
+        throw_error("Couldn't create window: {}", SDL_GetError());
 
     return window;
 }
@@ -87,7 +87,7 @@ SDL_Renderer* createRenderer(SDL_Window* window)
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, findPreferredRendererIndex(), rendering_flags);
     if (!renderer)
-        throw_error("Couldn't create renderer: %s\n", SDL_GetError());
+        throw_error("Couldn't create renderer: {}", SDL_GetError());
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -111,7 +111,7 @@ SDL_Surface* createScreenSurface()
         0x000000FF,
         0xFF000000);
     if (!surface)
-        throw_error("Couldn't create video buffer: %s\n", SDL_GetError());
+        throw_error("Couldn't create video buffer: {}", SDL_GetError());
 
     return surface;
 }
@@ -123,7 +123,7 @@ SDL_Texture* createScreenTexture(SDL_Renderer* renderer)
         SDL_TEXTUREACCESS_STREAMING,
         GFX_SCREEN_W, GFX_SCREEN_H);
     if (!texture)
-        throw_error("Couldn't create video texture: %s\n", SDL_GetError());
+        throw_error("Couldn't create video texture: {}", SDL_GetError());
 
     return texture;
 }
