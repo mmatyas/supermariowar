@@ -37,6 +37,7 @@ constexpr std::array<SDL_Rect, CTileset::MAX_TILES> generateTilesetRects(int til
 
 std::vector<TileType> readTileTypeFile(const fs::path& path)
 {
+    printf("Reading %s\n", path.string().c_str());
     //Detect if the tiletype file already exists, if not create it
     if (!fs::exists(path))
         return {};
@@ -64,24 +65,42 @@ std::vector<TileType> readTileTypeFile(const fs::path& path)
 /*********************************
 *  CTileset
 *********************************/
-CTileset::CTileset(const std::filesystem::path& dir)
+CTileset::CTileset(std::filesystem::path dir)
     : m_name(dir.filename().string())
-    , m_tileset_path(dir / "tileset.tls")
-    , m_tiletypes(readTileTypeFile(m_tileset_path))
+    , m_tileset_dir(std::move(dir))
 {}
 
 
 void CTileset::ensureLoaded()
 {
-    if (m_sprite_large.getSurface())
+    if (m_sprite_large)
         return;
 
-    m_sprite_large = ImageLoader(m_tileset_path.parent_path() / "large.png").create();
-    m_sprite_medium = ImageLoader(m_tileset_path.parent_path() / "medium.png").create();
-    m_sprite_small = ImageLoader(m_tileset_path.parent_path() / "small.png").create();
-
+    m_tiletypes = readTileTypeFile(m_tileset_dir / "tileset.tls");
+    m_sprite_large = ImageLoader(m_tileset_dir / "large.png").create();
     m_width = std::min(m_sprite_large.getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
     m_height = std::min(m_sprite_large.getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
+}
+
+
+const gfxSprite& CTileset::sprite(DrawSize size)
+{
+    assert(m_sprite_large); // call ensureLoaded first!
+    switch (size) {
+        case DrawSize::Ingame:
+            return m_sprite_large;
+        case DrawSize::Preview:
+            if (!m_sprite_medium) {
+                m_sprite_medium = ImageLoader(m_tileset_dir / "medium.png").create();
+            }
+            return m_sprite_medium;
+        case DrawSize::Thumbnail:
+            if (!m_sprite_small) {
+                m_sprite_small = ImageLoader(m_tileset_dir / "small.png").create();
+            }
+            return m_sprite_small;
+    }
+    return m_sprite_large;
 }
 
 
@@ -117,7 +136,7 @@ TileType CTileset::decrementTileType(size_t tileCol, size_t tileRow)
 }
 
 
-void CTileset::draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect) const
+void CTileset::draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect)
 {
     sprite(drawsize).draw(srcRect, dstSurface, dstRect);
 }
@@ -125,9 +144,10 @@ void CTileset::draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dst
 
 void CTileset::saveTileset() const
 {
-    BinaryFile tsf(m_tileset_path, "wb");
+    const fs::path tileset_path = m_tileset_dir / "tileset.tls";
+    BinaryFile tsf(tileset_path, "wb");
     if (!tsf.is_open()) {
-        printf("ERROR: couldn't open tileset file to save tile types: %s\n", m_tileset_path.string().c_str());
+        printf("ERROR: couldn't open tileset file to save tile types: %s\n", tileset_path.string().c_str());
         return;
     }
 
@@ -137,7 +157,7 @@ void CTileset::saveTileset() const
         tsf.write_i32(static_cast<int>(tiletype));
 
 #if defined(__APPLE__)
-    chmod(m_tileset_path.string().c_str(), S_IRWXU | S_IRWXG | S_IROTH);
+    chmod(tileset_path.string().c_str(), S_IRWXU | S_IRWXG | S_IROTH);
 #endif
 }
 
@@ -199,7 +219,7 @@ void CTilesetManager::Draw(
     short iSrcTileCol, short iSrcTileRow,
     short iDstTileCol, short iDstTileRow)
 {
-    const CTileset* tileset_ptr = tileset(iTilesetID);
+    CTileset* tileset_ptr = tileset(iTilesetID);
     if (!tileset_ptr)
         return;
 

@@ -21,7 +21,7 @@ public:
     static constexpr int MAX_TILES_PER_AXIS = 128;
     static constexpr int MAX_TILES = MAX_TILES_PER_AXIS * MAX_TILES_PER_AXIS;
 
-    explicit CTileset(const std::filesystem::path& dir);
+    explicit CTileset(std::filesystem::path dir);
     void ensureLoaded();
 
     void saveTileset() const;
@@ -31,24 +31,17 @@ public:
     TileType incrementTileType(size_t iTileCol, size_t iTileRow);
     TileType decrementTileType(size_t iTileCol, size_t iTileRow);
 
-    void draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect) const;
+    void draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect);
 
     const std::string& name() const { return m_name; }
     short height() const { return m_height; }
     short width() const { return m_width; }
 
-    const gfxSprite& sprite(DrawSize size) const {
-        switch (size) {
-            case DrawSize::Ingame: return m_sprite_large;
-            case DrawSize::Preview: return m_sprite_medium;
-            case DrawSize::Thumbnail: return m_sprite_small;
-        }
-        return m_sprite_large;
-    }
+    const gfxSprite& sprite(DrawSize size);
 
 private:
     std::string m_name;
-    std::filesystem::path m_tileset_path;
+    std::filesystem::path m_tileset_dir;
     std::vector<TileType> m_tiletypes;
 
     gfxSprite m_sprite_large;
