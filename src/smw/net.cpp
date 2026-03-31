@@ -45,10 +45,6 @@ extern CGameMode * gamemodes[GAMEMODE_LAST];
 
 short backup_playercontrol[4];
 
-Net_PlayerData::Net_PlayerData()
-    : x(0), y(0), xvel(0), yvel(0)
-{}
-
 Net_IndexedPlayerData::Net_IndexedPlayerData(uint8_t id)
     : input_id(id)
 {}
@@ -135,53 +131,36 @@ union GameModeSettingsUnion {
     }
 };
 
-bool net_init()
+NetworkSystem::NetworkSystem()
 {
-    netplay.active = false;
-    netplay.connectSuccessful = false;
-    netplay.joinSuccessful = false;
-    netplay.gameRunning = false;
-
+    netplay = {};
     netplay.myPlayerName = "Player";
-    netplay.currentMenuChanged = false;
-    netplay.theHostIsMe = false;
-    netplay.selectedRoomIndex = 0;
-    netplay.selectedServerIndex = 0;
-    netplay.roomFilter.clear();
-    netplay.newroom_name.clear();
-    netplay.newroom_password.clear();
-    netplay.mychatmessage.clear();
-    netplay.allowMapCollisionEvent = false;
 
-    if (!networkHandler.init())
-        return false;
+    networkHandler.init();
+    netplay.client.init();
 
-    if (!netplay.client.init())
-        return false;
-
-    net_loadServerList();
+    loadServerList();
 
     printf("[net] Network system initialized.\n");
-    return true;
 }
 
-void net_close()
+NetworkSystem::~NetworkSystem()
 {
-    net_saveServerList();
+    saveServerList();
 
-    net_endSession();
+    endSession();
     netplay.client.cleanup();
 
     networkHandler.cleanup();
 }
 
-void net_saveServerList()
+void NetworkSystem::saveServerList()
 {
     NetConfigManager config;
     config.save();
 }
 
-void net_loadServerList()
+void NetworkSystem::loadServerList()
 {
     NetConfigManager config;
     config.load();
@@ -191,9 +170,9 @@ void net_loadServerList()
     Session
 ****************************/
 
-bool net_startSession()
+bool NetworkSystem::startSession()
 {
-    net_endSession(); // Finish previous network session if active
+    endSession(); // Finish previous network session if active
 
     printf("[net] Session start.\n");
     netplay.active = true;
@@ -217,7 +196,7 @@ bool net_startSession()
     return netplay.client.start();
 }
 
-void net_endSession()
+void NetworkSystem::endSession()
 {
     if (netplay.active) {
         printf("[net] Session end.\n");
@@ -1364,7 +1343,7 @@ void NetGameHost::stop()
             clients[p]->disconnect();
             clients[p] = NULL;
         }
-        expected_clients[p].reset();
+        expected_clients[p] = {};
         last_processed_input_id[p] = 0xFF;
     }
 

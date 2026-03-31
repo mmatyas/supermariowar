@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gfx/gfxSDL.h"
+#include "net.h"
 #include "sfx.h"
 
 
@@ -25,6 +26,7 @@ struct Systems {
     Sdl sdl;
     Graphics gfx;
     Audio sfx;
+    NetworkSystem net;
 };
 
 

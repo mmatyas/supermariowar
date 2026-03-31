@@ -6,7 +6,7 @@
 class NetworkLayerNULL : public NetworkLayer
 {
     public:
-        bool init() { return false; }
+        void init() {}
         void cleanup() {}
 
         bool client_restart() { return false; }

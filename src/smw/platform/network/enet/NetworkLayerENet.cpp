@@ -23,20 +23,16 @@ NetworkLayerENet::~NetworkLayerENet()
     Init
 **************************************/
 
-bool NetworkLayerENet::init()
+void NetworkLayerENet::init()
 {
-    if (enet_initialize() != 0) {
-        fprintf(stderr, "[error][net] Could not initialize network system.\n");
-        return false;
-    }
+    if (enet_initialize() != 0)
+        throw "Could not initialize network system.";
 
     ENetVersion version = enet_linked_version();
     printf("[net] ENet %u.%u.%u initialized.\n",
         ENET_VERSION_GET_MAJOR(version),
         ENET_VERSION_GET_MINOR(version),
         ENET_VERSION_GET_PATCH(version));
-
-    return true;
 }
 
 bool NetworkLayerENet::client_restart()

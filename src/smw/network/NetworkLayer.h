@@ -10,7 +10,7 @@ class NetworkLayer
     public:
         virtual ~NetworkLayer() = default;
 
-        virtual bool init() { return true; }
+        virtual void init() {}
         virtual void cleanup() {}
 
         virtual bool client_restart() = 0;

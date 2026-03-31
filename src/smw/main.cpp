@@ -372,8 +372,6 @@ void main_game()
     return 0;
 #endif
 
-    net_init();                     //init the networking
-
     init_joysticks();
 
     //currently this only sets the title, not the icon.
@@ -439,8 +437,6 @@ void main_game()
 
     for (short i = 0; i < GAMEMODE_LAST; i++)
         delete gamemodes[i];
-
-    net_close();
 
     //Delete player skins
     for (short k = 0; k < MAX_PLAYERS; k++) {

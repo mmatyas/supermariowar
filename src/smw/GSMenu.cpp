@@ -564,7 +564,7 @@ void MenuState::update()
         } else if (MENU_CODE_TO_MAIN_MENU == code) {
             iDisplayError = DISPLAY_ERROR_NONE;
             iDisplayErrorTimer = 0;
-            net_endSession();
+            NetworkSystem::get().endSession();
 
             mCurrentMenu = mMainMenu.get();
         } else if (MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code) {
@@ -605,7 +605,7 @@ void MenuState::update()
         } else if (MENU_CODE_TO_NET_SERVERS_MENU == code) {
             mCurrentMenu = mNetServersMenu.get();
             mCurrentMenu->ResetMenu();
-            net_startSession();
+            NetworkSystem::get().startSession();
         } else if (MENU_CODE_BACK_TO_GRAPHIC_OPTIONS_MENU == code) {
             mCurrentMenu = mGraphicsOptionsMenu.get();
         } else if (MENU_CODE_TO_CONTROLS_MENU == code) {
@@ -1149,7 +1149,7 @@ void MenuState::update()
                 if (MENU_CODE_NET_SERVERLIST_EXIT == code)
                     netplay.currentMenuChanged = true;
                 else {
-                    net_startSession(); // release & restart socket
+                    NetworkSystem::get().startSession(); // release & restart socket
                     netplay.operationInProgress = false;
                 }
 

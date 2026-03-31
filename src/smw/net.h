@@ -5,6 +5,7 @@
 #include "network/NetworkLayer.h"
 #include "ProtocolDefinitions.h"
 
+#include <cassert>
 #include <chrono>
 #include <list>
 #include <string>
@@ -17,14 +18,27 @@ typedef std::chrono::system_clock::time_point nettimepoint;
 //Have all send and receive logic here
 //Make sure to have message handler functions in main and menu loops
 
-bool net_init();
-void net_close();
-void net_saveServerList();
-void net_loadServerList();
+class NetworkSystem {
+public:
+    static NetworkSystem& get() {
+        assert(s_instance);
+        return *s_instance;
+    }
 
-// called on network session start/end
-bool net_startSession();
-void net_endSession();
+    void saveServerList();
+    void loadServerList();
+
+    // called on network session start/end
+    bool startSession();
+    void endSession();
+
+private:
+    friend class Systems;
+    NetworkSystem();
+    ~NetworkSystem();
+    inline static NetworkSystem* s_instance = nullptr;
+};
+
 
 class MI_NetworkListScroll;
 //union COutputControl;
@@ -89,7 +103,7 @@ class NetGameHost : public NetworkEventHandler
         void stop();
         void cleanup();
 
-        bool isActive() { return active; }
+        bool isActive() const { return active; }
 
         // Listen to network events
         void onConnect(NetPeer*);
@@ -123,12 +137,9 @@ class NetGameHost : public NetworkEventHandler
 
         // TODO: This class should be replaced eventually
         struct RawPlayerAddress {
-            uint32_t host;
-            uint16_t port;
-            bool sync_ok;
-
-            RawPlayerAddress() { reset(); }
-            void reset() { host = 0; port = 0; sync_ok = false; }
+            uint32_t host = 0;
+            uint16_t port = 0;
+            bool sync_ok = false;
 
             bool operator==(const RawPlayerAddress& other) const {
                 if (host == other.host && port == other.port)
@@ -272,12 +283,10 @@ enum NetworkState {
 };
 
 struct Net_PlayerData {
-    float x;
-    float y;
-    float xvel;
-    float yvel;
-
-    Net_PlayerData();
+    float x = 0;
+    float y = 0;
+    float xvel = 0;
+    float yvel = 0;
 };
 
 struct Net_AllPlayerData {

@@ -14,7 +14,7 @@ class NetworkLayerENet : public NetworkLayer
         NetworkLayerENet();
         ~NetworkLayerENet();
 
-        bool init();
+        void init();
 
         bool client_restart();
         void client_listen(NetworkEventHandler&);
