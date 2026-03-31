@@ -14,6 +14,7 @@
 #include "objects/overmap/WO_StraightPathHazard.h"
 
 #include <cstring>
+#include <iostream>
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -120,28 +121,32 @@ void MI_MapPreview::LoadCurrentMap()
 
 void MI_MapPreview::LoadMap(const std::string& szMapPath)
 {
-    g_map->loadMap(szMapPath, read_type_preview);
-    smallDelay(); //Sleeps to help the music from skipping
+    try {
+        g_map->loadMap(szMapPath, read_type_preview);
+        smallDelay(); //Sleeps to help the music from skipping
 
-    LoadCurrentMapBackground();
-    smallDelay();
+        LoadCurrentMapBackground();
+        smallDelay();
 
-    g_map->preDrawPreviewBackground(rm->spr_background, surfaceMapBackground, false);
-    smallDelay();
+        g_map->preDrawPreviewBackground(rm->spr_background, surfaceMapBackground, false);
+        smallDelay();
 
-    g_map->preDrawPreviewBlocks(surfaceMapBlockLayer, false);
-    smallDelay();
+        g_map->preDrawPreviewBlocks(surfaceMapBlockLayer, false);
+        smallDelay();
 
-    g_map->preDrawPreviewMapItems(surfaceMapBackground, false);
-    smallDelay();
+        g_map->preDrawPreviewMapItems(surfaceMapBackground, false);
+        smallDelay();
 
-    g_map->preDrawPreviewForeground(surfaceMapForeground, false);
-    smallDelay();
+        g_map->preDrawPreviewForeground(surfaceMapForeground, false);
+        smallDelay();
 
-    g_map->preDrawPreviewWarps(game_values.toplayer ? surfaceMapForeground : surfaceMapBackground, false);
-    smallDelay();
+        g_map->preDrawPreviewWarps(game_values.toplayer ? surfaceMapForeground : surfaceMapBackground, false);
+        smallDelay();
 
-    LoadMapHazards(true);
+        LoadMapHazards(true);
+    } catch (const std::string& err) {
+        std::cout << "\n[error] Failed to draw map preview image for " << szMapPath << ": " << err << std::endl;
+    }
 }
 
 bool MI_MapPreview::SetMap(const char * paramSzMapName, bool fWorld)
