@@ -4,7 +4,7 @@
 #
 #-----------------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.24)
 
 project(smw
 	VERSION 2.0.0
@@ -27,14 +27,6 @@ if(WIN32)
 	set(SMW_INSTALL_PORTABLE_DEFAULT ON)
 endif()
 option(SMW_INSTALL_PORTABLE "Install to a single directory" ${SMW_INSTALL_PORTABLE_DEFAULT})
-
-option(USE_BUNDLED_SDL "If ON, downloads and builds SDL, otherwise uses the system library" OFF)
-option(USE_BUNDLED_ZLIB "If ON, downloads and builds ZLIB, otherwise uses the system library" OFF)
-option(USE_BUNDLED_ENET "If ON, downloads and builds ENet, otherwise uses the system library" OFF)
-option(USE_BUNDLED_YAMLCPP "If ON, downloads and builds yaml-cpp, otherwise uses the system library" OFF)
-if (DEFINED BUILD_STATIC_LIBS)
-	message(DEPRECATION "BUILD_STATIC_LIBS is deprecated. Please use USE_BUNDLED_ENET and USE_BUNDLED_YAMLCPP instead.")
-endif()
 
 # Additional CMake search path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
@@ -66,22 +58,6 @@ endif()
 #-----------------------------------------------------------------------------
 
 include(BundledDeps)
-
-if (NOT DISABLE_SYSLIB_CHECKS)
-	find_package(ZLIB REQUIRED)
-	find_package(SDL2 REQUIRED)
-	find_package(SDL2_image REQUIRED)
-	find_package(SDL2_mixer REQUIRED)
-endif()
-
-find_package(yaml-cpp REQUIRED)
-if(NOT NO_NETWORK)
-	find_package(ENet REQUIRED)
-endif()
-
-# Link to static ZLIB when bundled, shared when using system
-add_library(smw_zlib INTERFACE)
-target_link_libraries(smw_zlib INTERFACE $<IF:$<BOOL:${USE_BUNDLED_ZLIB}>,ZLIB::ZLIBSTATIC,ZLIB::ZLIB>)
 
 #-----------------------------------------------------------------------------
 #

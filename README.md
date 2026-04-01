@@ -185,15 +185,6 @@ You can change the build configuration by setting various CMake flags. The simpl
 
 Alternatively, you can pass these options directly to CMake as `-DFLAGNAME=VALUE` (eg. `cmake .. -DUSE_BUNDLED_SDL=ON`).
 
-For using the bundled libraries, you can set the following parameters:
-
-Parameter           | Description
---------------------|------------
-USE_BUNDLED_SDL     | If ON, downloads and builds SDL, otherwise uses the system library
-USE_BUNDLED_ZLIB    | If ON, downloads and builds ZLIB, otherwise uses the system library
-USE_BUNDLED_ENET    | If ON, downloads and builds ENet, otherwise uses the system library
-USE_BUNDLED_YAMLCPP | If ON, downloads and builds yaml-cpp, otherwise uses the system library
-
 *TODO: expand this section*
 
 ## How to play

@@ -17,13 +17,14 @@ jobs:
           libsdl2-image-dev
           libsdl2-mixer-dev
           ninja-build
+          zlib1g-dev
       - name: Version checks
         run: |
           sdl2-config --version
           cmake --version
 
       - name: Configure
-        run: cmake -B build -G Ninja -DUSE_BUNDLED_ENET=ON -DUSE_BUNDLED_YAMLCPP=ON -DSMW_INSTALL_PORTABLE=ON
+        run: cmake -B build -G Ninja -DSMW_INSTALL_PORTABLE=ON
 
       - name: Build
         run: cmake --build build --verbose

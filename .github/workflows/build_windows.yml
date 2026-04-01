@@ -6,9 +6,6 @@ env:
     -B build
     -G Ninja
     -DCMAKE_BUILD_TYPE=Release
-    -DUSE_BUNDLED_ENET=ON
-    -DUSE_BUNDLED_YAMLCPP=ON
-    -DUSE_BUNDLED_ZLIB=ON
     -DSMW_INSTALL_PORTABLE=ON
 
 jobs:
