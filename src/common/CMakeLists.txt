@@ -82,19 +82,12 @@ target_compile_definitions(CommonFiles PUBLIC USE_SDL2)  # TODO
 if (SDL2_FORCE_GLES)
     target_compile_definitions(CommonFiles PUBLIC SDL2_FORCE_GLES)
 endif()
-if (SDL2_USE_MIXERX)
-    target_compile_definitions(CommonFiles PUBLIC SDL2_USE_MIXERX)
-endif()
 
 
 if(NOT EMSCRIPTEN)
     target_link_libraries(CommonFiles
         SDL2::SDL2
         SDL2_image::SDL2_image
+        SDL2_mixer::SDL2_mixer
     )
-    if (SDL2_USE_MIXERX)
-        target_link_libraries(CommonFiles SDL2_mixer_ext::SDL2_mixer_ext)
-    else()
-        target_link_libraries(CommonFiles SDL2_mixer::SDL2_mixer)
-    endif()
 endif()

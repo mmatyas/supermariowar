@@ -19,7 +19,6 @@ project(smw
 
 option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" ON)
 option(NO_NETWORK "Disable all network communication" OFF)
-option(SDL2_USE_MIXERX "(SDL2) Use SDL Mixer X instead of SDL Mixer" OFF)
 option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
 option(BUILD_TESTS "Build the unit tests" ON)
 
@@ -72,11 +71,7 @@ if (NOT DISABLE_SYSLIB_CHECKS)
 	find_package(ZLIB REQUIRED)
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_image REQUIRED)
-	if (SDL2_USE_MIXERX)
-		find_package(SDL2_mixer_ext REQUIRED)
-	else()
-		find_package(SDL2_mixer REQUIRED)
-	endif()
+	find_package(SDL2_mixer REQUIRED)
 endif()
 
 find_package(yaml-cpp REQUIRED)

@@ -1,10 +1,6 @@
 #pragma once
 
-#ifdef SDL2_USE_MIXERX
-#include "SDL_mixer_ext.h"
-#else
 #include "SDL_mixer.h"
-#endif
 
 #include <array>
 #include <bitset>
