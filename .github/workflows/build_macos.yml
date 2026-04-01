@@ -18,7 +18,6 @@ jobs:
           -DUSE_BUNDLED_ENET=ON
           -DUSE_BUNDLED_YAMLCPP=ON
           -DSMW_INSTALL_PORTABLE=ON
-          -DDISABLE_DEFAULT_CFLAGS=ON
 
       - name: Build
         run: cmake --build build --verbose
