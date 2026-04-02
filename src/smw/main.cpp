@@ -408,8 +408,10 @@ void main_game()
     init_spawnlocations();
 
     //Load the gfx color palette
-    const bool pngPalette = gfx_loadpalette(convertPath("gfx/packs/palette.png", gamegraphicspacklist->currentPath()));
-    if (!pngPalette) {
+    try {
+        gfx_loadpalette(convertPath("gfx/packs/palette.png", gamegraphicspacklist->currentPath()));
+    } catch (const std::string& err) {
+        printf("\nwarning: %s -> falling back to BMP\n", err.c_str());
         gfx_loadpalette(convertPath("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
     }
 
