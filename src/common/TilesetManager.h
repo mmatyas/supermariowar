@@ -31,13 +31,13 @@ public:
     TileType incrementTileType(size_t iTileCol, size_t iTileRow);
     TileType decrementTileType(size_t iTileCol, size_t iTileRow);
 
-    void draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect);
+    void draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect) const;
 
     const std::string& name() const { return m_name; }
     short height() const { return m_height; }
     short width() const { return m_width; }
 
-    const gfxSprite& sprite(DrawSize size);
+    const gfxSprite& sprite(DrawSize size) const;
 
 private:
     std::string m_name;

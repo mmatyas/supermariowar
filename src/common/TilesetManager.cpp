@@ -59,6 +59,26 @@ std::vector<TileType> readTileTypeFile(const fs::path& path)
 
     return tiletypes;
 }
+
+gfxSprite loadImageOrDownscale(const std::filesystem::path& path, const gfxSprite& largeRes)
+{
+    try {
+        return ImageLoader(path).create();
+    } catch (const std::string& err) {
+        printf("\nwarning: %s -> falling back to downscaled image\n", err.c_str());
+
+        auto surf = SdlSurfacePtr(SDL_CreateRGBSurfaceWithFormat(
+            0, largeRes.getWidth() / 2, largeRes.getHeight() / 2,
+            largeRes.getSurface()->format->BitsPerPixel,
+            largeRes.getSurface()->format->format));
+        if (SDL_BlitSurface(largeRes.getSurface(), nullptr, surf.get(), nullptr) < 0) {
+            fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
+        }
+
+        return gfxSprite(std::move(surf), std::nullopt);
+    }
+
+}
 } // namespace
 
 
@@ -77,28 +97,23 @@ void CTileset::ensureLoaded()
         return;
 
     m_tiletypes = readTileTypeFile(m_tileset_dir / "tileset.tls");
+
     m_sprite_large = ImageLoader(m_tileset_dir / "large.png").create();
+    m_sprite_medium = loadImageOrDownscale(m_tileset_dir / "medium.png", m_sprite_large);
+    m_sprite_small = loadImageOrDownscale(m_tileset_dir / "small.png", m_sprite_medium);
+
     m_width = std::min(m_sprite_large.getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
     m_height = std::min(m_sprite_large.getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
 }
 
 
-const gfxSprite& CTileset::sprite(DrawSize size)
+const gfxSprite& CTileset::sprite(DrawSize size) const
 {
     assert(m_sprite_large); // call ensureLoaded first!
     switch (size) {
-        case DrawSize::Ingame:
-            return m_sprite_large;
-        case DrawSize::Preview:
-            if (!m_sprite_medium) {
-                m_sprite_medium = ImageLoader(m_tileset_dir / "medium.png").create();
-            }
-            return m_sprite_medium;
-        case DrawSize::Thumbnail:
-            if (!m_sprite_small) {
-                m_sprite_small = ImageLoader(m_tileset_dir / "small.png").create();
-            }
-            return m_sprite_small;
+        case DrawSize::Ingame: return m_sprite_large;
+        case DrawSize::Preview: return m_sprite_medium;
+        case DrawSize::Thumbnail: return m_sprite_small;
     }
     return m_sprite_large;
 }
@@ -136,7 +151,7 @@ TileType CTileset::decrementTileType(size_t tileCol, size_t tileRow)
 }
 
 
-void CTileset::draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect)
+void CTileset::draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect) const
 {
     sprite(drawsize).draw(srcRect, dstSurface, dstRect);
 }
