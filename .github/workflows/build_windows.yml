@@ -36,7 +36,7 @@ jobs:
           rm -rf supermariowar/include supermariowar/lib
           cp /usr/lib/gcc/x86_64-w64-mingw32/13-posix/{libgcc_s_seh-1,libstdc++-6}.dll supermariowar/
           cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll supermariowar/
-          cp /tmp/smwlibs/bin/{SDL2,SDL2_image,SDL2_mixer}.dll supermariowar/
+          cp /tmp/smwlibs/bin/{SDL2,SDL2_image,SDL2_mixer,libgme}.dll supermariowar/
           zip -9 -r "supermariowar_$(date +%F)_windows.zip" supermariowar
 
       - name: Upload artifacts
