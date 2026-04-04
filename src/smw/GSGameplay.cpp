@@ -1865,7 +1865,7 @@ void playMusic()
     if (!rm->backgroundmusic[0].isPlaying() && !rm->sfx_invinciblemusic.isPlaying() && !rm->sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
         if (game_values.playnextmusic) {
             musiclist->setNextMusic(static_cast<MusicCategory>(g_map->musicCategoryID), maplist->currentShortmapname(), g_map->szBackgroundFile);
-            rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic().string());
+            rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic());
         }
 
         rm->backgroundmusic[0].play(game_values.playnextmusic, false);
@@ -1879,7 +1879,7 @@ void PlayNextMusicTrack()
 
     rm->backgroundmusic[0].stop();
     musiclist->setNextMusic(static_cast<MusicCategory>(g_map->musicCategoryID), maplist->currentShortmapname(), g_map->szBackgroundFile);
-    rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic().string());
+    rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic());
     rm->backgroundmusic[0].play(game_values.playnextmusic, false);
 }
 
@@ -2383,7 +2383,7 @@ void start_gameplay()
 
     if (game_values.music) {
         musiclist->setRandomMusic(static_cast<MusicCategory>(g_map->musicCategoryID), "", "");
-        rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic().string());
+        rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic());
         rm->backgroundmusic[0].play(game_values.playnextmusic, false);
     }
 }

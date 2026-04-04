@@ -1299,7 +1299,7 @@ void MenuState::update()
                 LoadCurrentMapBackground();
 
                 if (game_values.music) {
-                    rm->backgroundmusic[0] = sfxMusic(worldmusiclist->currentMusic(WorldMusicCategory::Bonus, "").string());
+                    rm->backgroundmusic[0] = sfxMusic(worldmusiclist->currentMusic(WorldMusicCategory::Bonus, ""));
                     rm->backgroundmusic[0].play(false, false);
                 }
             } else {
