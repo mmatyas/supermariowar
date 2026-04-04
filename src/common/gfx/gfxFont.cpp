@@ -17,7 +17,7 @@ constexpr int ASCII_FIRST_PRINTABLE = 33;
 
 gfxFont::gfxFont(const std::filesystem::path& path)
 {
-    const std::string path_str = path.string();
+    const std::string path_str = path.generic_string();
 
     std::cout << "loading font " << path_str << " ...";
     auto surf = SdlSurfacePtr(IMG_Load(path_str.c_str()));

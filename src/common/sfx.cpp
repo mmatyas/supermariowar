@@ -72,7 +72,7 @@ bool sfx_canPlayAudio()
 
 sfxSound::sfxSound(const fs::path& path)
 {
-    const std::string path_str = path.string();
+    const std::string path_str = path.generic_string();
     std::cout << "loading " << path_str << " ...";
 
     m_sfx = MixChunkPtr(Mix_LoadWAV(path_str.c_str()));
@@ -128,7 +128,7 @@ void sfxSound::onChannelFinished(int channel)
 
 sfxMusic::sfxMusic(const fs::path& path)
 {
-    const std::string path_str = path.string();
+    const std::string path_str = path.generic_string();
     std::cout << "loading " << path_str << " ...";
 
     m_music = MixMusicPtr(Mix_LoadMUS(path_str.c_str()));

@@ -37,14 +37,14 @@ constexpr std::array<SDL_Rect, CTileset::MAX_TILES> generateTilesetRects(int til
 
 std::vector<TileType> readTileTypeFile(const fs::path& path)
 {
-    printf("Reading %s\n", path.string().c_str());
+    printf("Reading %s\n", path.generic_string().c_str());
     //Detect if the tiletype file already exists, if not create it
     if (!fs::exists(path))
         return {};
 
     BinaryFile tsf(path, "rb");
     if (!tsf.is_open()) {
-        printf("ERROR: couldn't open tileset file: %s\n", path.string().c_str());
+        printf("ERROR: couldn't open tileset file: %s\n", path.generic_string().c_str());
         return {};
     }
 
@@ -162,7 +162,7 @@ void CTileset::saveTileset() const
     const fs::path tileset_path = m_tileset_dir / "tileset.tls";
     BinaryFile tsf(tileset_path, "wb");
     if (!tsf.is_open()) {
-        printf("ERROR: couldn't open tileset file to save tile types: %s\n", tileset_path.string().c_str());
+        printf("ERROR: couldn't open tileset file to save tile types: %s\n", tileset_path.generic_string().c_str());
         return;
     }
 

@@ -4361,7 +4361,7 @@ void LoadBackgroundPage(std::array<gfxSprite, 16>& sBackgrounds, short iPage)
 
 		if (temp.getWidth() != 640 || temp.getHeight() != 480) {
 			printf("WARNING: Background %s is %dx%d but must be 640x480. Skipping.\n",
-				path.string().c_str(), temp.getWidth(), temp.getHeight());
+				path.generic_string().c_str(), temp.getWidth(), temp.getHeight());
 			continue;
 		}
 

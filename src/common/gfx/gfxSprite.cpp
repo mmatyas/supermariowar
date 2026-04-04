@@ -25,7 +25,7 @@ SdlSurfacePtr loadImage(
     std::optional<RGB> color_key = std::nullopt,
     std::optional<Uint8> alpha = std::nullopt)
 {
-    const std::string path_str = path.string();
+    const std::string path_str = path.generic_string();
 
     std::cout << "loading sprite ";
     if (color_key) {

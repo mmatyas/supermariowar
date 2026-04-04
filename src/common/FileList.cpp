@@ -104,7 +104,7 @@ SimpleFileList::SimpleFileList(const fs::path& dirpath, const std::string& exten
     }
 
     if (m_filelist.empty()) {
-        printf("WARNING: The directory `%s` is empty\n", dirpath.string().c_str());
+        printf("WARNING: The directory `%s` is empty\n", dirpath.generic_string().c_str());
         m_index = -1;
         return;
     }
@@ -254,7 +254,7 @@ SimpleDirectoryList::SimpleDirectoryList(const fs::path& path)
         m_filelist.emplace_back(std::move(*subdir));
     }
     if (m_filelist.empty()) {
-        printf("ERROR: Empty directory.  %s\n", path.string().c_str());
+        printf("ERROR: Empty directory.  %s\n", path.generic_string().c_str());
         //exit(0);
     }
 
@@ -322,7 +322,7 @@ std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
     const fs::path file_path = musicdirectory / "Music.txt";
     std::ifstream file(file_path);
     if (!file) {
-        printf("Error: Could not open: %s\n", file_path.string().c_str());
+        printf("Error: Could not open: %s\n", file_path.generic_string().c_str());
         return {};
     }
 
@@ -432,7 +432,7 @@ std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
     }
 
     if (self.m_all_songs.empty()) {
-        printf("Error: No songs found in: %s\n", musicdirectory.string().c_str());
+        printf("Error: No songs found in: %s\n", musicdirectory.generic_string().c_str());
         return {};
     }
 
@@ -606,7 +606,7 @@ std::optional<WorldMusicPack> WorldMusicPack::load(const fs::path& musicdirector
     const fs::path file_path = musicdirectory / "Music.txt";
     std::ifstream file(file_path);
     if (!file) {
-        printf("Error: Could not open: %s\n", file_path.string().c_str());
+        printf("Error: Could not open: %s\n", file_path.generic_string().c_str());
         return {};
     }
 

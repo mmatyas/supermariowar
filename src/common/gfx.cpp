@@ -207,7 +207,7 @@ SpriteStrip gfx_loadmenuskin(const fs::path& path, short colorScheme, bool fLoad
     const gfxSprite skin = ImageLoader(path).withoutColorKey().withoutOptimization().create();
 
     if (!validSkinSurface(skin))
-        throw std::format("Invalid skin file: {} has incorrect dimensions", path.string());
+        throw std::format("Invalid skin file: {} has incorrect dimensions", path.generic_string());
 
     SpriteStrip strip;
 
@@ -229,7 +229,7 @@ SpriteStrip gfx_loadfullskin(const fs::path& path, short colorScheme)
     const gfxSprite skin = ImageLoader(path).withoutColorKey().withoutOptimization().create();
 
     if (!validSkinSurface(skin))
-        throw std::format("Invalid skin file: {} has incorrect dimensions", path.string());
+        throw std::format("Invalid skin file: {} has incorrect dimensions", path.generic_string());
 
     SpriteStrip strip;
 
