@@ -1,8 +1,9 @@
 #include "MI_NetRoomTeamSelect.h"
 
-#include "GameValues.h"
-#include "ResourceManager.h"
 #include "FileList.h"
+#include "GameValues.h"
+#include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
 #include "ui/MI_Image.h"
 
 extern CGameValues game_values;
@@ -23,9 +24,9 @@ MI_NetRoomTeamSelect::MI_NetRoomTeamSelect(short x, short y, short player_id, st
     , onChangeAccepted(on_change_accepted)
 {
     miHoverImage = new MI_Image(&rm->menu_player_select, x - 6, y - 6, 32 + 18, 128 + 18, 44, 44, 1, 1, 1);
-    miHoverImage->Show(false);
+    miHoverImage->setVisible(false);
     miModifyImage = new MI_Image(&rm->menu_player_select, x - 24, y - 24, 32, 128, 78, 78, 4, 1, 8);
-    miModifyImage->Show(false);
+    miModifyImage->setVisible(false);
 }
 
 MI_NetRoomTeamSelect::~MI_NetRoomTeamSelect() {
@@ -47,23 +48,23 @@ void MI_NetRoomTeamSelect::Update() {
     }
 
     if (fSelected) {
-        miHoverImage->Show(true);
-        miModifyImage->Show(false);
+        miHoverImage->setVisible(true);
+        miModifyImage->setVisible(false);
 
         if (fModifying) {
-            miHoverImage->Show(false);
-            miModifyImage->Show(true);
+            miHoverImage->setVisible(false);
+            miModifyImage->setVisible(true);
             miModifyImage->Update();
         }
     }
     else {
-        miHoverImage->Show(false);
-        miModifyImage->Show(false);
+        miHoverImage->setVisible(false);
+        miModifyImage->setVisible(false);
     }
 }
 
 void MI_NetRoomTeamSelect::Draw() {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     miHoverImage->Draw();
@@ -71,9 +72,9 @@ void MI_NetRoomTeamSelect::Draw() {
 
     // if selected, animate
     if (fSelected)
-        rm->spr_player[owner_player][iAnimationFrame]->draw(x, y, 0, 0, 32, 32);
+        rm->spr_player[owner_player][iAnimationFrame].draw(x, y, {0, 0, 32, 32});
     else
-        rm->spr_player[owner_player][0]->draw(x, y, 0, 0, 32, 32);
+        rm->spr_player[owner_player][0].draw(x, y, {0, 0, 32, 32});
 }
 
 MenuCodeEnum MI_NetRoomTeamSelect::SendInput(CPlayerInput * playerInput) {

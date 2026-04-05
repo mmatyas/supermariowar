@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math/Vec2.h"
+
 class IO_MovingObject;
 
 
@@ -30,8 +32,9 @@ enum class PowerupType : unsigned char {
     Bomb,
     Leaf,
     PWings,
+    JailKey,
 };
 
 
-IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool spawn);
+IO_MovingObject* createpowerup(short iType, Vec2s pos, bool side, bool spawn);
 void CheckSecret(short id);

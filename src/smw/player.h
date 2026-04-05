@@ -4,9 +4,10 @@
 #include "ai.h"
 #include "gfx.h"
 #include "GlobalConstants.h"
-#include "Score.h"
+#include "objectgame.h"
 #include "PlayerKillStyles.h"
 #include "PlayerKillTypes.h"
+#include "Score.h"
 
 #include "player_components/PlayerAwardEffects.h"
 #include "player_components/PlayerBurnupTimer.h"
@@ -26,6 +27,10 @@
 #include "player_components/PlayerTanookiSuit.h"
 #include "player_components/PlayerWarpStatus.h"
 #include "player_components/PlayerWings.h"
+
+#include <optional>
+
+using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
 
 namespace NetPkgs {
     struct MapCollision;
@@ -79,7 +84,7 @@ class CPlayer
 public:
     CPlayer(short iGlobalID, short iLocalID,
             short iTeamID, short iSubTeamID, short iTeamColorID,
-            gfxSprite * nsprites[PGFX_LAST],
+            SpriteStrip& nsprites,
             CScore *nscore, short * respawnCounter, CPlayerAI * ai);
     ~CPlayer();
 
@@ -149,7 +154,7 @@ public:
     void DeathAwards();
     void AddKillerAward(CPlayer* killed, KillStyle style);
     void AddKillsInRowInAirAward();
-    gfxSprite ** GetScoreboardSprite() { return pScoreboardSprite; }
+    SpriteStrip* GetScoreboardSprite() { return pScoreboardSprite; }
 
     /* Map elements */
 
@@ -163,6 +168,9 @@ public:
 
     void SetPowerup(short iPowerup);
     void SetStoredPowerup(short iPowerup);
+    void SetStoredPowerup(PowerupType iPowerup) {
+        SetStoredPowerup(static_cast<short>(iPowerup));
+    }
     void StripPowerups();
 
     void DecreaseProjectileLimit();
@@ -281,7 +289,7 @@ private:
 		float fNewSwapX, fNewSwapY; //For moving players around during player swap effect
 		float fOldSwapX, fOldSwapY;
 		short iSrcOffsetX;
-		gfxSprite ** pScoreboardSprite;
+		SpriteStrip* pScoreboardSprite;
 
 		short iNewPowerupX, iNewPowerupY;  //For moving powerups around during player swap effect
 		short iOldPowerupX, iOldPowerupY;
@@ -313,7 +321,7 @@ private:
 
 		CPlayerAI * pPlayerAI;
 
-		gfxSprite *sprites[PGFX_LAST];
+		SpriteStrip* sprites;
 
 		uint8_t sprite_state;
 		short sprswitch;
@@ -353,7 +361,7 @@ private:
 
 		PlayerWarpStatus warpstatus;
 
-		short powerupused;
+		std::optional<PowerupType> powerupused;
 		float powerupradius;
 		float powerupangle;
 

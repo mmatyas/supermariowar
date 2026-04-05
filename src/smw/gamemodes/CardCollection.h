@@ -8,20 +8,19 @@ class CGM_Collection : public CGameMode
 {
     public:
         CGM_Collection();
-        virtual ~CGM_Collection() {}
 
-        void init();
-        void think();
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
+        void init() override;
+        void think() override;
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
 
         void ReleaseCard(CPlayer &player);
 
-        PlayerKillType CheckWinner(CPlayer * player);
+        PlayerKillType CheckWinner(CPlayer * player) override;
 
 #ifdef _DEBUG
-    void setdebuggoal() {
+    void setdebuggoal() override {
         goal = 5;
     }
 #endif

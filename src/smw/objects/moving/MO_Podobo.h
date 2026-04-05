@@ -5,7 +5,7 @@
 
 class MO_Podobo : public IO_MovingObject {
 public:
-    MO_Podobo(gfxSprite* nspr, short x, short y, float nspeed, short playerid, short teamid, short colorid, bool isSpawned);
+    MO_Podobo(gfxSprite* nspr, Vec2s pos, float nspeed, short playerid, short teamid, short colorid, bool isSpawned);
 
     void update() override;
     void draw() override;

@@ -10,13 +10,13 @@ class MI_TeamSelect : public UI_Control
 {
 	public:
 		MI_TeamSelect(gfxSprite * spr_background, short x, short y);
-		virtual ~MI_TeamSelect();
+		~MI_TeamSelect() override;
 
-		void Update();
-		void Draw();
+		void Update() override;
+		void Draw() override;
 
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		MenuCodeEnum Modify(bool modify);
+		MenuCodeEnum SendInput(CPlayerInput * playerInput) override;
+		MenuCodeEnum Modify(bool modify) override;
 
 		void Reset();
 		short OrganizeTeams();

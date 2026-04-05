@@ -20,7 +20,7 @@ extern CResourceManager* rm;
 // class flag base (for CTF mode)
 //------------------------------------------------------------------------------
 MO_FlagBase::MO_FlagBase(gfxSprite* nspr, short iTeamID, short iColorID)
-    : IO_MovingObject(nspr, 1280, 960, 5, 0)  // use 1280 and 960 so when placing base, it doesn't interfere (look in getClosestObject())
+    : IO_MovingObject(nspr, {1280, 960}, 5, 0)  // use 1280 and 960 so when placing base, it doesn't interfere (look in getClosestObject())
 {
     state = 1;
     iw = 32;
@@ -64,7 +64,7 @@ bool MO_FlagBase::collide(CPlayer* player)
 
 void MO_FlagBase::draw()
 {
-    spr->draw(ix - 8, iy - 8, iGraphicOffsetX, 0, 48, 48);
+    spr->draw(ix - 8, iy - 8, {iGraphicOffsetX, 0, 48, 48});
 }
 
 

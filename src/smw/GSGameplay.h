@@ -13,9 +13,6 @@ class GameplayState : public GameState
 
     private:
         GameplayState();
-        ~GameplayState() {}
-        GameplayState(GameplayState const&);
-        void operator=(GameplayState const&);
 
         void onEnterState();
 

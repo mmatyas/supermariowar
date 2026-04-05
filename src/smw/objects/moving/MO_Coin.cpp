@@ -17,8 +17,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class coin (for coin mode)
 //------------------------------------------------------------------------------
-MO_Coin::MO_Coin(gfxSprite* nspr, float dvelx, float dvely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin)
-    : IO_MovingObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
+MO_Coin::MO_Coin(gfxSprite* nspr, Vec2f vel, Vec2s pos, short color, short team, short type, short uncollectabletime, bool placecoin)
+    : IO_MovingObject(nspr, pos, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
 {
     state = 1;
     objectType = object_moving;
@@ -31,8 +31,8 @@ MO_Coin::MO_Coin(gfxSprite* nspr, float dvelx, float dvely, short ix, short iy, 
     iTeam = team;
 
     iUncollectableTime = uncollectabletime;
-    velx = dvelx;
-    vely = dvely;
+    velx = vel.x;
+    vely = vel.y;
 
     timer = 0;
     if (placecoin) {
@@ -60,7 +60,7 @@ bool MO_Coin::collide(CPlayer* player)
         game_values.gamemode->CheckWinner(player);
     }
 
-    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_coinsparkle, ix, iy, 7, 4));
+    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_coinsparkle, ix, iy, 7, 4);
 
     ifSoundOnPlay(rm->sfx_coin);
 
@@ -95,7 +95,7 @@ void MO_Coin::update()
         iUncollectableTime--;
 
         if (iType == 1 && iUncollectableTime < -game_values.gamemodesettings.greed.coinlife) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, iy, 3, 8);
             dead = true;
         }
     }
@@ -107,7 +107,7 @@ void MO_Coin::draw()
 
     // Draw sparkles
     if (iType != 1)
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
 }
 
 void MO_Coin::placeCoin()

@@ -8,8 +8,7 @@
 class NetworkLayer
 {
     public:
-        NetworkLayer() {}
-        virtual ~NetworkLayer() {}
+        virtual ~NetworkLayer() = default;
 
         virtual bool init(uint64_t max_players) = 0;
         virtual void cleanup() = 0;

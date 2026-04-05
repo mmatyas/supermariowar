@@ -39,11 +39,11 @@ void PlayerOutOfArenaTimer::draw(CPlayer& player)
 
     if (player.topY() < 0) {
         if (player.bottomY() < -1 || (player.bottomY() <= 0 && player.vely <= 1)) {
-            rm->spr_abovearrows.draw(player.leftX() - PWOFFSET, 0, player.getColorID() * 32, 0, 32, 26);
+            rm->spr_abovearrows.draw(player.leftX() - PWOFFSET, 0, {player.getColorID() * 32, 0, 32, 26});
 
             //This displays the out of arena timer before the player is killed
             if (game_values.outofboundstime > 0 && displaytimer >= 0)
-                rm->spr_awardkillsinrow.draw(player.leftX() - PWOFFSET + 8, 18, displaytimer << 4, player.getColorID() << 4, 16, 16);
+                rm->spr_awardkillsinrow.draw(player.leftX() - PWOFFSET + 8, 18, {displaytimer << 4, player.getColorID() << 4, 16, 16});
         }
     }
 }

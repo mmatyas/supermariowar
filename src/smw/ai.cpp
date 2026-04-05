@@ -13,6 +13,7 @@
 #include "gamemodes/Tag.h"
 #include "objects/IO_FlameCannon.h"
 
+#include "objects/moving/MO_BonusHouseChest.h"
 #include "objects/moving/MO_Boomerang.h"
 #include "objects/moving/MO_CarriedObject.h"
 #include "objects/moving/MO_Coin.h"
@@ -105,33 +106,24 @@ void CPlayerAI::Init()
     //Scan yoshi's egg mode objects to make sure that we ignore eggs without matching yoshis
     if (game_values.gamemode->gamemode == game_mode_eggs) {
         bool fYoshi[4] = {false, false, false, false};
+
         //Scan Yoshis to see which ones are present
         for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-            if (object_moving == obj->getObjectType()) {
-                IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
-
-                if (movingobject_yoshi == movingobject->getMovingObjectType()) {
-                    MO_Yoshi * yoshi = (MO_Yoshi*)movingobject;
-                    fYoshi[yoshi->getColor()] = true;
-                }
+            if (auto* yoshi = dynamic_cast<MO_Yoshi*>(obj.get())) {
+                fYoshi[yoshi->getColor()] = true;
             }
         }
 
         //Now scan eggs and ignore any egg that doesn't have a yoshi
         for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-            if (object_moving == obj->getObjectType()) {
-                IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
+            if (auto* egg = dynamic_cast<CO_Egg*>(obj.get())) {
+                if (!fYoshi[egg->getColor()]) {
+                    AttentionObject * ao = new AttentionObject();
+                    ao->iID = egg->networkId();
+                    ao->iType = 1;     //Ignore this object
+                    ao->iTimer = 0;		//Ignore it forever
 
-                if (movingobject_egg == movingobject->getMovingObjectType()) {
-                    CO_Egg * egg = (CO_Egg*)movingobject;
-                    if (!fYoshi[egg->getColor()]) {
-                        AttentionObject * ao = new AttentionObject();
-                        ao->iID = egg->iNetworkID;
-                        ao->iType = 1;     //Ignore this object
-                        ao->iTimer = 0;		//Ignore it forever
-
-                        attentionObjects[ao->iID] = ao;
-                    }
+                    attentionObjects[ao->iID] = ao;
                 }
             }
         }
@@ -170,7 +162,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
     //If there is a goal, then make sure we aren't paying attention to it for too long
     if (nearestObjects.goal) {
-        if (currentAttentionObject.iID == nearestObjects.goal->iNetworkID) {
+        if (currentAttentionObject.iID == nearestObjects.goal->networkId()) {
             //If we have been paying attention to this goal for too long, then start ignoring it
             if (++currentAttentionObject.iTimer > iTenSeconds) {
                 AttentionObject * ao = new AttentionObject();
@@ -181,7 +173,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 attentionObjects[ao->iID] = ao;
             }
         } else {
-            currentAttentionObject.iID = nearestObjects.goal->iNetworkID;
+            currentAttentionObject.iID = nearestObjects.goal->networkId();
             currentAttentionObject.iTimer = 0;
         }
     } else {
@@ -356,28 +348,28 @@ void CPlayerAI::Think(COutputControl * playerKeys)
         } else if (actionType == 1) { //Go for goal
             CObject * goal = nearestObjects.goal;
 
-            if ((goal->ix > ix && nearestObjects.goalwrap) || (goal->ix < ix && !nearestObjects.goalwrap))
+            if ((goal->x() > ix && nearestObjects.goalwrap) || (goal->x() < ix && !nearestObjects.goalwrap))
                 playerKeys->game_left.fDown = true;
             else
                 playerKeys->game_right.fDown = true;
 
-            if (goal->iy <= iy && goal->ix - ix < 45 && goal->ix - ix > -45) {
+            if (goal->y() <= iy && goal->x() - ix < 45 && goal->x() - ix > -45) {
                 playerKeys->game_jump.fDown = true;
-            } else if (goal->iy > iy && goal->ix - ix < 45 && goal->ix - ix > -45) {
+            } else if (goal->y() > iy && goal->x() - ix < 45 && goal->x() - ix > -45) {
                 if (!pPlayer->inair) playerKeys->game_down.fDown = true;
             }
 
-            if (goal->getObjectType() == object_moving && ((IO_MovingObject*)goal)->getMovingObjectType() == movingobject_egg)
+            if (dynamic_cast<CO_Egg*>(goal))
                 playerKeys->game_turbo.fDown = true;
-            else if (goal->getObjectType() == object_moving && ((IO_MovingObject*) goal)->getMovingObjectType() == movingobject_star && pPlayer->throw_star == 0)
+            else if (dynamic_cast<CO_Star*>(goal) && pPlayer->throw_star == 0)
                 playerKeys->game_turbo.fDown = true;
-            else if (goal->getObjectType() == object_moving && ((IO_MovingObject*) goal)->getMovingObjectType() == movingobject_flag)
+            else if (dynamic_cast<CO_Flag*>(goal))
                 playerKeys->game_turbo.fDown = true;
 
             //Drop current item if we're going after another carried item
             if (carriedItem) {
-                if (goal->getObjectType() == object_moving) {
-                    MovingObjectType goalobjecttype = ((IO_MovingObject*)goal)->getMovingObjectType();
+                if (auto* movingobject = dynamic_cast<IO_MovingObject*>(goal)) {
+                    MovingObjectType goalobjecttype = movingobject->getMovingObjectType();
                     if (goalobjecttype == movingobject_egg || goalobjecttype == movingobject_flag ||
                             goalobjecttype == movingobject_star || goalobjecttype == movingobject_phantokey) {
                         MovingObjectType carriedobjecttype = carriedItem->getMovingObjectType();
@@ -392,7 +384,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             }
 
             //Open treasure chests in bonus houses in world mode
-            if (goal->getObjectType() == object_moving && ((IO_MovingObject*)goal)->getMovingObjectType() == movingobject_treasurechest)
+            if (dynamic_cast<MO_BonusHouseChest*>(goal))
                 playerKeys->game_turbo.fPressed = true;
         } else if (actionType == 2) { //Evade Threat
             CObject * threat = nearestObjects.threat;
@@ -400,14 +392,14 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             //If threat, always use turbo
             playerKeys->game_turbo.fDown = true;
 
-            if ((threat->ix > ix && nearestObjects.threatwrap) || (threat->ix < ix && !nearestObjects.threatwrap))
+            if ((threat->x() > ix && nearestObjects.threatwrap) || (threat->x() < ix && !nearestObjects.threatwrap))
                 playerKeys->game_right.fDown = true;
             else
                 playerKeys->game_left.fDown = true;
 
-            if (threat->iy <= iy && threat->ix - ix < 60 && threat->ix - ix > -60) {
+            if (threat->y() <= iy && threat->x() - ix < 60 && threat->x() - ix > -60) {
                 if (!pPlayer->inair) playerKeys->game_down.fDown = true;
-            } else if (threat->iy > iy && threat->ix - ix < 60 && threat->ix - ix > -60) {
+            } else if (threat->y() > iy && threat->x() - ix < 60 && threat->x() - ix > -60) {
                 playerKeys->game_jump.fDown = true;
             }
         } else if (actionType == 3) { //Tag teammate
@@ -428,7 +420,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             bool * moveToward;
             bool * moveAway;
 
-            if ((stomp->ix > ix && nearestObjects.stompwrap) || (stomp->ix < ix && !nearestObjects.stompwrap)) {
+            if ((stomp->x() > ix && nearestObjects.stompwrap) || (stomp->x() < ix && !nearestObjects.stompwrap)) {
                 moveToward = &playerKeys->game_left.fDown;
                 moveAway = &playerKeys->game_right.fDown;
             } else {
@@ -436,7 +428,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 moveAway = &playerKeys->game_left.fDown;
             }
 
-            if (stomp->iy > iy + PH || pPlayer->shyguy || pPlayer->isInvincible() ||
+            if (stomp->y() > iy + PH || pPlayer->shyguy || pPlayer->isInvincible() ||
                     (carriedItem && (carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock))) {
                 //if true stomp target is lower or at the same level, run toward
                 *moveToward = true;
@@ -448,9 +440,9 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             }
 
 
-            if (stomp->iy <= iy + PH && nearestObjects.stompdistance < 2025) {
+            if (stomp->y() <= iy + PH && nearestObjects.stompdistance < 2025) {
                 playerKeys->game_jump.fDown = true;
-            } else if (stomp->iy > iy + PH && nearestObjects.stompdistance < 2025) {
+            } else if (stomp->y() > iy + PH && nearestObjects.stompdistance < 2025) {
                 if (!pPlayer->inair) playerKeys->game_down.fDown = true;
 
                 if (!pPlayer->superstomp.isInSuperStompState()) {
@@ -502,13 +494,13 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 playerKeys->game_turbo.fDown = false;
 
                 //Ignore the key for a little while
-                if (attentionObjects.find(carriedItem->iNetworkID) != attentionObjects.end()) {
-                    AttentionObject * ao = attentionObjects[carriedItem->iNetworkID];
+                if (attentionObjects.find(carriedItem->networkId()) != attentionObjects.end()) {
+                    AttentionObject * ao = attentionObjects[carriedItem->networkId()];
                     ao->iType = 1;
                     ao->iTimer = iDecisionPercentage[game_values.cpudifficulty] / 3;
                 } else {
                     AttentionObject * ao = new AttentionObject();
-                    ao->iID = carriedItem->iNetworkID;
+                    ao->iID = carriedItem->networkId();
                     ao->iType = 1;
                     ao->iTimer = iDecisionPercentage[game_values.cpudifficulty] / 3;
                     attentionObjects[ao->iID] = ao;
@@ -516,13 +508,12 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             }
         }
         //If we are holding something that we are ignoring, drop it
-        else if (attentionObjects.find(carriedItem->iNetworkID) != attentionObjects.end()) {
+        else if (attentionObjects.find(carriedItem->networkId()) != attentionObjects.end()) {
             playerKeys->game_turbo.fDown = false;
         }
 
         //Drop live bombs if they are not yours
-        if (carriedobjecttype == movingobject_bomb) {
-            CO_Bomb * bomb = (CO_Bomb*)carriedItem;
+        if (auto* bomb = dynamic_cast<CO_Bomb*>(carriedItem)) {
             if (bomb->iTeamID != pPlayer->teamID)
                 playerKeys->game_turbo.fDown = false;
         } else if (carriedobjecttype == movingobject_carried || carriedobjecttype == movingobject_throwbox) { //Drop springs,spikes,shoes
@@ -569,7 +560,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
 
         //Look through all platforms and see if we are hitting solid or death tiles in them
-        for (short iPlatform = 0; iPlatform < g_map->iNumPlatforms; iPlatform++) {
+        for (short iPlatform = 0; iPlatform < g_map->platforms.size(); iPlatform++) {
             int lefttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix, iDeathY << 5);
             int righttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix + PW, iDeathY << 5);
 
@@ -643,32 +634,58 @@ ExitDeathCheck:
     ***************************************************/
 
     if (iStoredPowerup > 0) {
-        //use 1-5up, clock, pow, bulletbill, mod, podobo, right away
-        if (iStoredPowerup == 1  || iStoredPowerup == 2 || iStoredPowerup == 3 || iStoredPowerup == 4 ||
-                iStoredPowerup == 7 || iStoredPowerup == 9 || iStoredPowerup == 10 || iStoredPowerup == 16 ||
-                iStoredPowerup == 22) {
-            playerKeys->game_powerup.fDown = true;
-        } else if (((iStoredPowerup == 5 || iStoredPowerup == 11 || iStoredPowerup == 17 || iStoredPowerup == 19 || iStoredPowerup == 21 || iStoredPowerup == 23 || iStoredPowerup == 24 || iStoredPowerup == 25) &&
-                   pPlayer->powerup == -1) || //Use fireflower, hammer, feather, boomerang, cape, wings, sledge, bombs
-                  (iStoredPowerup == 6 && !pPlayer->isInvincible()) || //Use star
-                  (iStoredPowerup == 8 && !pPlayer->bobomb) || //use bob-omb
-                  (iStoredPowerup >= 12 && iStoredPowerup <= 15 && !carriedItem) || //Use shell
-                  (iStoredPowerup == 20 && !pPlayer->tanookisuit.isOn())) { //use tanooki
-            playerKeys->game_powerup.fDown = true;
-        } else if (iStoredPowerup == 18) { //mystery mushroom
-            //See if another player has a powerup
-            for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
-                if (iPlayer == pPlayer->localID || players[iPlayer]->teamID == iTeamID)
-                    continue;
-
-                if (game_values.gamepowerups[players[iPlayer]->globalID] > 0) {
-                    playerKeys->game_powerup.fDown = true;
+        const auto canUse = [this, carriedItem, iTeamID](PowerupType powerup) -> bool {
+            switch (powerup) {
+                case PowerupType::PoisonMushroom:
+                    return false;
+                case PowerupType::ExtraLife1:
+                case PowerupType::ExtraLife2:
+                case PowerupType::ExtraLife3:
+                case PowerupType::ExtraLife5:
+                case PowerupType::Clock:
+                case PowerupType::Pow:
+                case PowerupType::BulletBill:
+                case PowerupType::Mod:
+                case PowerupType::Podobo:
+                    return true;  // use 1-5up, clock, pow, bulletbill, mod, podobo, right away
+                case PowerupType::Fire:
+                case PowerupType::Hammer:
+                case PowerupType::Feather:
+                case PowerupType::Boomerang:
+                case PowerupType::IceWand:
+                case PowerupType::Bomb:
+                case PowerupType::Leaf:
+                case PowerupType::PWings:
+                    return pPlayer->powerup == -1;
+                case PowerupType::Star:
+                    return !pPlayer->isInvincible();
+                case PowerupType::Bobomb:
+                    return !pPlayer->bobomb;
+                case PowerupType::ShellGreen:
+                case PowerupType::ShellRed:
+                case PowerupType::ShellSpiny:
+                case PowerupType::ShellBuzzy:
+                    return !carriedItem;
+                case PowerupType::Tanooki:
+                    return !pPlayer->tanookisuit.isOn();
+                case PowerupType::JailKey:
+                    return pPlayer->jail.isActive();
+                case PowerupType::MysteryMushroom:
+                    //See if another player has a powerup
+                    for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
+                        if (iPlayer == pPlayer->localID || players[iPlayer]->teamID == iTeamID) {
+                            continue;
+                        }
+                        if (game_values.gamepowerups[players[iPlayer]->globalID] > 0) {
+                            return true;
+                        }
+                    }
                     break;
-                }
             }
-        } else if (iStoredPowerup == 26) { //jail key
-            if (pPlayer->jail.isActive())
-                playerKeys->game_powerup.fDown = true;
+            return false;
+        };
+        if (canUse(static_cast<PowerupType>(iStoredPowerup))) {
+            playerKeys->game_powerup.fDown = true;
         }
     }
 }
@@ -684,7 +701,7 @@ void CPlayerAI::GetNearestObjects()
     std::map<int, AttentionObject*>::iterator lim = attentionObjects.end();
 
     for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-        if (attentionObjects.find(obj->iNetworkID) != lim) {
+        if (attentionObjects.find(obj->networkId()) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
         }
@@ -879,7 +896,7 @@ void CPlayerAI::GetNearestObjects()
     }
 
     for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list()) {
-        if (attentionObjects.find(obj->iNetworkID) != lim) {
+        if (attentionObjects.find(obj->networkId()) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
         }
@@ -942,7 +959,7 @@ void CPlayerAI::GetNearestObjects()
     }
 
     for (const std::unique_ptr<CObject>& obj : objectcontainer[2].list()) {
-        if (attentionObjects.find(obj->iNetworkID) != lim) {
+        if (attentionObjects.find(obj->networkId()) != lim) {
             //DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
             continue;
         }
@@ -1058,8 +1075,8 @@ void CPlayerAI::GetNearestObjects()
 void CPlayerAI::DistanceToObject(CObject * object, CObject ** target, int * nearest, bool * wrap)
 {
     //Calculate normal screen
-    short tx = object->ix - pPlayer->ix;
-    short ty = object->iy - pPlayer->iy;
+    short tx = object->x() - pPlayer->ix;
+    short ty = object->y() - pPlayer->iy;
     bool fScreenWrap = false;
 
     //See if it is a shorter distance wrapping around the screen
@@ -1083,8 +1100,8 @@ void CPlayerAI::DistanceToObject(CObject * object, CObject ** target, int * near
 void CPlayerAI::DistanceToObjectCenter(CObject * object, CObject ** target, int * nearest, bool * wrap)
 {
     //Calculate normal screen
-    short tx = object->ix + (object->collisionWidth >> 1) - pPlayer->ix - HALFPW;
-    short ty = object->iy + (object->collisionHeight >> 1) - pPlayer->iy - HALFPH;
+    short tx = object->x() + (object->collisionRectW() / 2) - pPlayer->ix - HALFPW;
+    short ty = object->y() + (object->collisionRectH() / 2) - pPlayer->iy - HALFPH;
     bool fScreenWrap = false;
 
     if (tx > App::screenWidth/2) {

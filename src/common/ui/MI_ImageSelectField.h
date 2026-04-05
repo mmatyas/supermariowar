@@ -11,7 +11,6 @@ public:
         std::string name,
         short width, short indent,
         short imageHeight, short imageWidth);
-    virtual ~MI_ImageSelectField() = default;
 
     void Draw() override;
 

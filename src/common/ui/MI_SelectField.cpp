@@ -18,11 +18,11 @@ MI_SelectField<T>::MI_SelectField(gfxSprite* nspr, short x, short y, std::string
     , m_width(width)
     , m_indent(indent)
 {
-    miModifyImageLeft = std::make_unique<MI_Image>(nspr, ix + indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
-    miModifyImageLeft->Show(false);
+    miModifyImageLeft = std::make_unique<MI_Image>(nspr, m_pos.x + indent - 26, m_pos.y + 4, 32, 64, 26, 24, 4, 1, 8);
+    miModifyImageLeft->setVisible(false);
 
-    miModifyImageRight = std::make_unique<MI_Image>(nspr, ix + width - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
-    miModifyImageRight->Show(false);
+    miModifyImageRight = std::make_unique<MI_Image>(nspr, m_pos.x + width - 16, m_pos.y + 4, 32, 88, 26, 24, 4, 1, 8);
+    miModifyImageRight->setVisible(false);
 }
 
 
@@ -45,11 +45,11 @@ MI_SelectField<T>::MI_SelectField(const MI_SelectField<T>& other)
 {
     setCurrentIndex(other.m_index);
 
-    miModifyImageLeft = std::make_unique<MI_Image>(m_spr, ix + m_indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
-    miModifyImageLeft->Show(false);
+    miModifyImageLeft = std::make_unique<MI_Image>(m_spr, m_pos.x + m_indent - 26, m_pos.y + 4, 32, 64, 26, 24, 4, 1, 8);
+    miModifyImageLeft->setVisible(false);
 
-    miModifyImageRight = std::make_unique<MI_Image>(m_spr, ix + m_width - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
-    miModifyImageRight->Show(false);
+    miModifyImageRight = std::make_unique<MI_Image>(m_spr, m_pos.x + m_width - 16, m_pos.y + 4, 32, 88, 26, 24, 4, 1, 8);
+    miModifyImageRight->setVisible(false);
 }
 
 
@@ -64,25 +64,25 @@ void MI_SelectField<T>::Update()
 template<typename T>
 void MI_SelectField<T>::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     if (m_indent == 0) {
         short iHalfWidth = m_width / 2;
-        m_spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + m_adjustmentY, iHalfWidth, 32);
-        m_spr->draw(ix + iHalfWidth, iy, 512 - iHalfWidth, (fSelected ? 32 : 0) + m_adjustmentY, m_width - iHalfWidth, 32);
+        m_spr->draw(m_pos.x, m_pos.y, {0, (fSelected ? 32 : 0) + m_adjustmentY, iHalfWidth, 32});
+        m_spr->draw(m_pos.x + iHalfWidth, m_pos.y, {512 - iHalfWidth, (fSelected ? 32 : 0) + m_adjustmentY, m_width - iHalfWidth, 32});
     } else {
-        m_spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + m_adjustmentY, m_indent - 16, 32);
-        m_spr->draw(ix + m_indent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
-        m_spr->draw(ix + m_indent + 16, iy, 528 - m_width + m_indent, (fSelected ? 32 : 0) + m_adjustmentY, m_width - m_indent - 16, 32);
+        m_spr->draw(m_pos.x, m_pos.y, {0, (fSelected ? 32 : 0) + m_adjustmentY, m_indent - 16, 32});
+        m_spr->draw(m_pos.x + m_indent - 16, m_pos.y, {0, (fSelected ? 96 : 64), 32, 32});
+        m_spr->draw(m_pos.x + m_indent + 16, m_pos.y, {528 - m_width + m_indent, (fSelected ? 32 : 0) + m_adjustmentY, m_width - m_indent - 16, 32});
     }
 
     if (m_indent> 0)
-        rm->menu_font_large.drawChopRight(ix + 16, iy + 5, m_indent - 8, m_name.c_str());
+        rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, m_indent - 8, m_name.c_str());
 
     if (!m_items.empty()) {
         const short indent = (m_indent > 0) ? m_indent : 8;
-        rm->menu_font_large.drawChopRight(ix + indent + 8, iy + 5, m_width - indent - 24, currentItem().name.c_str());
+        rm->menu_font_large.drawChopRight(m_pos.x + indent + 8, m_pos.y + 5, m_width - indent - 24, currentItem().name.c_str());
     }
 
     const bool drawLeft = m_index > 0;
@@ -109,8 +109,8 @@ MenuCodeEnum MI_SelectField<T>::Modify(bool modify)
     if (MENU_CODE_NONE != mcControlSelectedCode)
         return mcControlSelectedCode;
 
-    miModifyImageLeft->Show(modify);
-    miModifyImageRight->Show(modify);
+    miModifyImageLeft->setVisible(modify);
+    miModifyImageRight->setVisible(modify);
     fModifying = modify;
     return MENU_CODE_MODIFY_ACCEPTED;
 }
@@ -150,8 +150,8 @@ MenuCodeEnum MI_SelectField<T>::SendInput(CPlayerInput * playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            miModifyImageLeft->Show(false);
-            miModifyImageRight->Show(false);
+            miModifyImageLeft->setVisible(false);
+            miModifyImageRight->setVisible(false);
 
             fModifying = false;
 
@@ -194,7 +194,7 @@ MenuCodeEnum MI_SelectField<T>::MouseClick(short iMouseX, short iMouseY) {
     }
 
     //Otherwise just check to see if we clicked on the whole control
-    if (ix <= iMouseX && iMouseX < ix + m_width && iy <= iMouseY && iMouseY < iy + 32)
+    if (m_pos.x <= iMouseX && iMouseX < m_pos.x + m_width && m_pos.y <= iMouseY && iMouseY < m_pos.y + 32)
         return MENU_CODE_CLICKED;
 
     //Otherwise this control wasn't clicked at all

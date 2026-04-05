@@ -95,6 +95,6 @@ UI_EyeCandyOptionsMenu::UI_EyeCandyOptionsMenu()
     AddNonControl(miEyeCandyOptionsMenuRightHeaderBar);
     AddNonControl(miEyeCandyOptionsMenuHeaderText);
 
-    SetHeadControl(miSpawnStyleField);
+    setInitialFocus(miSpawnStyleField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };

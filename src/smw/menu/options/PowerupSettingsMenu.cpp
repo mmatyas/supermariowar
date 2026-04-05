@@ -103,6 +103,6 @@ UI_PowerupSettingsMenu::UI_PowerupSettingsMenu()
     AddNonControl(miPowerupSettingsMenuRightHeaderBar);
     AddNonControl(miPowerupSettingsMenuHeaderText);
 
-    SetHeadControl(miStoredPowerupDelayField);
+    setInitialFocus(miStoredPowerupDelayField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };

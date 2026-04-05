@@ -7,6 +7,7 @@
 #include "GSMenu.h"
 #include "GSGameplay.h"
 #include "eyecandy.h"
+#include "path.h"
 #include "ResourceManager.h"
 
 extern SDL_Surface* screen;
@@ -20,44 +21,6 @@ extern GraphicsList *menugraphicspacklist;
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-
-namespace {
-bool g_fLoadMessages = true;
-
-void _load_drawmsg(const std::string& f)
-{
-    if (g_fLoadMessages) {
-        /*
-        static SDL_Rect r;
-        r.x = 0;
-        r.y = 0;
-        r.w = 500;
-        r.h = (Uint16)menu_font_small.getHeight();
-        Uint32 col = SDL_MapRGB(screen->format, 189, 251, 255);
-        SDL_FillRect(screen, &r, col);      //fill empty area
-        */
-
-        rm->menu_font_small.draw(0, 0, f.c_str());
-    }
-}
-
-void _load_waitforkey()
-{
-#ifndef __EMSCRIPTEN__
-    SDL_Event event;
-    while (true) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_KEYDOWN)
-                return;
-            if (event.type == SDL_JOYBUTTONDOWN)
-                return;
-        }
-
-        SDL_Delay(10);
-    }
-#endif
-}
-} // namespace
 
 //-----------------------------------------------------------------------------
 // THE LOAD UP SEQUENCE + SPLASH SCREEN
@@ -82,45 +45,15 @@ void SplashScreenState::onLeaveState()
     delete menu_credits;
 }
 
-bool LoadStartGraphics()
-{
-    std::string graphicspack = menugraphicspacklist->currentPath();
-
-    bool loadok = true;
-
-    loadok &= rm->menu_font_small.init(convertPath("gfx/packs/menu/menu_font_small.png", graphicspack));
-    loadok &= rm->menu_font_large.init(convertPath("gfx/packs/menu/menu_font_large.png", graphicspack));
-
-    if (!loadok) {
-        _load_drawmsg("ERROR: error loading the fonts!\n");
-        _load_waitforkey();
-        return false;
-    }
-
-    //load basic stuff
-    loadok &= gfx_loadimagenocolorkey(&rm->menu_backdrop, convertPath("gfx/packs/menu/menu_background.png", graphicspack));
-    loadok &= gfx_loadimage(rm->menu_smw, convertPath("gfx/packs/menu/menu_smw.png", graphicspack), false);
-    loadok &= gfx_loadimage(rm->menu_version, convertPath("gfx/packs/menu/menu_version.png", graphicspack), false);
-
-    if (!loadok) {
-        _load_drawmsg("ERROR: error loading the start graphics!\n");
-        _load_waitforkey();
-        return false;
-    }
-
-    return true;
-}
-
 bool SplashScreenState::init()
 {
-    if (!LoadStartGraphics())
-        return false;
+    rm->loadStartGraphics();
 
 //  gfx_loadimagenocolorkey(&rm->menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist->current_name()));
 //  gfx_loadimagenocolorkey(&rm->menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
 
     menu_credits = new gfxSprite();
-    gfx_loadimage(*menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->currentPath()), false);
+    *menu_credits = ImageLoader(convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->currentPath())).create();
 
 //	const char * contributors[] = {
 //	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",
@@ -237,7 +170,6 @@ void SplashScreenState::update()
                 rm->menu_shade.draw(0, 0);
                 blitdest = screen;
 
-                g_fLoadMessages = false;
                 eyecandy[2].clean();
 
                 game_values.playerInput.ResetKeys();
@@ -310,7 +242,7 @@ void SplashScreenState::update()
         rm->menu_version.setalpha((Uint8)alpha);
         rm->menu_version.draw(628 - rm->menu_version.getWidth(), 10); //smw logo
 
-        rm->menu_font_large.setalpha((Uint8)alpha);
+        rm->menu_font_large.setAlpha((Uint8)alpha);
         //rm->menu_font_large.drawRightJustified(App::screenWidth * 0.98f, 45, "WIP");
 
         menu_credits->setalpha((Uint8)alpha);
@@ -332,7 +264,7 @@ void SplashScreenState::update()
                     static int index = 0;
                     if (++timer >= 60)
                     {
-                        eyecandy[2].add(new EC_GravText(&rm->menu_font_large, App::screenWidth/2, App::screenHeight, contributors[contributorOrder[index]], -8.2f));
+                        eyecandy[2].emplace<EC_GravText>(&rm->menu_font_large, App::screenWidth/2, App::screenHeight, contributors[contributorOrder[index]], -8.2f);
                         timer = 0;
 
                         if (++index >= NUM_CONTRIBUTORS)
@@ -348,9 +280,9 @@ void SplashScreenState::update()
 
     if (state == 7) {
         // load initial coin sound
-        rm->backgroundmusic[2].load(musiclist->GetMusic(1));
+        rm->backgroundmusic[2] = sfxMusic(musiclist->music(1));
 
-        rm->LoadAllGraphics();
+        rm->loadAllGraphics();
         rm->LoadGameSounds();
 
         if (!game_values.soundcapable) {

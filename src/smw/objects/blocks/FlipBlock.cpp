@@ -29,8 +29,8 @@ extern CEyecandyContainer eyecandy[3];
 // power, you're dead.  Plus fireballs have a large enough collision box that you can be hit
 // with them too.
 //------------------------------------------------------------------------------
-B_FlipBlock::B_FlipBlock(gfxSprite *nspr, short x, short y, bool fHidden) :
-    IO_Block(nspr, x, y)
+B_FlipBlock::B_FlipBlock(gfxSprite *nspr, Vec2s pos, bool fHidden) :
+    IO_Block(nspr, pos)
 {
     iw = (short)spr->getWidth() >> 2;
     collisionWidth = iw;
@@ -49,7 +49,7 @@ void B_FlipBlock::draw()
         return;
 
     if (state == 0 || state == 1)
-        spr->draw(ix, iy, frame, 0, iw, ih);
+        spr->draw(ix, iy, {frame, 0, iw, ih});
 }
 
 void B_FlipBlock::update()
@@ -297,10 +297,10 @@ void B_FlipBlock::triggerBehavior()
 
 void B_FlipBlock::explode()
 {
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenflipblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenflipblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenflipblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenflipblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
 
     ifSoundOnPlay(rm->sfx_breakblock);
 }

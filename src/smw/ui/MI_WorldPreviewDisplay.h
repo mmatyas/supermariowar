@@ -1,13 +1,14 @@
 #pragma once
 
+#include "gfx/gfxSprite.h"
 #include "uicontrol.h"
+
 #include "SDL.h"
 
 
 class MI_WorldPreviewDisplay : public UI_Control {
 public:
     MI_WorldPreviewDisplay(short x, short y, short cols, short rows);
-    virtual ~MI_WorldPreviewDisplay();
 
     //Updates animations or other events every frame
     void Update() override;
@@ -21,8 +22,7 @@ protected:
     void Init();
     void UpdateMapSurface(bool fFullRefresh);
 
-    SDL_Surface* sMapSurface = nullptr;
-    SDL_Rect rectDst;
+    gfxSprite map_sprite;
 
     short iCols = 0;
     short iRows = 0;

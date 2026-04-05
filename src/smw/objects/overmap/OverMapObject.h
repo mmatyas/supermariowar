@@ -8,21 +8,20 @@ class CPlayer;
 
 class IO_OverMapObject : public CObject {
 public:
-    IO_OverMapObject(gfxSprite* nspr, short x, short y, short iNumSpr,
+    IO_OverMapObject(gfxSprite* nspr, Vec2s pos, short iNumSpr,
         short aniSpeed, short iCollisionWidth = -1,
         short iCollisionHeight = -1, short iCollisionOffsetX = -1,
         short iCollisionOffsetY = -1, short iAnimationOffsetX = -1,
         short iAnimationOffsetY = -1, short iAnimationHeight = -1,
         short iAnimationWidth = -1);
-    virtual ~IO_OverMapObject() {};
 
-    virtual void draw();
+    void draw() override;
     virtual void draw(short iOffsetX, short iOffsetY);
-    virtual void update();
+    void update() override;
     virtual void animate();
 
-    virtual bool collide(CPlayer*) { return false; }
-    virtual void collide(IO_MovingObject*) {}
+    bool collide(CPlayer*) override { return false; }
+    void collide(IO_MovingObject*) override {}
 
 protected:
     short iNumSprites;

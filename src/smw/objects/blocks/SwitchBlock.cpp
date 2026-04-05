@@ -6,8 +6,8 @@
 
 extern CMap* g_map;
 
-B_SwitchBlock::B_SwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor color, short iState) :
-    IO_Block(nspr, x, y)
+B_SwitchBlock::B_SwitchBlock(gfxSprite *nspr, Vec2s pos, SwitchColor color, short iState) :
+    IO_Block(nspr, pos)
 {
     iw = (short)spr->getWidth() >> 2;
     collisionWidth = iw;
@@ -20,7 +20,7 @@ B_SwitchBlock::B_SwitchBlock(gfxSprite *nspr, short x, short y, SwitchColor colo
 
 void B_SwitchBlock::draw()
 {
-    spr->draw(ix, iy, iSrcX, (state == 0 ? 64 : 96), iw, ih);
+    spr->draw(ix, iy, {iSrcX, (state == 0 ? 64 : 96), iw, ih});
 }
 
 bool B_SwitchBlock::collide(CPlayer * player, short direction, bool useBehavior)

@@ -13,7 +13,7 @@ enum class NoteBlockType : unsigned char {
 
 class B_NoteBlock : public IO_Block {
 public:
-	B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, NoteBlockType type, bool fHidden);
+	B_NoteBlock(gfxSprite *nspr, Vec2s pos, short iNumSpr, short aniSpeed, NoteBlockType type, bool fHidden);
 
 	void draw() override;
 	void update() override;

@@ -17,7 +17,7 @@ enum class ShellType : unsigned char {
 
 class CO_Shell : public MO_CarriedObject {
 public:
-    CO_Shell(ShellType type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer);
+    CO_Shell(ShellType type, Vec2s pos, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer);
 
     void update() override;
     void draw() override;

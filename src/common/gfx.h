@@ -21,25 +21,17 @@
 #ifndef GFX_H
 #define GFX_H
 
-#include "SDL.h"
-#include <string>
-
+#include "GlobalConstants.h"
 #include "gfx/Color.h"
 #include "gfx/gfxSprite.h"
 #include "gfx/gfxFont.h"
 
-enum PlayerPalette {
-    normal,
-    invincibility_1,
-    invincibility_2,
-    invincibility_3,
-    shielded,
-    tagged,
-    ztarred,
-    got_shine,
-    frozen,
-    NUM_PALETTES
-};
+#include "SDL.h"
+#include <filesystem>
+#include <optional>
+
+using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
+
 
 bool gfx_init(int w, int h, bool fullscreen);
 void gfx_changefullscreen(bool fullscreen);
@@ -49,23 +41,30 @@ void gfx_show_error(const char*);
 void gfx_take_screenshot();
 
 void gfx_close();
-bool gfx_loadpalette(const std::string& palette_path);
+bool gfx_loadpalette(const std::filesystem::path& palette_path);
 
-void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h);
-bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHiddenDirection, short iHiddenValue);
-void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, short srcY, short iw, short ih, short clipX, short clipY, short clipW, short clipH, bool wrap, short hiddenDirection = -1, short hiddenPlane = -1);
+void gfx_cliprect(SDL_Rect& srcRect, SDL_Rect& dstRect, const SDL_Rect& clipRect);
 
-bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, const RGB& colorkey, short colorScheme);
-bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, const RGB& colorkey, short colorScheme, bool fLoadBothDirections);
+/// Clips a source and destination area pair, so that the destination area doesn't go past
+/// a certain threshold in a given direction.
+/// For example, if the clip edge is `ClipEdge::Right`, then `dstRect` is cut at `x = threshold`,
+/// and the width of `srcRect` shrinks accordingly.
+/// Returns true if the destination area is fully hidden.
+[[nodiscard]] bool gfx_adjusthiddenrects(SDL_Rect& srcRect, SDL_Rect& dstRect, ClipEdge edge, int threshold);
 
-bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f);
-bool gfx_loadimage(gfxSprite& sprite, const std::string& path, bool fWrap = true);
-bool gfx_loadimage(gfxSprite& sprite, const std::string& path, Uint8 alpha, bool fWrap = true);
-bool gfx_loadimage(gfxSprite& sprite, const std::string& path, const RGB& rgb, bool fWrap = true);
+void gfx_drawpreview(gfxSprite& sprite,
+    short dstX, short dstY,
+    short srcX, short srcY, short iw, short ih,
+    const SDL_Rect& clipRect,
+    bool wrap,
+    std::optional<std::pair<ClipEdge, int>> clip = std::nullopt);
 
-void gfx_setjoystickteamcolor(SDL_Joystick * joystick, unsigned short team, float brightness);
+SpriteStrip gfx_loadfullskin(const std::filesystem::path& path, short colorScheme);
+SpriteStrip gfx_loadmenuskin(const std::filesystem::path& path, short colorScheme, bool fLoadBothDirections);
 
+void gfx_setjoystickteamcolor(SDL_Joystick * joystick, short team, float brightness);
 
+Uint32 getRawPixel(SDL_Surface* surf, int x, int y);
 RGB getRgb(SDL_Surface* surf, int x, int y);
 
 #endif // GFX_H

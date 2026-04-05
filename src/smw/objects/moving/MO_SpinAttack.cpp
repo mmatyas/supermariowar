@@ -18,7 +18,7 @@ extern CResourceManager* rm;
 // class spin death (spinning cape or tail)
 //------------------------------------------------------------------------------
 MO_SpinAttack::MO_SpinAttack(short playerId, short teamId, KillStyle style, bool direction, short offsety)
-    : MO_AttackZone(playerId, teamId, 0, 0, 24, 12, 16, style, true)
+    : MO_AttackZone(playerId, teamId, Vec2s::zero(), {24, 12}, 16, style, true)
 {
     fDirection = direction;
     iOffsetY = offsety;

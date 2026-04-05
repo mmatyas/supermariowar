@@ -17,7 +17,7 @@ extern CResourceManager* rm;
 // class area (for Domination mode)
 //------------------------------------------------------------------------------
 OMO_Area::OMO_Area(gfxSprite* nspr, short iNumAreas)
-    : IO_OverMapObject(nspr, 1280, 960, 5, 0)
+    : IO_OverMapObject(nspr, {1280, 960}, 5, 0)
     , numareas(iNumAreas)
 {
     iw = (short)spr->getWidth() / 5;
@@ -46,7 +46,7 @@ bool OMO_Area::collide(CPlayer* player)
 
 void OMO_Area::draw()
 {
-    spr->draw(ix, iy, frame, 0, iw, ih);
+    spr->draw(ix, iy, {frame, 0, iw, ih});
 }
 
 void OMO_Area::update()

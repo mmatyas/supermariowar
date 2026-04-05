@@ -2,6 +2,7 @@
 
 #include "FileList.h"
 #include "input.h"
+#include "path.h"
 #include "ResourceManager.h"
 #include "ui/MI_Image.h"
 
@@ -18,19 +19,19 @@ MI_AnnouncerField::MI_AnnouncerField(gfxSprite* nspr, short x, short y, std::str
 {
     UpdateName();
 
-    miModifyImageLeft = std::make_unique<MI_Image>(nspr, ix + indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
-    miModifyImageLeft->Show(false);
+    miModifyImageLeft = std::make_unique<MI_Image>(nspr, m_pos.x + indent - 26, m_pos.y + 4, 32, 64, 26, 24, 4, 1, 8);
+    miModifyImageLeft->setVisible(false);
 
-    miModifyImageRight = std::make_unique<MI_Image>(nspr, ix + iWidth - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
-    miModifyImageRight->Show(false);
+    miModifyImageRight = std::make_unique<MI_Image>(nspr, m_pos.x + iWidth - 16, m_pos.y + 4, 32, 88, 26, 24, 4, 1, 8);
+    miModifyImageRight->setVisible(false);
 }
 
 MI_AnnouncerField::~MI_AnnouncerField() = default;
 
 MenuCodeEnum MI_AnnouncerField::Modify(bool modify)
 {
-    miModifyImageLeft->Show(modify);
-    miModifyImageRight->Show(modify);
+    miModifyImageLeft->setVisible(modify);
+    miModifyImageRight->setVisible(modify);
 
     fModifying = modify;
     return MENU_CODE_MODIFY_ACCEPTED;
@@ -58,8 +59,8 @@ MenuCodeEnum MI_AnnouncerField::SendInput(CPlayerInput* playerInput)
         }
 
         if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            miModifyImageLeft->Show(false);
-            miModifyImageRight->Show(false);
+            miModifyImageLeft->setVisible(false);
+            miModifyImageRight->setVisible(false);
 
             fModifying = false;
 
@@ -72,7 +73,7 @@ MenuCodeEnum MI_AnnouncerField::SendInput(CPlayerInput* playerInput)
 
 void MI_AnnouncerField::UpdateName()
 {
-    szFieldName = GetNameFromFileName(list->currentPath());
+    szFieldName = GetNameFromFileName(list->currentPath().string());
 }
 
 void MI_AnnouncerField::Update()
@@ -83,16 +84,16 @@ void MI_AnnouncerField::Update()
 
 void MI_AnnouncerField::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     //Draw the select field background
-    spr->draw(ix, iy, 0, (fSelected ? 32 : 0), iIndent - 16, 32);
-    spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
-    spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
+    spr->draw(m_pos.x, m_pos.y, {0, (fSelected ? 32 : 0), iIndent - 16, 32});
+    spr->draw(m_pos.x + iIndent - 16, m_pos.y, {0, (fSelected ? 96 : 64), 32, 32});
+    spr->draw(m_pos.x + iIndent + 16, m_pos.y, {528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32});
 
-    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName.c_str());
-    rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szFieldName.c_str());
+    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, iIndent - 8, szName.c_str());
+    rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 24, szFieldName.c_str());
 
     miModifyImageLeft->Draw();
     miModifyImageRight->Draw();

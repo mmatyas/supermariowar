@@ -17,8 +17,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class collection card (for card collection mode)
 //------------------------------------------------------------------------------
-MO_CollectionCard::MO_CollectionCard(gfxSprite* nspr, short iType, short iValue, short iUncollectableTime, float dvelx, float dvely, short iX, short iY)
-    : IO_MovingObject(nspr, iX, iY, 6, 8, -1, -1, -1, -1, 0, 0, 32, 32)
+MO_CollectionCard::MO_CollectionCard(gfxSprite* nspr, short iType, short iValue, short iUncollectableTime, Vec2f vel, Vec2s pos)
+    : IO_MovingObject(nspr, pos, 6, 8, -1, -1, -1, -1, 0, 0, 32, 32)
 {
     state = 1;
     objectType = object_moving;
@@ -31,8 +31,8 @@ MO_CollectionCard::MO_CollectionCard(gfxSprite* nspr, short iType, short iValue,
     value = iValue;
 
     uncollectabletime = iUncollectableTime;
-    velx = dvelx;
-    vely = dvely;
+    velx = vel.x;
+    vely = vel.y;
 
     if (iType == 0) {
         placeCard();
@@ -89,7 +89,7 @@ void MO_CollectionCard::update()
     } else if (state == 3) {
         if (++timer > 200) {
             dead = true;
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, iy, 3, 8);
         }
     }
 
@@ -109,7 +109,7 @@ void MO_CollectionCard::update()
         IO_MovingObject::update();
 
         if (--uncollectabletime < -game_values.gamemodesettings.collection.cardlife) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, iy, 3, 8);
             dead = true;
         }
     }
@@ -120,7 +120,7 @@ void MO_CollectionCard::draw()
     IO_MovingObject::draw();
 
     // Draw sparkles
-    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
 }
 
 void MO_CollectionCard::placeCard()

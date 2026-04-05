@@ -5,14 +5,16 @@
 #include "GlobalConstants.h"
 #include "Game.h"
 #include "FileIO.h"
-#include "map/MapReader.h"
+#include "FileList.h"
 #include "movingplatform.h"
+#include "path.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "TilesetManager.h"
+#include "Version.h"
+#include "map/MapReader.h"
 
 #include "SDL_image.h"
-#include "sdl12wrapper.h"
 
 #include <cmath>
 #include <iostream>
@@ -23,14 +25,6 @@ using std::endl;
 #include <sys/stat.h>
 #endif
 
-
-#ifdef PNG_SAVE_FORMAT
-    // this function was added to SDL2
-    #ifndef USE_SDL2
-        #include "savepng.h"
-    #endif
-#endif
-
 #ifndef __EMSCRIPTEN__
     inline void smallDelay() { SDL_Delay(10); }
 #else
@@ -38,18 +32,7 @@ using std::endl;
 #endif
 
 
-extern gfxSprite spr_frontmap[2];
-// extern int32_t g_iVersion[];
-
-extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrBefore(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrAfter(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-
-//Converts the tile type into the flags that this tile carries (solid + ice + death, etc)
-short g_iTileTypeConversion[NUMTILETYPES] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113, 4096};
-
 short g_iCurrentDrawIndex = 0;
-
 
 extern SDL_Surface* screen;
 extern SDL_Surface* blitdest;
@@ -69,7 +52,8 @@ SDL_Rect g_rFlameRects[4][4] = { { {0, 0, 96, 32}, {0, 32, 96, 32}, {0, 64, 96, 
 };
 
 //[Type][Direction][Frame]
-SDL_Rect g_rPirhanaRects[4][4][4] = { { { {0, 0, 32, 48}, {32, 0, 32, 48}, {64, 0, 32, 48}, {96, 0, 32, 48} },
+SDL_Rect g_rPirhanaRects[4][4][4] = {
+    {   { {0, 0, 32, 48}, {32, 0, 32, 48}, {64, 0, 32, 48}, {96, 0, 32, 48} },
         { {128, 0, 32, 48}, {160, 0, 32, 48}, {192, 0, 32, 48}, {224, 0, 32, 48} },
         { {304, 0, 48, 32}, {304, 32, 48, 32}, {304, 64, 48, 32}, {304, 96, 48, 32} },
         { {304, 128, 48, 32}, {304, 160, 48, 32}, {304, 192, 48, 32}, {304, 224, 48, 32} }
@@ -124,7 +108,7 @@ int GetScreenHeight(int iSize) {
 } // namespace
 
 
-void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
+void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter, SDL_Surface* dst)
 {
     short iSizeShift = 5 - iSize;
     short iTileSize = 1 << iSizeShift;
@@ -132,108 +116,116 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
     SDL_Rect rDotSrc = {iPlatformPathDotOffset[iSize] + 22, 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rDotDst;
     SDL_Rect rPathSrc = {iStandardOffset[iSize], 12, iTileSize, iTileSize}, rPathDst;
 
-    rPathDst = {hazard->ix << (iSizeShift - 1), hazard->iy << (iSizeShift - 1), iTileSize, iTileSize};
+    rPathDst = {hazard.ix << (iSizeShift - 1), hazard.iy << (iSizeShift - 1), iTileSize, iTileSize};
 
     if (fDrawCenter) {
-        if (hazard->itype <= 1) {
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+        if (hazard.itype <= 1) {
+            rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
         }
     }
 
-    if (hazard->itype == 0) { //fireball string
+    if (hazard.itype == 0) { //fireball string
         short iNumDots = 16;
-        float dRadius = (float)((hazard->iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
-        float dAngle = hazard->dparam[1];
+        float dRadius = (float)((hazard.iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
+        float dAngle = hazard.dparam[1];
         for (short iDot = 0; iDot < iNumDots; iDot++) {
             rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 
-            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
+            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, {rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h});
             dAngle += TWO_PI / iNumDots;
         }
 
         //Draw the fireball string
-        for (short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++) {
-            short x = (hazard->ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
-            short y = (hazard->iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
+        for (short iFireball = 0; iFireball < hazard.iparam[0]; iFireball++) {
+            short x = (hazard.ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
+            short y = (hazard.iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
 
-            rm->spr_hazard_fireball[iSize].draw(x, y, 0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]);
+            rm->spr_hazard_fireball[iSize].draw(x, y, {0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]});
         }
-    } else if (hazard->itype == 1) { //rotodisc
+    } else if (hazard.itype == 1) { //rotodisc
         short iNumDots = 16;
-        float dRadius = (hazard->dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
-        float dAngle = hazard->dparam[1];
+        float dRadius = (hazard.dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
+        float dAngle = hazard.dparam[1];
         for (short iDot = 0; iDot < iNumDots; iDot++) {
             rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 
-            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
+            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, {rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h});
             dAngle += TWO_PI / iNumDots;
         }
 
         //Draw the rotodiscs
-        float dSector = TWO_PI / hazard->iparam[0];
-        dAngle = hazard->dparam[1];
-        dRadius = hazard->dparam[2] / (float)(1 << iSize);
-        for (short iRotodisc = 0; iRotodisc < hazard->iparam[0]; iRotodisc++) {
+        float dSector = TWO_PI / hazard.iparam[0];
+        dAngle = hazard.dparam[1];
+        dRadius = hazard.dparam[2] / (float)(1 << iSize);
+        for (short iRotodisc = 0; iRotodisc < hazard.iparam[0]; iRotodisc++) {
             short x = rPathDst.x + (short)(dRadius * cos(dAngle));
             short y = rPathDst.y + (short)(dRadius * sin(dAngle));
 
-            rm->spr_hazard_rotodisc[iSize].draw(x, y, 0, 0, iTileSize, iTileSize);
+            rm->spr_hazard_rotodisc[iSize].draw(x, y, {0, 0, iTileSize, iTileSize});
 
             dAngle += dSector;
         }
-    } else if (hazard->itype == 2) { //bullet bill
-        rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, 0, hazard->dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize);
+    } else if (hazard.itype == 2) { //bullet bill
+        rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, {0, hazard.dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize});
 
         short iBulletPathX = rPathDst.x - iPlatformPathDotSize[iSize];
-        if (hazard->dparam[0] > 0.0f)
+        if (hazard.dparam[0] > 0.0f)
             iBulletPathX = rPathDst.x + iTileSize;
 
-        short iBulletPathSpacing = (short)(hazard->dparam[0] * dBulletBillFrequency[iSize]);
+        short iBulletPathSpacing = (short)(hazard.dparam[0] * dBulletBillFrequency[iSize]);
         while (iBulletPathX >= 0 && iBulletPathX < GetScreenWidth(iSize)) {
             rDotDst = {iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
+            rm->spr_platformpath.draw(rDotSrc, dst, rDotDst);
 
-            iBulletPathX += hazard->iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
+            iBulletPathX += hazard.iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
         }
-    } else if (hazard->itype == 3) { //flame cannon
-        const SDL_Rect * rect = &g_rFlameRects[hazard->iparam[1]][2];
+    } else if (hazard.itype == 3) { //flame cannon
+        const SDL_Rect * rect = &g_rFlameRects[hazard.iparam[1]][2];
 
         short iOffsetX = 0;
         short iOffsetY = 0;
 
-        if (hazard->iparam[1] == 1) {
+        if (hazard.iparam[1] == 1) {
             iOffsetX = -(iTileSize << 1);
-        } else if (hazard->iparam[1] == 2) {
+        } else if (hazard.iparam[1] == 2) {
             iOffsetY = -(iTileSize << 1);
         }
 
-        rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
-    } else if (hazard->itype >= 4 && hazard->itype <= 7) { //pirhana plants
-        const SDL_Rect * rect = &g_rPirhanaRects[hazard->itype - 4][hazard->iparam[1]][0];
+        rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, {rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize});
+    } else if (hazard.itype >= 4 && hazard.itype <= 7) { //pirhana plants
+        const SDL_Rect * rect = &g_rPirhanaRects[hazard.itype - 4][hazard.iparam[1]][0];
         short iOffsetX = 0;
         short iOffsetY = 0;
 
-        if (hazard->iparam[1] == 0) {
-            if (hazard->itype == 6)
+        if (hazard.iparam[1] == 0) {
+            if (hazard.itype == 6)
                 iOffsetY = -iTileSize;
             else
                 iOffsetY = -(iTileSize >> 1);
-        } else if (hazard->iparam[1] == 2) {
-            if (hazard->itype == 6)
+        } else if (hazard.iparam[1] == 2) {
+            if (hazard.itype == 6)
                 iOffsetX = -iTileSize;
             else
                 iOffsetX = -(iTileSize >> 1);
         }
 
-        rm->spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
+        rm->spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, {rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize});
     }
 }
 
-void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short startY, short endX, short endY, float angle, float radiusX, float radiusY, short iSize, short iPlatformWidth, short iPlatformHeight, bool fDrawPlatform, bool fDrawShadow)
+void DrawPlatform(
+    PlatformPathType pathtype,
+    const std::vector<TilesetTile>& tiles,
+    short startX, short startY,
+    short endX, short endY,
+    float angle, float radiusX, float radiusY,
+    short iSize, short iPlatformWidth, short iPlatformHeight,
+    bool fDrawPlatform, bool fDrawShadow,
+    SDL_Surface* dst)
 {
     short iStartX = startX >> iSize;
     short iStartY = startY >> iSize;
@@ -249,12 +241,12 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
     if (fDrawPlatform) {
         for (short iPlatformX = 0; iPlatformX < iPlatformWidth; iPlatformX++) {
             for (short iPlatformY = 0; iPlatformY < iPlatformHeight; iPlatformY++) {
-                TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
+                const TilesetTile& tile = tiles[iPlatformX * iPlatformHeight + iPlatformY];
 
                 int iDstX = 0;
                 int iDstY = 0;
 
-                if (pathtype == 2) {
+                if (pathtype == PlatformPathType::Ellipse) {
                     iDstX = iStartX + (iPlatformX << iSizeShift) + (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1));
                     iDstY = iStartY + (iPlatformY << iSizeShift) + (short)(fRadiusY * sin(angle)) - (iPlatformHeight << (iSizeShift - 1));
                 } else {
@@ -263,13 +255,16 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                 }
 
                 SDL_Rect bltrect = {iDstX, iDstY, iTileSize, iTileSize};
-                if (tile->iID >= 0) {
-                    SDL_BlitSurface(g_tilesetmanager->tileset(tile->iID)->surface(iSize), g_tilesetmanager->rect(iSize, tile->iCol, tile->iRow), blitdest, &bltrect);
-                } else if (tile->iID == TILESETANIMATED) {
-                    SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), g_tilesetmanager->rect(iSize, tile->iCol * 4, tile->iRow), blitdest, &bltrect);
-                } else if (tile->iID == TILESETUNKNOWN) {
+                if (tile.iID >= 0) {
+                    const SDL_Rect& srcRect = CTilesetManager::rect(static_cast<DrawSize>(iSize), tile.iCol, tile.iRow);
+                    g_tilesetmanager->tileset(tile.iID)->draw(static_cast<DrawSize>(iSize), srcRect, dst, bltrect);
+                } else if (tile.iID == TILESETANIMATED) {
+                    const SDL_Rect& srcRect = CTilesetManager::rect(static_cast<DrawSize>(iSize), tile.iCol * 4, tile.iRow);
+                    rm->spr_tileanimation[iSize].draw(srcRect, dst, bltrect);
+                } else if (tile.iID == TILESETUNKNOWN) {
                     //Draw unknown tile
-                    SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), g_tilesetmanager->rect(iSize, 0, 0), blitdest, &bltrect);
+                    const SDL_Rect& srcRect = CTilesetManager::rect(static_cast<DrawSize>(iSize), 0, 0);
+                    rm->spr_unknowntile[iSize].draw(srcRect, dst, bltrect);
                 }
 
                 bool fNeedWrap = false;
@@ -287,12 +282,16 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                     bltrect.w = iTileSize;
                     bltrect.h = iTileSize;
 
-                    if (tile->iID >= 0)
-                        SDL_BlitSurface(g_tilesetmanager->tileset(tile->iID)->surface(iSize), g_tilesetmanager->rect(iSize, tile->iCol, tile->iRow), blitdest, &bltrect);
-                    else if (tile->iID == TILESETANIMATED)
-                        SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), g_tilesetmanager->rect(iSize, tile->iCol * 4, tile->iRow), blitdest, &bltrect);
-                    else if (tile->iID == TILESETUNKNOWN)
-                        SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), g_tilesetmanager->rect(iSize, 0, 0), blitdest, &bltrect);
+                    if (tile.iID >= 0) {
+                        const SDL_Rect& srcRect = CTilesetManager::rect(static_cast<DrawSize>(iSize), tile.iCol, tile.iRow);
+                        g_tilesetmanager->tileset(tile.iID)->draw(static_cast<DrawSize>(iSize), srcRect, dst, bltrect);
+                    } else if (tile.iID == TILESETANIMATED) {
+                        const SDL_Rect& srcRect = CTilesetManager::rect(static_cast<DrawSize>(iSize), tile.iCol * 4, tile.iRow);
+                        rm->spr_tileanimation[iSize].draw(srcRect, dst, bltrect);
+                    } else if (tile.iID == TILESETUNKNOWN) {
+                        const SDL_Rect& srcRect = CTilesetManager::rect(static_cast<DrawSize>(iSize), 0, 0);
+                        rm->spr_unknowntile[iSize].draw(srcRect, dst, bltrect);
+                    }
                 }
             }
         }
@@ -300,19 +299,19 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
     SDL_Rect rPathSrc = {iPlatformPathDotOffset[iSize], 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rPathDst;
 
-    if (pathtype == 0) { //line segment
+    if (pathtype == PlatformPathType::Straight) {
         if (fDrawShadow) {
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if (tiles[iCol][iRow].iID != -2)
-                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                    if (tiles[iCol * iPlatformHeight + iRow].iID != -2)
+                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), {0, 0, iTileSize, iTileSize});
                 }
             }
 
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if (tiles[iCol][iRow].iID != -2)
-                        rm->spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                    if (tiles[iCol * iPlatformHeight + iRow].iID != -2)
+                        rm->spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), {0, 0, iTileSize, iTileSize});
                 }
             }
         }
@@ -332,17 +331,17 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
         for (short iSpot = 0; iSpot < iNumSpots + 1; iSpot++) {
             rPathDst = {(short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
 
             dX += dIncrementX;
             dY += dIncrementY;
         }
-    } else if (pathtype == 1) { //continuous straight path
+    } else if (pathtype == PlatformPathType::StraightContinuous) {
         if (fDrawShadow) {
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if (tiles[iCol][iRow].iID != -2)
-                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                    if (tiles[iCol * iPlatformHeight + iRow].iID != -2)
+                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), {0, 0, iTileSize, iTileSize});
                 }
             }
         }
@@ -355,7 +354,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
         for (short iSpot = 0; iSpot < 50; iSpot++) {
             rPathDst = {(short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
 
             short iWrapX = (short)dX;
             short iWrapY = (short)dY;
@@ -378,13 +377,13 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
             if (fNeedWrap) {
                 rPathDst = {iWrapX, iWrapY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+                rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
             }
 
             dX += dIncrementX;
             dY += dIncrementY;
         }
-    } else if (pathtype == 2) { //ellipse
+    } else if (pathtype == PlatformPathType::Ellipse) {
         //Calculate the starting position
         if (fDrawShadow) {
             short iEllipseStartX = (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1)) + iStartX;
@@ -392,8 +391,8 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if (tiles[iCol][iRow].iID != -2)
-                        rm->spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                    if (tiles[iCol * iPlatformHeight + iRow].iID != -2)
+                        rm->spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), {0, 0, iTileSize, iTileSize});
                 }
             }
         }
@@ -404,14 +403,14 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             short iY = (short)(fRadiusY * sin(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartY;
 
             rPathDst = {iX, iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
 
             if (iX + iPlatformPathDotSize[iSize] >= GetScreenWidth(iSize)) {
                 rPathDst = {iX - GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+                rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
             } else if (iX < 0) {
                 rPathDst = {iX + GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+                rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
             }
 
             fAngle += TWO_PI / 32.0f;
@@ -428,7 +427,10 @@ CMap::CMap()
     , iSwitches()
     , racegoallocations()
     , flagbaselocations()
-{}
+{
+    mapitems.reserve(MAXMAPITEMS);
+    maphazards.reserve(MAXMAPHAZARDS);
+}
 
 CMap::~CMap()
 {}
@@ -487,8 +489,7 @@ void CMap::clearMap()
                 mapdata[i][j][k].iID = TILESETNONE;  //no tile selected
             }
 
-            mapdatatop[i][j].iType = tile_nonsolid;
-            mapdatatop[i][j].iFlags = tile_flag_nonsolid;
+            mapdatatop[i][j] = TileType::NonSolid;
 
             objectdata[i][j].iType = -1;
             warpdata[i][j].direction = WARP_UNDEFINED;
@@ -503,8 +504,8 @@ void CMap::clearMap()
     eyecandy[1] = 0;
     eyecandy[2] = 0;
 
-    iNumMapItems = 0;
-    iNumMapHazards = 0;
+    mapitems.clear();
+    maphazards.clear();
 
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)
         iSwitches[iSwitch] = 0;
@@ -518,16 +519,10 @@ void CMap::clearPlatforms()
     for (short iLayer = 0; iLayer < 5; iLayer++)
         platformdrawlayer[iLayer].clear();
 
-    if (platforms) {
-        for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-            delete platforms[iPlatform];
-        }
+    for (MovingPlatform* platform : platforms)
+        delete platform;
 
-        delete [] platforms;
-        platforms = NULL;
-    }
-
-    iNumPlatforms = 0;
+    platforms.clear();
 
     std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
 
@@ -561,8 +556,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     eyecandy[0] = 0;
     eyecandy[1] = 0;
     eyecandy[2] = 0;
-    iNumMapItems = 0;
-    iNumMapHazards = 0;
+    mapitems.clear();
+    maphazards.clear();
 
     /*
     cout << "loading map " << file;
@@ -575,19 +570,17 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     cout << " ...";
     */
 
-    BinaryFile mapfile(file.c_str(), "rb");
+    BinaryFile mapfile(file, "rb");
     if (!mapfile.is_open()) {
         cout << endl << " ERROR: Couldn't open map" << endl;
         return;
     }
 
-    //Load version number
-    int32_t version[4];
-    //version[0] = mapfile.read_i32(); //Major
-    //version[1] = mapfile.read_i32(); //Minor
-    //version[2] = mapfile.read_i32(); //Micro
-    //version[3] = mapfile.read_i32(); //Build
-    mapfile.read_i32_array(version, 4);
+    Version version;
+    version.major = mapfile.read_i32();
+    version.minor = mapfile.read_i32();
+    version.patch = mapfile.read_i32();
+    version.build = mapfile.read_i32();
 
     if (iReadType != read_type_summary) {
         cout << "loading map " << file;
@@ -595,9 +588,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         if (iReadType == read_type_preview)
             cout << " (preview)";
 
-        if (VersionIsEqualOrAfter(version, 1, 6, 0, 0)) {
-            cout << " [v" << version[0] << '.' << version[1] << '.'
-                 << version[2] << '.' << version[3] << "]";
+        if (version >= Version {1, 6, 0, 0}) {
+            printf(" [v%d.%d.%d.%d]", version.major, version.minor, version.patch, version.build);
         }
         else
             cout << " [v1.5]";
@@ -664,18 +656,18 @@ void CMap::SetTileGap(short i, short j)
     IO_Block * topRightBlock = NULL;
 
     if (j > 0) {
-        topLeftTile = mapdatatop[iLeftTile][j - 1].iFlags;
-        topCenterTile = mapdatatop[i][j - 1].iFlags;
-        topRightTile = mapdatatop[iRightTile][j - 1].iFlags;
+        topLeftTile = tileToFlags(mapdatatop[iLeftTile][j - 1]);
+        topCenterTile = tileToFlags(mapdatatop[i][j - 1]);
+        topRightTile = tileToFlags(mapdatatop[iRightTile][j - 1]);
 
         topLeftBlock = blockdata[iLeftTile][j - 1];
         topCenterBlock = blockdata[i][j - 1];
         topRightBlock = blockdata[iRightTile][j - 1];
     }
 
-    int leftTile = mapdatatop[iLeftTile][j].iFlags;
-    int centerTile = mapdatatop[i][j].iFlags;
-    int rightTile = mapdatatop[iRightTile][j].iFlags;
+    int leftTile = tileToFlags(mapdatatop[iLeftTile][j]);
+    int centerTile = tileToFlags(mapdatatop[i][j]);
+    int rightTile = tileToFlags(mapdatatop[iRightTile][j]);
 
     IO_Block * leftBlock = blockdata[iLeftTile][j];
     IO_Block * centerBlock = blockdata[i][j];
@@ -695,11 +687,9 @@ void CMap::SetTileGap(short i, short j)
     bool fTopRightSolid = (topRightTile & tile_flag_solid) || (topRightBlock && !topRightBlock->isTransparent() && !topRightBlock->isHidden());
 
     if (fLeftSolid && !fCenterSolid && fRightSolid && !fTopLeftSolid && !fTopCenterSolid && !fTopRightSolid) {
-        mapdatatop[i][j].iType = tile_gap;
-        mapdatatop[i][j].iFlags = tile_flag_gap;
-    } else if (mapdatatop[i][j].iFlags == tile_flag_gap) {
-        mapdatatop[i][j].iType = tile_nonsolid;
-        mapdatatop[i][j].iFlags = tile_flag_nonsolid;
+        mapdatatop[i][j] = TileType::Gap;
+    } else if (mapdatatop[i][j] == TileType::Gap) {
+        mapdatatop[i][j] = TileType::NonSolid;
     }
 }
 
@@ -709,7 +699,7 @@ void CMap::saveMap(const std::string& file)
 
     cout << "saving map " << file << " ... ";
 
-    BinaryFile mapfile(file.c_str(), "wb");
+    BinaryFile mapfile(file, "wb");
     if (!mapfile.is_open()) {
         cout << endl << " ERROR: couldn't save map" << endl;
         return;
@@ -750,22 +740,17 @@ void CMap::saveMap(const std::string& file)
     int iItemDestroyableBlockCount = 0;
     int iHiddenBlockCount = 0;
 
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        for (short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++) {
-            for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
+    for (MovingPlatform* platform : platforms) {
+        for (short iCol = 0; iCol < platform->iTileWidth; iCol++) {
+            for (short iRow = 0; iRow < platform->iTileHeight; iRow++) {
+
                 //Set the tile type flags for each tile
-                int iType = platforms[iPlatform]->iTileType[iCol][iRow].iType;
-                if (iType >= 0 && iType < NUMTILETYPES) {
-                    platforms[iPlatform]->iTileType[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
-                } else {
-                    platforms[iPlatform]->iTileType[iCol][iRow].iType = tile_nonsolid;
-                    platforms[iPlatform]->iTileType[iCol][iRow].iFlags = tile_flag_nonsolid;
-                }
+                TileType iType = platform->tileTypeAt(iCol, iRow);
+                unsigned short iFlags = tileToFlags(iType);
 
-                TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
-                int iFlags = platforms[iPlatform]->iTileType[iCol][iRow].iFlags;
+                const TilesetTile& tile = platform->tileAt(iCol, iRow);
 
-                if (tile->iID != TILESETNONE)
+                if (tile.iID != TILESETNONE)
                     iPlatformCount++;
 
                 if (iFlags & tile_flag_has_death)
@@ -781,15 +766,6 @@ void CMap::saveMap(const std::string& file)
     short numWarpExits = 0;
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
-            //Set the tile type flags for each tile
-            int iType = mapdatatop[i][j].iType;
-            if (iType >= 0 && iType < NUMTILETYPES) {
-                mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
-            } else {
-                mapdatatop[i][j].iType = tile_nonsolid;
-                mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-            }
-
             //Calculate what warp tiles belong together (any warps that have the same connection that are
             //next to each other are merged into a single warp)
             //If there are too many warps, then remove any warp encountered that is over that limit
@@ -825,7 +801,7 @@ void CMap::saveMap(const std::string& file)
             }
 
             short iBlockType = objectdata[i][j].iType;
-            int iFlags = mapdatatop[i][j].iFlags;
+            int iFlags = tileToFlags(mapdatatop[i][j]);
 
             //Calculate auto map filters
             if (iFlags & tile_flag_has_death)
@@ -869,10 +845,10 @@ void CMap::saveMap(const std::string& file)
     mapfile.write_i32(iThrowBlockCount);
     mapfile.write_i32(iOnOffBlockCount);
     mapfile.write_i32(iPlatformCount);
-    mapfile.write_i32(iNumMapHazards);
+    mapfile.write_i32(maphazards.size());
     mapfile.write_i32(iItemDestroyableBlockCount);
     mapfile.write_i32(iHiddenBlockCount);
-    mapfile.write_i32(iNumMapItems);
+    mapfile.write_i32(mapitems.size());
     mapfile.write_i32(iDensity);
 
     //Write tileset names and indexes for translation at load time
@@ -893,13 +869,12 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Scan platforms too for tilesets used
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        for (short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++) {
-            for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
-                TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
-
-                if (tile->iID >= 0)
-                    fTilesetUsed[tile->iID] = true;
+    for (MovingPlatform* platform : platforms) {
+        for (short iCol = 0; iCol < platform->iTileWidth; iCol++) {
+            for (short iRow = 0; iRow < platform->iTileHeight; iRow++) {
+                const TilesetTile& tile = platform->tileAt(iCol, iRow);
+                if (tile.iID >= 0)
+                    fTilesetUsed[tile.iID] = true;
             }
         }
     }
@@ -955,91 +930,88 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Write background File
-    mapfile.write_string_long(szBackgroundFile);
+    mapfile.write_string_long(szBackgroundFile.c_str());
 
     //Save the default on/off switch states
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)
         mapfile.write_i32(iSwitches[iSwitch]);
 
     //Write moving platforms
-    mapfile.write_i32(iNumPlatforms);
+    mapfile.write_i32(platforms.size());
 
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        mapfile.write_i32(platforms[iPlatform]->iTileWidth);
-        mapfile.write_i32(platforms[iPlatform]->iTileHeight);
+    for (MovingPlatform* platform : platforms) {
+        mapfile.write_i32(platform->iTileWidth);
+        mapfile.write_i32(platform->iTileHeight);
 
-        for (short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++) {
-            for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
-                TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
+        for (short iCol = 0; iCol < platform->iTileWidth; iCol++) {
+            for (short iRow = 0; iRow < platform->iTileHeight; iRow++) {
+                TilesetTile tile = platform->tileAt(iCol, iRow);
 
                 //Make sure the tile's col and row are within the tileset
-                if (tile->iID >= 0) {
-                    if (tile->iCol < 0 || tile->iCol >= g_tilesetmanager->tileset(tile->iID)->width())
-                        tile->iCol = 0;
+                if (tile.iID >= 0) {
+                    if (tile.iCol < 0 || tile.iCol >= g_tilesetmanager->tileset(tile.iID)->width())
+                        tile.iCol = 0;
 
-                    if (tile->iRow < 0 || tile->iRow >= g_tilesetmanager->tileset(tile->iID)->height())
-                        tile->iRow = 0;
+                    if (tile.iRow < 0 || tile.iRow >= g_tilesetmanager->tileset(tile.iID)->height())
+                        tile.iRow = 0;
                 }
 
-                mapfile.write_i8(tile->iID);
-                mapfile.write_i8(tile->iCol);
-                mapfile.write_i8(tile->iRow);
+                mapfile.write_i8(tile.iID);
+                mapfile.write_i8(tile.iCol);
+                mapfile.write_i8(tile.iRow);
 
-                mapfile.write_i32(platforms[iPlatform]->iTileType[iCol][iRow].iType);
+                mapfile.write_i32(static_cast<int>(platform->tileTypeAt(iCol, iRow)));
             }
         }
 
-        mapfile.write_i32(platforms[iPlatform]->iDrawLayer);
+        mapfile.write_i32(platform->iDrawLayer);
 
-        short iPathType = platforms[iPlatform]->pPath->iType;
+        short iPathType = static_cast<short>(platform->pPath->typeId());
         mapfile.write_i32(iPathType);
 
-        if (iPathType == 0) {
-            StraightPath * path = (StraightPath*)platforms[iPlatform]->pPath;
-            mapfile.write_float(path->dPathPointX[0]);
-            mapfile.write_float(path->dPathPointY[0]);
-            mapfile.write_float(path->dPathPointX[1]);
-            mapfile.write_float(path->dPathPointY[1]);
-            mapfile.write_float(path->dVelocity);
-        } else if (iPathType == 1) {
-            StraightPathContinuous * path = (StraightPathContinuous*)platforms[iPlatform]->pPath;
-            mapfile.write_float(path->dPathPointX[0]);
-            mapfile.write_float(path->dPathPointY[0]);
-            mapfile.write_float(path->dAngle);
-            mapfile.write_float(path->dVelocity);
-        } else if (iPathType == 2) { //elliptical path
-            EllipsePath * path = (EllipsePath*)platforms[iPlatform]->pPath;
-            mapfile.write_float(path->dRadiusX);
-            mapfile.write_float(path->dRadiusY);
-            mapfile.write_float(path->dPathPointX[0]);
-            mapfile.write_float(path->dPathPointY[0]);
-            mapfile.write_float(path->dAngle[0]);
-            mapfile.write_float(path->dVelocity);
+        if (auto* path = dynamic_cast<StraightPath*>(platform->pPath)) {
+            mapfile.write_float(path->startPos().x);
+            mapfile.write_float(path->startPos().y);
+            mapfile.write_float(path->endPos().x);
+            mapfile.write_float(path->endPos().y);
+            mapfile.write_float(path->speed());
+        } else if (auto* path = dynamic_cast<StraightPathContinuous*>(platform->pPath)) {
+            mapfile.write_float(path->startPos().x);
+            mapfile.write_float(path->startPos().y);
+            mapfile.write_float(path->angle());
+            mapfile.write_float(path->speed());
+        } else if (auto* path = dynamic_cast<EllipsePath*>(platform->pPath)) {
+            mapfile.write_float(path->radius().x);
+            mapfile.write_float(path->radius().y);
+            mapfile.write_float(path->centerPos().x);
+            mapfile.write_float(path->centerPos().y);
+            mapfile.write_float(path->startAngle());
+            mapfile.write_float(path->speed());
         }
     }
 
     //Write map items (carried springs, spikes, kuribo's shoe, etc)
-    mapfile.write_i32(iNumMapItems);
+    mapfile.write_i32(mapitems.size());
 
-    for (short iMapItem = 0; iMapItem < iNumMapItems; iMapItem++) {
-        mapfile.write_i32(mapitems[iMapItem].itype);
-        mapfile.write_i32(mapitems[iMapItem].ix);  //tile aligned
-        mapfile.write_i32(mapitems[iMapItem].iy);
+    for (const MapItem& item : mapitems) {
+        mapfile.write_i32(item.itype);
+        mapfile.write_i32(item.ix);  //tile aligned
+        mapfile.write_i32(item.iy);
     }
 
     //Write map hazards (fireball strings, rotodiscs, pirhana plants, etc)
-    mapfile.write_i32(iNumMapHazards);
+    mapfile.write_i32(maphazards.size());
 
-    for (short iMapHazard = 0; iMapHazard < iNumMapHazards; iMapHazard++) {
-        mapfile.write_i32(maphazards[iMapHazard].itype);
-        mapfile.write_i32(maphazards[iMapHazard].ix);
-        mapfile.write_i32(maphazards[iMapHazard].iy);
-
-        for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            mapfile.write_i32(maphazards[iMapHazard].iparam[iParam]);
+    for (const MapHazard& hazard : maphazards) {
+        mapfile.write_i32(hazard.itype);
+        mapfile.write_i32(hazard.ix);
+        mapfile.write_i32(hazard.iy);
 
         for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            mapfile.write_float(maphazards[iMapHazard].dparam[iParam]);
+            mapfile.write_i32(hazard.iparam[iParam]);
+
+        for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
+            mapfile.write_float(hazard.dparam[iParam]);
     }
 
     //Write eyecandy for all eyecandy layers
@@ -1054,7 +1026,7 @@ void CMap::saveMap(const std::string& file)
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             //Write tile collision types (ice, solid, death, etc.)
-            mapfile.write_i32(mapdatatop[i][j].iType);
+            mapfile.write_i32(static_cast<int>(mapdatatop[i][j]));
 
             //Write per tile warp data
             mapfile.write_i32(warpdata[i][j].direction);
@@ -1321,67 +1293,39 @@ void CMap::saveMap(const std::string& file)
     	//Save thumbnail
     	std::string szSaveThumbnail("maps/cache/");
     	szSaveThumbnail += GetNameFromFileName_STR(file);
-
-    #ifdef PNG_SAVE_FORMAT
     	szSaveThumbnail += ".png";
-    #else
-    	szSaveThumbnail += ".bmp";
-    #endif
-
     	saveThumbnail(convertPath(szSaveThumbnail), true);
     */
 }
 
-SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
+gfxSprite CMap::createThumbnailSurface(bool fUseClassicPack)
 {
-    SDL_Surface * sThumbnail = SDL_CreateRGBSurface(screen->flags, 160, 120, 16, 0, 0, 0, 0);
+    gfxSprite sThumbnail = gfxSprite::blank(160, 120);
 
     std::string localSzBackgroundFile;
     std::string path;
 
     if (fUseClassicPack) {
-        localSzBackgroundFile = concat("gfx/packs/Classic/backgrounds/", g_map->szBackgroundFile);
+        localSzBackgroundFile = "gfx/packs/Classic/backgrounds/" + g_map->szBackgroundFile;
         path = convertPath(localSzBackgroundFile);
 
         //if the background file doesn't exist, use the classic background
         if (!FileExists(path))
             path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
     } else {
-        localSzBackgroundFile = concat("gfx/packs/backgrounds/", g_map->szBackgroundFile);
+        localSzBackgroundFile = "gfx/packs/backgrounds/" + g_map->szBackgroundFile;
         path = convertPath(localSzBackgroundFile, gamegraphicspacklist->currentPath());
 
         //if the background file doesn't exist, use the classic background
         if (!FileExists(path))
             path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath());
     }
-
-    SDL_Surface * temp = IMG_Load(path.c_str());
-    if (!temp) {
-        printf("ERROR: Couldn't load thumbnail background: %s\n", IMG_GetError());
-        return NULL;
+    {
+        gfxSprite sBackground = ImageLoader(path).withoutColorKey().create();
+        SDL_Rect srcRectBackground = {0, 0, App::screenWidth, App::screenHeight};
+        SDL_Rect dstRectBackground = {0, 0, 160, 120};
+        sBackground.drawStretch(srcRectBackground, sThumbnail.getSurface(), dstRectBackground);
     }
-
-#ifdef USE_SDL2
-    SDL_Surface * sBackground = temp;
-#else
-    SDL_Surface * sBackground = SDL_DisplayFormat(temp);
-    if (!sBackground) {
-        printf("ERROR: Couldn't convert thumbnail background to diplay pixel format: %s\n", SDL_GetError());
-        return NULL;
-    }
-
-    SDL_FreeSurface(temp);
-#endif
-
-	SDL_Rect srcRectBackground = {0, 0, App::screenWidth, App::screenHeight};
-    SDL_Rect dstRectBackground = {0, 0, 160, 120};
-
-    if (SDL_SCALEBLIT(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {
-        fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
-        return NULL;
-    }
-
-    SDL_FreeSurface(sBackground);
 
     preDrawPreviewBackground(sThumbnail, true);
     preDrawPreviewBlocks(sThumbnail, true);
@@ -1397,20 +1341,10 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
 //Save thumbnail image
 void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 {
-    SDL_Surface * sThumbnail = createThumbnailSurface(fUseClassicPack);
-
-    if (!sThumbnail)
-        return;
+    gfxSprite sThumbnail = createThumbnailSurface(fUseClassicPack);
 
     //Save the screenshot with the same name as the map file
-
-#ifdef PNG_SAVE_FORMAT
-    IMG_SavePNG(sThumbnail, sFile.c_str());
-#else
-    SDL_SaveBMP(sThumbnail, sFile.c_str());
-#endif
-
-    SDL_FreeSurface(sThumbnail);
+    IMG_SavePNG(sThumbnail.getSurface(), sFile.c_str());
 }
 
 void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDeath)
@@ -1435,7 +1369,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                     fUsed = true;
             }
 
-            if (!fUsed && (mapdatatop[i][j].iFlags & tile_flag_solid)) {
+            if (!fUsed && tileToFlags(mapdatatop[i][j]) & tile_flag_solid) {
                 fUsed = true;
             }
 
@@ -1450,7 +1384,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                 //If there is a death tile directly above
                 if (!fUsed) {
                     if (j > 0) {
-                        if (mapdatatop[i][j - 1].iFlags & tile_flag_death_on_bottom) {
+                        if (tileToFlags(mapdatatop[i][j - 1]) & tile_flag_death_on_bottom) {
                             fUsed = true;
                         }
                     }
@@ -1460,25 +1394,25 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                 if (!fUsed && !fIgnoreDeath) {
                     int m;
                     for (m = j; m < MAPHEIGHT; m++) {
-                        TileType type = mapdatatop[i][m].iType;
-                        int flags = mapdatatop[i][m].iFlags;
+                        TileType type = mapdatatop[i][m];
+                        int flags = tileToFlags(type);
                         short objBlock = objectdata[i][m].iType;
 
                         if (m == j && (flags & tile_flag_solid_on_top))
                             continue;
 
-                        if (type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death) {
+                        if (type == TileType::DeathOnTop || type == TileType::Death || type == TileType::SuperDeathTop || type == TileType::SuperDeath || type == TileType::PlayerDeath) {
                             fUsed = true;
                             break;
                         }
 
                         if (fUseTempBlocks) {
-                            if ((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
+                            if ((type != TileType::NonSolid && type != TileType::Gap) || objBlock != -1) {
                                 break;
                             }
                         } else {
                             //Ignore the blocks that might not be there anymore (destroyed, turned off, etc)
-                            if ((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
+                            if ((type != TileType::NonSolid && type != TileType::Gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
                                 break;
                             }
                         }
@@ -1487,20 +1421,20 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                     //If we didn't find a landing spot from here to bottom, then try to wrap around and see
                     if (m == MAPHEIGHT) {
                         for (m = 0; m < j; m++) {
-                            TileType type = mapdatatop[i][m].iType;
+                            TileType type = mapdatatop[i][m];
                             short objBlock = objectdata[i][m].iType;
 
-                            if (type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death) {
+                            if (type == TileType::DeathOnTop || type == TileType::Death || type == TileType::SuperDeathTop || type == TileType::SuperDeath || type == TileType::PlayerDeath) {
                                 fUsed = true;
                                 break;
                             }
 
                             if (fUseTempBlocks) {
-                                if ((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
+                                if ((type != TileType::NonSolid && type != TileType::Gap) || objBlock != -1) {
                                     break;
                                 }
                             } else {
-                                if ((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
+                                if ((type != TileType::NonSolid && type != TileType::Gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
                                     break;
                                 }
                             }
@@ -1586,23 +1520,22 @@ void CMap::AnimateTiles(short iFrame)
     //For each animated tile we are painting this frame, paint it to the map tiles or a platform
     for (short iTile = iAnimatedVectorIndices[iFrame]; iTile < iAnimatedVectorIndices[iFrame + 1]; iTile++) {
         AnimatedTile * tile = animatedtiles[iTile];
-        SDL_Rect * rDst = &(tile->rDest);
 
         if (tile->fBackgroundAnimated) {
-            SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), animatedBackmapSurface, rDst);
+            animatedTilesSurface.draw(tile->rAnimationSrc[0][iTileAnimationFrame], animatedBackmapSurface, tile->rDest);
         }
 
         if (tile->fForegroundAnimated) {
-            SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[1][iTileAnimationFrame]), animatedFrontmapSurface, rDst);
+            animatedTilesSurface.draw(tile->rAnimationSrc[1][iTileAnimationFrame], animatedFrontmapSurface, tile->rDest);
         }
 
         if (tile->pPlatform) {
-            SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), tile->pPlatform->sSurface[g_iCurrentDrawIndex], rDst);
+            animatedTilesSurface.draw(tile->rAnimationSrc[0][iTileAnimationFrame], tile->pPlatform->sprites[g_iCurrentDrawIndex].getSurface(), tile->rDest);
         }
     }
 }
 
-void CMap::draw(SDL_Surface *targetSurface, int layer)
+void CMap::draw(gfxSprite& targetSurface, int layer)
 {
     int i, j;
 
@@ -1622,8 +1555,8 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 
             //If this is an animated tile, then setup an animated tile struct for use in drawing
             if (tile->iID >= 0) {
-                g_tilesetmanager->Draw(targetSurface, tile->iID, 0, tile->iCol, tile->iRow, i, j);
-                //SDL_BlitSurface(rm->spr_maptiles[0].getSurface(), &g_tilesetmanager->rRects[0][tile->iCol][tile->iRow], targetSurface, &bltrect);
+                g_tilesetmanager->Draw(targetSurface.getSurface(), tile->iID, DrawSize::Ingame, tile->iCol, tile->iRow, i, j);
+                //rm->spr_maptiles[0].draw(g_tilesetmanager->rRects[0][tile->iCol][tile->iRow], targetSurface, bltrect);
             } else if (tile->iID == TILESETANIMATED) {
                 //See if we already have this tile
                 bool fNeedNewAnimatedTile = true;
@@ -1676,7 +1609,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
                     animatedtiles.push_back(animatedtile);
                 }
             } else if (tile->iID == TILESETUNKNOWN) { //Draw red X where tile should be
-                SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->rect(0, 0, 0), targetSurface, &bltrect);
+                rm->spr_unknowntile[0].draw(CTilesetManager::rect(DrawSize::Ingame, 0, 0), targetSurface.getSurface(), bltrect);
             }
         }
 
@@ -1691,19 +1624,16 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 
 void CMap::addPlatformAnimatedTiles()
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        MovingPlatform * platform = platforms[iPlatform];
-
+    for (MovingPlatform* platform : platforms) {
         short iHeight = platform->iTileHeight;
         short iWidth = platform->iTileWidth;
-        TilesetTile ** tiles = platform->iTileData;
 
         short iDestX = 0;
         short iDestY = 0;
 
         for (short iRow = 0; iRow < iHeight; iRow++) {
             for (short iCol = 0; iCol < iWidth; iCol++) {
-                if (tiles[iCol][iRow].iID == TILESETANIMATED) {
+                if (platform->tileAt(iCol, iRow).iID == TILESETANIMATED) {
                     AnimatedTile * animatedtile = new AnimatedTile();
                     animatedtile->id = -1;  //we don't want this ID to collide with an animated map tile
 
@@ -1711,15 +1641,15 @@ void CMap::addPlatformAnimatedTiles()
                     animatedtile->fForegroundAnimated = false;
                     animatedtile->pPlatform = platform;
 
-                    TilesetTile * tile = &tiles[iCol][iRow];
+                    const TilesetTile& tile = platform->tileAt(iCol, iRow);
                     TilesetTile * toTile = &animatedtile->layers[0];
 
-                    toTile->iID = tile->iID;
-                    toTile->iCol = tile->iCol;
-                    toTile->iRow = tile->iRow;
+                    toTile->iID = tile.iID;
+                    toTile->iCol = tile.iCol;
+                    toTile->iRow = tile.iRow;
 
                     for (short iRect = 0; iRect < 4; iRect++) {
-                        (animatedtile->rSrc[0][iRect]) = {(iRect + (tile->iCol << 2)) << 5, tile->iRow << 5, TILESIZE, TILESIZE};
+                        (animatedtile->rSrc[0][iRect]) = {(iRect + (tile.iCol << 2)) << 5, tile.iRow << 5, TILESIZE, TILESIZE};
                     }
 
                     (animatedtile->rDest) = {iDestX, iDestY, TILESIZE, TILESIZE};
@@ -1736,41 +1666,29 @@ void CMap::addPlatformAnimatedTiles()
     }
 }
 
-void CMap::drawThumbnailHazards(SDL_Surface * targetSurface)
+void CMap::drawThumbnailHazards(gfxSprite& targetSurface)
 {
-    blitdest = targetSurface;
-
-    for (short iHazard = 0; iHazard < iNumMapHazards; iHazard++) {
-        DrawMapHazard(&maphazards[iHazard], 2, false);
+    for (const MapHazard& hazard : maphazards) {
+        DrawMapHazard(hazard, 2, false, targetSurface.getSurface());
     }
-
-    blitdest = screen;
 }
 
-void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
+void CMap::drawThumbnailPlatforms(gfxSprite& targetSurface)
 {
-    blitdest = targetSurface;
-
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        MovingPlatform * platform = platforms[iPlatform];
+    for (MovingPlatform* platform : platforms) {
         MovingPlatformPath * basepath = platform->pPath;
 
-        if (basepath->iType == 0) {
-            StraightPath * path = (StraightPath*) basepath;
-            DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, ((short)path->dPathPointX[1]) << 1, ((short)path->dPathPointY[1]) << 1, 0.0f, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
-        } else if (basepath->iType == 1) {
-            StraightPathContinuous * path = (StraightPathContinuous*) basepath;
-            DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, 0, 0, path->dAngle, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
-        } else if (basepath->iType == 2) {
-            EllipsePath * path = (EllipsePath*) basepath;
-            DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, 0, 0, path->dStartAngle, path->dRadiusX * 2, path->dRadiusY * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+        if (auto* path = dynamic_cast<StraightPath*>(basepath)) {
+            DrawPlatform(path->typeId(), platform->iTileData, path->startPos().x * 2.f, path->startPos().y * 2.f, path->endPos().x * 2.f, path->endPos().y * 2.f, 0.0f, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true, targetSurface.getSurface());
+        } else if (auto* path = dynamic_cast<StraightPathContinuous*>(basepath)) {
+            DrawPlatform(path->typeId(), platform->iTileData, path->startPos().x * 2.f, path->startPos().y * 2.f, 0, 0, path->angle(), 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true, targetSurface.getSurface());
+        } else if (auto* path = dynamic_cast<EllipsePath*>(basepath)) {
+            DrawPlatform(path->typeId(), platform->iTileData, path->centerPos().x * 2.f, path->centerPos().y * 2.f, 0, 0, path->startAngle(), path->radius().x * 2, path->radius().y * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true, targetSurface.getSurface());
         }
     }
-
-    blitdest = screen;
 }
 
-void CMap::preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail)
+void CMap::preDrawPreviewWarps(gfxSprite& targetSurface, bool fThumbnail)
 {
     short iTileSize = 16;
     short iScreenshotSize = 0;
@@ -1788,13 +1706,13 @@ void CMap::preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail)
                 SDL_Rect rSrc = {wWarp->connection * iTileSize, wWarp->direction * iTileSize, iTileSize, iTileSize};
                 SDL_Rect rDst = {i * iTileSize, j * iTileSize, iTileSize, iTileSize};
 
-                SDL_BlitSurface(rm->spr_thumbnail_warps[iScreenshotSize].getSurface(), &rSrc, targetSurface, &rDst);
+                rm->spr_thumbnail_warps[iScreenshotSize].draw(rSrc, targetSurface.getSurface(), rDst);
             }
         }
     }
 }
 
-void CMap::preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail)
+void CMap::preDrawPreviewMapItems(gfxSprite& targetSurface, bool fThumbnail)
 {
     short iTileSize = 16;
     short iScreenshotSize = 0;
@@ -1804,15 +1722,15 @@ void CMap::preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail)
         iScreenshotSize = 1;
     }
 
-    for (int j = 0; j < iNumMapItems; j++) {
-        SDL_Rect rSrc = {mapitems[j].itype * iTileSize, 0, iTileSize, iTileSize};
-        SDL_Rect rDst = {mapitems[j].ix * iTileSize, mapitems[j].iy * iTileSize, iTileSize, iTileSize};
+    for (const MapItem& item : mapitems) {
+        SDL_Rect rSrc = {item.itype * iTileSize, 0, iTileSize, iTileSize};
+        SDL_Rect rDst = {item.ix * iTileSize, item.iy * iTileSize, iTileSize, iTileSize};
 
-        SDL_BlitSurface(rm->spr_thumbnail_mapitems[iScreenshotSize].getSurface(), &rSrc, targetSurface, &rDst);
+        rm->spr_thumbnail_mapitems[iScreenshotSize].draw(rSrc, targetSurface.getSurface(), rDst);
     }
 }
 
-void CMap::preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail)
+void CMap::preDrawPreviewBackground(gfxSprite& targetSurface, bool fThumbnail)
 {
     drawPreview(targetSurface, 0, fThumbnail);
     smallDelay(); //Sleeps to help the music from skipping
@@ -1831,7 +1749,7 @@ void CMap::preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail
     //drawPreviewBlocks(targetSurface, fThumbnail);
 }
 
-void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * targetSurface, bool fThumbnail)
+void CMap::preDrawPreviewBackground(const gfxSprite& background, gfxSprite& targetSurface, bool fThumbnail)
 {
     SDL_Rect srcrect;
     srcrect.x = 0;
@@ -1851,20 +1769,17 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
         dstrect.h = App::screenHeight/2;
     }
 
-    if (SDL_SCALEBLIT(background->getSurface(), &srcrect, targetSurface, &dstrect) < 0) {
-        fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
-        return;
-    }
+    background.drawStretch(srcrect, targetSurface.getSurface(), dstrect);
 
     smallDelay();
     preDrawPreviewBackground(targetSurface, fThumbnail);
 }
 
-void CMap::preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
+void CMap::preDrawPreviewBlocks(gfxSprite& targetSurface, bool fThumbnail)
 {
     if (!fThumbnail) {
-        SDL_FillRect(targetSurface, NULL, SDL_MapRGB(targetSurface->format, 255, 0, 255));
-        SDL_SETCOLORKEY(targetSurface, SDL_FALSE, SDL_MapRGB(targetSurface->format, 255, 0, 255));
+        SDL_FillRect(targetSurface.getSurface(), NULL, SDL_MapRGB(targetSurface.getSurface()->format, 255, 0, 255));
+        SDL_SetColorKey(targetSurface.getSurface(), SDL_TRUE, SDL_MapRGB(targetSurface.getSurface()->format, 255, 0, 255));
         smallDelay();
     }
 
@@ -1872,11 +1787,11 @@ void CMap::preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 }
 
 
-void CMap::preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail)
+void CMap::preDrawPreviewForeground(gfxSprite& targetSurface, bool fThumbnail)
 {
     if (!fThumbnail) {
-        SDL_FillRect(targetSurface, NULL, SDL_MapRGB(targetSurface->format, 255, 0, 255));
-        SDL_SETCOLORKEY(targetSurface, SDL_FALSE, SDL_MapRGB(targetSurface->format, 255, 0, 255));
+        SDL_FillRect(targetSurface.getSurface(), NULL, SDL_MapRGB(targetSurface.getSurface()->format, 255, 0, 255));
+        SDL_SetColorKey(targetSurface.getSurface(), SDL_TRUE, SDL_MapRGB(targetSurface.getSurface()->format, 255, 0, 255));
         smallDelay();
     }
 
@@ -1888,16 +1803,14 @@ void CMap::preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail
     drawPreview(targetSurface, 3, fThumbnail);
 }
 
-void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
+void CMap::drawPreview(gfxSprite& targetSurface, int layer, bool fThumbnail)
 {
     int i, j;
 
     //draw left to right full vertical
-    // 0: full, 1: preview, 2: thumbnail
-    short iTilesetSize = 1;
-
+    DrawSize iTilesetSize = DrawSize::Preview;
     if (fThumbnail)
-        iTilesetSize = 2;
+        iTilesetSize = DrawSize::Thumbnail;
 
     for (i = 0; i < MAPWIDTH; i++) {
         for (j = 0; j < MAPHEIGHT; j++) {
@@ -1907,18 +1820,21 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
 
             //Handle drawing preview for animated tiles
             if (tile->iID >= 0) {
-                g_tilesetmanager->Draw(targetSurface, tile->iID, iTilesetSize, tile->iCol, tile->iRow, i, j);
-                // SDL_BlitSurface(rm->spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetSize][tile->iCol][tile->iRow], targetSurface, &rectDst);
+                g_tilesetmanager->Draw(targetSurface.getSurface(), tile->iID, iTilesetSize, tile->iCol, tile->iRow, i, j);
             } else if (tile->iID == TILESETANIMATED) {
-                SDL_BlitSurface(rm->spr_tileanimation[iTilesetSize].getSurface(), g_tilesetmanager->rect(iTilesetSize, tile->iCol * 4, tile->iRow), targetSurface, g_tilesetmanager->rect(iTilesetSize, i, j));
+                const SDL_Rect& srcRect = CTilesetManager::rect(iTilesetSize, tile->iCol * 4, tile->iRow);
+                const SDL_Rect& dstRect = CTilesetManager::rect(iTilesetSize, i, j);
+                rm->spr_tileanimation[static_cast<size_t>(iTilesetSize)].draw(srcRect, targetSurface.getSurface(), dstRect);
             } else if (tile->iID == TILESETUNKNOWN) {
-                SDL_BlitSurface(rm->spr_unknowntile[iTilesetSize].getSurface(), g_tilesetmanager->rect(iTilesetSize, 0, 0), targetSurface, g_tilesetmanager->rect(iTilesetSize, i, j));
+                const SDL_Rect& srcRect = CTilesetManager::rect(iTilesetSize, 0, 0);
+                const SDL_Rect& dstRect = CTilesetManager::rect(iTilesetSize, i, j);
+                rm->spr_unknowntile[static_cast<size_t>(iTilesetSize)].draw(srcRect, targetSurface.getSurface(), dstRect);
             }
         }
     }
 }
 
-void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
+void CMap::drawPreviewBlocks(gfxSprite& targetSurface, bool fThumbnail)
 {
     int i, j, ts;
 
@@ -1969,9 +1885,9 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
             }
 
             if (fThumbnail)
-                SDL_BlitSurface(rm->spr_blocks[2].getSurface(), &rectSrc, targetSurface, &rectDst);
+                rm->spr_blocks[2].draw(rectSrc, targetSurface.getSurface(), rectDst);
             else
-                SDL_BlitSurface(rm->spr_blocks[1].getSurface(), &rectSrc, targetSurface, &rectDst);
+                rm->spr_blocks[1].draw(rectSrc, targetSurface.getSurface(), rectDst);
         }
 
         rectDst.x += iBlockSize;
@@ -1986,14 +1902,14 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 	r.w = App::screenWidth;
 	r.h = App::screenHeight;
 
-    SDL_BlitSurface(background.getSurface(), NULL, mapspr.getSurface(), &r);
+    background.draw(mapspr.getSurface(), r);
 
-    draw(mapspr.getSurface(), 0);
-    draw(mapspr.getSurface(), 1);
+    draw(mapspr, 0);
+    draw(mapspr, 1);
 
     if (!game_values.toplayer) {
-        draw(mapspr.getSurface(), 2);
-        draw(mapspr.getSurface(), 3);
+        draw(mapspr, 2);
+        draw(mapspr, 3);
     }
 
     //Add animated tile objects for each animated tile in a platform (to be used later for drawing)
@@ -2025,10 +1941,9 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 void CMap::predrawforeground(gfxSprite &foregroundspr)
 {
     SDL_FillRect(foregroundspr.getSurface(), NULL, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
-    SDL_SETCOLORKEY(foregroundspr.getSurface(), SDL_FALSE, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
-
-    draw(foregroundspr.getSurface(), 2);
-    draw(foregroundspr.getSurface(), 3);
+    SDL_SetColorKey(foregroundspr.getSurface(), SDL_TRUE, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
+    draw(foregroundspr, 2);
+    draw(foregroundspr, 3);
 }
 
 void CMap::SetupAnimatedTiles()
@@ -2040,21 +1955,14 @@ void CMap::SetupAnimatedTiles()
     g_iCurrentDrawIndex = 0;
 
     iAnimatedTileCount = animatedtiles.size();
-
-    if (animatedTilesSurface) {
-        SDL_FreeSurface(animatedTilesSurface);
-        animatedTilesSurface = NULL;
-    }
+    animatedTilesSurface = gfxSprite();
 
     if (iAnimatedTileCount > 0) {
-        SDL_Surface * backgroundSurface = rm->spr_background.getSurface();
-        SDL_Surface * animatedTileSrcSurface = rm->spr_tileanimation[0].getSurface();
-
         animatedFrontmapSurface = rm->spr_frontmap[g_iCurrentDrawIndex].getSurface();
         animatedBackmapSurface = rm->spr_backmap[g_iCurrentDrawIndex].getSurface();
-        animatedTilesSurface = SDL_CreateRGBSurface(screen->flags, 1024, 1024, screen->format->BitsPerPixel, 0, 0, 0, 0);
+        animatedTilesSurface = gfxSprite::blank(1024, 1024);
 
-        int iTransparentColor = SDL_MapRGB(animatedTilesSurface->format, 255, 0, 255);
+        int iTransparentColor = SDL_MapRGB(animatedTilesSurface.getSurface()->format, 255, 0, 255);
 
         std::vector<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
 
@@ -2063,7 +1971,6 @@ void CMap::SetupAnimatedTiles()
         SDL_Rect rDst = {0, 0, 32, 32};
         while (iter != lim && !fSrcSurfaceFull) {
             AnimatedTile * tile = *iter;
-            SDL_Rect * rSrc = &(tile->rDest);
 
             //If the background layer has an animated tile, then create the set of 4 images that will be
             //drawn to this tile during the gameplay (gfx optimization by only drawing from animatedTilesSurface)
@@ -2071,16 +1978,16 @@ void CMap::SetupAnimatedTiles()
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     tile->rAnimationSrc[0][sTileAnimationFrame] = rDst;
 
-                    SDL_BlitSurface(backgroundSurface, rSrc, animatedTilesSurface, &rDst);
+                    rm->spr_background.draw(tile->rDest, animatedTilesSurface.getSurface(), rDst);
 
                     for (short iLayer = 0; iLayer < iAnimatedBackgroundLayers; iLayer++) {
                         TilesetTile * tilesetTile = &tile->layers[iLayer];
                         if (tilesetTile->iID >= 0) {
-                            SDL_BlitSurface(g_tilesetmanager->tileset(tilesetTile->iID)->surface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+                            g_tilesetmanager->tileset(tilesetTile->iID)->draw(DrawSize::Ingame, tile->rSrc[iLayer][0], animatedTilesSurface.getSurface(), rDst);
                         } else if (tilesetTile->iID == TILESETANIMATED) {
-                            SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
+                            rm->spr_tileanimation[0].draw(tile->rSrc[iLayer][sTileAnimationFrame], animatedTilesSurface.getSurface(), rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
-                            SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->rect(0, 0, 0), animatedTilesSurface, &rDst);
+                            rm->spr_unknowntile[0].draw(CTilesetManager::rect(DrawSize::Ingame, 0, 0), animatedTilesSurface.getSurface(), rDst);
                         }
                     }
 
@@ -2107,16 +2014,16 @@ void CMap::SetupAnimatedTiles()
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     tile->rAnimationSrc[1][sTileAnimationFrame] = rDst;
 
-                    SDL_FillRect(animatedTilesSurface, &rDst, iTransparentColor);
+                    SDL_FillRect(animatedTilesSurface.getSurface(), &rDst, iTransparentColor);
 
                     for (short iLayer = 2; iLayer < 4; iLayer++) {
                         TilesetTile * tilesetTile = &tile->layers[iLayer];
                         if (tilesetTile->iID >= 0) {
-                            SDL_BlitSurface(g_tilesetmanager->tileset(tilesetTile->iID)->surface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+                            g_tilesetmanager->tileset(tilesetTile->iID)->draw(DrawSize::Ingame, tile->rSrc[iLayer][0], animatedTilesSurface.getSurface(), rDst);
                         } else if (tilesetTile->iID == TILESETANIMATED) {
-                            SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
+                            rm->spr_tileanimation[0].draw(tile->rSrc[iLayer][sTileAnimationFrame], animatedTilesSurface.getSurface(), rDst);
                         } else if (tilesetTile->iID == TILESETUNKNOWN) {
-                            SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->rect(0, 0, 0), animatedTilesSurface, &rDst);
+                            rm->spr_unknowntile[0].draw(CTilesetManager::rect(DrawSize::Ingame, 0, 0), animatedTilesSurface.getSurface(), rDst);
                         }
                     }
 
@@ -2142,11 +2049,11 @@ void CMap::SetupAnimatedTiles()
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     tile->rAnimationSrc[0][sTileAnimationFrame] = rDst;
 
-                    SDL_FillRect(animatedTilesSurface, &rDst, iTransparentColor);
+                    SDL_FillRect(animatedTilesSurface.getSurface(), &rDst, iTransparentColor);
 
                     TilesetTile * tilesetTile = &tile->layers[0];
                     if (tilesetTile->iID == TILESETANIMATED) {
-                        SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[0][sTileAnimationFrame]), animatedTilesSurface, &rDst);
+                        rm->spr_tileanimation[0].draw(tile->rSrc[0][sTileAnimationFrame], animatedTilesSurface.getSurface(), rDst);
                     } else {
                         cout << endl << " ERROR: A nonanimated platform tile was added to the animated tile list" << endl;
                     }
@@ -2197,8 +2104,8 @@ void CMap::SetupAnimatedTiles()
 
 void CMap::updatePlatforms()
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        platforms[iPlatform]->update();
+    for (MovingPlatform* platform : platforms) {
+        platform->update();
     }
 
     std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
@@ -2246,8 +2153,8 @@ void CMap::drawPlatforms(short iOffsetX, short iOffsetY, short iLayer)
 
 void CMap::movingPlatformCollision(IO_MovingObject * object)
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        platforms[iPlatform]->collide(object);
+    for (MovingPlatform* platform : platforms) {
+        platform->collide(object);
     }
 
     std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
@@ -2260,8 +2167,8 @@ void CMap::movingPlatformCollision(IO_MovingObject * object)
 bool CMap::movingPlatformCheckSides(IO_MovingObject * object)
 {
     bool fRet = false;
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        fRet |= platforms[iPlatform]->collision_detection_check_sides(object);
+    for (MovingPlatform* platform : platforms) {
+        fRet |= platform->collision_detection_check_sides(object);
     }
 
     std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
@@ -2275,8 +2182,8 @@ bool CMap::movingPlatformCheckSides(IO_MovingObject * object)
 
 void CMap::resetPlatforms()
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        platforms[iPlatform]->ResetPath();
+    for (MovingPlatform* platform : platforms) {
+        platform->ResetPath();
     }
 
     std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
@@ -2433,8 +2340,8 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
         break;
     }
     //Check to see if we are spawning into a platform
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        if (platforms[iPlatform]->IsInNoSpawnZone(*x, *y, width, height))
+    for (MovingPlatform* platform : platforms) {
+        if (platform->IsInNoSpawnZone(*x, *y, width, height))
             return false;
     }
 
@@ -2452,7 +2359,7 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 
 void CMap::AddPermanentPlatform(MovingPlatform * platform)
 {
-    platforms[iNumPlatforms++] = platform;
+    platforms.emplace_back(platform);
     platformdrawlayer[platform->iDrawLayer].push_back(platform);
 }
 
@@ -2463,8 +2370,8 @@ void CMap::AddTemporaryPlatform(MovingPlatform * platform)
 
 bool CMap::IsInPlatformNoSpawnZone(short x, short y, short width, short height)
 {
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        if (platforms[iPlatform]->IsInNoSpawnZone(x, y, width, height))
+    for (MovingPlatform* platform : platforms) {
+        if (platform->IsInNoSpawnZone(x, y, width, height))
             return true;
     }
 
@@ -2482,7 +2389,7 @@ bool CMap::IsInPlatformNoSpawnZone(short x, short y, short width, short height)
 void CMap::drawfrontlayer()
 {
     for (int k = 0; k < numdrawareas; k++)
-        rm->spr_frontmap[g_iCurrentDrawIndex].draw(drawareas[k].x, drawareas[k].y, drawareas[k].x, drawareas[k].y, drawareas[k].w, drawareas[k].h);
+        rm->spr_frontmap[g_iCurrentDrawIndex].draw(drawareas[k].x, drawareas[k].y, drawareas[k]);
 
     //Draw gaps in pink for debugging
     /*
@@ -2490,7 +2397,7 @@ void CMap::drawfrontlayer()
     {
     	for (short j = 0; j < MAPWIDTH; j++)
     	{
-            if (mapdatatop[j][i].iType == tile_gap)
+            if (mapdatatop[j][i].iType == TileType::gap)
     		{
     			SDL_Rect r = {j << 5, i << 5, TILESIZE, TILESIZE};
     			SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 255, 0, 255));
@@ -2526,7 +2433,7 @@ void CMap::optimize()
             for (int m = 1; m < MAPLAYERS; m++) {
                 TilesetTile * tile = &mapdata[i][j][m];
                 TileType type = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
-                if (type != tile_nonsolid && type != tile_gap && type != tile_solid_on_top) {
+                if (type != TileType::NonSolid && type != TileType::Gap && type != TileType::SolidOnTop) {
                     for (int k = m - 1; k >= 0; k--) {
                         TilesetTile * compareTile = &mapdata[i][j][k];
                         if (compareTile->iID == TILESETNONE) {

@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class 1up powerup
 //------------------------------------------------------------------------------
-PU_ExtraGuyPowerup::PU_ExtraGuyPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short type)
-    : MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_ExtraGuyPowerup::PU_ExtraGuyPowerup(gfxSprite* nspr, Vec2s pos, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short type)
+    : MO_Powerup(nspr, pos, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
     , iType(type)
 {
     if (moveToRight)
@@ -30,7 +30,7 @@ bool PU_ExtraGuyPowerup::collide(CPlayer* player)
         game_values.gamemode->playerextraguy(*player, iType);
         ifSoundOnPlay(rm->sfx_extraguysound);
 
-        eyecandy[2].add(new EC_FloatingObject(&rm->spr_extralife, player->ix + HALFPW - 19, player->iy - 16, 0.0f, -1.5f, 62, player->colorID * 38, (iType == 5 ? 3 : iType - 1) * 16, 38, 16));
+        eyecandy[2].emplace<EC_FloatingObject>(&rm->spr_extralife, player->ix + HALFPW - 19, player->iy - 16, 0.0f, -1.5f, 62, player->colorID * 38, (iType == 5 ? 3 : iType - 1) * 16, 38, 16);
 
         dead = true;
     }

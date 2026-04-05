@@ -15,6 +15,7 @@
 #include "ResourceManager.h"
 #include "Score.h"
 #include "sfx.h"
+#include "WorldTourStop.h"
 #include "gamemodes/Chicken.h"
 #include "gamemodes/MiniBoss.h"
 #include "gamemodes/Tag.h"
@@ -38,7 +39,6 @@
 #include "objects/moving/MO_BulletBill.h"
 #include "objects/moving/MO_Coin.h"
 #include "objects/moving/MO_PirhanaPlant.h"
-#include "objects/moving/WalkingEnemy.h"
 #include "objects/powerup/PU_BobombPowerup.h"
 #include "objects/powerup/PU_BombPowerup.h"
 #include "objects/powerup/PU_BoomerangPowerup.h"
@@ -58,6 +58,7 @@
 #include "objects/powerup/PU_PWingsPowerup.h"
 #include "objects/powerup/PU_StarPowerup.h"
 #include "objects/powerup/PU_Tanooki.h"
+#include "objects/walkingenemy/WalkingEnemy.h"
 
 #include <algorithm>
 #include <cmath>
@@ -378,7 +379,7 @@ void GameplayState::initEyeCandy()
                 velx = velx < 0.5f && velx > -0.5f ? 1 : velx;  //no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_clouds, (float)(RANDOM_INT(App::screenWidth)), (float)(RANDOM_INT(100)), velx, 0, srcy, w, h));
+                eyecandy[iEyeCandyLayer].emplace<EC_Cloud>(&rm->spr_clouds, (float)(RANDOM_INT(App::screenWidth)), (float)(RANDOM_INT(100)), velx, 0, srcy, w, h);
             }
         }
 
@@ -391,20 +392,20 @@ void GameplayState::initEyeCandy()
                 velx = velx < 0.5f && velx > -0.5f ? (RANDOM_INT(1) ? 1.0f : -1.0f) : velx; //no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
+                eyecandy[iEyeCandyLayer].emplace<EC_Ghost>(&rm->spr_ghosts, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32);
             }
         }
 
         //Leaves
         if (g_map->eyecandy[iEyeCandyLayer] & 4) {
             for (i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight)));
+                eyecandy[iEyeCandyLayer].emplace<EC_Leaf>(&rm->spr_leaves, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight));
         }
 
         //Snow
         if (g_map->eyecandy[iEyeCandyLayer] & 8) {
             for (i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), 0));
+                eyecandy[iEyeCandyLayer].emplace<EC_Snow>(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), 0);
         }
 
         //Fish
@@ -435,20 +436,20 @@ void GameplayState::initEyeCandy()
                 //add cloud to eyecandy array
                 short iPossibleY = (App::screenHeight - h) / 10;
                 float dDestY = (float)(RANDOM_INT(iPossibleY) + iPossibleY * i);
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_fish, (float)(RANDOM_INT(App::screenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
+                eyecandy[iEyeCandyLayer].emplace<EC_Cloud>(&rm->spr_fish, (float)(RANDOM_INT(App::screenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h);
             }
         }
 
         //Rain
         if (g_map->eyecandy[iEyeCandyLayer] & 32) {
             for (i = 0; i < 20; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Rain(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight)));
+                eyecandy[iEyeCandyLayer].emplace<EC_Rain>(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight));
         }
 
         //Bubbles
         if (g_map->eyecandy[iEyeCandyLayer] & 64) {
             for (i = 0; i < 10; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight)));
+                eyecandy[iEyeCandyLayer].emplace<EC_Bubble>(&rm->spr_rain, (float)(RANDOM_INT(App::screenWidth)), RANDOM_INT(App::screenHeight));
         }
     }
 }
@@ -682,8 +683,7 @@ void shakeScreen()
 
     //Kill goombas and koopas
     for (const std::unique_ptr<CObject>& obj : objectcontainer[0].list()) {
-        if (obj->getObjectType() == object_moving) {
-            IO_MovingObject * movingobject = (IO_MovingObject *)obj.get();
+        if (auto* movingobject = dynamic_cast<IO_MovingObject*>(obj.get())) {
             MovingObjectType type = movingobject->getMovingObjectType();
 
             if ((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
@@ -708,9 +708,7 @@ void shakeScreen()
 
     //Destroy throw blocks and flip shells over
     for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-        if (obj->getObjectType() == object_moving) {
-            IO_MovingObject * movingobject = (IO_MovingObject *)obj.get();
-
+        if (auto* movingobject = dynamic_cast<IO_MovingObject*>(obj.get())) {
             if (game_values.flags.screenshakekillinair == movingobject->inair) {
                 if (movingobject->getMovingObjectType() == movingobject_shell) {
                     CO_Shell * shell = (CO_Shell*)movingobject;
@@ -853,29 +851,27 @@ void handleObj2ObjCollisions()
         for (size_t iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
             CObject * object1 = objectcontainer[iLayer1].list()[iObject1].get();
 
-            if (object1->getObjectType() != object_moving)
+            auto* movingobject1 = dynamic_cast<IO_MovingObject*>(object1);
+            if (!movingobject1)
                 continue;
-
-            IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
 
             for (size_t iLayer2 = iLayer1; iLayer2 < 3; iLayer2++) {
                 size_t iContainerEnd2 = objectcontainer[iLayer2].list().size();
                 for (size_t iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
                     CObject * object2 = objectcontainer[iLayer2].list()[iObject2].get();
 
-                    if (object2->getObjectType() != object_moving)
+                    if (object2->isDead())
                         continue;
 
-                    IO_MovingObject * movingobject2 = (IO_MovingObject*)object2;
+                    auto* movingobject2 = dynamic_cast<IO_MovingObject*>(object2);
+                    if (!movingobject2)
+                        continue;
 
                     //if (g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()])
                     //  continue;
 
                     //if (iLayer1 == iLayer2 && iObject1 == iObject2)
                     //  continue;
-
-                    if (object2->isDead())
-                        continue;
 
                     MovingObjectType iType1 = movingobject1->getMovingObjectType();
                     MovingObjectType iType2 = movingobject2->getMovingObjectType();
@@ -944,7 +940,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
             if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
                 rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
             else
-                rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
+                rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, {0, 0, 256, 41});
 
             for (short k = 0; k < game_values.teamcounts[i]; k++) {
                 short globalID = game_values.teamids[i][k];
@@ -961,8 +957,8 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
                     short scorex = score[i]->x + scoreoffsets[k];
                     short scorey = score[i]->y + 2;
-                    rm->spr_egg.draw(scorex, scorey, respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32);
-                    rm->spr_eggnumbers.draw(scorex, scorey, ((respawnCount[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
+                    rm->spr_egg.draw(scorex, scorey, {respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32});
+                    rm->spr_eggnumbers.draw(scorex, scorey, {((respawnCount[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32});
                 } else { //otherwise draw the player's skin in the scoreboard
                     short iScoreboardSprite;
                     if (game_values.gamemode->gameover) {
@@ -982,23 +978,23 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                         short iScoreOffsetY = score[i]->y + 2;
 
                         if (player->ownerPlayerID > -1)
-                            rm->spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
+                            rm->spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, {player->ownerColorOffsetX, 0, 48, 48});
 
-                        player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
+                        player->GetScoreboardSprite()->at(iScoreboardSprite).draw(iScoreOffsetX, iScoreOffsetY, {player->iSrcOffsetX, 0, 32, 32});
 
                         //Display jail if player is jailed
                         if (player->jail.isActive())
-                            rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jail.getColor() + 1) * 44, 0, 44, 44);
+                            rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, {(player->jail.getColor() + 1) * 44, 0, 44, 44});
 
                         //Display current powerup if player is using one
                         if (player->powerup > 0)
-                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
+                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, {g_iPowerupToIcon[player->powerup - 1], 0, 16, 16});
 
                         //Display tanooki powerup if player has it
                         if (player->tanookisuit.isOn())
-                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, App::screenWidth/2, 0, 16, 16);
+                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, {App::screenWidth/2, 0, 16, 16});
                     } else {
-                        rm->spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
+                        rm->spr_player[globalID][iScoreboardSprite].draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, {0, 0, 32, 32});
                     }
 
                     //give crown to player(s) with most kills
@@ -1011,7 +1007,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                 //Draw stored powerup
                 if (storedpowerupid != -1) {
                     if (!game_values.flags.swapplayers) {
-                        rm->spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
+                        rm->spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, {storedpowerupid * 16, 0, 16, 16});
                     }
                 }
             }
@@ -1024,16 +1020,16 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
                 for (short iHeart = 0; iHeart < iLife; iHeart++) {
                     if (iHeart == iMax - 1 && iHeart % 2 == 0)
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, {32, 0, 8, 16});
                     else
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, (iHeart % 2) ? 8 : 0, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, {(iHeart % 2) ? 8 : 0, 0, 8, 16});
                 }
 
                 for (short iHeart = iLife; iHeart < iMax; iHeart++) {
                     if (iHeart == iMax - 1 && iHeart % 2 == 0)
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, {40, 0, 8, 16});
                     else
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, (iHeart % 2) ? 24 : 16, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, {(iHeart % 2) ? 24 : 16, 0, 8, 16});
                 }
             } else if (game_values.gamemode->gamemode == game_mode_collection) { //Draw cards for collection mode
                 //Flash collected cards if 3 have been collected
@@ -1043,7 +1039,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                     short iCardX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 20;
 
                     for (short iCard = 0; iCard < iNumCards; iCard++) {
-                        rm->spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, (iCardValues & 3) << 4, 0, 16, 16);
+                        rm->spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, {(iCardValues & 3) << 4, 0, 16, 16});
                         iCardValues >>= 2;
                     }
                 }
@@ -1054,20 +1050,20 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
                 short iCoin = 0;
                 for (; iCoin < iNumCoins; iCoin++) {
-                    rm->spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, 0, 0, 16, 16);
+                    rm->spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, {0, 0, 16, 16});
                 }
 
                 for (short iEmptyCoin = iCoin; iEmptyCoin < 5; iEmptyCoin++) {
-                    rm->spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, 16, 0, 16, 16);
+                    rm->spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, {16, 0, 16, 16});
                 }
             }
 
             short iScoreX = score[i]->x + iScoreTextOffset[i];
             short iScoreY = score[i]->y + 4;
 
-            rm->spr_scoretext.draw(iScoreX, iScoreY, score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16);
-            rm->spr_scoretext.draw(iScoreX + 18, iScoreY, score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16);
-            rm->spr_scoretext.draw(iScoreX + 36, iScoreY, score[i]->iDigitRight, 0, 16, 16);
+            rm->spr_scoretext.draw(iScoreX, iScoreY, {score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16});
+            rm->spr_scoretext.draw(iScoreX + 18, iScoreY, {score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16});
+            rm->spr_scoretext.draw(iScoreX + 36, iScoreY, {score[i]->iDigitRight, 0, 16, 16});
         }
     }
 }
@@ -1093,7 +1089,7 @@ void GameplayState::drawScreenFade()
 
                 short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
-                eyecandy[2].add(new EC_Announcement(&rm->game_font_large, &rm->menu_mode_large, szMode, iMode, 130, 90));
+                eyecandy[2].emplace<EC_Announcement>(&rm->game_font_large, &rm->menu_mode_large, szMode, iMode, 130, 90);
             }
         } else if (game_values.screenfade >= 255) {
             game_values.screenfadespeed = 0;
@@ -1146,7 +1142,7 @@ void GameplayState::drawPlayerSwap()
                     iPowerupY = (short)((float)(player->iNewPowerupY - player->iOldPowerupY) * game_values.flags.swapplayersposition) + player->iOldPowerupY;
                 }
 
-                rm->spr_storedpowerupsmall.draw(iPowerupX, iPowerupY, storedpowerupid * 16, 0, 16, 16);
+                rm->spr_storedpowerupsmall.draw(iPowerupX, iPowerupY, {storedpowerupid * 16, 0, 16, 16});
             }
         }
 
@@ -1167,13 +1163,13 @@ void GameplayState::drawPlayerSwap()
             game_values.screenfade = 0;
 
             if (game_values.swapstyle == 0)
-                ifsoundonstop(rm->sfx_skid);
+                rm->sfx_skid.stop();
 
             ifSoundOnPlay(rm->sfx_transform);
 
             if (game_values.swapstyle == 1) {
                 for (CPlayer* player : players)
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->leftX() + (HALFPW) - 16, player->topY() + (HALFPH) - 16, 3, 8));
+                    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->leftX() + (HALFPW) - 16, player->topY() + (HALFPH) - 16, 3, 8);
             }
         }
     }
@@ -1230,8 +1226,8 @@ void GameplayState::drawWindMeter()
 {
     if (game_values.windaffectsplayers) {
         short iDisplayWindMeterY = game_values.scoreboardstyle == ScoreboardStyle::Bottom ? 8 : 440;
-        rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
-        rm->spr_windmeter.draw((short)(game_values.flags.gamewindx * 20.0f) + App::screenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
+        rm->spr_windmeter.draw(210, iDisplayWindMeterY, {0, 0, 220, 32});
+        rm->spr_windmeter.draw((short)(game_values.flags.gamewindx * 20.0f) + App::screenWidth/2, iDisplayWindMeterY + 6, {220, 0, 12, 20});
     }
 }
 
@@ -1240,7 +1236,7 @@ void GameplayState::drawCountdown()
     //Draw countdown start timer
     if (iCountDownState > 0 && game_values.screenfade == 0) {
         const SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
-        rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
+        rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0]);
     }
 }
 
@@ -1282,7 +1278,7 @@ void drawExitPauseDialog()
         //menu_font_large.drawCentered(App::screenWidth/2, App::screenHeight/2, game_values.gamemode->GetModeName());
         short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
-        rm->menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
+        rm->menu_mode_large.draw(304, 224, {iMode << 5, 0, 32, 32});
 
         std::string szGoal = game_values.gamemode->GetGoalName() + ": ";
 
@@ -1298,8 +1294,8 @@ void drawExitPauseDialog()
         rm->spr_dialog.draw(App::screenWidth * 0.35f, App::screenHeight*0.37f);
         rm->menu_font_large.drawCentered(App::screenWidth * 0.5f, App::screenHeight*0.46f - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
 
-        rm->spr_dialogbutton.draw(App::screenWidth * 0.37f, App::screenHeight*0.52f, 0, (game_values.flags.exityes ? 34 : 0), 80, 34);
-        rm->spr_dialogbutton.draw(App::screenWidth * 0.51f, App::screenHeight*0.52f, 0, (game_values.flags.exityes ? 0 : 34), 80, 34);
+        rm->spr_dialogbutton.draw(App::screenWidth * 0.37f, App::screenHeight*0.52f, {0, (game_values.flags.exityes ? 34 : 0), 80, 34});
+        rm->spr_dialogbutton.draw(App::screenWidth * 0.51f, App::screenHeight*0.52f, {0, (game_values.flags.exityes ? 0 : 34), 80, 34});
 
         rm->menu_font_large.draw(App::screenWidth * 0.43f - (rm->menu_font_large.getWidth("Yes") >> 1),  App::screenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "Yes");
         rm->menu_font_large.draw(App::screenWidth * 0.57f - (rm->menu_font_large.getWidth("No") >> 1),  App::screenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "No");
@@ -1401,7 +1397,7 @@ void UpdateScoreBoard()
             }
         }
 
-        if (++game_values.tourstopcurrent >= game_values.tourstoptotal) {
+        if (++game_values.tourstopcurrent >= game_values.tourstops.size()) {
             //Calculate Tour Winner by counting up 1st, 2nd, 3rd, and 4th place wins
 
             short iWinningTeam = -2;  //Set winning team to -2 to signify a tie between teams
@@ -1479,39 +1475,39 @@ enum MapBlockType {
     MapBlock_WpnBreakLeaf,
 };
 
-IO_Block* spawnMapBlock(short typeId, short drawX, short drawY, const MapBlock& objdata, const std::array<short, 4>& switchStates)
+IO_Block* spawnMapBlock(short typeId, Vec2s drawPos, const MapBlock& objdata, const std::array<short, 4>& switchStates)
 {
     switch (typeId) {
-        case MapBlock_BrickYellow: return new B_BreakableBlock(&rm->spr_breakableblock, drawX, drawY, 4, 10);
-        case MapBlock_Powerup: return new B_PowerupBlock(&rm->spr_powerupblock, drawX, drawY, 4, 10, objdata.fHidden, objdata.iSettings);
-        case MapBlock_Donut: return new B_DonutBlock(&rm->spr_donutblock, drawX, drawY);
-        case MapBlock_Flip: return new B_FlipBlock(&rm->spr_flipblock, drawX, drawY, objdata.fHidden);
-        case MapBlock_Bounce: return new B_BounceBlock(&rm->spr_bounceblock, drawX, drawY, objdata.fHidden);
-        case MapBlock_NoteGray: return new B_NoteBlock(&rm->spr_noteblock, drawX, drawY, 4, 10, NoteBlockType::Gray, objdata.fHidden);
-        case MapBlock_BrickBlue: return new B_ThrowBlock(&rm->spr_throwblock, drawX, drawY, 4, 10, ThrowBlockType::Blue);
-        case MapBlock_SwitchToggleRed: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Red, switchStates[0]);
-        case MapBlock_SwitchToggleGreen: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Green, switchStates[1]);
-        case MapBlock_SwitchToggleYellow: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Yellow, switchStates[2]);
-        case MapBlock_SwitchToggleBlue: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Blue, switchStates[3]);
-        case MapBlock_SwitchBlockRed: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Red, objdata.iSettings[0]);
-        case MapBlock_SwitchBlockGreen: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Green, objdata.iSettings[0]);
-        case MapBlock_SwitchBlockYellow: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Yellow, objdata.iSettings[0]);
-        case MapBlock_SwitchBlockBlue: return new B_SwitchBlock(&rm->spr_switchblocks, drawX, drawY, SwitchColor::Blue, objdata.iSettings[0]);
-        case MapBlock_View: return new B_ViewBlock(&rm->spr_viewblock, drawX, drawY, objdata.fHidden, objdata.iSettings);
-        case MapBlock_BrickRed: return new B_ThrowBlock(&rm->spr_throwblock, drawX, drawY, 4, 10, ThrowBlockType::Red);
-        case MapBlock_NoteRed: return new B_NoteBlock(&rm->spr_noteblock, drawX, drawY, 4, 10, NoteBlockType::Red, objdata.fHidden);
-        case MapBlock_NoteBlue: return new B_NoteBlock(&rm->spr_noteblock, drawX, drawY, 4, 10, NoteBlockType::Blue, objdata.fHidden);
-        case MapBlock_BrickGray: return new B_ThrowBlock(&rm->spr_throwblock, drawX, drawY, 4, 10, ThrowBlockType::Gray);
-        case MapBlock_WpnBreakFireball: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Fireball);
-        case MapBlock_WpnBreakFeather: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Feather);
-        case MapBlock_WpnBreakShell: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Shell);
-        case MapBlock_WpnBreakBomb: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Bomb);
-        case MapBlock_WpnBreakBoomerang: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Boomerang);
-        case MapBlock_WpnBreakHammer: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Hammer);
-        case MapBlock_WpnBreakKuriboShoe: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::KuriboShoe);
-        case MapBlock_WpnBreakPWings: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::PWings);
-        case MapBlock_WpnBreakStar: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Star);
-        case MapBlock_WpnBreakLeaf: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawX, drawY, WeaponDamageType::Leaf);
+        case MapBlock_BrickYellow: return new B_BreakableBlock(&rm->spr_breakableblock, drawPos, 4, 10);
+        case MapBlock_Powerup: return new B_PowerupBlock(&rm->spr_powerupblock, drawPos, 4, 10, objdata.fHidden, objdata.iSettings);
+        case MapBlock_Donut: return new B_DonutBlock(&rm->spr_donutblock, drawPos);
+        case MapBlock_Flip: return new B_FlipBlock(&rm->spr_flipblock, drawPos, objdata.fHidden);
+        case MapBlock_Bounce: return new B_BounceBlock(&rm->spr_bounceblock, drawPos, objdata.fHidden);
+        case MapBlock_NoteGray: return new B_NoteBlock(&rm->spr_noteblock, drawPos, 4, 10, NoteBlockType::Gray, objdata.fHidden);
+        case MapBlock_BrickBlue: return new B_ThrowBlock(&rm->spr_throwblock, drawPos, 4, 10, ThrowBlockType::Blue);
+        case MapBlock_SwitchToggleRed: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Red, switchStates[0]);
+        case MapBlock_SwitchToggleGreen: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Green, switchStates[1]);
+        case MapBlock_SwitchToggleYellow: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Yellow, switchStates[2]);
+        case MapBlock_SwitchToggleBlue: return new B_OnOffSwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Blue, switchStates[3]);
+        case MapBlock_SwitchBlockRed: return new B_SwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Red, objdata.iSettings[0]);
+        case MapBlock_SwitchBlockGreen: return new B_SwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Green, objdata.iSettings[0]);
+        case MapBlock_SwitchBlockYellow: return new B_SwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Yellow, objdata.iSettings[0]);
+        case MapBlock_SwitchBlockBlue: return new B_SwitchBlock(&rm->spr_switchblocks, drawPos, SwitchColor::Blue, objdata.iSettings[0]);
+        case MapBlock_View: return new B_ViewBlock(&rm->spr_viewblock, drawPos, objdata.fHidden, objdata.iSettings);
+        case MapBlock_BrickRed: return new B_ThrowBlock(&rm->spr_throwblock, drawPos, 4, 10, ThrowBlockType::Red);
+        case MapBlock_NoteRed: return new B_NoteBlock(&rm->spr_noteblock, drawPos, 4, 10, NoteBlockType::Red, objdata.fHidden);
+        case MapBlock_NoteBlue: return new B_NoteBlock(&rm->spr_noteblock, drawPos, 4, 10, NoteBlockType::Blue, objdata.fHidden);
+        case MapBlock_BrickGray: return new B_ThrowBlock(&rm->spr_throwblock, drawPos, 4, 10, ThrowBlockType::Gray);
+        case MapBlock_WpnBreakFireball: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Fireball);
+        case MapBlock_WpnBreakFeather: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Feather);
+        case MapBlock_WpnBreakShell: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Shell);
+        case MapBlock_WpnBreakBomb: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Bomb);
+        case MapBlock_WpnBreakBoomerang: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Boomerang);
+        case MapBlock_WpnBreakHammer: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Hammer);
+        case MapBlock_WpnBreakKuriboShoe: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::KuriboShoe);
+        case MapBlock_WpnBreakPWings: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::PWings);
+        case MapBlock_WpnBreakStar: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Star);
+        case MapBlock_WpnBreakLeaf: return new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, drawPos, WeaponDamageType::Leaf);
         default: return nullptr;
     }
 }
@@ -1528,7 +1524,7 @@ void LoadMapObjects(bool fPreview)
     for (short x = 0; x < MAPWIDTH; x++) {
         for (short y = 0; y < MAPHEIGHT; y++) {
             const short typeId = g_map->objectdata[x][y].iType;
-            IO_Block* block = spawnMapBlock(typeId, x * 32, y * 32, g_map->objectdata[x][y], g_map->iSwitches);
+            IO_Block* block = spawnMapBlock(typeId, {x * 32, y * 32}, g_map->objectdata[x][y], g_map->iSwitches);
             g_map->blockdata[x][y] = block;
 
             if (block)
@@ -1559,8 +1555,8 @@ void LoadMapObjects(bool fPreview)
     bool * fBoxHasCoin = NULL;
 
     if (game_values.gamemode->gamemode == game_mode_boxes_minigame) {
-        for (short iItem = 0; iItem < g_map->iNumMapItems; iItem++) {
-            if (g_map->mapitems[iItem].itype == 5)
+        for (const MapItem& item : g_map->mapitems) {
+            if (item.itype == 5)
                 iThrowBoxCount++;
         }
 
@@ -1583,28 +1579,26 @@ void LoadMapObjects(bool fPreview)
         //If map has less than 5 boxes, then insert coins into map in random locations
         short iExtraCoinsNeeded = 5 - iThrowBoxCount;
         for (short iExtraCoin = 0; iExtraCoin < iExtraCoinsNeeded; iExtraCoin++) {
-            objectcontainer[1].add(new MO_Coin(&rm->spr_coin, 0.0f, 0.0f, 0, 0, 2, -1, 2, 0, true));
+            objectcontainer[1].add(new MO_Coin(&rm->spr_coin, Vec2f::zero(), Vec2s::zero(), 2, -1, 2, 0, true));
         }
     }
 
     //Add map objects like springs, shoes and spikes
     short iAddThrowBoxIndex = 0;
-    for (short i = 0; i < g_map->iNumMapItems; i++) {
-        MapItem * mapItem = &g_map->mapitems[i];
-        short iType = mapItem->itype;
-        short ix = mapItem->ix << 5;
-        short iy = mapItem->iy << 5;
+    for (const MapItem& item : g_map->mapitems) {
+        const short iType = item.itype;
+        const Vec2s pos(item.ix * 32, item.iy * 32);
 
         if (iType == 0)
-            objectcontainer[1].add(new CO_Spring(&rm->spr_spring, ix, iy, false));
+            objectcontainer[1].add(new CO_Spring(&rm->spr_spring, pos, false));
         else if (iType == 1)
-            objectcontainer[1].add(new CO_Spike(&rm->spr_spike, ix, iy));
+            objectcontainer[1].add(new CO_Spike(&rm->spr_spike, pos));
         else if (iType == 2)
-            objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, ix, iy, false));
+            objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, pos, false));
         else if (iType == 3)
-            objectcontainer[1].add(new CO_Spring(&rm->spr_spring, ix, iy, true));
+            objectcontainer[1].add(new CO_Spring(&rm->spr_spring, pos, true));
         else if (iType == 4)
-            objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, ix, iy, true));
+            objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, pos, true));
         else if (iType == 5) {
             short iItem = NO_POWERUP;
             if (!fPreview) {
@@ -1632,7 +1626,7 @@ void LoadMapObjects(bool fPreview)
                 }
             }
 
-            objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, ix, iy, iItem));
+            objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, pos, iItem));
             iAddThrowBoxIndex++;
         }
     }
@@ -1672,8 +1666,8 @@ void CleanUp()
 
     //Stop all game sounds
     sfx_stopallsounds();
-    rm->sfx_invinciblemusic.resetPause();
-    rm->sfx_slowdownmusic.resetPause();
+    rm->sfx_invinciblemusic.stop();
+    rm->sfx_slowdownmusic.stop();
 
     x_shake = 0;
     y_shake = 0;
@@ -1705,7 +1699,7 @@ bool updateExitPauseDialog(short iCountDownState) // true on exit
 
                         //Stop the pwings sound if it is on
                         if (rm->sfx_flyingsound.isPlaying())
-                            ifsoundonstop(rm->sfx_flyingsound);
+                            rm->sfx_flyingsound.stop();
                     }
 
                     //ifsoundonpause(rm->sfx_invinciblemusic);
@@ -1791,7 +1785,7 @@ void updateBulletBillPowerup()
             if (--game_values.bulletbillspawntimer[iPlayer] <= 0) {
                 game_values.bulletbillspawntimer[iPlayer] = (short)(RANDOM_INT(20) + 25);
                 float speed = ((float)(RANDOM_INT(21) + 20)) / 10.0f;
-                objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, 0, (short)(RANDOM_INT(448)), (RANDOM_INT(2) ? speed : -speed), iPlayer, false));
+                objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, {0, (short)(RANDOM_INT(448))}, (RANDOM_INT(2) ? speed : -speed), iPlayer, false));
                 ifSoundOnPlay(rm->sfx_bulletbillsound);
             }
         }
@@ -1820,7 +1814,7 @@ void updateScoreboardAnimation() // scrolling to center at the end of game
 void SetGameModeSettingsFromMenu()
 {
     //If this is a tour stop and the tour has settings in it, use those.  Otherwise use the menu settings.
-    if (game_values.tourstops[game_values.tourstopcurrent]->fUseSettings &&
+    if (game_values.tourstopcurrent < game_values.tourstops.size() && game_values.tourstops[game_values.tourstopcurrent]->fUseSettings &&
             (game_values.matchtype == MatchType::Tour || game_values.matchtype == MatchType::World))
         memcpy(&game_values.gamemodesettings, &game_values.tourstops[game_values.tourstopcurrent]->gmsSettings, sizeof(GameModeSettings));
     else
@@ -1835,7 +1829,7 @@ void playSFX()
             ifSoundOnPlay(rm->sfx_skid);
     } else {
         if (rm->sfx_skid.isPlaying())
-            ifsoundonstop(rm->sfx_skid);
+            rm->sfx_skid.stop();
     }
 
     //Play sound for players using PWings
@@ -1844,7 +1838,7 @@ void playSFX()
             ifSoundOnPlay(rm->sfx_flyingsound);
     } else {
         if (rm->sfx_flyingsound.isPlaying())
-            ifsoundonstop(rm->sfx_flyingsound);
+            rm->sfx_flyingsound.stop();
     }
 }
 
@@ -1856,7 +1850,7 @@ void playMusic()
             ifSoundOnPlay(rm->sfx_slowdownmusic);
     } else {
         if (rm->sfx_slowdownmusic.isPlaying())
-            ifsoundonstop(rm->sfx_slowdownmusic);
+            rm->sfx_slowdownmusic.stop();
     }
 
     if (game_values.flags.playinvinciblesound && game_values.musicvolume > 0) {
@@ -1864,14 +1858,14 @@ void playMusic()
             ifSoundOnPlay(rm->sfx_invinciblemusic);
     } else {
         if (rm->sfx_invinciblemusic.isPlaying())
-            ifsoundonstop(rm->sfx_invinciblemusic);
+            rm->sfx_invinciblemusic.stop();
     }
 
     //If no background music is playing, then play some
     if (!rm->backgroundmusic[0].isPlaying() && !rm->sfx_invinciblemusic.isPlaying() && !rm->sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
         if (game_values.playnextmusic) {
-            musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
-            rm->backgroundmusic[0].load(musiclist->GetCurrentMusic());
+            musiclist->setNextMusic(static_cast<MusicCategory>(g_map->musicCategoryID), maplist->currentShortmapname(), g_map->szBackgroundFile);
+            rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic());
         }
 
         rm->backgroundmusic[0].play(game_values.playnextmusic, false);
@@ -1884,8 +1878,8 @@ void PlayNextMusicTrack()
         return;
 
     rm->backgroundmusic[0].stop();
-    musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
-    rm->backgroundmusic[0].load(musiclist->GetCurrentMusic());
+    musiclist->setNextMusic(static_cast<MusicCategory>(g_map->musicCategoryID), maplist->currentShortmapname(), g_map->szBackgroundFile);
+    rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic());
     rm->backgroundmusic[0].play(game_values.playnextmusic, false);
 }
 
@@ -2155,74 +2149,74 @@ void GameplayState::handleInput()
                 players[iplayer]->shield.timer = 620;
             } else if (event.key.keysym.sym == SDLK_1) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_IceWandPowerup(&rm->spr_icewandpowerup, players[0]->leftX() + 32, players[0]->topY(), 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_IceWandPowerup(&rm->spr_icewandpowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, 0, 30, 30, 1, 1));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_BobombPowerup(&rm->spr_bobombpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_BobombPowerup(&rm->spr_bobombpowerup, {players[0]->leftX() + 32, players[0]->topY() - 1}, 1, true, 0, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_StarPowerup(&rm->spr_starpowerup, players[0]->leftX() + 32, players[0]->topY(), 4, true, 2, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_StarPowerup(&rm->spr_starpowerup, {players[0]->leftX() + 32, players[0]->topY()}, 4, true, 2, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_2) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_BombPowerup(&rm->spr_bombpowerup, players[0]->leftX() + 32, players[0]->topY(), 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_BombPowerup(&rm->spr_bombpowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, 0, 30, 30, 1, 1));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_PowPowerup(&rm->spr_powpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 8, true, 8, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_PowPowerup(&rm->spr_powpowerup, {players[0]->leftX() + 32, players[0]->topY() - 1}, 8, true, 8, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 1));
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, true, 0, 30, 30, 1, 1, 1));
             } else if (event.key.keysym.sym == SDLK_3) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_PodoboPowerup(&rm->spr_podobopowerup, players[0]->leftX() + 32, players[0]->topY(), 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_PodoboPowerup(&rm->spr_podobopowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, 0, 30, 30, 1, 1));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, {players[0]->leftX() + 32, players[0]->topY() - 1}, 1, true, 0, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 2));
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, true, 0, 30, 30, 1, 1, 2));
             } else if (event.key.keysym.sym == SDLK_4) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_Tanooki(players[0]->leftX() + 32, players[0]->topY()));
+                    objectcontainer[0].add(new PU_Tanooki({players[0]->leftX() + 32, players[0]->topY()}));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(ShellType::Green, players[0]->leftX() + 32, players[0]->topY(), true, true, true, false));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Green, {players[0]->leftX() + 32, players[0]->topY()}, true, true, true, false));
                 else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 3));
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, true, 0, 30, 30, 1, 1, 3));
             } else if (event.key.keysym.sym == SDLK_5) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_PWingsPowerup(&rm->spr_pwingspowerup, players[0]->leftX() + 32, players[0]->topY()));
+                    objectcontainer[0].add(new PU_PWingsPowerup(&rm->spr_pwingspowerup, {players[0]->leftX() + 32, players[0]->topY()}));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(ShellType::Red, players[0]->leftX() + 32, players[0]->topY(), false, true, true, false));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Red, {players[0]->leftX() + 32, players[0]->topY()}, false, true, true, false));
                 else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1, 5));
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, true, 0, 30, 30, 1, 1, 5));
             } else if (event.key.keysym.sym == SDLK_6) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_Spring(&rm->spr_spring, players[0]->leftX() + 32, players[0]->topY(), true));
+                    objectcontainer[1].add(new CO_Spring(&rm->spr_spring, {players[0]->leftX() + 32, players[0]->topY()}, true));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(ShellType::Spiny, players[0]->leftX() + 32, players[0]->topY(), false, false, true, true));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Spiny, {players[0]->leftX() + 32, players[0]->topY()}, false, false, true, true));
                 else
-                    objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_7) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, players[0]->leftX() + 32, players[0]->topY(), (RANDOM_INT(NUM_POWERUPS) + 3) - 3));
+                    objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, {players[0]->leftX() + 32, players[0]->topY()}, (RANDOM_INT(NUM_POWERUPS) + 3) - 3));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(ShellType::Buzzy, players[0]->leftX() + 32, players[0]->topY(), false, true, false, false));
+                    objectcontainer[1].add(new CO_Shell(ShellType::Buzzy, {players[0]->leftX() + 32, players[0]->topY()}, false, true, false, false));
                 else
-                    objectcontainer[0].add(new PU_HammerPowerup(&rm->spr_hammerpowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_HammerPowerup(&rm->spr_hammerpowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_8) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_Spike(&rm->spr_spike, players[0]->leftX() + 32, players[0]->topY()));
+                    objectcontainer[1].add(new CO_Spike(&rm->spr_spike, {players[0]->leftX() + 32, players[0]->topY()}));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_ModPowerup(&rm->spr_modpowerup, players[0]->leftX() + 32, players[0]->topY(), 8, true, 8, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_ModPowerup(&rm->spr_modpowerup, {players[0]->leftX() + 32, players[0]->topY()}, 8, true, 8, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_PoisonPowerup(&rm->spr_poisonpowerup, players[0]->leftX() + 32, players[0]->topY(), 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_PoisonPowerup(&rm->spr_poisonpowerup, {players[0]->leftX() + 32, players[0]->topY()}, 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_9) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, players[0]->leftX() + 32, players[0]->topY(), true));
+                    objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, {players[0]->leftX() + 32, players[0]->topY()}, true));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_FeatherPowerup(&rm->spr_featherpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_FeatherPowerup(&rm->spr_featherpowerup, {players[0]->leftX() + 32, players[0]->topY() - 1}, 1, 0, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_ClockPowerup(&rm->spr_clockpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_ClockPowerup(&rm->spr_clockpowerup, {players[0]->leftX() + 32, players[0]->topY() - 1}, 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_0) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_LeafPowerup(&rm->spr_leafpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_LeafPowerup(&rm->spr_leafpowerup, {players[0]->leftX() + 32, players[0]->topY() - 1}, 1, 0, 30, 30, 1, 1));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, {players[0]->leftX() + 32, players[0]->topY() - 1}, 1, true, 0, 30, 30, 1, 1));
                 else
-                    objectcontainer[0].add(new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, players[0]->leftX() + 32, players[0]->topY() - 1, 1, true, 0, 30, 30, 1, 1));
+                    objectcontainer[0].add(new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, {players[0]->leftX() + 32, players[0]->topY() - 1}, 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_F8) {
                 g_fAutoTest = !g_fAutoTest;
             }
@@ -2388,8 +2382,8 @@ void start_gameplay()
     //secretBoss();
 
     if (game_values.music) {
-        musiclist->SetRandomMusic(g_map->musicCategoryID, "", "");
-        rm->backgroundmusic[0].load(musiclist->GetCurrentMusic());
+        musiclist->setRandomMusic(static_cast<MusicCategory>(g_map->musicCategoryID), "", "");
+        rm->backgroundmusic[0] = sfxMusic(musiclist->currentMusic());
         rm->backgroundmusic[0].play(game_values.playnextmusic, false);
     }
 }
@@ -2416,7 +2410,7 @@ void GameplayState::update_countdown_timer()
 
             short countDownAnnounce = iCountDownAnnounce[28 - iCountDownState];
             if (countDownAnnounce >= 0)
-                ifsoundonandreadyplay(rm->sfx_announcer[countDownAnnounce]);
+                rm->sfx_announcer[countDownAnnounce].play();
         }
     }
 }
@@ -2591,29 +2585,29 @@ bool coldec_player2player(CPlayer * o1, CPlayer * o2)
 bool coldec_player2obj(CPlayer * o1, CObject * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
-    if (o1->rightX() < o2->ix) {
-        return o1->ix + App::screenWidth < o2->ix + o2->collisionWidth && o1->rightX() + App::screenWidth >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o1->bottomY() >= o2->iy;
-    } else if (o2->ix + o2->collisionWidth < o1->ix) {
-        return o1->ix < o2->ix + o2->collisionWidth + App::screenWidth && o1->rightX() >= o2->ix + App::screenWidth && o1->iy < o2->iy + o2->collisionHeight && o1->bottomY() >= o2->iy;
+    if (o1->rightX() < o2->x()) {
+        return o1->ix + App::screenWidth < o2->x() + o2->collisionRectW() && o1->rightX() + App::screenWidth >= o2->x() && o1->iy < o2->y() + o2->collisionRectH() && o1->bottomY() >= o2->y();
+    } else if (o2->x() + o2->collisionRectW() < o1->ix) {
+        return o1->ix < o2->x() + o2->collisionRectW() + App::screenWidth && o1->rightX() >= o2->x() + App::screenWidth && o1->iy < o2->y() + o2->collisionRectH() && o1->bottomY() >= o2->y();
     } else { //Normal case where no overlap
-        return o1->ix < o2->ix + o2->collisionWidth && o1->rightX() >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o2->iy <= o1->bottomY();
+        return o1->ix < o2->x() + o2->collisionRectW() && o1->rightX() >= o2->x() && o1->iy < o2->y() + o2->collisionRectH() && o2->y() <= o1->bottomY();
     }
 }
 
 bool coldec_obj2obj(CObject * o1, CObject * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
-    short o1r = o1->ix + o1->collisionWidth;
-    short o1b = o1->iy + o1->collisionHeight;
-    short o2r = o2->ix + o2->collisionWidth;
-    short o2b = o2->iy + o2->collisionHeight;
+    short o1r = o1->x() + o1->collisionRectW();
+    short o1b = o1->y() + o1->collisionRectH();
+    short o2r = o2->x() + o2->collisionRectW();
+    short o2b = o2->y() + o2->collisionRectH();
 
-    if (o1r < o2->ix) {
-        return o1->ix + App::screenWidth < o2r && o1r + App::screenWidth >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
-    } else if (o2r < o1->ix) {
-        return o1->ix < o2r + App::screenWidth && o1r >= o2->ix + App::screenWidth && o1->iy < o2b && o1b >= o2->iy;
+    if (o1r < o2->x()) {
+        return o1->x() + App::screenWidth < o2r && o1r + App::screenWidth >= o2->x() && o1->y() < o2b && o1b >= o2->y();
+    } else if (o2r < o1->x()) {
+        return o1->x() < o2r + App::screenWidth && o1r >= o2->x() + App::screenWidth && o1->y() < o2b && o1b >= o2->y();
     } else {
-        return o1->ix < o2r && o1r >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
+        return o1->x() < o2r && o1r >= o2->x() && o1->y() < o2b && o1b >= o2->y();
     }
 }
 
@@ -2682,7 +2676,7 @@ bool SwapPlayers(short iUsingPlayerID)
         spots[iPlayer].GetPlayer(player, &game_values.gamepowerups[player->getGlobalID()]);
 
         if (game_values.swapstyle != 1)
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)player->fNewSwapX + (HALFPW) - 16, (short)player->fNewSwapY + (HALFPH) - 16, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, (short)player->fNewSwapX + (HALFPW) - 16, (short)player->fNewSwapY + (HALFPH) - 16, 3, 8);
 
         if (game_values.swapstyle == 2) {
             player->setXf(player->fNewSwapX);

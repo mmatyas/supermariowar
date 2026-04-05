@@ -16,9 +16,6 @@ class FPSLimiter
 
         // disabled constructors
         FPSLimiter();
-        ~FPSLimiter() {}
-        FPSLimiter(FPSLimiter const&);
-        void operator=(FPSLimiter const&);
 };
 
 #endif // FPSLIMITER_H

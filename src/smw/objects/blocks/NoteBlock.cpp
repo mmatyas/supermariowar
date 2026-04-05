@@ -14,8 +14,8 @@ extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, NoteBlockType type, bool fHidden) :
-    IO_Block(nspr, x, y)
+B_NoteBlock::B_NoteBlock(gfxSprite *nspr, Vec2s pos, short iNumSpr, short aniSpeed, NoteBlockType type, bool fHidden) :
+    IO_Block(nspr, pos)
 {
     iw = (short)nspr->getWidth() >> 2;
     ih = TILESIZE;
@@ -36,7 +36,7 @@ void B_NoteBlock::draw()
     if (hidden)
         return;
 
-    spr->draw(ix, iy, drawFrame, iTypeOffsetY, iw, ih);
+    spr->draw(ix, iy, {drawFrame, iTypeOffsetY, iw, ih});
 }
 
 void B_NoteBlock::update()

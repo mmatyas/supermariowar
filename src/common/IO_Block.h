@@ -6,7 +6,7 @@
 class IO_Block : public CObject
 {
 	public:
-		IO_Block(gfxSprite *nspr, short x, short y);
+		IO_Block(gfxSprite* nspr, Vec2s pos);
 
 		virtual void draw();
 		virtual void update();

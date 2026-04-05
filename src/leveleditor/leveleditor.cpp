@@ -32,6 +32,7 @@
 #include "movingplatform.h"
 #include "path.h"
 #include "FileIO.h"
+#include "FileList.h"
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"
@@ -52,14 +53,6 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 
 #include "SDL.h"
 #include "SDL_image.h"
-#include "sdl12wrapper.h"
-
-#ifdef PNG_SAVE_FORMAT
-	// this function was added to SDL2
-	#ifndef USE_SDL2
-	    #include "savepng.h"
-	#endif
-#endif
 
 #include <algorithm>
 #include <array>
@@ -102,6 +95,7 @@ enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_B
 
 #define MAX_PLATFORMS 32
 #define MAX_PLATFORM_VELOCITY 16
+#define NUMTILETYPES 19
 constexpr int UI_PLATFORM_ROWS = 4;
 constexpr int UI_PLATFORM_COLS = 8;
 
@@ -120,7 +114,7 @@ SDL_Surface		*screen;
 SDL_Surface		*blitdest;
 SDL_Event		event;
 
-TileType		set_type = tile_solid;
+TileType		set_type = TileType::Solid;
 int				set_tile_rows = 0;
 int				set_tile_cols = 0;
 int				set_tile_tileset = 0;
@@ -137,7 +131,7 @@ int				view_animated_tileset_x = 0;
 
 int				set_block = 0;
 int				set_block_switch_on = 0;
-TileType		set_tiletype = tile_nonsolid;
+TileType		set_tiletype = TileType::NonSolid;
 int				set_mapitem = 0;
 
 int				set_direction = 0;
@@ -172,21 +166,17 @@ short			y_shake = 0;
 
 int				mouse_x, mouse_y;
 
-void update_mouse_coords() {
-	mouse_x = event.motion.x;
-	mouse_y = event.motion.y;
-	if (mouse_x < 0) mouse_x = 0;
-	if (mouse_y < 0) mouse_y = 0;
-	if (mouse_x > 640 - 1) mouse_x = 640 - 1;
-	if (mouse_y > 480 - 1) mouse_y = 480 - 1;
-}
-
 int bound_to_window_w(int x) {
-	return std::max(0, std::min(x, 640));
+	return std::max(0, std::min(x, 640 - 1));
 }
 
 int bound_to_window_h(int y) {
-	return std::max(0, std::min(y, 480));
+	return std::max(0, std::min(y, 480 - 1));
+}
+
+void bound_mouse_motion_coords() {
+    mouse_x = bound_to_window_w(event.motion.x);
+    mouse_y = bound_to_window_h(event.motion.y);
 }
 
 CEyecandyContainer eyecandy[3];
@@ -204,63 +194,45 @@ IO_MovingObject* createpowerup(short iType, short ix, short iy, bool side, bool 
 class MapPlatform
 {
 	public:
-    MapPlatform() {
-			tiles = new TilesetTile*[MAPWIDTH];
-
-			for (short i = 0; i < MAPWIDTH; i++)
-				tiles[i] = new TilesetTile[MAPHEIGHT];
-
-			preview = NULL;
-		}
-
-    ~MapPlatform() {
-			for (short i = 0; i < MAPWIDTH; i++)
-				delete [] tiles[i];
-
-			delete [] tiles;
-
-			if (preview)
-				SDL_FreeSurface(preview);
-		}
+    MapPlatform()
+        : tiles(MAPWIDTH * MAPHEIGHT)
+        , types(MAPWIDTH * MAPHEIGHT)
+    {}
 
     void UpdatePreview() {
         if (!preview) {
-				preview = SDL_CreateRGBSurface(screen->flags, 160, 120, screen->format->BitsPerPixel, 0, 0, 0, 0);
-#ifdef USE_SDL2
-				SDL_SetColorKey(preview, SDL_TRUE, SDL_MapRGB(preview->format, 255, 0, 255));
-#else
-				SDL_SetColorKey(preview, SDL_SRCCOLORKEY, SDL_MapRGB(preview->format, 255, 0, 255));
-#endif
-			}
+            preview = gfxSprite::blank(160, 120);
+            SDL_SetColorKey(preview.getSurface(), SDL_TRUE, SDL_MapRGB(preview.getSurface()->format, 255, 0, 255));
+        }
 
-			SDL_FillRect(preview, NULL, SDL_MapRGB(preview->format, 255, 0, 255));
+        SDL_FillRect(preview.getSurface(), NULL, SDL_MapRGB(preview.getSurface()->format, 255, 0, 255));
 
         for (short iPlatformX = 0; iPlatformX < MAPWIDTH; iPlatformX++) {
             for (short iPlatformY = 0; iPlatformY < MAPHEIGHT; iPlatformY++) {
-					TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
+                TilesetTile * tile = &tiles[iPlatformX * MAPHEIGHT + iPlatformY];
 
-					SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
+                SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
                 if (tile->iID >= 0) {
-                                            SDL_BlitSurface(g_tilesetmanager->tileset(tile->iID)->surface(2), g_tilesetmanager->rect(2, tile->iCol, tile->iRow), preview, &bltrect);
+                    g_tilesetmanager->tileset(tile->iID)->draw(DrawSize::Thumbnail, CTilesetManager::rect(DrawSize::Thumbnail, tile->iCol, tile->iRow), preview.getSurface(), bltrect);
                 } else if (tile->iID == TILESETANIMATED) {
-                    SDL_BlitSurface(rm->spr_tileanimation[2].getSurface(), g_tilesetmanager->rect(2, tile->iCol * 4, tile->iRow), preview, &bltrect);
+                    rm->spr_tileanimation[2].draw(CTilesetManager::rect(DrawSize::Thumbnail, tile->iCol * 4, tile->iRow), preview.getSurface(), bltrect);
                 } else if (tile->iID == TILESETUNKNOWN) {
-						//Draw unknown tile
-                    SDL_BlitSurface(rm->spr_unknowntile[2].getSurface(), g_tilesetmanager->rect(2, 0, 0), preview, &bltrect);
-					}
-				}
-			}
-		}
+                    //Draw unknown tile
+                    rm->spr_unknowntile[2].draw(CTilesetManager::rect(DrawSize::Thumbnail, 0, 0), preview.getSurface(), bltrect);
+                }
+            }
+        }
+    }
 
-		TilesetTile ** tiles;
-		TileType types[MAPWIDTH][MAPHEIGHT];
+    std::vector<TilesetTile> tiles;
+    std::vector<TileType> types;
 		short iVelocity;
 		short iStartX;
 		short iStartY;
 		short iEndX;
 		short iEndY;
 
-		short iPathType;
+		PlatformPathType iPathType;
 
 		float fAngle;
 		float fRadiusX;
@@ -269,26 +241,20 @@ class MapPlatform
 		short iDrawLayer;
 
 		SDL_Rect rIcon[2];
-		SDL_Surface * preview;
+		gfxSprite preview;
 };
 
 TileType * animatedtiletypes;
 bool ReadAnimatedTileTypeFile(const char * szFile);
 bool WriteAnimatedTileTypeFile(const char * szFile);
 
-#if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
 bool CheckKey(const Uint8 * keystate, SDL_Keycode key) {
-	return keystate[SDL_GetScancodeFromKey(key)];
+    return keystate[SDL_GetScancodeFromKey(key)];
 }
-#else
-bool CheckKey(Uint8 * keystate, SDLKey key) {
-	return keystate[key];
-}
-#endif
 
-SDL_Surface * s_platform;
-SDL_Surface * s_platformpathbuttons;
-SDL_Surface * s_maphazardbuttons;
+gfxSprite s_platform;
+gfxSprite s_platformpathbuttons;
+gfxSprite s_maphazardbuttons;
 
 int save_as();
 int find();
@@ -311,7 +277,7 @@ int newmap();
 void save_map(const std::string &file);
 void insert_platforms_into_map();
 void CalculatePlatformDims(short iPlatform, short * ix, short * iy, short * iw, short * ih);
-void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage);
+void LoadBackgroundPage(std::array<gfxSprite, 16>& sBackgrounds, short iPage);
 
 int editor_edit();
 int editor_warp();
@@ -364,12 +330,6 @@ std::string g_szMessageTitle = "";
 std::string g_szMessageLine[3];
 void DrawMessage();
 
-void CopyTilesetTile(TilesetTile * to, TilesetTile * from)
-{
-	to->iID = from->iID;
-	to->iCol = from->iCol;
-	to->iRow = from->iRow;
-}
 
 void SetTilesetTile(TilesetTile * tile, short iTileset, short iCol, short iRow)
 {
@@ -384,7 +344,7 @@ void ClearTilesetTile(TilesetTile * tile)
 }
 
 short NewMapHazard();
-void DrawMapHazardControls(MapHazard * hazard);
+void DrawMapHazardControls(const MapHazard& hazard);
 void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY);
 
 void SetNoSpawn(short nospawnmode, short col, short row, bool value);
@@ -417,13 +377,6 @@ int main(int argc, char *argv[])
 
 	ensureSettingsDir();
 
-	rm = new CResourceManager();
-	g_map = new CMap();
-	g_tilesetmanager = new CTilesetManager();
-	filterslist = new FiltersList();
-	maplist = new MapList(false);
-    backgroundlist = new BackgroundList();
-
     /* This must occur before any data files are loaded */
     Initialize_Paths();
 
@@ -436,7 +389,7 @@ int main(int argc, char *argv[])
 
     {
         const std::string options_path(GetHomeDirectory() + "leveleditor.bin");
-        BinaryFile editor_settings(options_path.c_str(), "rb");
+        BinaryFile editor_settings(options_path, "rb");
         if (editor_settings.is_open()) {
             g_fFullScreen = editor_settings.read_bool();
             editor_settings.read_string_long(findstring, FILEBUFSIZE);
@@ -445,7 +398,13 @@ int main(int argc, char *argv[])
 
 	gfx_init(640,480, g_fFullScreen);
 	blitdest = screen;
-        g_tilesetmanager->init(convertPath("gfx/Classic/tilesets").c_str());
+
+        rm = new CResourceManager();
+        g_tilesetmanager = new CTilesetManager(convertPath("gfx/Classic/tilesets"));
+        g_map = new CMap();
+        filterslist = new FiltersList();
+        maplist = new MapList(false);
+        backgroundlist = new BackgroundList();
 
 	//Add all of the maps that are world only so we can edit them
 	maplist->addWorldMaps();
@@ -455,114 +414,87 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- loading graphics ----------------\n");
 
-	rm->spr_tiletypes.init(convertPath("gfx/leveleditor/leveleditor_tile_types.png"));
-	rm->spr_transparenttiles.init(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png"), colors::MAGENTA, 160);
+	rm->spr_tiletypes = ImageLoader(convertPath("gfx/leveleditor/leveleditor_tile_types.png")).withoutColorKey().create();
+	rm->spr_transparenttiles = ImageLoader(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png")).withAlpha(160).create();
 
-	rm->spr_backgroundlevel.init(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), colors::MAGENTA);
-	rm->spr_tilesetlevel.init(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png"), colors::MAGENTA);
+	rm->spr_backgroundlevel = ImageLoader(convertPath("gfx/leveleditor/leveleditor_background_levels.png")).create();
+	rm->spr_tilesetlevel = ImageLoader(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png")).create();
 
-        rm->spr_eyecandy.init(convertPath("gfx/leveleditor/leveleditor_eyecandy.png"), colors::MAGENTA);
+        rm->spr_eyecandy = ImageLoader(convertPath("gfx/leveleditor/leveleditor_eyecandy.png")).create();
 
-        s_platform = IMG_Load(convertPath("gfx/leveleditor/leveleditor_platform.png").c_str());
-        s_platformpathbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_pathtype_buttons.png").c_str());
-        s_maphazardbuttons = IMG_Load(convertPath("gfx/leveleditor/leveleditor_maphazard_buttons.png").c_str());
+        s_platform = ImageLoader(convertPath("gfx/leveleditor/leveleditor_platform.png")).create();
+        s_platformpathbuttons = ImageLoader(convertPath("gfx/leveleditor/leveleditor_pathtype_buttons.png")).create();
+        s_maphazardbuttons = ImageLoader(convertPath("gfx/leveleditor/leveleditor_maphazard_buttons.png")).create();
 
-	rm->spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), colors::MAGENTA);
-	rm->spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), colors::MAGENTA);
-	rm->spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), colors::MAGENTA);
+	rm->spr_warps[0] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_warp.png")).create();
+	rm->spr_warps[1] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_warp_preview.png")).create();
+	rm->spr_warps[2] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png")).create();
 
-	rm->spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), colors::MAGENTA, 128);
+	rm->spr_platformpath = ImageLoader(convertPath("gfx/leveleditor/leveleditor_platform_path.png")).withAlpha(128).create();
 
-	rm->spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 128);
-	rm->spr_nospawntile.init(convertPath("gfx/leveleditor/leveleditor_nospawntile.png"), colors::BLACK, 128);
-	rm->spr_noitemspawntile.init(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png"), colors::BLACK, 128);
-	rm->spr_platformstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), colors::BLACK, 64);
-	rm->spr_platformendtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), colors::BLACK, 64);
-	rm->spr_platformstarttile.SetWrap(true);
-	rm->spr_platformendtile.SetWrap(true);
+	rm->spr_selectedtile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_selectedtile.png")).withColorKey(colors::BLACK).withAlpha(128).create();
+	rm->spr_nospawntile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_nospawntile.png")).withColorKey(colors::BLACK).withAlpha(128).create();
+	rm->spr_noitemspawntile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png")).withColorKey(colors::BLACK).withAlpha(128).create();
+	rm->spr_platformstarttile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png")).withColorKey(colors::BLACK).withAlpha(64).withWrapping().create();
+	rm->spr_platformendtile = ImageLoader(convertPath("gfx/leveleditor/leveleditor_selectedtile.png")).withColorKey(colors::BLACK).withAlpha(64).withWrapping().create();
 
-	rm->spr_mapitems[0].init(convertPath("gfx/leveleditor/leveleditor_mapitems.png"), colors::MAGENTA);
-	rm->spr_mapitems[1].init(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png"), colors::MAGENTA);
-	rm->spr_mapitems[2].init(convertPath("gfx/leveleditor/leveleditor_mapitems_thumbnail.png"), colors::MAGENTA);
+	rm->spr_mapitems[0] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_mapitems.png")).create();
+	rm->spr_mapitems[1] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png")).create();
+	rm->spr_mapitems[2] = ImageLoader(convertPath("gfx/leveleditor/leveleditor_mapitems_thumbnail.png")).create();
 
-	rm->spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), colors::MAGENTA, 255);
-	rm->menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), colors::MAGENTA, 128);
+	rm->spr_dialog = ImageLoader(convertPath("gfx/leveleditor/leveleditor_dialog.png")).withAlpha(255).create();
+	rm->menu_shade = ImageLoader(convertPath("gfx/leveleditor/leveleditor_shade.png")).withAlpha(128).create();
 
-	rm->spr_tileanimation[0].init(convertPath("gfx/packs/Classic/tilesets/tile_animation.png"), colors::MAGENTA);
-	rm->spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), colors::MAGENTA);
-	rm->spr_tileanimation[2].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), colors::MAGENTA);
+	rm->spr_tileanimation[0] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/tile_animation.png")).create();
+	rm->spr_tileanimation[1] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png")).create();
+	rm->spr_tileanimation[2] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png")).create();
 
-	rm->spr_blocks[0].init(convertPath("gfx/packs/Classic/tilesets/blocks.png"), colors::MAGENTA);
-	rm->spr_blocks[1].init(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), colors::MAGENTA);
-	rm->spr_blocks[2].init(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), colors::MAGENTA);
+	rm->spr_blocks[0] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/blocks.png")).create();
+	rm->spr_blocks[1] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png")).create();
+	rm->spr_blocks[2] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png")).create();
 
-	rm->spr_unknowntile[0].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile.png"), colors::MAGENTA);
-	rm->spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), colors::MAGENTA);
-	rm->spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), colors::MAGENTA);
+	rm->spr_unknowntile[0] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/unknown_tile.png")).create();
+	rm->spr_unknowntile[1] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png")).create();
+	rm->spr_unknowntile[2] = ImageLoader(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png")).create();
 
-	rm->spr_powerups.init(convertPath("gfx/packs/Classic/powerups/large.png"), colors::MAGENTA);
-	rm->spr_powerupselector.init(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), colors::MAGENTA, 128);
-	rm->spr_hidden_marker.init(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png"), colors::MAGENTA);
+	rm->spr_powerups = ImageLoader(convertPath("gfx/packs/Classic/powerups/large.png")).create();
+	rm->spr_powerupselector = ImageLoader(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png")).withAlpha(128).create();
+	rm->spr_hidden_marker = ImageLoader(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png")).create();
 
-	rm->spr_flagbases.init(convertPath("gfx/packs/Classic/modeobjects/flagbases.png"), colors::MAGENTA);
-	rm->spr_racegoals.init(convertPath("gfx/packs/Classic/modeobjects/racegoal.png"), colors::MAGENTA);
+	rm->spr_flagbases = ImageLoader(convertPath("gfx/packs/Classic/modeobjects/flagbases.png")).create();
+	rm->spr_racegoals = ImageLoader(convertPath("gfx/packs/Classic/modeobjects/racegoal.png")).create();
 
-	rm->spr_hazard_fireball[0].init(convertPath("gfx/packs/Classic/hazards/fireball.png"), colors::MAGENTA);
-	rm->spr_hazard_fireball[1].init(convertPath("gfx/packs/Classic/hazards/fireball_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_fireball[2].init(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_fireball[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/fireball.png")).create();
+	rm->spr_hazard_fireball[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/fireball_preview.png")).create();
+	rm->spr_hazard_fireball[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png")).create();
 
-	rm->spr_hazard_rotodisc[0].init(convertPath("gfx/packs/Classic/hazards/rotodisc.png"), colors::MAGENTA);
-	rm->spr_hazard_rotodisc[1].init(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_rotodisc[2].init(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_rotodisc[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/rotodisc.png")).create();
+	rm->spr_hazard_rotodisc[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png")).create();
+	rm->spr_hazard_rotodisc[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png")).create();
 
-	rm->spr_hazard_bulletbill[0].init(convertPath("gfx/packs/Classic/hazards/bulletbill.png"), colors::MAGENTA);
-	rm->spr_hazard_bulletbill[1].init(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_bulletbill[2].init(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_bulletbill[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/bulletbill.png")).create();
+	rm->spr_hazard_bulletbill[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png")).create();
+	rm->spr_hazard_bulletbill[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png")).create();
 
-	rm->spr_hazard_flame[0].init(convertPath("gfx/packs/Classic/hazards/flame.png"), colors::MAGENTA);
-	rm->spr_hazard_flame[1].init(convertPath("gfx/packs/Classic/hazards/flame_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_flame[2].init(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_flame[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/flame.png")).create();
+	rm->spr_hazard_flame[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/flame_preview.png")).create();
+	rm->spr_hazard_flame[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png")).create();
 
-	rm->spr_hazard_pirhanaplant[0].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant.png"), colors::MAGENTA);
-	rm->spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), colors::MAGENTA);
-	rm->spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), colors::MAGENTA);
+	rm->spr_hazard_pirhanaplant[0] = ImageLoader(convertPath("gfx/packs/Classic/hazards/pirhanaplant.png")).create();
+	rm->spr_hazard_pirhanaplant[1] = ImageLoader(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png")).create();
+	rm->spr_hazard_pirhanaplant[2] = ImageLoader(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png")).create();
 
-	rm->spr_number_icons.init(convertPath("gfx/packs/Classic/awards/killsinrownumbers.png"), colors::MAGENTA);
+	rm->spr_number_icons = ImageLoader(convertPath("gfx/packs/Classic/awards/killsinrownumbers.png")).create();
 
     for (short i = 0; i < 3; i++) {
-		rm->spr_hazard_fireball[i].SetWrap(true, 640 >> i);
-		rm->spr_hazard_rotodisc[i].SetWrap(true, 640 >> i);
-		rm->spr_hazard_flame[i].SetWrap(true, 640 >> i);
-		rm->spr_hazard_pirhanaplant[i].SetWrap(true, 640 >> i);
-	}
-#ifdef USE_SDL2
-    if ( SDL_SetColorKey(s_platform, SDL_TRUE, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
+		rm->spr_hazard_fireball[i].setWrap(640 >> i);
+		rm->spr_hazard_rotodisc[i].setWrap(640 >> i);
+		rm->spr_hazard_flame[i].setWrap(640 >> i);
+		rm->spr_hazard_pirhanaplant[i].setWrap(640 >> i);
 	}
 
-    if ( SDL_SetColorKey(s_platformpathbuttons, SDL_TRUE, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-
-    if ( SDL_SetColorKey(s_maphazardbuttons, SDL_TRUE, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-#else
-    if ( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-
-    if ( SDL_SetColorKey(s_platformpathbuttons, SDL_SRCCOLORKEY, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-
-    if ( SDL_SetColorKey(s_maphazardbuttons, SDL_SRCCOLORKEY, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0) {
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-#endif
-
-	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
-	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
+	rm->menu_font_small = gfxFont(convertPath("gfx/packs/Classic/fonts/font_small.png"));
+	rm->menu_font_large = gfxFont(convertPath("gfx/packs/Classic/fonts/font_large.png"));
 
 	printf("\n---------------- load map ----------------\n");
 
@@ -582,8 +514,8 @@ int main(int argc, char *argv[])
 
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
             for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-				ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
-				g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
+				ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
+				g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = TileType::NonSolid;
 			}
 		}
 
@@ -714,7 +646,7 @@ void gameloop_frame()
 	save_map(convertPath("maps/ZZleveleditor.map"));
 
     const std::string options_path(GetHomeDirectory() + "leveleditor.bin");
-    BinaryFile editor_settings(options_path.c_str(), "wb");
+    BinaryFile editor_settings(options_path, "wb");
     if (editor_settings.is_open()) {
         editor_settings.write_bool(g_fFullScreen);
         editor_settings.write_string_long(maplist->currentFilename());
@@ -730,17 +662,17 @@ void gameloop_frame()
 
 TileType CalculateTileType(short x, short y)
 {
-	TileType type = tile_nonsolid;
+	TileType type = TileType::NonSolid;
     for (short k = MAPLAYERS - 1; k >= 0; k--) {
 		TilesetTile * tile = &g_map->mapdata[x][y][k];
 
-		TileType iTileType = tile_nonsolid;
+		TileType iTileType = TileType::NonSolid;
 		if (tile->iID >= 0)
                     iTileType = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
 		else if (tile->iID == TILESETANIMATED)
 			iTileType = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
 
-        if (iTileType != tile_nonsolid) {
+        if (iTileType != TileType::NonSolid) {
 			type = iTileType;
 			break;
 		}
@@ -751,51 +683,42 @@ TileType CalculateTileType(short x, short y)
 
 void UpdateTileType(short x, short y)
 {
-	g_map->mapdatatop[x][y].iType = CalculateTileType(x, y);
+	g_map->mapdatatop[x][y] = CalculateTileType(x, y);
 }
 
 bool TileTypeIsModified(short x, short y)
 {
-	return g_map->mapdatatop[x][y].iType != CalculateTileType(x, y);
+	return g_map->mapdatatop[x][y] != CalculateTileType(x, y);
 }
 
-void AdjustMapItems(short iClickX, short iClickY)
+void AdjustMapItems(short x, short y)
 {
-    for (short j = 0; j < g_map->iNumMapItems; j++) {
-        if (g_map->mapitems[j].ix == iClickX && g_map->mapitems[j].iy == iClickY) {
-			if ((g_map->mapdatatop[iClickX][iClickY].iType != tile_nonsolid &&
-				g_map->mapdatatop[iClickX][iClickY].iType != tile_solid_on_top &&
-				g_map->mapdatatop[iClickX][iClickY].iType != tile_ice_on_top) ||
-                    g_map->objectdata[iClickX][iClickY].iType != -1) {
-				g_map->iNumMapItems--;
+    constexpr std::array<TileType, 3> IGNORED_TILES {
+        TileType::NonSolid,
+        TileType::SolidOnTop,
+        TileType::IceOnTop,
+    };
 
-                for (short k = j; k < g_map->iNumMapItems - 1; k++) {
-					g_map->mapitems[k].itype = g_map->mapitems[k + 1].itype;
-					g_map->mapitems[k].ix = g_map->mapitems[k + 1].ix;
-					g_map->mapitems[k].iy = g_map->mapitems[k + 1].iy;
-				}
-			}
+    const auto pred = [x, y](const MapItem& item){ return item.ix == x && item.iy == y; };
+    const auto it = std::find_if(g_map->mapitems.begin(), g_map->mapitems.end(), pred);
+    if (it != g_map->mapitems.end()) {
+        const TileType tiletype = g_map->mapdatatop[x][y];
+        const short objtype = g_map->objectdata[x][y].iType;
 
-			break;
-		}
-	}
+        const bool tiletypeValid = std::find(IGNORED_TILES.cbegin(), IGNORED_TILES.cend(), tiletype) == IGNORED_TILES.cend();
+        const bool objtypeValid = objtype != -1;
+        if (tiletypeValid || objtypeValid) {
+            g_map->mapitems.erase(it);
+        }
+    }
 }
 
+/// Removes map items located at the XY position.
 void RemoveMapItemAt(short x, short y)
 {
-    for (short j = 0; j < g_map->iNumMapItems; j++) {
-        if (g_map->mapitems[j].ix == x && g_map->mapitems[j].iy == y) {
-			g_map->iNumMapItems--;
-
-            for (short k = j; k < g_map->iNumMapItems; k++) {
-				g_map->mapitems[k].itype = g_map->mapitems[k + 1].itype;
-				g_map->mapitems[k].ix = g_map->mapitems[k + 1].ix;
-				g_map->mapitems[k].iy = g_map->mapitems[k + 1].iy;
-			}
-
-			break;
-		}
-	}
+    const auto pred = [x, y](const MapItem& item){ return item.ix == x && item.iy == y; };
+    const auto it = std::remove_if(g_map->mapitems.begin(), g_map->mapitems.end(), pred);
+    g_map->mapitems.erase(it, g_map->mapitems.end());
 }
 
 bool fExiting = false;
@@ -867,11 +790,7 @@ int editor_edit()
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
                     case SDL_KEYDOWN: {
-#ifdef USE_SDL2
-                        SDL_Keycode key = event.key.keysym.sym;
-#else
-                        SDLKey key = event.key.keysym.sym;
-#endif
+                        const SDL_Keycode key = event.key.keysym.sym;
 
                         if (key == SDLK_LEFT) {
                             fSelectedYes = true;
@@ -894,22 +813,14 @@ int editor_edit()
         } else {
 			//handle messages
             while (SDL_PollEvent(&event)) {
-            #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                 const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-            #else
-                Uint8 * keystate = SDL_GetKeyState(NULL);
-            #endif
 
                 switch (event.type) {
                 case SDL_QUIT:
 					return EDITOR_QUIT;
 
                 case SDL_KEYDOWN: {
-#ifdef USE_SDL2
-                    SDL_Keycode key = event.key.keysym.sym;
-#else
-                    SDLKey key = event.key.keysym.sym;
-#endif
+                    const SDL_Keycode key = event.key.keysym.sym;
 
                     if (key == SDLK_ESCAPE) {
 							if (g_musiccategorydisplaytimer > 0)
@@ -1001,13 +912,13 @@ int editor_edit()
                     if (key == SDLK_g) {
                         backgroundlist->next();
 
-                        rm->spr_background.init(backgroundlist->currentPath());
-                        strcpy(g_map->szBackgroundFile, getFilenameFromPath(backgroundlist->currentPath()).c_str());
+                        rm->spr_background = ImageLoader(backgroundlist->currentPath()).withoutColorKey().create();
+                        g_map->szBackgroundFile = backgroundlist->currentPath().filename().string();
 
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
 								//Set music to background default
                             for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
-                                if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile, strlen(g_szMusicCategoryNames[iCategory]))) {
+                                if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile.c_str(), strlen(g_szMusicCategoryNames[iCategory]))) {
 										g_map->musicCategoryID = iCategory;
 										break;
 									}
@@ -1047,7 +958,7 @@ int editor_edit()
                         } else if (edit_mode == 6) {
 								for (short iRow = 0; iRow < MAPHEIGHT; iRow++)
 									for (short iCol = 0; iCol < MAPWIDTH; iCol++)
-										g_map->mapdatatop[iCol][iRow].iType = tile_nonsolid;
+										g_map->mapdatatop[iCol][iRow] = TileType::NonSolid;
 							}
 						}
 
@@ -1087,7 +998,7 @@ int editor_edit()
                     if (key == SDLK_PAGEUP) {
                         do {
 								maplist->prev(false);
-                        } while (!maplist->GetValid());
+                        } while (!maplist->isValid());
 
 							loadcurrentmap();
 						}
@@ -1095,7 +1006,7 @@ int editor_edit()
                     if (key == SDLK_PAGEDOWN) {
                         do {
 								maplist->next(false);
-                        } while (!maplist->GetValid());
+                        } while (!maplist->isValid());
 
 							loadcurrentmap();
 
@@ -1293,32 +1204,30 @@ int editor_edit()
                         } else if (edit_mode == 5) { // no item spawn areas
 								g_map->nospawn[5][iClickX][iClickY] = true;
                         } else if (edit_mode == 6) { //tile types
-								g_map->mapdatatop[iClickX][iClickY].iType = set_tiletype;
+								g_map->mapdatatop[iClickX][iClickY] = set_tiletype;
 								AdjustMapItems(iClickX, iClickY);
                         } else if (edit_mode == 7) { //map items
-                            if (g_map->iNumMapItems < MAXMAPITEMS) {
-									bool fTileNotAvailable = false;
-                                for (short j = 0; j < g_map->iNumMapItems; j++) {
-                                    if (g_map->mapitems[j].ix == iClickX && g_map->mapitems[j].iy == iClickY) {
-											fTileNotAvailable = true;
-											break;
-										}
-									}
-
-									if (g_map->mapdatatop[iClickX][iClickY].iType != tile_nonsolid &&
-										g_map->mapdatatop[iClickX][iClickY].iType != tile_solid_on_top &&
-										g_map->mapdatatop[iClickX][iClickY].iType != tile_ice_on_top)
-										fTileNotAvailable = true;
-
+                            if (g_map->mapitems.size() < MAXMAPITEMS) {
+                                bool fTileNotAvailable = false;
+                                for (const MapItem& item : g_map->mapitems) {
+                                    if (item.ix == iClickX && item.iy == iClickY) {
+                                        fTileNotAvailable = true;
+                                        break;
+                                    }
+                                }
+                                if (g_map->mapdatatop[iClickX][iClickY] != TileType::NonSolid &&
+                                    g_map->mapdatatop[iClickX][iClickY] != TileType::SolidOnTop &&
+                                    g_map->mapdatatop[iClickX][iClickY] != TileType::IceOnTop) {
+                                    fTileNotAvailable = true;
+                                }
                                 if (!fTileNotAvailable) {
-										MapItem * mapitem = &g_map->mapitems[g_map->iNumMapItems];
-										mapitem->itype = set_mapitem;
-										mapitem->ix = iClickX;
-										mapitem->iy = iClickY;
-
-										g_map->iNumMapItems++;
-									}
-								}
+                                    MapItem mapitem = {};
+                                    mapitem.itype = static_cast<MapItemType>(set_mapitem);
+                                    mapitem.ix = iClickX;
+                                    mapitem.iy = iClickY;
+                                    g_map->mapitems.emplace_back(std::move(mapitem));
+                                }
+                            }
                         } else if (edit_mode == 8) { //animated tiles
                             for (short i = 0; i < set_tile_cols; i++) {
 									short iLocalX = iClickX + i;
@@ -1366,7 +1275,7 @@ int editor_edit()
                         } else if (edit_mode == 5) {
 								g_map->nospawn[5][iClickX][iClickY] = false;
                         } else if (edit_mode == 6) {
-								g_map->mapdatatop[iClickX][iClickY].iType = tile_nonsolid;
+								g_map->mapdatatop[iClickX][iClickY] = TileType::NonSolid;
                         } else if (edit_mode == 7) {
 								RemoveMapItemAt(iClickX, iClickY);
 							}
@@ -1376,7 +1285,7 @@ int editor_edit()
 					}
 
                 case SDL_MOUSEMOTION: {
-						update_mouse_coords();
+						bound_mouse_motion_coords();
 						short iClickX = bound_to_window_w(event.motion.x) / TILESIZE;
 						short iClickY = bound_to_window_h(event.motion.y) / TILESIZE;
 
@@ -1424,7 +1333,7 @@ int editor_edit()
                         } else if (edit_mode == 5) {
 								g_map->nospawn[5][iClickX][iClickY] = true;
                         } else if (edit_mode == 6) {
-								g_map->mapdatatop[iClickX][iClickY].iType = set_tiletype;
+								g_map->mapdatatop[iClickX][iClickY] = set_tiletype;
 								AdjustMapItems(iClickX, iClickY);
                         } else if (edit_mode == 8) {
                             for (short i = 0; i < set_tile_cols; i++) {
@@ -1463,7 +1372,7 @@ int editor_edit()
                         } else if (edit_mode == 5) {
 								g_map->nospawn[5][iClickX][iClickY] = false;
                         } else if (edit_mode == 6) {
-								g_map->mapdatatop[iClickX][iClickY].iType = tile_nonsolid;
+								g_map->mapdatatop[iClickX][iClickY] = TileType::NonSolid;
 							}
 						}
 
@@ -1520,7 +1429,7 @@ int editor_edit()
 
 		}
 
-        if (maplist->GetValid()) {
+        if (maplist->isValid()) {
 			drawmap(false, TILESIZE);
         } else {
 			SDL_FillRect(screen, NULL, 0x0);
@@ -1529,13 +1438,13 @@ int editor_edit()
 
 		//Ask if you are sure you want to exit
         if (fExiting) {
-			rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+			rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 			rm->menu_font_large.drawCentered(320, 195, "Exit");
 			rm->menu_font_large.drawCentered(320, 220, "Are You Sure?");
 			rm->menu_font_large.drawCentered(282, 254, "Yes");
 			rm->menu_font_large.drawCentered(356, 254, "No");
 
-			rm->spr_dialog.draw(fSelectedYes ? 250 : 326, 250, 192, 0, 64, 32);
+			rm->spr_dialog.draw(fSelectedYes ? 250 : 326, 250, {192, 0, 64, 32});
         } else {
             if (edit_mode == 0) {
 				rm->menu_font_small.draw(0,0, "Block Mode");
@@ -1562,9 +1471,9 @@ int editor_edit()
 				rm->menu_font_small.draw(0,0, modestring);
 
 				if (view_only_layer)
-					rm->spr_backgroundlevel.draw(2, 18 + (3 - selected_layer) * 18, selected_layer * 16, (3 - selected_layer) * 18, 16, 16);
+					rm->spr_backgroundlevel.draw(2, 18 + (3 - selected_layer) * 18, {selected_layer * 16, (3 - selected_layer) * 18, 16, 16});
 				else
-					rm->spr_backgroundlevel.draw(2, 18, selected_layer * 16, 0, 16, 70);
+					rm->spr_backgroundlevel.draw(2, 18, {selected_layer * 16, 0, 16, 70});
             } else if (edit_mode == 2) {
 				rm->menu_font_small.draw(0,0, "Warp Mode");
             } else if (edit_mode == 3) {
@@ -1596,18 +1505,18 @@ int editor_edit()
 					rm->menu_font_small.draw(0,0, "Move Mode - Merge");
 
 				if (view_only_layer)
-					rm->spr_backgroundlevel.draw(2, 18 + (3 - selected_layer) * 18, selected_layer * 16, (3 - selected_layer) * 18, 16, 16);
+					rm->spr_backgroundlevel.draw(2, 18 + (3 - selected_layer) * 18, {selected_layer * 16, (3 - selected_layer) * 18, 16, 16});
 				else
-					rm->spr_backgroundlevel.draw(2, 18, selected_layer * 16, 0, 16, 70);
+					rm->spr_backgroundlevel.draw(2, 18, {selected_layer * 16, 0, 16, 70});
             } else if (edit_mode == 4) {
                 for (int k = 0; k < MAPHEIGHT; k++) {
                     for (int j = 0; j < MAPWIDTH; j++) {
 						if (g_map->nospawn[nospawn_mode][j][k])
-							rm->spr_nospawntile.draw(j * TILESIZE, k * TILESIZE, nospawn_mode * 32, 0, 32, 32);
+							rm->spr_nospawntile.draw(j * TILESIZE, k * TILESIZE, {nospawn_mode * 32, 0, 32, 32});
 
                         if (nospawn_mode > 0) {
 							if (g_map->nospawn[0][j][k])
-								rm->spr_nospawntile.draw(j * TILESIZE, k * TILESIZE, 0, 0, 32, 32);
+								rm->spr_nospawntile.draw(j * TILESIZE, k * TILESIZE, {0, 0, 32, 32});
 						}
 					}
 				}
@@ -1626,8 +1535,8 @@ int editor_edit()
             } else if (edit_mode == 6) {
                 for (int k = 0; k < MAPHEIGHT; k++) {
                     for (int j = 0; j < MAPWIDTH; j++) {
-						if (g_map->mapdatatop[j][k].iType != tile_nonsolid)
-							rm->spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, (g_map->mapdatatop[j][k].iType - 1) * TILESIZE, 0, TILESIZE, TILESIZE);
+						if (g_map->mapdatatop[j][k] != TileType::NonSolid)
+                            rm->spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, {static_cast<int>(PrevTileType(g_map->mapdatatop[j][k])) * TILESIZE, 0, TILESIZE, TILESIZE});
 					}
 				}
 
@@ -1637,12 +1546,12 @@ int editor_edit()
 				rm->menu_font_small.draw(0, 0, "Map Item Mode");
 			}
 
-			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
             if (g_musiccategorydisplaytimer > 0) {
 				--g_musiccategorydisplaytimer;
 
-				rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+				rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 				rm->menu_font_small.drawCentered(320, 195, "Music Category");
 				rm->menu_font_large.drawCentered(320, 220, g_szMusicCategoryNames[g_map->musicCategoryID]);
 
@@ -1661,7 +1570,7 @@ void DrawMessage()
     if (g_messagedisplaytimer > 0) {
 		--g_messagedisplaytimer;
 
-		rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+		rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 		rm->menu_font_large.drawCentered(320, 195, g_szMessageTitle.c_str());
 		rm->menu_font_large.drawCentered(320, 220, g_szMessageLine[0].c_str());
 		rm->menu_font_large.drawCentered(320, 240, g_szMessageLine[1].c_str());
@@ -1685,7 +1594,7 @@ void SetNoSpawn(short nospawnmode, short col, short row, bool value)
 
 void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 {
-	short iTilesetIndex = iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2;
+	const DrawSize drawsize = iBlockSize == TILESIZE ? DrawSize::Ingame : iBlockSize == PREVIEWTILESIZE ? DrawSize::Preview : DrawSize::Thumbnail;
 
 	//draw left to right full vertical
     for (short i = 0; i < MAPWIDTH; i++) {
@@ -1705,8 +1614,7 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 				continue;
 
             if (tile->iID >= 0) {
-				g_tilesetmanager->Draw(screen, tile->iID, iTilesetIndex, tile->iCol, tile->iRow, i, j);
-				//SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iTilesetIndex), g_tilesetmanager->GetRect(iTilesetIndex, tile->iCol, tile->iRow), screen, &bltrect);
+				g_tilesetmanager->Draw(screen, tile->iID, drawsize, tile->iCol, tile->iRow, i, j);
             } else if (tile->iID == TILESETANIMATED) {
 				short iSrcCol = tile->iCol << 2;
 				short iSrcRow = tile->iRow;
@@ -1716,9 +1624,9 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 					iSrcRow = 0;
 				}
 
-                SDL_BlitSurface(rm->spr_tileanimation[iTilesetIndex].getSurface(), g_tilesetmanager->rect(iTilesetIndex, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(iTilesetIndex, i, j));
+                rm->spr_tileanimation[static_cast<size_t>(drawsize)].draw(CTilesetManager::rect(drawsize, iSrcCol, iSrcRow), screen, CTilesetManager::rect(drawsize, i, j));
             } else if (tile->iID == TILESETUNKNOWN) {
-                SDL_BlitSurface(rm->spr_unknowntile[iTilesetIndex].getSurface(), g_tilesetmanager->rect(iTilesetIndex, 0, 0), screen, g_tilesetmanager->rect(iTilesetIndex, i, j));
+                rm->spr_unknowntile[static_cast<size_t>(drawsize)].draw(CTilesetManager::rect(drawsize, 0, 0), screen, CTilesetManager::rect(drawsize, i, j));
 			}
 		}
 	}
@@ -1739,10 +1647,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		dstrect.w = iBlockSize * 20;
 		dstrect.h = iBlockSize * 15;
 
-        if (SDL_SCALEBLIT(rm->spr_background.getSurface(), &srcrect, blitdest, &dstrect) < 0) {
-			fprintf(stderr, "SDL_SCALEBLIT error: %s\n", SDL_GetError());
-			return;
-		}
+                rm->spr_background.drawStretch(srcrect, blitdest, dstrect);
     } else {
 		rm->spr_background.draw(0,0);
 	}
@@ -1767,7 +1672,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		g_map->drawPlatforms(0);
 
     if ((viewblocks && !view_only_layer) || fScreenshot) {
-		short iTilesizeIndex = iBlockSize == 32 ? 0 : iBlockSize == 16 ? 1 : 2;
+		const DrawSize drawsize = iBlockSize == 32 ? DrawSize::Ingame : iBlockSize == 16 ? DrawSize::Preview : DrawSize::Thumbnail;
 
 		SDL_Rect rSrc = {0, 0, iBlockSize, iBlockSize};
 
@@ -1806,7 +1711,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 						rSrc.y = iBlockSize << 1;
 					}
 
-                    SDL_BlitSurface(rm->spr_blocks[iTilesizeIndex].getSurface(), &rSrc, screen, g_tilesetmanager->rect(iTilesizeIndex, i, j));
+                    rm->spr_blocks[static_cast<size_t>(drawsize)].draw(rSrc, screen, CTilesetManager::rect(drawsize, i, j));
 				}
 			}
 		}
@@ -1816,9 +1721,9 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		g_map->drawPlatforms(1);
 
     if (!view_only_layer || fScreenshot) {
-        for (short j = 0; j < g_map->iNumMapItems; j++) {
-			rm->spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(g_map->mapitems[j].ix * iBlockSize, g_map->mapitems[j].iy * iBlockSize, g_map->mapitems[j].itype * iBlockSize, 0, iBlockSize, iBlockSize);
-		}
+        for (const MapItem& item : g_map->mapitems) {
+            rm->spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(item.ix * iBlockSize, item.iy * iBlockSize, {item.itype * iBlockSize, 0, iBlockSize, iBlockSize});
+        }
 
         if (!fScreenshot) {
             for (int j = 0; j < MAPHEIGHT; j++) {
@@ -1830,7 +1735,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 						iNewY >= 0 && iNewY < MAPHEIGHT &&
                             selectedtiles[iNewX][iNewY]) {
 						if (copiedtiles[iNewX][iNewY].item >= 0)
-							rm->spr_mapitems[0].draw(i << 5, j << 5, copiedtiles[iNewX][iNewY].item << 5, 0, TILESIZE, TILESIZE);
+							rm->spr_mapitems[0].draw(i << 5, j << 5, {copiedtiles[iNewX][iNewY].item << 5, 0, TILESIZE, TILESIZE});
 					}
 				}
 			}
@@ -1875,7 +1780,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 					SDL_Rect rSrc = {warp->connection * iBlockSize, warp->direction * iBlockSize, iBlockSize, iBlockSize};
 					SDL_Rect rDst = {i * iBlockSize, j * iBlockSize, iBlockSize, iBlockSize};
 
-					SDL_BlitSurface(rm->spr_warps[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].getSurface(), &rSrc, screen, &rDst);
+					rm->spr_warps[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(rSrc, screen, rDst);
 				}
 			}
 		}
@@ -1890,7 +1795,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		SDL_Rect rSrc = {g_map->warpexits[k].connection * TILESIZE, g_map->warpexits[k].direction * TILESIZE, TILESIZE, TILESIZE};
 		SDL_Rect rDst = {g_map->warpexits[k].x, g_map->warpexits[k].y, TILESIZE, TILESIZE};
 
-		SDL_BlitSurface(rm->spr_warps[0].getSurface(), &rSrc, screen, &rDst);
+		rm->spr_warps[0].draw(rSrc, screen, rDst);
 	}
 	*/
 }
@@ -1940,8 +1845,8 @@ int editor_warp()
         r.w = 640;
         r.h = 480;
 
-		SDL_BlitSurface(rm->spr_warps[0].getSurface(), NULL, screen, &r);
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->spr_warps[0].draw(screen, r);
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
         return EDITOR_WARP;
@@ -1987,7 +1892,7 @@ int editor_eyecandy()
 				}
 
 			case SDL_MOUSEMOTION: {
-				update_mouse_coords();
+				bound_mouse_motion_coords();
 				break;
 				}
 
@@ -2006,11 +1911,11 @@ int editor_eyecandy()
 				short iy = k * 65 + 20;
 
 				if (mouse_x >= ix && mouse_x < ix + 90 && mouse_y >= iy && mouse_y < iy + 52)
-					rm->spr_powerupselector.draw(ix, iy, 0, 0, 90, 52);
+					rm->spr_powerupselector.draw(ix, iy, {0, 0, 90, 52});
 				else
-					rm->spr_powerupselector.draw(ix, iy, 0, 52, 90, 52);
+					rm->spr_powerupselector.draw(ix, iy, {0, 52, 90, 52});
 
-				rm->spr_eyecandy.draw(ix + 10, iy + 10, k << 5, 0, 32, 32);
+				rm->spr_eyecandy.draw(ix + 10, iy + 10, {k << 5, 0, 32, 32});
 
 				short mask = 1 << k;
 				if (g_map->eyecandy[iLayer] & mask)
@@ -2029,7 +1934,7 @@ int editor_eyecandy()
 		}
 
 		rm->menu_font_small.draw(0,480-rm->menu_font_small.getHeight(), "Eyecandy: [e] Exit, [LMB] Choose Eyecandy");
-		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		return EDITOR_EYECANDY;
@@ -2094,11 +1999,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 						else if (event.key.keysym.sym == SDLK_d)
 							iValue = defaultPowerupSetting(0, iSettingIndex);
 
-                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
-                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                    #else
-                        Uint8 * keystate = SDL_GetKeyState(NULL);
-                    #endif
+                    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
                     if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
                         for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++) {
 								if (event.key.keysym.sym == SDLK_d)
@@ -2160,7 +2061,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 				}
 
 			case SDL_MOUSEMOTION: {
-				update_mouse_coords();
+				bound_mouse_motion_coords();
 				break;
 				}
 
@@ -2183,11 +2084,11 @@ int editor_properties(short iBlockCol, short iBlockRow)
 				short iy = (iSetting / 6) * 62 + 65;
 
 				if (mouse_x >= ix - 10 && mouse_x < ix + 80 && mouse_y >= iy - 10 && mouse_y < iy + 42 && !fUseGame)
-					rm->spr_powerupselector.draw(ix - 10, iy - 10, 0, 0, 90, 52);
+					rm->spr_powerupselector.draw(ix - 10, iy - 10, {0, 0, 90, 52});
 				else
-					rm->spr_powerupselector.draw(ix - 10, iy - 10, 0, 52, 90, 52);
+					rm->spr_powerupselector.draw(ix - 10, iy - 10, {0, 52, 90, 52});
 
-				rm->spr_powerups.draw(ix, iy, iSetting << 5, 0, 32, 32);
+				rm->spr_powerups.draw(ix, iy, {iSetting << 5, 0, 32, 32});
 
 				char szNum[8];
 				if (fUseGame)
@@ -2209,9 +2110,9 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		}
 
 		if (mouse_x >= 270 && mouse_x < 370 && mouse_y >= iHiddenCheckboxY && mouse_y < iHiddenCheckboxY + 52)
-			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, 90, 0, 100, 52);
+			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, {90, 0, 100, 52});
 		else
-			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, 90, 52, 100, 52);
+			rm->spr_powerupselector.draw(270, iHiddenCheckboxY, {90, 52, 100, 52});
 
 		rm->menu_font_large.drawCentered(320, iHiddenCheckboxY + 3, "Hidden");
 
@@ -2221,9 +2122,9 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		//Display "Use Game" option
         if (iBlockType == 1 || iBlockType == 15) {
 			if (mouse_x >= 390 && mouse_x < 490 && mouse_y >= iHiddenCheckboxY && mouse_y < iHiddenCheckboxY + 52)
-				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, 90, 0, 100, 52);
+				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, {90, 0, 100, 52});
 			else
-				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, 90, 52, 100, 52);
+				rm->spr_powerupselector.draw(390, iHiddenCheckboxY, {90, 52, 100, 52});
 
 			rm->menu_font_large.drawCentered(440, iHiddenCheckboxY + 3, "Use Game");
 
@@ -2232,7 +2133,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		}
 
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		FPSLimiter::instance().beforeFlip();
@@ -2332,7 +2233,7 @@ void editor_platforms_draw_background_section(const SDL_Rect& src_area, const SD
 
             SDL_Rect src { src_area.x, src_area.y, w, h };
             SDL_Rect dst { dst_area.x + offset_x, dst_area.y + offset_y, w, h };
-            SDL_BlitSurface(s_platform, &src, screen, &dst);
+            s_platform.draw(src, screen, dst);
 
             offset_x += w;
         }
@@ -2393,7 +2294,7 @@ int editor_platforms()
 							iEditPlatform = event.key.keysym.sym - SDLK_1;
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
                     } else if ((PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState) && event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_3) {
-							g_Platforms[iEditPlatform].iPathType = event.key.keysym.sym - SDLK_1;
+							g_Platforms[iEditPlatform].iPathType = static_cast<PlatformPathType>(event.key.keysym.sym - SDLK_1);
 
                         if (PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState) {
 								iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
@@ -2479,8 +2380,8 @@ int editor_platforms()
                         for (short iPlatform = iEditPlatform; iPlatform < g_iNumPlatforms - 1; iPlatform++) {
                             for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
                                 for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-										CopyTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow], &g_Platforms[iPlatform + 1].tiles[iCol][iRow]);
-										g_Platforms[iPlatform].types[iCol][iRow] = g_Platforms[iPlatform + 1].types[iCol][iRow];
+										g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow] = g_Platforms[iPlatform + 1].tiles[iCol * MAPHEIGHT + iRow];
+										g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = g_Platforms[iPlatform + 1].types[iCol * MAPHEIGHT + iRow];
 									}
 								}
 
@@ -2517,7 +2418,7 @@ int editor_platforms()
 						}
                 } else if (event.key.keysym.sym == SDLK_KP_MINUS || event.key.keysym.sym == SDLK_MINUS) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-                        if (g_Platforms[iEditPlatform].iPathType == 2) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								if (g_Platforms[iEditPlatform].iVelocity > -10)
 									g_Platforms[iEditPlatform].iVelocity--;
 
@@ -2530,7 +2431,7 @@ int editor_platforms()
 						}
                 } else if (event.key.keysym.sym == SDLK_KP_PLUS || event.key.keysym.sym == SDLK_EQUALS) {
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-                        if (g_Platforms[iEditPlatform].iPathType == 2) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								if (g_Platforms[iEditPlatform].iVelocity < 10)
 									g_Platforms[iEditPlatform].iVelocity++;
 
@@ -2598,7 +2499,7 @@ int editor_platforms()
                                         iClickY >= rTypeButton[iType][1].y && iClickY < rTypeButton[iType][1].y + rTypeButton[iType][1].h) {
 										ignoreclick = true;
 
-										g_Platforms[iEditPlatform].iPathType = iType;
+										g_Platforms[iEditPlatform].iPathType = static_cast<PlatformPathType>(iType);
 
                                     if (PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState) {
 											iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
@@ -2619,9 +2520,9 @@ int editor_platforms()
                             for (short i = 0; i < set_tile_cols; i++) {
                                 for (short j = 0; j < set_tile_rows; j++) {
                                     if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
-											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
+											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[(ix + i) * MAPHEIGHT + iy + j];
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-                                                                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
+											g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
 										}
 									}
 								}
@@ -2634,9 +2535,9 @@ int editor_platforms()
                             for (short i = 0; i < set_tile_cols; i++) {
                                 for (short j = 0; j < set_tile_rows; j++) {
                                     if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
-											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
+											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[(ix + i) * MAPHEIGHT + iy + j];
 											SetTilesetTile(tile, TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
-											g_Platforms[iEditPlatform].types[ix + i][iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
+											g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
 										}
 									}
 								}
@@ -2646,15 +2547,11 @@ int editor_platforms()
 								short ix = event.button.x / TILESIZE;
 								short iy = event.button.y / TILESIZE;
 
-								g_Platforms[iEditPlatform].types[ix][iy] = set_tiletype;
+								g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = set_tiletype;
 							}
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                         const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                    #else
-                        Uint8 * keystate = SDL_GetKeyState(NULL);
-                    #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 2 && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
 								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT), CheckKey(keystate, SDLK_z) != 0, CheckKey(keystate, SDLK_c) != 0);
                         } else {
 								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
@@ -2667,26 +2564,26 @@ int editor_platforms()
 						short iy = event.button.y / TILESIZE;
 
                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState) {
-							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix][iy]);
-							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
+							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix * MAPHEIGHT + iy]);
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
-							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
                     #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                         const Uint8 * keystate = SDL_GetKeyboardState(NULL);
                     #else
                         Uint8 * keystate = SDL_GetKeyState(NULL);
                     #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 0) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
-                        } else if (g_Platforms[iEditPlatform].iPathType == 1 || g_Platforms[iEditPlatform].iPathType == 2) {
+                        } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous || g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								UpdatePlatformPathAngle(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
 							}
 						}
 					}
 				}
             case SDL_MOUSEMOTION: {
-					update_mouse_coords();
+					bound_mouse_motion_coords();
 					short ix = bound_to_window_w(event.motion.x) / TILESIZE;
 					short iy = bound_to_window_h(event.motion.y) / TILESIZE;
 
@@ -2695,48 +2592,40 @@ int editor_platforms()
                         for (short i = 0; i < set_tile_cols; i++) {
                             for (short j = 0; j < set_tile_rows; j++) {
                                 if (ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT) {
-										TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
+										TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[(ix + i) * MAPHEIGHT + iy + j];
 
                                     if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState) {
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-                                        g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
+                                        g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = g_tilesetmanager->tileset(tile->iID)->tileType(tile->iCol, tile->iRow);
                                     } else {
 											SetTilesetTile(tile, TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
-											g_Platforms[iEditPlatform].types[ix + i][iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
+											g_Platforms[iEditPlatform].types[(ix + i) * MAPHEIGHT + iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
 										}
 									}
 								}
 							}
                     } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix][iy]);
-							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
+							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix * MAPHEIGHT + iy]);
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
 						}
                 } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 						if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
-							g_Platforms[iEditPlatform].types[ix][iy] = set_tiletype;
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = set_tiletype;
 						else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
-							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
+							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                 } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
-                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                         const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                    #else
-                        Uint8 * keystate = SDL_GetKeyState(NULL);
-                    #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 2 && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
-								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT), CheckKey(keystate, SDLK_z) != 0, CheckKey(keystate, SDLK_c) != 0);
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse && (CheckKey(keystate, SDLK_z) || CheckKey(keystate, SDLK_x) || CheckKey(keystate, SDLK_c))) {
+                            UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT), CheckKey(keystate, SDLK_z) != 0, CheckKey(keystate, SDLK_c) != 0);
                         } else {
-								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
-							}
+                            UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
+                        }
                     } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                         const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                    #else
-                        Uint8 * keystate = SDL_GetKeyState(NULL);
-                    #endif
-                        if (g_Platforms[iEditPlatform].iPathType == 0) {
+                        if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
-                        } else if (g_Platforms[iEditPlatform].iPathType == 1 || g_Platforms[iEditPlatform].iPathType == 2) {
+                        } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous || g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 								UpdatePlatformPathAngle(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
 							}
 						}
@@ -2779,13 +2668,13 @@ int editor_platforms()
             rm->menu_font_small.drawCentered(320, r.y + 18, "Platforms");
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Platform Mode: [esc] Exit  [c] Check Paths, [1-8] Select, [n] New");
-			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+			rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 			for (int iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
-				SDL_BlitSurface(s_platform, &g_Platforms[iPlatform].rIcon[0], screen, &g_Platforms[iPlatform].rIcon[1]);
+				s_platform.draw(g_Platforms[iPlatform].rIcon[0], screen, g_Platforms[iPlatform].rIcon[1]);
 
 			if (g_iNumPlatforms < MAX_PLATFORMS && PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
-				SDL_BlitSurface(s_platform, &rNewButton[0], screen, &rNewButton[1]);
+				s_platform.draw(rNewButton[0], screen, rNewButton[1]);
 
             if (PLATFORM_EDIT_STATE_MOVE == iPlatformEditState) {
                 if (iPlatformSwitchState == 0) {
@@ -2803,8 +2692,8 @@ int editor_platforms()
         } else if (PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState) {
 			//Draw path options
             for (short iType = 0; iType < 3; iType++) {
-				SDL_BlitSurface(s_platformpathbuttons, &rTypeButton[iType][0], screen, &rTypeButton[iType][1]);
-				SDL_BlitSurface(s_platformpathbuttons, &rTypeButton[iType][2], screen, &rTypeButton[iType][3]);
+				s_platformpathbuttons.draw(rTypeButton[iType][0], screen, rTypeButton[iType][1]);
+				s_platformpathbuttons.draw(rTypeButton[iType][2], screen, rTypeButton[iType][3]);
 
 				rm->menu_font_large.draw(rTypeButton[iType][1].x + 36, rTypeButton[iType][1].y + 6, szPathNames[iType]);
 			}
@@ -2816,14 +2705,14 @@ int editor_platforms()
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[+/-] Velocity  [y] Draw Layer");
 			draw_platform(iEditPlatform, PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState);
 
-            if (g_Platforms[iEditPlatform].iPathType == 2) {
+            if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 				short iVelMarkerX = 198 + (g_Platforms[iEditPlatform].iVelocity + 10) * 12;
 
 				SDL_Rect rVel[2] = {{0, 400, 244, 17},{198, 10, 244, 17}};
-				SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
+				s_platform.draw(rVel[0], screen, rVel[1]);
 
 				SDL_Rect rMarker[2] = {{244,400,8,18},{iVelMarkerX,10,8,18}};
-				SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
+				s_platform.draw(rMarker[0], screen, rMarker[1]);
 
 				rm->menu_font_small.drawRightJustified(198, 10, "Counter");
 				rm->menu_font_small.draw(442, 10, "Clockwise");
@@ -2831,33 +2720,33 @@ int editor_platforms()
 				short iVelMarkerX = 220 + (g_Platforms[iEditPlatform].iVelocity - 1) * 12;
 
 				SDL_Rect rVel[2] = {{12, 384, 172, 13},{234, 10, 172, 13}};
-				SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
+				s_platform.draw(rVel[0], screen, rVel[1]);
 
 				SDL_Rect rMarker[2] = {{184, 384, 8, 16},{iVelMarkerX, 8, 8, 16}};
-				SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
+				s_platform.draw(rMarker[0], screen, rMarker[1]);
 
 				rm->menu_font_small.drawRightJustified(234, 10, "Slow");
 				rm->menu_font_small.draw(406, 10, "Fast");
 			}
 
-			rm->spr_number_icons.draw(619, 5, g_Platforms[iEditPlatform].iDrawLayer << 4, 48, 16, 16);
+			rm->spr_number_icons.draw(619, 5, {g_Platforms[iEditPlatform].iDrawLayer << 4, 48, 16, 16});
 
         } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-            if (g_Platforms[iEditPlatform].iPathType == 0) { //line segment path
+            if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
-				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
+				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true, blitdest);
 
 				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Edit Path");
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[esc] Exit  [LMB] Set Start Point  [RMB] Set End Point [t] Path Type");
-            } else if (g_Platforms[iEditPlatform].iPathType == 1) { //continuous path
+            } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous) {
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
-				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
+				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true, blitdest);
 
 				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Edit Path: [esc] Exit  [LMB] Set Start Point  [RMB] Set Angle");
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[SHIFT + LMB] Location Snap [SHIFT + RMB] Angle Snap [t] Path Type");
-            } else if (g_Platforms[iEditPlatform].iPathType == 2) { //ellipse path
+            } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
-				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
+				DrawPlatform(platform->iPathType, g_map->platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true, blitdest);
 
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 4, "Edit Path: [esc] Exit  [LMB] Set Center [SHIFT + LMB] Center Snap");
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 3, "[X + LMB] Set X Radius [SHIFT + X + LMB] X Radius Snap");
@@ -2881,7 +2770,7 @@ void DisplayPlatformPreview(short iPlatformId, short iMouseX, short iMouseY)
 {
 	SDL_Rect srcRect = {0, 0, 160, 120};
 	SDL_Rect dstRect = {iMouseX, iMouseY, 160, 120};
-	SDL_BlitSurface(g_Platforms[iPlatformId].preview, &srcRect, screen, &dstRect);
+	g_Platforms[iPlatformId].preview.draw(srcRect, screen, dstRect);
 }
 
 void SwitchPlatforms(short iPlatformId1, short iPlatformId2)
@@ -2910,8 +2799,8 @@ void CopyPlatform(MapPlatform * toPlatform, MapPlatform * fromPlatform)
 
     for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
-			CopyTilesetTile(&toPlatform->tiles[iCol][iRow], &fromPlatform->tiles[iCol][iRow]);
-			toPlatform->types[iCol][iRow] = fromPlatform->types[iCol][iRow];
+			toPlatform->tiles[iCol * MAPHEIGHT + iRow] = fromPlatform->tiles[iCol * MAPHEIGHT + iRow];
+			toPlatform->types[iCol * MAPHEIGHT + iRow] = fromPlatform->types[iCol * MAPHEIGHT + iRow];
 		}
 	}
 }
@@ -3013,11 +2902,11 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 {
     for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
         for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-			TilesetTile * tile = &g_Platforms[iPlatform].tiles[iCol][iRow];
+			TilesetTile * tile = &g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow];
 
             if (tile->iID >= 0) {
-				g_tilesetmanager->Draw(screen, tile->iID, 0, tile->iCol, tile->iRow, iCol, iRow);
-				//SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(0), g_tilesetmanager->GetRect(0, tile->iCol, tile->iRow), screen, &bltrect);
+				g_tilesetmanager->Draw(screen, tile->iID, DrawSize::Ingame, tile->iCol, tile->iRow, iCol, iRow);
+				//g_tilesetmanager->tileset(tile->iID)->draw(CTilesetManager::rect(0, tile->iCol, tile->iRow), screen, bltrect);
             } else if (tile->iID == TILESETANIMATED) {
 				short iSrcCol = tile->iCol << 2;
 				short iSrcRow = tile->iRow;
@@ -3027,14 +2916,14 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 					iSrcRow = 0;
 				}
 
-                SDL_BlitSurface(rm->spr_tileanimation[0].getSurface(), g_tilesetmanager->rect(0, iSrcCol, iSrcRow), screen, g_tilesetmanager->rect(0, iCol, iRow));
+                rm->spr_tileanimation[0].draw(CTilesetManager::rect(DrawSize::Ingame, iSrcCol, iSrcRow), screen, CTilesetManager::rect(DrawSize::Ingame, iCol, iRow));
             } else if (tile->iID == TILESETUNKNOWN) {
-                SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), g_tilesetmanager->rect(0, 0, 0), screen, g_tilesetmanager->rect(0, iCol, iRow));
+                rm->spr_unknowntile[0].draw(CTilesetManager::rect(DrawSize::Ingame, 0, 0), screen, CTilesetManager::rect(DrawSize::Ingame, iCol, iRow));
 			}
 
             if (fDrawTileTypes) {
-				TileType type = g_Platforms[iPlatform].types[iCol][iRow];
-				rm->spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, (type - 1) * TILESIZE, 0, TILESIZE, TILESIZE);
+				TileType type = g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow];
+                rm->spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, {static_cast<int>(PrevTileType(type)) * TILESIZE, 0, TILESIZE, TILESIZE});
 			}
 		}
 	}
@@ -3139,11 +3028,11 @@ int editor_maphazards()
 						}
                 } else if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9) {
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
-							short iHazard = event.key.keysym.sym - SDLK_1;
-                        if (iHazard < g_map->iNumMapHazards) {
-								iEditMapHazard = iHazard;
-								iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
-							}
+                        short iHazard = event.key.keysym.sym - SDLK_1;
+                        if (iHazard < static_cast<short>(g_map->maphazards.size())) {
+                            iEditMapHazard = iHazard;
+                            iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
+                        }
                     } else if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
@@ -3152,21 +3041,21 @@ int editor_maphazards()
 						}
                 } else if (event.key.keysym.sym == SDLK_DELETE) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState || MAPHAZARD_EDIT_STATE_LOCATION == iEditState) {
-							//Copy platforms into empty spot
-                        for (short iMapHazard = iEditMapHazard; iMapHazard < g_map->iNumMapHazards - 1; iMapHazard++) {
-								g_map->maphazards[iMapHazard].itype = g_map->maphazards[iMapHazard + 1].itype;
-								g_map->maphazards[iMapHazard].ix = g_map->maphazards[iMapHazard + 1].ix;
-								g_map->maphazards[iMapHazard].iy = g_map->maphazards[iMapHazard + 1].iy;
+                        //Copy platforms into empty spot
+                        for (short iMapHazard = iEditMapHazard; iMapHazard < g_map->maphazards.size() - 1; iMapHazard++) {
+                            g_map->maphazards[iMapHazard].itype = g_map->maphazards[iMapHazard + 1].itype;
+                            g_map->maphazards[iMapHazard].ix = g_map->maphazards[iMapHazard + 1].ix;
+                            g_map->maphazards[iMapHazard].iy = g_map->maphazards[iMapHazard + 1].iy;
 
                             for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++) {
-									g_map->maphazards[iMapHazard].iparam[iParam] = g_map->maphazards[iMapHazard + 1].iparam[iParam];
-									g_map->maphazards[iMapHazard].dparam[iParam] = g_map->maphazards[iMapHazard + 1].dparam[iParam];
-								}
-							}
+                                g_map->maphazards[iMapHazard].iparam[iParam] = g_map->maphazards[iMapHazard + 1].iparam[iParam];
+                                g_map->maphazards[iMapHazard].dparam[iParam] = g_map->maphazards[iMapHazard + 1].dparam[iParam];
+                            }
+                        }
 
-							g_map->iNumMapHazards--;
-							iEditState = MAPHAZARD_EDIT_STATE_SELECT;
-						}
+                        g_map->maphazards.pop_back();
+                        iEditState = MAPHAZARD_EDIT_STATE_SELECT;
+                    }
                 } else if (event.key.keysym.sym == SDLK_ESCAPE) {
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
                             editor_maphazards_initialized = false;
@@ -3248,25 +3137,25 @@ int editor_maphazards()
 						short iClickY = event.button.y;
 
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
-							//check clicks on existing platforms
-                        for (int iMapHazard = 0; iMapHazard < g_map->iNumMapHazards; iMapHazard++) {
-								if (iClickX >= rIconRects[iMapHazard][1].x && iClickX < rIconRects[iMapHazard][1].x + rIconRects[iMapHazard][1].w &&
-                                    iClickY >= rIconRects[iMapHazard][1].y && iClickY < rIconRects[iMapHazard][1].y + rIconRects[iMapHazard][1].h) {
-									iEditMapHazard = iMapHazard;
-									iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
-									ignoreclick = true;
+                        //check clicks on existing platforms
+                        for (int iMapHazard = 0; iMapHazard < static_cast<int>(g_map->maphazards.size()); iMapHazard++) {
+                            if (iClickX >= rIconRects[iMapHazard][1].x && iClickX < rIconRects[iMapHazard][1].x + rIconRects[iMapHazard][1].w &&
+                                iClickY >= rIconRects[iMapHazard][1].y && iClickY < rIconRects[iMapHazard][1].y + rIconRects[iMapHazard][1].h) {
+                                iEditMapHazard = iMapHazard;
+                                iEditState = MAPHAZARD_EDIT_STATE_PROPERTIES;
+                                ignoreclick = true;
 
-									break;
-								}
-							}
+                                break;
+                            }
+                        }
 
-							//check click on the new button
-							if (g_map->iNumMapHazards < MAXMAPHAZARDS && iClickX >= rNewButton[1].x && iClickX < rNewButton[1].x + rNewButton[1].w &&
-                                iClickY >= rNewButton[1].y && iClickY < rNewButton[1].y + rNewButton[1].h) {
-								iEditMapHazard = NewMapHazard();
-								iEditState = MAPHAZARD_EDIT_STATE_TYPE;
-								ignoreclick = true;
-							}
+                        //check click on the new button
+                        if (g_map->maphazards.size() < MAXMAPHAZARDS && iClickX >= rNewButton[1].x && iClickX < rNewButton[1].x + rNewButton[1].w &&
+                            iClickY >= rNewButton[1].y && iClickY < rNewButton[1].y + rNewButton[1].h) {
+                            iEditMapHazard = NewMapHazard();
+                            iEditState = MAPHAZARD_EDIT_STATE_TYPE;
+                            ignoreclick = true;
+                        }
                     } else if (MAPHAZARD_EDIT_STATE_TYPE == iEditState && !ignoreclick) {
                         for (int iType = 0; iType < 8; iType++) {
 								if (iClickX >= rTypeButton[iType][1].x && iClickX < rTypeButton[iType][1].x + rTypeButton[iType][1].w &&
@@ -3327,7 +3216,7 @@ int editor_maphazards()
 					}
 				}
             case SDL_MOUSEMOTION: {
-					update_mouse_coords();
+					bound_mouse_motion_coords();
 					short iClickX = bound_to_window_w(event.motion.x);
 					short iClickY = bound_to_window_h(event.motion.y);
 
@@ -3368,102 +3257,99 @@ int editor_maphazards()
 		rm->menu_shade.draw(0, 0);
 
         if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
-			SDL_BlitSurface(s_platform, &rBackground[0], screen, &rBackground[1]);
+			s_platform.draw(rBackground[0], screen, rBackground[1]);
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Map Hazard Mode: [esc] Exit");
 
-			for (int iMapHazard = 0; iMapHazard < g_map->iNumMapHazards; iMapHazard++)
-				SDL_BlitSurface(s_platform, &rIconRects[iMapHazard][0], screen, &rIconRects[iMapHazard][1]);
+			for (int iMapHazard = 0; iMapHazard < g_map->maphazards.size(); iMapHazard++)
+				s_platform.draw(rIconRects[iMapHazard][0], screen, rIconRects[iMapHazard][1]);
 
-			if (g_map->iNumMapHazards < MAXMAPHAZARDS)
-				SDL_BlitSurface(s_platform, &rNewButton[0], screen, &rNewButton[1]);
+			if (g_map->maphazards.size() < MAXMAPHAZARDS)
+				s_platform.draw(rNewButton[0], screen, rNewButton[1]);
 
 			rm->menu_font_small.drawCentered(320, rBackground[1].y - 18, "Hazards");
         } else if (MAPHAZARD_EDIT_STATE_TYPE == iEditState) {
-			//SDL_BlitSurface(s_platform, &rBackground[0], screen, &rBackground[1]);
+			//s_platform.draw(rBackground[0], screen, &rBackground[1]);
 
 			//Draw map hazard options
             for (short iType = 0; iType < 8; iType++) {
-				SDL_BlitSurface(s_maphazardbuttons, &rTypeButton[iType][0], screen, &rTypeButton[iType][1]);
-				SDL_BlitSurface(s_maphazardbuttons, &rTypeButton[iType][2], screen, &rTypeButton[iType][3]);
+				s_maphazardbuttons.draw(rTypeButton[iType][0], screen, rTypeButton[iType][1]);
+				s_maphazardbuttons.draw(rTypeButton[iType][2], screen, rTypeButton[iType][3]);
 
 				rm->menu_font_large.draw(rTypeButton[iType][1].x + 36, rTypeButton[iType][1].y + 6, szHazardNames[iType]);
 			}
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Choose Hazard Type");
         } else if (MAPHAZARD_EDIT_STATE_LOCATION == iEditState) {
-			MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
-			DrawMapHazard(hazard, 0, true);
+			const MapHazard& hazard = g_map->maphazards[iEditMapHazard];
+			DrawMapHazard(hazard, 0, true, blitdest);
 			DrawMapHazardControls(hazard);
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Location: [esc] Exit, [p] Properties, [LMB] Set Location");
         } else if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
-			MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
-			DrawMapHazard(hazard, 0, true);
-			DrawMapHazardControls(hazard);
+            const MapHazard& hazard = g_map->maphazards[iEditMapHazard];
+            DrawMapHazard(hazard, 0, true, blitdest);
+            DrawMapHazardControls(hazard);
 
-            if (hazard->itype == 0 || hazard->itype == 1) {
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 3, "Properties");
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 2, "[esc] Exit, [l] Location, [+/-] Velocity, [LMB] Angle and Radius");
+            if (hazard.itype == 0 || hazard.itype == 1) {
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 3, "Properties");
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 2, "[esc] Exit, [l] Location, [+/-] Velocity, [LMB] Angle and Radius");
 
-				if (hazard->itype == 1)
-					rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle, [1-9] Number of Electorbs");
-				else
-					rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle");
-            } else if (hazard->itype == 2) {
-				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location, [d] Direction");
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[-/+] Velocity, [[/]] or [</>] Frequency");
-            } else if (hazard->itype >= 3 && hazard->itype <= 7) {
-				rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location");
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[[/]] or [</>] Frequency, [d] direction");
+                if (hazard.itype == 1) {
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle, [1-9] Number of Electorbs");
+                } else {
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle");
+                }
+            } else if (hazard.itype == 2) {
+                rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location, [d] Direction");
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[-/+] Velocity, [[/]] or [</>] Frequency");
+            } else if (hazard.itype >= 3 && hazard.itype <= 7) {
+                rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location");
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[[/]] or [</>] Frequency, [d] direction");
             } else {
-				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location");
-			}
-		}
+                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location");
+            }
+        }
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+        rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
-		DrawMessage();
-		return EDITOR_MAPHAZARDS;
+        DrawMessage();
+        return EDITOR_MAPHAZARDS;
 }
 
 short NewMapHazard()
 {
-	//Clear new map hazard
-	short iEditMapHazard = g_map->iNumMapHazards;
-
-	MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
-	hazard->itype = 0;
-	hazard->ix = 10;
-	hazard->iy = 7;
+    MapHazard hazard;
+    hazard.itype = 0;
+    hazard.ix = 10;
+    hazard.iy = 7;
 
     for (short iMapHazard = 0; iMapHazard < NUMMAPHAZARDPARAMS; iMapHazard++) {
-		hazard->iparam[iMapHazard] = 0;
-		hazard->dparam[iMapHazard] = 0.0f;
-	}
+        hazard.iparam[iMapHazard] = 0;
+        hazard.dparam[iMapHazard] = 0.f;
+    }
 
-	g_map->iNumMapHazards++;
-
-	return iEditMapHazard;
+    g_map->maphazards.emplace_back(std::move(hazard));
+    return g_map->maphazards.size() - 1;
 }
 
-void DrawMapHazardControls(MapHazard * hazard)
+void DrawMapHazardControls(const MapHazard& hazard)
 {
-    if (hazard->itype == 0 || hazard->itype == 1 || hazard->itype == 2) {
+    if (hazard.itype == 0 || hazard.itype == 1 || hazard.itype == 2) {
 		short iVelMarkerX = 0;
 
-		if (hazard->itype == 2)
-			iVelMarkerX = (short)(hazard->dparam[0] + 10.0f) * 12 + 196;
+		if (hazard.itype == 2)
+			iVelMarkerX = (short)(hazard.dparam[0] + 10.0f) * 12 + 196;
 		else
-			iVelMarkerX = (short)((hazard->dparam[0] + 0.05f) / 0.005f) * 12 + 196;
+			iVelMarkerX = (short)((hazard.dparam[0] + 0.05f) / 0.005f) * 12 + 196;
 
 		SDL_Rect rVel[2] = {{0, 400, 244, 17},{198, 420, 244, 17}};
-		SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
+		s_platform.draw(rVel[0], screen, rVel[1]);
 
 		SDL_Rect rMarker[2] = {{244,400,8,18},{iVelMarkerX,418,8,18}};
-		SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
+		s_platform.draw(rMarker[0], screen, rMarker[1]);
 
-        if (hazard->itype == 2) {
+        if (hazard.itype == 2) {
 			rm->menu_font_small.drawRightJustified(190, 420, "Left");
 			rm->menu_font_small.draw(450, 420, "Right");
         } else {
@@ -3472,14 +3358,14 @@ void DrawMapHazardControls(MapHazard * hazard)
 		}
 	}
 
-    if (hazard->itype >= 2 && hazard->itype <= 7) { // Draw frequency for bullet bill and flame cannon
-		short iFreqMarkerX = ((hazard->iparam[0] / 30) - 1) * 12 + 196;
+    if (hazard.itype >= 2 && hazard.itype <= 7) { // Draw frequency for bullet bill and flame cannon
+		short iFreqMarkerX = ((hazard.iparam[0] / 30) - 1) * 12 + 196;
 
 		SDL_Rect rVel[2] = {{0, 384, 184, 13},{198, 390, 184, 13}};
-		SDL_BlitSurface(s_platform, &rVel[0], screen, &rVel[1]);
+		s_platform.draw(rVel[0], screen, rVel[1]);
 
 		SDL_Rect rMarker[2] = {{244,400,8,18},{iFreqMarkerX,388,8,18}};
-		SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
+		s_platform.draw(rMarker[0], screen, rMarker[1]);
 
 		rm->menu_font_small.drawRightJustified(190, 390, "More Frequent");
 		rm->menu_font_small.draw(388, 390, "Less Frequent");
@@ -3497,11 +3383,7 @@ void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
 	if (angle < 0.0f)
 		angle += TWO_PI;
 
-    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
-        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-    #else
-        Uint8 * keystate = SDL_GetKeyState(NULL);
-    #endif
+    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
     if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
 		float dSector = TWO_PI / 16;
 		angle += TWO_PI / 32;
@@ -3688,7 +3570,7 @@ int editor_tiles()
 				}
 
             case SDL_MOUSEMOTION: {
-					update_mouse_coords();
+					bound_mouse_motion_coords();
 					short iCol = bound_to_window_w(event.motion.x) / TILESIZE + view_tileset_x;
 					short iRow = bound_to_window_h(event.motion.y) / TILESIZE + view_tileset_y;
 
@@ -3752,16 +3634,16 @@ int editor_tiles()
         r.w = 640;
         r.h = 480;
 
-        SDL_BlitSurface(g_tilesetmanager->tileset(set_tile_tileset)->surface(0), &rectSrc, screen, &r);
-		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+        g_tilesetmanager->tileset(set_tile_tileset)->draw(DrawSize::Ingame, rectSrc, screen, r);
+		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
                 rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), tileset->name());
 
         int i, j;
         for (i = view_tileset_x; i < view_tileset_x + 20 && i < tileset->width(); i++) {
             for (j = view_tileset_y; j < view_tileset_y + 15 && j < tileset->height(); j++) {
                                 TileType t = tileset->tileType(i, j);
-				if (t != tile_nonsolid)
-					rm->spr_tiletypes.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5, (t-1) << 3, 0, 8, 8);
+				if (t != TileType::NonSolid)
+                                    rm->spr_tiletypes.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5, {static_cast<int>(PrevTileType(t)) << 3, 0, 8, 8});
 			}
 		}
 
@@ -3858,29 +3740,29 @@ int editor_blocks()
 		SDL_Rect rSrc = {0, 0, 224, 32};
 		SDL_Rect rDst = {0, 0, 224, 32};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rSrc, screen, &rDst);
+		rm->spr_blocks[0].draw(rSrc, screen, rDst);
 
 		SDL_Rect rOnOffSrc = {224, 0, 128, 64};
 		SDL_Rect rOnOffDst = {0, 32, 128, 64};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rOnOffSrc, screen, &rOnOffDst);
+		rm->spr_blocks[0].draw(rOnOffSrc, screen, rOnOffDst);
 
 		SDL_Rect rOnOffBlockSrc = {352, 0, 128, 64};
 		SDL_Rect rOnOffBlockDst = {128, 32, 128, 64};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rOnOffBlockSrc, screen, &rOnOffBlockDst);
+		rm->spr_blocks[0].draw(rOnOffBlockSrc, screen, rOnOffBlockDst);
 
 		SDL_Rect rBlocksRow2Src = {0, 32, 160, 32};
 		SDL_Rect rBlocksRow2Dst = {224, 0, 160, 32};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rBlocksRow2Src, screen, &rBlocksRow2Dst);
+		rm->spr_blocks[0].draw(rBlocksRow2Src, screen, rBlocksRow2Dst);
 
 		SDL_Rect rBlocksRow3Src = {0, 64, 320, 32};
 		SDL_Rect rBlocksRow3Dst = {0, 96, 320, 32};
 
-		SDL_BlitSurface(rm->spr_blocks[0].getSurface(), &rBlocksRow3Src, screen, &rBlocksRow3Dst);
+		rm->spr_blocks[0].draw(rBlocksRow3Src, screen, rBlocksRow3Dst);
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		return EDITOR_BLOCKS;
@@ -3926,9 +3808,9 @@ int editor_mapitems()
 		drawmap(false, TILESIZE);
 		rm->menu_shade.draw(0, 0);
 
-		rm->spr_mapitems[0].draw(0, 0, 0, 0, 192, 32);
+		rm->spr_mapitems[0].draw(0, 0, {0, 0, 192, 32});
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 		rm->menu_font_small.drawRightJustified(0, 480 - rm->menu_font_small.getHeight(), "Map Items");
 
 		DrawMessage();
@@ -4031,13 +3913,9 @@ int editor_modeitems()
 				}
 
             case SDL_MOUSEMOTION: {
-                update_mouse_coords();
+                bound_mouse_motion_coords();
                 if (dragmodeitem >= 0 && event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
-                        #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
-                            const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                        #else
-                            Uint8 * keystate = SDL_GetKeyState(NULL);
-                        #endif
+                    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
 						bool fShiftDown = CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT);
 
                     if (modeitemmode == 0) {
@@ -4077,7 +3955,7 @@ int editor_modeitems()
 				rm->menu_font_large.drawCentered(320, 220, "Press 'R' to manually set them.");
             } else {
                 for (short iGoal = 0; iGoal < g_map->iNumRaceGoals; iGoal++) {
-					rm->spr_racegoals.draw(g_map->racegoallocations[iGoal].x - 16, g_map->racegoallocations[iGoal].y - 18, 0, 0, 68, 54);
+					rm->spr_racegoals.draw(g_map->racegoallocations[iGoal].x - 16, g_map->racegoallocations[iGoal].y - 18, {0, 0, 68, 54});
 					char szNum[4];
 					sprintf(szNum, "%d", iGoal + 1);
 					rm->menu_font_large.drawCentered(g_map->racegoallocations[iGoal].x + 18, g_map->racegoallocations[iGoal].y + 6, szNum);
@@ -4091,14 +3969,14 @@ int editor_modeitems()
 				rm->menu_font_large.drawCentered(320, 220, "Press 'R' to manually set them.");
             } else {
                 for (short iBase = 0; iBase < g_map->iNumFlagBases; iBase++) {
-					rm->spr_flagbases.draw(g_map->flagbaselocations[iBase].x - 8, g_map->flagbaselocations[iBase].y - 8, iBase * 48, 0, 48, 48);
+					rm->spr_flagbases.draw(g_map->flagbaselocations[iBase].x - 8, g_map->flagbaselocations[iBase].y - 8, {iBase * 48, 0, 48, 48});
 				}
 			}
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Set Flag Base Locations - Press [1] for Race Goals");
 		}
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		return EDITOR_MODEITEMS;
@@ -4148,14 +4026,14 @@ int editor_tiletype()
 
 		rm->spr_transparenttiles.draw(0, 0);
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		DrawMessage();
 		return EDITOR_TILETYPE;
 }
 
 short iPage;
-SDL_Surface * sBackgrounds[16];
+std::array<gfxSprite, 16> sBackgrounds;
 SDL_Rect rSrc = {0, 0, 160, 120};
 SDL_Rect rDst[16];
 
@@ -4177,7 +4055,7 @@ void init_editor_backgrounds()
     }
 
     for (short iSurface = 0; iSurface < 16; iSurface++)
-        sBackgrounds[iSurface] = SDL_CreateRGBSurface(screen->flags, 160, 120, 16, 0, 0, 0, 0);
+        sBackgrounds[iSurface] = gfxSprite::blank(160, 120);
 
     LoadBackgroundPage(sBackgrounds, iPage);
 
@@ -4189,20 +4067,20 @@ int editor_backgrounds()
     init_editor_backgrounds();
 
 		//handle messages
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-				case SDL_QUIT:
-                    for (short iSurface = 0; iSurface < 16; iSurface++)
-                        SDL_FreeSurface(sBackgrounds[iSurface]);
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+            case SDL_QUIT:
+                for (short iSurface = 0; iSurface < 16; iSurface++)
+                    sBackgrounds[iSurface] = gfxSprite();
 
-                    editor_backgrounds_initialized = false;
-                    return EDITOR_EDIT;
-				break;
+                editor_backgrounds_initialized = false;
+                return EDITOR_EDIT;
+                break;
 
-				case SDL_KEYDOWN:
+            case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
-					for (short iSurface = 0; iSurface < 16; iSurface++)
-                        SDL_FreeSurface(sBackgrounds[iSurface]);
+                    for (short iSurface = 0; iSurface < 16; iSurface++)
+                        sBackgrounds[iSurface] = gfxSprite();
 
                     editor_backgrounds_initialized = false;
                     return EDITOR_EDIT;
@@ -4231,13 +4109,13 @@ int editor_backgrounds()
                             {
                                 backgroundlist->setCurrentIndex(iPage * 16 + iBackground);
 
-                                rm->spr_background.init(backgroundlist->currentPath());
-                                strcpy(g_map->szBackgroundFile, getFilenameFromPath(backgroundlist->currentPath()).c_str());
+                                rm->spr_background = ImageLoader(backgroundlist->currentPath()).withoutColorKey().create();
+                                g_map->szBackgroundFile = backgroundlist->currentPath().filename().string();
 
                                 if (event.button.button == SDL_BUTTON_LEFT) {
 									//Set music to background default
                                     for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
-                                        if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile, strlen(g_szMusicCategoryNames[iCategory]))) {
+                                        if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile.c_str(), strlen(g_szMusicCategoryNames[iCategory]))) {
 											g_map->musicCategoryID = iCategory;
 											break;
 										}
@@ -4245,7 +4123,7 @@ int editor_backgrounds()
 								}
 
                                 for (short iSurface = 0; iSurface < 16; iSurface++)
-                                    SDL_FreeSurface(sBackgrounds[iSurface]);
+                                    sBackgrounds[iSurface] = gfxSprite();
 
                                 editor_backgrounds_initialized = false;
                                 return EDITOR_EDIT;
@@ -4255,7 +4133,7 @@ int editor_backgrounds()
 				break;
 
 				case SDL_MOUSEMOTION:
-					update_mouse_coords();
+					bound_mouse_motion_coords();
 				break;
 
 				default:
@@ -4270,7 +4148,7 @@ int editor_backgrounds()
             if (iPage * 16 + iBackground >= backgroundlist->count())
 				break;
 
-			SDL_BlitSurface(sBackgrounds[iBackground], &rSrc, screen, &rDst[iBackground]);
+			sBackgrounds[iBackground].draw(rSrc, screen, rDst[iBackground]);
 		}
 
 		rm->menu_font_small.draw(0,480-rm->menu_font_small.getHeight() * 2, "[Page Up] next page, [Page Down] previous page");
@@ -4279,7 +4157,7 @@ int editor_backgrounds()
 		int iID = mouse_x / 160 + mouse_y / 120 * 4 + iPage * 16;
 
         if (iID < backgroundlist->count())
-            rm->menu_font_small.draw(0, 0, backgroundlist->at(iID));
+            rm->menu_font_small.draw(0, 0, backgroundlist->at(iID).string());
 
 		DrawMessage();
 		return EDITOR_BACKGROUNDS;
@@ -4389,7 +4267,7 @@ int editor_animation()
 				}
 
             case SDL_MOUSEMOTION: {
-                update_mouse_coords();
+                bound_mouse_motion_coords();
                 if (fInValidTile) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
 							if (iCol < set_tile_start_x)
@@ -4440,11 +4318,11 @@ int editor_animation()
 				short iSrcX = iRow << 7;
 				short iSrcY = iCol << 5;
 
-				rm->spr_tileanimation[0].draw(iDestX, iDestY, iSrcX, iSrcY, TILESIZE, TILESIZE);
+				rm->spr_tileanimation[0].draw(iDestX, iDestY, {iSrcX, iSrcY, TILESIZE, TILESIZE});
 
 				TileType t = animatedtiletypes[iCol + (iRow << 5)];
-				if (t != tile_nonsolid)
-					rm->spr_tiletypes.draw(iDestX, iDestY, (t-1) << 3, 0, 8, 8);
+				if (t != TileType::NonSolid)
+					rm->spr_tiletypes.draw(iDestX, iDestY, {static_cast<int>(PrevTileType(t)) << 3, 0, 8, 8});
 			}
 		}
 
@@ -4456,7 +4334,7 @@ int editor_animation()
 			}
 		}
 
-		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 
 		rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Use Arrow Keys To Scroll");
 
@@ -4464,37 +4342,30 @@ int editor_animation()
 		return EDITOR_ANIMATION;
 }
 
-void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
+void LoadBackgroundPage(std::array<gfxSprite, 16>& sBackgrounds, short iPage)
 {
 	SDL_Rect srcRectBackground = {0, 0, 640, 480};
 	SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
-    for (short iIndex = 0; iIndex < 16; iIndex++) {
-            std::string szFileName = backgroundlist->at(iPage * 16 + iIndex);
+	for (short iIndex = 0; iIndex < 16; iIndex++) {
+		if (iPage * 16 + iIndex >= backgroundlist->count())
+			break;
 
-            if (szFileName.empty())
+		const std::filesystem::path& path = backgroundlist->at(iPage * 16 + iIndex);
+		if (path.empty())
 			return;
 
-            SDL_Surface * temp = IMG_Load(szFileName.c_str());
+		gfxSprite temp = ImageLoader(path).withoutColorKey().create();
 
-#ifdef USE_SDL2
-		SDL_Surface * sBackground = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_ARGB8888, 0);
-#else
-		SDL_Surface * sBackground = SDL_DisplayFormat(temp);
-#endif
-        if (!sBackground) {
-			printf("ERROR: Couldn't convert thumbnail background to diplay pixel format: %s\n", SDL_GetError());
-			return;
+		SDL_FillRect(sBackgrounds[iIndex].getSurface(), NULL, 0x0);
+
+		if (temp.getWidth() != 640 || temp.getHeight() != 480) {
+			printf("WARNING: Background %s is %dx%d but must be 640x480. Skipping.\n",
+				path.generic_string().c_str(), temp.getWidth(), temp.getHeight());
+			continue;
 		}
 
-		SDL_FreeSurface(temp);
-
-        if (SDL_SCALEBLIT(sBackground, &srcRectBackground, sBackgrounds[iIndex], &dstRectBackground) < 0) {
-			fprintf(stderr, "SDL_SCALEBLIT error: %s\n", SDL_GetError());
-			return;
-		}
-
-		SDL_FreeSurface(sBackground);
+		temp.drawStretch(srcRectBackground, sBackgrounds[iIndex].getSurface(), dstRectBackground);
 	}
 }
 
@@ -4663,10 +4534,10 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 	drawmap(false, TILESIZE);
 	rm->menu_shade.draw(0, 0);
-	rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+	rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
-	rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+	rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 	gfx_flipscreen();
 
     while (true) {
@@ -4691,11 +4562,11 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 							drawmap(false, TILESIZE);
 							rm->menu_shade.draw(0, 0);
-							rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+							rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 							gfx_flipscreen();
 
 							currentChar--;
@@ -4709,11 +4580,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							//insert character into fileName and onScreenText and increment current char
 							Uint8 key = event.key.keysym.sym;
 
-                        #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
-                            const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                        #else
-                            Uint8 * keystate = SDL_GetKeyState(NULL);
-                        #endif
+                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
                         if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
 								if (event.key.keysym.sym == 45)
 									key = 95;
@@ -4747,11 +4614,11 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 							drawmap(false, TILESIZE);
 							rm->menu_shade.draw(0, 0);
-							rm->spr_dialog.draw(224, 176, 0, 0, 192, 128);
+							rm->spr_dialog.draw(224, 176, {0, 0, 192, 128});
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
+							rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename().c_str());
 							gfx_flipscreen();
 						}
 					}
@@ -4803,7 +4670,7 @@ int clearMap()
 #ifdef _DEBUG
 void convertAll()
 {
-    for (int k = 0; k < maplist->GetCount(); k++) {
+    for (int k = 0; k < maplist->count(); k++) {
 		//g_map->convertMap();
 		g_map->saveMap(maplist->currentFilename());
 		maplist->next(false);
@@ -4831,7 +4698,7 @@ void loadcurrentmap()
 		}
 	}
 
-	std::string filename = concat("gfx/packs/Classic/backgrounds/", g_map->szBackgroundFile);
+	std::string filename = "gfx/packs/Classic/backgrounds/" + g_map->szBackgroundFile;
 	std::string path = convertPath(filename);
     backgroundlist->setCurrentPath(filename);
 
@@ -4840,51 +4707,44 @@ void loadcurrentmap()
         backgroundlist->setCurrentPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
 
-	rm->spr_background.init(path);
+    rm->spr_background = ImageLoader(path).withoutColorKey().create();
 
-	g_iNumPlatforms = g_map->iNumPlatforms;
+        g_iNumPlatforms = g_map->platforms.size();
 
     for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
             for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
                 if (iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight) {
-					CopyTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow], &g_map->platforms[iPlatform]->iTileData[iCol][iRow]);
-					g_Platforms[iPlatform].types[iCol][iRow] = g_map->platforms[iPlatform]->iTileType[iCol][iRow].iType;
+                    g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow] = g_map->platforms[iPlatform]->tileAt(iCol, iRow);
+                    g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = g_map->platforms[iPlatform]->tileTypeAt(iCol, iRow);
                 } else {
-					ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
-					g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
+					ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
+					g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = TileType::NonSolid;
 				}
 			}
 		}
 
-		short iDrawLayer = g_map->platforms[iPlatform]->iDrawLayer;
-		g_Platforms[iPlatform].iDrawLayer = iDrawLayer;
+		g_Platforms[iPlatform].iDrawLayer = g_map->platforms[iPlatform]->iDrawLayer;
+		g_Platforms[iPlatform].iPathType = g_map->platforms[iPlatform]->pPath->typeId();
 
-		short iPathType = g_map->platforms[iPlatform]->pPath->GetType();
-		g_Platforms[iPlatform].iPathType = iPathType;
-
-        if (iPathType == 0) {
-			StraightPath * path = (StraightPath*)g_map->platforms[iPlatform]->pPath;
-			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
-			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
-			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
-			g_Platforms[iPlatform].iEndX = (int)(path->dPathPointX[1]);
-			g_Platforms[iPlatform].iEndY = (int)(path->dPathPointY[1]);
-        } else if (iPathType == 1) {
-			StraightPathContinuous * path = (StraightPathContinuous*)g_map->platforms[iPlatform]->pPath;
-			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
-			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
-			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
-			g_Platforms[iPlatform].fAngle = path->dAngle;
-        } else if (iPathType == 2) {
-			EllipsePath * path = (EllipsePath*)g_map->platforms[iPlatform]->pPath;
-
-			g_Platforms[iPlatform].iVelocity = (short)(path->dVelocity / 0.0030f);
-			g_Platforms[iPlatform].fRadiusX = path->dRadiusX;
-			g_Platforms[iPlatform].fRadiusY = path->dRadiusY;
-			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0]);
-			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
-			g_Platforms[iPlatform].fAngle = path->dStartAngle;
+        if (auto* path = dynamic_cast<StraightPath*>(g_map->platforms[iPlatform]->pPath)) {
+			g_Platforms[iPlatform].iVelocity = (int)(path->speed() * 4.0f);
+			g_Platforms[iPlatform].iStartX = (int)(path->startPos().x);
+			g_Platforms[iPlatform].iStartY = (int)(path->startPos().y);
+			g_Platforms[iPlatform].iEndX = (int)(path->endPos().x);
+			g_Platforms[iPlatform].iEndY = (int)(path->endPos().y);
+        } else if (auto* path = dynamic_cast<StraightPathContinuous*>(g_map->platforms[iPlatform]->pPath)) {
+			g_Platforms[iPlatform].iVelocity = (int)(path->speed() * 4.0f);
+			g_Platforms[iPlatform].iStartX = (int)(path->startPos().x);
+			g_Platforms[iPlatform].iStartY = (int)(path->startPos().y);
+			g_Platforms[iPlatform].fAngle = path->angle();
+        } else if (auto* path = dynamic_cast<EllipsePath*>(g_map->platforms[iPlatform]->pPath)) {
+			g_Platforms[iPlatform].iVelocity = (short)(path->speed() / 0.0030f);
+			g_Platforms[iPlatform].fRadiusX = path->radius().x;
+			g_Platforms[iPlatform].fRadiusY = path->radius().y;
+			g_Platforms[iPlatform].iStartX = (int)(path->centerPos().x);
+			g_Platforms[iPlatform].iStartY = (int)(path->centerPos().y);
+			g_Platforms[iPlatform].fAngle = path->startAngle();
 		}
 
 		g_Platforms[iPlatform].UpdatePreview();
@@ -4895,8 +4755,8 @@ void SetPlatformToDefaults(short iPlatform)
 {
     for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
         for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-			ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
-			g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
+			ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow]);
+			g_Platforms[iPlatform].types[iCol * MAPHEIGHT + iRow] = TileType::NonSolid;
 		}
 	}
 
@@ -4931,24 +4791,22 @@ void insert_platforms_into_map()
 	g_map->clearPlatforms();
 
 	//g_map->iNumPlatforms = g_iNumPlatforms;
-	g_map->platforms = new MovingPlatform*[g_iNumPlatforms];
+        g_map->platforms.reserve(g_iNumPlatforms);
 
     for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
-		short iTop, iLeft, iWidth, iHeight;
-		CalculatePlatformDims(iPlatform, &iLeft, &iTop, &iWidth, &iHeight);
+        short iTop, iLeft, iWidth, iHeight;
+        CalculatePlatformDims(iPlatform, &iLeft, &iTop, &iWidth, &iHeight);
 
-		TilesetTile ** tiles = new TilesetTile*[iWidth];
-		MapTile ** types = new MapTile*[iWidth];
+        std::vector<TilesetTile> tiles(iWidth * iHeight);
+        std::vector<TileType> types(iWidth * iHeight);
 
         for (short iCol = 0; iCol < iWidth; iCol++) {
-			tiles[iCol] = new TilesetTile[iHeight];
-			types[iCol] = new MapTile[iHeight];
-
             for (short iRow = 0; iRow < iHeight; iRow++) {
-				CopyTilesetTile(&tiles[iCol][iRow], &g_Platforms[iPlatform].tiles[iCol + iLeft][iRow + iTop]);
-				types[iCol][iRow].iType = g_Platforms[iPlatform].types[iCol + iLeft][iRow + iTop];
-			}
-		}
+                const size_t cellIdx = (iCol + iLeft) * MAPHEIGHT + iRow + iTop;
+                tiles[iCol * iHeight + iRow] = g_Platforms[iPlatform].tiles[cellIdx];
+                types[iCol * iHeight + iRow] = g_Platforms[iPlatform].types[cellIdx];
+            }
+        }
 
 		short iDrawLayer = g_Platforms[iPlatform].iDrawLayer;
 
@@ -4957,22 +4815,23 @@ void insert_platforms_into_map()
 
 		MovingPlatformPath * path = NULL;
 
-        if (g_Platforms[iPlatform].iPathType == 0) {
+        if (g_Platforms[iPlatform].iPathType == PlatformPathType::Straight) {
 			float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.26f;
 			float fEndX = (float)(g_Platforms[iPlatform].iEndX);
 			float fEndY = (float)(g_Platforms[iPlatform].iEndY);
-
-			path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, false);
-        } else if (g_Platforms[iPlatform].iPathType == 1) {
+			path = new StraightPath(fVelocity, Vec2f(fStartX, fStartY), Vec2f(fEndX, fEndY), false);
+        } else if (g_Platforms[iPlatform].iPathType == PlatformPathType::StraightContinuous) {
 			float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.26f;
-			path = new StraightPathContinuous(fVelocity, fStartX, fStartY, g_Platforms[iPlatform].fAngle, false);
-        } else if (g_Platforms[iPlatform].iPathType == 2) {
+			path = new StraightPathContinuous(fVelocity, Vec2f(fStartX, fStartY), g_Platforms[iPlatform].fAngle, false);
+        } else if (g_Platforms[iPlatform].iPathType == PlatformPathType::Ellipse) {
 			float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.0030f;
-			path = new EllipsePath(fVelocity, g_Platforms[iPlatform].fAngle, g_Platforms[iPlatform].fRadiusX, g_Platforms[iPlatform].fRadiusY, fStartX, fStartY, false);
+			float radiusX = g_Platforms[iPlatform].fRadiusX;
+			float radiusY = g_Platforms[iPlatform].fRadiusY;
+			path = new EllipsePath(fVelocity, g_Platforms[iPlatform].fAngle, Vec2f(radiusX, radiusY), Vec2f(fStartX, fStartY), false);
 		}
 
-		g_map->AddPermanentPlatform(new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, false));
-	}
+        g_map->AddPermanentPlatform(new MovingPlatform(std::move(tiles), std::move(types), iWidth, iHeight, iDrawLayer, path, false));
+    }
 }
 
 void save_map(const std::string &file)
@@ -4989,7 +4848,7 @@ void CalculatePlatformDims(short iPlatform, short * ix, short * iy, short * iw, 
 	//Calculate the height and width of the platform
     for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
         for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-            if (g_Platforms[iPlatform].tiles[iCol][iRow].iID != TILESETNONE) {
+            if (g_Platforms[iPlatform].tiles[iCol * MAPHEIGHT + iRow].iID != TILESETNONE) {
 				if (iTop > iRow)
 					iTop = iRow;
 
@@ -5086,15 +4945,15 @@ void pastemoveselection(int movex, int movey)
 
 bool copyselectedtiles()
 {
-	//Copy the selected tiles and remove tiles from map
-	bool ret = false;
+    //Copy the selected tiles and remove tiles from map
+    bool ret = false;
     for (int k = 0; k < MAPHEIGHT; k++) {
         for (int j = 0; j < MAPWIDTH; j++) {
             if (selectedtiles[j][k]) {
-				ret = true;
+                ret = true;
                 for (short iLayer = 0; iLayer < MAPLAYERS; iLayer++) {
-					CopyTilesetTile(&copiedtiles[j][k].tile[iLayer], &g_map->mapdata[j][k][iLayer]);
-				}
+                    copiedtiles[j][k].tile[iLayer] = g_map->mapdata[j][k][iLayer];
+                }
 
 				copiedtiles[j][k].block.iType = g_map->objectdata[j][k].iType;
 				for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
@@ -5105,25 +4964,25 @@ bool copyselectedtiles()
 				copiedtiles[j][k].warp.direction = g_map->warpdata[j][k].direction;
 				copiedtiles[j][k].warp.id = g_map->warpdata[j][k].id;
 
-				copiedtiles[j][k].tiletype = g_map->mapdatatop[j][k].iType;
+				copiedtiles[j][k].tiletype = g_map->mapdatatop[j][k];
 
 				for (short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
 					copiedtiles[j][k].nospawn[iType] = g_map->nospawn[iType][j][k];
 
 				copiedtiles[j][k].item = -1;
-                for (short iMapItem = 0; iMapItem < g_map->iNumMapItems; iMapItem++) {
-                    if (g_map->mapitems[iMapItem].ix == j && g_map->mapitems[iMapItem].iy == k) {
-						copiedtiles[j][k].item = g_map->mapitems[iMapItem].itype;
-						break;
-					}
-				}
-			}
-		}
-	}
+                for (const MapItem& item : g_map->mapitems) {
+                    if (item.ix == j && item.iy == k) {
+                        copiedtiles[j][k].item = item.itype;
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
-	copiedlayer = selected_layer;
+    copiedlayer = selected_layer;
 
-	return ret;
+    return ret;
 }
 
 void clearselectedmaptiles()
@@ -5226,7 +5085,7 @@ void pasteselectedtiles(int movex, int movey)
 						replacetile(&g_map->warpdata[iNewX][iNewY].id, copiedtiles[j][k].warp.id, copiedtiles[j][k].warp.connection != -1);
 
 						if (move_replace)
-							g_map->mapdatatop[iNewX][iNewY].iType = copiedtiles[j][k].tiletype;
+							g_map->mapdatatop[iNewX][iNewY] = copiedtiles[j][k].tiletype;
 						else
 							UpdateTileType(j, k);
 
@@ -5236,16 +5095,15 @@ void pasteselectedtiles(int movex, int movey)
 						//if (move_replace)
 						//	RemoveMapItemAt(j, k);
 
-                        if (g_map->iNumMapItems < MAXMAPITEMS && copiedtiles[j][k].item >= 0) {
+                                                if (g_map->mapitems.size() < MAXMAPITEMS && copiedtiles[j][k].item >= 0) {
 						//	if (!move_replace)
 						//		RemoveMapItemAt(j, k);
 
-							MapItem * mapitem = &g_map->mapitems[g_map->iNumMapItems];
-							mapitem->itype = copiedtiles[j][k].item;
-							mapitem->ix = iNewX;
-							mapitem->iy = iNewY;
-
-							g_map->iNumMapItems++;
+                                                    MapItem item = {};
+                                                    item.itype = static_cast<MapItemType>(copiedtiles[j][k].item);
+                                                    item.ix = iNewX;
+                                                    item.iy = iNewY;
+                                                    g_map->mapitems.emplace_back(std::move(item));
 						}
 					}
 				}
@@ -5296,12 +5154,12 @@ void takescreenshot()
 		short iTileSize = iTileSizes[iScreenshotSize];
 
 		//Allow wrapping of path dots
-		rm->spr_platformpath.SetWrap(true, 640 >> iScreenshotSize);
+		rm->spr_platformpath.setWrap(640 >> iScreenshotSize);
 
 		//Create new screenshot surface
-		SDL_Surface * screenshot = SDL_CreateRGBSurface(old_screen->flags, iTileSize * 20, iTileSize * 15, old_screen->format->BitsPerPixel, 0, 0, 0, 0);
-		blitdest = screenshot;
-		screen = screenshot;
+		auto screenshot = gfxSprite::blank(iTileSize * 20, iTileSize * 15);
+		blitdest = screenshot.getSurface();
+		screen = screenshot.getSurface();
 
 		//Draw map to screenshot
 		drawmap(true, iTileSize);
@@ -5309,12 +5167,12 @@ void takescreenshot()
 		//Draw platforms to screenshot
         for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
 			MapPlatform * platform = &g_Platforms[iPlatform];
-			DrawPlatform(platform->iPathType, platform->tiles, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, iScreenshotSize, g_map->platforms[iPlatform]->iTileWidth, g_map->platforms[iPlatform]->iTileHeight, true, true);
+			DrawPlatform(platform->iPathType, platform->tiles, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, iScreenshotSize, g_map->platforms[iPlatform]->iTileWidth, g_map->platforms[iPlatform]->iTileHeight, true, true, blitdest);
 		}
 
 		//Draw map hazards
-		for (short iHazard = 0; iHazard < g_map->iNumMapHazards; iHazard++)
-			DrawMapHazard(&g_map->maphazards[iHazard], iScreenshotSize, false);
+                for (const MapHazard& hazard : g_map->maphazards)
+                    DrawMapHazard(hazard, iScreenshotSize, false, blitdest);
 
 		//Save the screenshot with the same name as the map file
 		std::string szSaveFile("maps/screenshots/");
@@ -5325,15 +5183,8 @@ void takescreenshot()
 		else if (iTileSize == THUMBTILESIZE)
 			szSaveFile += "_thumb";
 
-#ifdef PNG_SAVE_FORMAT
 		szSaveFile += ".png";
-		IMG_SavePNG(screenshot, convertPath(szSaveFile).c_str());
-#else
-		szSaveFile += ".bmp";
-		SDL_SaveBMP(screenshot, convertPath(szSaveFile).c_str());
-#endif
-
-		SDL_FreeSurface(screenshot);
+                IMG_SavePNG(screenshot.getSurface(), convertPath(szSaveFile).c_str());
 
 		printf("Screenshot taken: %s\n", szSaveFile.c_str());
 	}
@@ -5362,7 +5213,7 @@ bool ReadAnimatedTileTypeFile(const char * szFile)
 		animatedtiletypes = new TileType[256];
 
         for (short i = 0; i < 256; i++) {
-			animatedtiletypes[i] = tile_nonsolid;
+			animatedtiletypes[i] = TileType::NonSolid;
 		}
 	}
 
@@ -5378,7 +5229,7 @@ bool WriteAnimatedTileTypeFile(const char * szFile)
 	}
 
     for (short i = 0; i < 256; i++) {
-		tsf.write_i32(animatedtiletypes[i]);
+            tsf.write_i32(static_cast<int>(animatedtiletypes[i]));
 	}
 
 	return true;

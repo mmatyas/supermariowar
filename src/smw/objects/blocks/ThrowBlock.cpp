@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 extern CEyecandyContainer eyecandy[3];
 extern CObjectContainer objectcontainer[3];
 
-B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, ThrowBlockType type) :
-    IO_Block(nspr, x, y)
+B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, Vec2s pos, short iNumSpr, short aniSpeed, ThrowBlockType type) :
+    IO_Block(nspr, pos)
 {
     iw = 32;
     ih = 32;
@@ -29,7 +29,7 @@ B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 
 void B_ThrowBlock::draw()
 {
-    spr->draw(ix, iy, drawFrame, static_cast<short>(iType) * 32, iw, ih);
+    spr->draw(ix, iy, {drawFrame, static_cast<short>(iType) * 32, iw, ih});
 }
 
 void B_ThrowBlock::update()
@@ -114,7 +114,7 @@ bool B_ThrowBlock::hitleft(CPlayer * player, bool useBehavior)
 
 void B_ThrowBlock::GiveBlockToPlayer(CPlayer * player)
 {
-    CO_ThrowBlock * block = new CO_ThrowBlock(&rm->spr_blueblock, ix, iy, iType);
+    CO_ThrowBlock * block = new CO_ThrowBlock(&rm->spr_blueblock, {ix, iy}, iType);
     if (player->AcceptItem(block)) {
         dead = true;
         g_map->blockdata[col][row] = NULL;
@@ -135,10 +135,10 @@ void B_ThrowBlock::triggerBehavior()
     g_map->UpdateTileGap(col, row);
 
     const int srcY = static_cast<int>(iType) * 16;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, srcY, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, srcY, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, srcY, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, srcY, 16, 16));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, srcY, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, srcY, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, srcY, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, srcY, 16, 16);
 
     ifSoundOnPlay(rm->sfx_breakblock);
 }

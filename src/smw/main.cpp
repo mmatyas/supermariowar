@@ -21,7 +21,7 @@
 #include "map.h"
 #include "MapList.h"
 #include "net.h"
-#include "linfunc.h"
+#include "path.h"
 #include "player.h"
 #include "ResourceManager.h"
 #include "sfx.h"
@@ -104,9 +104,6 @@ CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 
 short currentgamemode = 0;
 
-//Adds music overrides to the music lists
-extern void UpdateMusicWithOverrides();
-
 extern SDL_Joystick     **joysticks;
 extern short            joystickcount;
 
@@ -173,13 +170,12 @@ void create_globals()
 #pragma warning ("delete these or use boost GC shared_ptr")
 
     g_map = new CMap();
-    g_tilesetmanager = new CTilesetManager();
 
     filterslist = new FiltersList();
     maplist = new MapList(false);
 
     //TODO: add proper test via size
-    if (maplist->IsEmpty()) {
+    if (maplist->isEmpty()) {
         throw "Empty map directory!";
     }
 
@@ -196,14 +192,20 @@ void create_globals()
     gamegraphicspacklist = new GraphicsList();
 
     announcerlist->setCurrentIndex(0);
-    musiclist->SetCurrent(0);
-    worldmusiclist->SetCurrent(0);
+    musiclist->setCurrent(0);
+    worldmusiclist->setCurrent(0);
     menugraphicspacklist->setCurrentIndex(0);
     worldgraphicspacklist->setCurrentIndex(0);
     gamegraphicspacklist->setCurrentIndex(0);
     soundpacklist->setCurrentIndex(0);
 
     players.reserve(4);
+
+    try {
+        UpdateMusicWithOverrides(*musiclist, *worldmusiclist);
+    } catch (const std::exception& ex) {
+        throw std::format("ERROR: Could not load music overrides: {}", ex.what());
+    }
 }
 
 void init_joysticks()
@@ -288,7 +290,7 @@ void init_spawnlocations()
 
 void main_game();
 
-void show_catched_error(std::string error)
+void show_catched_error(const std::string& error)
 {
     std::string message = ""
         "It seems the game has unexpectedly crashed. If you could tell us\n"
@@ -297,7 +299,7 @@ void show_catched_error(std::string error)
         "https://github.com/mmatyas/supermariowar/issues\n\n"
         "Sincerely,\nThe Developers";
     if (!error.empty()) {
-        message += "\n\n\nThe error message:\n" + std::move(error);
+        message += "\n\n\nThe error message:\n" + error;
     }
 
     fprintf(stderr, "\n%s\n", message.c_str());
@@ -328,6 +330,10 @@ int main(int argc, char *argv[])
         show_catched_error(what);
         return 1;
     }
+    catch (const std::string& ex) {
+        show_catched_error(ex);
+        return 1;
+    }
     catch (const std::exception& ex) {
         show_catched_error(ex.what());
         return 1;
@@ -342,13 +348,13 @@ int main(int argc, char *argv[])
 
 void main_game()
 {
-    ensureSettingsDir();
-    create_globals();
-
     printf("-------------------------------------------------------------------------------\n");
     printf(" %s %s %s\n", TITLESTRING, GIT_REVISION, GIT_DATE);
     printf("-------------------------------------------------------------------------------\n");
     printf("\n---------------- startup ----------------\n");
+
+    ensureSettingsDir();
+    create_globals();
 
 	gfx_init(App::screenWidth, App::screenHeight, false);		//initialize the graphics (SDL)
     blitdest = screen;
@@ -385,8 +391,6 @@ void main_game()
 
     game_values.init();
 
-    UpdateMusicWithOverrides();
-
     create_gamemodes();
 
     game_values.ReadBinaryConfig();
@@ -404,8 +408,10 @@ void main_game()
     init_spawnlocations();
 
     //Load the gfx color palette
-    const bool pngPalette = gfx_loadpalette(convertPath("gfx/packs/palette.png", gamegraphicspacklist->currentPath()));
-    if (!pngPalette) {
+    try {
+        gfx_loadpalette(convertPath("gfx/packs/palette.png", gamegraphicspacklist->currentPath()));
+    } catch (const std::string& err) {
+        printf("\nwarning: %s -> falling back to BMP\n", err.c_str());
         gfx_loadpalette(convertPath("gfx/packs/palette.bmp", gamegraphicspacklist->currentPath()));
     }
 
@@ -443,23 +449,8 @@ void main_game()
 
     //Delete player skins
     for (short k = 0; k < MAX_PLAYERS; k++) {
-        for (short j = 0; j < PGFX_LAST; j++) {
-            delete rm->spr_player[k][j];
-            delete rm->spr_shyguy[k][j];
-            delete rm->spr_chocobo[k][j];
-            delete rm->spr_bobomb[k][j];
-        }
-
-        delete [] rm->spr_player[k];
-        delete [] rm->spr_shyguy[k];
-        delete [] rm->spr_chocobo[k];
-        delete [] rm->spr_bobomb[k];
-
         delete score[k];
     }
-
-    delete [] game_values.pfFilters;
-    delete [] game_values.piFilterIcons;
 
 	// release all resources
 	delete rm;

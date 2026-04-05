@@ -1,91 +1,87 @@
-#ifndef FILELIST_H
-#define FILELIST_H
+#pragma once
 
-#include "path.h"
-#include "RandomNumberGenerator.h"
-
-#include <map>
+#include <filesystem>
+#include <memory>
+#include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
-#define MAXMUSICCATEGORY        11
-#define MAXWORLDMUSICCATEGORY   9
-#define MAXCATEGORYTRACKS       64
 
 //it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
 class SimpleFileList {
 public:
     SimpleFileList() = default;
-    SimpleFileList(const std::string& dirpath, const std::string& extension, bool fAlphabetize = false);
+    SimpleFileList(const std::filesystem::path& dirpath, const std::string& extension, bool fAlphabetize = false);
     virtual ~SimpleFileList() = default;
 
-    std::string at(size_t index) const;
+    const std::filesystem::path& at(size_t index) const { return m_filelist.at(index); }
     size_t count() const { return m_filelist.size(); }
     size_t currentIndex() const { return m_index; }
-    std::string currentPath() const { return at(m_index); }
+    const std::filesystem::path& currentPath() const { return at(m_index); }
 
     void setCurrentIndex(size_t index);
-    void setCurrentPath(const std::string& path);
+    void setCurrentPath(const std::filesystem::path& path);
 
     void next();
     void prev();
     void random();
 
-    void add(std::string path);
+    void add(std::filesystem::path path);
     bool find(const std::string& name);
 
 protected:
-    std::vector<std::string> m_filelist;
+    std::vector<std::filesystem::path> m_filelist;
     size_t m_index = -1;
 };
 
 
 class SimpleDirectoryList : public SimpleFileList {
 public:
-    SimpleDirectoryList(const std::string& dirpath);
+    SimpleDirectoryList(const std::filesystem::path& dirpath);
     virtual ~SimpleDirectoryList() = default;
 };
 
 
 class AnnouncerList : public SimpleFileList {
 public:
-    AnnouncerList(): SimpleFileList(convertPath("sfx/announcer/"), ".txt") {}
+    AnnouncerList();
 };
 
 class GraphicsList : public SimpleDirectoryList {
 public:
-    GraphicsList(): SimpleDirectoryList(convertPath("gfx/packs/")) {}
+    GraphicsList();
 };
 
 class SoundsList : public SimpleDirectoryList {
 public:
-    SoundsList(): SimpleDirectoryList(convertPath("sfx/packs/")) {}
+    SoundsList();
 };
 
 class TourList : public SimpleFileList {
 public:
-    TourList() : SimpleFileList(convertPath("tours/"), ".txt") {}
+    TourList();
 };
 
 class WorldList : public SimpleFileList {
 public:
-    WorldList() : SimpleFileList(convertPath("worlds/"), ".txt", true) {}
+    WorldList();
 };
 
 class BackgroundList : public SimpleFileList {
 public:
-    BackgroundList() : SimpleFileList(convertPath("gfx/packs/Classic/backgrounds/"), ".png") {}
+    BackgroundList();
 };
 
 class FiltersList : public SimpleFileList {
 public:
-    FiltersList() : SimpleFileList(convertPath("filters/"), ".txt") {}
+    FiltersList();
 };
 
 
 struct SkinListNode {
     std::string name;
-    std::string path;
+    std::filesystem::path path;
 };
 
 class SkinList {
@@ -93,145 +89,209 @@ public:
     SkinList();
 
     size_t count() const { return m_skins.size(); }
-
-    std::string getPath(size_t index) const;
-    std::string getName(size_t index) const;
+    const SkinListNode& at(size_t idx) const { return m_skins.at(idx); }
 
 private:
     std::vector<SkinListNode> m_skins;
 };
 
 
-class MusicOverride
-{
-public:
-    std::vector<int> songs;
+enum class MusicCategory : unsigned char {
+    Land,
+    Underground,
+    Underwater,
+    Castle,
+    Platforms,
+    Ghost,
+    Bonus,
+    Battle,
+    Desert,
+    Clouds,
+    Snow,
+    COUNT,
+};
+constexpr std::string_view to_string(MusicCategory category) noexcept {
+    switch (category) {
+        case MusicCategory::Land: return "Land";
+        case MusicCategory::Underground: return "Underground";
+        case MusicCategory::Underwater: return "Underwater";
+        case MusicCategory::Castle: return "Castle";
+        case MusicCategory::Platforms: return "Platforms";
+        case MusicCategory::Ghost: return "Ghost";
+        case MusicCategory::Bonus: return "Bonus";
+        case MusicCategory::Battle: return "Battle";
+        case MusicCategory::Desert: return "Desert";
+        case MusicCategory::Clouds: return "Clouds";
+        case MusicCategory::Snow: return "Snow";
+        case MusicCategory::COUNT: return "COUNT";
+    }
+#if defined(_MSC_VER) && !defined(__clang__) // MSVC
+    __assume(false);
+#else // GCC, Clang
+    __builtin_unreachable();
+#endif
+}
+
+
+struct MapMusicOverride {
+    std::string mapname;
+    std::vector<std::filesystem::path> songs;
 };
 
-class MusicEntry
-{
+
+class MusicPack {
 public:
-    MusicEntry(const std::string & musicdirectory);
-    ~MusicEntry() {}
+    explicit MusicPack(std::string name);
 
-    void UpdateWithOverrides();
+    static std::optional<MusicPack> load(const std::filesystem::path& musicDirectory);
 
-    std::string GetMusic(unsigned int musicID);
-    std::string GetRandomMusic(int iCategoryID, const char * szMapName, const char * szBackground);
-    std::string GetNextMusic(int iCategoryID, const char * szMapName, const char * szBackground);
+    void updateWithOverrides(const std::vector<MapMusicOverride>& overrides);
 
-    int numsongsforcategory[MAXMUSICCATEGORY];
-    int songsforcategory[MAXMUSICCATEGORY][MAXCATEGORYTRACKS];
-    std::vector<std::string> songFileNames;
+    const std::string& name() const { return m_name; }
+    const std::filesystem::path& music(size_t musicID) const;
+    const std::filesystem::path& randomMusic(MusicCategory category, const std::string& mapName, const std::string& background);
+    const std::filesystem::path& nextMusic(MusicCategory category, const std::string& mapName, const std::string& background);
 
-    std::map<std::string, MusicOverride*> mapoverride;
-    std::map<std::string, MusicOverride*> backgroundoverride;
+private:
+    std::string m_name;
+    size_t m_currentMusic = 0;
 
-    std::string name;
-    unsigned short iCurrentMusic;
+    std::vector<std::filesystem::path> m_all_songs;
 
-    bool fError;
-
-    bool fUsesMapOverrides;
-    bool fUsesBackgroundOverrides;
+    std::unordered_map<MusicCategory, std::vector<size_t>> m_category_songs;
+    std::unordered_map<std::string, std::vector<size_t>> m_map_overrides;
+    std::unordered_map<std::string, std::vector<size_t>> m_background_overrides;
 };
+
 
 class MusicList
 {
 public:
     MusicList();
-    ~MusicList();
 
-    std::string GetMusic(int musicID);
-    void SetRandomMusic(int iCategoryID, const char * szMapName, const char * szBackground);
-    void SetNextMusic(int iCategoryID, const char * szMapName, const char * szBackground);
-    std::string GetCurrentMusic();
+    const std::filesystem::path& music(size_t musicID) const {
+        return m_entries.at(m_currentIndex).music(musicID);
+    }
+    const std::filesystem::path& currentMusic() const {
+        return m_currentMusic;
+    }
+    void setRandomMusic(MusicCategory category, const std::string& mapName, const std::string& background);
+    void setNextMusic(MusicCategory category, const std::string& mapName, const std::string& background);
 
-    int GetCurrentIndex() {
-        return currentIndex;
-    };
-    void SetCurrent(unsigned int index) {
-        if (index < entries.size())
-            currentIndex = index;
-        else
-            currentIndex = 0;
-    };
+    size_t currentIndex() const {
+        return m_currentIndex;
+    }
+    void setCurrent(size_t index) {
+        m_currentIndex = index < m_entries.size() ? index : 0;
+    }
+    const std::string& currentName() const {
+        return m_entries.at(m_currentIndex).name();
+    }
 
-    const char * current_name() {
-        return entries[currentIndex]->name.c_str();
-    };
     void next();
     void prev();
-    void random() {
-        currentIndex = RANDOM_INT(entries.size());
-    };
+    void random();
 
-    void UpdateEntriesWithOverrides();
+    void updateEntriesWithOverrides(const std::vector<MapMusicOverride>& overrides);
 
 private:
-    std::string CurrentMusic;
-    std::vector<MusicEntry*> entries;
-    int currentIndex;
+    std::filesystem::path m_currentMusic;
+    std::vector<MusicPack> m_entries;
+    size_t m_currentIndex = 0;
 };
 
-class WorldMusicEntry
-{
+
+enum class WorldMusicCategory : unsigned char {
+    Grass,
+    Desert,
+    Water,
+    Giant,
+    Sky,
+    Ice,
+    Pipe,
+    Dark,
+    Space,
+    Bonus,
+    Sleep,
+    COUNT,
+};
+constexpr std::string_view to_string(WorldMusicCategory category) noexcept {
+    switch (category) {
+        case WorldMusicCategory::Grass: return "Grass";
+        case WorldMusicCategory::Desert: return "Desert";
+        case WorldMusicCategory::Water: return "Water";
+        case WorldMusicCategory::Giant: return "Giant";
+        case WorldMusicCategory::Sky: return "Sky";
+        case WorldMusicCategory::Ice: return "Ice";
+        case WorldMusicCategory::Pipe: return "Pipe";
+        case WorldMusicCategory::Dark: return "Dark";
+        case WorldMusicCategory::Space: return "Space";
+        case WorldMusicCategory::Bonus: return "Bonus";
+        case WorldMusicCategory::Sleep: return "Sleep";
+        case WorldMusicCategory::COUNT: return "COUNT";
+    }
+#if defined(_MSC_VER) && !defined(__clang__) // MSVC
+    __assume(false);
+#else // GCC, Clang
+    __builtin_unreachable();
+#endif
+}
+
+
+struct WorldMusicOverride {
+    std::string worldname;
+    std::filesystem::path song;
+};
+
+
+class WorldMusicPack {
 public:
-    WorldMusicEntry(const std::string & musicdirectory);
-    ~WorldMusicEntry() {}
+    explicit WorldMusicPack(std::string name);
 
-    void UpdateWithOverrides();
+    static std::optional<WorldMusicPack> load(const std::filesystem::path& musicDirectory);
 
-    std::string GetMusic(unsigned int musicID, const char * szWorldName);
+    const std::filesystem::path& music(WorldMusicCategory category, const std::string& worldName) const;
+    const std::string& name() const { return m_name; }
 
-    std::string songFileNames[MAXWORLDMUSICCATEGORY + 2];
-    std::string name;
+    void updateWithOverrides(const std::vector<WorldMusicOverride>& overrides);
 
-    std::map<std::string, std::string> worldoverride;
-
-    bool fError;
-
-    bool fUsesWorldOverrides;
+private:
+    std::string m_name;
+    std::unordered_map<std::string, std::filesystem::path> m_world_overrides;
+    std::unordered_map<WorldMusicCategory, std::filesystem::path> m_category_song;
 };
 
-class WorldMusicList
-{
+
+class WorldMusicList {
 public:
     WorldMusicList();
-    ~WorldMusicList();
 
-    std::string GetMusic(int musicID, const char * szWorldName);
-    std::string GetCurrentMusic();
-
-    int GetCurrentIndex() {
-        return currentIndex;
+    size_t currentIndex() const {
+        return m_currentIndex;
     }
-    void SetCurrent(unsigned int index) {
-        if (index < entries.size())
-            currentIndex = index;
-        else
-            currentIndex = 0;
-    };
-
-    const char * current_name() {
-        return entries[currentIndex]->name.c_str();
+    void setCurrent(size_t index) {
+        m_currentIndex = index < m_entries.size() ? index : 0;
     }
+    const std::string& currentName() const {
+        return m_entries[m_currentIndex].name();
+    }
+    const std::filesystem::path& currentMusic(WorldMusicCategory category, const std::string& worldName) const {
+        return m_entries[m_currentIndex].music(category, worldName);
+    }
+    size_t count() const {
+        return m_entries.size();
+    }
+
     void next();
     void prev();
-    void random() {
-        currentIndex = RANDOM_INT(entries.size());
-    }
+    void random();
 
-    int GetCount() {
-        return entries.size();
-    }
-
-    void UpdateEntriesWithOverrides();
+    void updateEntriesWithOverrides(const std::vector<WorldMusicOverride>& overrides);
 
 private:
-    std::string CurrentMusic;
-    std::vector<WorldMusicEntry*> entries;
-    int currentIndex;
+    std::vector<WorldMusicPack> m_entries;
+    size_t m_currentIndex = 0;
 };
 
-#endif // FILELIST_H
+/// Adds music overrides to the music lists
+void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusiclist);

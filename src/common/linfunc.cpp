@@ -54,6 +54,12 @@ void inPlaceLowerCase(std::string& str)
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
 
+std::string lowercase(std::string str)
+{
+    inPlaceLowerCase(str);
+    return str;
+}
+
 bool cstr_ci_equals(const char* const a, const char* const b)
 {
     if (a == b)
@@ -67,13 +73,31 @@ bool cstr_ci_equals(const char* const a, const char* const b)
     return true;
 }
 
-std::list<std::string> tokenize(const std::string& text, char delim)
+std::list<std::string_view> tokenize(std::string_view text, char delim, size_t maxsplit)
 {
-    std::list<std::string> tokens;
+    if (text.empty()) {
+        return { text };
+    }
 
-    std::istringstream stream(text);
-    for (std::string part; std::getline(stream, part, delim);)
-        tokens.emplace_back(part);
+    std::list<std::string_view> tokens;
+    size_t start = 0;
+
+    while (start < text.size()) {
+        if (maxsplit == 0) {
+            tokens.emplace_back(text.substr(start));
+            break;
+        }
+
+        const size_t end = text.find(delim, start);
+        if (end == std::string_view::npos) {
+            tokens.emplace_back(text.substr(start));
+            break;
+        }
+
+        tokens.emplace_back(text.substr(start, end - start));
+        start = end + 1;
+        maxsplit--;
+    }
 
     return tokens;
 }

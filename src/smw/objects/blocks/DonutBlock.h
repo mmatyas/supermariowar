@@ -4,7 +4,7 @@
 
 class B_DonutBlock : public IO_Block {
 public:
-	B_DonutBlock(gfxSprite *nspr, short x, short y);
+	B_DonutBlock(gfxSprite *nspr, Vec2s pos);
 
 	void draw() override;
 	void update() override;

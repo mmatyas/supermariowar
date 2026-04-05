@@ -1,9 +1,8 @@
 #include "path.h"
 
-#ifdef USE_SDL2
 #include "SDL.h"
-#endif
 
+#include <array>
 #include <cassert>
 #include <cstring>
 #include <string>
@@ -15,6 +14,8 @@
 #else
 #include <stdlib.h>
 #endif
+
+namespace fs = std::filesystem;
 
 
 extern std::string RootDataDirectory;
@@ -46,29 +47,20 @@ std::string GetHomeDirectory()
 
 #else // catch-all for Linux-based systems
     std::string result;
-#ifdef USE_SDL2
-    char* prefPath = SDL_GetPrefPath(nullptr, "supermariowar");
-    if (prefPath) {
-        result = prefPath;
-        SDL_free(prefPath);
+    if (char* sdl_path = SDL_GetPrefPath(nullptr, "supermariowar")) {
+        result = sdl_path;
+        SDL_free(sdl_path);
     }
-#else
-    char* home = getenv("HOME");
-    if (home) {
-        result = std::string(home) + "/.smw/";
-    }
-#endif
     return result;
 #endif
 }
 
 std::string GetRootDirectory()
 {
-#if !defined(_WIN32) && defined(USE_SDL2)
+#if !defined(_WIN32)
     // TODO: SDL_GetBasePath returns an UTF-8 string, which needs
     // some special treatment on Windows to work
-    char* const sdl_path = SDL_GetBasePath();
-    if (sdl_path) {
+    if (char* sdl_path = SDL_GetBasePath()) {
         std::string result = sdl_path;
         SDL_free(sdl_path);
         return result;
@@ -78,9 +70,9 @@ std::string GetRootDirectory()
     return "./";
 }
 
-bool FileExists(const std::string path)
+bool FileExists(const std::string& path)
 {
-    struct stat buffer;
+    struct stat buffer {};
     int i = stat(path.c_str(), &buffer);
     return i == 0;
 }
@@ -153,43 +145,27 @@ std::string convertPath(const std::string& source)
     return SMW_Root_Data_Dir + source;
 }
 
-std::string convertPath(const std::string& source, const std::string& pack)
+std::string convertPath(std::string_view relpath, const std::filesystem::path& packdir)
 {
-    if (source.find("gfx/packs/") == 0) {
-                std::string trailingdir = source.substr(9);
+    constexpr std::array<std::string_view, 2> prefixes {
+        "gfx/packs/",
+        "sfx/packs/",
+    };
+    for (std::string_view prefix : prefixes) {
+        if (!relpath.starts_with(prefix))
+            continue;
 
-                const std::string s = pack + trailingdir;
+        relpath.remove_prefix(prefix.length());
 
-		//If the file exists, return the path to it
-                if (FileExists(s))
-			return s;
+        //If the file exists, return the path to it
+        fs::path path = packdir / relpath;
+        if (fs::exists(path))
+            return path.generic_string();
 
-		//If not, use the classic file
-		return convertPath("gfx/packs/Classic" + trailingdir);
-	}
-
-    if (source.find("sfx/packs/") == 0) {
-                std::string trailingdir = source.substr(9);
-
-                const std::string s = pack + trailingdir;
-
-		//If the file exists, return the path to it
-                if (FileExists(s))
-			return s;
-
-		//If not, use the classic file
-		return convertPath("sfx/packs/Classic" + trailingdir);
-	}
-
-	return convertPath(source);
-}
-
-std::string getFilenameFromPath(const std::string& path)
-{
-    size_t pos = path.find_last_of(dirSeparator());
-    return pos != std::string::npos
-        ? path.substr(pos + 1)
-        : path;
+        //If not, use the classic file
+        return convertPath(std::string(prefix) + "Classic/" + std::string(relpath));  // FIXME
+    }
+    return convertPath(std::string(relpath));
 }
 
 // Takes a path to a file and gives you back the file name (with or without author) as a char *

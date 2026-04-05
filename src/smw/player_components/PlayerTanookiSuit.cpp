@@ -28,7 +28,7 @@ bool PlayerTanookiSuit::canTurnIntoStatue(CPlayer& player) {
     return player.playerKeys->game_turbo.fPressed
         && player.playerKeys->game_down.fDown
         && !statue_lock
-        && player.powerupused == -1
+        && !player.powerupused.has_value()
         && !player.lockfire
         && !player.kuriboshoe.is_on()
         && !player.tail.isInUse();
@@ -58,7 +58,7 @@ void PlayerTanookiSuit::update(CPlayer& player)
         statue_timer = 123;
 
         // perform tansformation effects
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player.centerX() - 24, player.centerY() - 24, 4, 5));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, player.centerX() - 24, player.centerY() - 24, 4, 5);
         ifSoundOnPlay(rm->sfx_transform);
 
         // Neutralize lateral velocity
@@ -101,7 +101,7 @@ void PlayerTanookiSuit::update(CPlayer& player)
                 player.vely = -8.0;
 
             // perform transformation effects
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player.centerX() - 24, player.centerY() - 24, 4, 5));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, player.centerX() - 24, player.centerY() - 24, 4, 5);
             ifSoundOnPlay(rm->sfx_transform);
 
             //Decrease the amount of tanooki uses, if feature is turned on
@@ -177,13 +177,11 @@ void PlayerTanookiSuit::drawStatue(CPlayer& player)
         rm->spr_statue.draw(
             player.leftX() - PWOFFSET,
             player.topY() - 31,
-            player.getColorID() << 5,
-            0, 32, 58,
-            (short)player.state % 4, player.GetWarpPlane());
+            {player.getColorID() << 5, 0, 32, 58},
+            static_cast<ClipEdge>((short)player.state % 4), player.GetWarpPlane());
     else
         rm->spr_statue.draw(
             player.leftX() - PWOFFSET,
             player.topY() - 31,
-            player.getColorID() << 5,
-            0, 32, 58);
+            {player.getColorID() << 5, 0, 32, 58});
 }

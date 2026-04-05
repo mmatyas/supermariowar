@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class OMO Straight Path Hazard - straight path fireball
 //------------------------------------------------------------------------------
-OMO_StraightPathHazard::OMO_StraightPathHazard(gfxSprite* nspr, short x, short y, float angle, float vel, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth)
-    : IO_OverMapObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
+OMO_StraightPathHazard::OMO_StraightPathHazard(gfxSprite* nspr, Vec2s pos, float angle, float vel, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth)
+    : IO_OverMapObject(nspr, pos, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
 {
     objectType = object_pathhazard;
 
@@ -42,7 +42,7 @@ void OMO_StraightPathHazard::update()
 bool OMO_StraightPathHazard::collide(CPlayer* player)
 {
     if (!player->isShielded()) {
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8);
         dead = true;
 
         if (!player->isInvincible() && !player->shyguy) {

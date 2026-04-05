@@ -67,9 +67,9 @@ public:
     void update(bool& running);
 
     // NetworkEventHandler methods
-    void onConnect(NetPeer*);
-    void onReceive(NetPeer&, const uint8_t*, size_t);
-    void onDisconnect(NetPeer& client);
+    void onConnect(NetPeer*) override;
+    void onReceive(NetPeer&, const uint8_t*, size_t) override;
+    void onDisconnect(NetPeer& client) override;
 };
 
 #endif // SMWSERVER_H

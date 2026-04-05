@@ -89,7 +89,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 
     miUpArrow = new MI_Image(&rm->menu_verticalarrows, 310, 162, 20, 0, 20, 20, 1, 4, 8);
     miDownArrow = new MI_Image(&rm->menu_verticalarrows, 310, 402, 0, 0, 20, 20, 1, 4, 8);
-    miUpArrow->Show(false);
+    miUpArrow->setVisible(false);
 
     mMenu->AddControl(miQuantityField, NULL, miRateField, NULL, NULL);
     mMenu->AddControl(miRateField, miQuantityField, miStoredShellsField, NULL, NULL);
@@ -141,7 +141,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 
     mMenu->AddControl(miBackButton, miPowerupSlider[NUMFRENZYCARDS - 1], NULL, miPowerupSlider[NUMFRENZYCARDS - 1], NULL);
 
-    mMenu->SetHeadControl(miQuantityField);
+    mMenu->setInitialFocus(miQuantityField);
     mMenu->SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 }
 
@@ -157,10 +157,10 @@ void MI_FrenzyModeOptions::SetupPowerupFields()
         MI_PowerupSlider * slider = miPowerupSlider[iPosition];
 
         if ((iPosition >> 1) < iOffset || (iPosition >> 1) >= iOffset + iNumLines)
-            slider->Show(false);
+            slider->setVisible(false);
         else {
-            slider->Show(true);
-            slider->SetPosition(ix + (iPosition % 2) * 295, iy + 118 + 38 * (iPosition / 2 - iOffset));
+            slider->setVisible(true);
+            slider->SetPosition(m_pos.x + (iPosition % 2) * 295, m_pos.y + 118 + 38 * (iPosition / 2 - iOffset));
         }
     }
 }
@@ -179,11 +179,11 @@ MenuCodeEnum MI_FrenzyModeOptions::Modify(bool modify)
 
 MenuCodeEnum MI_FrenzyModeOptions::SendInput(CPlayerInput * playerInput)
 {
-    UI_Control * prevControl = mMenu->GetCurrentControl();
+    UI_Control * prevControl = mMenu->currentFocus();
 
     MenuCodeEnum ret = mMenu->SendInput(playerInput);
 
-    UI_Control * nextControl = mMenu->GetCurrentControl();
+    UI_Control * nextControl = mMenu->currentFocus();
 
     if (MENU_CODE_CANCEL_INPUT == ret) {
         fModifying = false;
@@ -206,7 +206,7 @@ void MI_FrenzyModeOptions::Update()
 
 void MI_FrenzyModeOptions::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     mMenu->Draw();
@@ -249,14 +249,14 @@ void MI_FrenzyModeOptions::SetRandomGameModeSettings()
 void MI_FrenzyModeOptions::AdjustDisplayArrows()
 {
     if (iIndex > iTopStop)
-        miUpArrow->Show(true);
+        miUpArrow->setVisible(true);
     else
-        miUpArrow->Show(false);
+        miUpArrow->setVisible(false);
 
     if (iIndex < iBottomStop)
-        miDownArrow->Show(true);
+        miDownArrow->setVisible(true);
     else
-        miDownArrow->Show(false);
+        miDownArrow->setVisible(false);
 }
 
 MenuCodeEnum MI_FrenzyModeOptions::MouseClick(short iMouseX, short iMouseY)
@@ -273,7 +273,7 @@ MenuCodeEnum MI_FrenzyModeOptions::MouseClick(short iMouseX, short iMouseY)
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
         MI_PowerupSlider * slider = miPowerupSlider[iPowerup];
 
-        if (slider == mMenu->GetCurrentControl()) {
+        if (slider == mMenu->currentFocus()) {
             iIndex = (iPowerup >> 1) + 3;
 
             if (iIndex <= iTopStop)

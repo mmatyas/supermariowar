@@ -5,8 +5,8 @@
 
 extern CResourceManager* rm;
 
-B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y, bool fHidden, const short * piSettings) :
-    B_PowerupBlock(nspr1, x, y, 1, 32000, fHidden, piSettings)
+B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, Vec2s pos, bool fHidden, const short * piSettings) :
+    B_PowerupBlock(nspr1, pos, 1, 32000, fHidden, piSettings)
 {
     poweruptimer = 0;
     powerupindex = RANDOM_INT(NUM_POWERUPS);
@@ -30,7 +30,7 @@ void B_ViewBlock::draw()
 
     //Draw powerup behind block
     if (state == 0 && !fNoPowerupsSelected)
-        rm->spr_storedpoweruplarge.draw(ix, iy, powerupindex * 32, 0, 32, 32);
+        rm->spr_storedpoweruplarge.draw(ix, iy, {powerupindex * 32, 0, 32, 32});
 
     B_PowerupBlock::draw();
 }

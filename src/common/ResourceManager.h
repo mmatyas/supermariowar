@@ -6,31 +6,38 @@
 #include "GlobalConstants.h"
 #include "sfx.h"
 
-#include <string>
+#include <array>
+#include <filesystem>
+
+using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
+
 
 class CResourceManager {
 public:
-	bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID);
-	bool LoadFullSkin(gfxSprite ** sprites, const std::string& filename, short colorID);
+	SpriteStrip LoadFullSkin(short skinID, short colorID);
+	SpriteStrip LoadFullSkin(const std::filesystem::path& path, short colorID);
 
-	bool LoadWorldGraphics();
 	bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
-	bool LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections);
-	void LoadAllGraphics();
-	bool LoadMenuGraphics();
-	bool LoadGameGraphics();
+	bool LoadMenuSkin(short playerID, const std::filesystem::path& path, short colorID, bool fLoadBothDirections);
+
+	void loadAllGraphics();
+	void loadMenuGraphics();
+	void loadGameGraphics();
+	void loadWorldGraphics();
+	void loadStartGraphics();
 
 	bool LoadGameSounds();
 
 private:
-	void LoadAllSprites();
+	void loadAllSprites();
 
 public:
 
-	gfxSprite		** spr_player[4];	//all player sprites
-	gfxSprite		** spr_shyguy[4];
-	gfxSprite		** spr_chocobo[4];
-	gfxSprite		** spr_bobomb[4];
+	std::array<SpriteStrip, 4> spr_player;	//all player sprites
+	std::array<SpriteStrip, 4> spr_shyguy;
+	std::array<SpriteStrip, 4> spr_chocobo;
+	std::array<SpriteStrip, 4> spr_bobomb;
+
 	gfxSprite		spr_clouds;
 	gfxSprite		spr_ghosts;
 	gfxSprite		spr_fish;

@@ -1,40 +1,27 @@
 #include "FileList.h"
 
-#include "dirlist.h"
-#include "GlobalConstants.h"
 #include "linfunc.h"
+#include "path.h"
+#include "RandomNumberGenerator.h"
+#include "util/ContainerHelpers.h"
+#include "util/DirIterator.h"
 
 #include <algorithm>
+#include <format>
 #include <fstream>
-#include <list>
-#include <cstring>
+#include <variant>
 
-extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
+namespace fs = std::filesystem;
 
-extern MusicList* musiclist;
-extern WorldMusicList* worldmusiclist;
-
-namespace {
-const short g_iDefaultMusicCategory[MAXMUSICCATEGORY] {0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 0};
-}// namespace
+#define MAXCATEGORYTRACKS 64
 
 
-struct MapMusicOverride {
-    std::string mapname;
-    std::vector<std::string> songs;
-};
-
-struct WorldMusicOverride {
-    std::string worldname;
-    std::string song;
-};
-
-std::vector<MapMusicOverride> mapmusicoverrides;
-std::vector<WorldMusicOverride> worldmusicoverrides;
-
-void UpdateMusicWithOverrides()
+void UpdateMusicWithOverrides(MusicList& musiclist, WorldMusicList& worldmusiclist)
 {
-    enum class Category : unsigned char {
+    std::vector<MapMusicOverride> mapmusicoverrides;
+    std::vector<WorldMusicOverride> worldmusicoverrides;
+
+    enum class Section : unsigned char {
         None,
         Maps,
         Worlds,
@@ -44,7 +31,7 @@ void UpdateMusicWithOverrides()
     if (!file)
         return;
 
-    Category currentCategory = Category::None;
+    Section current_section = Section::None;
     std::string line;
     while (std::getline(file, line)) {
         //Ignore comment lines
@@ -52,73 +39,72 @@ void UpdateMusicWithOverrides()
             continue;
 
         //Chop off line ending
-        line = line.substr(0, line.find('\r'));
-        line = line.substr(0, line.find('\n'));
+        if (line.ends_with('\r'))
+            line.pop_back();
 
         //If we found a category header
         if (line[0] == '[') {
             std::transform(line.begin(), line.end(), line.begin(), ::tolower);
 
             if (line == "[maps]")
-                currentCategory = Category::Maps;
+                current_section = Section::Maps;
             else if (line == "[worlds]")
-                currentCategory = Category::Worlds;
+                current_section = Section::Worlds;
 
             continue;
         }
 
         //If we're not in a category, ignore this line
-        if (currentCategory == Category::None)
+        if (current_section == Section::None)
             continue;
 
-        std::list<std::string> tokens = tokenize(line, ',');
+        std::list<std::string_view> tokens = tokenize(line, ',');
         if (tokens.empty())
             continue;
 
-        if (currentCategory == Category::Maps) {
+        if (current_section == Section::Maps) {
             MapMusicOverride override;
 
             override.mapname = std::move(tokens.front());
             tokens.pop_front();
 
-            for (const std::string& token : tokens) {
-                std::string path = convertPath(token);
-                if (FileExists(path))
+            for (std::string_view token : tokens) {
+                fs::path path = convertPath(std::string(token));
+                if (fs::exists(path))
                     override.songs.emplace_back(std::move(path));
             }
             //Don't add overrides that have no songs
             if (!override.songs.empty())
                 mapmusicoverrides.emplace_back(std::move(override));
         }
-        else if (currentCategory == Category::Worlds) {
+        else if (current_section == Section::Worlds) {
             WorldMusicOverride override;
 
             override.worldname = std::move(tokens.front());
             tokens.pop_front();
 
-            std::string path = convertPath(tokens.front());
-            if (FileExists(path)) {
+            fs::path path = convertPath(std::string(tokens.front()));
+            if (fs::exists(path)) {
                 override.song = std::move(path);
                 worldmusicoverrides.emplace_back(std::move(override));
             }
         }
     }
 
-    musiclist->UpdateEntriesWithOverrides();
-    worldmusiclist->UpdateEntriesWithOverrides();
+    musiclist.updateEntriesWithOverrides(mapmusicoverrides);
+    worldmusiclist.updateEntriesWithOverrides(worldmusicoverrides);
 }
 
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SimpleFileList::SimpleFileList(const std::string& dirpath, const std::string& extension, bool fAlphabetize)
+SimpleFileList::SimpleFileList(const fs::path& dirpath, const std::string& extension, bool fAlphabetize)
 {
-    DirectoryListing dir(dirpath, extension);
-    std::string curname;
-    while (dir(curname)) {
-        m_filelist.emplace_back(dir.fullName(curname));
+    FilesIterator dir(dirpath, {extension});
+    while (auto path = dir.next()) {
+        m_filelist.emplace_back(std::move(*path));
     }
 
     if (m_filelist.empty()) {
-        printf("WARNING: The directory `%s` is empty\n", dirpath.c_str());
+        printf("WARNING: The directory `%s` is empty\n", dirpath.generic_string().c_str());
         m_index = -1;
         return;
     }
@@ -131,8 +117,8 @@ SimpleFileList::SimpleFileList(const std::string& dirpath, const std::string& ex
         names.reserve(m_filelist.size());
 
         //Get only the names of the files, no author information
-        for (const std::string& filepath : m_filelist) {
-            std::string name = stripPathAndExtension(filepath);
+        for (const fs::path& filepath : m_filelist) {
+            std::string name = stripPathAndExtension(filepath.filename().string());
             std::transform(name.begin(), name.end(), name.begin(), ::tolower);
             names.emplace_back(std::move(name));
         }
@@ -158,7 +144,7 @@ void SimpleFileList::setCurrentIndex(size_t index)
         m_index = index;
 }
 
-void SimpleFileList::setCurrentPath(const std::string& name)
+void SimpleFileList::setCurrentPath(const fs::path& name)
 {
     auto it = std::find(m_filelist.cbegin(), m_filelist.cend(), name);
     if (it != m_filelist.cend())
@@ -191,84 +177,84 @@ void SimpleFileList::random()
         m_index = RANDOM_INT(m_filelist.size());
 }
 
-std::string SimpleFileList::at(size_t index) const
-{
-    return index < m_filelist.size()
-        ? m_filelist[index]
-        : std::string();
-}
-
-void SimpleFileList::add(std::string path)
+void SimpleFileList::add(fs::path path)
 {
     m_filelist.emplace_back(std::move(path));
 }
 
 bool SimpleFileList::find(const std::string& name)
 {
-    bool fFound = false;
-    size_t oldCurrent = m_index;
+    if (m_filelist.empty())
+        return false;
+
+    const size_t start = m_index;
     do {
         next(); //sets us to the beginning if we hit the end -> loop through the maps
-        if (strstr(m_filelist[m_index].c_str(), name.c_str()))   //compare names after
-            fFound = true;
-    }
-    while (m_index != oldCurrent && !fFound);
 
-    return fFound;
+        const fs::path& path = m_filelist[m_index];
+        if (path.filename().string().starts_with(name))
+            return true;
+    }
+    while (m_index != start);
+
+    return false;
 }
+
+
+AnnouncerList::AnnouncerList()
+    : SimpleFileList(convertPath("sfx/announcer/"), ".txt")
+{}
+
+GraphicsList::GraphicsList()
+    : SimpleDirectoryList(convertPath("gfx/packs/"))
+{}
+
+SoundsList::SoundsList()
+    : SimpleDirectoryList(convertPath("sfx/packs/"))
+{}
+
+TourList::TourList()
+    : SimpleFileList(convertPath("tours/"), ".txt")
+{}
+
+WorldList::WorldList()
+    : SimpleFileList(convertPath("worlds/"), ".txt", true)
+{}
+
+BackgroundList::BackgroundList()
+    : SimpleFileList(convertPath("gfx/packs/Classic/backgrounds/"), ".png")
+{}
+
+FiltersList::FiltersList()
+    : SimpleFileList(convertPath("filters/"), ".txt")
+{}
+
 
 ///////////// SkinList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SkinList::SkinList()
 {
-    DirectoryListing dir(convertPath("gfx/skins/"));
-    std::string curname;
-    while (dir(curname)) {
-        if (curname.length() < 5)
-            continue;
-
-        std::string file_ext = curname.substr(curname.length() - 4);
-        inPlaceLowerCase(file_ext);
-        if (file_ext != ".bmp" && file_ext != ".png") //Allow bmp and png skins
-            continue;
-
-        SkinListNode node {
-            stripCreatorAndExt(curname),
-            dir.fullName(curname),
-        };
-
-        auto it = m_skins.begin();
-        for (; it != m_skins.end(); it++) {
-            if (node.name.compare(it->name) < 0)
-                break;
-        }
-        m_skins.insert(it, std::move(node));
+    FilesIterator dir(convertPath("gfx/skins/"), {".bmp", ".png"});
+    while (auto path = dir.next()) {
+        m_skins.emplace_back(SkinListNode {
+            stripCreatorAndExt(path->filename().string()),
+            std::move(*path),
+        });
     }
+    utils::sort(m_skins, [](const SkinListNode& lhs, const SkinListNode& rhs) {
+        return lhs.name < rhs.name;
+    });
 }
 
-std::string SkinList::getPath(size_t index) const
-{
-    return index < m_skins.size()
-        ? m_skins[index].path
-        : std::string();
-}
-
-std::string SkinList::getName(size_t index) const
-{
-    return index < m_skins.size()
-        ? m_skins[index].name
-        : std::string();
-}
 
 ///////////// SimpleDirectoryList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
+SimpleDirectoryList::SimpleDirectoryList(const fs::path& path)
 {
-    DirectoryListing d(path);
-    std::string curname;
-    while (d.NextDirectory(curname)) {
-        m_filelist.insert(m_filelist.end(), d.fullName(curname));
+    SubdirsIterator dir(path);
+    while (auto subdir = dir.next()) {
+        m_filelist.emplace_back(std::move(*subdir));
     }
     if (m_filelist.empty()) {
-        printf("ERROR: Empty directory.  %s\n", path.c_str());
+        printf("ERROR: Empty directory.  %s\n", path.generic_string().c_str());
         //exit(0);
     }
 
@@ -279,564 +265,448 @@ SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
 ///////////// MusicList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MusicList::MusicList()
 {
-    DirectoryListing d(convertPath("music/game/"));
-    std::string currentdir;
-    while (d.NextDirectory(currentdir)) {
-        MusicEntry *m = new MusicEntry(d.fullName(currentdir));
-        if (!m->fError)
-            entries.push_back(m);
-        else
-            delete m;
+    SubdirsIterator dir(convertPath("music/game/"));
+    while (auto path = dir.next()) {
+        try {
+            if (auto pack = MusicPack::load(*path))
+                m_entries.emplace_back(std::move(*pack));
+        } catch (const std::exception& ex) {
+            throw std::format("ERROR: Could not load music pack at {}\nReason: {}", path->string(), ex.what());
+        }
     }
 
-    if (entries.empty()) {
-        throw "Empty Music directory!";
+    if (m_entries.empty()) {
+        throw "Could not load any map music!";
     }
-
-    currentIndex = 0;
 }
 
-MusicList::~MusicList()
+void MusicList::setRandomMusic(MusicCategory musicCategory, const std::string& mapName, const std::string& background)
 {
-    for (unsigned int i = 0; i < entries.size(); i++) {
-        delete entries[i];
-    }
-
-    entries.clear();
+    m_currentMusic = m_entries[m_currentIndex].randomMusic(musicCategory, mapName, background);
 }
 
-std::string MusicList::GetMusic(int musicID)
+void MusicList::setNextMusic(MusicCategory musicCategory, const std::string& mapName, const std::string& background)
 {
-    return entries[currentIndex]->GetMusic(musicID);
+    m_currentMusic = m_entries[m_currentIndex].nextMusic(musicCategory, mapName, background);
 }
 
-void MusicList::SetRandomMusic(int iMusicCategory, const char * szMapName, const char * szBackground)
-{
-    CurrentMusic = entries[currentIndex]->GetRandomMusic(iMusicCategory, szMapName, szBackground);
+void MusicList::next() {
+    m_currentIndex = (m_currentIndex + 1) % m_entries.size();
 }
 
-void MusicList::SetNextMusic(int iMusicCategory, const char * szMapName, const char * szBackground)
-{
-    CurrentMusic = entries[currentIndex]->GetNextMusic(iMusicCategory, szMapName, szBackground);
+void MusicList::prev() {
+    m_currentIndex = (m_currentIndex == 0 ? m_entries.size() : m_currentIndex) - 1;
 }
 
-std::string MusicList::GetCurrentMusic()
-{
-    return CurrentMusic;
+void MusicList::random() {
+    m_currentIndex = RANDOM_INT(m_entries.size());
 }
 
-
-void MusicList::next()
+void MusicList::updateEntriesWithOverrides(const std::vector<MapMusicOverride>& overrides)
 {
-    if (currentIndex+1 == int(entries.size()))
-        currentIndex = 0;
-    else
-        currentIndex++;
-}
-
-void MusicList::prev()
-{
-    if (currentIndex == 0)
-        currentIndex = entries.size()-1;
-    else
-        currentIndex--;
-}
-
-void MusicList::UpdateEntriesWithOverrides()
-{
-    for (unsigned short i = 0; i < entries.size(); i++) {
-        entries[i]->UpdateWithOverrides();
+    for (MusicPack& entry : m_entries) {
+        entry.updateWithOverrides(overrides);
     }
 }
 
 
-///////////// MusicEntry ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-MusicEntry::MusicEntry(const std::string & musicdirectory)
+///////////// MusicPack///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+MusicPack::MusicPack(std::string name)
+    : m_name(std::move(name))
+{}
+
+std::optional<MusicPack> MusicPack::load(const fs::path& musicdirectory)
 {
-    fError = false;
-    fUsesMapOverrides = false;
-    fUsesBackgroundOverrides = false;
+    MusicPack self(musicdirectory.filename().string());
 
-    iCurrentMusic = 0;
-
-    int i, k;
-
-    for (k = 0; k < MAXMUSICCATEGORY; k++)
-        numsongsforcategory[k] = 0;
-
-    size_t separator_pos = musicdirectory.rfind(dirSeparator());
-    if (separator_pos != std::string::npos)
-        name = musicdirectory.substr(separator_pos + 1);
-    else
-        name = musicdirectory;
-
-    name = name.substr(0, name.rfind("."));
-
-    std::string musicfile = musicdirectory + dirSeparator() + std::string("Music.txt");
-    FILE * in = fopen(musicfile.c_str(), "r");
-    if (!in) {
-        printf("Error: Could not open: %s\n", musicfile.c_str());
-        fError = true;
-        return;
+    const fs::path file_path = musicdirectory / "Music.txt";
+    std::ifstream file(file_path);
+    if (!file) {
+        printf("Error: Could not open: %s\n", file_path.generic_string().c_str());
+        return {};
     }
 
-    int iNumFile = 0;
+    struct HeaderSection {};
+    struct CategorySection { MusicCategory category; };
+    struct MapSpecificSection {};
+    struct BackgroundSpecificSection {};
+    using Section = std::variant<HeaderSection, CategorySection, MapSpecificSection, BackgroundSpecificSection>;
 
-    //Run through the global overrides and add them to the map overrides of this music entry
-    //if there are any overrides then for each override
-    /*
-    {
-        if (mapoverride.find(pszName) == mapoverride.end())
-            mapoverride[pszName] = new MusicOverride();
+    // The file starts with four special songs
+    Section current_section = HeaderSection {};
 
-        songFileNames.push_back(sPath);
-
-        fUsesMapOverrides = true;
-        mapoverride[pszName]->songs.push_back(iNumFile);
-        iNumFile++;
-    }
-    */
-
-    int iAddToCategory = -1;
-    char szBuffer[256];
-    while (fgets(szBuffer, 256, in)) {
+    std::string line;
+    while (std::getline(file, line)) {
         //Ignore comment lines
-        if (szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
+        if (line.empty() || line[0] == '#' || line[0] == '\n' || line[0] == '\r' || line[0] == ' ' || line[0] == '\t')
             continue;
 
         //Chop off line ending
-        int stringLength = strlen(szBuffer);
-        for (k = 0; k < stringLength; k++) {
-            if (szBuffer[k] == '\r' || szBuffer[k] == '\n') {
-                szBuffer[k] = '\0';
-                break;
-            }
-        }
+        if (line.ends_with('\r'))
+            line.pop_back();
 
         //If we found a category header
-        if (szBuffer[0] == '[') {
-            if (cstr_ci_equals(szBuffer, "[land]"))
-                iAddToCategory = 0;
-            else if (cstr_ci_equals(szBuffer, "[underground]"))
-                iAddToCategory = 1;
-            else if (cstr_ci_equals(szBuffer, "[underwater]"))
-                iAddToCategory = 2;
-            else if (cstr_ci_equals(szBuffer, "[castle]"))
-                iAddToCategory = 3;
-            else if (cstr_ci_equals(szBuffer, "[platforms]"))
-                iAddToCategory = 4;
-            else if (cstr_ci_equals(szBuffer, "[ghost]"))
-                iAddToCategory = 5;
-            else if (cstr_ci_equals(szBuffer, "[bonus]"))
-                iAddToCategory = 6;
-            else if (cstr_ci_equals(szBuffer, "[battle]"))
-                iAddToCategory = 7;
-            else if (cstr_ci_equals(szBuffer, "[desert]"))
-                iAddToCategory = 8;
-            else if (cstr_ci_equals(szBuffer, "[clouds]"))
-                iAddToCategory = 9;
-            else if (cstr_ci_equals(szBuffer, "[snow]"))
-                iAddToCategory = 10;
-            else if (cstr_ci_equals(szBuffer, "[maps]"))
-                iAddToCategory = MAXMUSICCATEGORY;
-            else if (cstr_ci_equals(szBuffer, "[backgrounds]"))
-                iAddToCategory = MAXMUSICCATEGORY + 1;
-
+        if (line[0] == '[') {
+            std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+            current_section = [current_section, &line]() -> Section {
+                if (line == "[land]") return CategorySection { MusicCategory::Land };
+                if (line == "[underground]") return CategorySection { MusicCategory::Underground };
+                if (line == "[underwater]") return CategorySection { MusicCategory::Underwater };
+                if (line == "[castle]") return CategorySection { MusicCategory::Castle };
+                if (line == "[platforms]") return CategorySection { MusicCategory::Platforms };
+                if (line == "[ghost]") return CategorySection { MusicCategory::Ghost };
+                if (line == "[bonus]") return CategorySection { MusicCategory::Bonus };
+                if (line == "[battle]") return CategorySection { MusicCategory::Battle };
+                if (line == "[desert]") return CategorySection { MusicCategory::Desert };
+                if (line == "[clouds]") return CategorySection { MusicCategory::Clouds };
+                if (line == "[snow]") return CategorySection { MusicCategory::Snow };
+                if (line == "[maps]") return MapSpecificSection {};
+                if (line == "[backgrounds]") return BackgroundSpecificSection {};
+                return current_section;
+            }();
             continue;
         }
 
-        //Cap the number of songs at MAXCATEGORYTRACKS for a category
-        if (iAddToCategory > -1 && iAddToCategory < MAXMUSICCATEGORY && numsongsforcategory[iAddToCategory] >= MAXCATEGORYTRACKS)
-            continue;
+        std::visit([&line, &self, &musicdirectory](auto const& section) {
+            using T = std::decay_t<decltype(section)>;
 
-        if (iNumFile < 4 || iAddToCategory > -1) {
-            if (iAddToCategory == MAXMUSICCATEGORY || iAddToCategory == MAXMUSICCATEGORY + 1) {
-                char * pszName = strtok(szBuffer, ",\n");
-
-                if (!pszName)
-                    continue;
-
-                if (iAddToCategory == MAXMUSICCATEGORY) {
-                    if (mapoverride.find(pszName) == mapoverride.end())
-                        mapoverride[pszName] = new MusicOverride();
-                } else {
-                    if (backgroundoverride.find(pszName) == backgroundoverride.end())
-                        backgroundoverride[pszName] = new MusicOverride();
-                }
-
-                char * pszMusic = strtok(NULL, ",\n");
-                while (pszMusic) {
-                    std::string sPath = musicdirectory + dirSeparator() + pszMusic;
-
-                    if (FileExists(sPath.c_str())) {
-                        songFileNames.push_back(sPath);
-
-                        if (iAddToCategory == MAXMUSICCATEGORY) {
-                            fUsesMapOverrides = true;
-                            mapoverride[pszName]->songs.push_back(iNumFile);
-                        } else {
-                            fUsesBackgroundOverrides = true;
-                            backgroundoverride[pszName]->songs.push_back(iNumFile);
-                        }
-
-                        iNumFile++;
-                    }
-                    pszMusic = strtok(NULL, ",\n");
-                }
-            } else {
-                std::string sPath = musicdirectory + dirSeparator() + szBuffer;
-
-                if (FileExists(sPath.c_str())) {
-                    songFileNames.push_back(sPath);
-
-                    //Don't add to category lists if this is one of the four special music tracks
-                    if (iNumFile >= 4) {
-                        songsforcategory[iAddToCategory][numsongsforcategory[iAddToCategory]] = iNumFile;
-                        numsongsforcategory[iAddToCategory]++;
-                    }
-                    iNumFile++;
-                }
+            if constexpr (std::is_same_v<T, HeaderSection>) {
+                fs::path path = musicdirectory / line;
+                if (fs::exists(path))
+                    self.m_all_songs.emplace_back(std::move(path));
+                return;
             }
-        }
+            if constexpr (std::is_same_v<T, CategorySection>) {
+                //Cap the number of songs at MAXCATEGORYTRACKS for a category
+                if (self.m_category_songs[section.category].size() >= MAXCATEGORYTRACKS)
+                    return;
+
+                fs::path path = musicdirectory / line;
+                if (!fs::exists(path))
+                    return;
+
+                self.m_all_songs.emplace_back(std::move(path));
+                self.m_category_songs[section.category].emplace_back(self.m_all_songs.size() - 1);
+                return;
+            }
+            if constexpr (std::is_same_v<T, MapSpecificSection> || std::is_same_v<T, BackgroundSpecificSection>) {
+                std::list<std::string_view> tokens = tokenize(line, ',');
+                if (tokens.size() < 2)
+                    return;
+
+                const auto mapname = std::string(tokens.front());
+                tokens.pop_front();
+
+                std::vector<size_t>& target_index_list = std::is_same_v<T, MapSpecificSection>
+                    ? self.m_map_overrides[mapname]
+                    : self.m_background_overrides[mapname];
+
+                for (std::string_view filename : tokens) {
+                    fs::path path = musicdirectory / filename;
+                    if (fs::exists(path)) {
+                        self.m_all_songs.emplace_back(std::move(path));
+                        target_index_list.emplace_back(self.m_all_songs.size() - 1);
+                    }
+                }
+                return;
+            }
+        }, current_section);
     }
 
-    fclose(in);
+    file.close();
 
     //Now read labeled subdirectories like "Land", "Underground", "Castle", etc for more songs
+    for (size_t idx = 0; idx < static_cast<size_t>(MusicCategory::COUNT); idx++) {
+        const auto category = static_cast<MusicCategory>(idx);
+        const fs::path category_dir = musicdirectory / to_string(category);
+        if (!fs::is_directory(category_dir))
+            continue;
 
-    for (short iMusicCategory = 0; iMusicCategory < MAXMUSICCATEGORY; iMusicCategory++) {
-        std::string musicPath = musicdirectory + dirSeparator() + std::string(g_szMusicCategoryNames[iMusicCategory]);
-        if (FileExists(musicPath)) {
-            SimpleFileList musList(musicPath + dirSeparator(), ".ogg");
-
-            short iCount = musList.count();
-
-            //printf("Found %d files in %s\n", iCount, musicPath.c_str());
-
-            for (short iFile = 0; iFile < iCount; iFile++) {
-                if (numsongsforcategory[iMusicCategory] < MAXCATEGORYTRACKS) {
-                    songFileNames.push_back(musList.currentPath());
-                    songsforcategory[iMusicCategory][numsongsforcategory[iMusicCategory]] = iNumFile;
-                    numsongsforcategory[iMusicCategory]++;
-                    iNumFile++;
-                }
-
-                musList.next();
+        FilesIterator iter(category_dir, {".ogg"});
+        while (auto path = iter.next()) {
+            if (self.m_category_songs[category].size() < MAXCATEGORYTRACKS) {
+                self.m_all_songs.emplace_back(std::move(*path));
+                self.m_category_songs[category].emplace_back(self.m_all_songs.size() - 1);
             }
         }
     }
 
-    if (iNumFile == 0) {
-        printf("Error: No songs found in: %s\n", musicdirectory.c_str());
-        fError = true;
-        return;
+    if (self.m_all_songs.empty()) {
+        printf("Error: No songs found in: %s\n", musicdirectory.generic_string().c_str());
+        return {};
     }
 
     //Verify we have at least one track for each category
-    for (i = 0; i < MAXMUSICCATEGORY; i++) {
-        if (numsongsforcategory[i] == 0) {
-            if (i < 4) {
-                printf("Error: Missing track definition for music category: %s\n", g_szMusicCategoryNames[i]);
-                fError = true;
-                return;
-            } else { //Use default category
-                numsongsforcategory[i] = numsongsforcategory[g_iDefaultMusicCategory[i]];
-                for (k = 0; k < numsongsforcategory[i]; k++) {
-                    songsforcategory[i][k] = songsforcategory[g_iDefaultMusicCategory[i]][k];
-                }
+    const auto get_fallback_category = [](MusicCategory category) constexpr -> std::optional<MusicCategory> {
+        switch (category) {
+            case MusicCategory::Platforms: return MusicCategory::Land;
+            case MusicCategory::Ghost: return MusicCategory::Underground;
+            case MusicCategory::Bonus: return MusicCategory::Underwater;
+            case MusicCategory::Battle: return MusicCategory::Castle;
+            case MusicCategory::Desert: return MusicCategory::Land;
+            case MusicCategory::Clouds: return MusicCategory::Land;
+            case MusicCategory::Snow: return MusicCategory::Land;
+            default: return std::nullopt;
+        }
+    };
+    for (size_t idx = 0; idx < static_cast<size_t>(MusicCategory::COUNT); idx++) {
+        const auto category = static_cast<MusicCategory>(idx);
+        std::vector<size_t>& songlist = self.m_category_songs[category];
+        if (songlist.empty()) {
+            if (auto fallback = get_fallback_category(category)) {
+                songlist = self.m_category_songs[*fallback];
+            } else {
+                printf("Error: Missing track definition for music category: %s\n", to_string(category).data());
+                return {};
             }
         }
     }
 
-    /*
-    std::vector<std::string>::iterator itr = songFileNames.begin();
-
-    printf("------ Songlist ------\n");
-    short iCounter = 0;
-    while (itr != songFileNames.end())
-    {
-        printf("%d: %s\n", iCounter++, itr->c_str());
-        itr++;
+/*#ifndef NDEBUG
+    printf("------ Songlist for %s ------\n", self.m_name.c_str());
+    for (size_t i = 0; i < self.m_all_songs.size(); i++) {
+        printf("%lu: %s\n", i, self.m_all_songs[i].c_str());
     }
-
     printf("\n\n");
-
-    for (i = 0; i < MAXMUSICCATEGORY; i++)
-    {
-        printf("---- %d ----\n", i);
-        printf("Count: %d\n", numsongsforcategory[i]);
-        for (k = 0; k < numsongsforcategory[i]; k++)
-            printf("%d\n", songsforcategory[i][k]);
+    for (const auto& [category, songlist] : self.m_category_songs) {
+        printf("---- %s ----\n", to_string(category).data());
+        for (size_t i = 0; i < songlist.size(); i++) {
+            const size_t file_idx = songlist[i];
+            printf("%lu: %s\n", i, self.m_all_songs[file_idx].c_str());
+        }
     }
-    */
+#endif*/
+
+    return self;
 }
 
-std::string MusicEntry::GetMusic(unsigned int musicID)
+const fs::path& MusicPack::music(size_t idx) const
 {
-    if (musicID >= songFileNames.size())
-        return songFileNames[songFileNames.size()-1];
-
-    return songFileNames[musicID];
+    idx = std::min(idx, m_all_songs.size() - 1);
+    return m_all_songs[idx];
 }
 
-std::string MusicEntry::GetRandomMusic(int iMusicCategory, const char * szMapName, const char * szBackground)
+const fs::path& MusicPack::randomMusic(MusicCategory musicCategory, const std::string& mapName, const std::string& background)
 {
     //First check if there is specific map music
-    if (fUsesMapOverrides && mapoverride.find(szMapName) != mapoverride.end()) {
-        if (mapoverride[szMapName]->songs.size() > 0) {
-            iCurrentMusic = RANDOM_INT( mapoverride[szMapName]->songs.size());
-            return songFileNames[mapoverride[szMapName]->songs[iCurrentMusic]];
-        }
+    const auto mapIter = m_map_overrides.find(mapName);
+    if (mapIter != m_map_overrides.end() && !mapIter->second.empty()) {
+        m_currentMusic = RANDOM_INT(mapIter->second.size());
+        const size_t path_idx = mapIter->second[m_currentMusic];
+        return m_all_songs[path_idx];
     }
+
     //Then check if there is specific background music
-    if (fUsesBackgroundOverrides && backgroundoverride.find(szBackground) != backgroundoverride.end()) {
-        if (backgroundoverride[szBackground]->songs.size() > 0) {
-            iCurrentMusic = RANDOM_INT(backgroundoverride[szBackground]->songs.size());
-            return songFileNames[backgroundoverride[szBackground]->songs[iCurrentMusic]];
-        }
+    const auto bgIter = m_background_overrides.find(background);
+    if (bgIter != m_background_overrides.end() && !bgIter->second.empty()) {
+        m_currentMusic = RANDOM_INT(bgIter->second.size());
+        const size_t path_idx = bgIter->second[m_currentMusic];
+        return m_all_songs[path_idx];
     }
 
     //Then default to the music category
-    if (iMusicCategory >= 0 && iMusicCategory < MAXMUSICCATEGORY && numsongsforcategory[iMusicCategory] > 0) {
-        iCurrentMusic = RANDOM_INT( numsongsforcategory[iMusicCategory]);
-        return songFileNames[songsforcategory[iMusicCategory][iCurrentMusic]];
+    if (!m_category_songs[musicCategory].empty()) {
+        m_currentMusic = RANDOM_INT(m_category_songs[musicCategory].size());
+        const size_t path_idx = m_category_songs[musicCategory][m_currentMusic];
+        return m_all_songs[path_idx];
     }
 
-    return songFileNames[4];
+    return m_all_songs.at(4);
 }
 
-std::string MusicEntry::GetNextMusic(int iMusicCategory, const char * szMapName, const char * szBackground)
+const fs::path& MusicPack::nextMusic(MusicCategory musicCategory, const std::string& mapName, const std::string& background)
 {
     //First check if there is specific map music
-    if (mapoverride.find(szMapName) != mapoverride.end()) {
-        if (mapoverride[szMapName]->songs.size() > 0) {
-            if (++iCurrentMusic >= mapoverride[szMapName]->songs.size())
-                iCurrentMusic = 0;
+    const auto mapIter = m_map_overrides.find(mapName);
+    if (mapIter != m_map_overrides.end() && !mapIter->second.empty()) {
+        if (++m_currentMusic >= mapIter->second.size())
+            m_currentMusic = 0;
 
-            return songFileNames[mapoverride[szMapName]->songs[iCurrentMusic]];
-        }
+        return m_all_songs[mapIter->second[m_currentMusic]];
     }
     //Then check if there is specific background music
-    if (backgroundoverride.find(szBackground) != backgroundoverride.end()) {
-        if (backgroundoverride[szBackground]->songs.size() > 0) {
-            if (++iCurrentMusic >= backgroundoverride[szBackground]->songs.size())
-                iCurrentMusic = 0;
+    const auto bgIter = m_background_overrides.find(background);
+    if (bgIter != m_background_overrides.end() && !bgIter->second.empty()) {
+        if (++m_currentMusic >= bgIter->second.size())
+            m_currentMusic = 0;
 
-            return songFileNames[backgroundoverride[szBackground]->songs[iCurrentMusic]];
-        }
+        return m_all_songs[bgIter->second[m_currentMusic]];
     }
-
     //Then default to the music category
-    if (iMusicCategory >= 0 && iMusicCategory < MAXMUSICCATEGORY && numsongsforcategory[iMusicCategory] > 0) {
-        if (++iCurrentMusic >= numsongsforcategory[iMusicCategory])
-            iCurrentMusic = 0;
+    if (!m_category_songs[musicCategory].empty()) {
+        if (++m_currentMusic >= m_category_songs[musicCategory].size())
+            m_currentMusic = 0;
 
-        return songFileNames[songsforcategory[iMusicCategory][iCurrentMusic]];
+        return m_all_songs[m_category_songs[musicCategory][m_currentMusic]];
     }
 
-    return songFileNames[4];
+    return m_all_songs.at(4);
 }
 
-void MusicEntry::UpdateWithOverrides()
+void MusicPack::updateWithOverrides(const std::vector<MapMusicOverride>& overrides)
 {
-    short iNumFile = songFileNames.size();
-
-    if (!mapmusicoverrides.empty())
-        fUsesMapOverrides = true;
-
-    for (const MapMusicOverride& override : mapmusicoverrides) {
-        if (mapoverride.find(override.mapname) == mapoverride.end())
-            mapoverride[override.mapname] = new MusicOverride();
-
-        for (unsigned short j = 0; j < override.songs.size(); j++) {
-            songFileNames.push_back(override.songs[j]);
-            mapoverride[override.mapname]->songs.push_back(iNumFile);
-            iNumFile++;
+    for (const MapMusicOverride& override : overrides) {
+        std::vector<size_t>& songlist = m_map_overrides[override.mapname];
+        songlist.reserve(songlist.size() + override.songs.size());
+        for (const fs::path& path : override.songs) {
+            m_all_songs.emplace_back(path);
+            songlist.emplace_back(m_all_songs.size() - 1);
         }
     }
 }
+
 
 ///////////// MusicList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 WorldMusicList::WorldMusicList()
 {
-    DirectoryListing d(convertPath("music/world/"));
-    std::string currentdir;
-    while (d.NextDirectory(currentdir)) {
-        WorldMusicEntry *m = new WorldMusicEntry(d.fullName(currentdir));
-        if (!m->fError)
-            entries.push_back(m);
-        else
-            delete m;
+    SubdirsIterator dir(convertPath("music/world/"));
+    while (auto path = dir.next()) {
+        try {
+            if (auto pack = WorldMusicPack::load(*path)) {
+                m_entries.emplace_back(std::move(*pack));
+            }
+        } catch (const std::exception& ex) {
+            throw std::format("ERROR: Could not load world music pack at {}\nReason: {}", path->string(), ex.what());
+        }
     }
-
-    if (entries.empty()) {
-        throw "Empty Music directory!";
+    if (m_entries.empty()) {
+        throw "Could not load any world music!";
     }
-
-    currentIndex = 0;
 }
 
-WorldMusicList::~WorldMusicList()
-{
-    for (unsigned int i = 0; i < entries.size(); i++) {
-        delete entries[i];
-    }
-
-    entries.clear();
+void WorldMusicList::next() {
+    m_currentIndex = (m_currentIndex + 1) % m_entries.size();
 }
 
-std::string WorldMusicList::GetMusic(int musicID, const char * szWorldName)
-{
-    return entries[currentIndex]->GetMusic(musicID, szWorldName);
+void WorldMusicList::prev() {
+    m_currentIndex = (m_currentIndex == 0 ? m_entries.size() : m_currentIndex) - 1;
 }
 
-std::string WorldMusicList::GetCurrentMusic()
-{
-    return CurrentMusic;
+void WorldMusicList::random() {
+    m_currentIndex = RANDOM_INT(m_entries.size());
 }
 
-
-void WorldMusicList::next()
+void WorldMusicList::updateEntriesWithOverrides(const std::vector<WorldMusicOverride>& overrides)
 {
-    if (currentIndex+1 == int(entries.size()))
-        currentIndex = 0;
-    else
-        currentIndex++;
-}
-
-void WorldMusicList::prev()
-{
-    if (currentIndex == 0)
-        currentIndex = entries.size()-1;
-    else
-        currentIndex--;
-}
-
-void WorldMusicList::UpdateEntriesWithOverrides()
-{
-    for (unsigned short i = 0; i < entries.size(); i++) {
-        entries[i]->UpdateWithOverrides();
+    for (WorldMusicPack& entry : m_entries) {
+        entry.updateWithOverrides(overrides);
     }
 }
 
 
-///////////// WorldMusicEntry ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
+///////////// WorldMusicPack ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+WorldMusicPack::WorldMusicPack(std::string name)
+    : m_name(std::move(name))
+{}
+
+std::optional<WorldMusicPack> WorldMusicPack::load(const fs::path& musicdirectory)
 {
-    fError = false;
-    fUsesWorldOverrides = false;
+    WorldMusicPack self(musicdirectory.filename().string());
 
-    size_t separator_pos = musicdirectory.rfind(dirSeparator());
-    if (separator_pos != std::string::npos)
-        name = musicdirectory.substr(separator_pos + 1);
-    else
-        name = musicdirectory;
-
-    name = name.substr(0, name.rfind("."));
-
-    std::string musicfile = musicdirectory + dirSeparator() + std::string("Music.txt");
-    FILE * in = fopen(musicfile.c_str(), "r");
-    if (!in) {
-        printf("Error: Could not open: %s\n", musicfile.c_str());
-        fError = true;
-        return;
+    const fs::path file_path = musicdirectory / "Music.txt";
+    std::ifstream file(file_path);
+    if (!file) {
+        printf("Error: Could not open: %s\n", file_path.generic_string().c_str());
+        return {};
     }
 
-    int iAddToCategory = -1;
-    char szBuffer[256];
-    while (fgets(szBuffer, 256, in)) {
+    struct HeaderSection {};
+    struct CategorySection { WorldMusicCategory category; };
+    struct WorldSpecificSection {};
+    struct BackgroundSpecificSection {};
+    using Section = std::variant<HeaderSection, CategorySection, WorldSpecificSection>;
+
+    // The file starts with a version header
+    Section current_section = HeaderSection {};
+
+    std::string line;
+    while (std::getline(file, line)) {
         //Ignore comment lines
-        if (szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
+        if (line.empty() || line[0] == '#' || line[0] == '\n' || line[0] == '\r' || line[0] == ' ' || line[0] == '\t')
             continue;
 
         //Chop off line ending
-        int stringLength = strlen(szBuffer);
-        for (int k = 0; k < stringLength; k++) {
-            if (szBuffer[k] == '\r' || szBuffer[k] == '\n') {
-                szBuffer[k] = '\0';
-                break;
-            }
-        }
+        if (line.ends_with('\r'))
+            line.pop_back();
 
         //If we found a category header
-        if (szBuffer[0] == '[') {
-            if (cstr_ci_equals(szBuffer, "[grass]"))
-                iAddToCategory = 0;
-            else if (cstr_ci_equals(szBuffer, "[desert]"))
-                iAddToCategory = 1;
-            else if (cstr_ci_equals(szBuffer, "[water]"))
-                iAddToCategory = 2;
-            else if (cstr_ci_equals(szBuffer, "[giant]"))
-                iAddToCategory = 3;
-            else if (cstr_ci_equals(szBuffer, "[sky]"))
-                iAddToCategory = 4;
-            else if (cstr_ci_equals(szBuffer, "[ice]"))
-                iAddToCategory = 5;
-            else if (cstr_ci_equals(szBuffer, "[pipe]"))
-                iAddToCategory = 6;
-            else if (cstr_ci_equals(szBuffer, "[dark]"))
-                iAddToCategory = 7;
-            else if (cstr_ci_equals(szBuffer, "[space]"))
-                iAddToCategory = 8;
-            else if (cstr_ci_equals(szBuffer, "[bonus]"))
-                iAddToCategory = WORLDMUSICBONUS;
-            else if (cstr_ci_equals(szBuffer, "[sleep]"))
-                iAddToCategory = WORLDMUSICSLEEP;
-            else if (cstr_ci_equals(szBuffer, "[worlds]"))
-                iAddToCategory = WORLDMUSICWORLDS;
-
+        if (line[0] == '[') {
+            std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+            current_section = [current_section, &line]() -> Section {
+                if (line == "[grass]") return CategorySection { WorldMusicCategory::Grass };
+                if (line == "[desert]") return CategorySection { WorldMusicCategory::Desert };
+                if (line == "[water]") return CategorySection { WorldMusicCategory::Water };
+                if (line == "[giant]") return CategorySection { WorldMusicCategory::Giant };
+                if (line == "[sky]") return CategorySection { WorldMusicCategory::Sky };
+                if (line == "[ice]") return CategorySection { WorldMusicCategory::Ice };
+                if (line == "[pipe]") return CategorySection { WorldMusicCategory::Pipe };
+                if (line == "[dark]") return CategorySection { WorldMusicCategory::Dark };
+                if (line == "[space]") return CategorySection { WorldMusicCategory::Space };
+                if (line == "[bonus]") return CategorySection { WorldMusicCategory::Bonus };
+                if (line == "[sleep]") return CategorySection { WorldMusicCategory::Sleep };
+                if (line == "[worlds]") return WorldSpecificSection {};
+                return current_section;
+            }();
             continue;
         }
 
-        if (iAddToCategory > -1 && iAddToCategory <= WORLDMUSICSLEEP) {
-            std::string sPath = musicdirectory + dirSeparator() + szBuffer;
+        std::visit([&line, &self, &musicdirectory](auto const& section) {
+            using T = std::decay_t<decltype(section)>;
 
-            if (FileExists(sPath.c_str()))
-                songFileNames[iAddToCategory] = sPath;
-        } else if (iAddToCategory == WORLDMUSICWORLDS) {
-            char * pszName = strtok(szBuffer, ",\n");
+            if constexpr (std::is_same_v<T, CategorySection>) {
+                fs::path path = musicdirectory / line;
+                if (fs::exists(path)) {
+                    self.m_category_song[section.category] = std::move(path);
+                }
+                return;
+            }
+            if constexpr (std::is_same_v<T, WorldSpecificSection>) {
+                std::list<std::string_view> tokens = tokenize(line, ',');
+                if (tokens.size() < 2)
+                    return;
 
-            if (!pszName)
-                continue;
+                const auto worldname = std::string(tokens.front());
+                tokens.pop_front();
+                const std::string_view filename = tokens.front();
 
-            char * pszMusic = strtok(NULL, ",\n");
+                fs::path path = musicdirectory / filename;
+                if (!fs::exists(path))
+                    return;
 
-            if (!pszMusic)
-                continue;
-
-            std::string sPath = musicdirectory + dirSeparator() + pszMusic;
-
-            if (!FileExists(sPath.c_str()))
-                continue;
-
-            fUsesWorldOverrides = true;
-            worldoverride[pszName] = sPath;
-
-        }
+                self.m_world_overrides[worldname] = std::move(path);
+                return;
+            }
+        }, current_section);
     }
 
-    fclose(in);
+    file.close();
+
+/*#ifndef NDEBUG
+    printf("------ World Songlist for %s ------\n", self.m_name.c_str());
+    for (const auto& [category, song] : self.m_category_song) {
+        printf("%s: %s\n", to_string(category).data(), song.c_str());
+    }
+#endif*/
+    return self;
 }
 
-std::string WorldMusicEntry::GetMusic(unsigned int musicID, const char * szWorldName)
+const fs::path& WorldMusicPack::music(WorldMusicCategory category, const std::string& worldName) const
 {
     //First check if there is specific map music
-    if (fUsesWorldOverrides && worldoverride.find(szWorldName) != worldoverride.end()) {
-        return worldoverride[szWorldName];
+    const auto iter = m_world_overrides.find(worldName);
+    if (iter != m_world_overrides.cend()) {
+        return iter->second;
     }
 
-    if (musicID > WORLDMUSICSLEEP)
-        return songFileNames[0];
-
-    return songFileNames[musicID];
+    if (auto it = m_category_song.find(category); it != m_category_song.cend()) {
+        return it->second;
+    }
+    return m_category_song.at(WorldMusicCategory::Grass);
 }
 
-void WorldMusicEntry::UpdateWithOverrides()
+void WorldMusicPack::updateWithOverrides(const std::vector<WorldMusicOverride>& overrides)
 {
-    if (!worldmusicoverrides.empty())
-        fUsesWorldOverrides = true;
-
-    for (const WorldMusicOverride& override : worldmusicoverrides) {
-        worldoverride[override.worldname] = override.song;
+    for (const WorldMusicOverride& override : overrides) {
+        m_world_overrides[override.worldname] = override.song;
     }
 }

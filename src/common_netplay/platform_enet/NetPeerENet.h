@@ -13,20 +13,20 @@ class NetPeerENet : public NetPeer
 {
     public:
         NetPeerENet(ENetPeer*);
-        ~NetPeerENet();
+        ~NetPeerENet() override;
 
-        bool send(const void*, size_t);
-        bool sendReliable(const void*, size_t);
-        void disconnect();
+        bool send(const void*, size_t) override;
+        bool sendReliable(const void*, size_t) override;
+        void disconnect() override;
 
-        uint32_t addressHost();
-        uint16_t addressPort();
-        std::string addressAsString();
+        uint32_t addressHost() override;
+        uint16_t addressPort() override;
+        std::string addressAsString() override;
 
-        uint32_t averageRTT() const;
+        uint32_t averageRTT() const override;
 
-        bool operator==(const NetPeer&) const;
-        bool operator==(const NetPeer*) const;
+        bool operator==(const NetPeer&) const override;
+        bool operator==(const NetPeer*) const override;
 
     private:
         ENetPeer* foreign_peer;

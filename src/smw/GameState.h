@@ -5,6 +5,8 @@
 
 class GameState {
 public:
+    virtual ~GameState() = default;
+
     virtual bool init() { return true; }
     virtual void update() = 0;
     virtual void cleanup() {}
@@ -32,9 +34,4 @@ public:
         static GameStateManager gsm;
         return gsm;
     }
-
-private:
-    GameStateManager() {}
-    GameStateManager(GameStateManager const&);
-    void operator=(GameStateManager const&);
 };

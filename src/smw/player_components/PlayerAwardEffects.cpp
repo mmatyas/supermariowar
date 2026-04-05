@@ -55,9 +55,9 @@ void PlayerAwardEffects::drawRingAward(CPlayer& player)
         short awardy = yoffset + (short)(30.0f * sin(angle));
 
         if (player.iswarping())
-            rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16, (short)player.state % 4, player.GetWarpPlane());
+            rm->spr_award.draw(awardx, awardy, {awards[k] * 16, 0, 16, 16}, static_cast<ClipEdge>((short)player.state % 4), player.GetWarpPlane());
         else
-            rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16);
+            rm->spr_award.draw(awardx, awardy, {awards[k] * 16, 0, 16, 16});
     }
 }
 
@@ -82,7 +82,7 @@ void PlayerAwardEffects::addExploding(CPlayer& player)
         float awardvelx = 7.0f * cosangle;
         float awardvely = 7.0f * sinangle;
 
-        eyecandy[2].add(new EC_ExplodingAward(&rm->spr_awardsolid, awardx, awardy, awardvelx, awardvely, 30, awards[k]));
+        eyecandy[2].emplace<EC_ExplodingAward>(&rm->spr_awardsolid, awardx, awardy, awardvelx, awardvely, 30, awards[k]);
     }
 }
 
@@ -100,9 +100,9 @@ void PlayerAwardEffects::addSwirling(CPlayer& player)
         float angle = (float)k * addangle + awardangle;
 
         if (numawards == MAXAWARDS)
-            eyecandy[2].add(new EC_SwirlingAward(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, angle, 30.0f, 0.05f, 60, 10, player.getColorID(), 16, 16, 4, 4));
+            eyecandy[2].emplace<EC_SwirlingAward>(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, angle, 30.0f, 0.05f, 60, 10, player.getColorID(), 16, 16, 4, 4);
         else
-            eyecandy[2].add(new EC_SwirlingAward(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, angle, 30.0f, 0.05f, 60, numawards - 1, player.getColorID(), 16, 16));
+            eyecandy[2].emplace<EC_SwirlingAward>(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, angle, 30.0f, 0.05f, 60, numawards - 1, player.getColorID(), 16, 16);
     }
 }
 
@@ -124,9 +124,9 @@ void PlayerAwardEffects::addRocket(CPlayer& player)
         float awardvely = 9.0f * sin(angle);
 
         if (numawards == MAXAWARDS)
-            eyecandy[2].add(new EC_RocketAward(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, awardvelx, awardvely, 80, 10, player.getColorID(), 16, 16, 4, 4));
+            eyecandy[2].emplace<EC_RocketAward>(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, awardvelx, awardvely, 80, 10, player.getColorID(), 16, 16, 4, 4);
         else
-            eyecandy[2].add(new EC_RocketAward(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, awardvelx, awardvely, 80, numawards - 1, player.getColorID(), 16, 16));
+            eyecandy[2].emplace<EC_RocketAward>(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, awardvelx, awardvely, 80, numawards - 1, player.getColorID(), 16, 16);
     }
 }
 
@@ -135,11 +135,11 @@ void PlayerAwardEffects::addDeathAward(CPlayer& player)
     if (game_values.awardstyle == AwardStyle::Halo)
         addExploding(player);
     else if (game_values.awardstyle == AwardStyle::Souls && player.killsinrow >= MINAWARDSNEEDED)
-        eyecandy[2].add(new EC_SoulsAward(&rm->spr_awardsouls,
+        eyecandy[2].emplace<EC_SoulsAward>(&rm->spr_awardsouls,
             &rm->spr_awardsoulspawn,
             player.centerX(), player.centerY(),
             60, 9.0f,
-            player.killsinrow, awards));
+            player.killsinrow, awards);
 
     player.killsinrow = 0;
     player.killsinrowinair = 0;
@@ -156,7 +156,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
         {
             if (!game_values.gamemode->gameover && game_values.bosspeeking == -1)
             {
-                eyecandy[2].add(new EC_BossPeeker(&rm->spr_sledgebrothers, RANDOM_INT(90) + 90, 2));
+                eyecandy[2].emplace<EC_BossPeeker>(&rm->spr_sledgebrothers, RANDOM_INT(90) + 90, 2);
 
                 rm->backgroundmusic[0].stop();
                 ifsoundonstop(rm->sfx_invinciblemusic);
@@ -172,12 +172,12 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
     //Play announcer
     bool fSoundPlayed = false;
     if (killer.killsinrowinair > 1) {
-        if (ifsoundonandreadyplay(rm->sfx_announcer[9]) > -1)
+        if (rm->sfx_announcer[9].play())
             fSoundPlayed = true;
     }
 
     if (killed && killed->killsinrow >= 2 && !fSoundPlayed) {
-        if (ifsoundonandreadyplay(rm->sfx_announcer[10]) > -1)
+        if (rm->sfx_announcer[10].play())
             fSoundPlayed = true;
     }
 
@@ -186,7 +186,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
         awardIndex = (killer.killsinrow - 2) >= PAWARD_LAST ? PAWARD_LAST -1 : (killer.killsinrow - 2);
 
         if (!fSoundPlayed) {
-            if (ifsoundonandreadyplay(rm->sfx_announcer[awardIndex]) > -1)
+            if (rm->sfx_announcer[awardIndex].play())
                 fSoundPlayed = true;
         }
 
@@ -230,7 +230,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
                 sprintf(text, "%d - %s", killer.killsinrow, awardtexts[awardIndex].name);
 
                 //now add the eyecandy
-                eyecandy[2].add(new EC_GravText(awardtexts[awardIndex].large ? &rm->game_font_large : &rm->game_font_small, killer.centerX(), killer.bottomY(), text, -VELJUMP));
+                eyecandy[2].emplace<EC_GravText>(awardtexts[awardIndex].large ? &rm->game_font_large : &rm->game_font_small, killer.centerX(), killer.bottomY(), text, -VELJUMP);
             }
 
             //if we stopped the other players run show another award
@@ -239,7 +239,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
                 //char text[128];
                 //sprintf(text, "%s Stopped!",  awardtexts[a].name);
 
-                eyecandy[2].add(new EC_GravText(awardtexts[a].large ? &rm->game_font_large : &rm->game_font_small, killed->centerX(), killed->bottomY(), "Combo Broken!", -VELJUMP*1.3f));
+                eyecandy[2].emplace<EC_GravText>(awardtexts[a].large ? &rm->game_font_large : &rm->game_font_small, killed->centerX(), killed->bottomY(), "Combo Broken!", -VELJUMP*1.3f);
             }
         }
     }
@@ -253,12 +253,12 @@ void PlayerAwardEffects::addKillsInRowInAirAward(CPlayer& player)
         float awardvelx = vel * cos(angle);
         float awardvely = vel * sin(angle);
 
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_bonus,
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_bonus,
             player.centerX() - 8,
             player.centerY() - 8,
             awardvelx, awardvely,
             4, 2, 0,
-            player.getColorID() * 16, 16, 16));
+            player.getColorID() * 16, 16, 16);
         angle -= (float)PI / 14;
     }
 

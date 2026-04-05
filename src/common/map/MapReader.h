@@ -3,20 +3,22 @@
 
 #include "FileIO.h"
 
+#include <vector>
+
 class CMap;
 class MovingPlatformPath;
 struct TilesetTile;
-struct MapTile;
+struct Version;
 enum ReadType: unsigned char;
+enum class TileType : unsigned char;
 
 class MapReader {
 public:
-    MapReader() {}
-    virtual ~MapReader() {}
+    virtual ~MapReader() = default;
 
     virtual bool load(CMap&, BinaryFile&, ReadType) = 0;
 
-    static MapReader* getLoaderByVersion(int32_t (&mapversion)[4]);
+    static MapReader* getLoaderByVersion(const Version& mapversion);
 };
 
 /*
@@ -25,8 +27,6 @@ public:
 
 class MapReader1500 : public MapReader {
 public:
-    MapReader1500() : MapReader() {}
-    virtual ~MapReader1500() {}
     virtual bool load(CMap&, BinaryFile&, ReadType);
 
 protected:
@@ -43,7 +43,6 @@ protected:
 class MapReader1600 : public MapReader1500 {
 public:
     MapReader1600();
-    virtual ~MapReader1600() {}
     virtual bool load(CMap&, BinaryFile&, ReadType);
 
 protected:
@@ -64,13 +63,11 @@ private:
 class MapReader160A : public MapReader1600 {
 public:
     MapReader160A();
-    virtual ~MapReader160A() {}
 };
 
 class MapReader1610 : public MapReader160A {
 public:
     MapReader1610();
-    virtual ~MapReader1610() {}
     virtual bool load(CMap&, BinaryFile&, ReadType);
 };
 
@@ -81,7 +78,6 @@ public:
 class MapReader1700 : public MapReader1600 /* ignore 1.6 patches */ {
 public:
     MapReader1700();
-    virtual ~MapReader1700() {}
     virtual bool load(CMap&, BinaryFile&, ReadType);
 
 protected:
@@ -92,7 +88,7 @@ protected:
     virtual bool read_spawn_areas(CMap&, BinaryFile&);
 
     virtual void read_platforms(CMap&, BinaryFile&, bool preview);
-    virtual void read_platform_tiles(CMap&, BinaryFile&, short w, short h, TilesetTile**&, MapTile**&);
+    virtual std::pair<std::vector<TilesetTile>, std::vector<TileType>> read_platform_tiles(CMap&, BinaryFile&, short w, short h);
     MovingPlatformPath* read_platform_path_details(BinaryFile&, short type, bool preview);
 
     unsigned char patch_version;
@@ -101,7 +97,6 @@ protected:
 class MapReader1701 : public MapReader1700 {
 public:
     MapReader1701();
-    virtual ~MapReader1701() {}
 
 protected:
     virtual void read_background(CMap&, BinaryFile&); // background by underscore-conversion
@@ -111,7 +106,6 @@ protected:
 class MapReader1702 : public MapReader1701 {
 public:
     MapReader1702();
-    virtual ~MapReader1702() {}
 
 protected:
     virtual void read_autofilters(CMap& map, BinaryFile& mapfile); // 9 autofilter support
@@ -125,7 +119,6 @@ protected:
 class MapReader1800 : public MapReader1702 {
 public:
     MapReader1800();
-    virtual ~MapReader1800() {}
     virtual bool load(CMap&, BinaryFile&, ReadType);
 
 protected:
@@ -141,7 +134,7 @@ protected:
     virtual void read_extra_tiledata(CMap&, BinaryFile&);
     virtual void read_gamemode_settings(CMap&, BinaryFile&);
     virtual void read_platforms(CMap&, BinaryFile&, bool preview);
-    virtual void read_platform_tiles(CMap&, BinaryFile&, short w, short h, TilesetTile**&, MapTile**&);
+    virtual std::pair<std::vector<TilesetTile>, std::vector<TileType>> read_platform_tiles(CMap&, BinaryFile&, short w, short h);
 
 private:
     short iMaxTilesetID;
@@ -153,13 +146,11 @@ private:
 class MapReader1801 : public MapReader1800 {
 public:
     MapReader1801();
-    virtual ~MapReader1801() {}
 };
 
 class MapReader1802 : public MapReader1801 {
 public:
     MapReader1802();
-    virtual ~MapReader1802() {}
 
 protected:
     virtual void read_eyecandy(CMap&, BinaryFile&); // 3-layer eyecandy support

@@ -6,11 +6,9 @@
 class CGM_Survival : public CGM_Classic {
 public:
     CGM_Survival();
-    virtual ~CGM_Survival() {}
 
-    void init();
-    void think();
-    char* getMenuString(char* buffer64);
+    void init() override;
+    void think() override;
 
 protected:
     short timer;

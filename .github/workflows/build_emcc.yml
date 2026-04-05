@@ -1,31 +1,25 @@
 name: Build - Web
-on:
-  workflow_call:
+on: workflow_call
 
 jobs:
   emscripten:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: 'recursive'
+
       - name: Install Emscripten
         working-directory: /tmp
         run: |
           git clone https://github.com/emscripten-core/emsdk.git --depth=1
           cd emsdk
-          ./emsdk install 3.1.43
-          ./emsdk activate 3.1.43
-      - name: Download SDL mixer
-        working-directory: dependencies
-        run: curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.4.tar.gz | tar xzf -
+          ./emsdk install 5.0.2
+          ./emsdk activate 5.0.2
 
       - name: Build
         run: |
           source /tmp/emsdk/emsdk_env.sh
           emcc -v
-          sed -i 's|if (BUILD_STATIC_LIBS)|if (BUILD_STATIC_LIBS)\ninclude_directories(dependencies/SDL2_mixer-2.0.4)|' CMakeLists.txt
-          mkdir build_js && cd build_js
-          emcmake cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1
-          emmake make smw
+          emcmake cmake -B build -G Ninja -DNO_NETWORK=ON -DBUILD_SHARED_LIBS=OFF
+          cmake --build build --target smw

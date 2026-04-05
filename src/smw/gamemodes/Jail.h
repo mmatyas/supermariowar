@@ -12,9 +12,7 @@ class CGM_Jail : public CGM_Frag
 {
     public:
         CGM_Jail();
-        virtual ~CGM_Jail() {}
 
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
-        char *getMenuString(char *buffer64);
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
 };

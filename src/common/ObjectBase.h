@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math/Vec2.h"
+
 #include <array>
 
 class gfxSprite;
@@ -33,7 +35,7 @@ float CapSideVelocity(float vel);
 //object base class
 class CObject {
 public:
-    CObject(gfxSprite* nspr, short x, short y);
+    CObject(gfxSprite* nspr, Vec2s pos);
     virtual ~CObject() = default;
 
     virtual void draw(){};
@@ -60,19 +62,24 @@ public:
         fy = static_cast<float>(iy);
     }
 
-    short ix, iy;
-    short iw = 0, ih = 0;
-    float velx = 0.f, vely = 0.f;
-    int iNetworkID;
+    int x() const { return ix; }
+    int y() const { return iy; }
+    int w() const { return iw; }
+    int h() const { return ih; }
 
-    short collisionWidth;
-    short collisionHeight;
-    short collisionOffsetX = 0;
-    short collisionOffsetY = 0;
+    float velX() const { return velx; }
+    float velY() const { return vely; }
+    float& mutVelX() { return velx; }
+    float& mutVelY() { return vely; }
+
+    short collisionRectW() const { return collisionWidth; }
+    short collisionRectH() const { return collisionHeight; }
 
     short GetState() const { return state; }
     bool isDead() const { return dead; }
     bool GetWrap() const;
+
+    int networkId() const { return iNetworkID; }
 
     /// Returns the blocks touching each of the four corners,
     std::array<IO_Block*, 4> GetCollisionBlocks() const;
@@ -80,9 +87,19 @@ public:
 protected:
     ObjectType objectType = object_none;
 
+    short ix = 0, iy = 0;
+    short iw = 0, ih = 0;
     float fx = 0.f, fy = 0.f;
+    float velx = 0.f, vely = 0.f;
+
+    short collisionWidth;
+    short collisionHeight;
+    short collisionOffsetX = 0;
+    short collisionOffsetY = 0;
 
     gfxSprite* spr = nullptr;
     short state = 0;
     bool dead = false;
+
+    int iNetworkID;  // TODO: remove, unused
 };

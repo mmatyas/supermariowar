@@ -18,8 +18,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class boomerang
 //------------------------------------------------------------------------------
-MO_Boomerang::MO_Boomerang(gfxSprite* nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short teamID, short iColorID)
-    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 3, 0, 0)
+MO_Boomerang::MO_Boomerang(gfxSprite* nspr, Vec2s pos, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short teamID, short iColorID)
+    : IO_MovingObject(nspr, pos, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 3, 0, 0)
 {
     // boomerangs sprites have both right and left sprites in them
     ih = ih >> 3;
@@ -274,7 +274,7 @@ void MO_Boomerang::update()
 void MO_Boomerang::forcedead()
 {
     removeifprojectile(this, false, true);
-    ifsoundonstop(rm->sfx_boomerang);
+    rm->sfx_boomerang.stop();
 
     if (game_values.boomeranglimit == 0)
         return;
@@ -309,5 +309,5 @@ bool MO_Boomerang::collide(CPlayer* player)
 
 void MO_Boomerang::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset + (fMoveToRight ? 0 : 32), iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, colorOffset + (fMoveToRight ? 0 : 32), iw, ih});
 }

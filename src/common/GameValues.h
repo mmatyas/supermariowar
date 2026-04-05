@@ -13,13 +13,9 @@
 
 class sfxSound;
 class CGameMode;
+struct TourStop;
 
 void ifSoundOnPlay(sfxSound&);
-#define ifsoundonandreadyplay(x) (x.isReady() && game_values.sound ? x.play() : -1)
-#define ifSoundOnPlayLoop(x,y) (game_values.sound ? x.playLoop(y) : -1)
-#define ifsoundonstop(x) (game_values.sound ? x.stop() : void(NULL))
-#define ifsoundonpause(x) (game_values.sound ? x.togglePause() : void(NULL))
-#define ifmusiconplay(x) (game_values.music ? x.play() : -1)
 
 short defaultPowerupSetting(size_t presetIdx, size_t powerupIdx);
 
@@ -39,34 +35,6 @@ struct TournamentScores {
     short       type[MAXTOURNAMENTGAMES];
     short       total;      //used for running total in a tour
 };
-
-struct WorldStageBonus {
-    short iWinnerPlace;
-    short iBonus;
-    char szBonusString[8];
-};
-
-struct TourStop {
-    const char * pszMapFile;
-    short iMode;
-    short iGoal;
-    short iPoints;
-    short iBonusType;
-    char szName[128];
-
-    bool fEndStage;
-    short iNumBonuses;
-    WorldStageBonus wsbBonuses[10];
-    short iStageType;
-
-    bool fUseSettings;
-    short iNumUsedSettings;
-    GameModeSettings gmsSettings;
-
-    short iBonusTextLines;
-    char szBonusText[5][128];
-};
-
 
 /// Gameplay-specific variables, which are reset on the start of a game.
 struct GameplayFlags {
@@ -219,8 +187,7 @@ public:
     Minigame selectedminigame;
 
     short		tourindex;
-    short		tourstopcurrent;
-    short		tourstoptotal;
+    size_t		tourstopcurrent;
     std::vector<TourStop*> tourstops;
 
     short		worldindex;
@@ -253,8 +220,8 @@ public:
 
     bool		soundcapable;
 
-    bool *		pfFilters;
-    short *		piFilterIcons;
+    std::vector<bool> pfFilters;
+    std::vector<short> piFilterIcons;
     short		selectedmapfilter;
     bool		fNeedWriteFilters;
     bool		fFiltersOn;

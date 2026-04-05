@@ -9,17 +9,13 @@
 class SplashScreenState : public GameState
 {
     public:
-        bool init();
-        void update();
+        bool init() override;
+        void update() override;
 
         static SplashScreenState& instance();
 
     private:
-        void onEnterState() {}
-        void onLeaveState();
-
-        //bool LoadStartGraphics();
-        //bool LoadGameSounds();
+        void onLeaveState() override;
 
         SDL_Event loop_event;
         gfxSprite* menu_dpi_logo;
@@ -31,9 +27,6 @@ class SplashScreenState : public GameState
         bool firstFrame;
 
         SplashScreenState();
-        ~SplashScreenState() {}
-        SplashScreenState(SplashScreenState const&);
-        void operator=(SplashScreenState const&);
 };
 
 #endif // GAMESTATE_SPLASHSCREEN_H

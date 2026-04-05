@@ -39,7 +39,5 @@ void PlayerSuicideTimer::draw(CPlayer& player)
         rm->spr_awardkillsinrow.draw(
             player.leftX() - PWOFFSET + 8,
             player.topY() - PHOFFSET + 8,
-            displaytimer << 4,
-            player.getColorID() << 4,
-            16, 16);
+            {displaytimer << 4, player.getColorID() << 4, 16, 16});
 }

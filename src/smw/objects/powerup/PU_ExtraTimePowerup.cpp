@@ -11,8 +11,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class special extra time powerup for timed or star mode
 //------------------------------------------------------------------------------
-PU_ExtraTimePowerup::PU_ExtraTimePowerup(gfxSprite* nspr, short x, short y)
-    : MO_Powerup(nspr, x, y, 1, 0, 30, 30, 1, 1)
+PU_ExtraTimePowerup::PU_ExtraTimePowerup(gfxSprite* nspr, Vec2s pos)
+    : MO_Powerup(nspr, pos, 1, 0, 30, 30, 1, 1)
 {
     velx = 0.0f;
 }

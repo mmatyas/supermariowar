@@ -18,8 +18,8 @@ extern CEyecandyContainer eyecandy[3];
 // class breakable block
 //------------------------------------------------------------------------------
 
-B_BreakableBlock::B_BreakableBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed) :
-    IO_Block(nspr, x, y)
+B_BreakableBlock::B_BreakableBlock(gfxSprite *nspr, Vec2s pos, short iNumSpr, short aniSpeed) :
+    IO_Block(nspr, pos)
 {
     iw = (short)nspr->getWidth() >> 2;
     iNumSprites = iNumSpr;
@@ -32,7 +32,7 @@ B_BreakableBlock::B_BreakableBlock(gfxSprite *nspr, short x, short y, short iNum
 void B_BreakableBlock::draw()
 {
     if (state == 0)
-        spr->draw(ix, iy, drawFrame, 0, iw, ih);
+        spr->draw(ix, iy, {drawFrame, 0, iw, ih});
 }
 
 void B_BreakableBlock::update()
@@ -167,10 +167,10 @@ bool B_BreakableBlock::hitleft(IO_MovingObject * object)
 void B_BreakableBlock::triggerBehavior()
 {
     if (state == 0) {
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenyellowblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenyellowblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenyellowblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenyellowblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenyellowblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenyellowblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
 
         state = 1;
         ifSoundOnPlay(rm->sfx_breakblock);

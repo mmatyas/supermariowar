@@ -2,19 +2,16 @@
 
 #include "GameValues.h"
 #include "map.h"
+#include "MapReaderConstants.h"
 #include "movingplatform.h"
 #include "FileIO.h"
 #include "TilesetManager.h"
 
 #include <cassert>
-#include <cstring>
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
-extern const char* g_szBackgroundConversion[26];
-extern short g_iTileTypeConversion[NUMTILETYPES];
 
-using namespace std;
 
 MapReader1700::MapReader1700()
     : MapReader1600()
@@ -51,7 +48,7 @@ void MapReader1702::read_autofilters(CMap& map, BinaryFile& mapfile)
 
 void MapReader1700::read_tiles(CMap& map, BinaryFile& mapfile)
 {
-    short iClassicTilesetID = g_tilesetmanager->indexFromName("Classic");
+    short iClassicTilesetID = g_tilesetmanager->classicTilesetIndex();
 
     unsigned short i, j, k;
     for (j = 0; j < MAPHEIGHT; j++) {
@@ -89,19 +86,18 @@ void MapReader1700::read_tiles(CMap& map, BinaryFile& mapfile)
 void MapReader1701::read_background(CMap& map, BinaryFile& mapfile)
 {
     //Read in background to use
-    mapfile.read_string_long(map.szBackgroundFile, 128);
+    char text[128];
+    mapfile.read_string_long(text, 128);
+    map.szBackgroundFile = text;
 
-    for (short iBackground = 0; iBackground < 26; iBackground++) {
-        const char * szFindUnderscore = strstr(g_szBackgroundConversion[iBackground], "_");
-
+    for (const std::string_view background : g_szBackgroundConversion) {
         // All items must have an underscore in g_szBackgroundConversion
-        assert(szFindUnderscore);
+        const size_t underscorePos = background.find("_");
+        assert(underscorePos != background.npos);
 
-        szFindUnderscore++;
-
-        if (!strcmp(szFindUnderscore, map.szBackgroundFile)) {
-            assert(strlen(g_szBackgroundConversion[iBackground]) <= 128);
-            strcpy(map.szBackgroundFile, g_szBackgroundConversion[iBackground]);
+        if (background.substr(underscorePos + 1) == map.szBackgroundFile) {
+            map.szBackgroundFile = background;
+            break;
         }
     }
 }
@@ -109,7 +105,9 @@ void MapReader1701::read_background(CMap& map, BinaryFile& mapfile)
 void MapReader1702::read_background(CMap& map, BinaryFile& mapfile)
 {
     //Read in background to use
-    mapfile.read_string_long(map.szBackgroundFile, 128);
+    char text[128];
+    mapfile.read_string_long(text, 128);
+    map.szBackgroundFile = text;
 }
 
 void MapReader1700::set_preview_switches(CMap& map, BinaryFile& mapfile)
@@ -161,15 +159,7 @@ void MapReader1700::read_warp_locations(CMap& map, BinaryFile& mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
-            TileType iType = (TileType)mapfile.read_i32();
-
-            if (iType >= 0 && iType < NUMTILETYPES) {
-                map.mapdatatop[i][j].iType = iType;
-                map.mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
-            } else {
-                map.mapdatatop[i][j].iType = tile_nonsolid;
-                map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-            }
+            map.mapdatatop[i][j] = (TileType)mapfile.read_i32();
 
             map.warpdata[i][j].direction = (WarpEnterDirection)mapfile.read_i32();
             map.warpdata[i][j].connection = (short)mapfile.read_i32();
@@ -194,9 +184,9 @@ bool MapReader1700::read_spawn_areas(CMap& map, BinaryFile& mapfile)
         map.numspawnareas[i] = (short)mapfile.read_i32();
 
         if (map.numspawnareas[i] > MAXSPAWNAREAS) {
-            cout << endl << " ERROR: Number of spawn areas (" << map.numspawnareas[i]
-                 << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
-                 << endl;
+            std::cout << std::endl << " ERROR: Number of spawn areas (" << map.numspawnareas[i]
+                << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
+                << std::endl;
             return false;
         }
 
@@ -233,17 +223,14 @@ void MapReader1700::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
     map.clearPlatforms();
 
     //Load moving platforms
-    map.iNumPlatforms = (short)mapfile.read_i32();
-    map.platforms = new MovingPlatform*[map.iNumPlatforms];
+    const size_t iNumPlatforms = (short)mapfile.read_i32();
+    map.platforms.reserve(iNumPlatforms);
 
-    for (short iPlatform = 0; iPlatform < map.iNumPlatforms; iPlatform++) {
+    for (size_t idx = 0; idx < iNumPlatforms; idx++) {
         short iWidth = (short)mapfile.read_i32();
         short iHeight = (short)mapfile.read_i32();
 
-        TilesetTile ** tiles = new TilesetTile*[iWidth];
-        MapTile ** types = new MapTile*[iWidth];
-
-        read_platform_tiles(map, mapfile, iWidth, iHeight, tiles, types);
+        auto [tiles, types] = read_platform_tiles(map, mapfile, iWidth, iHeight);
 
         short iDrawLayer = 2;
         //printf("Layer: %d\n", iDrawLayer);
@@ -251,94 +238,92 @@ void MapReader1700::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
         short iPathType = 0;
         //printf("PathType: %d\n", iPathType);
 
-        MovingPlatformPath* path = NULL;
-        path = read_platform_path_details(mapfile, iPathType, fPreview);
+        MovingPlatformPath* path = read_platform_path_details(mapfile, iPathType, fPreview);
         if (!path)
             continue;
 
-        MovingPlatform * platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);
-        map.platforms[iPlatform] = platform;
+        MovingPlatform* platform = new MovingPlatform(std::move(tiles), std::move(types), iWidth, iHeight, iDrawLayer, path, fPreview);
+        map.platforms.emplace_back(platform);
         map.platformdrawlayer[iDrawLayer].push_back(platform);
     }
 }
 
-void MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile,
-    short iWidth, short iHeight, TilesetTile**& tiles, MapTile**& types)
+std::pair<std::vector<TilesetTile>, std::vector<TileType>>
+MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile, short iWidth, short iHeight)
 {
+    std::vector<TilesetTile> tiles;
+    std::vector<TileType> types;
+    tiles.reserve(iWidth * iHeight);
+    types.reserve(iWidth * iHeight);
+
     for (short iCol = 0; iCol < iWidth; iCol++) {
-        tiles[iCol] = new TilesetTile[iHeight];
-        types[iCol] = new MapTile[iHeight];
-
         for (short iRow = 0; iRow < iHeight; iRow++) {
-            TilesetTile * tile = &tiles[iCol][iRow];
-
             short iTile = mapfile.read_i32();
+
+            TilesetTile tile;
             TileType type;
 
             if (iTile == TILESETSIZE) {
-                tile->iID = TILESETNONE;
-                tile->iCol = 0;
-                tile->iRow = 0;
+                tile.iID = TILESETNONE;
+                tile.iCol = 0;
+                tile.iRow = 0;
 
-                type = tile_nonsolid;
+                type = TileType::NonSolid;
             } else {
-                tile->iID = g_tilesetmanager->classicTilesetIndex();
-                tile->iCol = iTile % TILESETWIDTH;
-                tile->iRow = iTile / TILESETWIDTH;
+                tile.iID = g_tilesetmanager->classicTilesetIndex();
+                tile.iCol = iTile % TILESETWIDTH;
+                tile.iRow = iTile / TILESETWIDTH;
 
-                type = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
+                type = g_tilesetmanager->classicTileset()->tileType(tile.iCol, tile.iRow);
             }
 
-            if (type >= 0 && type < NUMTILETYPES) {
-                types[iCol][iRow].iType = type;
-                types[iCol][iRow].iFlags = g_iTileTypeConversion[type];
-            } else {
-                map.mapdatatop[iCol][iRow].iType = tile_nonsolid;
-                map.mapdatatop[iCol][iRow].iFlags = tile_flag_nonsolid;
-            }
+            tiles.emplace_back(std::move(tile));
+            types.emplace_back(std::move(type));
         }
     }
+
+    return {tiles, types};
 }
 
 MovingPlatformPath* MapReader1700::read_platform_path_details(BinaryFile& mapfile, short iPathType, bool fPreview)
 {
-    MovingPlatformPath* path = NULL;
     if (iPathType == 0) { //segment path
-        float fStartX = mapfile.read_float();
-        float fStartY = mapfile.read_float();
-        float fEndX = mapfile.read_float();
-        float fEndY = mapfile.read_float();
-        float fVelocity = mapfile.read_float();
+        float startX = mapfile.read_float();
+        float startY = mapfile.read_float();
+        float endX = mapfile.read_float();
+        float endY = mapfile.read_float();
+        float speed = mapfile.read_float();
 
-        path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, fPreview);
+        return new StraightPath(speed, Vec2f(startX, startY), Vec2f(endX, endY), fPreview);
 
         //printf("Read segment path\n");
-        //printf("StartX: %.2f StartY:%.2f EndX:%.2f EndY:%.2f Velocity:%.2f\n", fStartX, fStartY, fEndX, fEndY, fVelocity);
-    } else if (iPathType == 1) { //continuous path
-        float fStartX = mapfile.read_float();
-        float fStartY = mapfile.read_float();
-        float fAngle = mapfile.read_float();
-        float fVelocity = mapfile.read_float();
+        //printf("StartX: %.2f StartY:%.2f EndX:%.2f EndY:%.2f Velocity:%.2f\n", startX, startY, endX, endY, speed);
+    }
+    if (iPathType == 1) { //continuous path
+        float startX = mapfile.read_float();
+        float startY = mapfile.read_float();
+        float angle = mapfile.read_float();
+        float speed = mapfile.read_float();
 
-        path = new StraightPathContinuous(fVelocity, fStartX, fStartY, fAngle, fPreview);
+        return new StraightPathContinuous(speed, Vec2f(startX, startY), angle, fPreview);
 
         //printf("Read continuous path\n");
-        //printf("StartX: %.2f StartY:%.2f Angle:%.2f Velocity:%.2f\n", fStartX, fStartY, fAngle, fVelocity);
-    } else if (iPathType == 2) { //elliptical path
-        float fRadiusX = mapfile.read_float();
-        float fRadiusY = mapfile.read_float();
-        float fCenterX = mapfile.read_float();
-        float fCenterY = mapfile.read_float();
-        float fAngle = mapfile.read_float();
-        float fVelocity = mapfile.read_float();
+        //printf("StartX: %.2f StartY:%.2f Angle:%.2f Velocity:%.2f\n", startX, startY, angle, speed);
+    }
+    if (iPathType == 2) { //elliptical path
+        float radiusX = mapfile.read_float();
+        float radiusY = mapfile.read_float();
+        float centerX = mapfile.read_float();
+        float centerY = mapfile.read_float();
+        float angle = mapfile.read_float();
+        float speed = mapfile.read_float();
 
-        path = new EllipsePath(fVelocity, fAngle, fRadiusX, fRadiusY, fCenterX, fCenterY, fPreview);
+        return new EllipsePath(speed, angle, Vec2f(radiusX, radiusY), Vec2f(centerX, centerY), fPreview);
 
         //printf("Read elliptical path\n");
-        //printf("CenterX: %.2f CenterY:%.2f Angle:%.2f RadiusX: %.2f RadiusY: %.2f Velocity:%.2f\n", fCenterX, fCenterY, fAngle, fRadiusX, fRadiusY, fVelocity);
+        //printf("CenterX: %.2f CenterY:%.2f Angle:%.2f RadiusX: %.2f RadiusY: %.2f Velocity:%.2f\n", centerX, centerY, angle, radiusX, radiusY, speed);
     }
-
-    return path;
+    return nullptr;
 }
 
 bool MapReader1700::load(CMap& map, BinaryFile& mapfile, ReadType readtype)

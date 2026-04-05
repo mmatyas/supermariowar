@@ -1,42 +1,56 @@
 #include "TilesetManager.h"
 
 #include "FileIO.h"
-#include "map.h"
+#include "path.h"
+#include "util/ContainerHelpers.h"
+#include "util/DirIterator.h"
 
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstring>
-#include <memory>
+#include <unordered_set>
 
 #if defined(__APPLE__)
 #include <sys/stat.h>
 #endif
 
+namespace fs = std::filesystem;
 
-// The map format supports tilesets with up to 128x128 tiles
-constexpr int MAX_TILES_PER_AXIS = 128;
 
 namespace {
-std::vector<TileType> readTileTypeFile(const std::string& path)
+constexpr std::array<SDL_Rect, CTileset::MAX_TILES> generateTilesetRects(int tilesize)
 {
-    constexpr int MAX_TILES = MAX_TILES_PER_AXIS * MAX_TILES_PER_AXIS;
+    std::array<SDL_Rect, CTileset::MAX_TILES> rects {};
+    for (int row = 0; row < CTileset::MAX_TILES_PER_AXIS; row++) {
+        for (int col = 0; col < CTileset::MAX_TILES_PER_AXIS; col++) {
+            rects[row * CTileset::MAX_TILES_PER_AXIS + col] = SDL_Rect {
+                col * tilesize,
+                row * tilesize,
+                tilesize,
+                tilesize,
+            };
+        }
+    }
+    return rects;
+}
 
+std::vector<TileType> readTileTypeFile(const fs::path& path)
+{
+    printf("Reading %s\n", path.generic_string().c_str());
     //Detect if the tiletype file already exists, if not create it
-    if (!FileExists(path))
+    if (!fs::exists(path))
         return {};
 
-    BinaryFile tsf(path.c_str(), "rb");
+    BinaryFile tsf(path, "rb");
     if (!tsf.is_open()) {
-        printf("ERROR: couldn't open tileset file: %s\n", path.c_str());
+        printf("ERROR: couldn't open tileset file: %s\n", path.generic_string().c_str());
         return {};
     }
 
     int tiletype_count = tsf.read_i32();
-    if (tiletype_count <= 0 || tiletype_count > MAX_TILES)
+    if (tiletype_count <= 0 || tiletype_count > CTileset::MAX_TILES)
         return {};
-
-    tiletype_count = std::min<int>(tiletype_count, path.size());
 
     std::vector<TileType> tiletypes;
     tiletypes.reserve(tiletype_count);
@@ -45,32 +59,63 @@ std::vector<TileType> readTileTypeFile(const std::string& path)
 
     return tiletypes;
 }
+
+gfxSprite loadImageOrDownscale(const std::filesystem::path& path, const gfxSprite& largeRes)
+{
+    try {
+        return ImageLoader(path).create();
+    } catch (const std::string& err) {
+        printf("\nwarning: %s -> falling back to downscaled image\n", err.c_str());
+
+        auto surf = SdlSurfacePtr(SDL_CreateRGBSurfaceWithFormat(
+            0, largeRes.getWidth() / 2, largeRes.getHeight() / 2,
+            largeRes.getSurface()->format->BitsPerPixel,
+            largeRes.getSurface()->format->format));
+        if (SDL_BlitSurface(largeRes.getSurface(), nullptr, surf.get(), nullptr) < 0) {
+            fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
+        }
+
+        return gfxSprite(std::move(surf), std::nullopt);
+    }
+
+}
 } // namespace
 
 
 /*********************************
 *  CTileset
 *********************************/
-CTileset::CTileset(const std::string& dir)
-    : m_name(getFilenameFromPath(dir))
-    , m_tilesetPath(dir + "/tileset.tls")
-    , m_tiletypes(readTileTypeFile(m_tilesetPath))
-{
-    gfx_loadimage(m_sprites[0], dir + "/large.png", false);
-    gfx_loadimage(m_sprites[1], dir + "/medium.png", false);
-    gfx_loadimage(m_sprites[2], dir + "/small.png", false);
+CTileset::CTileset(std::filesystem::path dir)
+    : m_name(dir.filename().string())
+    , m_tileset_dir(std::move(dir))
+{}
 
-    m_width = std::min(m_sprites[0].getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
-    m_height = std::min(m_sprites[0].getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
-    m_tiletypes = std::vector<TileType>(m_width * m_height, tile_nonsolid);
+
+void CTileset::ensureLoaded()
+{
+    if (m_sprite_large)
+        return;
+
+    m_tiletypes = readTileTypeFile(m_tileset_dir / "tileset.tls");
+
+    m_sprite_large = ImageLoader(m_tileset_dir / "large.png").create();
+    m_sprite_medium = loadImageOrDownscale(m_tileset_dir / "medium.png", m_sprite_large);
+    m_sprite_small = loadImageOrDownscale(m_tileset_dir / "small.png", m_sprite_medium);
+
+    m_width = std::min(m_sprite_large.getWidth() / TILESIZE, MAX_TILES_PER_AXIS);
+    m_height = std::min(m_sprite_large.getHeight() / TILESIZE, MAX_TILES_PER_AXIS);
 }
 
 
-SDL_Surface* CTileset::surface(size_t index) const
+const gfxSprite& CTileset::sprite(DrawSize size) const
 {
-    return index < m_sprites.size()
-        ? m_sprites[index].getSurface()
-        : nullptr;
+    assert(m_sprite_large); // call ensureLoaded first!
+    switch (size) {
+        case DrawSize::Ingame: return m_sprite_large;
+        case DrawSize::Preview: return m_sprite_medium;
+        case DrawSize::Thumbnail: return m_sprite_small;
+    }
+    return m_sprite_large;
 }
 
 
@@ -106,27 +151,28 @@ TileType CTileset::decrementTileType(size_t tileCol, size_t tileRow)
 }
 
 
-void CTileset::Draw(SDL_Surface* dstSurface, short tileSize, SDL_Rect* srcRect, SDL_Rect* dstRect) const
+void CTileset::draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dstSurface, const SDL_Rect& dstRect) const
 {
-    SDL_BlitSurface(surface(tileSize), srcRect, dstSurface, dstRect);
+    sprite(drawsize).draw(srcRect, dstSurface, dstRect);
 }
 
 
 void CTileset::saveTileset() const
 {
-    BinaryFile tsf(m_tilesetPath.c_str(), "wb");
+    const fs::path tileset_path = m_tileset_dir / "tileset.tls";
+    BinaryFile tsf(tileset_path, "wb");
     if (!tsf.is_open()) {
-        printf("ERROR: couldn't open tileset file to save tile types: %s\n", m_tilesetPath.c_str());
+        printf("ERROR: couldn't open tileset file to save tile types: %s\n", tileset_path.generic_string().c_str());
         return;
     }
 
     tsf.write_i32(m_tiletypes.size());
 
     for (TileType tiletype : m_tiletypes)
-        tsf.write_i32(tiletype);
+        tsf.write_i32(static_cast<int>(tiletype));
 
 #if defined(__APPLE__)
-    chmod(m_tilesetPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH);
+    chmod(tileset_path.string().c_str(), S_IRWXU | S_IRWXG | S_IROTH);
 #endif
 }
 
@@ -135,97 +181,47 @@ void CTileset::saveTileset() const
 *  CTilesetManager
 *********************************/
 
-CTilesetManager::CTilesetManager()
-    : SimpleDirectoryList(convertPath("gfx/packs/Classic/tilesets/"))
-{}
+const std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_ingame = generateTilesetRects(TILESIZE);
+const std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_preview = generateTilesetRects(PREVIEWTILESIZE);
+const std::array<SDL_Rect, CTileset::MAX_TILES> CTilesetManager::s_rects_thumb = generateTilesetRects(THUMBTILESIZE);
 
-
-void CTilesetManager::init(const std::string& gfxPack)
+CTilesetManager::CTilesetManager(const fs::path& gfxPack)
 {
-    //Remove all existing tilesets
-    m_tilesetlist.clear();
+    std::unordered_set<std::string> found_tileset_names;
 
-    //Add in tilesets from the new gfxpack (if the gfxpack isn't "Classic")
-    if (getFilenameFromPath(gfxPack) != "Classic") {
-        std::string s = convertPath("gfx/packs/tilesets", gfxPack) + '/';
-        SimpleDirectoryList dirlist(s);
-
-        for (size_t i = 0; i < dirlist.count(); i++) {
-            std::unique_ptr<CTileset> tileset = std::make_unique<CTileset>(dirlist.currentPath());
-
-            //If the tileset is "classic" then keep it's index for common operations
-            if (tileset->name() == "Classic")
-                m_classicTilesetIndex = i;
-
-            m_tilesetlist.emplace_back(std::move(tileset));
-            dirlist.next();
-        }
+    SubdirsIterator dir(convertPath("gfx/packs/tilesets", gfxPack) + '/');
+    while (auto path = dir.next()) {
+        CTileset tileset(*path);
+        found_tileset_names.insert(tileset.name());
+        m_tilesets.emplace_back(std::move(tileset));
     }
 
-    //Add in tilesets from the classic tileset to fill the gaps
-    for (size_t i = 0; i < m_filelist.size(); i++) {
-        const std::string tilesetName = getFilenameFromPath(m_filelist[i]);
-
-        //See if the new tileset already exists and if it does, skip it
-        bool fFound = false;
-        for (size_t iTileset = 0; iTileset < m_tilesetlist.size(); iTileset++) {
-            if (m_tilesetlist[iTileset]->name() == tilesetName) {
-                fFound = true;
-                break;
+    //Add tilesets from the Classic pack to fill the gaps
+    if (gfxPack.filename() != "Classic") {
+        dir = SubdirsIterator(convertPath("gfx/packs/Classic/tilesets/"));
+        while (auto path = dir.next()) {
+            if (!found_tileset_names.contains(path->filename().string())) {
+                CTileset tileset(*path);
+                m_tilesets.emplace_back(std::move(tileset));
             }
         }
-
-        //Add the tileset if another one by the same name isn't already in the tileset
-        if (!fFound) {
-            std::unique_ptr<CTileset> tileset = std::make_unique<CTileset>(m_filelist[i]);
-            if (tileset->name() == "Classic") {
-                m_classicTilesetIndex = i;
-            }
-            m_tilesetlist.emplace_back(std::move(tileset));
-        }
     }
 
-    initTilesetRects();
-}
+    utils::sort(m_tilesets, [](const CTileset& a, const CTileset& b) {
+        return a.name() < b.name();
+    });
 
-
-void CTilesetManager::initTilesetRects()
-{
-    size_t max_tileset_rows = 0;
-    for (const std::unique_ptr<CTileset>& tileset : m_tilesetlist) {
-        max_tileset_rows = std::max<size_t>(max_tileset_rows, tileset->height());
-        m_max_tileset_cols = std::max<size_t>(m_max_tileset_cols, tileset->width());
-    }
-
-    const size_t tile_count = max_tileset_rows * m_max_tileset_cols;
-    m_rects_ingame.reserve(tile_count);
-    m_rects_preview.reserve(tile_count);
-    m_rects_thumb.reserve(tile_count);
-
-    short y1 = 0, y2 = 0, y3 = 0;
-    for (size_t row = 0; row < max_tileset_rows; row++) {
-        short x1 = 0, x2 = 0, x3 = 0;
-        for (size_t col = 0; col < m_max_tileset_cols; col++) {
-            m_rects_ingame.emplace_back(SDL_Rect { x1, y1, TILESIZE, TILESIZE });
-            m_rects_preview.emplace_back(SDL_Rect { x2, y2, PREVIEWTILESIZE, PREVIEWTILESIZE });
-            m_rects_thumb.emplace_back(SDL_Rect { x3, y3, THUMBTILESIZE, THUMBTILESIZE });
-
-            x1 += TILESIZE;
-            x2 += PREVIEWTILESIZE;
-            x3 += THUMBTILESIZE;
-        }
-
-        y1 += TILESIZE;
-        y2 += PREVIEWTILESIZE;
-        y3 += THUMBTILESIZE;
+    const auto it = utils::find_if(m_tilesets, [](const CTileset& tileset){ return tileset.name() == "Classic"; });
+    if (it != m_tilesets.cend()) {
+        m_classicTilesetIndex = std::distance(m_tilesets.cbegin(), it);
     }
 }
 
 
 size_t CTilesetManager::indexFromName(const std::string& name) const
 {
-    for (size_t i = 0; i < m_tilesetlist.size(); i++) {
-        if (m_tilesetlist[i]->name() == name)
+    for (size_t i = 0; i < m_tilesets.size(); i++) {
+        if (m_tilesets[i].name() == name)
             return i;
     }
 
@@ -233,53 +229,52 @@ size_t CTilesetManager::indexFromName(const std::string& name) const
 }
 
 
-void CTilesetManager::Draw(SDL_Surface * dstSurface, short iTilesetID, short iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow)
+void CTilesetManager::Draw(
+    SDL_Surface* dstSurface, size_t iTilesetID, DrawSize drawsize,
+    short iSrcTileCol, short iSrcTileRow,
+    short iDstTileCol, short iDstTileRow)
 {
-    assert(0 <= iTilesetID && static_cast<size_t>(iTilesetID) < m_tilesetlist.size());
-    assert(iSrcTileCol >= 0 && iSrcTileRow >= 0);
-    assert(iDstTileCol >= 0 && iDstTileRow >= 0);
+    CTileset* tileset_ptr = tileset(iTilesetID);
+    if (!tileset_ptr)
+        return;
 
-    const size_t src_rect_idx = iSrcTileRow * m_max_tileset_cols + iSrcTileCol;
-    const size_t dst_rect_idx = iDstTileRow * m_max_tileset_cols + iDstTileCol;
+    const SDL_Rect& src_rect = rect(drawsize, iSrcTileCol, iSrcTileRow);
+    const SDL_Rect& dst_rect = rect(drawsize, iDstTileCol, iDstTileRow);
 
-    SDL_Rect* src_rect = rect(iTileSize, src_rect_idx);
-    SDL_Rect* dst_rect = rect(iTileSize, dst_rect_idx);
-
-    m_tilesetlist[iTilesetID]->Draw(dstSurface, iTileSize, src_rect, dst_rect);
+    tileset_ptr->draw(drawsize, src_rect, dstSurface, dst_rect);
 }
 
 
 CTileset* CTilesetManager::tileset(size_t index)
 {
-    return index < m_tilesetlist.size()
-        ? m_tilesetlist[index].get()
-        : nullptr;
-}
-
-
-SDL_Rect* CTilesetManager::rect(short size_id, short col, short row)
-{
-    const size_t rect_idx = row * m_max_tileset_cols + col;
-    return rect(size_id, rect_idx);
-}
-
-
-SDL_Rect* CTilesetManager::rect(short size_id, size_t idx)
-{
-    assert(0 <= size_id && size_id < 3);
-    assert(idx < m_rects_ingame.size());
-
-    switch (size_id) {
-    case 0: return &m_rects_ingame[idx];
-    case 1: return &m_rects_preview[idx];
-    case 2: return &m_rects_thumb[idx];
-        default: return nullptr;
+    if (index < m_tilesets.size()) {
+        m_tilesets[index].ensureLoaded();
+        return &m_tilesets[index];
     }
+    return nullptr;
+}
+
+
+const SDL_Rect& CTilesetManager::rect(DrawSize size, size_t col, size_t row)
+{
+    const size_t rect_idx = row * CTileset::MAX_TILES_PER_AXIS + col;
+    return rect(size, rect_idx);
+}
+
+
+const SDL_Rect& CTilesetManager::rect(DrawSize size, size_t idx)
+{
+    switch (size) {
+        case DrawSize::Ingame: return s_rects_ingame.at(idx);
+        case DrawSize::Preview: return s_rects_preview.at(idx);
+        case DrawSize::Thumbnail: return s_rects_thumb.at(idx);
+    }
+    return s_rects_ingame.at(idx);
 }
 
 
 void CTilesetManager::saveTilesets() const
 {
-    for (const std::unique_ptr<CTileset>& tileset : m_tilesetlist)
-        tileset->saveTileset();
+    for (const CTileset& tileset : m_tilesets)
+        tileset.saveTileset();
 }

@@ -7,8 +7,6 @@
 #include "path.h"
 #include "ResourceManager.h"
 
-#include "SDL_image.h"
-
 extern CGameValues game_values;
 extern CResourceManager* rm;
 extern CMap* g_map;
@@ -30,9 +28,6 @@ inline void smallDelay() {}
 MI_MapBrowser::MI_MapBrowser()
     : UI_Control(0, 0)
 {
-    for (short iSurface = 0; iSurface < 9; iSurface++)
-        mapSurfaces[iSurface] = nullptr;
-
     srcRectBackground.x = 0;
     srcRectBackground.y = 0;
     srcRectBackground.w = App::screenWidth;
@@ -42,16 +37,6 @@ MI_MapBrowser::MI_MapBrowser()
     dstRectBackground.y = 0;
     dstRectBackground.w = 160;
     dstRectBackground.h = 120;
-}
-
-MI_MapBrowser::~MI_MapBrowser()
-{
-    for (short iSurface = 0; iSurface < 9; iSurface++) {
-        if (mapSurfaces[iSurface]) {
-            SDL_FreeSurface(mapSurfaces[iSurface]);
-            mapSurfaces[iSurface] = nullptr;
-        }
-    }
 }
 
 void MI_MapBrowser::Update()
@@ -67,7 +52,7 @@ void MI_MapBrowser::Update()
 
 void MI_MapBrowser::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     SDL_Rect rSrc = {0, 0, 160, 120};
@@ -83,11 +68,11 @@ void MI_MapBrowser::Draw()
 
                 rDst.x = iCol * 200 + 40;
 
-                SDL_BlitSurface(mapSurfaces[iRow * 3 + iCol], &rSrc, blitdest, &rDst);
+                mapSurfaces[iRow * 3 + iCol].draw(rSrc, blitdest, rDst);
 
                 if (iType == 0) {
                     if (mapListNodes[iRow * 3 + iCol]->pfFilters[game_values.selectedmapfilter])
-                        rm->menu_map_filter.draw(rDst.x, rDst.y, iFilterTagAnimationFrame, 24, 24, 24);
+                        rm->menu_map_filter.draw(rDst.x, rDst.y, {iFilterTagAnimationFrame, 24, 24, 24});
                 }
 
                 rm->menu_font_large.drawChopRight(rDst.x, rDst.y + 120, 165, mapNames[iRow * 3 + iCol].c_str());
@@ -99,16 +84,16 @@ void MI_MapBrowser::Draw()
     rDst.y = iSelectedRow * 150 + 30;
     rDst.x = iSelectedCol * 200 + 40;
 
-    rm->menu_dialog.draw(rDst.x - 16, rDst.y - 16, 0, 0, 176, 148);
-    rm->menu_dialog.draw(rDst.x + 160, rDst.y - 16, 496, 0, 16, 148);
-    rm->menu_dialog.draw(rDst.x - 16, rDst.y + 132, 0, 464, 176, 16);
-    rm->menu_dialog.draw(rDst.x + 160, rDst.y + 132, 496, 464, 16, 16);
+    rm->menu_dialog.draw(rDst.x - 16, rDst.y - 16, {0, 0, 176, 148});
+    rm->menu_dialog.draw(rDst.x + 160, rDst.y - 16, {496, 0, 16, 148});
+    rm->menu_dialog.draw(rDst.x - 16, rDst.y + 132, {0, 464, 176, 16});
+    rm->menu_dialog.draw(rDst.x + 160, rDst.y + 132, {496, 464, 16, 16});
 
-    SDL_BlitSurface(mapSurfaces[iSelectedRow * 3 + iSelectedCol], &rSrc, blitdest, &rDst);
+    mapSurfaces[iSelectedRow * 3 + iSelectedCol].draw(rSrc, blitdest, rDst);
 
     if (iType == 0) {
         if (mapListNodes[iSelectedRow * 3 + iSelectedCol]->pfFilters[game_values.selectedmapfilter])
-            rm->menu_map_filter.draw(rDst.x, rDst.y, iFilterTagAnimationFrame, 24, 24, 24);
+            rm->menu_map_filter.draw(rDst.x, rDst.y, {iFilterTagAnimationFrame, 24, 24, 24});
     }
 
     rm->menu_font_large.drawChopRight(rDst.x, rDst.y + 120, 165, mapNames[iSelectedRow * 3 + iSelectedCol].c_str());
@@ -238,15 +223,15 @@ void MI_MapBrowser::Reset(short type)
     iType = type;
 
     if (iType == 0) {
-        iSelectedIndex = maplist->GetCurrent()->second->iIndex;
+        iSelectedIndex = maplist->GetCurrent()->second.iIndex;
 
         iFilterTagAnimationTimer = 0;
         iFilterTagAnimationFrame = 72;
 
-        iMapCount = maplist->GetCount();
+        iMapCount = maplist->count();
     } else {
-        iSelectedIndex = maplist->GetCurrent()->second->iFilteredIndex;
-        iMapCount = maplist->GetFilteredCount();
+        iSelectedIndex = maplist->GetCurrent()->second.iFilteredIndex;
+        iMapCount = maplist->filteredCount();
     }
 
     iSelectedRow = (iSelectedIndex / 3) % 3;
@@ -264,34 +249,25 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
         if (iIndex >= iMapCount)
             return;
 
-        std::map<std::string, MapListNode*>::iterator itr = maplist->GetIteratorAt(iIndex, fUseFilters);
+        std::map<std::string, MapListNode>::iterator itr = maplist->GetIteratorAt(iIndex, fUseFilters);
 
                //See if we already have a thumbnail saved for this map
 
         std::string szThumbnail("maps/cache/");
-        szThumbnail += GetNameFromFileName((*itr).second->filename.c_str());
-
-#ifdef PNG_SAVE_FORMAT
+        szThumbnail += GetNameFromFileName((*itr).second.filename.c_str());
         szThumbnail += ".png";
-#else
-        szThumbnail += ".bmp";
-#endif
 
         std::string sConvertedPath = convertPath(szThumbnail);
 
         if (!FileExists(sConvertedPath)) {
-            g_map->loadMap((*itr).second->filename, read_type_preview);
+            g_map->loadMap((*itr).second.filename, read_type_preview);
             smallDelay();  //Sleeps to help the music from skipping
             g_map->saveThumbnail(sConvertedPath, false);
             smallDelay();
         }
 
-        if (mapSurfaces[iMap])
-            SDL_FreeSurface(mapSurfaces[iMap]);
-
-        mapSurfaces[iMap] = IMG_Load(sConvertedPath.c_str());
-
-        mapListNodes[iMap] = (*itr).second;
+        mapSurfaces[iMap] = ImageLoader(sConvertedPath.c_str()).withoutColorKey().create();
+        mapListNodes[iMap] = &(*itr).second;
         mapNames[iMap] = (*itr).first.c_str();
         mapListItr[iMap] = itr;
     }

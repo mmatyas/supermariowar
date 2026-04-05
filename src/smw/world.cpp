@@ -1,17 +1,18 @@
 #include "world.h"
 
-#include "GameMode.h"
+#include "FileList.h"
 #include "GameValues.h"
-#include "gfx.h"
+#include "linfunc.h"
+#include "path.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "FileList.h"
-#include "MapList.h"
+#include "Version.h"
+#include "WorldTourStop.h"
 
+#include <algorithm>
+#include <charconv>
 #include <cstdio>
-#include <cstdlib> // atoi()
 #include <cstring>
-
 #include <fstream>
 #include <map>
 #include <queue>
@@ -21,29 +22,39 @@
 #include <sys/stat.h>
 #endif
 
-void ResetTourStops();
-TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld);
-void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld);
-
-WorldMap g_worldmap;
-
-extern std::string stripPathAndExtension(const std::string &path);
-
-extern int32_t g_iVersion[];
-extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrBefore(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrAfter(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-
-extern CGameMode * gamemodes[GAMEMODE_LAST];
+WorldMap g_worldmap(0, 0);
 
 extern SDL_Surface* blitdest;
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-extern MapList *maplist;
 extern SkinList *skinlist;
-extern WorldList *worldlist;
+
+
+namespace {
+std::string_view popNext(std::list<std::string_view>& list)
+{
+    std::string_view result;
+    if (!list.empty()) {
+        result = std::move(list.front());
+        list.pop_front();
+    }
+    return result;
+}
+
+int toInt(std::string_view text, int defval = 0)
+{
+    int value = defval;
+    std::from_chars(text.data(), text.data() + text.size(), value);  // TODO: Handle errors
+    return value;
+}
+
+int popNextInt(std::list<std::string_view>& list, int defval = 0)
+{
+    return toInt(popNext(list));
+}
+} // namespace
 
 
 /**********************************
@@ -51,15 +62,9 @@ extern WorldList *worldlist;
 **********************************/
 
 WorldMovingObject::WorldMovingObject()
-    : iDrawSprite(0)
-    , iDrawDirection(0)
-    , iTileSize(0)
 {
     SetPosition(0, 0);
 }
-
-WorldMovingObject::~WorldMovingObject()
-{}
 
 void WorldMovingObject::Init(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize)
 {
@@ -74,17 +79,17 @@ void WorldMovingObject::Init(short iCol, short iRow, short iSprite, short iIniti
 void WorldMovingObject::Move(short iDirection)
 {
     if (iDirection == 0) {
-        iDestTileY--;
+        destTile.y--;
         iState = 1;
     } else if (iDirection == 1) {
-        iDestTileY++;
+        destTile.y++;
         iState = 2;
     } else if (iDirection == 2) {
-        iDestTileX--;
+        destTile.x--;
         iState = 3;
         iDrawDirection = 1;
     } else if (iDirection == 3) {
-        iDestTileX++;
+        destTile.x++;
         iState = 4;
         iDrawDirection = 0;
     }
@@ -100,38 +105,38 @@ bool WorldMovingObject::Update()
     }
 
     if (iState == 1) {
-        iy -= 2;
-        if (iy < iDestTileY * iTileSize) {
-            iy = iDestTileY * iTileSize;
+        pos.y -= 2;
+        if (pos.y < destTile.y * iTileSize) {
+            pos.y = destTile.y * iTileSize;
             iState = 0;
-            iCurrentTileY = iDestTileY;
+            currentTile.y = destTile.y;
 
             return true;
         }
     } else if (iState == 2) { //down
-        iy += 2;
-        if (iy > iDestTileY * iTileSize) {
-            iy = iDestTileY * iTileSize;
+        pos.y += 2;
+        if (pos.y > destTile.y * iTileSize) {
+            pos.y = destTile.y * iTileSize;
             iState = 0;
-            iCurrentTileY = iDestTileY;
+            currentTile.y = destTile.y;
 
             return true;
         }
     } else if (iState == 3) { //left
-        ix -= 2;
-        if (ix < iDestTileX * iTileSize) {
-            ix = iDestTileX * iTileSize;
+        pos.x -= 2;
+        if (pos.x < destTile.x * iTileSize) {
+            pos.x = destTile.x * iTileSize;
             iState = 0;
-            iCurrentTileX = iDestTileX;
+            currentTile.x = destTile.x;
 
             return true;
         }
     } else if (iState == 4) { //right
-        ix += 2;
-        if (ix > iDestTileX * iTileSize) {
-            ix = iDestTileX * iTileSize;
+        pos.x += 2;
+        if (pos.x > destTile.x * iTileSize) {
+            pos.x = destTile.x * iTileSize;
             iState = 0;
-            iCurrentTileX = iDestTileX;
+            currentTile.x = destTile.x;
 
             return true;
         }
@@ -147,12 +152,9 @@ void WorldMovingObject::FaceDirection(short iDirection)
 
 void WorldMovingObject::SetPosition(short iCol, short iRow)
 {
-    ix = iCol * iTileSize;
-    iy = iRow * iTileSize;
-    iCurrentTileX = iCol;
-    iCurrentTileY = iRow;
-    iDestTileX = iCol;
-    iDestTileY = iRow;
+    pos = {iCol * iTileSize, iRow * iTileSize};
+    currentTile = {iCol, iRow};
+    destTile = {iCol, iRow};
 
     iState = 0;
     iAnimationFrame = 0;
@@ -163,21 +165,19 @@ void WorldMovingObject::SetPosition(short iCol, short iRow)
 * WorldPlayer
 **********************************/
 
-WorldPlayer::WorldPlayer() :
-    WorldMovingObject()
+WorldPlayer::WorldPlayer()
+    : WorldPlayer(0, 0)
 {}
 
-WorldPlayer::~WorldPlayer()
-{}
-
-void WorldPlayer::Init(short iCol, short iRow)
+WorldPlayer::WorldPlayer(short iCol, short iRow)
+    : WorldMovingObject()
 {
     WorldMovingObject::Init(iCol, iRow, 0, 0, 32);
 }
 
-void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY)
+void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY) const
 {
-    rm->spr_player[iDrawSprite][iAnimationFrame + iDrawDirection]->draw(ix + iMapOffsetX, iy + iMapOffsetY, 0, 0, 32, 32);
+    rm->spr_player[iDrawSprite][iAnimationFrame + iDrawDirection].draw(pos.x + iMapOffsetX, pos.y + iMapOffsetY, {0, 0, 32, 32});
 }
 
 void WorldPlayer::SetSprite(short iPlayer)
@@ -249,14 +249,11 @@ void WorldVehicle::SetNextDest()
     if (iState != 0 || iMaxMoves == 0)
         return;
 
-    WorldMapTile * tile = &g_worldmap.tiles[iCurrentTileX][iCurrentTileY];
-
-    short iPlayerCurrentTileX, iPlayerCurrentTileY;
-    g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+    WorldMapTile * tile = &g_worldmap.tiles.at(currentTile.x, currentTile.y);
+    const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
     if (iNumMoves-- <= 0) {
-        if (tile->iType == 0 && (iPlayerCurrentTileX != iCurrentTileX || iPlayerCurrentTileY != iCurrentTileY) &&
-                g_worldmap.NumVehiclesInTile(iCurrentTileX, iCurrentTileY) <= 1)
+        if (tile->iType == 0 && iPlayerCurrentTile != currentTile && g_worldmap.NumVehiclesInTile(currentTile) <= 1)
             return;
     }
 
@@ -271,13 +268,13 @@ void WorldVehicle::SetNextDest()
     for (short iDirection = 0; iDirection < 4; iDirection++) {
         bool fIsDoor = false;
         if (iDirection == 0)
-            fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY - 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY - 1) == iBoundary);
+            fIsDoor = g_worldmap.IsDoor(currentTile.x, currentTile.y - 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x, currentTile.y - 1) == iBoundary);
         else if (iDirection == 1)
-            fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY + 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY + 1) == iBoundary);
+            fIsDoor = g_worldmap.IsDoor(currentTile.x, currentTile.y + 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x, currentTile.y + 1) == iBoundary);
         else if (iDirection == 2)
-            fIsDoor = g_worldmap.IsDoor(iCurrentTileX - 1, iCurrentTileY) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX - 1, iCurrentTileY) == iBoundary);
+            fIsDoor = g_worldmap.IsDoor(currentTile.x - 1, currentTile.y) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x - 1, currentTile.y) == iBoundary);
         else if (iDirection == 3)
-            fIsDoor = g_worldmap.IsDoor(iCurrentTileX + 1, iCurrentTileY) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX + 1, iCurrentTileY) == iBoundary);
+            fIsDoor = g_worldmap.IsDoor(currentTile.x + 1, currentTile.y) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(currentTile.x + 1, currentTile.y) == iBoundary);
 
         if (tile->fConnection[iDirection] && !fIsDoor)
             iConnections[iNumConnections++] = iDirection;
@@ -294,10 +291,7 @@ bool WorldVehicle::Update()
     bool fMoveDone = WorldMovingObject::Update();
 
     if (fMoveDone) {
-        short iPlayerTileX, iPlayerTileY;
-        g_worldmap.GetPlayerCurrentTile(&iPlayerTileX, &iPlayerTileY);
-
-        if (iCurrentTileX == iPlayerTileX && iCurrentTileY == iPlayerTileY)
+        if (currentTile == g_worldmap.GetPlayerCurrentTile())
             return true;
 
         SetNextDest();
@@ -319,14 +313,14 @@ bool WorldVehicle::Update()
     return false;
 }
 
-void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping)
+void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping) const
 {
     if (fVehiclesSleeping) {
-        SDL_Rect rDst = {ix + iWorldOffsetX, iy + iWorldOffsetY, iTileSize, iTileSize};
-        SDL_BlitSurface(rm->spr_worldvehicle[iTileSheet].getSurface(), &srcRects[4], blitdest, &rDst);
+        SDL_Rect rDst = {pos.x + iWorldOffsetX, pos.y + iWorldOffsetY, iTileSize, iTileSize};
+        rm->spr_worldvehicle[iTileSheet].draw(srcRects[4], blitdest, rDst);
     } else {
-        SDL_Rect rDst = {ix + iWorldOffsetX + iPaceOffset, iy + iWorldOffsetY, iTileSize, iTileSize};
-        SDL_BlitSurface(rm->spr_worldvehicle[iTileSheet].getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
+        SDL_Rect rDst = {pos.x + iWorldOffsetX + iPaceOffset, pos.y + iWorldOffsetY, iTileSize, iTileSize};
+        rm->spr_worldvehicle[iTileSheet].draw(srcRects[iDrawDirection + iAnimationFrame], blitdest, rDst);
     }
 }
 
@@ -335,35 +329,21 @@ void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehicles
 * WorldWarp
 **********************************/
 
-WorldWarp::WorldWarp()
-{
-    iCol1 = 0;
-    iRow1 = 0;
-    iCol2 = 0;
-    iRow2 = 0;
-}
+WorldWarp::WorldWarp(short id, Vec2s posA, Vec2s posB)
+    : id(id)
+    , posA(posA)
+    , posB(posB)
+{}
 
-void WorldWarp::Init(short id, short col1, short row1, short col2, short row2)
+Vec2s WorldWarp::getOtherSide(Vec2s target) const
 {
-    iID = id;
-    iCol1 = col1;
-    iRow1 = row1;
-    iCol2 = col2;
-    iRow2 = row2;
-}
-
-void WorldWarp::GetOtherSide(short iCol, short iRow, short * iOtherCol, short * iOtherRow)
-{
-    if (iCol1 == iCol && iRow1 == iRow) {
-        *iOtherCol = iCol2;
-        *iOtherRow = iRow2;
-    } else if (iCol2 == iCol && iRow2 == iRow) {
-        *iOtherCol = iCol1;
-        *iOtherRow = iRow1;
-    } else {
-        *iOtherCol = iCol;
-        *iOtherRow = iRow;
+    if (target == posA) {
+        return posB;
     }
+    if (target == posB) {
+        return posA;
+    }
+    return target;
 }
 
 
@@ -371,26 +351,16 @@ void WorldWarp::GetOtherSide(short iCol, short iRow, short * iOtherCol, short * 
 * WorldMap
 **********************************/
 
-WorldMap::WorldMap()
+WorldMap::WorldMap(short w, short h)
+    : iWidth(w)
+    , iHeight(h)
+    , tiles(w, h)
 {
-    iWidth = 0;
-    iHeight = 0;
-    tiles = NULL;
-    vehicles = NULL;
-    warps = NULL;
-    iNumVehicles = 0;
-    iNumStages = 0;
-    iNumWarps = 0;
+    ResetTourStops();  // FIXME
 }
 
-WorldMap::~WorldMap()
+WorldMap::WorldMap(const std::string& path, short tilesize)
 {
-    Cleanup();
-}
-
-bool WorldMap::Load(short tilesize)
-{
-    Cleanup();
     ResetDrawCycle();
 
     iTileSize = tilesize;
@@ -406,68 +376,45 @@ bool WorldMap::Load(short tilesize)
         iTileSheet = 2;
     }
 
-    const std::string szPath = worldlist->at(game_values.worldindex);
-    worldName = stripPathAndExtension(szPath);
+    worldName = stripPathAndExtension(path);
 
-    std::ifstream file(szPath);
+    std::ifstream file(path);
     if (!file)
-        return false;
+        throw std::runtime_error("Could not open the world file");
 
     std::string line;
-    char* buffer = NULL;
     short iReadType = 0;
-    int32_t iVersion[4] = {0, 0, 0, 0};
+    Version version;
     short iMapTileReadRow = 0;
     short iCurrentStage = 0;
-    short iCurrentWarp = 0;
-    short iCurrentVehicle = 0;
+    short iNumWarps = 0;
+    short iNumVehicles = 0;
 
     while (std::getline(file, line)) {
         if (line.empty())
             continue;
 
-        if (buffer)
-            delete[] buffer;
-
-        buffer = new char[line.size() + 1];
-        std::copy(line.begin(), line.end(), buffer);
-        buffer[line.size()] = '\0';
-
-        if (buffer[0] == '#' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
+        if (line[0] == '#' || line[0] == '\r' || line[0] == ' ' || line[0] == '\t')
             continue;
 
         if (iReadType == 0) { //Read version number
-            char * psz = strtok(buffer, ".\n");
-            if (psz)
-                iVersion[0] = atoi(psz);
-
-            psz = strtok(NULL, ".\n");
-            if (psz)
-                iVersion[1] = atoi(psz);
-
-            psz = strtok(NULL, ".\n");
-            if (psz)
-                iVersion[2] = atoi(psz);
-
-            psz = strtok(NULL, ".\n");
-            if (psz)
-                iVersion[3] = atoi(psz);
-
+            std::list<std::string_view> tokens = tokenize(line, '.');
+            version.major = popNextInt(tokens);
+            version.minor = popNextInt(tokens);
+            version.patch = popNextInt(tokens);
+            version.build = popNextInt(tokens);
             iReadType = 1;
         } else if (iReadType == 1) { //music category
-            iMusicCategory = atoi(buffer);
+            iMusicCategory = static_cast<WorldMusicCategory>(std::stoi(line));  // FIXME
             iReadType = 2;
         } else if (iReadType == 2) { //world width
-            iWidth = atoi(buffer);
+            iWidth = std::stoi(line);
             iReadType = 3;
         } else if (iReadType == 3) { //world height
-            iHeight = atoi(buffer);
+            iHeight = std::stoi(line);
             iReadType = 4;
 
-            tiles = new WorldMapTile*[iWidth];
-
-            for (short iCol = 0; iCol < iWidth; iCol++)
-                tiles[iCol] = new WorldMapTile[iHeight];
+            tiles = decltype(tiles)(iWidth, iHeight);
 
             short iDrawSurfaceTiles = iWidth * iHeight;
 
@@ -476,16 +423,13 @@ bool WorldMap::Load(short tilesize)
 
             iTilesPerCycle = iDrawSurfaceTiles / 8;
         } else if (iReadType == 4) { //background water
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
-
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iBackgroundWater = atoi(psz);
-
-                psz = strtok(NULL, ",\n");
+                WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+                tile.iBackgroundWater = popNextInt(tokens);
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -493,21 +437,18 @@ bool WorldMap::Load(short tilesize)
                 iMapTileReadRow = 0;
             }
         } else if (iReadType == 5) { //background sprites
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
+                WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+                tile.iBackgroundSprite = popNextInt(tokens);
+                tile.fAnimated = (tile.iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE) != 1;
 
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iBackgroundSprite = atoi(psz);
-                tile->fAnimated = (tile->iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE) != 1;
-
-                tile->iID = iMapTileReadRow * iWidth + iMapTileReadCol;
-                tile->iCol = iMapTileReadCol;
-                tile->iRow = iMapTileReadRow;
-
-                psz = strtok(NULL, ",\n");
+                tile.iID = iMapTileReadRow * iWidth + iMapTileReadCol;
+                tile.iCol = iMapTileReadCol;
+                tile.iRow = iMapTileReadRow;
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -515,32 +456,29 @@ bool WorldMap::Load(short tilesize)
                 iMapTileReadRow = 0;
             }
         } else if (iReadType == 6) { //foreground sprites
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
+                WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+                tile.iForegroundSprite = popNextInt(tokens);
 
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iForegroundSprite = atoi(psz);
-
-                short iForegroundSprite = tile->iForegroundSprite;
+                short iForegroundSprite = tile.iForegroundSprite;
 
                 //Animated parts of paths
-                if (!tile->fAnimated && iForegroundSprite >= 0 && iForegroundSprite <= 8 * WORLD_PATH_SPRITE_SET_SIZE) {
+                if (!tile.fAnimated && iForegroundSprite >= 0 && iForegroundSprite <= 8 * WORLD_PATH_SPRITE_SET_SIZE) {
                     short iForeground = iForegroundSprite % WORLD_PATH_SPRITE_SET_SIZE;
-                    tile->fAnimated = iForeground >= 3 && iForeground <= 10;
+                    tile.fAnimated = iForeground >= 3 && iForeground <= 10;
                 }
 
                 //Animated 1-100 stages
-                if (!tile->fAnimated)
-                    tile->fAnimated = iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399;
+                if (!tile.fAnimated)
+                    tile.fAnimated = iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399;
 
                 //Animated foreground tiles
-                if (!tile->fAnimated)
-                    tile->fAnimated = iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29;
-
-                psz = strtok(NULL, ",\n");
+                if (!tile.fAnimated)
+                    tile.fAnimated = iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29;
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -548,16 +486,13 @@ bool WorldMap::Load(short tilesize)
                 iMapTileReadRow = 0;
             }
         } else if (iReadType == 7) { //path connections
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
-
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iConnectionType = atoi(psz);
-
-                psz = strtok(NULL, ",\n");
+                WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+                tile.iConnectionType = popNextInt(tokens);
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -575,24 +510,22 @@ bool WorldMap::Load(short tilesize)
                 }
             }
         } else if (iReadType == 8) { //stages
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
+                WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+                tile.iType = popNextInt(tokens);
+                tile.iWarp = -1;
 
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iType = atoi(psz);
-                tile->iWarp = -1;
-
-                if (tile->iType == 1) {
+                if (tile.iType == 1) {
                     iStartX = iMapTileReadCol;
                     iStartY = iMapTileReadRow;
+                    player.SetPosition(iStartX, iStartY);
                 }
 
-                tile->iCompleted = tile->iType <= 5 ? -1 : -2;
-
-                psz = strtok(NULL, ",\n");
+                tile.iCompleted = tile.iType <= 5 ? -1 : -2;
             }
 
             if (++iMapTileReadRow == iHeight) {
@@ -600,36 +533,37 @@ bool WorldMap::Load(short tilesize)
                 iMapTileReadRow = 0;
             }
         } else if (iReadType == 9) { //vehicle boundaries
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
+            if (tokens.size() < iWidth)
+                goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-                if (!psz)
-                    goto RETURN;
-
-                WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-                tile->iVehicleBoundary = atoi(psz);
-
-                psz = strtok(NULL, ",\n");
+                WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+                tile.iVehicleBoundary = popNextInt(tokens);
             }
 
             if (++iMapTileReadRow == iHeight)
                 iReadType = 10;
         } else if (iReadType == 10) { //number of stages
-            iNumStages = atoi(buffer);
+            iNumStages = std::stoi(line);
 
             iReadType = iNumStages == 0 ? 12 : 11;
         } else if (iReadType == 11) { //stage details
-            TourStop * ts = ParseTourStopLine(buffer, iVersion, true);
+            TourStop* ts = new TourStop();
+            char* buffer = new char[line.size() + 1];
+            std::copy(line.begin(), line.end(), buffer);
+            buffer[line.size()] = '\0';
+            *ts = ParseTourStopLine(buffer, version, true);
+            delete[] buffer;
 
             game_values.tourstops.push_back(ts);
-            game_values.tourstoptotal++;
 
             if (++iCurrentStage >= iNumStages) {
                 //Scan stage IDs and make sure we have a stage for each one
-                short iMaxStage = game_values.tourstoptotal + 5;
+                short iMaxStage = game_values.tourstops.size() + 5;
                 for (short iRow = 0; iRow < iHeight; iRow++) {
                     for (short iCol = 0; iCol < iWidth; iCol++) {
-                        short iType = tiles[iCol][iRow].iType;
+                        short iType = tiles.at(iCol, iRow).iType;
                         if (iType < 0 || iType > iMaxStage)
                             goto RETURN;
                     }
@@ -638,127 +572,88 @@ bool WorldMap::Load(short tilesize)
                 iReadType = 12;
             }
         } else if (iReadType == 12) { //number of warps
-            iNumWarps = atoi(buffer);
+            iNumWarps = std::stoi(line);
 
             if (iNumWarps < 0)
                 iNumWarps = 0;
 
             if (iNumWarps > 0)
-                warps = new WorldWarp[iNumWarps];
+                warps.reserve(iNumWarps);
 
             iReadType = iNumWarps == 0 ? 14 : 13;
         } else if (iReadType == 13) { //warp details
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
 
-            if (!psz)
-                goto RETURN;
+            short iCol1 = std::max(0, popNextInt(tokens));
+            short iRow1 = std::max(0, popNextInt(tokens));
+            short iCol2 = std::max(0, popNextInt(tokens));
+            short iRow2 = std::max(0, popNextInt(tokens));
 
-            short iCol1 = atoi(psz);
-            if (iCol1 < 0)
-                iCol1 = 0;
+            short warpId = warps.size();
+            warps.emplace_back(WorldWarp(warpId, {iCol1, iRow1}, {iCol2, iRow2}));
 
-            psz = strtok(NULL, ",\n");
+            tiles.at(iCol1, iRow1).iWarp = warpId;
+            tiles.at(iCol2, iRow2).iWarp = warpId;
 
-            short iRow1 = atoi(psz);
-            if (iRow1 < 0)
-                iRow1 = 0;
-
-            psz = strtok(NULL, ",\n");
-
-            short iCol2 = atoi(psz);
-            if (iCol2 < 0)
-                iCol2 = 0;
-
-            psz = strtok(NULL, ",\n");
-
-            short iRow2 = atoi(psz);
-            if (iRow2 < 0)
-                iRow2 = 0;
-
-            warps[iCurrentWarp].Init(iCurrentWarp, iCol1, iRow1, iCol2, iRow2);
-
-            tiles[iCol1][iRow1].iWarp = iCurrentWarp;
-            tiles[iCol2][iRow2].iWarp = iCurrentWarp;
-
-            if (++iCurrentWarp >= iNumWarps)
+            if (warps.size() >= iNumWarps)
                 iReadType = 14;
         } else if (iReadType == 14) { //number of vehicles
-            iNumVehicles = atoi(buffer);
+            iNumVehicles = std::stoi(line);
 
             if (iNumVehicles < 0)
                 iNumVehicles = 0;
 
             if (iNumVehicles > 0)
-                vehicles = new WorldVehicle[iNumVehicles];
+                vehicles.reserve(iNumVehicles);
 
             iReadType = iNumVehicles == 0 ? 16 : 15;
         } else if (iReadType == 15) { //vehicles
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
 
-            if (!psz)
-                goto RETURN;
+            short iSprite = popNextInt(tokens);
 
-            short iSprite = atoi(psz);
-
-            psz = strtok(NULL, ",\n");
-
-            short iStage = atoi(psz);
-
+            short iStage = popNextInt(tokens);
             if (iStage > iNumStages)
                 iStage = 0;
 
-            psz = strtok(NULL, ",\n");
-            short iCol = atoi(psz);
+            short iCol = popNextInt(tokens);
+            short iRow = popNextInt(tokens);
 
-            psz = strtok(NULL, ",\n");
-            short iRow = atoi(psz);
+            short iMinMoves = std::max(0, popNextInt(tokens));
+            short iMaxMoves = std::max<short>(iMinMoves, popNextInt(tokens));
 
-            psz = strtok(NULL, ",\n");
-            short iMinMoves = atoi(psz);
+            bool fSpritePaces = popNextInt(tokens) == 1;
 
-            if (iMinMoves < 0)
-                iMinMoves = 0;
-
-            psz = strtok(NULL, ",\n");
-            short iMaxMoves = atoi(psz);
-
-            if (iMaxMoves < iMinMoves)
-                iMaxMoves = iMinMoves;
-
-            psz = strtok(NULL, ",\n");
-            bool fSpritePaces = atoi(psz) == 1;
-
-            psz = strtok(NULL, ",\n");
-            short iInitialDirection = atoi(psz);
-
+            short iInitialDirection = popNextInt(tokens);
             if (iInitialDirection != 0)
                 iInitialDirection = 1;
 
-            psz = strtok(NULL, ",\n");
-            short iBoundary = atoi(psz);
+            short iBoundary = popNextInt(tokens);
 
-            vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary, iTileSize);
+            vehicles.emplace_back(WorldVehicle());
+            vehicles.back().Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary, iTileSize);
 
-            if (++iCurrentVehicle >= iNumVehicles)
+            if (vehicles.size() >= iNumVehicles)
                 iReadType = 16;
         } else if (iReadType == 16) { //initial bonus items
-            char * psz = strtok(buffer, ",\n");
+            std::list<std::string_view> tokens = tokenize(line, ',');
 
             iNumInitialBonuses = 0;
 
-            while (psz != NULL) {
+            while (!tokens.empty()) {
+                std::string_view token = popNext(tokens);
+                if (token.empty())
+                    break;
+
                 //0 indicates no initial bonuses
-                if (psz[0] == '0')
+                if (token[0] == '0')
                     break;
 
                 short iBonusOffset = 0;
-                if (psz[0] == 'w' || psz[0] == 'W')
+                if (token[0] == 'w' || token[0] == 'W')
                     iBonusOffset += NUM_POWERUPS;
 
-                psz++;
-
-                short iBonus = atoi(psz) + iBonusOffset;
-
+                short iBonus = toInt(token.substr(1)) + iBonusOffset;
                 if (iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
                     iBonus = 0;
 
@@ -766,8 +661,6 @@ bool WorldMap::Load(short tilesize)
                     iInitialBonuses[iNumInitialBonuses++] = iBonus;
                 else
                     iInitialBonuses[31] = iBonus;
-
-                psz = strtok(NULL, ",\n");
             }
 
             iReadType = 17;
@@ -775,10 +668,10 @@ bool WorldMap::Load(short tilesize)
     }
 
 RETURN:
-    if (buffer)
-        delete[] buffer;
+    if (iReadType != 17)
+        throw std::runtime_error("Invalid world file");
 
-    return iReadType == 17;
+    ResetTourStops();  // FIXME
 }
 
 void WorldMap::SetTileConnections(short iCol, short iRow)
@@ -786,61 +679,56 @@ void WorldMap::SetTileConnections(short iCol, short iRow)
     if (iCol < 0 || iRow < 0 || iCol >= iWidth || iRow >= iHeight)
         return;
 
-    WorldMapTile * tile = &tiles[iCol][iRow];
+    WorldMapTile& tile = tiles.at(iCol, iRow);
 
     for (short iDirection = 0; iDirection < 4; iDirection++)
-        tile->fConnection[iDirection] = false;
+        tile.fConnection[iDirection] = false;
 
     if (iRow > 0) {
-        WorldMapTile * topTile = &tiles[iCol][iRow - 1];
+        const WorldMapTile& topTile = tiles.at(iCol, iRow - 1);
 
-        tile->fConnection[0] = (topTile->iConnectionType == 1 || topTile->iConnectionType == 5 || topTile->iConnectionType == 6 ||
-                                topTile->iConnectionType == 7 || topTile->iConnectionType == 9 || topTile->iConnectionType == 10 ||
-                                topTile->iConnectionType == 11 || topTile->iConnectionType == 15) && (tile->iConnectionType == 1 ||
-                                        tile->iConnectionType == 3 || tile->iConnectionType == 4 || tile->iConnectionType == 7 ||
-                                        tile->iConnectionType == 8 || tile->iConnectionType == 9 || tile->iConnectionType == 11 ||
-                                        tile->iConnectionType == 15);
+        tile.fConnection[0] = (topTile.iConnectionType == 1 || topTile.iConnectionType == 5 || topTile.iConnectionType == 6 ||
+                                topTile.iConnectionType == 7 || topTile.iConnectionType == 9 || topTile.iConnectionType == 10 ||
+                                topTile.iConnectionType == 11 || topTile.iConnectionType == 15) && (tile.iConnectionType == 1 ||
+                                        tile.iConnectionType == 3 || tile.iConnectionType == 4 || tile.iConnectionType == 7 ||
+                                        tile.iConnectionType == 8 || tile.iConnectionType == 9 || tile.iConnectionType == 11 ||
+                                        tile.iConnectionType == 15);
     }
 
     if (iRow < iHeight - 1) {
-        WorldMapTile * bottomTile = &tiles[iCol][iRow + 1];
+        const WorldMapTile& bottomTile = tiles.at(iCol, iRow + 1);
 
-        tile->fConnection[1] = (bottomTile->iConnectionType == 1 || bottomTile->iConnectionType == 3 || bottomTile->iConnectionType == 4 ||
-                                bottomTile->iConnectionType == 7 || bottomTile->iConnectionType == 8 || bottomTile->iConnectionType == 9 ||
-                                bottomTile->iConnectionType == 11 || bottomTile->iConnectionType == 15) && (tile->iConnectionType == 1 ||
-                                        tile->iConnectionType == 5 || tile->iConnectionType == 6 || tile->iConnectionType == 7 ||
-                                        tile->iConnectionType == 9 || tile->iConnectionType == 10 || tile->iConnectionType == 11 ||
-                                        tile->iConnectionType == 15);
+        tile.fConnection[1] = (bottomTile.iConnectionType == 1 || bottomTile.iConnectionType == 3 || bottomTile.iConnectionType == 4 ||
+                                bottomTile.iConnectionType == 7 || bottomTile.iConnectionType == 8 || bottomTile.iConnectionType == 9 ||
+                                bottomTile.iConnectionType == 11 || bottomTile.iConnectionType == 15) && (tile.iConnectionType == 1 ||
+                                        tile.iConnectionType == 5 || tile.iConnectionType == 6 || tile.iConnectionType == 7 ||
+                                        tile.iConnectionType == 9 || tile.iConnectionType == 10 || tile.iConnectionType == 11 ||
+                                        tile.iConnectionType == 15);
     }
 
     if (iCol > 0) {
-        WorldMapTile * leftTile = &tiles[iCol - 1][iRow];
+        const WorldMapTile& leftTile = tiles.at(iCol - 1, iRow);
 
-        tile->fConnection[2] = (leftTile->iConnectionType == 2 || leftTile->iConnectionType == 4 || leftTile->iConnectionType == 5 ||
-                                leftTile->iConnectionType == 8 || leftTile->iConnectionType == 9 || leftTile->iConnectionType == 10 ||
-                                leftTile->iConnectionType == 11 || leftTile->iConnectionType == 13) && (tile->iConnectionType == 2 || tile->iConnectionType == 3 ||
-                                        tile->iConnectionType == 6 || tile->iConnectionType == 7 || tile->iConnectionType == 8 ||
-                                        tile->iConnectionType == 10 || tile->iConnectionType == 11 || tile->iConnectionType == 13);
+        tile.fConnection[2] = (leftTile.iConnectionType == 2 || leftTile.iConnectionType == 4 || leftTile.iConnectionType == 5 ||
+                                leftTile.iConnectionType == 8 || leftTile.iConnectionType == 9 || leftTile.iConnectionType == 10 ||
+                                leftTile.iConnectionType == 11 || leftTile.iConnectionType == 13) && (tile.iConnectionType == 2 || tile.iConnectionType == 3 ||
+                                        tile.iConnectionType == 6 || tile.iConnectionType == 7 || tile.iConnectionType == 8 ||
+                                        tile.iConnectionType == 10 || tile.iConnectionType == 11 || tile.iConnectionType == 13);
     }
 
     if (iCol < iWidth - 1) {
-        WorldMapTile * rightTile = &tiles[iCol + 1][iRow];
+        const WorldMapTile& rightTile = tiles.at(iCol + 1, iRow);
 
-        tile->fConnection[3] = (rightTile->iConnectionType == 2 || rightTile->iConnectionType == 3 || rightTile->iConnectionType == 6 ||
-                                rightTile->iConnectionType == 7 || rightTile->iConnectionType == 8 || rightTile->iConnectionType == 10 ||
-                                rightTile->iConnectionType == 11 || rightTile->iConnectionType == 13) && (tile->iConnectionType == 2 || tile->iConnectionType == 4 ||
-                                        tile->iConnectionType == 5 || tile->iConnectionType == 8 || tile->iConnectionType == 9 ||
-                                        tile->iConnectionType == 10 || tile->iConnectionType == 11 || tile->iConnectionType == 13);
+        tile.fConnection[3] = (rightTile.iConnectionType == 2 || rightTile.iConnectionType == 3 || rightTile.iConnectionType == 6 ||
+                                rightTile.iConnectionType == 7 || rightTile.iConnectionType == 8 || rightTile.iConnectionType == 10 ||
+                                rightTile.iConnectionType == 11 || rightTile.iConnectionType == 13) && (tile.iConnectionType == 2 || tile.iConnectionType == 4 ||
+                                        tile.iConnectionType == 5 || tile.iConnectionType == 8 || tile.iConnectionType == 9 ||
+                                        tile.iConnectionType == 10 || tile.iConnectionType == 11 || tile.iConnectionType == 13);
     }
 }
 
 //Saves world to file
-bool WorldMap::Save()
-{
-    return Save(worldlist->at(game_values.worldindex));
-}
-
-bool WorldMap::Save(const std::string& szPath)
+bool WorldMap::Save(const std::string& szPath) const
 {
     FILE * file = fopen(szPath.c_str(), "w");
 
@@ -866,8 +754,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iBackgroundWater);
+            const WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+            fprintf(file, "%d", tile.iBackgroundWater);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -881,8 +769,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iBackgroundSprite);
+            const WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+            fprintf(file, "%d", tile.iBackgroundSprite);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -896,8 +784,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iForegroundSprite);
+            const WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+            fprintf(file, "%d", tile.iForegroundSprite);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -911,8 +799,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iConnectionType);
+            const WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+            fprintf(file, "%d", tile.iConnectionType);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -926,8 +814,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iType);
+            const WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+            fprintf(file, "%d", tile.iType);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -941,8 +829,8 @@ bool WorldMap::Save(const std::string& szPath)
 
     for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
         for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
-            WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-            fprintf(file, "%d", tile->iVehicleBoundary);
+            const WorldMapTile& tile = tiles.at(iMapTileReadCol, iMapTileReadRow);
+            fprintf(file, "%d", tile.iVehicleBoundary);
 
             if (iMapTileReadCol == iWidth - 1)
                 fprintf(file, "\n");
@@ -956,38 +844,37 @@ bool WorldMap::Save(const std::string& szPath)
     fprintf(file, "#Stage Type 0,Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)\n");
     fprintf(file, "#Stage Type 1,Bonus House Name,Sequential/Random Order,Display Text,Powerup List(Max 5)\n");
 
-    fprintf(file, "%d\n", game_values.tourstoptotal);
+    fprintf(file, "%d\n", game_values.tourstops.size());
 
-    for (short iStage = 0; iStage < game_values.tourstoptotal; iStage++) {
-        char szLine[4096];
-        WriteTourStopLine(game_values.tourstops[iStage], szLine, true);
-        fprintf(file, "%s", szLine);
+    for (short iStage = 0; iStage < game_values.tourstops.size(); iStage++) {
+        std::string line = WriteTourStopLine(*game_values.tourstops[iStage], true);
+        fprintf(file, "%s", line.c_str());
     }
     fprintf(file, "\n");
 
     fprintf(file, "#Warps\n");
     fprintf(file, "#location 1 x, y, location 2 x, y\n");
 
-    fprintf(file, "%d\n", iNumWarps);
+    fprintf(file, "%d\n", warps.size());
 
-    for (short iWarp = 0; iWarp < iNumWarps; iWarp++) {
-        fprintf(file, "%d,", warps[iWarp].iCol1);
-        fprintf(file, "%d,", warps[iWarp].iRow1);
-        fprintf(file, "%d,", warps[iWarp].iCol2);
-        fprintf(file, "%d\n", warps[iWarp].iRow2);
+    for (const WorldWarp& warp : warps) {
+        fprintf(file, "%d,", warp.posA.x);
+        fprintf(file, "%d,", warp.posA.y);
+        fprintf(file, "%d,", warp.posB.x);
+        fprintf(file, "%d\n", warp.posB.y);
     }
     fprintf(file, "\n");
 
     fprintf(file, "#Vehicles\n");
     fprintf(file, "#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction, Boundary\n");
 
-    fprintf(file, "%d\n", iNumVehicles);
+    fprintf(file, "%d\n", vehicles.size());
 
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < vehicles.size(); iVehicle++) {
         fprintf(file, "%d,", vehicles[iVehicle].iDrawSprite);
         fprintf(file, "%d,", vehicles[iVehicle].iActionId);
-        fprintf(file, "%d,", vehicles[iVehicle].iCurrentTileX);
-        fprintf(file, "%d,", vehicles[iVehicle].iCurrentTileY);
+        fprintf(file, "%d,", vehicles[iVehicle].currentTile.x);
+        fprintf(file, "%d,", vehicles[iVehicle].currentTile.y);
         fprintf(file, "%d,", vehicles[iVehicle].iMinMoves);
         fprintf(file, "%d,", vehicles[iVehicle].iMaxMoves);
         fprintf(file, "%d,", vehicles[iVehicle].fSpritePaces);
@@ -1028,97 +915,56 @@ bool WorldMap::Save(const std::string& szPath)
 
 void WorldMap::Clear()
 {
-    if (tiles) {
-        for (short iCol = 0; iCol < iWidth; iCol++) {
-            for (short iRow = 0; iRow < iHeight; iRow++) {
-                tiles[iCol][iRow].iBackgroundSprite = 0;
-                tiles[iCol][iRow].iBackgroundWater = 0;
-                tiles[iCol][iRow].iForegroundSprite = 0;
-                tiles[iCol][iRow].iConnectionType = 0;
-                tiles[iCol][iRow].iType = 0;
-                tiles[iCol][iRow].iID = iRow * iWidth + iCol;
-                tiles[iCol][iRow].iVehicleBoundary = 0;
-                tiles[iCol][iRow].iWarp = 0;
-            }
+    for (size_t row = 0; row < tiles.rows(); row++) {
+        for (size_t col = 0; col < tiles.cols(); col++) {
+            WorldMapTile& tile = tiles.at(col, row);
+            tile.iBackgroundSprite = 0;
+            tile.iBackgroundWater = 0;
+            tile.iForegroundSprite = 0;
+            tile.iConnectionType = 0;
+            tile.iType = 0;
+            tile.iID = row * iWidth + col;
+            tile.iVehicleBoundary = 0;
+            tile.iWarp = 0;
         }
     }
 
-    if (vehicles) {
-        delete [] vehicles;
-        vehicles = NULL;
-    }
-
-    iNumVehicles = 0;
-
-    if (warps) {
-        delete [] warps;
-        warps = NULL;
-    }
-
-    iNumWarps = 0;
-}
-
-//Creates clears world and resizes (essentially creating a new world to work on for editor)
-void WorldMap::New(short w, short h)
-{
-    Cleanup();
-
-    iWidth = w;
-    iHeight = h;
-
-    tiles = new WorldMapTile*[iWidth];
-
-    for (short iCol = 0; iCol < iWidth; iCol++)
-        tiles[iCol] = new WorldMapTile[iHeight];
-
-    Clear();
+    vehicles.clear();
+    warps.clear();
 }
 
 //Resizes world keeping intact current tiles (if possible)
 void WorldMap::Resize(short w, short h)
 {
-    //Copy tiles from old map
-    WorldMapTile ** tempTiles = tiles;
     short iOldWidth = iWidth;
     short iOldHeight = iHeight;
 
     //Create new map
     iWidth = w;
     iHeight = h;
-
-    tiles = new WorldMapTile*[iWidth];
+    Grid<WorldMapTile> newTiles(w, h);
 
     //Copy tiles to new map
     for (short iCol = 0; iCol < iWidth; iCol++) {
-        tiles[iCol] = new WorldMapTile[iHeight];
         for (short iRow = 0; iRow < iHeight; iRow++) {
-            if (iCol < iOldWidth && iRow < iOldHeight)
-                tiles[iCol][iRow] = tempTiles[iCol][iRow];
-            else {
-                tiles[iCol][iRow].iBackgroundSprite = 0;
-                tiles[iCol][iRow].iBackgroundWater = 0;
-                tiles[iCol][iRow].iForegroundSprite = 0;
-                tiles[iCol][iRow].iConnectionType = 0;
-                tiles[iCol][iRow].iType = 0;
-                tiles[iCol][iRow].iID = iRow * iWidth + iCol;
-                tiles[iCol][iRow].iVehicleBoundary = 0;
-                tiles[iCol][iRow].iWarp = 0;
+            WorldMapTile& newTile = newTiles.at(iCol, iRow);
+            if (iCol < iOldWidth && iRow < iOldHeight) {
+                newTile = std::move(tiles.at(iCol, iRow));
+            } else {
+                newTile.iBackgroundSprite = 0;
+                newTile.iBackgroundWater = 0;
+                newTile.iForegroundSprite = 0;
+                newTile.iConnectionType = 0;
+                newTile.iType = 0;
+                newTile.iID = iRow * iWidth + iCol;
+                newTile.iVehicleBoundary = 0;
+                newTile.iWarp = 0;
             }
         }
     }
 
-    //Delete old tiles
-    if (tempTiles) {
-        for (short iCol = 0; iCol < iOldWidth; iCol++)
-            delete [] tempTiles[iCol];
-
-        delete [] tempTiles;
-    }
-}
-
-void WorldMap::InitPlayer()
-{
-    player.Init(iStartX, iStartY);
+    // Apply the new tiles
+    tiles = std::move(newTiles);
 }
 
 bool WorldMap::Update(bool * fPlayerVehicleCollision)
@@ -1128,13 +974,13 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
     bool fPlayerDoneMove = player.Update();
 
     *fPlayerVehicleCollision = false;
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        if (!vehicles[iVehicle].fEnabled)
+    for (WorldVehicle& vehicle : vehicles) {
+        if (!vehicle.fEnabled)
             continue;
 
-        *fPlayerVehicleCollision |= vehicles[iVehicle].Update();
+        *fPlayerVehicleCollision |= vehicle.Update();
 
-        if (vehicles[iVehicle].iState > 0)
+        if (vehicle.iState > 0)
             fPlayMovingVehicleSound = true;
     }
 
@@ -1144,13 +990,13 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
     return fPlayerDoneMove;
 }
 
-void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping)
+void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping) const
 {
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        if (!vehicles[iVehicle].fEnabled)
+    for (const WorldVehicle& vehicle : vehicles) {
+        if (!vehicle.fEnabled)
             continue;
 
-        vehicles[iVehicle].Draw(iMapOffsetX, iMapOffsetY, fVehiclesSleeping);
+        vehicle.Draw(iMapOffsetX, iMapOffsetY, fVehiclesSleeping);
     }
 
     if (fDrawPlayer)
@@ -1162,7 +1008,7 @@ void WorldMap::UpdateTile(SDL_Surface * surface, short iCol, short iRow, short i
     DrawTileToSurface(surface, iCol, iRow, iMapDrawOffsetCol, iMapDrawOffsetRow, true, iAnimationFrame);
 }
 
-void WorldMap::DrawMapToSurface(SDL_Surface * surface)
+void WorldMap::DrawMapToSurface(SDL_Surface * surface) const
 {
     for (short iRow = 0; iRow < iHeight; iRow++) {
         for (short iCol = 0; iCol < iWidth; iCol++) {
@@ -1177,7 +1023,7 @@ void WorldMap::ResetDrawCycle()
     iLastDrawCol = 0;
 }
 
-void WorldMap::DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame)
+void WorldMap::DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface* surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame)
 {
     short iRowEnd = 19 + iMapDrawOffsetRow < iHeight ? 19 : iHeight - iMapDrawOffsetRow;
     short iColEnd = 24 + iMapDrawOffsetCol < iWidth ? 24 : iWidth - iMapDrawOffsetCol;
@@ -1204,18 +1050,18 @@ STOPDRAWING:
     iLastDrawCol = iCol;
 }
 
-void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer)
+void WorldMap::DrawTileToSurface(SDL_Surface* surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer) const
 {
-    WorldMapTile * tile = &tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
+    const WorldMapTile& tile = tiles.at(iCol + iMapDrawOffsetCol, iRow + iMapDrawOffsetRow);
 
-    if (!tile->fAnimated && !fFullRefresh)
+    if (!tile.fAnimated && !fFullRefresh)
         return;
 
     SDL_Rect r = {iCol * iTileSize, iRow * iTileSize, iTileSize, iTileSize};
 
-    short iBackgroundSprite = tile->iBackgroundSprite;
-    short iBackgroundWater = tile->iBackgroundWater;
-    short iForegroundSprite = tile->iForegroundSprite;
+    short iBackgroundSprite = tile.iBackgroundSprite;
+    short iBackgroundWater = tile.iBackgroundWater;
+    short iForegroundSprite = tile.iForegroundSprite;
 
     short iBackgroundStyleOffset = iBackgroundSprite / WORLD_BACKGROUND_SPRITE_SET_SIZE * (4 << iTileSizeShift);
 
@@ -1225,33 +1071,33 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
     if (iLayer != 2) {
         if (iBackgroundSprite == 1) {
             SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, iTileSize, iTileSize, iTileSize};
-            SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+            rm->spr_worldbackground[iTileSheet].draw(rSrc, surface, r);
         } else {
             SDL_Rect rSrc = {iAnimationFrame + (iBackgroundWater << (2 + iTileSizeShift)), 0, iTileSize, iTileSize};
-            SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+            rm->spr_worldbackground[iTileSheet].draw(rSrc, surface, r);
 
             if ((iBackgroundSprite >= 2 && iBackgroundSprite <= 48)) {
                 if (iBackgroundSprite >= 45) {
-                    SDL_Rect rSrc = {(3 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 44) << iTileSizeShift, iTileSize, iTileSize};
-                    SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                    rSrc = {(3 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 44) << iTileSizeShift, iTileSize, iTileSize};
+                    rm->spr_worldbackground[iTileSheet].draw(rSrc, surface, r);
                 } else if (iBackgroundSprite >= 30) {
-                    SDL_Rect rSrc = {(2 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 29) << iTileSizeShift, iTileSize, iTileSize};
-                    SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                    rSrc = {(2 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 29) << iTileSizeShift, iTileSize, iTileSize};
+                    rm->spr_worldbackground[iTileSheet].draw(rSrc, surface, r);
                 } else if (iBackgroundSprite >= 16) {
-                    SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, (iBackgroundSprite - 14) << iTileSizeShift, iTileSize, iTileSize};
-                    SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                    rSrc = {iTileSize + iBackgroundStyleOffset, (iBackgroundSprite - 14) << iTileSizeShift, iTileSize, iTileSize};
+                    rm->spr_worldbackground[iTileSheet].draw(rSrc, surface, r);
                 } else {
-                    SDL_Rect rSrc = {iBackgroundStyleOffset, iBackgroundSprite << iTileSizeShift, iTileSize, iTileSize};
-                    SDL_BlitSurface(rm->spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                    rSrc = {iBackgroundStyleOffset, iBackgroundSprite << iTileSizeShift, iTileSize, iTileSize};
+                    rm->spr_worldbackground[iTileSheet].draw(rSrc, surface, r);
                 }
             }
         }
     }
 
     if (iLayer != 1) {
-        if (tile->iCompleted >= 0) {
-            SDL_Rect rSrc = {(tile->iCompleted + 10) << iTileSizeShift, 5 << iTileSizeShift, iTileSize, iTileSize};
-            SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+        if (tile.iCompleted >= 0) {
+            SDL_Rect rSrc = {(tile.iCompleted + 10) << iTileSizeShift, 5 << iTileSizeShift, iTileSize, iTileSize};
+            rm->spr_worldforegroundspecial[iTileSheet].draw(rSrc, surface, r);
         } else {
             if (iForegroundSprite >= 0 && iForegroundSprite < WORLD_FOREGROUND_STAGE_OFFSET) {
                 short iPathStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
@@ -1261,80 +1107,50 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
 
                 if (iForegroundSprite == 1 || iForegroundSprite == 2) { //Non-animated straight paths
                     SDL_Rect rSrc = {iPathOffsetX, ((iForegroundSprite - 1) << iTileSizeShift) + iPathOffsetY, iTileSize, iTileSize};
-                    SDL_BlitSurface(rm->spr_worldpaths[iTileSheet].getSurface(), &rSrc, surface, &r);
+                    rm->spr_worldpaths[iTileSheet].draw(rSrc, surface, r);
                 } else if (iForegroundSprite >= 3 && iForegroundSprite <= 10) { //Animated paths with "coins" in them
                     SDL_Rect rSrc = {iPathOffsetX + iAnimationFrame, ((iForegroundSprite - 1) << iTileSizeShift) + iPathOffsetY, iTileSize, iTileSize};
-                    SDL_BlitSurface(rm->spr_worldpaths[iTileSheet].getSurface(), &rSrc, surface, &r);
+                    rm->spr_worldpaths[iTileSheet].draw(rSrc, surface, r);
                 } else if (iForegroundSprite >= 11 && iForegroundSprite <= 18) { //Non-animated straight paths over water
                     short iSpriteX = (((iForegroundSprite - 11) / 2) + 1) << iTileSizeShift;
                     short iSpriteY = ((iForegroundSprite - 11) % 2) << iTileSizeShift;
 
                     SDL_Rect rSrc = {iPathOffsetX + iSpriteX, iSpriteY + iPathOffsetY, iTileSize, iTileSize};
-                    SDL_BlitSurface(rm->spr_worldpaths[iTileSheet].getSurface(), &rSrc, surface, &r);
+                    rm->spr_worldpaths[iTileSheet].draw(rSrc, surface, r);
                 }
             } else if (iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399) {
                 short iTileColor = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) / 100;
                 SDL_Rect rSrc = {(10 << iTileSizeShift) + iAnimationFrame, iTileColor << iTileSizeShift, iTileSize, iTileSize};
-                SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+                rm->spr_worldforegroundspecial[iTileSheet].draw(rSrc, surface, r);
 
                 short iTileNumber = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) % 100;
                 rSrc.x = (iTileNumber % 10) << iTileSizeShift;
                 rSrc.y = (iTileNumber / 10) << iTileSizeShift;
-                SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+                rm->spr_worldforegroundspecial[iTileSheet].draw(rSrc, surface, r);
             } else if (iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) {
                 SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 10) << iTileSizeShift, 7 << iTileSizeShift, iTileSize, iTileSize};
-                SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+                rm->spr_worldforegroundspecial[iTileSheet].draw(rSrc, surface, r);
             } else if (iForegroundSprite >= WORLD_START_SPRITE_OFFSET && iForegroundSprite <= WORLD_START_SPRITE_OFFSET + 1) {
                 SDL_Rect rSrc = {(iForegroundSprite - WORLD_START_SPRITE_OFFSET + 10) << iTileSizeShift, 4 << iTileSizeShift, iTileSize, iTileSize};
-                SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+                rm->spr_worldforegroundspecial[iTileSheet].draw(rSrc, surface, r);
             } else if (iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 179) {
                 short iSprite = iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET;
                 SDL_Rect rSrc = {(iSprite % 12) << iTileSizeShift, (iSprite / 12) << iTileSizeShift, iTileSize, iTileSize};
-                SDL_BlitSurface(rm->spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                rm->spr_worldforeground[iTileSheet].draw(rSrc, surface, r);
             } else if (iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29) {
                 short iSprite = iForegroundSprite - WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET;
                 SDL_Rect rSrc = {(iSprite >= 15 ? (16 << iTileSizeShift) : (12 << iTileSizeShift)) + iAnimationFrame, (iSprite % 15) << iTileSizeShift, iTileSize, iTileSize};
-                SDL_BlitSurface(rm->spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+                rm->spr_worldforeground[iTileSheet].draw(rSrc, surface, r);
             }
         }
 
         //Draw doors
-        short iType = tile->iType;
+        short iType = tile.iType;
         if (iType >= 2 && iType <= 5) {
             SDL_Rect rSrc = {(iType + 8) << iTileSizeShift, 6 << iTileSizeShift, iTileSize, iTileSize};
-            SDL_BlitSurface(rm->spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+            rm->spr_worldforegroundspecial[iTileSheet].draw(rSrc, surface, r);
         }
     }
-}
-
-void WorldMap::Cleanup()
-{
-    ResetTourStops();
-    iNumStages = 0;
-    iNumInitialBonuses = 0;
-
-    if (tiles) {
-        for (short iCol = 0; iCol < iWidth; iCol++)
-            delete [] tiles[iCol];
-
-        delete [] tiles;
-
-        tiles = NULL;
-    }
-
-    if (vehicles) {
-        delete [] vehicles;
-        vehicles = NULL;
-    }
-
-    iNumVehicles = 0;
-
-    if (warps) {
-        delete [] warps;
-        warps = NULL;
-    }
-
-    iNumWarps = 0;
 }
 
 void WorldMap::SetPlayerSprite(short iPlayerSprite)
@@ -1342,74 +1158,9 @@ void WorldMap::SetPlayerSprite(short iPlayerSprite)
     player.SetSprite(iPlayerSprite);
 }
 
-bool WorldMap::IsVehicleMoving()
-{
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        if (!vehicles[iVehicle].fEnabled)
-            continue;
-
-        if (vehicles[iVehicle].iState > 0)
-            return true;
-    }
-
-    return false;
-}
-
-void WorldMap::GetPlayerPosition(short * iPlayerX, short * iPlayerY)
-{
-    *iPlayerX = player.ix;
-    *iPlayerY = player.iy;
-}
-
 void WorldMap::SetPlayerPosition(short iPlayerCol, short iPlayerRow)
 {
     player.SetPosition(iPlayerCol, iPlayerRow);
-}
-
-void WorldMap::GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY)
-{
-    *iPlayerCurrentTileX = player.iCurrentTileX;
-    *iPlayerCurrentTileY = player.iCurrentTileY;
-}
-
-void WorldMap::GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY)
-{
-    *iPlayerDestTileX = player.iDestTileX;
-    *iPlayerDestTileY = player.iDestTileY;
-}
-
-short WorldMap::GetPlayerState()
-{
-    return player.iState;
-}
-
-short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex)
-{
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        WorldVehicle * vehicle = &vehicles[iVehicle];
-
-        if (!vehicle->fEnabled)
-            continue;
-
-        if (vehicle->iCurrentTileX == player.iCurrentTileX && vehicle->iCurrentTileY == player.iCurrentTileY) {
-            *vehicleIndex = iVehicle;
-            return vehicle->iActionId;
-        }
-    }
-
-    *vehicleIndex = -1;
-    return -1;
-}
-
-bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow)
-{
-    short iWarp = tiles[player.iCurrentTileX][player.iCurrentTileY].iWarp;
-
-    if (iWarp < 0)
-        return false;
-
-    warps[iWarp].GetOtherSide(player.iCurrentTileX, player.iCurrentTileY, iWarpCol, iWarpRow);
-    return true;
 }
 
 void WorldMap::MovePlayer(short iDirection)
@@ -1422,13 +1173,37 @@ void WorldMap::FacePlayer(short iDirection)
     player.FaceDirection(iDirection);
 }
 
-void WorldMap::MoveVehicles()
+bool WorldMap::IsVehicleMoving() const
 {
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        if (!vehicles[iVehicle].fEnabled)
+    return std::any_of(vehicles.cbegin(), vehicles.cend(),
+        [](const WorldVehicle& vehicle) {
+            return vehicle.fEnabled && vehicle.iState > 0;
+        });
+}
+
+short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
+{
+    for (size_t i = 0; i < vehicles.size(); i++) {
+        const WorldVehicle& vehicle = vehicles[i];
+
+        if (!vehicle.fEnabled)
             continue;
 
-        vehicles[iVehicle].Move();
+        if (vehicle.currentTile == player.currentTile) {
+            *vehicleIndex = i;
+            return vehicle.iActionId;
+        }
+    }
+
+    *vehicleIndex = -1;
+    return -1;
+}
+
+void WorldMap::MoveVehicles()
+{
+    for (WorldVehicle& vehicle : vehicles) {
+        if (vehicle.fEnabled)
+            vehicle.Move();
     }
 }
 
@@ -1437,72 +1212,76 @@ void WorldMap::RemoveVehicle(short iVehicleIndex)
     vehicles[iVehicleIndex].fEnabled = false;
 }
 
-short WorldMap::NumVehiclesInTile(short iTileX, short iTileY)
+size_t WorldMap::NumVehiclesInTile(Vec2s iTile) const
 {
-    short iVehicleCount = 0;
-    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
-        WorldVehicle * vehicle = &vehicles[iVehicle];
-
-        if (!vehicle->fEnabled)
-            continue;
-
-        if (vehicle->iCurrentTileX == iTileX && vehicle->iCurrentTileY == iTileY)
-            iVehicleCount++;
-    }
-
-    return iVehicleCount;
+    return std::count_if(vehicles.cbegin(), vehicles.cend(),
+        [iTile](const WorldVehicle& vehicle) {
+            return vehicle.fEnabled && vehicle.currentTile == iTile;
+        });
 }
 
-short WorldMap::GetVehicleStageScore(short iVehicleIndex)
+short WorldMap::GetVehicleStageScore(short iVehicleIndex) const
 {
     return game_values.tourstops[vehicles[iVehicleIndex].iActionId]->iPoints;
+}
+
+bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const
+{
+    short iWarp = tiles.at(player.currentTile.x, player.currentTile.y).iWarp;
+    if (iWarp < 0)
+        return false;
+
+    Vec2s pos = warps[iWarp].getOtherSide(player.currentTile);
+    *iWarpCol = pos.x;
+    *iWarpRow = pos.y;
+    return true;
 }
 
 void WorldMap::MoveBridges()
 {
     for (short iRow = 0; iRow < iHeight; iRow++) {
         for (short iCol = 0; iCol < iWidth; iCol++) {
-            if (tiles[iCol][iRow].iConnectionType == 12) {
-                tiles[iCol][iRow].iConnectionType = 13;
+            if (tiles.at(iCol, iRow).iConnectionType == 12) {
+                tiles.at(iCol, iRow).iConnectionType = 13;
                 SetTileConnections(iCol, iRow);
                 SetTileConnections(iCol - 1, iRow);
                 SetTileConnections(iCol + 1, iRow);
-            } else if (tiles[iCol][iRow].iConnectionType == 13) {
-                tiles[iCol][iRow].iConnectionType = 12;
+            } else if (tiles.at(iCol, iRow).iConnectionType == 13) {
+                tiles.at(iCol, iRow).iConnectionType = 12;
                 SetTileConnections(iCol, iRow);
                 SetTileConnections(iCol - 1, iRow);
                 SetTileConnections(iCol + 1, iRow);
-            } else if (tiles[iCol][iRow].iConnectionType == 14) {
-                tiles[iCol][iRow].iConnectionType = 15;
+            } else if (tiles.at(iCol, iRow).iConnectionType == 14) {
+                tiles.at(iCol, iRow).iConnectionType = 15;
                 SetTileConnections(iCol, iRow);
                 SetTileConnections(iCol, iRow - 1);
                 SetTileConnections(iCol, iRow + 1);
-            } else if (tiles[iCol][iRow].iConnectionType == 15) {
-                tiles[iCol][iRow].iConnectionType = 14;
+            } else if (tiles.at(iCol, iRow).iConnectionType == 15) {
+                tiles.at(iCol, iRow).iConnectionType = 14;
                 SetTileConnections(iCol, iRow);
                 SetTileConnections(iCol, iRow - 1);
                 SetTileConnections(iCol, iRow + 1);
             }
 
-            if (tiles[iCol][iRow].iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET)
-                tiles[iCol][iRow].iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 1;
-            else if (tiles[iCol][iRow].iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET + 1)
-                tiles[iCol][iRow].iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET;
-            else if (tiles[iCol][iRow].iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET + 2)
-                tiles[iCol][iRow].iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 3;
-            else if (tiles[iCol][iRow].iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET + 3)
-                tiles[iCol][iRow].iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 2;
+            if (tiles.at(iCol, iRow).iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET)
+                tiles.at(iCol, iRow).iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 1;
+            else if (tiles.at(iCol, iRow).iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET + 1)
+                tiles.at(iCol, iRow).iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET;
+            else if (tiles.at(iCol, iRow).iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET + 2)
+                tiles.at(iCol, iRow).iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 3;
+            else if (tiles.at(iCol, iRow).iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET + 3)
+                tiles.at(iCol, iRow).iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 2;
         }
     }
 }
 
-void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
+void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4]) const
 {
-    WorldMapTile * tile = &tiles[iCol][iRow];
+    const WorldMapTile& tile = tiles.at(iCol, iRow);
 
     if (iCol > 0) {
-        if (tile->iCompleted >= -1) {
-            short iType = tiles[iCol - 1][iRow].iType - 2;
+        if (tile.iCompleted >= -1) {
+            short iType = tiles.at(iCol - 1, iRow).iType - 2;
 
             if (iType >= 0 && iType <= 3)
                 doors[iType] = true;
@@ -1510,8 +1289,8 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
     }
 
     if (iCol < iWidth - 1) {
-        if (tile->iCompleted >= -1) {
-            short iType = tiles[iCol + 1][iRow].iType - 2;
+        if (tile.iCompleted >= -1) {
+            short iType = tiles.at(iCol + 1, iRow).iType - 2;
 
             if (iType >= 0 && iType <= 3)
                 doors[iType] = true;
@@ -1519,8 +1298,8 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
     }
 
     if (iRow > 0) {
-        if (tile->iCompleted >= -1) {
-            short iType = tiles[iCol][iRow - 1].iType - 2;
+        if (tile.iCompleted >= -1) {
+            short iType = tiles.at(iCol, iRow - 1).iType - 2;
 
             if (iType >= 0 && iType <= 3)
                 doors[iType] = true;
@@ -1528,8 +1307,8 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
     }
 
     if (iCol < iHeight - 1) {
-        if (tile->iCompleted >= -1) {
-            short iType = tiles[iCol][iRow + 1].iType - 2;
+        if (tile.iCompleted >= -1) {
+            short iType = tiles.at(iCol, iRow + 1).iType - 2;
 
             if (iType >= 0 && iType <= 3)
                 doors[iType] = true;
@@ -1537,10 +1316,10 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
     }
 }
 
-bool WorldMap::IsDoor(short iCol, short iRow)
+bool WorldMap::IsDoor(short iCol, short iRow) const
 {
     if (iCol >= 0 && iRow >= 0 && iCol < iWidth && iRow < iHeight) {
-        short iType = tiles[iCol][iRow].iType;
+        short iType = tiles.at(iCol, iRow).iType;
         if (iType >= 2 && iType <= 5)
             return true;
     }
@@ -1552,32 +1331,32 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow, bool fCloud)
 {
     short iDoorsOpened = 0;
 
-    WorldMapTile * tile = &tiles[iCol][iRow];
+    const WorldMapTile& tile = tiles.at(iCol, iRow);
 
     if (iCol > 0) {
-        if ((tile->iCompleted >= -1 || fCloud) && tiles[iCol - 1][iRow].iType - 2 == iKeyType) {
-            tiles[iCol - 1][iRow].iType = 0;
+        if ((tile.iCompleted >= -1 || fCloud) && tiles.at(iCol - 1, iRow).iType - 2 == iKeyType) {
+            tiles.at(iCol - 1, iRow).iType = 0;
             iDoorsOpened |= 1;
         }
     }
 
     if (iCol < iWidth - 1) {
-        if ((tile->iCompleted >= -1 || fCloud) && tiles[iCol + 1][iRow].iType - 2 == iKeyType) {
-            tiles[iCol + 1][iRow].iType = 0;
+        if ((tile.iCompleted >= -1 || fCloud) && tiles.at(iCol + 1, iRow).iType - 2 == iKeyType) {
+            tiles.at(iCol + 1, iRow).iType = 0;
             iDoorsOpened |= 2;
         }
     }
 
     if (iRow > 0) {
-        if ((tile->iCompleted >= -1 || fCloud) && tiles[iCol][iRow - 1].iType - 2 == iKeyType) {
-            tiles[iCol][iRow - 1].iType = 0;
+        if ((tile.iCompleted >= -1 || fCloud) && tiles.at(iCol, iRow - 1).iType - 2 == iKeyType) {
+            tiles.at(iCol, iRow - 1).iType = 0;
             iDoorsOpened |= 4;
         }
     }
 
     if (iRow < iHeight - 1) {
-        if ((tile->iCompleted >= -1 || fCloud) && tiles[iCol][iRow + 1].iType - 2 == iKeyType) {
-            tiles[iCol][iRow + 1].iType = 0;
+        if ((tile.iCompleted >= -1 || fCloud) && tiles.at(iCol, iRow + 1).iType - 2 == iKeyType) {
+            tiles.at(iCol, iRow + 1).iType = 0;
             iDoorsOpened |= 8;
         }
     }
@@ -1585,33 +1364,33 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow, bool fCloud)
     return iDoorsOpened;
 }
 
-short WorldMap::GetVehicleBoundary(short iCol, short iRow)
+short WorldMap::GetVehicleBoundary(short iCol, short iRow) const
 {
     if (iCol >= 0 && iRow >= 0 && iCol < iWidth && iRow < iHeight) {
-        return tiles[iCol][iRow].iVehicleBoundary;
+        return tiles.at(iCol, iRow).iVehicleBoundary;
     }
 
     return 0;
 }
 
 //Implements breadth first search to find a stage or vehicle of interest
-short WorldMap::GetNextInterestingMove(short iCol, short iRow)
+short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
 {
-    WorldMapTile * currentTile = &tiles[iCol][iRow];
+    const WorldMapTile& currentTile = tiles.at(iCol, iRow);
 
     //Look for stages or vehicles, but not bonus houses
-    if ((currentTile->iType >= 6 && currentTile->iCompleted == -2) || NumVehiclesInTile(iCol, iRow) > 0)
+    if ((currentTile.iType >= 6 && currentTile.iCompleted == -2) || NumVehiclesInTile({iCol, iRow}) > 0)
         return 4; //Signal to press select on this tile
 
-    short iCurrentId = currentTile->iID;
+    short iCurrentId = currentTile.iID;
 
-    std::queue<WorldMapTile*> next;
+    std::queue<const WorldMapTile*> next;
     std::map<short, short> visitedTiles;
-    visitedTiles[currentTile->iID] = -1;
-    next.push(currentTile);
+    visitedTiles[currentTile.iID] = -1;
+    next.push(&currentTile);
 
     while (!next.empty()) {
-        WorldMapTile * tile = next.front();
+        const WorldMapTile* const tile = next.front();
 
         if (tile == NULL)
             return -1;
@@ -1619,7 +1398,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
         next.pop();
 
         //Look for stages or vehicles, but not bonus houses
-        if ((tile->iType >= 6 && tile->iCompleted == -2) || NumVehiclesInTile(tile->iCol, tile->iRow) > 0) {
+        if ((tile->iType >= 6 && tile->iCompleted == -2) || NumVehiclesInTile({tile->iCol, tile->iRow}) > 0) {
             short iBackTileDirection = visitedTiles[tile->iID];
             short iBackTileId = tile->iID;
 
@@ -1633,12 +1412,9 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
                 else if (iBackTileDirection == 3)
                     iBackTileId += 1;
                 else if (iBackTileDirection == 4) {
-                    short iWarpCol, iWarpRow;
-                    short iCol = iBackTileId % iWidth;
-                    short iRow = iBackTileId / iWidth;
-
-                    warps[tiles[iCol][iRow].iWarp].GetOtherSide(iCol, iRow, &iWarpCol, &iWarpRow);
-                    iBackTileId = tiles[iWarpCol][iWarpRow].iID;
+                    const Vec2s target(iBackTileId % iWidth, iBackTileId / iWidth);
+                    const Vec2s pos = warps[tiles.at(iCol, iRow).iWarp].getOtherSide(target);
+                    iBackTileId = tiles.at(pos.x, pos.y).iID;
                 }
 
                 if (iBackTileId == iCurrentId) {
@@ -1657,65 +1433,63 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
         for (short iNeighbor = 0; iNeighbor < 4; iNeighbor++) {
             if (tile->fConnection[iNeighbor]) {
                 if (iNeighbor == 0 && tile->iRow > 0) {
-                    WorldMapTile * topTile = &tiles[tile->iCol][tile->iRow - 1];
+                    const WorldMapTile& topTile = tiles.at(tile->iCol, tile->iRow - 1);
 
                     //Stop at door tiles
-                    if (topTile->iType >= 2 && topTile->iType <= 5)
+                    if (topTile.iType >= 2 && topTile.iType <= 5)
                         continue;
 
-                    if (visitedTiles.find(topTile->iID) == visitedTiles.end()) {
-                        visitedTiles[topTile->iID] = 1;
-                        next.push(topTile);
+                    if (visitedTiles.find(topTile.iID) == visitedTiles.end()) {
+                        visitedTiles[topTile.iID] = 1;
+                        next.push(&topTile);
                     }
                 } else if (iNeighbor == 1 && tile->iRow < iHeight - 1) {
-                    WorldMapTile * bottomTile = &tiles[tile->iCol][tile->iRow + 1];
+                    const WorldMapTile& bottomTile = tiles.at(tile->iCol, tile->iRow + 1);
 
                     //Stop at door tiles
-                    if (bottomTile->iType >= 2 && bottomTile->iType <= 5)
+                    if (bottomTile.iType >= 2 && bottomTile.iType <= 5)
                         continue;
 
-                    if (visitedTiles.find(bottomTile->iID) == visitedTiles.end()) {
-                        visitedTiles[bottomTile->iID] = 0;
-                        next.push(bottomTile);
+                    if (visitedTiles.find(bottomTile.iID) == visitedTiles.end()) {
+                        visitedTiles[bottomTile.iID] = 0;
+                        next.push(&bottomTile);
                     }
                 } else if (iNeighbor == 2 && tile->iCol > 0) {
-                    WorldMapTile * leftTile = &tiles[tile->iCol - 1][tile->iRow];
+                    const WorldMapTile& leftTile = tiles.at(tile->iCol - 1, tile->iRow);
 
                     //Stop at door tiles
-                    if (leftTile->iType >= 2 && leftTile->iType <= 5)
+                    if (leftTile.iType >= 2 && leftTile.iType <= 5)
                         continue;
 
-                    if (visitedTiles.find(leftTile->iID) == visitedTiles.end()) {
-                        visitedTiles[leftTile->iID] = 3;
-                        next.push(leftTile);
+                    if (visitedTiles.find(leftTile.iID) == visitedTiles.end()) {
+                        visitedTiles[leftTile.iID] = 3;
+                        next.push(&leftTile);
                     }
                 } else if (iNeighbor == 3 && tile->iCol < iWidth - 1) {
-                    WorldMapTile * rightTile = &tiles[tile->iCol + 1][tile->iRow];
+                    const WorldMapTile& rightTile = tiles.at(tile->iCol + 1, tile->iRow);
 
                     //Stop at door tiles
-                    if (rightTile->iType >= 2 && rightTile->iType <= 5)
+                    if (rightTile.iType >= 2 && rightTile.iType <= 5)
                         continue;
 
-                    if (visitedTiles.find(rightTile->iID) == visitedTiles.end()) {
-                        visitedTiles[rightTile->iID] = 2;
-                        next.push(rightTile);
+                    if (visitedTiles.find(rightTile.iID) == visitedTiles.end()) {
+                        visitedTiles[rightTile.iID] = 2;
+                        next.push(&rightTile);
                     }
                 }
             }
 
             if (tile->iWarp >= 0) {
-                short iWarpCol, iWarpRow;
-                warps[tile->iWarp].GetOtherSide(tile->iCol, tile->iRow, &iWarpCol, &iWarpRow);
-
-                WorldMapTile * warpTile = &tiles[iWarpCol][iWarpRow];
+                const Vec2s pos = warps[tile->iWarp].getOtherSide({tile->iCol, tile->iRow});
+                const WorldMapTile& warpTile = tiles.at(pos.x, pos.y);
 
                 //Stop at door tiles
-                if (warpTile->iType >= 2 && warpTile->iType <= 5)
+                if (warpTile.iType >= 2 && warpTile.iType <= 5)
                     continue;
 
-                if (visitedTiles.find(warpTile->iID) == visitedTiles.end()) {
-                    visitedTiles[warpTile->iID] = 4;
-                    next.push(warpTile);
+                if (visitedTiles.find(warpTile.iID) == visitedTiles.end()) {
+                    visitedTiles[warpTile.iID] = 4;
+                    next.push(&warpTile);
                 }
             }
         }
@@ -1732,864 +1506,4 @@ void WorldMap::SetInitialPowerups()
         for (short iItem = 0; iItem < iNumInitialBonuses; iItem++)
             game_values.worldpowerups[iTeam][iItem] = iInitialBonuses[iItem];
     }
-}
-
-
-/**********************************
-* Tour Stop functions
-**********************************/
-
-template<typename T>
-short ReadTourStopSetting(T& output, T defaultVal)
-{
-    char* tok = strtok(NULL, ",\n");
-    if (tok) {
-        output = static_cast<T>(atoi(tok));
-        return 1;
-    } else {
-        output = defaultVal;
-        return 0;
-    }
-}
-
-TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
-{
-    TourStop * ts = new TourStop();
-    ts->fUseSettings = false;
-    ts->iNumUsedSettings = 0;
-
-    char * pszTemp = strtok(buffer, ",\n");
-
-    short iStageType = 0;
-    if (fIsWorld) {
-        iStageType = atoi(pszTemp);
-        if (iStageType < 0 || iStageType > 1)
-            iStageType = 0;
-
-        pszTemp = strtok(NULL, ",\n");
-    }
-
-    ts->iStageType = iStageType;
-
-    ts->szBonusText[0][0] = 0;
-    ts->szBonusText[1][0] = 0;
-    ts->szBonusText[2][0] = 0;
-    ts->szBonusText[3][0] = 0;
-    ts->szBonusText[4][0] = 0;
-
-    if (iStageType == 0) {
-        char * szMap = new char[strlen(pszTemp) + 1];
-        strcpy(szMap, pszTemp);
-
-        pszTemp = strtok(NULL, ",\n");
-
-        if (pszTemp)
-            ts->iMode = atoi(pszTemp);
-        else
-            ts->iMode = -1;
-
-        //If this is 1.8.0.2 or earlier and we are playing a minigame, use the default map
-        if (VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2) &&
-                (ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame)) {
-            //Get a bogus map name so the mode will know to load the default map
-            ts->pszMapFile = maplist->GetUnknownMapName();
-        } else {
-            //Using the maplist to cheat and find a map for us
-            maplist->SaveCurrent();
-
-            //If that map is not found
-            bool fMapFound = maplist->findexact(szMap, true);
-
-            if (!fMapFound) {
-                if (ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame) {
-                    //Get a bogus map name so the mode will know to load the default map
-                    ts->pszMapFile = maplist->GetUnknownMapName();
-                } else {
-                    maplist->random(false);
-                    ts->pszMapFile = maplist->currentShortmapname();
-                }
-            } else {
-                ts->pszMapFile = maplist->currentShortmapname();
-            }
-
-            maplist->ResumeCurrent();
-        }
-
-        delete [] szMap;
-
-        //The pipe minigame was using the value 24 from version 1.8.0.0 to 1.8.0.2
-        //It was later switched to 1000 to accomodate new modes easily
-        if (VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2)) {
-            if (ts->iMode == 24)
-                ts->iMode = game_mode_pipe_minigame;
-        }
-
-        //If a valid mode was not detected, then just choose a random mode
-        if (ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame && ts->iMode != game_mode_boss_minigame && ts->iMode != game_mode_boxes_minigame))
-            ts->iMode = RANDOM_INT(GAMEMODE_LAST);
-
-        pszTemp = strtok(NULL, ",\n");
-
-        //This gets the closest game mode to what the tour has
-        ts->iGoal = -1;
-        if (pszTemp) {
-            //If it is commented out, this will allow things like 33 coins, 17 kill goals, etc.
-            //ts->iGoal = gamemodes[ts->iMode]->GetClosestGoal(atoi(pszTemp));
-            ts->iGoal = atoi(pszTemp);
-        }
-
-        //Default to a random goal if an invalid goal was used
-        if (ts->iGoal <= 0) {
-            if (ts->iMode < GAMEMODE_LAST)
-                ts->iGoal = gamemodes[ts->iMode]->GetOptions()[RANDOM_INT(GAMEMODE_NUM_OPTIONS - 1)].iValue;
-            else
-                ts->iGoal = 50;
-        }
-
-        if (VersionIsEqualOrAfter(iVersion, 1, 7, 0, 2)) {
-            pszTemp = strtok(NULL, ",\n");
-
-            //Read in point value for tour stop
-            if (pszTemp)
-                ts->iPoints = atoi(pszTemp);
-            else
-                ts->iPoints = 1;
-
-            pszTemp = strtok(NULL, ",\n");
-
-            if (fIsWorld) {
-                ts->iBonusType = 0;
-                ts->iNumBonuses = 0;
-
-                char * pszStart = pszTemp;
-
-                while (pszStart != NULL) {
-                    char * pszEnd = strstr(pszStart, "|");
-                    if (pszEnd)
-                        *pszEnd = 0;
-
-                    //if it is "0", then no bonuses
-                    short iWinnerPlace = pszStart[0] - 48;
-                    if (iWinnerPlace == 0)
-                        break;
-                    else if (iWinnerPlace < 1 || iWinnerPlace > 4)
-                        iWinnerPlace = 1;
-
-                    strcpy(ts->wsbBonuses[ts->iNumBonuses].szBonusString, pszStart);
-
-                    ts->wsbBonuses[ts->iNumBonuses].iWinnerPlace = iWinnerPlace - 1;
-
-                    short iPowerupOffset = 0;
-                    if (pszStart[1] == 'w' || pszStart[1] == 'W')
-                        iPowerupOffset += NUM_POWERUPS;
-
-                    pszStart += 2;
-
-                    short iBonus = atoi(pszStart) + iPowerupOffset;
-                    if (iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
-                        iBonus = 0;
-
-                    ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
-
-                    if (++ts->iNumBonuses >= 10)
-                        break;
-
-                    if (pszEnd)
-                        pszStart = pszEnd + 1;
-                    else
-                        pszStart = NULL;
-                }
-            } else {
-                if (pszTemp)
-                    ts->iBonusType = atoi(pszTemp);
-                else
-                    ts->iBonusType = 0;
-            }
-
-            pszTemp = strtok(NULL, ",\n");
-
-            if (pszTemp) {
-                strncpy(ts->szName, pszTemp, 127);
-                ts->szName[127] = 0;
-            } else {
-                sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
-            }
-        } else {
-            ts->iPoints = 1;
-            ts->iBonusType = 0;
-            sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
-        }
-
-        if (VersionIsEqualOrAfter(iVersion, 1, 8, 0, 0)) {
-            if (fIsWorld) {
-                //is this a world ending stage?
-                pszTemp = strtok(NULL, ",\n");
-
-                if (pszTemp)
-                    ts->fEndStage = pszTemp[0] == '1';
-                else
-                    ts->fEndStage = false;
-            }
-
-            //Copy in default values first
-            memcpy(&ts->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
-
-            if (ts->iMode == game_mode_classic) {
-                ts->fUseSettings = true;
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.classic.style, game_values.gamemodemenusettings.classic.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.classic.scoring, game_values.gamemodemenusettings.classic.scoring);
-            } else if (ts->iMode == game_mode_frag) {
-                ts->fUseSettings = true;
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frag.style, game_values.gamemodemenusettings.frag.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frag.scoring, game_values.gamemodemenusettings.frag.scoring);
-            } else if (ts->iMode == game_mode_timelimit) {
-                ts->fUseSettings = true;
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.style, game_values.gamemodemenusettings.time.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.scoring, game_values.gamemodemenusettings.time.scoring);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.time.percentextratime, game_values.gamemodemenusettings.time.percentextratime);
-            } else if (ts->iMode == game_mode_jail) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.style, game_values.gamemodemenusettings.jail.style);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.timetofree, game_values.gamemodemenusettings.jail.timetofree);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.tagfree, game_values.gamemodemenusettings.jail.tagfree);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.jail.percentkey, game_values.gamemodemenusettings.jail.percentkey);
-            } else if (ts->iMode == game_mode_coins) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.coins.penalty, game_values.gamemodemenusettings.coins.penalty);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.coins.quantity, game_values.gamemodemenusettings.coins.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.coins.percentextracoin, game_values.gamemodemenusettings.coins.percentextracoin);
-            } else if (ts->iMode == game_mode_stomp) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.stomp.rate, game_values.gamemodemenusettings.stomp.rate);
-
-                for (int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.stomp.enemyweight[iEnemy]), game_values.gamemodemenusettings.stomp.enemyweight[iEnemy]);
-            } else if (ts->iMode == game_mode_eggs) {
-                ts->fUseSettings = true;
-
-                for (int iEgg = 0; iEgg < 4; iEgg++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.egg.eggs[iEgg]), game_values.gamemodemenusettings.egg.eggs[iEgg]);
-
-                for (int iYoshi = 0; iYoshi < 4; iYoshi++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.egg.yoshis[iYoshi]), game_values.gamemodemenusettings.egg.yoshis[iYoshi]);
-
-                ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.egg.explode), game_values.gamemodemenusettings.egg.explode);
-            } else if (ts->iMode == game_mode_ctf) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.speed, game_values.gamemodemenusettings.flag.speed);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.touchreturn, game_values.gamemodemenusettings.flag.touchreturn);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.pointmove, game_values.gamemodemenusettings.flag.pointmove);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.autoreturn, game_values.gamemodemenusettings.flag.autoreturn);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.homescore, game_values.gamemodemenusettings.flag.homescore);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.flag.centerflag, game_values.gamemodemenusettings.flag.centerflag);
-            } else if (ts->iMode == game_mode_chicken) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chicken.usetarget, game_values.gamemodemenusettings.chicken.usetarget);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chicken.glide, game_values.gamemodemenusettings.chicken.glide);
-            } else if (ts->iMode == game_mode_tag) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.tag.tagontouch, game_values.gamemodemenusettings.tag.tagontouch);
-            } else if (ts->iMode == game_mode_star) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.time, game_values.gamemodemenusettings.star.time);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.shine, game_values.gamemodemenusettings.star.shine);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.star.percentextratime, game_values.gamemodemenusettings.star.percentextratime);
-            } else if (ts->iMode == game_mode_domination) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.quantity, game_values.gamemodemenusettings.domination.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.relocationfrequency, game_values.gamemodemenusettings.domination.relocationfrequency);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.loseondeath, game_values.gamemodemenusettings.domination.loseondeath);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.relocateondeath, game_values.gamemodemenusettings.domination.relocateondeath);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.domination.stealondeath, game_values.gamemodemenusettings.domination.stealondeath);
-            } else if (ts->iMode == game_mode_koth) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.kingofthehill.areasize, game_values.gamemodemenusettings.kingofthehill.areasize);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.kingofthehill.relocationfrequency, game_values.gamemodemenusettings.kingofthehill.relocationfrequency);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.kingofthehill.maxmultiplier, game_values.gamemodemenusettings.kingofthehill.maxmultiplier);
-            } else if (ts->iMode == game_mode_race) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.race.quantity, game_values.gamemodemenusettings.race.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.race.speed, game_values.gamemodemenusettings.race.speed);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.race.penalty, game_values.gamemodemenusettings.race.penalty);
-            } else if (ts->iMode == game_mode_frenzy) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frenzy.quantity, game_values.gamemodemenusettings.frenzy.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frenzy.rate, game_values.gamemodemenusettings.frenzy.rate);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.frenzy.storedshells, game_values.gamemodemenusettings.frenzy.storedshells);
-
-                for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.frenzy.powerupweight[iPowerup]), game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
-            } else if (ts->iMode == game_mode_survival) {
-                ts->fUseSettings = true;
-
-                for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
-                    ts->iNumUsedSettings += ReadTourStopSetting((ts->gmsSettings.survival.enemyweight[iEnemy]), game_values.gamemodemenusettings.survival.enemyweight[iEnemy]);
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.survival.density, game_values.gamemodemenusettings.survival.density);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.survival.speed, game_values.gamemodemenusettings.survival.speed);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.survival.shield, game_values.gamemodemenusettings.survival.shield);
-            } else if (ts->iMode == game_mode_greed) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.coinlife, game_values.gamemodemenusettings.greed.coinlife);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.owncoins, game_values.gamemodemenusettings.greed.owncoins);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.multiplier, game_values.gamemodemenusettings.greed.multiplier);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.greed.percentextracoin, game_values.gamemodemenusettings.greed.percentextracoin);
-            } else if (ts->iMode == game_mode_health) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.health.startlife, game_values.gamemodemenusettings.health.startlife);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.health.maxlife, game_values.gamemodemenusettings.health.maxlife);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.health.percentextralife, game_values.gamemodemenusettings.health.percentextralife);
-            } else if (ts->iMode == game_mode_collection) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.quantity, game_values.gamemodemenusettings.collection.quantity);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.rate, game_values.gamemodemenusettings.collection.rate);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.banktime, game_values.gamemodemenusettings.collection.banktime);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.collection.cardlife, game_values.gamemodemenusettings.collection.cardlife);
-            } else if (ts->iMode == game_mode_chase) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chase.phantospeed, game_values.gamemodemenusettings.chase.phantospeed);
-
-                for (short iPhanto = 0; iPhanto < 3; iPhanto++)
-                    ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.chase.phantoquantity[iPhanto], game_values.gamemodemenusettings.chase.phantoquantity[iPhanto]);
-            } else if (ts->iMode == game_mode_shyguytag) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.shyguytag.tagonsuicide, game_values.gamemodemenusettings.shyguytag.tagonsuicide);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.shyguytag.tagtransfer, game_values.gamemodemenusettings.shyguytag.tagtransfer);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.shyguytag.freetime, game_values.gamemodemenusettings.shyguytag.freetime);
-            } else if (ts->iMode == game_mode_boss_minigame) {
-                ts->fUseSettings = true;
-
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.bosstype, game_values.gamemodemenusettings.boss.bosstype);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.difficulty, game_values.gamemodemenusettings.boss.difficulty);
-                ts->iNumUsedSettings += ReadTourStopSetting(ts->gmsSettings.boss.hitpoints, game_values.gamemodemenusettings.boss.hitpoints);
-            }
-        }
-    } else if (iStageType == 1) { //Bonus House
-        if (pszTemp) {
-            strncpy(ts->szName, pszTemp, 127);
-            ts->szName[127] = 0;
-        } else {
-            sprintf(ts->szName, "Bonus House %d", game_values.tourstoptotal + 1);
-        }
-
-        pszTemp = strtok(NULL, ",\n");
-
-        short iBonusOrdering = atoi(pszTemp);
-        if (iBonusOrdering < 0 || iBonusOrdering > 1)
-            iBonusOrdering = 0;
-
-        ts->iBonusType = iBonusOrdering;
-
-        pszTemp = strtok(NULL, ",\n");
-
-        char * pszStart = pszTemp;
-
-        ts->iBonusTextLines = 0;
-        while (pszStart != NULL && pszStart[0] != '-') {
-            char * pszEnd = strstr(pszStart, "|");
-
-            if (pszEnd)
-                *pszEnd = 0;
-
-            strcpy(ts->szBonusText[ts->iBonusTextLines], pszStart);
-
-            if (++ts->iBonusTextLines >= 5 || !pszEnd)
-                break;
-
-            pszStart = pszEnd + 1;
-        }
-
-        ts->iNumBonuses = 0;
-        pszTemp = strtok(NULL, ",\n");
-        while (pszTemp) {
-            strcpy(ts->wsbBonuses[ts->iNumBonuses].szBonusString, pszTemp);
-
-            short iPowerupOffset = 0;
-            if (pszTemp[0] == 'w' || pszTemp[0] == 'W')
-                iPowerupOffset += NUM_POWERUPS;
-            else if (pszTemp[0] == 's' || pszTemp[0] == 'S')
-                iPowerupOffset += NUM_POWERUPS + NUM_WORLD_POWERUPS - 1;
-
-            pszTemp++;
-
-            short iBonus = atoi(pszTemp) + iPowerupOffset;
-            if (iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS + NUM_WORLD_SCORE_BONUSES)
-                iBonus = 0;
-
-            ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
-            ts->wsbBonuses[ts->iNumBonuses].iWinnerPlace = -1;
-
-            if (++ts->iNumBonuses >= MAX_BONUS_CHESTS)
-                break;
-
-            pszTemp = strtok(NULL, ",\n");
-        }
-    }
-
-    return ts;
-}
-
-void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
-{
-    buffer[0] = 0;
-    char szTemp[32];
-
-    if (fIsWorld) {
-        //Write stage type (battle stage vs. bonus house, etc.)
-        sprintf(szTemp, "%d,", ts->iStageType);
-        strcat(buffer, szTemp);
-    }
-
-    //Battle stage
-    if (ts->iStageType == 0) {
-        strcat(buffer, ts->pszMapFile);
-        strcat(buffer, ",");
-
-        sprintf(szTemp, "%d,", ts->iMode);
-        strcat(buffer, szTemp);
-
-        sprintf(szTemp, "%d,", ts->iGoal);
-        strcat(buffer, szTemp);
-
-        sprintf(szTemp, "%d,", ts->iPoints);
-        strcat(buffer, szTemp);
-
-        if (fIsWorld) {
-            if (ts->iNumBonuses <= 0) {
-                strcat(buffer, "0");
-            } else {
-                for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
-                    if (iBonus > 0)
-                        strcat(buffer, "|");
-
-                    strcat(buffer, ts->wsbBonuses[iBonus].szBonusString);
-                }
-            }
-
-            strcat(buffer, ",");
-        } else {
-            sprintf(szTemp, "%d,", ts->iBonusType);
-            strcat(buffer, szTemp);
-        }
-
-        strcat(buffer, ts->szName);
-        strcat(buffer, ",");
-
-        if (fIsWorld) {
-            sprintf(szTemp, "%d", ts->fEndStage);
-            strcat(buffer, szTemp);
-        }
-
-        if (ts->fUseSettings) {
-            if (ts->iMode == game_mode_classic) { //classic
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.classic.style));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.classic.scoring));
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_frag) { //frag
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.frag.style));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.frag.scoring));
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_timelimit) { //time
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.time.style));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.time.scoring));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.time.percentextratime);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_jail) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.jail.style));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.jail.timetofree);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.jail.tagfree);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.jail.percentkey);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_coins) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.coins.penalty);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.coins.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.coins.percentextracoin);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_stomp) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.stomp.rate);
-                    strcat(buffer, szTemp);
-                }
-
-                for (int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++) {
-                    if (ts->iNumUsedSettings > iEnemy + 1) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.stomp.enemyweight[iEnemy]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-            } else if (ts->iMode == game_mode_eggs) {
-                for (int iEgg = 0; iEgg < 4; iEgg++) {
-                    if (ts->iNumUsedSettings > iEgg) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.egg.eggs[iEgg]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-
-                for (int iYoshi = 0; iYoshi < 4; iYoshi++) {
-                    if (ts->iNumUsedSettings > iYoshi + 4) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.egg.yoshis[iYoshi]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-
-                if (ts->iNumUsedSettings > 8) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.egg.explode);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_ctf) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.speed);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.touchreturn);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.pointmove);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.autoreturn);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 4) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.homescore);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 5) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.flag.centerflag);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_chicken) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.chicken.usetarget);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.chicken.glide);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_tag) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.tag.tagontouch);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_star) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.star.time);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.star.shine));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.star.percentextratime);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_domination) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocationfrequency);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.loseondeath);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocateondeath);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 4) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.domination.stealondeath);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_koth) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.areasize);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.relocationfrequency);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.maxmultiplier);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_race) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.race.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.race.speed);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.race.penalty);
-                    strcat(buffer, szTemp);
-                }
-            // NOTE: Owned missing
-            } else if (ts->iMode == game_mode_frenzy) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.rate);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.storedshells);
-                    strcat(buffer, szTemp);
-                }
-
-                for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
-                    if (ts->iNumUsedSettings > iPowerup + 3) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.powerupweight[iPowerup]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-            } else if (ts->iMode == game_mode_survival) {
-                for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++) {
-                    if (ts->iNumUsedSettings > iEnemy) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.survival.enemyweight[iEnemy]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.survival.density);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 4) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.survival.speed);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 5) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.survival.shield);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_greed) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.greed.coinlife);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.greed.owncoins);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.greed.multiplier);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.greed.percentextracoin);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_health) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.health.startlife);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.health.maxlife);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.health.percentextralife);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_collection) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.collection.quantity);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.collection.rate);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.collection.banktime);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 3) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.collection.cardlife);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_chase) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantospeed);
-                    strcat(buffer, szTemp);
-                }
-
-                for (short iPhanto = 0; iPhanto < 3; iPhanto++) {
-                    if (ts->iNumUsedSettings > iPhanto + 1) {
-                        sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantoquantity[iPhanto]);
-                        strcat(buffer, szTemp);
-                    }
-                }
-            } else if (ts->iMode == game_mode_shyguytag) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagonsuicide);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagtransfer);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.freetime);
-                    strcat(buffer, szTemp);
-                }
-            } else if (ts->iMode == game_mode_boss_minigame) {
-                if (ts->iNumUsedSettings > 0) {
-                    sprintf(szTemp, ",%d", static_cast<short>(ts->gmsSettings.boss.bosstype));
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 1) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.boss.difficulty);
-                    strcat(buffer, szTemp);
-                }
-
-                if (ts->iNumUsedSettings > 2) {
-                    sprintf(szTemp, ",%d", ts->gmsSettings.boss.hitpoints);
-                    strcat(buffer, szTemp);
-                }
-            }
-        }
-    } else if (ts->iStageType == 1) { //Bonus House
-        strcat(buffer, ts->szName);
-        strcat(buffer, ",");
-
-        sprintf(szTemp, "%d,", ts->iBonusType);
-        strcat(buffer, szTemp);
-
-        for (short iText = 0; iText < ts->iBonusTextLines; iText++) {
-            if (iText != 0)
-                strcat(buffer, "|");
-
-            strcat(buffer, ts->szBonusText[iText]);
-        }
-
-        if (ts->iNumBonuses == 0) {
-            strcat(buffer, ",p0");
-        } else {
-            for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
-                strcat(buffer, ",");
-                strcat(buffer, ts->wsbBonuses[iBonus].szBonusString);
-            }
-        }
-    }
-
-    strcat(buffer, "\n");
-}
-
-void ResetTourStops()
-{
-    game_values.tourstopcurrent = 0;
-    game_values.tourstoptotal = 0;
-
-    // added to prevent 'vector iterators incompatible' exception
-    if (!game_values.tourstops.empty())
-        game_values.tourstops.clear();
 }

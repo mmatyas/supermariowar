@@ -20,7 +20,7 @@ extern CResourceManager* rm;
 // class cheep cheep
 //------------------------------------------------------------------------------
 MO_CheepCheep::MO_CheepCheep(gfxSprite* nspr)
-    : IO_MovingObject(nspr, 0, App::screenHeight, 2, 8, 30, 28, 1, 3)
+    : IO_MovingObject(nspr, {0, App::screenHeight}, 2, 8, 30, 28, 1, 3)
 {
     ih = 32;
     setXi((short)(RANDOM_INT(608)));
@@ -64,10 +64,10 @@ void MO_CheepCheep::update()
 
 void MO_CheepCheep::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, iColorOffsetY, iw, ih});
 
     if (frozen) {
-        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
+        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, 0, 32, 32});
     }
 }
 
@@ -132,7 +132,7 @@ void MO_CheepCheep::collide(IO_MovingObject* object)
 
         if (type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion || type == movingobject_sledgehammer) {
             // Don't kill goombas with non-moving shells
-            if (type == movingobject_shell && object->state == 2)
+            if (type == movingobject_shell && object->GetState() == 2)
                 return;
 
             if (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
@@ -167,7 +167,7 @@ void MO_CheepCheep::collide(IO_MovingObject* object)
             animationspeed = 0;
             frozen = true;
 
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8);
         }
     }
 }
@@ -180,7 +180,7 @@ void MO_CheepCheep::Die()
     }
 
     dead = true;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_cheepcheepdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iColorOffsetY, 32, 32));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_cheepcheepdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iColorOffsetY, 32, 32);
 }
 
 void MO_CheepCheep::ShatterDie()
@@ -189,16 +189,10 @@ void MO_CheepCheep::ShatterDie()
     dead = true;
 
     short iBrokenIceX = ix - collisionOffsetX, iBrokenIceY = iy - collisionOffsetY;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, iBrokenIceX, iBrokenIceY, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, iBrokenIceX, iBrokenIceY + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, iBrokenIceX, iBrokenIceY, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, iBrokenIceX, iBrokenIceY + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
 
     game_values.unlocksecret2part2++;
 }
-
-///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////
-#ifdef _DEBUG
-extern bool fDebugShowBossSettings;
-#endif
-///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////

@@ -2,42 +2,12 @@
 
 #include "GameValues.h"
 #include "map.h"
+#include "MapReaderConstants.h"
 #include "FileIO.h"
 #include "TilesetManager.h"
 
-#include <cstring>
-
 extern CTilesetManager* g_tilesetmanager;
-extern short g_iTileTypeConversion[NUMTILETYPES];
 
-const char * g_szBackgroundConversion[26] = {
-    "Land_Classic.png",
-    "Castle_Dungeon.png",
-    "Desert_Pyramids.png",
-    "Ghost_GhostHouse.png",
-    "Underground_Cave.png",
-    "Clouds_AboveTheClouds.png",
-    "Castle_GoombaHall.png",
-    "Platforms_GreenSpottedHills.png",
-    "Snow_SnowTrees.png",
-    "Desert_Desert.png",
-    "Underground_BrownRockWall.png",
-    "Land_CastleWall.png",
-    "Clouds_Clouds.png",
-    "Land_GreenMountains.png",
-    "Land_InTheTrees.png",
-    "Battle_Manor.png",
-    "Platforms_JaggedGreenStones.png",
-    "Underground_RockWallAndPlants.png",
-    "Underground_DarkPipes.png",
-    "Bonus_StarryNight.png",
-    "Platforms_CloudsAndWaterfalls.png",
-    "Battle_GoombaPillars.png",
-    "Bonus_HillsAtNight.png",
-    "Castle_CastlePillars.png",
-    "Land_GreenHillsAndClouds.png",
-    "Platforms_BlueSpottedHills.png"
-};
 
 namespace {
 const short g_iMusicCategoryConversion[26] {0, 3, 8, 5, 1, 9, 3, 4, 10, 8, 1, 0, 9, 0, 0, 7, 4, 1, 1, 6, 4, 7, 6, 3, 0, 4};
@@ -64,15 +34,8 @@ void MapReader1500::read_tiles(CMap& map, BinaryFile& mapfile)
             tile->iCol = iTileID % 32;
             tile->iRow = iTileID / 32;
 
-            TileType iType = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
-
-            if (iType >= 0 && iType < NUMTILETYPES) {
-                map.mapdatatop[i][j].iType = iType;
-                map.mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
-            } else {
-                map.mapdatatop[i][j].iType = tile_nonsolid;
-                map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-            }
+            TileType iType = g_tilesetmanager->classicTileset()->tileType(tile->iCol, tile->iRow);
+            map.mapdatatop[i][j] = iType;
 
             map.mapdata[i][j][0].iID = TILESETNONE;
             map.mapdata[i][j][2].iID = TILESETNONE;
@@ -101,7 +64,7 @@ void MapReader1500::read_background(CMap& map, BinaryFile& mapfile)
 {
     // Read old background IDs and convert that to a background filename
     map.backgroundID = (short)mapfile.read_i32();
-    strcpy(map.szBackgroundFile, g_szBackgroundConversion[map.backgroundID]);
+    map.szBackgroundFile = g_szBackgroundConversion[map.backgroundID];
 }
 
 void MapReader1500::read_music_category(CMap& map, BinaryFile& mapfile)

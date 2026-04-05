@@ -5,6 +5,8 @@
 
 #include "SDL.h"
 
+#include <format>
+
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -47,7 +49,7 @@ void FPSLimiter::beforeFlip()
 #endif
     {
         float potentialFps = 1000.0f / (float)(game_values.framelimiter == 0 ? 1 : game_values.framelimiter);
-        rm->menu_font_large.drawf(0, 480 - rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, potentialFps, flipfps, 1000.0f / (float)ticks);
+        rm->menu_font_large.draw(0, 480 - rm->menu_font_large.getHeight(), std::format("Actual:{:.1f}/{:.1f}, Flip:{:.1f}, Potential:{:.1f}", realfps, potentialFps, flipfps, 1000.0f / (float)ticks));
     }
 }
 

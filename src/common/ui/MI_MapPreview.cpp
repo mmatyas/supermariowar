@@ -39,9 +39,9 @@ MI_MapPreview::MI_MapPreview(gfxSprite * nspr, short x, short y, short width, sh
     , iIndent(indent)
     , iSlideListOut(0)
 {
-    surfaceMapBackground = SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0);
-    surfaceMapBlockLayer = SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0);
-    surfaceMapForeground = SDL_CreateRGBSurface(0, App::screenWidth/2, App::screenHeight/2, 16, 0, 0, 0, 0);
+    surfaceMapBackground = gfxSprite::blank(App::screenWidth/2, App::screenHeight/2);
+    surfaceMapBlockLayer = gfxSprite::blank(App::screenWidth/2, App::screenHeight/2);
+    surfaceMapForeground = gfxSprite::blank(App::screenWidth/2, App::screenHeight/2);
     LoadCurrentMap();
 
     rectDst.x = x + 16;
@@ -51,8 +51,6 @@ MI_MapPreview::MI_MapPreview(gfxSprite * nspr, short x, short y, short width, sh
 
     memset(szMapName, 0, sizeof(szMapName));
 }
-
-MI_MapPreview::~MI_MapPreview() {}
 
 void MI_MapPreview::Update()
 {
@@ -67,52 +65,46 @@ void MI_MapPreview::Update()
 
 void MI_MapPreview::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
-    short iMapBoxX = ix + (iWidth >> 1) - 176 - iSlideListOut;
+    short iMapBoxX = m_pos.x + (iWidth >> 1) - 176 - iSlideListOut;
 
     //Draw the background for the map preview
-    rm->menu_dialog.draw(iMapBoxX, iy + 30, 0, 0, 336, 254);
-    rm->menu_dialog.draw(iMapBoxX + 336, iy + 30, 496, 0, 16, 254);
-    rm->menu_dialog.draw(iMapBoxX, iy + 284, 0, 464, 336, 16);
-    rm->menu_dialog.draw(iMapBoxX + 336, iy + 284, 496, 464, 16, 16);
+    rm->menu_dialog.draw(iMapBoxX, m_pos.y + 30, {0, 0, 336, 254});
+    rm->menu_dialog.draw(iMapBoxX + 336, m_pos.y + 30, {496, 0, 16, 254});
+    rm->menu_dialog.draw(iMapBoxX, m_pos.y + 284, {0, 464, 336, 16});
+    rm->menu_dialog.draw(iMapBoxX + 336, m_pos.y + 284, {496, 464, 16, 16});
 
     rectDst.x = iMapBoxX + 16;
 
-    SDL_BlitSurface(surfaceMapBackground, NULL, blitdest, &rectDst);
+    surfaceMapBackground.draw(blitdest, rectDst);
 
     g_map->drawPlatforms(rectDst.x, rectDst.y, 0);
 
-    SDL_BlitSurface(surfaceMapBlockLayer, NULL, blitdest, &rectDst);
+    surfaceMapBlockLayer.draw(blitdest, rectDst);
 
     g_map->drawPlatforms(rectDst.x, rectDst.y, 1);
 
     //Draw map hazards
     for (const std::unique_ptr<CObject>& obj : objectcontainer[1].list()) {
-        ObjectType type = obj->getObjectType();
-
-        if (type == object_orbithazard) {
-            ((OMO_OrbitHazard*)obj.get())->draw(rectDst.x, rectDst.y);
-        } else if (type == object_pathhazard) {
-            ((OMO_StraightPathHazard*)obj.get())->draw(rectDst.x, rectDst.y);
-        } else if (type == object_flamecannon) {
-            ((IO_FlameCannon*)obj.get())->draw(rectDst.x, rectDst.y);
-        } else if (type == object_moving) {
-            IO_MovingObject * movingobject = (IO_MovingObject *) obj.get();
-
-            if (movingobject->getMovingObjectType() == movingobject_bulletbill) {
-                ((MO_BulletBill*)movingobject)->draw(rectDst.x, rectDst.y);
-            } else if (movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
-                ((MO_PirhanaPlant*)movingobject)->draw(rectDst.x, rectDst.y);
-            }
+        if (auto* hazard = dynamic_cast<OMO_OrbitHazard*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
+        } else if (auto* hazard = dynamic_cast<OMO_StraightPathHazard*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
+        } else if (auto* hazard = dynamic_cast<IO_FlameCannon*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
+        } else if (auto* hazard = dynamic_cast<MO_BulletBill*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
+        } else if (auto* hazard = dynamic_cast<MO_PirhanaPlant*>(obj.get())) {
+            hazard->draw(rectDst.x, rectDst.y);
         }
     }
 
     g_map->drawPlatforms(rectDst.x, rectDst.y, 2);
 
     if (game_values.toplayer)
-        SDL_BlitSurface(surfaceMapForeground, NULL, blitdest, &rectDst);
+        surfaceMapForeground.draw(blitdest, rectDst);
 
     g_map->drawPlatforms(rectDst.x, rectDst.y, 3);
     g_map->drawPlatforms(rectDst.x, rectDst.y, 4);
@@ -120,13 +112,13 @@ void MI_MapPreview::Draw()
 
 void MI_MapPreview::LoadCurrentMap()
 {
-    strncpy(szMapName, maplist->currentShortmapname(), 255);
+    strncpy(szMapName, maplist->currentShortmapname().c_str(), 255);
     szMapName[255] = 0;
 
     LoadMap(maplist->currentFilename());
 }
 
-void MI_MapPreview::LoadMap(const char * szMapPath)
+void MI_MapPreview::LoadMap(const std::string& szMapPath)
 {
     g_map->loadMap(szMapPath, read_type_preview);
     smallDelay(); //Sleeps to help the music from skipping
@@ -134,7 +126,7 @@ void MI_MapPreview::LoadMap(const char * szMapPath)
     LoadCurrentMapBackground();
     smallDelay();
 
-    g_map->preDrawPreviewBackground(&rm->spr_background, surfaceMapBackground, false);
+    g_map->preDrawPreviewBackground(rm->spr_background, surfaceMapBackground, false);
     smallDelay();
 
     g_map->preDrawPreviewBlocks(surfaceMapBlockLayer, false);

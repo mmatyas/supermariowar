@@ -1,6 +1,6 @@
 #pragma once
 
-#include "objects/moving/Powerup.h"
+#include "objects/powerup/Powerup.h"
 
 class CPlayer;
 class gfxSprite;
@@ -16,7 +16,7 @@ enum class CoinColor : unsigned char {
 
 class PU_CoinPowerup : public MO_Powerup {
 public:
-    PU_CoinPowerup(gfxSprite* nspr, short x, short y, CoinColor color, short value);
+    PU_CoinPowerup(gfxSprite* nspr, Vec2s pos, CoinColor color, short value);
 
     void update() override;
     void draw() override;

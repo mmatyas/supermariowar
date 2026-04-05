@@ -101,8 +101,6 @@
 #define TILESETHEIGHT   30
 #define TILESETWIDTH    32
 
-#define NUMTILETYPES    19
-
 #define TILESETANIMATED     -1
 #define TILESETNONE         -2
 #define TILESETUNKNOWN      -3
@@ -117,7 +115,6 @@
 #define MAXCATEGORYTRACKS       64
 
 #define MAXEYECANDY 192
-#define MAXOBJECTS  300
 #define CORPSESTAY  200
 
 #define WAITTIME        16      //delay between frames (default:16)
@@ -135,11 +132,6 @@
 #define THREE_QUARTER_PI    2.3561945f
 #define HALF_PI             1.5707963f
 #define QUARTER_PI          0.7853982f
-
-#define MENU_ITEM_NEIGHBOR_UP       0
-#define MENU_ITEM_NEIGHBOR_DOWN     1
-#define MENU_ITEM_NEIGHBOR_LEFT     2
-#define MENU_ITEM_NEIGHBOR_RIGHT    3
 
 #define NUM_POWERUPS            26
 #define NUM_WORLD_POWERUPS      15

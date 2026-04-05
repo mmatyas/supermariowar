@@ -1,6 +1,7 @@
 #pragma once
 
-#include "objects/moving/Powerup.h"
+
+#include "objects/powerup/Powerup.h"
 
 class CPlayer;
 class gfxSprite;
@@ -8,7 +9,7 @@ class gfxSprite;
 
 class PU_PWingsPowerup : public MO_Powerup {
 public:
-    PU_PWingsPowerup(gfxSprite* nspr, short x, short y);
+    PU_PWingsPowerup(gfxSprite* nspr, Vec2s pos);
 
     bool collide(CPlayer* player) override;
 };

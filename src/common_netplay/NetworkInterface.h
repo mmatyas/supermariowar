@@ -8,8 +8,7 @@
 class NetPeer
 {
     public:
-        NetPeer() {};
-        virtual ~NetPeer() {}
+        virtual ~NetPeer() = default;
 
         virtual bool send(const void*, size_t) = 0;
         virtual bool sendReliable(const void*, size_t) = 0;
@@ -36,6 +35,7 @@ class NetPeer
 class NetworkEventHandler
 {
     public:
+        virtual ~NetworkEventHandler() = default;
         virtual void onConnect(NetPeer*) = 0;
         virtual void onReceive(NetPeer&, const uint8_t*, size_t) = 0;
         virtual void onDisconnect(NetPeer& client) = 0;

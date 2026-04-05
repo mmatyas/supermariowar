@@ -7,7 +7,7 @@ class gfxSprite;
 
 class CO_Spring : public MO_CarriedObject {
 public:
-    CO_Spring(gfxSprite* nspr, short ix, short iy, bool fsuper);
+    CO_Spring(gfxSprite* nspr, Vec2s pos, bool fsuper);
 
     void update() override;
     void draw() override;

@@ -120,3 +120,10 @@ enum MenuCodeEnum {
     MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS,
     MENU_CODE_NET_ROOM_GO,
 };
+
+enum class MenuNavDirection : unsigned char {
+    Up,
+    Down,
+    Left,
+    Right,
+};

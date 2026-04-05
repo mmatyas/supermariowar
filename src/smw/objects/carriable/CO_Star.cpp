@@ -12,7 +12,7 @@ extern CResourceManager* rm;
 // class star (for star mode)
 //------------------------------------------------------------------------------
 CO_Star::CO_Star(gfxSprite* nspr, short type, short id)
-    : MO_CarriedObject(nspr, 0, 0, 8, 8, 30, 30, 1, 1)
+    : MO_CarriedObject(nspr, Vec2s::zero(), 8, 8, 30, 30, 1, 1)
 {
     iID = id;
 
@@ -93,20 +93,20 @@ void CO_Star::draw()
 {
     if (owner) {
         if (owner->iswarping())
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iOffsetY, iw, ih}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
         else
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, iw, ih);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iOffsetY, iw, ih});
     } else {
         if (velx != 0.0f)
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, iw, ih);  // keep the star still while it's moving
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iOffsetY, iw, ih});  // keep the star still while it's moving
         else
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iOffsetY, iw, ih);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, iOffsetY, iw, ih});
     }
 
     if (owner && owner->iswarping())
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, iType ? 0 : 32, 32, 32, owner->GetWarpState(), owner->GetWarpPlane());
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, iType ? 0 : 32, 32, 32}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
     else
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, iType ? 0 : 32, 32, 32);
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, iType ? 0 : 32, 32, 32});
 }
 
 void CO_Star::placeStar()

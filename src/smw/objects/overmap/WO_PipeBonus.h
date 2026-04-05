@@ -4,8 +4,7 @@
 
 class OMO_PipeBonus : public IO_OverMapObject {
 public:
-    OMO_PipeBonus(gfxSprite* nspr, float velx, float vely, short ix, short iy,
-        short type, short duration, short uncollectabletime);
+    OMO_PipeBonus(gfxSprite* nspr, Vec2f vel, Vec2s pos, short type, short duration, short uncollectabletime);
 
     void update() override;
     void draw() override;

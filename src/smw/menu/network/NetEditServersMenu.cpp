@@ -18,7 +18,7 @@ UI_NetEditServersMenu::UI_NetEditServersMenu()
     : UI_Menu()
 {
     currentState = DEFAULT;
-    std::fill(dialogTextData, dialogTextData + 128, 0);
+    dialogTextData.clear();
 
     miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
@@ -53,10 +53,10 @@ UI_NetEditServersMenu::UI_NetEditServersMenu()
     miDialogCancel = new MI_Button(&rm->spr_selectfield, 150, 432, "Cancel", 100, TextAlign::CENTER);
     miDialogCancel->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
-    miDialogTitle->Show(false);
-    miDialogTextField->Show(false);
-    miDialogOK->Show(false);
-    miDialogCancel->Show(false);
+    miDialogTitle->setVisible(false);
+    miDialogTextField->setVisible(false);
+    miDialogOK->setVisible(false);
+    miDialogCancel->setVisible(false);
 
     AddControl(miAddButton, miBackButton, miEditButton, NULL, NULL);
     AddControl(miEditButton, miAddButton, miRemoveButton, NULL, NULL);
@@ -76,7 +76,7 @@ UI_NetEditServersMenu::UI_NetEditServersMenu()
     AddControl(miDialogOK, miDialogTextField, miDialogTextField, miDialogCancel, miDialogCancel);
     AddControl(miDialogCancel, miDialogTextField, miDialogTextField, miDialogOK, miDialogOK);
 
-    SetHeadControl(miAddButton);
+    setInitialFocus(miAddButton);
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 };
 
@@ -91,23 +91,23 @@ void UI_NetEditServersMenu::ReloadScroll()
 
 void UI_NetEditServersMenu::ShowDialog()
 {
-    miDialogTitle->Show(true);
-    miDialogTextField->Show(true);
-    miDialogOK->Show(true);
-    miDialogCancel->Show(true);
+    miDialogTitle->setVisible(true);
+    miDialogTextField->setVisible(true);
+    miDialogOK->setVisible(true);
+    miDialogCancel->setVisible(true);
 }
 
 void UI_NetEditServersMenu::HideDialog()
 {
-    miDialogTitle->Show(false);
-    miDialogTextField->Show(false);
-    miDialogOK->Show(false);
-    miDialogCancel->Show(false);
+    miDialogTitle->setVisible(false);
+    miDialogTextField->setVisible(false);
+    miDialogOK->setVisible(false);
+    miDialogCancel->setVisible(false);
 }
 
 void UI_NetEditServersMenu::Restore()
 {
-    if (savedCurrent)
+    if (m_savedCurrent)
         RestoreCurrent();
 
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
@@ -126,7 +126,7 @@ void UI_NetEditServersMenu::onPressAdd()
     currentState = ADD;
 
     ShowDialog();
-    SetHeadControl(miDialogTextField);
+    setInitialFocus(miDialogTextField);
     SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 }
 
@@ -138,7 +138,7 @@ void UI_NetEditServersMenu::onPressEdit()
     RememberCurrent();
     currentState = EDIT;
 
-    SetHeadControl(miServerScroll);
+    setInitialFocus(miServerScroll);
     SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
     miServerScroll->Activate();
 
@@ -154,7 +154,7 @@ void UI_NetEditServersMenu::onPressDelete()
     RememberCurrent();
     currentState = DELETE;
 
-    SetHeadControl(miServerScroll);
+    setInitialFocus(miServerScroll);
     SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
     miServerScroll->Activate();
 
@@ -168,10 +168,10 @@ void UI_NetEditServersMenu::onEntrySelect()
 
     switch (currentState) {
     case EDIT:
-        strncpy(dialogTextData, netplay.savedServers[miServerScroll->CurrentIndex()].hostname.c_str(), 127);
+        dialogTextData = netplay.savedServers[miServerScroll->CurrentIndex()].hostname;
         miDialogTextField->Refresh();
         ShowDialog();
-        SetHeadControl(miDialogTextField);
+        setInitialFocus(miDialogTextField);
         SetCancelCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
         break;
 
@@ -211,7 +211,7 @@ void UI_NetEditServersMenu::onDialogOk()
         assert(false);
     }
 
-    std::fill(dialogTextData, dialogTextData + 128, 0);
+    dialogTextData.clear();
     miDialogTextField->Refresh();
     Restore();
 }

@@ -26,7 +26,7 @@ public:
 private:
     void FreeScoreboard();
     short GetYFromPlace(short iPlace) const {
-        return iy + iPlace * 69 + (4 - iNumTeams) * 35;
+        return m_pos.y + iPlace * 69 + (4 - iNumTeams) * 35;
     }
     float GetIconSpacing() const {
         return (float)(372 - iNumGames * 32) / (float)(iNumGames + 1);

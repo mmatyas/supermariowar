@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class feather powerup
 //------------------------------------------------------------------------------
-PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
-    : IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
+    : IO_MovingObject(nspr, pos, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
     , desty(fy - collisionHeight)
 {
     movingObjectType = movingobject_powerup;
@@ -29,11 +29,11 @@ PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite* nspr, short x, short y, short iN
 void PU_FeatherPowerup::draw()
 {
     if (state == 0)
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, iw, (short)(ih - fy + desty));
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, 0, iw, (short)(ih - fy + desty)});
     else if (state == 1)
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, 0, iw, ih});
     else
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, (fFloatDirectionRight ? 0 : 32), 0, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {(fFloatDirectionRight ? 0 : 32), 0, iw, ih});
 }
 
 

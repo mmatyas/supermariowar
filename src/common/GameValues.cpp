@@ -5,6 +5,8 @@
 #include "GameMode.h"
 #include "GlobalConstants.h"
 #include "MapList.h" // req. only by WriteConfig
+#include "path.h"
+#include "Version.h"
 #include "sfx.h"
 
 #include <stdio.h>
@@ -27,12 +29,9 @@ extern SoundsList *soundpacklist;
 
 extern short joystickcount;
 
-extern int32_t g_iVersion[];
-extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-
 
 //[Keyboard/Joystick][Game/Menu][NumPlayers][NumKeys]  left, right, jump, down, turbo, powerup, start, cancel
-SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RCTRL, SDLK_RSHIFT, SDLK_RETURN, SDLK_ESCAPE},
+SDL_Keycode controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RCTRL, SDLK_RSHIFT, SDLK_RETURN, SDLK_ESCAPE},
             {SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_e, SDLK_q, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_g, SDLK_j, SDLK_y, SDLK_h, SDLK_u, SDLK_t, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_l, SDLK_QUOTE, SDLK_p, SDLK_SEMICOLON, SDLK_LEFTBRACKET, SDLK_o, SDLK_UNKNOWN, SDLK_UNKNOWN}
@@ -150,7 +149,6 @@ void CGameValues::init()
     matchtype = MatchType::SingleGame;
     tourindex     = 0;
     tourstopcurrent   = 0;
-    tourstoptotal   = 0;
     worldindex      = 0;
     teamcollision = TeamCollisionStyle::Off;
     screencrunch    = true;
@@ -216,14 +214,9 @@ void CGameValues::init()
     tournamentcontrolstyle = TournamentControlStyle::All;
 
 
-    pfFilters     = new bool[NUM_AUTO_FILTERS + filterslist->count()];
-    piFilterIcons   = new short[NUM_AUTO_FILTERS + filterslist->count()];
+    pfFilters.resize(NUM_AUTO_FILTERS + filterslist->count(), false);
+    piFilterIcons.resize(NUM_AUTO_FILTERS + filterslist->count(), 0);
     fNeedWriteFilters = false;
-
-    for (size_t iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->count(); iFilter++) {
-        pfFilters[iFilter] = false;
-        piFilterIcons[iFilter] = 0;
-    }
 
     //networktype   = 0;
     //networkhost   = false;
@@ -299,14 +292,17 @@ void CGameValues::resetSecretCounters()
 void CGameConfig::ReadBinaryConfig() {
     try {
         std::string options_path(GetHomeDirectory() + "options.bin");
-        BinaryFile options(options_path.c_str(), "rb");
+        BinaryFile options(options_path, "rb");
         if (!options.is_open())
             throw std::runtime_error("Could not open " + options_path);
 
-        int32_t version[4];
-        options.read_i32_array(version, 4);
+        Version version;
+        version.major = options.read_i32();
+        version.minor = options.read_i32();
+        version.patch = options.read_i32();
+        version.build = options.read_i32();
 
-        if (!VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
+        if (GAME_VERSION != version) {
             printf("Old options.bin detected. Skipped reading it.\n");
             return;
         }
@@ -393,8 +389,8 @@ void CGameConfig::ReadBinaryConfig() {
         }
 
         announcerlist->setCurrentIndex(options.read_u8());
-        musiclist->SetCurrent(options.read_u8());
-        worldmusiclist->SetCurrent(options.read_u8());
+        musiclist->setCurrent(options.read_u8());
+        worldmusiclist->setCurrent(options.read_u8());
         soundpacklist->setCurrentIndex(options.read_u8());
         menugraphicspacklist->setCurrentIndex(options.read_u8());
         worldgraphicspacklist->setCurrentIndex(options.read_u8());
@@ -410,12 +406,8 @@ void CGameConfig::ReadBinaryConfig() {
     }
 
     try {
-#ifdef USE_SDL2
         std::string controls_path(GetHomeDirectory() + "controls.sdl2.bin");
-#else
-        std::string controls_path(GetHomeDirectory() + "controls.sdl.bin");
-#endif
-        BinaryFile controls(controls_path.c_str(), "rb");
+        BinaryFile controls(controls_path, "rb");
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);
 
@@ -445,11 +437,14 @@ void CGameConfig::WriteConfig() const
 {
     try {
         std::string options_path(GetHomeDirectory() + "options.bin");
-        BinaryFile options(options_path.c_str(), "wb");
+        BinaryFile options(options_path, "wb");
         if (!options.is_open())
             throw std::runtime_error("Could not open " + options_path);
 
-        options.write_raw(g_iVersion, sizeof(int) * 4);
+        options.write_i32(GAME_VERSION.major);
+        options.write_i32(GAME_VERSION.minor);
+        options.write_i32(GAME_VERSION.patch);
+        options.write_i32(GAME_VERSION.build);
 
         options.write_u8(static_cast<uint8_t>(spawnstyle));
         options.write_u8(static_cast<uint8_t>(awardstyle));
@@ -529,8 +524,8 @@ void CGameConfig::WriteConfig() const
         options.write_raw(&playercontrol, sizeof(short) * 4);
 
         options.write_u8(announcerlist->currentIndex());
-        options.write_u8(musiclist->GetCurrentIndex());
-        options.write_u8(worldmusiclist->GetCurrentIndex());
+        options.write_u8(musiclist->currentIndex());
+        options.write_u8(worldmusiclist->currentIndex());
         options.write_u8(soundpacklist->currentIndex());
         options.write_u8(menugraphicspacklist->currentIndex());
         options.write_u8(worldgraphicspacklist->currentIndex());
@@ -543,12 +538,8 @@ void CGameConfig::WriteConfig() const
     }
 
     try {
-#ifdef USE_SDL2
         std::string controls_path(GetHomeDirectory() + "controls.sdl2.bin");
-#else
-        std::string controls_path(GetHomeDirectory() + "controls.sdl.bin");
-#endif
-        BinaryFile controls(controls_path.c_str(), "wb");
+        BinaryFile controls(controls_path, "wb");
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);
 

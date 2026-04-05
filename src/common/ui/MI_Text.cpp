@@ -20,15 +20,15 @@ void MI_Text::SetText(std::string text)
 
 void MI_Text::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     if (m_align == TextAlign::LEFT && iw == 0)
-        font->draw(ix, iy, szText.c_str());
+        font->draw(m_pos.x, m_pos.y, szText.c_str());
     else if (m_align == TextAlign::LEFT)
-        font->drawChopRight(ix, iy, iw, szText.c_str());
+        font->drawChopRight(m_pos.x, m_pos.y, iw, szText.c_str());
     else if (m_align == TextAlign::CENTER)
-        font->drawCentered(ix, iy, szText.c_str());
+        font->drawCentered(m_pos.x, m_pos.y, szText.c_str());
     else if (m_align == TextAlign::RIGHT)
-        font->drawRightJustified(ix, iy, szText.c_str());
+        font->drawRightJustified(m_pos.x, m_pos.y, szText.c_str());
 }

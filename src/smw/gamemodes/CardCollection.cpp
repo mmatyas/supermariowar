@@ -57,7 +57,7 @@ void CGM_Collection::think()
             else if (iRandom >= 2)
                 iRandomCard = 1;
 
-            objectcontainer[1].add(new MO_CollectionCard(&rm->spr_collectcards, 0, iRandomCard, 0, 0.0f, 0.0f, 0, 0));
+            objectcontainer[1].add(new MO_CollectionCard(&rm->spr_collectcards, 0, iRandomCard, 0, Vec2f::zero(), Vec2s::zero()));
         }
     }
 
@@ -114,13 +114,11 @@ PlayerKillType CGM_Collection::playerkilledself(CPlayer &player, KillStyle style
 void CGM_Collection::ReleaseCard(CPlayer &player)
 {
     if (player.Score().subscore[0] > 0) {
-        short ix = player.centerX() - 16;
-        short iy = player.centerY() - 16;
+        Vec2s pos(player.centerX() - 16, player.centerY() - 16);
 
-        float vel = 7.0f + (float)RANDOM_INT(9) / 2.0f;
+        float speed = 7.0f + (float)RANDOM_INT(9) / 2.0f;
         float angle = -(float)RANDOM_INT(314) / 100.0f;
-        float velx = vel * cos(angle);
-        float vely = vel * sin(angle);
+        Vec2f vel(speed * cos(angle), speed * sin(angle));
 
         player.Score().subscore[0]--;
 
@@ -131,7 +129,7 @@ void CGM_Collection::ReleaseCard(CPlayer &player)
 
         player.Score().subscore[1] &= iCardMaskInverted;
 
-        objectcontainer[1].add(new MO_CollectionCard(&rm->spr_collectcards, 1, iValue, 30, velx, vely, ix, iy));
+        objectcontainer[1].add(new MO_CollectionCard(&rm->spr_collectcards, 1, iValue, 30, vel, pos));
     }
 }
 

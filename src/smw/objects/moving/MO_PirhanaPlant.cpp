@@ -21,8 +21,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 extern SDL_Rect g_rPirhanaRects[4][4][4];
 
-MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short direction, bool preview)
-    : IO_MovingObject(NULL, x, y, 1, 0)
+MO_PirhanaPlant::MO_PirhanaPlant(Vec2s pos, short type, short freq, short direction, bool preview)
+    : IO_MovingObject(NULL, pos, 1, 0)
 {
     iType = type;
     iDirection = direction;
@@ -188,7 +188,7 @@ void MO_PirhanaPlant::update()
 
     // Fire a fireball
     if (iType <= 1 && state == 2 && iTimer == 30) {
-        objectcontainer[1].add(new OMO_StraightPathHazard(&rm->spr_hazard_fireball[fPreview ? 1 : 0], iDirection != 3 ? ix + 7 : ix + iw - 23, iDirection != 1 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFrame <= 1 ? 18 : 0, 18, 18));
+        objectcontainer[1].add(new OMO_StraightPathHazard(&rm->spr_hazard_fireball[fPreview ? 1 : 0], {iDirection != 3 ? ix + 7 : ix + iw - 23, iDirection != 1 ? iy + 7 : iy + ih - 23}, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFrame <= 1 ? 18 : 0, 18, 18));
     }
 }
 
@@ -197,13 +197,13 @@ void MO_PirhanaPlant::draw()
     if (state > 0) {
         SDL_Rect* rect = &g_rPirhanaRects[iType][iDirection][iFrame];
         if (iDirection == 0)
-            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y, 32, collisionHeight);
+            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, {rect->x, rect->y, 32, collisionHeight});
         else if (iDirection == 1)
-            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y + ih - collisionHeight, 32, collisionHeight);
+            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, {rect->x, rect->y + ih - collisionHeight, 32, collisionHeight});
         else if (iDirection == 2)
-            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y, collisionWidth, 32);
+            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, {rect->x, rect->y, collisionWidth, 32});
         else
-            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x + iw - collisionWidth, rect->y, collisionWidth, 32);
+            rm->spr_hazard_pirhanaplant[0].draw(ix, iy, {rect->x + iw - collisionWidth, rect->y, collisionWidth, 32});
 
         // SDL_Rect r = {ix, iy, collisionWidth, collisionHeight};
         // SDL_FillRect(blitdest, &r, 0xf000);
@@ -214,15 +214,36 @@ void MO_PirhanaPlant::draw()
 void MO_PirhanaPlant::draw(short iOffsetX, short iOffsetY)
 {
     if (state > 0) {
-        SDL_Rect* rect = &g_rPirhanaRects[iType][iDirection][iFrame];
-        if (iDirection == 0)
-            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
-        else if (iDirection == 1)
-            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, (rect->y + ih - collisionHeight) >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
-        else if (iDirection == 2)
-            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, collisionWidth >> 1, 16, iOffsetX, iOffsetY, 320, 240, true);
-        else
-            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, (rect->x + iw - collisionWidth) >> 1, rect->y >> 1, collisionWidth >> 1, 16, iOffsetX, iOffsetY, 320, 240, true);
+        const SDL_Rect& rect = g_rPirhanaRects[iType][iDirection][iFrame];
+        const SDL_Rect clipRect { iOffsetX, iOffsetY, 320, 240 };
+        if (iDirection == 0) {
+            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1],
+                (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+                rect.x >> 1, rect.y >> 1,
+                16, collisionHeight >> 1,
+                clipRect, true);
+        }
+        else if (iDirection == 1) {
+            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1],
+                (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+                rect.x >> 1, (rect.y + ih - collisionHeight) >> 1,
+                16, collisionHeight >> 1,
+                clipRect, true);
+        }
+        else if (iDirection == 2) {
+            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1],
+                (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+                rect.x >> 1, rect.y >> 1,
+                collisionWidth >> 1, 16,
+                clipRect, true);
+        }
+        else {
+            gfx_drawpreview(rm->spr_hazard_pirhanaplant[1],
+                (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+                (rect.x + iw - collisionWidth) >> 1, rect.y >> 1,
+                collisionWidth >> 1, 16,
+                clipRect, true);
+        }
     }
 }
 
@@ -253,7 +274,7 @@ void MO_PirhanaPlant::collide(IO_MovingObject* object)
 
     if (type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
         // Don't kill things with shells that are sitting still
-        if (type == movingobject_shell && object->state == 2)
+        if (type == movingobject_shell && object->GetState() == 2)
             return;
 
         // Don't kill things with boxesx that aren't moving fast enough
@@ -295,7 +316,7 @@ void MO_PirhanaPlant::KillPlant()
     state = 0;
 
     ifSoundOnPlay(rm->sfx_kicksound);
-    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iDirection == 2 ? 0 : collisionWidth - 32), iy + (iDirection == 0 ? 0 : collisionHeight - 32), 3, 4));
+    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + (iDirection == 2 ? 0 : collisionWidth - 32), iy + (iDirection == 0 ? 0 : collisionHeight - 32), 3, 4);
 
     if (iDirection == 0)
         iy += collisionHeight;

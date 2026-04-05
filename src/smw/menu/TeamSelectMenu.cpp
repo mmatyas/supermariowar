@@ -24,7 +24,7 @@ UI_TeamSelectMenu::UI_TeamSelectMenu()
     AddNonControl(miTeamSelectRightHeaderBar);
     AddNonControl(miTeamSelectHeaderText);
 
-    SetHeadControl(miTeamSelect);
+    setInitialFocus(miTeamSelect);
     SetCancelCode(MENU_CODE_BACK_TO_MATCH_SELECTION_MENU);
 }
 

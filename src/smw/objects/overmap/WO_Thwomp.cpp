@@ -11,7 +11,7 @@ extern CGameValues game_values;
 // class thwomp (for thwomp mode)
 //------------------------------------------------------------------------------
 OMO_Thwomp::OMO_Thwomp(gfxSprite* nspr, short x, float nspeed)
-    : IO_OverMapObject(nspr, x, (short)-nspr->getHeight(), 1, 0)
+    : IO_OverMapObject(nspr, {x, (short)-nspr->getHeight()}, 1, 0)
 {
     objectType = object_thwomp;
     vely = nspeed;

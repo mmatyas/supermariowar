@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class treasure chest powerup
 //------------------------------------------------------------------------------
-MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite* nspr, short iX, short iY, short iBonusItem)
-    : IO_MovingObject(nspr, iX, iY, 1, 0, 64, 64, 0, 0)
+MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite* nspr, Vec2s pos, short iBonusItem)
+    : IO_MovingObject(nspr, pos, 1, 0, 64, 64, 0, 0)
 {
     iw = 64;
     ih = 64;
@@ -38,7 +38,7 @@ void MO_BonusHouseChest::update()
         drawbonusitemy -= 2;
 
         if (--drawbonusitemtimer <= 0) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + 16, drawbonusitemy, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + 16, drawbonusitemy, 3, 8);
             state = 3;
         }
     }
@@ -47,25 +47,25 @@ void MO_BonusHouseChest::update()
 void MO_BonusHouseChest::draw()
 {
     if (state < 2)
-        spr->draw(ix, iy, 0, 0, iw, ih);
+        spr->draw(ix, iy, {0, 0, iw, ih});
 
     if (state >= 2)
-        spr->draw(ix, iy, 128, 0, iw, ih);
+        spr->draw(ix, iy, {128, 0, iw, ih});
 
     if (state == 2) {
         if (bonusitem >= NUM_POWERUPS + NUM_WORLD_POWERUPS) {  // Score bonuses
             short iBonus = bonusitem - NUM_POWERUPS - NUM_WORLD_POWERUPS;
             short iBonusX = (iBonus % 10) << 5;
             short iBonusY = ((iBonus / 10) << 5) + 32;
-            rm->spr_worlditems.draw(ix + 16, drawbonusitemy, iBonusX, iBonusY, 32, 32);
+            rm->spr_worlditems.draw(ix + 16, drawbonusitemy, {iBonusX, iBonusY, 32, 32});
         } else if (bonusitem >= NUM_POWERUPS)  // World Item
-            rm->spr_worlditems.draw(ix + 16, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
+            rm->spr_worlditems.draw(ix + 16, drawbonusitemy, {(bonusitem - NUM_POWERUPS) << 5, 0, 32, 32});
         else  // Normal Powerup
-            rm->spr_storedpoweruplarge.draw(ix + 16, drawbonusitemy, bonusitem << 5, 0, 32, 32);
+            rm->spr_storedpoweruplarge.draw(ix + 16, drawbonusitemy, {bonusitem << 5, 0, 32, 32});
     }
 
     if (state >= 2)
-        spr->draw(ix, iy, 64, 0, iw, ih);
+        spr->draw(ix, iy, {64, 0, iw, ih});
 }
 
 bool MO_BonusHouseChest::collide(CPlayer* player)

@@ -23,7 +23,7 @@ bool PlayerTail::isInUse() const {
 }
 
 void PlayerTail::shake(CPlayer& player) {
-    ifsoundonstop(rm->sfx_tailspin);
+    rm->sfx_tailspin.stop();
     ifSoundOnPlay(rm->sfx_tailspin);
     player.lockjump = true;
 
@@ -115,17 +115,12 @@ void PlayerTail::draw(CPlayer& player) {
         if (player.iswarping())
             rm->spr_tail.draw(player.leftX() + (fPlayerFacingRight ? - 18 : 18),
                 player.topY() + 6,
-                iTailFrame,
-                (fPlayerFacingRight ? 0 : 26) + iOffsetY,
-                22,
-                26,
-                (short)player.state %4, player.GetWarpPlane());
+                {iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26},
+                static_cast<ClipEdge>((short)player.state % 4), player.GetWarpPlane());
         else
             rm->spr_tail.draw(player.leftX() + (fPlayerFacingRight ? - 18 : 18),
                 player.topY() + 6,
-                iTailFrame,
-                (fPlayerFacingRight ? 0 : 26) + iOffsetY,
-                22, 26);
+                {iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26});
 
     }
 }

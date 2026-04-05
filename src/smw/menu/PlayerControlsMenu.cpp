@@ -13,7 +13,7 @@ UI_PlayerControlsMenu::UI_PlayerControlsMenu()
     miInputContainer->SetAutoModify(true);
 
     AddControl(miInputContainer, NULL, NULL, NULL, NULL);
-    SetHeadControl(miInputContainer);
+    setInitialFocus(miInputContainer);
     SetCancelCode(MENU_CODE_BACK_TO_CONTROLS_MENU);
 };
 

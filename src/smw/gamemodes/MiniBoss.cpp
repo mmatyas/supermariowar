@@ -6,9 +6,9 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "objects/moving/MO_FrenzyCard.h"
-#include "objects/moving/MO_Koopa.h"
 #include "objects/moving/MO_Podobo.h"
 #include "objects/moving/MO_SledgeBrother.h"
+#include "objects/walkingenemy/WE_Koopa.h"
 
 extern std::vector<CPlayer*> players;
 extern short score_cnt;
@@ -48,9 +48,9 @@ void CGM_Boss_MiniGame::think()
         gameover = true;
 
         if (game_values.music) {
-            ifsoundonstop(rm->sfx_invinciblemusic);
-            ifsoundonstop(rm->sfx_timewarning);
-            ifsoundonstop(rm->sfx_slowdownmusic);
+            rm->sfx_invinciblemusic.stop();
+            rm->sfx_timewarning.stop();
+            rm->sfx_slowdownmusic.stop();
             ifSoundOnPlay(rm->sfx_gameover);
 
             rm->backgroundmusic[1].stop();
@@ -71,7 +71,7 @@ void CGM_Boss_MiniGame::think()
         } else if (iBossType == Boss::Fire) {
             //Only create podobos if the difficulty is moderate or greater
             if (--enemytimer <= 0 && game_values.gamemodesettings.boss.difficulty >= 2) {
-                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, {(short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight}, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 enemytimer = (short)(RANDOM_INT(80) + 60);
             }
 
@@ -179,9 +179,9 @@ bool CGM_Boss_MiniGame::SetWinner(CPlayer * player)
     ShowScoreBoard();
 
     if (game_values.music) {
-        ifsoundonstop(rm->sfx_invinciblemusic);
-        ifsoundonstop(rm->sfx_timewarning);
-        ifsoundonstop(rm->sfx_slowdownmusic);
+        rm->sfx_invinciblemusic.stop();
+        rm->sfx_timewarning.stop();
+        rm->sfx_slowdownmusic.stop();
 
         rm->backgroundmusic[1].play(true, false);
     }

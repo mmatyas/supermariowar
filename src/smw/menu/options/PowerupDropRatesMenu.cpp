@@ -24,6 +24,6 @@ UI_PowerupDropRatesMenu::UI_PowerupDropRatesMenu()
     AddNonControl(miPowerupSelectionMenuRightHeaderBar);
     AddNonControl(miPowerupSelectionMenuHeaderText);
 
-    SetHeadControl(miPowerupSelection);
+    setInitialFocus(miPowerupSelection);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 }

@@ -23,6 +23,29 @@ extern CEyecandyContainer eyecandy[3];
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
+
+namespace {
+void pushBombs(CObjectContainer& container, short x, short y)
+{
+    for (const std::unique_ptr<CObject>& obj : container.list()) {
+        auto* bomb = dynamic_cast<CO_Bomb*>(obj.get());
+        if (!bomb || bomb->HasOwner())
+            continue;
+
+        int bombx = bomb->x() + (bomb->w() >> 1) - x;
+        int bomby = bomb->y() + (bomb->h() >> 1) - y;
+
+        int dist = bombx * bombx + bomby * bomby;
+
+        if (dist < 10000) {
+            const float signX = (bombx > 0) ? 1.f : -1.f;
+            bomb->mutVelX() += signX * (static_cast<float>(RANDOM_INT(30)) / 10.0f + 4.0f);
+            bomb->mutVelY() -= static_cast<float>(RANDOM_INT(30)) / 10.0f + 6.0f;
+        }
+    }
+}
+} // namespace
+
 //------------------------------------------------------------------------------
 // class sledge brother
 //------------------------------------------------------------------------------
@@ -52,7 +75,7 @@ short g_iSledgeBrotherWaitTime[3][5][2] = {
 };
 
 MO_SledgeBrother::MO_SledgeBrother(gfxSprite* nspr, short platformY, Boss type)
-    : IO_MovingObject(nspr, 0, 0, 8, 0, 32, 56, 8, 8)
+    : IO_MovingObject(nspr, Vec2s::zero(), 8, 0, 32, 56, 8, 8)
 {
     iType = static_cast<short>(type);  // FIXME
     state = 1;
@@ -104,11 +127,11 @@ MO_SledgeBrother::MO_SledgeBrother(gfxSprite* nspr, short platformY, Boss type)
 
 void MO_SledgeBrother::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, leg_offset_x + arm_offset_x + (face_right ? 0 : 192), hit_offset_y, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {leg_offset_x + arm_offset_x + (face_right ? 0 : 192), hit_offset_y, iw, ih});
 
     if (hit_timer != 0) {
         for (short iHeart = 0; iHeart < hit_points; iHeart++)
-            rm->spr_scorehearts.draw(ix - collisionOffsetX + iHeart * 8, iy - collisionOffsetY - 18, 0, 0, 16, 16);
+            rm->spr_scorehearts.draw(ix - collisionOffsetX + iHeart * 8, iy - collisionOffsetY - 18, {0, 0, 16, 16});
     }
 }
 
@@ -152,7 +175,7 @@ void MO_SledgeBrother::update()
                 //{
                 //	short iRandomX = RANDOM_INT(612);
                 //	short iRandomY = RANDOM_INT(442);
-                //	eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8));
+                //	eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8);
                 //	objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, RANDOM_INT(30) + 30));
                 // }
             } else if (iType == 2) {
@@ -162,7 +185,7 @@ void MO_SledgeBrother::update()
                 short numPodobos = RANDOM_INT(5) + 8;
 
                 for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)(RANDOM_INT(608)), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
+                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, {(short)(RANDOM_INT(608)), App::screenHeight}, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 }
             }
         }
@@ -321,15 +344,15 @@ void MO_SledgeBrother::throwprojectile()
 
     if (iType == 0) {
         float fHammerVelX = ((float)(RANDOM_INT(9) + 2)) / 2.0f - (face_right ? 0.0f : 6.0f);
-        objectcontainer[2].add(new MO_SledgeHammer(&rm->spr_sledgehammer, (face_right ? ix + 32 : ix) - collisionOffsetX, iy, 8, fHammerVelX, -HAMMERTHROW, 5, -1, -1, -1, false));
+        objectcontainer[2].add(new MO_SledgeHammer(&rm->spr_sledgehammer, {(face_right ? ix + 32 : ix) - collisionOffsetX, iy}, 8, {fHammerVelX, -HAMMERTHROW}, 5, -1, -1, -1, false));
     } else if (iType == 1) {
         float fBombVelX = ((float)(RANDOM_INT(5) + 12)) / 2.0f - (face_right ? 0.0f : 14.0f);
         float fBombVelY = -(float)(RANDOM_INT(13)) / 2.0f - 6.0f;
-        objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, face_right ? ix + iw - 32 : ix - 20, iy, fBombVelX, fBombVelY, 4, -1, -1, -1, RANDOM_INT(60) + 120));
+        objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, {face_right ? ix + iw - 32 : ix - 20, iy}, {fBombVelX, fBombVelY}, 4, -1, -1, -1, RANDOM_INT(60) + 120));
     } else if (iType == 2) {
         float fFireVelX = ((float)(RANDOM_INT(9) + 6)) / 2.0f - (face_right ? 0.0f : 10.0f);
         float fFireVelY = (float)(RANDOM_INT(17)) / 2.0f - 4.0f;
-        objectcontainer[2].add(new MO_SuperFireball(&rm->spr_superfireball, face_right ? ix + iw - 32 : ix - 16, iy, 4, fFireVelX, fFireVelY, 4, -1, -1, -1));
+        objectcontainer[2].add(new MO_SuperFireball(&rm->spr_superfireball, {face_right ? ix + iw - 32 : ix - 16, iy}, 4, {fFireVelX, fFireVelY}, 4, -1, -1, -1));
     }
 
     need_action[1] = 0;
@@ -339,7 +362,7 @@ void MO_SledgeBrother::taunt()
 {
     SetLastAction(2);
 
-    ifSoundOnPlayLoop(rm->sfx_boomerang, 3);
+    rm->sfx_boomerang.playLoop(3);
     taunt_timer = 60;
     iActionState = 5;
 
@@ -347,7 +370,7 @@ void MO_SledgeBrother::taunt()
 
     // If this is a bomb brother, push bombs away when taunting
     if (iType == 1) {
-        objectcontainer[2].pushBombs(ix + 32, iy + 32);
+        pushBombs(objectcontainer[2], ix + 32, iy + 32);
     }
 }
 
@@ -455,7 +478,7 @@ void MO_SledgeBrother::collide(IO_MovingObject* object)
 void MO_SledgeBrother::Die()
 {
     dead = true;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_sledgebrothersdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iType * 64, iw, ih));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_sledgebrothersdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iType * 64, iw, ih);
 }
 
 void MO_SledgeBrother::Damage(short playerID)

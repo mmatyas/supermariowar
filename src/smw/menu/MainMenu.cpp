@@ -63,7 +63,7 @@ UI_MainMenu::UI_MainMenu()
     AddControl(miControlsButton, miOptionsButton, miMainStartButton, NULL, NULL);
 #endif
 
-    SetHeadControl(miMainStartButton);
+    setInitialFocus(miMainStartButton);
 #ifndef __EMSCRIPTEN__
     SetCancelCode(MENU_CODE_EXIT_APPLICATION);
 #endif

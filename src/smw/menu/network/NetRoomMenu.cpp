@@ -64,8 +64,8 @@ UI_NetRoomMenu::UI_NetRoomMenu()
     miNetRoomStartingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetRoomStartingDialogText = new MI_HeaderText("Starting...", 320, 240 - 40);
 
-    miNetRoomStartingDialogImage->Show(false);
-    miNetRoomStartingDialogText->Show(false);
+    miNetRoomStartingDialogImage->setVisible(false);
+    miNetRoomStartingDialogText->setVisible(false);
 
     AddNonControl(miNetRoomStartingDialogImage);
     AddNonControl(miNetRoomStartingDialogText);
@@ -78,7 +78,7 @@ UI_NetRoomMenu::UI_NetRoomMenu()
     AddNonControl(miNetRoomRightHeaderBar);
     AddNonControl(miNetRoomHeaderText);
 
-    SetHeadControl(miNetRoomMessageField);
+    setInitialFocus(miNetRoomMessageField);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 };
 
@@ -86,8 +86,8 @@ void UI_NetRoomMenu::Refresh()
 {
     miNetRoomHeaderText->SetText(netplay.currentRoom.name.c_str());
 
-    miNetRoomStartButton->SetNeighbor(MENU_ITEM_NEIGHBOR_UP, miSkinSelector[netplay.remotePlayerNumber]);
-    miNetRoomMessageField->SetNeighbor(MENU_ITEM_NEIGHBOR_DOWN, miSkinSelector[netplay.remotePlayerNumber]);
+    miNetRoomStartButton->setNeighbor(MenuNavDirection::Up, miSkinSelector[netplay.remotePlayerNumber]);
+    miNetRoomMessageField->setNeighbor(MenuNavDirection::Down, miSkinSelector[netplay.remotePlayerNumber]);
 
     for (short p = 0; p < 4; p++) {
         miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p].c_str());
@@ -124,11 +124,11 @@ void UI_NetRoomMenu::StartInProgress()
         netplay.client.local_gamehost.sendStartRoomMessage();
         netplay.operationInProgress = true;
 
-        miNetRoomStartingDialogImage->Show(true);
-        miNetRoomStartingDialogText->Show(true);
+        miNetRoomStartingDialogImage->setVisible(true);
+        miNetRoomStartingDialogText->setVisible(true);
         RememberCurrent();
 
-        SetHeadControl(miNetRoomStartingDialogText);
+        setInitialFocus(miNetRoomStartingDialogText);
         // SetCancelCode(MENU_CODE_NET_START_ABORT);
         // SetCancelCode(MENU_CODE_NONE);
         SetCancelCode(MENU_CODE_TO_NET_ROOM_MENU);
@@ -138,14 +138,14 @@ void UI_NetRoomMenu::StartInProgress()
 
 void UI_NetRoomMenu::Restore()
 {
-    miNetRoomStartingDialogImage->Show(false);
-    miNetRoomStartingDialogText->Show(false);
+    miNetRoomStartingDialogImage->setVisible(false);
+    miNetRoomStartingDialogText->setVisible(false);
     /*if (netplay.client.theHostIsMe)
         miNetRoomStartButton->SetName("Start");
     else
         miNetRoomStartButton->SetName("(waiting)");*/
 
-    SetHeadControl(miNetRoomMessageField);
+    setInitialFocus(miNetRoomMessageField);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 }
 

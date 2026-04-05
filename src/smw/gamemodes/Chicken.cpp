@@ -63,7 +63,7 @@ void CGM_Chicken::draw_foreground()
     //Draw the chicken indicator around the chicken
     if (game_values.gamemodesettings.chicken.usetarget && !gameover && m_chicken) {
         if (m_chicken->iswarping())
-            rm->spr_chicken.draw(m_chicken->leftX() - PWOFFSET - 16, m_chicken->topY() - PHOFFSET - 16, 0, 0, 64, 64, m_chicken->GetWarpState(), m_chicken->GetWarpPlane());
+            rm->spr_chicken.draw(m_chicken->leftX() - PWOFFSET - 16, m_chicken->topY() - PHOFFSET - 16, {0, 0, 64, 64}, static_cast<ClipEdge>(m_chicken->GetWarpState()), m_chicken->GetWarpPlane());
         else if (m_chicken->isready())
             rm->spr_chicken.draw(m_chicken->centerX() - 32, m_chicken->centerY() - 32);
     }
@@ -74,9 +74,9 @@ PlayerKillType CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &othe
 {
     if (!m_chicken || &other == m_chicken) {
         m_chicken = &inflictor;
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, inflictor.centerX(), inflictor.bottomY(), "Chicken!", -VELJUMP*1.5));
-        //eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, inflictor.centerX() - 16, inflictor.centerY() - 16, 3, 8));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, inflictor.centerX() - 24, inflictor.centerY() - 24, 4, 5));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, inflictor.centerX(), inflictor.bottomY(), "Chicken!", -VELJUMP*1.5);
+        //eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, inflictor.centerX() - 16, inflictor.centerY() - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, inflictor.centerX() - 24, inflictor.centerY() - 24, 4, 5);
         ifSoundOnPlay(rm->sfx_transform);
 
         if (&other == m_chicken)

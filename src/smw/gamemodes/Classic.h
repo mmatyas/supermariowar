@@ -7,15 +7,14 @@
 class CGM_Classic : public CGameMode {
 public:
     CGM_Classic();
-    virtual ~CGM_Classic() {}
 
-    virtual void init();
-    virtual PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-    virtual PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-    virtual void playerextraguy(CPlayer &player, short iType);
+    void init() override;
+    PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+    PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+    void playerextraguy(CPlayer &player, short iType) override;
 
 #ifdef _DEBUG
-    void setdebuggoal() {
+    void setdebuggoal() override {
         goal = 5;
     }
 #endif

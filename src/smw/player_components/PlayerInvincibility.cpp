@@ -29,7 +29,7 @@ void PlayerInvincibility::turn_on(CPlayer& player)
 
     //Stop the invincible music if a player is already invincible
     //(we don't want two invincible music sounds playing at the same time)
-    ifsoundonstop(rm->sfx_invinciblemusic);
+    rm->sfx_invinciblemusic.stop();
 
     if (!game_values.gamemode->gameover) {
         game_values.flags.playinvinciblesound = true;

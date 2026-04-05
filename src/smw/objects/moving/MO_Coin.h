@@ -8,7 +8,7 @@ class CPlayer;
 
 class MO_Coin : public IO_MovingObject {
 public:
-    MO_Coin(gfxSprite* nspr, float velx, float vely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin);
+    MO_Coin(gfxSprite* nspr, Vec2f vel, Vec2s pos, short color, short team, short type, short uncollectabletime, bool placecoin);
 
     void update() override;
     void draw() override;

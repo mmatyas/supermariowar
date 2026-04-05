@@ -1,6 +1,7 @@
 #pragma once
 
 #include "uicontrol.h"
+#include "gfx/gfxSprite.h"
 
 #include "SDL.h"
 
@@ -10,7 +11,6 @@ struct COutputControl;
 class MI_World : public UI_Control {
 public:
     MI_World();
-    virtual ~MI_World();
 
     void Update() override;
     void Draw() override;
@@ -54,7 +54,7 @@ private:
     short iItemCol[4];
     short iItemPage[4];
 
-    SDL_Surface* sMapSurface[2];
+    std::array<gfxSprite, 2> map_sprites;
     SDL_Rect rectSrcSurface;
     SDL_Rect rectDstSurface;
 

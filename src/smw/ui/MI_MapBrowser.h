@@ -1,8 +1,11 @@
 #pragma once
 
 #include "uicontrol.h"
+#include "gfx/gfxSprite.h"
+
 #include "SDL.h"
 
+#include <array>
 #include <map>
 #include <string>
 
@@ -12,7 +15,6 @@ class MapListNode;
 class MI_MapBrowser : public UI_Control {
 public:
     MI_MapBrowser();
-    virtual ~MI_MapBrowser();
 
     void Update() override;
     void Draw() override;
@@ -30,10 +32,10 @@ private:
     short iSelectedRow = 0;
     short iSelectedIndex = 0;
 
-    SDL_Surface* mapSurfaces[9];
+    std::array<gfxSprite, 9> mapSurfaces;
     MapListNode* mapListNodes[9];
     std::string mapNames[9];
-    std::map<std::string, MapListNode*>::iterator mapListItr[9];
+    std::map<std::string, MapListNode>::iterator mapListItr[9];
 
     short iFilterTagAnimationTimer = 0;
     short iFilterTagAnimationFrame = 0;

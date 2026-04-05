@@ -20,7 +20,7 @@ constexpr short iKingOfTheHillZoneLimits[4][4] = {{0, 0, 1, 2}, {0, 1, 2, 4}, {0
 // class KingOfTheHillArea (for King of the Hill mode)
 //------------------------------------------------------------------------------
 OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite* nspr)
-    : IO_OverMapObject(nspr, 0, 0, 5, 0)
+    : IO_OverMapObject(nspr, Vec2s::zero(), 5, 0)
 {
     size = game_values.gamemodesettings.kingofthehill.areasize;
 
@@ -73,9 +73,9 @@ void OMO_KingOfTheHillZone::draw()
             short iRowX = iy + (iRow << 5);
 
             if (multiplier > 1)
-                rm->spr_awardkillsinrow.draw(iColX + 8, iRowX + 8, (multiplier - 1) << 4, colorID << 4, 16, 16);
+                rm->spr_awardkillsinrow.draw(iColX + 8, iRowX + 8, {(multiplier - 1) << 4, colorID << 4, 16, 16});
 
-            spr->draw(iColX, iRowX, iXPiece + frame, iYPiece, TILESIZE, TILESIZE);
+            spr->draw(iColX, iRowX, {iXPiece + frame, iYPiece, TILESIZE, TILESIZE});
         }
     }
 }

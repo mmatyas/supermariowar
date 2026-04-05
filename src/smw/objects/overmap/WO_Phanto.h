@@ -4,8 +4,7 @@
 
 class OMO_Phanto : public IO_OverMapObject {
 public:
-    OMO_Phanto(gfxSprite* nspr, short x, short y, float velx, float vely,
-        short type);
+    OMO_Phanto(gfxSprite* nspr, Vec2s pos, float velx, float vely, short type);
 
     void update() override;
     bool collide(CPlayer* player) override;

@@ -21,8 +21,8 @@ extern short LookupTeamID(short id);
 //------------------------------------------------------------------------------
 // class bulletbill
 //------------------------------------------------------------------------------
-MO_BulletBill::MO_BulletBill(gfxSprite* nspr, gfxSprite* nsprdead, short x, short y, float nspeed, short playerID, bool isspawned)
-    : IO_MovingObject(nspr, x, y, 4, 8, 30, 28, 1, 2)
+MO_BulletBill::MO_BulletBill(gfxSprite* nspr, gfxSprite* nsprdead, Vec2s pos, float nspeed, short playerID, bool isspawned)
+    : IO_MovingObject(nspr, pos, 4, 8, 30, 28, 1, 2)
 {
     spr_dead = nsprdead;
 
@@ -84,18 +84,30 @@ void MO_BulletBill::update()
 void MO_BulletBill::draw()
 {
     if (fIsSpawned)
-        spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih, iHiddenDirection, iHiddenPlane);
+        spr->draw(ix, iy, {drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih}, static_cast<ClipEdge>(iHiddenDirection), iHiddenPlane);
     else
-        spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih);
+        spr->draw(ix, iy, {drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih});
 }
 
 // For preview drawing
 void MO_BulletBill::draw(short iOffsetX, short iOffsetY)
 {
-    if (fIsSpawned)
-        gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false, iHiddenDirection, (iHiddenPlane >> 1) + iOffsetX);
-    else
-        gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false);
+    if (fIsSpawned) {
+        gfx_drawpreview(*spr,
+            (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+            drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1,
+            iw >> 1, ih >> 1,
+            {iOffsetX, iOffsetY, 320, 240},
+            false,
+            {{static_cast<ClipEdge>(iHiddenDirection), (iHiddenPlane >> 1) + iOffsetX}});
+    } else {
+        gfx_drawpreview(*spr,
+            (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY,
+            drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1,
+            iw >> 1, ih >> 1,
+            {iOffsetX, iOffsetY, 320, 240},
+            false);
+    }
 }
 
 bool MO_BulletBill::collide(CPlayer* player)
@@ -180,11 +192,11 @@ void MO_BulletBill::collide(IO_MovingObject* object)
         short iCenterX = ((ix + iOffsetX - bulletbill->ix) >> 1) + (bulletbill->ix + (bulletbill->iw >> 1));
         short iCenterY = ((iy - bulletbill->iy) >> 1) + (bulletbill->iy + (bulletbill->ih >> 1));
 
-        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, KillStyle::BulletBill));
+        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, {iCenterX - 96, iCenterY - 64}, 2, 4, -1, -1, KillStyle::BulletBill));
         ifSoundOnPlay(rm->sfx_bobombsound);
     } else if (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
         // Don't kill things with shells that are sitting still
-        if (type == movingobject_shell && object->state == 2)
+        if (type == movingobject_shell && object->GetState() == 2)
             return;
 
         // Don't kill things with boxesx that aren't moving fast enough
@@ -204,7 +216,7 @@ void MO_BulletBill::collide(IO_MovingObject* object)
 void MO_BulletBill::Die()
 {
     dead = true;
-    eyecandy[2].add(new EC_FallingObject(spr_dead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, velx > 0 ? 0 : 32, iColorID * 32, 32, 32));
+    eyecandy[2].emplace<EC_FallingObject>(spr_dead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, velx > 0 ? 0 : 32, iColorID * 32, 32, 32);
 }
 
 void MO_BulletBill::SetDirectionOffset()

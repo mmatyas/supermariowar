@@ -10,16 +10,15 @@ class CGM_CaptureTheFlag : public CGameMode
 {
     public:
         CGM_CaptureTheFlag();
-        virtual ~CGM_CaptureTheFlag() {}
 
-        void init();
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
-        PlayerKillType CheckWinner(CPlayer * player);
+        void init() override;
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
+        PlayerKillType CheckWinner(CPlayer * player) override;
 
 #ifdef _DEBUG
-    void setdebuggoal() {
+    void setdebuggoal() override {
         goal = 5;
     }
 #endif

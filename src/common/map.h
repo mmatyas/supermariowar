@@ -16,12 +16,23 @@
 #define NUM_FRAMES_IN_TILE_ANIMATION        4
 #define NUM_FRAMES_BETWEEN_TILE_ANIMATION   8
 
+enum class PlatformPathType: unsigned char;
 
 
 enum ReadType: uint8_t {
     read_type_full = 0,
     read_type_preview = 1,
     read_type_summary = 2
+};
+
+// NOTE: Types have a fixed order! See the 1.8 map reader.
+enum MapItemType : unsigned char {
+    GreenSpring,
+    Spike,
+    GreenKuriboShoe,
+    GoldenSpring,
+    StickyKuriboShoe,
+    ThrowBox,
 };
 
 /*
@@ -105,9 +116,9 @@ struct SpawnArea {
 };
 
 struct MapItem {
-	short itype;
-	short ix;
-	short iy;
+    MapItemType itype;
+    short ix;
+    short iy;
 };
 
 struct MapHazard {
@@ -136,11 +147,6 @@ struct AnimatedTile {
 	MovingPlatform * pPlatform;
 };
 
-struct MapTile {
-	TileType iType;
-	int iFlags;
-};
-
 struct MapBlock {
 	short iType;
 	short iSettings[NUM_BLOCK_SETTINGS];
@@ -149,12 +155,12 @@ struct MapBlock {
 
 class IO_Block;
 
-void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter);
-void DrawPlatform(short pathtype, TilesetTile ** tiles,
+void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter, SDL_Surface* dst);
+void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& tiles,
 	short startX, short startY, short endX, short endY,
 	float angle, float radiusX, float radiusY,
 	short iSize, short iPlatformWidth, short iPlatformHeight,
-	bool fDrawPlatform, bool fDrawShadow);
+	bool fDrawPlatform, bool fDrawShadow, SDL_Surface* dst);
 
 class CMap
 {
@@ -168,7 +174,7 @@ class CMap
 		void loadMap(const std::string& file, ReadType iReadType);
 		void saveMap(const std::string& file);
 
-		SDL_Surface * createThumbnailSurface(bool fUseClassicPack);
+		gfxSprite createThumbnailSurface(bool fUseClassicPack);
 		void saveThumbnail(const std::string &file, bool fUseClassicPack);
 
 		void UpdateAllTileGaps();
@@ -183,12 +189,12 @@ class CMap
 
 		void SetupAnimatedTiles();
 
-		void preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail);
-		void preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail);
+		void preDrawPreviewBackground(gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewBackground(const gfxSprite& spr_background, gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewBlocks(gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewForeground(gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewWarps(gfxSprite& targetSurface, bool fThumbnail);
+		void preDrawPreviewMapItems(gfxSprite& targetSurface, bool fThumbnail);
 
 		void drawfrontlayer();
 
@@ -199,8 +205,8 @@ class CMap
 		//returns the tiletype at the specific position (map coordinates) of the
 		//front most visible tile
     int map(int x, int y) {
-			return mapdatatop[x][y].iFlags;
-		}
+        return tileToFlags(mapdatatop[x][y]);
+    }
 
     IO_Block * block(short x, short y) {
 			return blockdata[x][y];
@@ -245,13 +251,10 @@ class CMap
 		bool findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned);
 		bool IsInPlatformNoSpawnZone(short x, short y, short width, short height);
 
-		char szBackgroundFile[128];
+		std::string szBackgroundFile;
 		short backgroundID;
 		short eyecandy[3];
 		short musicCategoryID;
-
-		short iNumMapItems = 0;
-		short iNumMapHazards = 0;
 
 		short iNumRaceGoals = 0;
 		short iNumFlagBases = 0;
@@ -263,20 +266,18 @@ class CMap
 		void calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDeath);
 
 		TilesetTile	mapdata[MAPWIDTH][MAPHEIGHT][MAPLAYERS];
-		MapTile		mapdatatop[MAPWIDTH][MAPHEIGHT];
+		TileType		mapdatatop[MAPWIDTH][MAPHEIGHT];
 		MapBlock	objectdata[MAPWIDTH][MAPHEIGHT];
 		IO_Block*   blockdata[MAPWIDTH][MAPHEIGHT];
 		bool		nospawn[NUMSPAWNAREATYPES][MAPWIDTH][MAPHEIGHT];
 
 		std::vector<AnimatedTile*> animatedtiles;
 
-		MovingPlatform ** platforms = nullptr;
-		short		iNumPlatforms = 0;
-
+                std::vector<MovingPlatform*> platforms;
 		std::list<MovingPlatform*> tempPlatforms;
 
-		MapItem		mapitems[MAXMAPITEMS];
-		MapHazard	maphazards[MAXMAPHAZARDS];
+                std::vector<MapItem> mapitems;
+                std::vector<MapHazard>	maphazards;
 
 		SpawnArea	spawnareas[NUMSPAWNAREATYPES][MAXSPAWNAREAS];
 		short		numspawnareas[NUMSPAWNAREATYPES];
@@ -298,7 +299,7 @@ class CMap
 		std::array<short, 4> iSwitches;
 		std::list<IO_Block*> switchBlocks[8];
 
-		bool		fAutoFilter[NUM_AUTO_FILTERS];
+		std::array<bool, NUM_AUTO_FILTERS> fAutoFilter;
 
 		Point       racegoallocations[MAXRACEGOALS];
 
@@ -309,7 +310,7 @@ class CMap
 
 		short iAnimatedBackgroundLayers = 0;
 		SDL_Surface * animatedFrontmapSurface = nullptr;
-		SDL_Surface * animatedTilesSurface = nullptr;
+		gfxSprite animatedTilesSurface;
 
 		short iAnimatedTileCount = 0;
 		short iAnimatedVectorIndices[NUM_FRAMES_BETWEEN_TILE_ANIMATION + 1];
@@ -320,11 +321,11 @@ class CMap
 		void AnimateTiles(short iFrame);
 		void ClearAnimatedTiles();
 
-		void draw(SDL_Surface *targetsurf, int layer);
-		void drawThumbnailHazards(SDL_Surface * targetSurface);
-		void drawThumbnailPlatforms(SDL_Surface * targetSurface);
-		void drawPreview(SDL_Surface * targetsurf, int layer, bool fThumbnail);
-		void drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
+		void draw(gfxSprite& targetsurf, int layer);
+		void drawThumbnailHazards(gfxSprite& targetSurface);
+                void drawThumbnailPlatforms(gfxSprite& targetSurface);
+		void drawPreview(gfxSprite& targetsurf, int layer, bool fThumbnail);
+		void drawPreviewBlocks(gfxSprite& targetSurface, bool fThumbnail);
 
 		void addPlatformAnimatedTiles();
 

@@ -7,17 +7,16 @@ class CGM_Coins : public CGameMode
 {
     public:
         CGM_Coins();
-        virtual ~CGM_Coins() {}
 
-        virtual void init();
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
+        void init() override;
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
 
-        PlayerKillType CheckWinner(CPlayer * player);
+        PlayerKillType CheckWinner(CPlayer * player) override;
 
 #ifdef _DEBUG
-    void setdebuggoal() {
+    void setdebuggoal() override {
         goal = 5;
     }
 #endif

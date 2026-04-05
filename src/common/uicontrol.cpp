@@ -1,48 +1,42 @@
 #include "uicontrol.h"
 
-#include "GameValues.h"
-#include "ResourceManager.h"
-
 #include <cassert>
-#include <cmath>
-#include <cstring>
-
-extern CGameValues game_values;
-extern CResourceManager* rm;
 
 
 UI_Control::UI_Control(short x, short y)
-    : ix(x)
-    , iy(y)
+    : m_pos(x, y)
 {
-    neighborControls.fill(nullptr);
+    m_neighbors.fill(nullptr);
 }
+
 
 UI_Control& UI_Control::operator= (const UI_Control& other)
 {
     if (this != &other) {
-        ix = other.ix;
-        iy = other.iy;
+        m_pos = other.m_pos;
 
         fSelected = other.fSelected;
         fModifying = other.fModifying;
         fAutoModify = other.fAutoModify;
         fDisable = other.fDisable;
-        fShow = other.fShow;
+        m_visible = other.m_visible;
 
-        uiMenu = nullptr;
-        neighborControls.fill(nullptr);
+        m_parentMenu = nullptr;
+        m_neighbors.fill(nullptr);
         iControllingTeam = other.iControllingTeam;
     }
     return *this;
 }
+
 
 UI_Control::UI_Control(const UI_Control& other)
 {
     *this = other;
 }
 
-void UI_Control::SetNeighbor(unsigned short iNeighbor, UI_Control* uiControl) {
-    assert(iNeighbor < neighborControls.size());
-    neighborControls[iNeighbor] = uiControl;
+
+void UI_Control::setNeighbor(MenuNavDirection iNeighbor, UI_Control* uiControl)
+{
+    const auto idx = static_cast<std::size_t>(iNeighbor);
+    m_neighbors[idx] = uiControl;
 }

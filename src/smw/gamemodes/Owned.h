@@ -7,20 +7,19 @@ class CGM_Owned : public CGameMode
 {
     public:
         CGM_Owned();
-        virtual ~CGM_Owned() {}
 
-        void think();
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
+        void think() override;
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
 
 #ifdef _DEBUG
-    void setdebuggoal() {
+    void setdebuggoal() override {
         goal = 100;
     }
 #endif
 
     private:
-        PlayerKillType CheckWinner(CPlayer * player);
+        PlayerKillType CheckWinner(CPlayer * player) override;
 
 };

@@ -20,8 +20,8 @@ extern CResourceManager* rm;
 extern CGameValues game_values;
 extern CEyecandyContainer eyecandy[3];
 
-B_WeaponBreakableBlock::B_WeaponBreakableBlock(gfxSprite *nspr, short x, short y, WeaponDamageType type)
-    : IO_Block(nspr, x, y)
+B_WeaponBreakableBlock::B_WeaponBreakableBlock(gfxSprite *nspr, Vec2s pos, WeaponDamageType type)
+    : IO_Block(nspr, pos)
     , iType(type)
     , iDrawOffsetX(static_cast<short>(type) * 32)
 {
@@ -32,7 +32,7 @@ B_WeaponBreakableBlock::B_WeaponBreakableBlock(gfxSprite *nspr, short x, short y
 void B_WeaponBreakableBlock::draw()
 {
     if (state == 0)
-        spr->draw(ix, iy, iDrawOffsetX, 0, iw, ih);
+        spr->draw(ix, iy, {iDrawOffsetX, 0, iw, ih});
 }
 
 void B_WeaponBreakableBlock::update()
@@ -187,10 +187,10 @@ bool B_WeaponBreakableBlock::hitleft(IO_MovingObject * object)
 void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID)
 {
     if (state == 0) {
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokengrayblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokengrayblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokengrayblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
-        eyecandy[2].add(new EC_FallingObject(&rm->spr_brokengrayblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokengrayblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokengrayblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokengrayblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
+        eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokengrayblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
 
         state = 1;
         ifSoundOnPlay(rm->sfx_breakblock);

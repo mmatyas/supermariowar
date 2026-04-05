@@ -16,7 +16,7 @@ extern CResourceManager* rm;
 // class treasure chest powerup
 //------------------------------------------------------------------------------
 PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite* nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem)
-    : MO_Powerup(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+    : MO_Powerup(nspr, Vec2s::zero(), iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
     , bonusitem(iBonusItem)
 {
     velx = 0.0f;
@@ -50,7 +50,7 @@ void PU_TreasureChestBonus::update()
         if (--drawbonusitemtimer <= 0)
             state = 4;
     } else if (state == 4) {
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, drawbonusitemy, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, drawbonusitemy, 3, 8);
         dead = true;
     }
 }
@@ -61,12 +61,12 @@ void PU_TreasureChestBonus::draw()
         MO_Powerup::draw();
 
         // Draw sparkles
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
     } else {
         if (bonusitem >= NUM_POWERUPS)
-            rm->spr_worlditems.draw(drawbonusitemx, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
+            rm->spr_worlditems.draw(drawbonusitemx, drawbonusitemy, {(bonusitem - NUM_POWERUPS) << 5, 0, 32, 32});
         else
-            rm->spr_storedpoweruplarge.draw(drawbonusitemx, drawbonusitemy, bonusitem << 5, 0, 32, 32);
+            rm->spr_storedpoweruplarge.draw(drawbonusitemx, drawbonusitemy, {bonusitem << 5, 0, 32, 32});
     }
 }
 
@@ -85,7 +85,7 @@ bool PU_TreasureChestBonus::collide(CPlayer* player)
         drawbonusitemy = iy;
         drawbonusitemtimer = 60;
 
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, iy, 3, 8);
 
         game_values.flags.noexit = false;
     }

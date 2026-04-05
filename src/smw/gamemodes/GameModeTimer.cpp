@@ -54,13 +54,13 @@ short GameTimerDisplay::RunClock()
 void GameTimerDisplay::Draw()
 {
     rm->spr_timershade.draw(iScoreOffsetX, 5);
-    rm->spr_scoretext.draw(iDigitRightDstX, 13, iDigitRightSrcX, 0, 16, 16);
+    rm->spr_scoretext.draw(iDigitRightDstX, 13, {iDigitRightSrcX, 0, 16, 16});
 
     if (iDigitLeftSrcX > 0) {
-        rm->spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
-        rm->spr_scoretext.draw(iDigitLeftDstX, 13, iDigitLeftSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, 13, {iDigitMiddleSrcX, 0, 16, 16});
+        rm->spr_scoretext.draw(iDigitLeftDstX, 13, {iDigitLeftSrcX, 0, 16, 16});
     } else if (iDigitMiddleSrcX > 0) {
-        rm->spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, 13, {iDigitMiddleSrcX, 0, 16, 16});
     }
 }
 

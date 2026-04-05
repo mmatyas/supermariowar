@@ -1,64 +1,56 @@
-#ifndef EYECANDY_H
-#define EYECANDY_H
+#pragma once
 
 #include "gfx.h"
 #include "GlobalConstants.h"
 
+#include <array>
+#include <memory>
 #include <vector>
 
-//this system is pretty cool ;)
-//it can be easily changed to handle every object in the game
+// this system is pretty cool ;)
+// it can be easily changed to handle every object in the game
 
 
-//eyecandy base class
-class CEyecandy
-{
+// eyecandy base class
+class CEyecandy {
 public:
-    CEyecandy() {
-        dead = false;
-    }
-    virtual ~CEyecandy() {}
+    virtual ~CEyecandy() = default;
 
     virtual void update() = 0;
-    virtual void draw() = 0;
+    virtual void draw() const = 0;
+
+    bool isDead() const { return dead; }
 
 protected:
-    bool dead;
-
-    friend class CEyecandyContainer;
+    bool dead = false;
 };
 
-class EC_StillImage : public CEyecandy
-{
+class EC_StillImage : public CEyecandy {
 public:
-    EC_StillImage(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h);
-    virtual ~EC_StillImage() {}
+    EC_StillImage(gfxSprite* nspr, short dstx, short dsty, short srcx, short srcy, short w, short h);
 
-    virtual void update() {}
-    virtual void draw();
+    void draw() const override;
 
 protected:
-    gfxSprite * spr;
+    gfxSprite* spr;
 
     short iSrcX, iSrcY;
     short ix, iy;
     short iw, ih;
 };
 
-//animated eyecandy base class
-class EC_Animated : public CEyecandy
-{
+// animated eyecandy base class
+class EC_Animated : public CEyecandy {
 public:
-    EC_Animated(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames);
-    virtual ~EC_Animated() {}
+    EC_Animated(gfxSprite* nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames);
 
     virtual void animate();
 
-    virtual void update();
-    virtual void draw();
+    void update() override;
+    void draw() const override;
 
 protected:
-    gfxSprite * spr;
+    gfxSprite* spr;
 
     short iAnimationX, iAnimationY;
     short iAnimationW, iAnimationH;
@@ -71,25 +63,22 @@ protected:
     short ix, iy;
 };
 
-class EC_OscillatingAnimation : public EC_Animated
-{
+class EC_OscillatingAnimation : public EC_Animated {
 public:
-    EC_OscillatingAnimation(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames);
-    virtual ~EC_OscillatingAnimation() {}
+    EC_OscillatingAnimation(gfxSprite* nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames);
 
-    virtual void animate();
+    void animate() override;
 
 protected:
     bool fForward;
 };
 
-//actual eyecandy implementations
-class EC_Corpse : public EC_StillImage
-{
+// actual eyecandy implementations
+class EC_Corpse : public EC_StillImage {
 public:
-    EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX);
-    ~EC_Corpse() {}
-    void update();
+    EC_Corpse(gfxSprite* nspr, float nx, float ny, short iSrcOffsetX);
+
+    void update() override;
 
 private:
     float dx, dy;
@@ -100,37 +89,33 @@ private:
 };
 
 
-class EC_Cloud : public EC_StillImage
-{
+class EC_Cloud : public EC_StillImage {
 public:
-    EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx, short srcx, short srcy, short w, short h);
-    ~EC_Cloud() {}
-    void update();
+    EC_Cloud(gfxSprite* nspr, float nx, float ny, float nvelx, short srcx, short srcy, short w, short h);
+
+    void update() override;
 
 private:
     float dx, dy;
     float velx;
 };
 
-class EC_Ghost : public EC_Animated
-{
+class EC_Ghost : public EC_Animated {
 public:
-    EC_Ghost(gfxSprite *nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes, short srcx, short srcy, short w, short h);
-    ~EC_Ghost() {}
-    void update();
+    EC_Ghost(gfxSprite* nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes, short srcx, short srcy, short w, short h);
+
+    void update() override;
 
 private:
     float dx, dy;
     float velx;
 };
 
-class EC_Leaf : public EC_OscillatingAnimation
-{
+class EC_Leaf : public EC_OscillatingAnimation {
 public:
-    EC_Leaf(gfxSprite *nspr, float nx, float ny);
-    ~EC_Leaf() {}
+    EC_Leaf(gfxSprite* nspr, float nx, float ny);
 
-    void update();
+    void update() override;
 
 private:
     void NextLeaf();
@@ -139,26 +124,22 @@ private:
     float velx, vely;
 };
 
-class EC_Snow : public EC_StillImage
-{
+class EC_Snow : public EC_StillImage {
 public:
-    EC_Snow(gfxSprite *nspr, float nx, float ny, short type);
-    ~EC_Snow() {}
+    EC_Snow(gfxSprite* nspr, float nx, float ny, short type);
 
-    void update();
+    void update() override;
 
 private:
     float dx, dy;
     float velx, vely;
 };
 
-class EC_Rain : public EC_StillImage
-{
+class EC_Rain : public EC_StillImage {
 public:
-    EC_Rain(gfxSprite *nspr, float nx, float ny);
-    ~EC_Rain() {}
+    EC_Rain(gfxSprite* nspr, float nx, float ny);
 
-    void update();
+    void update() override;
 
 private:
     void NextRainDrop();
@@ -167,13 +148,11 @@ private:
     float velx, vely;
 };
 
-class EC_Bubble : public EC_OscillatingAnimation
-{
+class EC_Bubble : public EC_OscillatingAnimation {
 public:
-    EC_Bubble(gfxSprite *nspr, float nx, float ny);
-    ~EC_Bubble() {}
+    EC_Bubble(gfxSprite* nspr, float nx, float ny);
 
-    void update();
+    void update() override;
 
 private:
     void NextBubble();
@@ -182,72 +161,68 @@ private:
     float velx, vely;
 };
 
-class EC_GravText : public CEyecandy
-{
+class EC_GravText : public CEyecandy {
 public:
-    EC_GravText(gfxFont *font, short nx, short ny, const char *text, float nvely);
-    ~EC_GravText();
-    void draw();
-    void update();
+    EC_GravText(gfxFont* font, short nx, short ny, std::string text, float nvely);
+
+    void draw() const override;
+    void update() override;
 
 private:
-    gfxFont *font;
+    gfxFont* font;
     float x, y;
     short w;
     float vely;
-    char *text;
+    std::string text;
 };
 
-class EC_Announcement : public CEyecandy
-{
+class EC_Announcement : public CEyecandy {
 public:
-    EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char *ntext, short icon, short time, short y);
-    ~EC_Announcement();
-    void draw();
-    void update();
+    EC_Announcement(gfxFont* nfont, gfxSprite* nsprite, std::string ntext, short icon, short time, short y);
+
+    void draw() const override;
+    void update() override;
 
 private:
-    gfxFont *font;
-    gfxSprite *sprite;
+    gfxFont* font;
+    gfxSprite* sprite;
 
     short ix, iy;
-    char *text;
+    std::string text;
 
     short iTime, iTimer;
     short iIcon;
 
     short iFontY, iFontOffsetX;
 
-    SDL_Rect rSrcRect[4];
-    SDL_Rect rDstRect[4];
+    std::array<SDL_Rect, 4> rSrcRect;
+    std::array<SDL_Rect, 4> rDstRect;
 };
 
-class EC_FallingObject : public EC_Animated
-{
+class EC_FallingObject : public EC_Animated {
 public:
-    EC_FallingObject(gfxSprite *nspr, short x, short y, float nvelx, float nvely, short animationframes, short animationspeed, short srcOffsetX, short srcOffsetY, short w, short h);
+    EC_FallingObject(gfxSprite* nspr, short x, short y, float nvelx, float nvely, short animationframes, short animationspeed, short srcOffsetX, short srcOffsetY, short w, short h);
 
-    void update();
+    void update() override;
 
 private:
     float fx, fy;
     float vely, velx;
 };
 
-class EC_SingleAnimation : public EC_Animated
-{
+class EC_SingleAnimation : public EC_Animated {
 public:
-    EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate);
-    EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate, short offsetx, short offsety, short w, short h);
+    EC_SingleAnimation(gfxSprite* nspr, short nx, short ny, short iframes, short irate);
+    EC_SingleAnimation(gfxSprite* nspr, short nx, short ny, short iframes, short irate, short offsetx, short offsety, short w, short h);
 
-    void update();
+    void update() override;
 };
 
-class EC_LoopingAnimation : public EC_Animated
-{
+class EC_LoopingAnimation : public EC_Animated {
 public:
-    EC_LoopingAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short loops, short ioffsetx, short ioffsety, short w, short h);
-    void update();
+    EC_LoopingAnimation(gfxSprite* nspr, short x, short y, short iframes, short irate, short loops, short ioffsetx, short ioffsety, short w, short h);
+
+    void update() override;
 
 private:
     short iCountLoops;
@@ -256,43 +231,42 @@ private:
 
 /*
 //actual eyecandy implementations
-class EC_Award : public EC_LoopingAnimation
-{
-	public:
-		EC_Award(gfxSprite *nspr, short ix, short iy, short destx, short desty, short iframes, short irate);
-		~EC_Award() {}
-		void update();
+class EC_Award : public EC_LoopingAnimation {
+public:
+    EC_Award(gfxSprite *nspr, short ix, short iy, short destx, short desty, short iframes, short irate);
 
-	private:
-		float dx, dy;
-		float vely, velx;
+    void update() override;
+
+private:
+    float dx, dy;
+    float vely, velx;
 };
 */
 
-class EC_ExplodingAward : public CEyecandy
-{
+class EC_ExplodingAward : public CEyecandy {
 public:
-    EC_ExplodingAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short awardID);
-    void draw();
-    void update();
+    EC_ExplodingAward(gfxSprite* nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short awardID);
+
+    void draw() const override;
+    void update() override;
 
 private:
-    gfxSprite *spr;
+    gfxSprite* spr;
     float x, y;
     short w, h;
     short timer, ttl, id;
     float velx, vely;
 };
 
-class EC_SwirlingAward : public CEyecandy
-{
+class EC_SwirlingAward : public CEyecandy {
 public:
-    EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate = 0, short animationFrames = 0);
-    void draw();
-    void update();
+    EC_SwirlingAward(gfxSprite* nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate = 0, short animationFrames = 0);
+
+    void draw() const override;
+    void update() override;
 
 private:
-    gfxSprite *spr;
+    gfxSprite* spr;
     short x, y;
     short w, h;
     short timer, ttl;
@@ -303,15 +277,15 @@ private:
     short iAnimationTimer, iAnimationFrame, iAnimationEndFrame;
 };
 
-class EC_RocketAward : public CEyecandy
-{
+class EC_RocketAward : public CEyecandy {
 public:
-    EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate = 0, short animationFrames = 0);
-    void draw();
-    void update();
+    EC_RocketAward(gfxSprite* nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate = 0, short animationFrames = 0);
+
+    void draw() const override;
+    void update() override;
 
 private:
-    gfxSprite *spr;
+    gfxSprite* spr;
     float x, y;
     short w, h;
     float velx, vely;
@@ -322,15 +296,15 @@ private:
     short iAnimationTimer, iAnimationFrame, iAnimationEndFrame;
 };
 
-class EC_FloatingObject : public CEyecandy
-{
+class EC_FloatingObject : public CEyecandy {
 public:
-    EC_FloatingObject(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short nsrcx, short nsrcy, short nwidth, short nheight);
-    void draw();
-    void update();
+    EC_FloatingObject(gfxSprite* nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short nsrcx, short nsrcy, short nwidth, short nheight);
+
+    void draw() const override;
+    void update() override;
 
 private:
-    gfxSprite *spr;
+    gfxSprite* spr;
     float x, y;
     short w, h;
     float velx, vely;
@@ -338,21 +312,21 @@ private:
     short srcx, srcy;
 };
 
-class EC_SoulsAward : public CEyecandy
-{
+class EC_SoulsAward : public CEyecandy {
 public:
-    EC_SoulsAward(gfxSprite *nspr, gfxSprite *nspr2, short nx, short ny, short timetolive, float nSpeed, short nSouls, short * nSoulArray);
+    EC_SoulsAward(gfxSprite* nspr, gfxSprite* nspr2, short nx, short ny, short timetolive, float nSpeed, short nSouls, short* nSoulArray);
     ~EC_SoulsAward();
-    void draw();
-    void update();
+
+    void draw() const override;
+    void update() override;
 
 private:
-    gfxSprite *spr;
-    gfxSprite *spawnspr;
+    gfxSprite* spr;
+    gfxSprite* spawnspr;
 
     short x, y;
     short numSouls;
-    short * id;
+    short* id;
     short ttl, timer, count;
     float speed;
 
@@ -361,16 +335,16 @@ private:
     short w, h;
 };
 
-class EC_Door : public CEyecandy
-{
+class EC_Door : public CEyecandy {
 public:
-    EC_Door(gfxSprite *nspr, gfxSprite *mario, short nx, short ny, short irate, short iOffsetX, short iColor);
-    virtual void draw();
-    virtual void update();
+    EC_Door(gfxSprite* nspr, gfxSprite* mario, short nx, short ny, short irate, short iOffsetX, short iColor);
+
+    void draw() const override;
+    void update() override;
 
 protected:
-    gfxSprite *spr;
-    gfxSprite *mariospr;
+    gfxSprite* spr;
+    gfxSprite* mariospr;
 
     short x, y;
     short frame, timer;
@@ -383,71 +357,69 @@ protected:
 };
 
 /*
-class EC_BossPeeker : public CEyecandy
-{
-	public:
-		EC_BossPeeker(gfxSprite *nspr, short speed, short bossType);
-		void draw();
-		void update();
+class EC_BossPeeker : public CEyecandy {
+public:
+    EC_BossPeeker(gfxSprite *nspr, short speed, short bossType);
+    void draw();
+    void update();
 
-	private:
-		gfxSprite *spr;
-		int iSpeed;
-		int iBossColorOffsetY;
-		int timer;
-		int state;
-		int ix, iy;
+private:
+    gfxSprite *spr;
+    int iSpeed;
+    int iBossColorOffsetY;
+    int timer;
+    int state;
+    int ix, iy;
 };
 */
 
-class EC_SuperStompExplosion : public CEyecandy
-{
+class EC_SuperStompExplosion : public CEyecandy {
 public:
-    EC_SuperStompExplosion(gfxSprite *nspr, short x, short y, short irate);
-    void update();
-    void draw();
+    EC_SuperStompExplosion(gfxSprite* nspr, short x, short y, short irate);
+
+    void update() override;
+    void draw() const override;
 
 protected:
-    gfxSprite *spr;
+    gfxSprite* spr;
     short ix, iy;
     short iAnimationFrame, iAnimationTimer;
     short iRate;
 };
 
-//eyecandy container
-class CEyecandyContainer
-{
+// eyecandy container
+class CEyecandyContainer {
 public:
     CEyecandyContainer();
-    ~CEyecandyContainer();
 
-    short add(CEyecandy *ec);
+    template <typename T, typename... Args>
+    void emplace(Args&&... args) {
+        auto ptr = std::make_unique<T>(std::forward<Args>(args)...);
+        eyecandies.emplace_back(std::move(ptr));
+    }
 
     void update() {
-        for (short i = 0; i < list_end; i++)
-            list[i]->update();
-    };
-    void draw() {
-        for (short i = 0; i < list_end; i++)
-            list[i]->draw();
-    };
+        for (auto& ec : eyecandies)
+            ec->update();
+    }
+    void draw() const {
+        for (const auto& ec : eyecandies)
+            ec->draw();
+    }
 
-    void clean();
+    void clean() {
+        eyecandies.clear();
+    }
 
     void cleanDeadObjects();
 
 public:
-    CEyecandy *list[MAXEYECANDY];
-    short		 list_end;
-
-    void remove(short i);
+    std::vector<std::unique_ptr<CEyecandy>> eyecandies;
 };
 
-class Spotlight
-{
+class Spotlight {
 public:
     Spotlight(short x, short y, short size);
-    ~Spotlight() {}
 
     void Update();
     void UpdatePosition(short x, short y);
@@ -472,16 +444,12 @@ private:
     SDL_Rect rSrc;
 };
 
-class SpotlightManager
-{
+class SpotlightManager {
 public:
-    Spotlight * AddSpotlight(short ix, short iy, short iSize);
+    Spotlight* AddSpotlight(short ix, short iy, short iSize);
     void DrawSpotlights();
     void ClearSpotlights();
 
 private:
     std::vector<Spotlight*> spotlightList;
-
 };
-
-#endif // EYECANDY_H

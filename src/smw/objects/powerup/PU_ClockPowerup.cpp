@@ -5,8 +5,8 @@
 //------------------------------------------------------------------------------
 // class clock powerup
 //------------------------------------------------------------------------------
-PU_ClockPowerup::PU_ClockPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, bool, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
-    : MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+PU_ClockPowerup::PU_ClockPowerup(gfxSprite* nspr, Vec2s pos, short iNumSpr, bool, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY)
+    : MO_Powerup(nspr, pos, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
     velx = 0.0f;
 }
@@ -14,7 +14,7 @@ PU_ClockPowerup::PU_ClockPowerup(gfxSprite* nspr, short x, short y, short iNumSp
 bool PU_ClockPowerup::collide(CPlayer* player)
 {
     if (state > 0) {
-        player->SetStoredPowerup(7);
+        player->SetStoredPowerup(PowerupType::Clock);
         dead = true;
     }
 

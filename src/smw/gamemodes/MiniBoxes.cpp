@@ -157,17 +157,15 @@ void CGM_Boxes_MiniGame::ReleaseCoin(CPlayer &player)
     if (player.Score().subscore[0] > 0) {
         player.Score().subscore[0]--;
 
-        short ix = player.centerX() - 16;
-        short iy = player.centerY() - 16;
+        Vec2s pos(player.centerX() - 16, player.centerY() - 16);
 
-        float vel = 7.0f + (float)RANDOM_INT(9) / 2.0f;
+        float speed = 7.0f + (float)RANDOM_INT(9) / 2.0f;
         float angle = -(float)RANDOM_INT(314) / 100.0f;
-        float velx = vel * cos(angle);
-        float vely = vel * sin(angle);
+        Vec2f vel(speed * cos(angle), speed * sin(angle));
 
         ifSoundOnPlay(rm->sfx_coin);
 
-        objectcontainer[1].add(new MO_Coin(&rm->spr_coin, velx, vely, ix, iy, 2, -1, 2, 30, false));
+        objectcontainer[1].add(new MO_Coin(&rm->spr_coin, vel, pos, 2, -1, 2, 30, false));
     }
 }
 

@@ -23,7 +23,7 @@ UI_NetServersMenu::UI_NetServersMenu()
 
     miNetServersScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 90, 72, 640 - 2 * 90, 9, "Saved Servers", MENU_CODE_NET_SERVERLIST_EXIT, MENU_CODE_NET_SERVERLIST_EXIT);
     miNetServersScroll->SetAutoModify(true);
-    miNetServersScroll->Show(false);
+    miNetServersScroll->setVisible(false);
     miNetServersScroll->RemoteIndex(&netplay.selectedServerIndex);
 
     miNetServersNicknameField = new MI_TextField(&rm->menu_plain_field, 70, 120, "Your name", 640 - 2 * 70, 150);
@@ -50,8 +50,8 @@ UI_NetServersMenu::UI_NetServersMenu()
     miNetServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetServersConnectingDialogText = new MI_HeaderText("Connecting...", 640 / 2, 240 - 12);
 
-    miNetServersConnectingDialogImage->Show(false);
-    miNetServersConnectingDialogText->Show(false);
+    miNetServersConnectingDialogImage->setVisible(false);
+    miNetServersConnectingDialogText->setVisible(false);
     miNetServersConnectingDialogText->Disable(true);
 
     // miNetServersConnectionDetector = new MI_NetworkStatusDetector(&rm->spr_selectfield, 320, 240 - 10, "Connecting...", 80, 1);
@@ -84,7 +84,7 @@ UI_NetServersMenu::UI_NetServersMenu()
     // AddNonControl(miNetServersConnectingDialogImage);
     // AddControl(miNetServersConnectionDetector, NULL, NULL, NULL, NULL);
 
-    SetHeadControl(miNetServersSelectButton);
+    setInitialFocus(miNetServersSelectButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 };
 
@@ -118,11 +118,11 @@ void UI_NetServersMenu::ConnectInProgress()
     netplay.client.sendConnectRequestToSelectedServer();
     netplay.operationInProgress = true;
 
-    miNetServersConnectingDialogImage->Show(true);
-    miNetServersConnectingDialogText->Show(true);
+    miNetServersConnectingDialogImage->setVisible(true);
+    miNetServersConnectingDialogText->setVisible(true);
     RememberCurrent();
 
-    SetHeadControl(miNetServersConnectingDialogText);
+    setInitialFocus(miNetServersConnectingDialogText);
     SetCancelCode(MENU_CODE_NET_CONNECT_ABORT);
     ResetMenu();
 }
@@ -130,21 +130,21 @@ void UI_NetServersMenu::ConnectInProgress()
 void UI_NetServersMenu::OpenServerList()
 {
     netplay.connectSuccessful = false;
-    miNetServersScroll->Show(true);
+    miNetServersScroll->setVisible(true);
     RememberCurrent();
 
-    SetHeadControl(miNetServersScroll);
+    setInitialFocus(miNetServersScroll);
     SetCancelCode(MENU_CODE_NONE);
     ResetMenu();
 }
 
 void UI_NetServersMenu::Restore()
 {
-    miNetServersScroll->Show(false);
-    miNetServersConnectingDialogImage->Show(false);
-    miNetServersConnectingDialogText->Show(false);
+    miNetServersScroll->setVisible(false);
+    miNetServersConnectingDialogImage->setVisible(false);
+    miNetServersConnectingDialogText->setVisible(false);
 
-    SetHeadControl(miNetServersSelectButton);
+    setInitialFocus(miNetServersSelectButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
     RestoreCurrent();
 }

@@ -1,58 +1,45 @@
 name: Build - Linux
-on:
-  workflow_call:
+on: workflow_call
 
 jobs:
   linux:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        sdl: [1, 2]
-    name: X11 SDL${{ matrix.sdl }}
+    runs-on: ubuntu-24.04
+    name: X11
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: 'recursive'
       - name: Install dependencies
         run: sudo apt-get update -qq && sudo apt-get install -y
           cmake
           g++
-          libsdl1.2-dev
-          libsdl-image1.2-dev
-          libsdl-mixer1.2-dev
           libsdl2-dev
           libsdl2-image-dev
           libsdl2-mixer-dev
-          libegl1-mesa-dev
-          libgles2-mesa-dev
           ninja-build
+          zlib1g-dev
       - name: Version checks
         run: |
-          sdl-config --version
           sdl2-config --version
           cmake --version
 
-      - name: Configure with SDL1
-        if: matrix.sdl == 1
-        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=OFF -DUSE_PNG_SAVE=OFF -DSMW_INSTALL_PORTABLE=ON -DCMAKE_CXX_FLAGS=-fdiagnostics-color=always
-      - name: Configure with SDL2
-        if: matrix.sdl == 2
-        run: cmake -B build -G Ninja -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON -DSMW_INSTALL_PORTABLE=ON -DCMAKE_CXX_FLAGS=-fdiagnostics-color=always
+      - name: Configure
+        run: cmake -B build -G Ninja -DSMW_INSTALL_PORTABLE=ON
 
       - name: Build
         run: cmake --build build --verbose
 
+      - name: Test
+        run: ctest --test-dir build/tests --output-on-failure
+
       - name: Package
-        if: matrix.sdl == 2
         run: |
           cmake --install build --prefix supermariowar --strip
           rm -rf supermariowar/include supermariowar/lib
           zip -9 -r "supermariowar_$(date +%F)_linux.zip" supermariowar
 
       - name: Upload artifacts
-        if: matrix.sdl == 2
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: supermariowar_linux
           path: supermariowar_*_linux.zip

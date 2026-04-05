@@ -8,13 +8,12 @@ class CPlayer;
 
 class MO_CarriedObject : public IO_MovingObject {
 public:
-    MO_CarriedObject(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth);
-    MO_CarriedObject(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+    MO_CarriedObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth);
+    MO_CarriedObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
     ~MO_CarriedObject();
 
-    virtual void update() {}
-    virtual void draw();
-    virtual bool collide(CPlayer*) { return false; }
+    void draw() override;
+    bool collide(CPlayer*) override { return false; }
 
     virtual void MoveToOwner();
 

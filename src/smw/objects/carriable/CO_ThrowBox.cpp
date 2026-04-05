@@ -14,8 +14,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class throwable box - can be used as a shield, thrown at a player, or holds items
 //------------------------------------------------------------------------------
-CO_ThrowBox::CO_ThrowBox(gfxSprite* nspr, short x, short y, short item)
-    : MO_CarriedObject(nspr, x, y, 4, 8, 30, 30, 1, 1)
+CO_ThrowBox::CO_ThrowBox(gfxSprite* nspr, Vec2s pos, short item)
+    : MO_CarriedObject(nspr, pos, 4, 8, 30, 30, 1, 1)
 {
     state = 1;
     ih = 32;
@@ -115,7 +115,7 @@ void CO_ThrowBox::collide(IO_MovingObject* object)
         frozen = true;
         frozentimer = 300;
 
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8);
     }
 }
 
@@ -128,7 +128,7 @@ void CO_ThrowBox::update()
 
             animationspeed = frozenanimationspeed;
 
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8);
         }
     }
 
@@ -159,12 +159,12 @@ void CO_ThrowBox::update()
 void CO_ThrowBox::draw()
 {
     if (owner && owner->iswarping())
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, 0, iw, ih}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
     else
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, 0, iw, ih});
 
     if (frozen) {
-        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
+        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, 0, 32, 32});
     }
 }
 
@@ -204,10 +204,10 @@ void CO_ThrowBox::Die()
     if (dead)
         return;
 
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenyellowblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenyellowblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenyellowblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenyellowblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenyellowblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenyellowblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16);
 
     DieHelper();
 }
@@ -217,10 +217,10 @@ void CO_ThrowBox::ShatterDie()
     if (dead)
         return;
 
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix, iy, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + 16, iy, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix, iy + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + 16, iy + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix, iy, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + 16, iy, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix, iy + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + 16, iy + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
 
     game_values.unlocksecret2part2++;
 
@@ -239,7 +239,7 @@ void CO_ThrowBox::DieHelper()
 
     // Check to see if we should spawn an item here
     if (iItem != NO_POWERUP) {
-        createpowerup(iItem, ix, iy, velx < 0.0f, false);
+        createpowerup(iItem, {ix, iy}, velx < 0.0f, false);
     }
 }
 

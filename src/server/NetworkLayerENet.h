@@ -11,11 +11,11 @@ class NetworkLayerENet : public NetworkLayer
 {
     public:
         NetworkLayerENet();
-        ~NetworkLayerENet();
+        ~NetworkLayerENet() override;
 
-        bool init(uint64_t max_players);
-        void cleanup();
-        void listen(NetworkEventHandler&);
+        bool init(uint64_t max_players) override;
+        void cleanup() override;
+        void listen(NetworkEventHandler&) override;
 
     private:
         ENetHost* server_host;

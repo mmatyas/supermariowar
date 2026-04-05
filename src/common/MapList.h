@@ -3,32 +3,32 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
-class MapListNode
-{
-	public:
-		MapListNode(std::string fullName);
-		~MapListNode();
+class MapListNode {
+public:
+    MapListNode(std::string fullName);
 
-		bool * pfFilters;
-		bool fInCurrentFilterSet;
-		std::string filename;
-		short iIndex;
-		short iFilteredIndex;
+    MapListNode(const MapListNode&) = delete;
+    MapListNode(MapListNode&&) = default;
+    MapListNode& operator=(const MapListNode&) = delete;
+    MapListNode& operator=(MapListNode&&) = default;
 
-		int iShortNameLength;
+    std::vector<bool> pfFilters;
+    std::string filename;
 
-		bool fReadFromCache;
+    short iIndex = 0;
+    short iFilteredIndex = 0;
 
-		bool fValid;
+    bool fInCurrentFilterSet = false;
+    bool fReadFromCache = false;
+    bool fValid = true;
 };
 
 //announcerlist and musiclist are still a screwed up (a vector accessed like a vector and a list), but way better than before
-class MapList
-{
-    public:
-        MapList(bool fWorldEditor);
-        ~MapList();
+class MapList {
+public:
+    MapList(bool fWorldEditor);
 
 		//Adds maps in all world map directories to the map list so they can be edited in the map editor
 		void addWorldMaps();
@@ -36,70 +36,63 @@ class MapList
         void add(const char * name);
         bool find(const char * name);
 		bool findexact(const char * name, bool fWorld);
-        bool startswith(char letter);
-		bool startswith(std::string match);
+    bool startswith(char letter);
+    bool startswith(const std::string& match);
 
-    const char* currentFilename() {
-        return (*outercurrent).second->filename.c_str();
+    const std::string& currentFilename() const {
+        return (*outercurrent).second.filename;
     }
-    const char* currentShortmapname() {
-        return (*outercurrent).first.c_str();
-    }
-    int currentShortMapNameLen() {
-        return (*outercurrent).second->iShortNameLength;
+    const std::string& currentShortmapname() const {
+        return (*outercurrent).first;
     }
 
 		void prev(bool fUseFilters);
         void next(bool fUseFilters);
 		void random(bool fUseFilters);
 
-		const char* randomFilename();
+    std::string randomFilename() const;
 
-		//Sets/Gets if a map at the current map node is valid and can be loaded
-    void SetValid(bool fValid) {
-        (*current).second->fValid = fValid;
+    /// Sets whether the current map is valid and can be loaded
+    void setValid(bool fValid) {
+        (*current).second.fValid = fValid;
     }
-    bool GetValid() {
-        return (*current).second->fValid;
+    /// The current map is valid and can be loaded
+    bool isValid() const {
+        return (*current).second.fValid;
     }
 
-		//TODO: use size?
-    bool IsEmpty() {
+    bool isEmpty() const {
         return maps.empty();
     }
-
-    int GetFilteredCount() {
+    size_t filteredCount() const {
         return iFilteredMapCount;
     }
-    int GetCount() {
+    size_t count() const {
         return maps.size();
     }
 
-    std::multimap<std::string, MapListNode*>::iterator GetCurrent() {
+    std::multimap<std::string, MapListNode>::iterator GetCurrent() {
         return current;
     }
-    void SetCurrent(std::multimap<std::string, MapListNode*>::iterator itr) {
+    void SetCurrent(std::multimap<std::string, MapListNode>::iterator itr) {
         outercurrent = current = itr;
     }
 
 		void WriteFilters();
 		void ReadFilters();
 
-    bool GetFilter(short iFilter) {
-        return (*current).second->pfFilters[iFilter];
+    bool GetFilter(size_t iFilter) const {
+        return (*current).second.pfFilters[iFilter];
     }
-    bool * GetFilters() {
-        return (*current).second->pfFilters;
-    }
-    void ToggleFilter(short iFilter) {
-        (*current).second->pfFilters[iFilter] = !(*current).second->pfFilters[iFilter];
+    void ToggleFilter(size_t iFilter) {
+        (*current).second.pfFilters[iFilter] = !(*current).second.pfFilters[iFilter];
     }
 
 		bool FindFilteredMap();
-		void ApplyFilters(bool * pfFilters);
+		void ApplyFilters(const std::vector<bool>& pfFilters);
 		bool MapInFilteredSet();
 
-		std::multimap<std::string, MapListNode*>::iterator GetIteratorAt(unsigned short iIndex, bool fUseFilters);
+		std::multimap<std::string, MapListNode>::iterator GetIteratorAt(unsigned short iIndex, bool fUseFilters);
 
     void SaveCurrent() {
         savedcurrent = current;
@@ -111,24 +104,19 @@ class MapList
 		void ReloadMapAutoFilters();
 		void WriteMapSummaryCache();
 
-		const char * GetUnknownMapName();
-
     private:
 
-        std::multimap<std::string, MapListNode*> maps;
-		std::multimap<std::string, MapListNode*> worldmaps;
+    std::multimap<std::string, MapListNode> maps;
+    std::multimap<std::string, MapListNode> worldmaps;
 
-        std::multimap<std::string, MapListNode*>::iterator current;
-		std::multimap<std::string, MapListNode*>::iterator savedcurrent;
+    decltype(maps)::iterator current;
+    decltype(maps)::iterator savedcurrent;
+    decltype(maps)::iterator outercurrent;
 
-		std::multimap<std::string, MapListNode*>::iterator outercurrent;
+    std::vector<decltype(maps)::iterator> mlnFilteredMaps;
+    std::vector<decltype(maps)::iterator> mlnMaps;
 
-		short iFilteredMapCount;
-
-		std::multimap<std::string, MapListNode*>::iterator * mlnFilteredMaps;
-		std::multimap<std::string, MapListNode*>::iterator * mlnMaps;
-
-		char szUnknownMapString[2];
+    size_t iFilteredMapCount;
 };
 
 #endif // MAPLIST_H

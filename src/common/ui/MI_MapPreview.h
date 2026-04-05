@@ -1,12 +1,12 @@
 #ifndef UI_MAP_PREVIEW
 #define UI_MAP_PREVIEW
 
-#include "SDL.h"
+#include "gfx/gfxSprite.h"
 #include "uicontrol.h"
 
-#include <string>
+#include "SDL.h"
 
-class gfxSprite;
+#include <string>
 
 
 class MI_MapPreview : public UI_Control
@@ -14,16 +14,15 @@ class MI_MapPreview : public UI_Control
 public:
 
     MI_MapPreview(gfxSprite* nspr, short x, short y, short width, short indent);
-    virtual ~MI_MapPreview();
 
     //Updates animations or other events every frame
-    virtual void Update();
+    void Update() override;
 
     //Draws every frame
-    virtual void Draw();
+    void Draw() override;
 
     void LoadCurrentMap();
-    void LoadMap(const char * szMapPath);
+    void LoadMap(const std::string& szMapPath);
 
     bool SetMap(const char * szMapName, bool fWorld);
     void SetSpecialMap(const char * szMapName, const char * szMapPath);
@@ -37,9 +36,9 @@ protected:
 
     gfxSprite * spr;
 
-    SDL_Surface * surfaceMapBackground;
-    SDL_Surface * surfaceMapBlockLayer;
-    SDL_Surface * surfaceMapForeground;
+    gfxSprite surfaceMapBackground;
+    gfxSprite surfaceMapBlockLayer;
+    gfxSprite surfaceMapForeground;
     SDL_Rect rectDst;
 
     short iWidth, iIndent;

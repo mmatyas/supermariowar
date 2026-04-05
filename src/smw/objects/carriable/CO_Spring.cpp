@@ -11,8 +11,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class spring
 //------------------------------------------------------------------------------
-CO_Spring::CO_Spring(gfxSprite* nspr, short iX, short iY, bool fsuper)
-    : MO_CarriedObject(nspr, iX, iY, 4, 4, 30, 31, 1, 0)
+CO_Spring::CO_Spring(gfxSprite* nspr, Vec2s pos, bool fsuper)
+    : MO_CarriedObject(nspr, pos, 4, 4, 30, 31, 1, 0)
 {
     fSuper = fsuper;
     iOffsetY = fSuper ? 32 : 0;
@@ -97,11 +97,11 @@ void CO_Spring::draw()
 {
     if (owner) {
         if (owner->iswarping())
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, animationOffsetX, iOffsetY, 32, 32, owner->GetWarpState(), owner->GetWarpPlane());
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {animationOffsetX, iOffsetY, 32, 32}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
         else
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, animationOffsetX, iOffsetY, 32, 32);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {animationOffsetX, iOffsetY, 32, 32});
     } else {
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, animationOffsetX + drawframe, iOffsetY, 32, 32);
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {animationOffsetX + drawframe, iOffsetY, 32, 32});
     }
 }
 

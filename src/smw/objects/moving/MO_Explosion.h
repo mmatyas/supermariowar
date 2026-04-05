@@ -6,11 +6,10 @@
 
 class MO_Explosion : public IO_MovingObject {
 public:
-    MO_Explosion(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short id, short iTeamID, KillStyle style);
-    ~MO_Explosion() {};
+    MO_Explosion(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short id, short iTeamID, KillStyle style);
 
-    void update();
-    bool collide(CPlayer* player);
+    void update() override;
+    bool collide(CPlayer* player) override;
 
 private:
     short timer;

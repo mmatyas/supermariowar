@@ -23,10 +23,10 @@ UI_TourStopMenu::UI_TourStopMenu()
     miTourStopExitDialogYesButton->SetCode(MENU_CODE_EXIT_TOUR_YES);
     miTourStopExitDialogNoButton->SetCode(MENU_CODE_EXIT_TOUR_NO);
 
-    miTourStopExitDialogImage->Show(false);
-    miTourStopExitDialogExitTourText->Show(false);
-    miTourStopExitDialogYesButton->Show(false);
-    miTourStopExitDialogNoButton->Show(false);
+    miTourStopExitDialogImage->setVisible(false);
+    miTourStopExitDialogExitTourText->setVisible(false);
+    miTourStopExitDialogYesButton->setVisible(false);
+    miTourStopExitDialogNoButton->setVisible(false);
 
     AddControl(miTourStop, NULL, NULL, NULL, NULL);
 
@@ -36,32 +36,32 @@ UI_TourStopMenu::UI_TourStopMenu()
     AddControl(miTourStopExitDialogYesButton, NULL, NULL, NULL, miTourStopExitDialogNoButton);
     AddControl(miTourStopExitDialogNoButton, NULL, NULL, miTourStopExitDialogYesButton, NULL);
 
-    SetHeadControl(miTourStop);
+    setInitialFocus(miTourStop);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 };
 
 void UI_TourStopMenu::OpenExitDialog()
 {
-    miTourStopExitDialogImage->Show(true);
-    miTourStopExitDialogExitTourText->Show(true);
-    miTourStopExitDialogYesButton->Show(true);
-    miTourStopExitDialogNoButton->Show(true);
+    miTourStopExitDialogImage->setVisible(true);
+    miTourStopExitDialogExitTourText->setVisible(true);
+    miTourStopExitDialogYesButton->setVisible(true);
+    miTourStopExitDialogNoButton->setVisible(true);
 
     RememberCurrent();
 
-    SetHeadControl(miTourStopExitDialogNoButton);
+    setInitialFocus(miTourStopExitDialogNoButton);
     SetCancelCode(MENU_CODE_NONE);
     ResetMenu();
 }
 
 void UI_TourStopMenu::CloseExitDialog()
 {
-    miTourStopExitDialogImage->Show(false);
-    miTourStopExitDialogExitTourText->Show(false);
-    miTourStopExitDialogYesButton->Show(false);
-    miTourStopExitDialogNoButton->Show(false);
+    miTourStopExitDialogImage->setVisible(false);
+    miTourStopExitDialogExitTourText->setVisible(false);
+    miTourStopExitDialogYesButton->setVisible(false);
+    miTourStopExitDialogNoButton->setVisible(false);
 
-    SetHeadControl(miTourStop);
+    setInitialFocus(miTourStop);
     SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
     RestoreCurrent();

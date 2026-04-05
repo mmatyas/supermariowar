@@ -27,10 +27,10 @@ void PlayerBurnupTimer::update(CPlayer& player)
                 if (++timer > 80)
                     player.KillPlayerMapHazard(true, KillStyle::Environment, false);
                 else {
-                    eyecandy[0].add(new EC_SingleAnimation(&rm->spr_burnup,
+                    eyecandy[0].emplace<EC_SingleAnimation>(&rm->spr_burnup,
                         player.centerX() - 16,
                         player.centerY() - 16,
-                        5, 4));
+                        5, 4);
                 }
             }
         }

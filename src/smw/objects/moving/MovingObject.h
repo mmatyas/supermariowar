@@ -7,43 +7,34 @@ class MovingPlatform;
 
 class IO_MovingObject : public CObject {
 public:
-    IO_MovingObject(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth = -1, short iCollisionHeight = -1, short iCollisionOffsetX = -1, short iCollisionOffsetY = -1, short iAnimationOffsetX = -1, short iAnimationOffsetY = -1, short iAnimationHeight = -1, short iAnimationWidth = -1);
-    virtual ~IO_MovingObject() {};
+    IO_MovingObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth = -1, short iCollisionHeight = -1, short iCollisionOffsetX = -1, short iCollisionOffsetY = -1, short iAnimationOffsetX = -1, short iAnimationOffsetY = -1, short iAnimationHeight = -1, short iAnimationWidth = -1);
 
-    virtual void draw();
-    virtual void update();
+    void draw() override;
+    void update() override;
     virtual void animate();
 
-    virtual bool collide(CPlayer* player);
+    bool collide(CPlayer* player) override;
+    void collide(IO_MovingObject*) override {}
 
-    void collide(IO_MovingObject*) {}
-    MovingObjectType getMovingObjectType() const
-    {
-        return movingObjectType;
-    }
+    MovingObjectType getMovingObjectType() const { return movingObjectType; }
+
     void applyfriction();
     void collision_detection_map();
     bool collision_detection_checksides();
     void flipsidesifneeded();
 
     virtual void SideBounce(bool fRightSide) {}
-    virtual float BottomBounce()
-    {
-        return bounce;
-    }
+    virtual float BottomBounce() { return bounce; }
     void KillObjectMapHazard(short playerID = -1);
 
-    virtual void CheckAndDie()
-    {
+    virtual void CheckAndDie() {
         dead = true;
     }
-    virtual void Die()
-    {
+    virtual void Die() {
         dead = true;
     }
 
-    bool CollidesWithMap() const
-    {
+    bool CollidesWithMap() const {
         return fObjectCollidesWithMap;
     }
 
@@ -89,11 +80,6 @@ protected:
     friend class B_OnOffSwitchBlock;
     friend class B_SwitchBlock;
     friend class B_WeaponBreakableBlock;
-
-    friend class MO_BulletBill;
-    friend class MO_WalkingEnemy;
-    friend class MO_CheepCheep;
-    friend class MO_PirhanaPlant;
 
     friend class MovingPlatform;
 

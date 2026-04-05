@@ -64,22 +64,17 @@ void CScore::AdjustScore(short iValue)
 void CMap::movingPlatformCollision(CPlayer * player)
 {
     //Collide player with normal moving platforms
-    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        platforms[iPlatform]->collide(player);
-
+    for (MovingPlatform* platform : platforms) {
+        platform->collide(player);
         if (!player->isready())
             return;
     }
 
     //Collide player with temporary platforms (like falling donut blocks)
-    std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
-    while (iterateAll != lim) {
-        (*iterateAll)->collide(player);
-
+    for (MovingPlatform* platform : tempPlatforms) {
+        platform->collide(player);
         if (!player->isready())
             return;
-
-        iterateAll++;
     }
 }
 
@@ -94,7 +89,7 @@ CPlayer * GetPlayerFromGlobalID(short iGlobalID)
 }
 
 CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID,
-    gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)
+    SpriteStrip& nsprites, CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)
     : shyguy(false)
     , globalID(iGlobalID)
     , teamID(iTeamID)
@@ -111,7 +106,6 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     , spawnradius(0.0f)
     , spawnangle(0.0f)
     , respawncounter(sRespawnCounter)
-    , powerupused(-1)
     , powerupradius(0.0f)
     , powerupangle(0.0f)
     , fAcceptingItem(false)
@@ -142,9 +136,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     }
 
     playerDevice = game_values.playerInput.inputControls[globalID]->iDevice;
-
-    for (short i = 0; i < PGFX_LAST; i++)
-        sprites[i] = nsprites[i];
+    sprites = &nsprites;
 
     //Do this so we have a valid x,y to say the player is so other items that init with the player will get valid positions
     //The actual choosing of a spawning position happens later
@@ -181,7 +173,7 @@ void CPlayer::updateFrozenStatus(int keymask)
 
             //Shield the player after becoming unfrozen to protect against being frozen again
             shield.turn_on();
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8);
         }
     }
 }
@@ -237,7 +229,7 @@ void CPlayer::accelerate(float direction)
         //If rain candy is turned on
         if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && fabs(velx) > VELMOVINGADD && ++rainsteptimer > 7) {
             rainsteptimer = 0;
-            eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+            eyecandy[1].emplace<EC_SingleAnimation>(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16);
         }
     }
 }
@@ -425,7 +417,7 @@ void reference_code() {
         //Keep this code -> good for items that destroy blocks on the map
 
         //Active Super POW destroys and triggers blocks
-        if (super_pow && (game_values.flags.screenshaketimer > 0 || powerupused == 9))
+        if (super_pow && (game_values.flags.screenshaketimer > 0 || powerupused == PowerupType::Pow))
         {
             if (game_values.flags.screenshaketimer > 0)
             {
@@ -454,7 +446,7 @@ void reference_code() {
         }
 
         //Active Super MOd Destroys and triggers blocks
-        if (super_mod && (game_values.flags.screenshaketimer > 0 || powerupused == 16))
+        if (super_mod && (game_values.flags.screenshaketimer > 0 || powerupused == PowerupType::Mod))
         {
             if (game_values.flags.screenshaketimer > 0)
             {
@@ -483,7 +475,7 @@ void reference_code() {
         }
 
         //Super Pow
-        if (game_values.gamepowerups[globalID] == 9)
+        if (game_values.gamepowerups[globalID] == PowerupType::Pow)
         {
             static const int super_pow_code[3] = {2, 2, 32};
 
@@ -501,7 +493,7 @@ void reference_code() {
         }
 
         //Super Mod
-        if (game_values.gamepowerups[globalID] == 16)
+        if (game_values.gamepowerups[globalID] == PowerupType::Mod)
         {
             static const int super_mod_code[3] = {1, 1, 32};
 
@@ -659,9 +651,9 @@ void CPlayer::update_waitingForRespawn()
             state = PlayerState::Spawning;
 
             if (game_values.spawnstyle == SpawnStyle::Instant) {
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+                eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8);
             } else if (game_values.spawnstyle == SpawnStyle::Door) {
-                eyecandy[0].add(new EC_Door(&rm->spr_spawndoor, sprites[sprite_state], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
+                eyecandy[0].emplace<EC_Door>(&rm->spr_spawndoor, &sprites->at(sprite_state), ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID);
             }
         }
     }
@@ -692,7 +684,7 @@ void CPlayer::update_respawning()
                 short iColorIdOffset = colorID << 5;
 
                 for (short iSwirl = 0; iSwirl < 4; iSwirl++)
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
+                    eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32);
             }
             break;
     }
@@ -700,48 +692,51 @@ void CPlayer::update_respawning()
 
 void CPlayer::triggerPowerup()
 {
-    switch (powerupused) {
-    case 1: {
+    switch (powerupused.value()) {
+    case PowerupType::PoisonMushroom: {
+        break;
+    }
+    case PowerupType::ExtraLife1: {
         game_values.gamemode->playerextraguy(*this, 1);
         ifSoundOnPlay(rm->sfx_extraguysound);
         break;
     }
-    case 2: {
+    case PowerupType::ExtraLife2: {
         game_values.gamemode->playerextraguy(*this, 2);
         ifSoundOnPlay(rm->sfx_extraguysound);
         break;
     }
-    case 3: {
+    case PowerupType::ExtraLife3: {
         game_values.gamemode->playerextraguy(*this, 3);
         ifSoundOnPlay(rm->sfx_extraguysound);
         break;
     }
-    case 4: {
+    case PowerupType::ExtraLife5: {
         game_values.gamemode->playerextraguy(*this, 5);
         ifSoundOnPlay(rm->sfx_extraguysound);
         break;
     }
-    case 5: {
+    case PowerupType::Fire: {
         powerup = -1;
         SetPowerup(1);
         break;
     }
-    case 6: {
+    case PowerupType::Star: {
         invincibility.turn_on(*this);
         break;
     }
-    case 7: {
+    case PowerupType::Clock: {
         turnslowdownon();
         outofarena.reset();
         break;
     }
-    case 8: {
+    case PowerupType::Bobomb: {
         powerup = -1;
         bobomb = false;
         SetPowerup(0);
         break;
     }
-    case 9: {
+    case PowerupType::Pow: {
         ifSoundOnPlay(rm->sfx_thunder);
         game_values.flags.screenshaketimer = 20;
         game_values.flags.screenshakeplayerid = globalID;
@@ -750,41 +745,41 @@ void CPlayer::triggerPowerup()
         game_values.flags.screenshakekillscount = 0;
         break;
     }
-    case 10: {
+    case PowerupType::BulletBill: {
         game_values.bulletbilltimer[globalID] = 400;
         game_values.bulletbillspawntimer[globalID] = 0;
         break;
     }
-    case 11: {
+    case PowerupType::Hammer: {
         powerup = -1;
         SetPowerup(2);
         break;
     }
-    case 12: {
-        CO_Shell * shell = new CO_Shell(ShellType::Green, 0, 0, true, true, true, false);
+    case PowerupType::ShellGreen: {
+        CO_Shell * shell = new CO_Shell(ShellType::Green, Vec2s::zero(), true, true, true, false);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
-    case 13: {
-        CO_Shell * shell = new CO_Shell(ShellType::Red, 0, 0, false, true, true, false);
+    case PowerupType::ShellRed: {
+        CO_Shell * shell = new CO_Shell(ShellType::Red, Vec2s::zero(), false, true, true, false);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
-    case 14: {
-        CO_Shell * shell = new CO_Shell(ShellType::Spiny, 0, 0, false, false, true, true);
+    case PowerupType::ShellSpiny: {
+        CO_Shell * shell = new CO_Shell(ShellType::Spiny, Vec2s::zero(), false, false, true, true);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
-    case 15: {
-        CO_Shell * shell = new CO_Shell(ShellType::Buzzy, 0, 0, false, true, false, false);
+    case PowerupType::ShellBuzzy: {
+        CO_Shell * shell = new CO_Shell(ShellType::Buzzy, Vec2s::zero(), false, true, false, false);
         if (objectcontainer[1].add(shell))
             shell->UsedAsStoredPowerup(this);
         break;
     }
-    case 16: {
+    case PowerupType::Mod: {
         ifSoundOnPlay(rm->sfx_thunder);
         game_values.flags.screenshaketimer = 20;
         game_values.flags.screenshakeplayerid = globalID;
@@ -792,64 +787,64 @@ void CPlayer::triggerPowerup()
         game_values.flags.screenshakekillinair = true;
         break;
     }
-    case 17: {
+    case PowerupType::Feather: {
         powerup = -1;
         SetPowerup(3);
         break;
     }
-    case 18: {
+    case PowerupType::MysteryMushroom: {
         SwapPlayers(localID);
         break;
     }
-    case 19: {
+    case PowerupType::Boomerang: {
         powerup = -1;
         SetPowerup(4);
         break;
     }
-    case 20: { //tanooki
+    case PowerupType::Tanooki: {
         tanookisuit.onPickup();
         break;
     }
-    case 21: { //ice wand
+    case PowerupType::IceWand: {
         powerup = -1;
         SetPowerup(5);
         break;
     }
-    case 22: { //golden podobo
+    case PowerupType::Podobo: {
         short numPodobos = RANDOM_INT(6) + 10;
         for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-            objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
+            objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, {(short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight}, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
         }
         ifSoundOnPlay(rm->sfx_thunder);
         break;
     }
-    case 23: { //bombs
+    case PowerupType::Bomb: {
         powerup = -1;
         SetPowerup(6);
         break;
     }
-    case 24: { //leaf
+    case PowerupType::Leaf: {
         powerup = -1;
         SetPowerup(7);
         break;
     }
-    case 25: { //pwings
+    case PowerupType::PWings: {
         powerup = -1;
         SetPowerup(8);
         break;
     }
-    case 26: { //jail key
+    case PowerupType::JailKey: {
         jail.escape(*this);
         break;
     }
     }
 
-    powerupused = -1;
+    powerupused.reset();
 }
 
 void CPlayer::update_usePowerup()
 {
-    assert(powerupused > -1);
+    assert(powerupused.has_value());
 
     powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
     powerupangle += 0.05f;
@@ -1023,10 +1018,10 @@ void CPlayer::tryReleasingPowerup()
         return;
 
     // Don't allow releasing another powerup when you're in the middle of releasing one
-    if (powerupused != -1)
+    if (powerupused.has_value())
         return;
 
-    powerupused = game_values.gamepowerups[globalID];
+    powerupused = static_cast<PowerupType>(game_values.gamepowerups[globalID]);
     game_values.gamepowerups[globalID] = -1;
 
     powerupradius = 100.0f;
@@ -1240,7 +1235,7 @@ void CPlayer::move()
         else if (iswarping())
             warpstatus.update(*this);
     }
-    else if (powerupused > -1)
+    else if (powerupused.has_value())
         update_usePowerup();
 
     invincibility.update(*this); // Animate invincibility
@@ -1373,10 +1368,10 @@ void CPlayer::CommitAction()
 {
     if (PlayerAction::Bobomb == action) {
         bobomb = false;
-        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, KillStyle::Bobomb));
+        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, {ix + HALFPW - 96, iy + HALFPH - 64}, 2, 4, globalID, teamID, KillStyle::Bobomb));
         ifSoundOnPlay(rm->sfx_bobombsound);
     } else if (PlayerAction::Fireball == action) {
-        objectcontainer[0].add(new MO_Fireball(&rm->spr_fireball, ix + 6, iy, 4, isFacingRight(), 5, globalID, teamID, colorID));
+        objectcontainer[0].add(new MO_Fireball(&rm->spr_fireball, {ix + 6, iy}, 4, isFacingRight(), 5, globalID, teamID, colorID));
         ifSoundOnPlay(rm->sfx_fireball);
 
         projectiles++;
@@ -1384,11 +1379,11 @@ void CPlayer::CommitAction()
         if (game_values.fireballlimit > 0)
             DecreaseProjectileLimit();
     } else if (PlayerAction::Hammer == action) {
-        if (isFacingRight())
-            objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, ix + 8, iy, 6, (game_values.reversewalk ? -velx : velx) + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
-        else
-            objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, ix - 14, iy, 6, (game_values.reversewalk ? -velx : velx) - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
-
+        if (isFacingRight()) {
+            objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, {ix + 8, iy}, 6, {(game_values.reversewalk ? -velx : velx) + 2.0f, -HAMMERTHROW}, 5, globalID, teamID, colorID, false));
+        } else {
+            objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, {ix - 14, iy}, 6, {(game_values.reversewalk ? -velx : velx) - 2.0f, -HAMMERTHROW}, 5, globalID, teamID, colorID, false));
+        }
         projectiles++;
 
         hammertimer = game_values.hammerdelay;
@@ -1397,16 +1392,16 @@ void CPlayer::CommitAction()
         if (game_values.hammerlimit > 0)
             DecreaseProjectileLimit();
     } else if (PlayerAction::Boomerang == action) {
-        objectcontainer[2].add(new MO_Boomerang(&rm->spr_boomerang, ix, iy + HALFPH - 16, 4, isFacingRight(), 5, globalID, teamID, colorID));
+        objectcontainer[2].add(new MO_Boomerang(&rm->spr_boomerang, {ix, iy + HALFPH - 16}, 4, isFacingRight(), 5, globalID, teamID, colorID));
         projectiles++;
 
         if (game_values.boomeranglimit > 0)
             DecreaseProjectileLimit();
     } else if (PlayerAction::Iceblast == action) {
         if (isFacingRight())
-            objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, ix + HALFPW - 2, iy + HALFPH - 16, 5.0f, globalID, teamID, colorID));
+            objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, {ix + HALFPW - 2, iy + HALFPH - 16}, 5.0f, globalID, teamID, colorID));
         else
-            objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, ix + HALFPW - 30, iy + HALFPH - 16, -5.0f, globalID, teamID, colorID));
+            objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, {ix + HALFPW - 30, iy + HALFPH - 16}, -5.0f, globalID, teamID, colorID));
 
         projectiles++;
 
@@ -1415,7 +1410,7 @@ void CPlayer::CommitAction()
         if (game_values.wandlimit > 0)
             DecreaseProjectileLimit();
     } else if (PlayerAction::Bomb == action) {
-        CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, ix + HALFPW - 14, iy - 8, isFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, RANDOM_INT(120) + 120);
+        CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, {ix + HALFPW - 14, iy - 8}, {isFacingRight() ? 3.0f : -3.0f, -3.0f}, 4, globalID, teamID, colorID, RANDOM_INT(120) + 120);
 
         if (AcceptItem(bomb)) {
             bomb->owner = this;
@@ -1492,7 +1487,7 @@ void CPlayer::updateSprite()
 
                     if (++frictionslidetimer > 3) {
                         frictionslidetimer = 0;
-                        eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 12, 4, 4, 0, 0, 16, 16));
+                        eyecandy[1].emplace<EC_SingleAnimation>(&rm->spr_frictionsmoke, ix, iy + PH - 12, 4, 4, 0, 0, 16, 16);
                     }
                 } else {
                     if (onice && !playerKeys->game_right.fDown && !playerKeys->game_left.fDown)
@@ -1531,7 +1526,7 @@ void CPlayer::updateSprite()
 
                     if (++frictionslidetimer > 3) {
                         frictionslidetimer = 0;
-                        eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4, 0, 0, 16, 16));
+                        eyecandy[1].emplace<EC_SingleAnimation>(&rm->spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4, 0, 0, 16, 16);
                     }
                 } else {
                     if (onice && !playerKeys->game_right.fDown && !playerKeys->game_left.fDown)
@@ -1631,29 +1626,29 @@ void CPlayer::die(PlayerDeathStyle deathStyle, bool fTeamRemoved, bool fKillCarr
     if (state >= PlayerState::Dead) {
         short iDeathSprite = deathStyle == PlayerDeathStyle::Jump ? PGFX_DEADFLYING : PGFX_DEAD;
 
-        gfxSprite * corpseSprite = sprites[iDeathSprite];
+        gfxSprite* corpseSprite = &sprites->at(iDeathSprite);
         auto* gmChicken = dynamic_cast<CGM_Chicken*>(game_values.gamemode);
 
         //If the player was a bobomb or chicken, make sure their death sprite matches
         if (diedas == 1 || (gmChicken && gmChicken->chicken() == this))
-            corpseSprite = rm->spr_chocobo[colorID][iDeathSprite];
+            corpseSprite = &rm->spr_chocobo[colorID][iDeathSprite];
         else if (diedas == 2 || bobomb)
-            corpseSprite = rm->spr_bobomb[colorID][iDeathSprite];
+            corpseSprite = &rm->spr_bobomb[colorID][iDeathSprite];
         else if (diedas == 3 || shyguy)
-            corpseSprite = rm->spr_shyguy[colorID][iDeathSprite];
+            corpseSprite = &rm->spr_shyguy[colorID][iDeathSprite];
 
         //Add eyecandy for the dead player
         if (deathStyle == PlayerDeathStyle::Shatter || frozen) {
-            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
-            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+            eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+            eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+            eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
+            eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
 
             game_values.unlocksecret2part2++;
         } else if (deathStyle == PlayerDeathStyle::Jump) {
-            eyecandy[2].add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
+            eyecandy[2].emplace<EC_FallingObject>(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32);
         } else if (deathStyle == PlayerDeathStyle::Squish) {
-            eyecandy[1].add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
+            eyecandy[1].emplace<EC_Corpse>(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX);
         }
     }
 
@@ -1669,7 +1664,7 @@ void CPlayer::die(PlayerDeathStyle deathStyle, bool fTeamRemoved, bool fKillCarr
 
     //Drop a shoe item if the player died in one
     if (kuriboshoe.is_on()) {
-        CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET, kuriboshoe.getType() == STICKY);
+        CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, {ix - PWOFFSET, iy - PHOFFSET}, kuriboshoe.getType() == STICKY);
         shoe->collision_detection_checksides();
 
         objectcontainer[1].add(shoe);
@@ -1780,8 +1775,7 @@ void CPlayer::StripPowerups()
 
     tanookisuit.reset();
     invincibility.reset();
-
-    powerupused = -1;
+    powerupused.reset();
 }
 
 bool CPlayer::FindSpawnPoint()
@@ -1806,7 +1800,7 @@ bool CPlayer::FindSpawnPoint()
 void CPlayer::spawnText(const char * szText)
 {
     if (++spawntext >= 20) {
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, ix + HALFPW, iy, szText, -VELJUMP));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, ix + HALFPW, iy, szText, -VELJUMP);
         spawntext = 0;	//spawn text every 20 frames
     }
 }
@@ -1921,14 +1915,14 @@ void CPlayer::TransferTag(CPlayer* o2)
     if (gmTag->tagged() == o1 && !o2->isShielded() && !o2->isInvincible()) {
         gmTag->setTagged(o2);
         o1->shield.turn_on();
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5);
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8);
         ifSoundOnPlay(rm->sfx_transform);
     } else if (gmTag->tagged() == o2 && !o1->isShielded() && !o1->isInvincible()) {
         gmTag->setTagged(o1);
         o2->shield.turn_on();
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8));
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, gmTag->tagged()->ix + HALFPW, gmTag->tagged()->iy + PH, "Tagged!", -VELJUMP*1.5);
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, gmTag->tagged()->ix + HALFPW - 16, gmTag->tagged()->iy + HALFPH - 16, 3, 8);
         ifSoundOnPlay(rm->sfx_transform);
     }
 }
@@ -1984,7 +1978,7 @@ void CPlayer::draw_spotlight()
 
 void CPlayer::draw_powerupRing()
 {
-    if (powerupused > -1) {
+    if (powerupused.has_value()) {
         short numeyecandy = 8;
         float addangle = TWO_PI / numeyecandy;
         float displayangle = powerupangle;
@@ -1996,9 +1990,9 @@ void CPlayer::draw_powerupRing()
             displayangle += addangle;
 
             if (iswarping())
-                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, GetWarpPlane());
+                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, {static_cast<short>(*powerupused) * 16, 0, 16, 16}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
             else
-                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
+                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, {static_cast<short>(*powerupused) * 16, 0, 16, 16});
         }
     }
 }
@@ -2007,7 +2001,7 @@ void CPlayer::draw_winnerCrown()
 {
     if (game_values.showwinningcrown && g_iWinningPlayer == teamID) {
         if (iswarping())
-            rm->spr_crown.draw(ix + HALFPW - (isFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), 0, 0, 14, 14, (short)state % 4, GetWarpPlane());
+            rm->spr_crown.draw(ix + HALFPW - (isFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), {0, 0, 14, 14}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
         else
             rm->spr_crown.draw(ix + HALFPW - (isFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0));
     }
@@ -2035,35 +2029,35 @@ void CPlayer::draw()
     if (tanookisuit.isStatue()) {
         //Make sure the scoreboard still accurately represents the player
         if (bobomb)
-            pScoreboardSprite = rm->spr_bobomb[colorID];
+            pScoreboardSprite = &rm->spr_bobomb[colorID];
         else if (chicken == this)
-            pScoreboardSprite = rm->spr_chocobo[colorID];
+            pScoreboardSprite = &rm->spr_chocobo[colorID];
         else if (shyguy)
-            pScoreboardSprite = rm->spr_shyguy[colorID];
+            pScoreboardSprite = &rm->spr_shyguy[colorID];
 
         tanookisuit.drawStatue(*this);
 
         return;
     } else if (bobomb) { //draw him as bob-omb
-        pScoreboardSprite = rm->spr_bobomb[colorID];
+        pScoreboardSprite = &rm->spr_bobomb[colorID];
 
         //Add smoke to the top of the bomb
         if (++bobombsmoketimer > 2 && (velx != 0.0f || vely != GRAVITATION) && state == PlayerState::Ready) {
             bobombsmoketimer = 0;
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4);
         }
     } else if (chicken == this) { //draw him as chicken
-        pScoreboardSprite = rm->spr_chocobo[colorID];
+        pScoreboardSprite = &rm->spr_chocobo[colorID];
     } else if (shyguy) { //draw him as chicken
-        pScoreboardSprite = rm->spr_shyguy[colorID];
-        rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
+        pScoreboardSprite = &rm->spr_shyguy[colorID];
+        rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, {ownerColorOffsetX, 0, 48, 48});
     }
 
     if (ownerPlayerID > -1) {
         if (iswarping())
-            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48, (short)state % 4, GetWarpPlane());
+            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, {ownerColorOffsetX, 0, 48, 48}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
         else
-            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
+            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, {ownerColorOffsetX, 0, 48, 48});
     }
 
     //Don't allow cape, tail, wings to be used with shoe
@@ -2085,9 +2079,9 @@ void CPlayer::draw()
     //Don't draw the player if he is frozen in a shoe
     if (!frozen || !kuriboshoe.is_on()) {
         if (iswarping())
-            pScoreboardSprite[sprite_state]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, GetWarpPlane());
+            pScoreboardSprite->at(sprite_state).draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, {iSrcOffsetX, 0, 32, 32}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
         else
-            pScoreboardSprite[sprite_state]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
+            pScoreboardSprite->at(sprite_state).draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, {iSrcOffsetX, 0, 32, 32});
     }
 
     //Draw Kuribo's Shoe
@@ -2101,9 +2095,9 @@ void CPlayer::draw()
 
     if (frozen) {
         if (iswarping())
-            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32, (short)state % 4, GetWarpPlane());
+            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, {0, 0, 32, 32}, static_cast<ClipEdge>((short)state % 4), GetWarpPlane());
         else
-            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32);
+            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, {0, 0, 32, 32});
     }
 
     jail.draw(*this);
@@ -2799,7 +2793,7 @@ void CPlayer::makefrozen(short iTime)
         frozen = true;
         frozentimer = iTime;
 
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8);
     }
 }
 
@@ -2872,31 +2866,31 @@ void CPlayer::SetPowerup(short iPowerup)
 
     if (iPowerup == 0) {
         if (bobomb)
-            SetStoredPowerup(8);
+            SetStoredPowerup(PowerupType::Bobomb);
         else {
             ifSoundOnPlay(rm->sfx_transform);
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5);
             bobomb = true;
         }
     } else if (iPowerup == 9) {
         if (tanookisuit.isOn())
-            SetStoredPowerup(20);
+            SetStoredPowerup(PowerupType::Tanooki);
         else
             tanookisuit.onPickup();
     } else if (iPowerup >= 10) {
         if (iPowerup == 10)
-            SetStoredPowerup(9);   //POW
+            SetStoredPowerup(PowerupType::Pow);
         else if (iPowerup == 11)
-            SetStoredPowerup(16);  //MOd
+            SetStoredPowerup(PowerupType::Mod);
         else if (iPowerup == 12)
-            SetStoredPowerup(10);  //Bullet Bill
+            SetStoredPowerup(PowerupType::BulletBill);
         else if (iPowerup == 13)
-            SetStoredPowerup(22);  //Podobo
+            SetStoredPowerup(PowerupType::Podobo);
         else if (iPowerup >= 14)
             SetStoredPowerup(iPowerup - 2); //Storing shells
     } else {
         if (iPowerup == 3 || iPowerup == 7 || iPowerup == 8) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8);
         }
 
         if (powerup != iPowerup) {
@@ -2909,21 +2903,21 @@ void CPlayer::SetPowerup(short iPowerup)
         ClearPowerupStates();
 
         if (powerup == 1)
-            SetStoredPowerup(5);
+            SetStoredPowerup(PowerupType::Fire);
         else if (powerup == 2)
-            SetStoredPowerup(11);
+            SetStoredPowerup(PowerupType::Hammer);
         else if (powerup == 3)
-            SetStoredPowerup(17);
+            SetStoredPowerup(PowerupType::Feather);
         else if (powerup == 4)
-            SetStoredPowerup(19);
+            SetStoredPowerup(PowerupType::Boomerang);
         else if (powerup == 5)
-            SetStoredPowerup(21);
+            SetStoredPowerup(PowerupType::IceWand);
         else if (powerup == 6)
-            SetStoredPowerup(23);
+            SetStoredPowerup(PowerupType::Bomb);
         else if (powerup == 7)
-            SetStoredPowerup(24);
+            SetStoredPowerup(PowerupType::Leaf);
         else if (powerup == 8)
-            SetStoredPowerup(25);
+            SetStoredPowerup(PowerupType::PWings);
 
         powerup = iPowerup;
         projectilelimit = 0;
@@ -2965,7 +2959,7 @@ void CPlayer::SetPowerup(short iPowerup)
 void CPlayer::SetStoredPowerup(short iPowerup)
 {
     //If the player as the poison mushroom or the game is over, don't store the powerup
-    if (game_values.gamepowerups[globalID] == 0 || game_values.gamemode->gameover) {
+    if (game_values.gamepowerups[globalID] == static_cast<short>(PowerupType::PoisonMushroom) || game_values.gamemode->gameover) {
         ifSoundOnPlay(rm->sfx_stun);
         return;
     }

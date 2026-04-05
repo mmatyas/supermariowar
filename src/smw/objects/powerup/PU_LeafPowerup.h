@@ -8,7 +8,7 @@ class gfxSprite;
 
 class PU_LeafPowerup : public PU_FeatherPowerup {
 public:
-    PU_LeafPowerup(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+    PU_LeafPowerup(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
 
     bool collide(CPlayer* player) override;
 };

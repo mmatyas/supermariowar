@@ -2,7 +2,6 @@
 
 #include "path.h"
 
-#include "SDL.h"
 #include "SDL_image.h"
 
 #include <chrono>
@@ -17,225 +16,179 @@ extern SDL_Surface* screen;
 #define GFX_SCREEN_W 640
 #define GFX_SCREEN_H 480
 
-enum SDL_Errors {
-    E_INIT_SDL,
-    E_INIT_SDL_IMG,
-    E_CREATE_WINDOW
-};
-#ifdef USE_SDL2
-enum SDL2_Errors {
-    E_CREATE_RENDERER,
-    E_CREATE_SCREEN_SURFACE,
-    E_CREATE_SCREEN_TEX,
-};
-#endif
+template<typename... Args>
+[[noreturn]] void throw_error(std::format_string<Args...> fmt, Args&&... args) {
+    throw std::runtime_error(std::format(fmt, std::forward<Args>(args)...));
+}
 
-GraphicsSDL::GraphicsSDL() {}
-GraphicsSDL::~GraphicsSDL() {
-    Close();
+namespace {
+void initSdl()
+{
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+        throw_error("SDL error: {}", SDL_GetError());
+
+    SDL_version sdl_version;
+    SDL_GetVersion(&sdl_version);
+    printf("[gfx] SDL %d.%d.%d loaded.\n", sdl_version.major, sdl_version.minor, sdl_version.patch);
+
+    constexpr int IMG_FLAGS = IMG_INIT_PNG;
+    if ((IMG_Init(IMG_FLAGS) & IMG_FLAGS) != IMG_FLAGS)
+        throw_error("SDL_image error: {}", IMG_GetError());
+
+    const SDL_version* img_version = IMG_Linked_Version();
+    printf("[gfx] SDL_image %d.%d.%d loaded.\n", img_version->major, img_version->minor, img_version->patch);
+}
+
+void quitSdl()
+{
     IMG_Quit();
     SDL_Quit();
 }
 
-bool GraphicsSDL::Init(bool fullscreen)
+SDL_Window* createWindow(bool fullscreen)
 {
-    try {
-        init_sdl();
-        init_sdl_img();
-        create_game_window(fullscreen);
+    Uint32 window_flags = SDL_WINDOW_RESIZABLE;
+    if (fullscreen)
+        window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+    SDL_Window* window = SDL_CreateWindow("smw",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        GFX_SCREEN_W, GFX_SCREEN_H,
+        window_flags);
+    if (!window)
+        throw_error("Couldn't create window: {}", SDL_GetError());
+
+    return window;
+}
+
+int findPreferredRendererIndex() {
+#ifdef SDL2_FORCE_GLES
+    const int render_driver_count = SDL_GetNumRenderDrivers();
+    if (render_driver_count < 1) {
+        printf("[gfx][warning] Couldn't access renderers, fallback to default: %s\n", SDL_GetError());
+        return -1;
     }
-    catch (...) {
-        return false;
+
+    for (int i = 0; i < render_driver_count; i++) {
+        SDL_RendererInfo renderer_info;
+        SDL_GetRenderDriverInfo(i, &renderer_info);
+        if (strncmp(renderer_info.name, "opengles", strlen("opengles")) == 0)
+            return i;
     }
+
+    printf("[gfx][warning] No GLES renderer found, fallback to default");
+#endif
+    return -1;
+}
+
+SDL_Renderer* createRenderer(SDL_Window* window)
+{
+    constexpr Uint32 rendering_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE;
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, findPreferredRendererIndex(), rendering_flags);
+    if (!renderer)
+        throw_error("Couldn't create renderer: {}", SDL_GetError());
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+    SDL_RenderSetLogicalSize(renderer, GFX_SCREEN_W, GFX_SCREEN_H);
+
+    SDL_RendererInfo renderer_info;
+    SDL_GetRendererInfo(renderer, &renderer_info);
+    printf("[gfx] Renderer: %s, %s\n",
+        renderer_info.name,
+        (renderer_info.flags & SDL_RENDERER_ACCELERATED) ? "accelerated" : "software");
+
+    return renderer;
+}
+
+SDL_Surface* createScreenSurface()
+{
+    SDL_Surface* surface = SDL_CreateRGBSurface(0x0,
+        GFX_SCREEN_W, GFX_SCREEN_H, 32,
+        0x00FF0000,
+        0x0000FF00,
+        0x000000FF,
+        0xFF000000);
+    if (!surface)
+        throw_error("Couldn't create video buffer: {}", SDL_GetError());
+
+    return surface;
+}
+
+SDL_Texture* createScreenTexture(SDL_Renderer* renderer)
+{
+    SDL_Texture* texture = SDL_CreateTexture(renderer,
+        SDL_PIXELFORMAT_ARGB8888,
+        SDL_TEXTUREACCESS_STREAMING,
+        GFX_SCREEN_W, GFX_SCREEN_H);
+    if (!texture)
+        throw_error("Couldn't create video texture: {}", SDL_GetError());
+
+    return texture;
+}
+} // namespace
+
+
+GraphicsSDL::~GraphicsSDL()
+{
+    SDL_DestroyTexture(sdl_screen_texture);
+    SDL_FreeSurface(sdl_screen_surface);
+    SDL_DestroyRenderer(sdl_renderer);
+    SDL_DestroyWindow(sdl_window);
+
+    quitSdl();
+}
+
+bool GraphicsSDL::init(bool fullscreen)
+{
+    initSdl();
+
+    sdl_window = createWindow(fullscreen);
+    sdl_renderer = createRenderer(sdl_window);
+    sdl_screen_surface = createScreenSurface();
+    sdl_screen_texture = createScreenTexture(sdl_renderer);
 
     printf("[gfx] Game window initialized (%dx%d, %dbpp)\n",
-        GFX_SCREEN_W, GFX_SCREEN_H, screen->format->BitsPerPixel);
+        sdl_screen_surface->w,
+        sdl_screen_surface->h,
+        sdl_screen_surface->format->BitsPerPixel);
 
+    screen = sdl_screen_surface;
     return true;
-}
-
-void GraphicsSDL::init_sdl()
-{
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("[gfx] SDL error: %s\n", SDL_GetError());
-        throw E_INIT_SDL;
-    }
-
-    print_sdl_version();
-}
-
-void GraphicsSDL::init_sdl_img()
-{
-    int img_flags = IMG_INIT_PNG;
-    if ((IMG_Init(img_flags) & img_flags) != img_flags) {
-        printf("[gfx] SDL_image error: %s\n", IMG_GetError());
-        throw E_INIT_SDL_IMG;
-    }
-
-    print_sdl_img_version();
-}
-
-void GraphicsSDL::print_sdl_version()
-{
-    SDL_version ver_current;
-
-#ifdef USE_SDL2
-    SDL_GetVersion(&ver_current);
-#else
-    const SDL_version * constptr_ver_current = SDL_Linked_Version(); // dyn. linked version
-    ver_current = *constptr_ver_current;
-#endif
-
-    printf("[gfx] SDL %d.%d.%d loaded.\n",
-        ver_current.major, ver_current.minor, ver_current.patch);
-}
-
-void GraphicsSDL::print_sdl_img_version()
-{
-    // show SDL_image version
-    SDL_version ver_compiled;
-    const SDL_version * ver_img_current = IMG_Linked_Version();
-    SDL_IMAGE_VERSION(&ver_compiled);
-    printf("[gfx] SDL_image %d.%d.%d loaded.\n",
-        ver_img_current->major, ver_img_current->minor, ver_img_current->patch);
 }
 
 void GraphicsSDL::showErrorBox(const char* message) const
 {
-#ifdef USE_SDL2
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message, sdl2_window);
-#endif
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message, sdl_window);
 }
 
-#ifdef USE_SDL2
-// -----------------------
-//  SDL2 specific methods
-// -----------------------
-void GraphicsSDL::create_game_window(bool fullscreen)
+void GraphicsSDL::setTitle(const char* title) const
 {
-    RecreateWindow(fullscreen);
-    create_renderer();
-    print_renderer_info();
-    create_screen_surface();
-    create_screen_tex();
+    SDL_SetWindowTitle(sdl_window, title);
 }
 
-#ifdef SDL2_FORCE_GLES
-    int GraphicsSDL::find_gles_driver_index() {
-        int render_driver_count = SDL_GetNumRenderDrivers();
-        if (render_driver_count < 1) {
-            printf("[gfx][warning] Couldn't access renderers, fallback to default: %s\n", SDL_GetError());
-            return -1;
-        }
-
-        for (int i = 0; i < render_driver_count; i++) {
-            SDL_RendererInfo renderer_info;
-            SDL_GetRenderDriverInfo(i, &renderer_info);
-            if (strncmp(renderer_info.name, "opengles", strlen("opengles")) == 0)
-                return i;
-        }
-
-        printf("[gfx][warning] No GLES renderer found, fallback to default");
-        return -1;
-    }
-#endif
-
-    void GraphicsSDL::create_renderer()
-    {
-#ifdef SDL2_FORCE_GLES
-        sdl2_renderer = SDL_CreateRenderer(sdl2_window, find_gles_driver_index(),
-#else
-        sdl2_renderer = SDL_CreateRenderer(sdl2_window, -1,
-#endif
-            SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-        if (!sdl2_renderer) {
-            fprintf(stderr, "[gfx] Couldn't create renderer: %s\n", SDL_GetError());
-            throw E_CREATE_RENDERER;
-        }
-
-        SDL_SetRenderDrawColor(sdl2_renderer, 0, 0, 0, 255);
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-        SDL_RenderSetLogicalSize(sdl2_renderer, GFX_SCREEN_W, GFX_SCREEN_H);
-    }
-
-    void GraphicsSDL::create_screen_surface()
-    {
-        screen = SDL_CreateRGBSurface(0, GFX_SCREEN_W, GFX_SCREEN_H, 32,
-            0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-        if (!screen) {
-            fprintf(stderr, "[gfx] Couldn't create video buffer: %s\n", SDL_GetError());
-            throw E_CREATE_SCREEN_SURFACE;
-        }
-    }
-
-    void GraphicsSDL::create_screen_tex()
-    {
-        sdl2_screen_as_texture = SDL_CreateTexture(sdl2_renderer,
-            SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, GFX_SCREEN_W, GFX_SCREEN_H);
-        if (!sdl2_screen_as_texture) {
-            fprintf(stderr, "[gfx] Couldn't create video texture: %s\n", SDL_GetError());
-            throw E_CREATE_SCREEN_TEX;
-        }
-    }
-
-    void GraphicsSDL::print_renderer_info()
-    {
-        SDL_RendererInfo renderer_info;
-        SDL_GetRendererInfo(sdl2_renderer, &renderer_info);
-        printf("[gfx] Renderer: %s, %s\n",
-            renderer_info.name,
-            renderer_info.flags & SDL_RENDERER_ACCELERATED ? "accelerated" : "software");
-    }
-
-void GraphicsSDL::setTitle(const char* title)
+void GraphicsSDL::flipScreen() const
 {
-    SDL_SetWindowTitle(sdl2_window, title);
-    //SDL_SetRelativeMouseMode(SDL_TRUE);
+    SDL_UpdateTexture(sdl_screen_texture, nullptr, sdl_screen_surface->pixels, sdl_screen_surface->pitch);
+    SDL_RenderClear(sdl_renderer);
+    SDL_RenderCopy(sdl_renderer, sdl_screen_texture, nullptr, nullptr);
+    SDL_RenderPresent(sdl_renderer);
 }
 
-void GraphicsSDL::FlipScreen()
+void GraphicsSDL::changeFullScreen(bool fullscreen) const
 {
-    SDL_UpdateTexture(sdl2_screen_as_texture, NULL, screen->pixels, screen->pitch);
-    SDL_RenderClear(sdl2_renderer);
-    SDL_RenderCopy(sdl2_renderer, sdl2_screen_as_texture, NULL, NULL);
-    SDL_RenderPresent(sdl2_renderer);
-}
-
-void GraphicsSDL::RecreateWindow(bool fullscreen)
-{
-    if (sdl2_window)
-        SDL_DestroyWindow(sdl2_window);
-
-    sdl2_window = SDL_CreateWindow("smw",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        GFX_SCREEN_W, GFX_SCREEN_H,
-        fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE : SDL_WINDOW_RESIZABLE);
-
-    if (!sdl2_window) {
-        fprintf(stderr, "[gfx] Couldn't create window: %s\n", SDL_GetError());
-        throw E_CREATE_WINDOW;
-    }
-
-    // on some systems there's a mouse input bug after re-creating the window
-    /*if (SDL_GetRelativeMouseMode()) {
-        SDL_SetRelativeMouseMode(SDL_FALSE);
-        SDL_SetRelativeMouseMode(SDL_TRUE);
-    }*/
-}
-
-void GraphicsSDL::ChangeFullScreen(bool fullscreen)
-{
-    Uint32 flags = SDL_GetWindowFlags(sdl2_window);
-    if (fullscreen)
+    Uint32 flags = SDL_GetWindowFlags(sdl_window);
+    if (fullscreen) {
         flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-    else
+    } else {
         flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
 
-    if (SDL_SetWindowFullscreen(sdl2_window, flags) < 0) {
+    if (SDL_SetWindowFullscreen(sdl_window, flags) < 0) {
         fprintf(stderr, "[gfx] Couldn't toggle fullscreen mode: %s\n", SDL_GetError());
         return;
     }
-    //SDL_SetWindowSize(sdl2_window, GFX_SCREEN_W, GFX_SCREEN_H);
 }
 
 void GraphicsSDL::takeScreenshot() const
@@ -243,82 +196,17 @@ void GraphicsSDL::takeScreenshot() const
     using std::chrono::system_clock;
 
     // NOTE: %F and %T don't work on Windows
-#ifdef PNG_SAVE_FORMAT
     constexpr const char* path_format = "screenshots/%Y-%m-%d_%H%M%S.png";
-#else
-    constexpr const char* path_format = "screenshots/%Y-%m-%d_%H%M%S.bmp";
-#endif
 
     const std::time_t now = system_clock::to_time_t(system_clock::now());
     std::ostringstream path_ss;
     path_ss << std::put_time(std::localtime(&now), path_format);
     const std::string path = convertPath(path_ss.str());
 
-#ifdef PNG_SAVE_FORMAT
-    const int save_result = IMG_SavePNG(screen, path.c_str());
-#else
-    const int save_result = SDL_SaveBMP(screen, path.c_str());
-#endif
-    if (save_result != 0) {
+    if (IMG_SavePNG(sdl_screen_surface, path.c_str()) != 0) {
         fprintf(stderr, "[gfx] Couldn't write the screenshot to file: %s\n", SDL_GetError());
         return;
     }
 
     printf("[gfx] Screenshot saved to file: %s\n", path.c_str());
 }
-
-void GraphicsSDL::Close()
-{
-    SDL_DestroyTexture(sdl2_screen_as_texture);
-    SDL_FreeSurface(screen);
-    SDL_DestroyRenderer(sdl2_renderer);
-    SDL_DestroyWindow(sdl2_window);
-}
-
-#else
-// ----------------------------
-//  SDL 1.2.x specific methods
-// ----------------------------
-void GraphicsSDL::create_game_window(bool fullscreen)
-{
-    RecreateWindow(fullscreen);
-}
-
-void GraphicsSDL::setTitle(const char* title)
-{
-    SDL_WM_SetCaption(title, "smw.ico");
-}
-
-void GraphicsSDL::FlipScreen()
-{
-    SDL_Flip(screen);
-}
-
-void GraphicsSDL::RecreateWindow(bool fullscreen)
-{
-    Uint32 flags = SDL_SWSURFACE | SDL_HWACCEL;
-    if (fullscreen)
-        flags |= SDL_FULLSCREEN;
-
-    screen = SDL_SetVideoMode(GFX_SCREEN_W, GFX_SCREEN_H, GFX_BPP, flags);
-    if (!screen) {
-        printf("[gfx] Couldn't create window: %s\n", SDL_GetError());
-        throw E_CREATE_WINDOW;
-    }
-}
-
-void GraphicsSDL::ChangeFullScreen(bool fullscreen)
-{
-    RecreateWindow(fullscreen);
-}
-
-void GraphicsSDL::takeScreenshot() const
-{
-    fprintf(stderr, "[gfx] Taking screenshots is not implemented for the SDL 1.x backend, sorry!");
-}
-
-void GraphicsSDL::Close()
-{
-}
-
-#endif

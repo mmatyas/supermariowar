@@ -8,26 +8,25 @@ class CGM_ShyGuyTag : public CGameMode
 {
     public:
         CGM_ShyGuyTag();
-        virtual ~CGM_ShyGuyTag() {}
 
-        void init();
-        void think();
-        void draw_foreground();
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
+        void init() override;
+        void think() override;
+        void draw_foreground() override;
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
 
         void SetShyGuy(short iTeam);
 
 #ifdef _DEBUG
-    void setdebuggoal() {
+    void setdebuggoal() override {
         goal = 100;
     }
 #endif
 
     private:
 
-        PlayerKillType CheckWinner(CPlayer * player);
+        PlayerKillType CheckWinner(CPlayer * player) override;
         short CountShyGuys();
         void FreeShyGuys();
 

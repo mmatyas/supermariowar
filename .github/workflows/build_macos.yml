@@ -1,23 +1,27 @@
 name: Build - MacOS
-on:
-  workflow_call:
+on: workflow_call
 
 jobs:
   macos:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: 'recursive'
       - name: Install dependencies
         run: brew install SDL2 SDL2_image SDL2_mixer
 
       - name: Configure
-        run: cmake -B build -DUSE_SDL2_LIBS=ON -DUSE_PNG_SAVE=ON -DSMW_INSTALL_PORTABLE=ON
+        run: cmake
+          -B build
+          -G Ninja
+          -DSMW_INSTALL_PORTABLE=ON
 
       - name: Build
         run: cmake --build build --verbose
+
+      - name: Test
+        run: ctest --test-dir build/tests --output-on-failure
 
       - name: Package
         run: |
@@ -26,7 +30,7 @@ jobs:
           zip -9 -r "supermariowar_$(date +%F)_macos.zip" supermariowar
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: supermariowar_macos
           path: supermariowar_*_macos.zip

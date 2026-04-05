@@ -3,351 +3,199 @@
 #include "gfx.h"
 
 #include "SDL_image.h"
-#include "sdl12wrapper.h"
 
 #include <cassert>
 #include <cstdio>
+#include <filesystem>
+#include <format>
 #include <iostream>
+#include <optional>
 
-using namespace std;
+namespace fs = std::filesystem;
 
 extern SDL_Surface * blitdest;
 extern SDL_Surface * screen;
 extern short x_shake;
 extern short y_shake;
 
-gfxSprite::gfxSprite()
+namespace {
+SdlSurfacePtr loadImage(
+    const fs::path& path,
+    bool optimize = true,
+    std::optional<RGB> color_key = std::nullopt,
+    std::optional<Uint8> alpha = std::nullopt)
 {
-    clearSurface();
-    iWrapSize = 640; // TODO: Get it from a global setting.
-}
+    const std::string path_str = path.generic_string();
 
-gfxSprite::~gfxSprite()
-{
-    //free the allocated surface
-    freeSurface();
-}
-
-void gfxSprite::clearSurface()
-{
-    m_bltrect.x = 0;
-    m_bltrect.y = 0;
-    m_bltrect.w = 0;
-    m_bltrect.h = 0;
-    m_picture = NULL;
-
-    fWrap = false;
-}
-
-void gfxSprite::freeSurface()
-{
-    if (m_picture) {
-        SDL_FreeSurface(m_picture);
-        m_picture = NULL;
+    std::cout << "loading sprite ";
+    if (color_key) {
+        std::cout << "with key";
+        if (alpha) {
+            std::cout << "+alpha";
+        }
+        std::cout << " ";
     }
-}
+    std::cout << path_str << " ...";
 
-//
-// Color keyed without alpha
-//
-bool gfxSprite::init(const std::string& filename, const RGB& key)
-{
-    cout << "loading sprite (mode 1) " << filename << "...";
-
-    if (m_picture) {
-        SDL_FreeSurface(m_picture);
-        m_picture = NULL;
+    auto raw = SdlSurfacePtr(IMG_Load(path_str.c_str()));
+    if (!raw) {
+        throw std::format("Couldn't load {}: {}", path_str, IMG_GetError());
     }
 
-    // Load the BMP file into a surface
-    m_picture = IMG_Load(filename.c_str());
-    if (!m_picture) {
-        cout << endl << " ERROR: Couldn't load " << filename << ": " << IMG_GetError() << endl;
-        return false;
-    }
-
-    if ( SDL_SETCOLORKEY(m_picture, SDL_TRUE, SDL_MapRGB(m_picture->format, key.r, key.g, key.b)) < 0) {
-        cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-#ifdef USE_SDL2
-    // FIXME: this causes missing map tiles
-    // SDL_Surface* temp = SDL_ConvertSurface(m_picture, screen->format, 0);
-#else
-    SDL_Surface* temp = SDL_DisplayFormat(m_picture);
-    if (!temp) {
-        cout << endl << " ERROR: Couldn't convert "
-             << filename << " to the display's pixel format: " << SDL_GetError()
-             << endl;
-        return false;
-    }
-
-    SDL_FreeSurface(m_picture);
-    m_picture = temp;
-#endif
-
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-
-    cout << "done" << endl;
-    return true;
-}
-
-//
-// Color keyed + alpha
-//
-bool gfxSprite::init(const std::string& filename, const RGB& key, Uint8 alpha)
-{
-    cout << "Loading sprite (mode 2) " << filename << " ...";
-
-    if (m_picture) {
-        SDL_FreeSurface(m_picture);
-        m_picture = NULL;
-    }
-
-    // Load the BMP file into a surface
-    m_picture = IMG_Load(filename.c_str());
-    if (!m_picture) {
-        cout << endl << " ERROR: Couldn't load "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    if ( SDL_SETCOLORKEY(m_picture, SDL_TRUE, SDL_MapRGB(m_picture->format, key.r, key.g, key.b)) < 0) {
-        cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    if ( (SDL_SETALPHABYTE(m_picture, SDL_TRUE, alpha)) < 0) {
-        cout << endl << " ERROR: Couldn't set per-surface alpha on "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-#ifdef USE_SDL2
-    SDL_Surface* temp = SDL_ConvertSurface(m_picture, screen->format, 0);
-#else
-    SDL_Surface* temp = SDL_DisplayFormatAlpha(m_picture);
-#endif
-    if (!temp) {
-        cout << endl << " ERROR: Couldn't convert "
-             << filename << " to the display's pixel format: " << SDL_GetError()
-             << endl;
-        return false;
-    }
-    SDL_FreeSurface(m_picture);
-    m_picture = temp;
-
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-
-    cout << "done" << endl;
-    return true;
-}
-
-//
-// Non color keyed
-//
-bool gfxSprite::init(const std::string& filename)
-{
-    cout << "loading sprite (mode 3) " << filename << "...";
-
-    if (m_picture) {
-        SDL_FreeSurface(m_picture);
-        m_picture = NULL;
-    }
-
-    // Load the BMP file into a surface
-    m_picture = IMG_Load(filename.c_str());
-
-    if (!m_picture) {
-        cout << endl << " ERROR: Couldn't load "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-#ifdef USE_SDL2
-    SDL_Surface * temp = SDL_ConvertSurface(m_picture, screen->format, 0);
-#else
-    SDL_Surface * temp = SDL_DisplayFormat(m_picture);
-#endif
-    if (!temp) {
-        cout << endl << " ERROR: Couldn't convert "
-             << filename << " to the display's pixel format: " << SDL_GetError()
-             << endl;
-        return false;
-    }
-
-    SDL_FreeSurface(m_picture);
-    m_picture = temp;
-
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-
-    cout << "done" << endl;
-    return true;
-}
-
-bool gfxSprite::draw(short x, short y)
-{
-    assert(m_picture != NULL);
-
-    m_bltrect.x = x + x_shake;
-    m_bltrect.y = y + y_shake;
-
-    if (SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
-        fprintf(stderr, "BlitSurface error: %s\n", SDL_GetError());
-        return false;
-    }
-
-    if (fWrap) {
-        if (x + m_picture->w >= iWrapSize) {
-            m_bltrect.x = x - iWrapSize + x_shake;
-            m_bltrect.y = y + y_shake;
-
-            if (SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
-        } else if (x < 0) {
-            m_bltrect.x = x + iWrapSize + x_shake;
-            m_bltrect.y = y + y_shake;
-
-            if (SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
+    if (color_key) {
+        const Uint32 key = SDL_MapRGB(raw->format, color_key->r, color_key->g, color_key->b);
+        if (SDL_SetColorKey(raw.get(), SDL_TRUE, key) < 0) {
+            throw std::format("Couldn't set color key for {}: {}", path_str, SDL_GetError());
         }
     }
 
-    return true;
-}
-
-//TODO Perf Optimization: Set w/h once when sprite is initialized, set srcx/srcy just when animation frame advance happens
-bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h, short sHiddenDirection, short sHiddenValue)
-{
-    assert(m_picture != NULL);
-
-    m_bltrect.x = x + x_shake;
-    m_bltrect.y = y + y_shake;
-    m_bltrect.w = w;
-    m_bltrect.h = h;
-
-    SDL_Rect srcrect {
-        srcx,
-        srcy,
-        w,
-        h,
-    };
-
-    if (sHiddenDirection > -1) {
-        if (gfx_adjusthiddenrects(&srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
-            return true;
+    auto img = SdlSurfacePtr(SDL_ConvertSurface(raw.get(), screen->format, 0));
+    if (!img) {
+        throw std::format("Couldn't convert {} to the display's pixel format: {}", path_str, SDL_GetError());
     }
 
-    // Blit onto the screen surface
-    if (SDL_BlitSurface(m_picture, &srcrect, blitdest, &m_bltrect) < 0) {
+    if (optimize) {
+        if (SDL_SetSurfaceRLE(img.get(), 1) < 0) {
+            throw std::format("Couldn't set RLE acceleration for {}: {}", path_str, SDL_GetError());
+        }
+    }
+
+    if (alpha) {
+        if (SDL_SetSurfaceBlendMode(img.get(), SDL_BLENDMODE_BLEND) < 0) {
+            throw std::format("Couldn't set blend mode for {}: {}", path_str, SDL_GetError());
+        }
+        if (SDL_SetSurfaceAlphaMod(img.get(), *alpha) < 0) {
+            throw std::format("Couldn't set alpha modulation for {}: {}", path_str, SDL_GetError());
+        }
+    }
+
+    std::cout << " done" << std::endl;
+    return img;
+}
+
+void blitSurface(SDL_Surface* src, const SDL_Rect* srcArea, SDL_Surface* dst, SDL_Rect* dstArea)
+{
+    if (SDL_BlitSurface(src, srcArea, dst, dstArea) < 0) {
         fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-        return false;
     }
+}
+} // namespace
 
-    if (fWrap) {
-        if (x + w >= iWrapSize) {
-            srcrect = {srcx, srcy, w, h};
-            m_bltrect = {x - iWrapSize + x_shake, y + y_shake, w, h};
 
-            if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
-                    return true;
-            }
+gfxSprite::gfxSprite(SdlSurfacePtr image, std::optional<int> wrap)
+    : m_picture(std::move(image))
+    , m_wrap_x(wrap)
+{}
 
-            if (SDL_BlitSurface(m_picture, &srcrect, blitdest, &m_bltrect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
-        } else if (x < 0) {
-            srcrect = {srcx, srcy, w, h};
-            m_bltrect = {x + iWrapSize + x_shake, y + y_shake, w, h};
+gfxSprite gfxSprite::blank(unsigned w, unsigned h)
+{
+    auto surf = SdlSurfacePtr(SDL_CreateRGBSurfaceWithFormat(0x0, w, h, screen->format->BitsPerPixel, screen->format->format));
+    if (!surf)
+        throw std::format("Couldn't create blank surface: {}", SDL_GetError());
 
-            if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
-                    return true;
-            }
+    if (SDL_SetSurfaceBlendMode(surf.get(), SDL_BLENDMODE_NONE) < 0)
+        throw std::format("Couldn't set blend mode for blank surface: {}", SDL_GetError());
 
-            if (SDL_BlitSurface(m_picture, &srcrect, blitdest, &m_bltrect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
-        }
-    }
-
-    return true;
+    return gfxSprite(std::move(surf));
 }
 
-bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, short srcy, short srcw, short srch)
+void gfxSprite::draw(int x, int y) const
 {
-    assert(m_picture != NULL);
+    blit(nullptr, blitdest, {x + x_shake, y + y_shake});
+}
 
-    m_bltrect.x = x + x_shake;
-    m_bltrect.y = y + y_shake;
-    m_bltrect.w = w;
-    m_bltrect.h = h;
+void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect) const
+{
+    blit(&srcRect, blitdest, {x + x_shake, y + y_shake});
+}
 
-    SDL_Rect srcrect {
-        srcx,
-        srcy,
-        srcw,
-        srch,
-    };
+void gfxSprite::blit(const SDL_Rect* srcRect, SDL_Surface* dst, Vec2i dstPos) const
+{
+    assert(m_picture);
 
-    // Looks like SoftStretch doesn't respect transparent colors
-    // I need to look into the actual SDL code to see if I can fix this
-    if (SDL_SCALEBLIT(m_picture, &srcrect, blitdest, &m_bltrect) < 0) {
-        fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
-        return false;
+    SDL_Rect dstRect { dstPos.x, dstPos.y, 0, 0 };
+    blitSurface(m_picture.get(), srcRect, dst, &dstRect);
+
+    if (m_wrap_x) {
+        if (dstRect.x + getWidth() >= *m_wrap_x) {
+            dstRect.x -= *m_wrap_x;
+            blitSurface(m_picture.get(), srcRect, dst, &dstRect);
+        } else if (dstRect.x < 0) {
+            dstRect.x += *m_wrap_x;
+            blitSurface(m_picture.get(), srcRect, dst, &dstRect);
+        }
     }
+}
 
-    return true;
+void gfxSprite::draw(int x, int y, const SDL_Rect& srcRect, ClipEdge clipEdge, int clipTreshold) const
+{
+    assert(m_picture);
+
+    const SDL_Rect dstRect {x + x_shake, y + y_shake, srcRect.w, srcRect.h};
+    SDL_Rect adjustedSrcRect = srcRect;
+    SDL_Rect adjustedDstRect = dstRect;
+
+    if (gfx_adjusthiddenrects(adjustedSrcRect, adjustedDstRect, clipEdge, clipTreshold))
+        return;
+
+    blitSurface(m_picture.get(), &adjustedSrcRect, blitdest, &adjustedDstRect);
+
+    if (m_wrap_x) {
+        if (x + srcRect.w >= *m_wrap_x) {
+            adjustedSrcRect = srcRect;
+            adjustedDstRect = dstRect;
+            adjustedDstRect.x -= *m_wrap_x;
+
+            if (gfx_adjusthiddenrects(adjustedSrcRect, adjustedDstRect, clipEdge, clipTreshold))
+                return;
+
+            blitSurface(m_picture.get(), &adjustedSrcRect, blitdest, &adjustedDstRect);
+        } else if (x < 0) {
+            adjustedSrcRect = srcRect;
+            adjustedDstRect = dstRect;
+            adjustedDstRect.x += *m_wrap_x;
+
+            if (gfx_adjusthiddenrects(adjustedSrcRect, adjustedDstRect, clipEdge, clipTreshold))
+                return;
+
+            blitSurface(m_picture.get(), &adjustedSrcRect, blitdest, &adjustedDstRect);
+        }
+    }
+}
+
+void gfxSprite::drawStretch(const SDL_Rect& srcRect, SDL_Surface* dst, const SDL_Rect& dstRect) const
+{
+    assert(m_picture);
+
+    // TODO: SDL2 requires dst to be writable. Fixed in SDL3.
+    SDL_Rect dstRect_w = dstRect;
+
+    if (SDL_BlitScaled(m_picture.get(), &srcRect, dst, &dstRect_w) < 0) {
+        fprintf(stderr, "SDL_BlitScaled error: %s\n", SDL_GetError());
+    }
 }
 
 void gfxSprite::setalpha(Uint8 alpha)
 {
     assert(m_picture != NULL);
 
-    if ( (SDL_SETALPHABYTE(m_picture, SDL_TRUE, alpha)) < 0) {
-        printf("\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
+    if (SDL_SetSurfaceBlendMode(m_picture.get(), SDL_BLENDMODE_BLEND) < 0) {
+        fprintf(stderr, "\n ERROR: couldn't set blend mode on sprite: %s\n", SDL_GetError());
+        return;
+    }
+    if (SDL_SetSurfaceAlphaMod(m_picture.get(), alpha) < 0) {
+        fprintf(stderr, "\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
+        return;
     }
 }
 
-int gfxSprite::getWidth()
+void gfxSprite::setWrap(short wrapsize)
 {
-    return m_picture->w;
+    m_wrap_x = wrapsize;
 }
-int gfxSprite::getHeight()
+
+
+gfxSprite ImageLoader::create() const
 {
-    return m_picture->h;
-}
-
-void gfxSprite::setSurface(SDL_Surface * surface)
-{
-    freeSurface();
-    m_picture = surface;
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-}
-
-bool gfxSprite::GetWrap() {
-    return fWrap;
-}
-
-void gfxSprite::SetWrap(bool wrap) {
-    fWrap = wrap;
-}
-
-void gfxSprite::SetWrap(bool wrap, short wrapsize) {
-    fWrap = wrap;
-    iWrapSize = wrapsize;
+    return gfxSprite(loadImage(m_path, m_optimize, m_color_key, m_alpha), m_wrap_x);
 }

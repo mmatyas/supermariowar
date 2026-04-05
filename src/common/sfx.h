@@ -1,12 +1,17 @@
 #pragma once
 
-#ifdef SDL2_USE_MIXERX
-#include "SDL_mixer_ext.h"
-#else
 #include "SDL_mixer.h"
-#endif
 
-#include <string>
+#include <array>
+#include <bitset>
+#include <filesystem>
+
+struct MixDeleter {
+    void operator()(Mix_Chunk* ptr) const noexcept;
+    void operator()(Mix_Music* ptr) const noexcept;
+};
+using MixChunkPtr = std::unique_ptr<Mix_Chunk, MixDeleter>;
+using MixMusicPtr = std::unique_ptr<Mix_Music, MixDeleter>;
 
 
 bool sfx_init();
@@ -19,52 +24,41 @@ bool sfx_canPlayAudio();
 
 class sfxSound {
 public:
-    ~sfxSound();
+    static constexpr int k_channels = 16;
 
-    bool init(const std::string& filename);
+    sfxSound() = default;
+    sfxSound(const std::filesystem::path& path);
 
-    int play();
-    int playLoop(int iLoop);
+    bool play();
+    void playLoop(int iLoop);
     void stop();
 
-    void togglePause();
-    void resetPause() {
-        paused = false;
-    }
+    bool isPlaying() const { return m_channels.any(); }
 
-    void reset();
-    void clearChannel();
-
-    bool isReady() const { return ready; }
-    bool isPlaying() const;
+    static void onChannelFinished(int channel);
 
 private:
-    Mix_Chunk* sfx = nullptr;
-    int channel = -1;
-    bool paused = false;
-    bool ready = false;
-    int starttime = 0;
-    short instances = 0;
+    MixChunkPtr m_sfx;
+    std::bitset<k_channels> m_channels;
+    size_t m_last_start_time = 0;
+
+    static inline std::array<sfxSound*, k_channels> s_channels {};
 };
 
 
 class sfxMusic {
 public:
-    ~sfxMusic();
-
-    bool load(const std::string& filename);
+    sfxMusic() = default;
+    sfxMusic(const std::filesystem::path& path);
 
     void play(bool fPlayonce, bool fResume);
     void stop();
 
     void togglePause();
 
-    void reset();
     bool isPlaying() const;
-    bool isReady() const { return ready; }
 
 private:
-    Mix_Music* music = nullptr;
-    bool paused = false;
-    bool ready = false;
+    MixMusicPtr m_music;
+    bool m_paused = false;
 };

@@ -7,17 +7,16 @@
 class CGM_Greed : public CGM_Classic {
 public:
     CGM_Greed();
-    virtual ~CGM_Greed() {}
 
-    void init();
-    PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-    PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-    void playerextraguy(CPlayer &player, short iType);
+    void init() override;
+    PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+    PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+    void playerextraguy(CPlayer &player, short iType) override;
 
     PlayerKillType ReleaseCoins(CPlayer &player, KillStyle style);
 
 #ifdef _DEBUG
-    void setdebuggoal() {
+    void setdebuggoal() override {
         goal = 10;
     }
 #endif

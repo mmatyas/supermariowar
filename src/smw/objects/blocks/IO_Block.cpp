@@ -7,10 +7,10 @@
 #include "player.h"
 #include "ResourceManager.h"
 #include "objects/moving/MovingObject.h"
-#include "objects/moving/WalkingEnemy.h"
 #include "objects/carriable/CO_Shell.h"
 #include "objects/carriable/CO_ThrowBlock.h"
 #include "objects/carriable/CO_ThrowBox.h"
+#include "objects/walkingenemy/WalkingEnemy.h"
 
 extern CMap* g_map;
 extern CObjectContainer objectcontainer[3];
@@ -26,8 +26,8 @@ extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 // class Block base class
 //------------------------------------------------------------------------------
 
-IO_Block::IO_Block(gfxSprite *nspr, short x, short y)
-    : CObject(nspr, x, y)
+IO_Block::IO_Block(gfxSprite *nspr, Vec2s pos)
+    : CObject(nspr, pos)
 {
     objectType = object_block;
 
@@ -37,11 +37,11 @@ IO_Block::IO_Block(gfxSprite *nspr, short x, short y)
     fposx = fx;
     fposy = fy;
 
-    iposx = x;
-    iposy = y;
+    iposx = pos.x;
+    iposy = pos.y;
 
-    col = x / TILESIZE;
-    row = y / TILESIZE;
+    col = pos.x / TILESIZE;
+    row = pos.y / TILESIZE;
 
     hidden = ishiddentype = false;
     iHiddenTimer = 0;
@@ -244,12 +244,8 @@ void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
     //Loop through objects
     for (short iLayer = 0; iLayer < 3; iLayer++) {
         for (const std::unique_ptr<CObject>& obj : objectcontainer[iLayer].list()) {
-            if (obj->getObjectType() != object_moving)
-                continue;
-
-            IO_MovingObject * movingobject = (IO_MovingObject*)obj.get();
-
-            if (!movingobject->CollidesWithMap())
+            auto* movingobject = dynamic_cast<IO_MovingObject*>(obj.get());
+            if (!movingobject || !movingobject->CollidesWithMap())
                 continue;
 
             short iSwapSides = 0;

@@ -4,6 +4,6 @@
 #include <chrono>
 
 typedef std::chrono::steady_clock::time_point TimePoint;
-#define TIME_NOW() std::chrono::steady_clock::now()
+inline TimePoint time_now() noexcept { return std::chrono::steady_clock::now(); }
 
 #endif // CLOCK_DEFINITIONS_H

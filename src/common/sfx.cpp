@@ -2,39 +2,28 @@
 
 #include "SDL.h"
 
-#include <array>
-#include <cstdio>
+#include <format>
 #include <iostream>
 #include <string>
 
-#define NUM_SOUND_CHANNELS 16
+namespace fs = std::filesystem;
 
 
 bool fResumeMusic = true;
 extern void SDLCALL musicfinished();
 
-namespace {
-std::array<sfxSound*, NUM_SOUND_CHANNELS> g_PlayingSoundChannels;
 
-void SDLCALL soundfinished(int channel)
-{
-    if (!g_PlayingSoundChannels[channel])
-        printf("Error: SoundFinished() tried to clear a channel that was already cleared!\n");
-    else {
-        g_PlayingSoundChannels[channel]->clearChannel();
-        g_PlayingSoundChannels[channel] = NULL;
-    }
-}
-} // namespace
+void MixDeleter::operator()(Mix_Chunk* ptr) const noexcept { Mix_FreeChunk(ptr); }
+void MixDeleter::operator()(Mix_Music* ptr) const noexcept { Mix_FreeMusic(ptr); }
 
 
 bool sfx_init()
 {
     Mix_OpenAudio(44100, AUDIO_S16, 2, 2048);
-    Mix_AllocateChannels(NUM_SOUND_CHANNELS);
+    Mix_AllocateChannels(sfxSound::k_channels);
 
-    for (short iChannel = 0; iChannel < NUM_SOUND_CHANNELS; iChannel++)
-        g_PlayingSoundChannels[iChannel] = NULL;
+    Mix_ChannelFinished(&sfxSound::onChannelFinished);
+    Mix_HookMusicFinished(&musicfinished);
 
 #ifndef __EMSCRIPTEN__
     const SDL_version* link_version = Mix_Linked_Version();
@@ -58,7 +47,6 @@ void sfx_close()
 void sfx_stopallsounds()
 {
     Mix_HaltChannel(-1);
-    g_PlayingSoundChannels.fill(nullptr);
 }
 
 void sfx_setmusicvolume(int volume)
@@ -82,145 +70,77 @@ bool sfx_canPlayAudio()
 #endif
 }
 
-sfxSound::~sfxSound()
+sfxSound::sfxSound(const fs::path& path)
 {
-    reset();
+    const std::string path_str = path.generic_string();
+    std::cout << "loading " << path_str << " ...";
+
+    m_sfx = MixChunkPtr(Mix_LoadWAV(path_str.c_str()));
+    if (!m_sfx)
+        throw std::format("Failed to load {}: {}", path_str, Mix_GetError());
+
+    std::cout << " done" << std::endl;
 }
 
-bool sfxSound::init(const std::string& filename)
+bool sfxSound::play()
 {
-    if (sfx)
-        reset();
-
-    printf("loading %s ...\n", filename.c_str());
-
-    sfx = Mix_LoadWAV(filename.c_str());
-    if (!sfx) {
-        printf("  failed: %s\n", Mix_GetError());
+    const Uint32 current_time = SDL_GetTicks();
+    if (current_time - m_last_start_time < 40)
         return false;
-    }
 
-    channel = -1;
-    starttime = 0;
-    ready = true;
-    instances = 0;
+    const int channel = Mix_PlayChannel(-1, m_sfx.get(), 0);
+    if (channel < 0)
+        return false;
 
-    Mix_ChannelFinished(&soundfinished);
-
+    m_last_start_time = current_time;
+    m_channels.set(channel);
+    s_channels[channel] = this;
     return true;
 }
 
-int sfxSound::play()
+void sfxSound::playLoop(int loops)
 {
-    int ticks = SDL_GetTicks();
-
-    // Don't play sounds right over the top (doubles volume)
-    if (channel < 0 || ticks - starttime > 40) {
-        instances++;
-        channel = Mix_PlayChannel(-1, sfx, 0);
-
-        if (channel < 0)
-            return channel;
-
-        starttime = ticks;
-
-        if (g_PlayingSoundChannels[channel])
-            printf("Error: Sound was played on channel that was not cleared!\n");
-
-        g_PlayingSoundChannels[channel] = this;
-    }
-    return channel;
-}
-
-int sfxSound::playLoop(int iLoop)
-{
-    instances++;
-    channel = Mix_PlayChannel(-1, sfx, iLoop);
-
+    const int channel = Mix_PlayChannel(-1, m_sfx.get(), loops);
     if (channel < 0)
-        return channel;
+        return;
 
-    g_PlayingSoundChannels[channel] = this;
-
-    return channel;
+    m_channels.set(channel);
 }
 
 void sfxSound::stop()
 {
-    if (channel != -1) {
-        instances = 0;
-        Mix_HaltChannel(channel);
-        channel = -1;
+    for (size_t i = 0; i < m_channels.size(); i++) {
+        if (m_channels.test(i)) {
+            Mix_HaltChannel(i);
+        }
     }
 }
 
-void sfxSound::togglePause()
+void sfxSound::onChannelFinished(int channel)
 {
-    paused = !paused;
-
-    if (paused)
-        Mix_Pause(channel);
-    else
-        Mix_Resume(channel);
-}
-
-void sfxSound::clearChannel()
-{
-    if (--instances <= 0) {
-        instances = 0;
-        channel = -1;
+    sfxSound* const sfx = s_channels[channel];
+    if (sfx) {
+        sfx->m_channels.reset(channel);
     }
-}
-
-void sfxSound::reset()
-{
-    Mix_FreeChunk(sfx);
-    sfx = nullptr;
-    ready = false;
-
-    if (channel > -1)
-        g_PlayingSoundChannels[channel] = nullptr;
-
-    channel = -1;
-}
-
-bool sfxSound::isPlaying() const
-{
-    if (channel == -1)
-        return false;
-
-    return Mix_Playing(channel);
+    s_channels[channel] = nullptr;
 }
 
 
-sfxMusic::~sfxMusic()
+sfxMusic::sfxMusic(const fs::path& path)
 {
-    reset();
-}
+    const std::string path_str = path.generic_string();
+    std::cout << "loading " << path_str << " ...";
 
-bool sfxMusic::load(const std::string& filename)
-{
-    if (music)
-        reset();
+    m_music = MixMusicPtr(Mix_LoadMUS(path_str.c_str()));
+    if (!m_music)
+        throw std::format("Failed to load {}: {}", path_str, Mix_GetError());
 
-    printf("loading %s ...\n", filename.c_str());
-
-    music = Mix_LoadMUS(filename.c_str());
-    if (!music) {
-        printf("  failed: %s\n", Mix_GetError());
-        return false;
-    }
-
-    Mix_HookMusicFinished(&musicfinished);
-
-    ready = true;
-
-    return true;
+    std::cout << " done" << std::endl;
 }
 
 void sfxMusic::play(bool fPlayonce, bool fResume)
 {
-    Mix_PlayMusic(music, fPlayonce ? 0 : -1);
+    Mix_PlayMusic(m_music.get(), fPlayonce ? 0 : -1);
     fResumeMusic = fResume;
 }
 
@@ -231,19 +151,12 @@ void sfxMusic::stop()
 
 void sfxMusic::togglePause()
 {
-    paused = !paused;
-
-    if (paused)
-        Mix_PauseMusic();
-    else
+    if (m_paused) {
         Mix_ResumeMusic();
-}
-
-void sfxMusic::reset()
-{
-    Mix_FreeMusic(music);
-    music = NULL;
-    ready = false;
+    } else {
+        Mix_PauseMusic();
+    }
+    m_paused = !m_paused;
 }
 
 bool sfxMusic::isPlaying() const

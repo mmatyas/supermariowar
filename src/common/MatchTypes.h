@@ -4,8 +4,8 @@ enum class MatchType : unsigned char {
     SingleGame,
     Tournament,
     Tour,
-    World,
     MiniGame,
+    World,
     QuickGame,
     NetGame,
 };

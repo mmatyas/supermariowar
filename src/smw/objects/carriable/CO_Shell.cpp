@@ -24,8 +24,8 @@ extern CResourceManager* rm;
 // state 1: Shell is moving
 // state 2: Shell is waiting to be picked up
 // state 3: Shell is being held
-CO_Shell::CO_Shell(ShellType type, short x, short y, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer)
-    : MO_CarriedObject(&rm->spr_shell, x, y, 4, 4, 30, 20, 1, 11, 0, static_cast<int>(type) * 32, 32, 32)
+CO_Shell::CO_Shell(ShellType type, Vec2s pos, bool dieOnMovingPlayerCollision, bool dieOnHoldingPlayerCollision, bool dieOnFire, bool killBouncePlayer)
+    : MO_CarriedObject(&rm->spr_shell, pos, 4, 4, 30, 20, 1, 11, 0, static_cast<int>(type) * 32, 32, 32)
 {
     iShellType = type;
 
@@ -294,7 +294,7 @@ void CO_Shell::collide(IO_MovingObject* object)
         frozen = true;
         frozentimer = 300;
 
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8);
     }
 }
 
@@ -311,12 +311,12 @@ void CO_Shell::update()
             velx = frozenvelocity;
             animationspeed = frozenanimationspeed;
 
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8);
         }
     } else {
         if (state == 1) {
             if (game_values.shellttl > 0 && ++iDeathTime >= game_values.shellttl) {
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
+                eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix, iy, 3, 8);
                 dead = true;
                 ifSoundOnPlay(rm->sfx_kicksound);
 
@@ -376,23 +376,23 @@ void CO_Shell::update()
 void CO_Shell::draw()
 {
     if (state == 0) {
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY, iw, (short)(ih - fy + iDestY));
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iColorOffsetY, iw, (short)(ih - fy + iDestY)});
     } else if (owner) {
         if (owner->iswarping())
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iColorOffsetY + iFlippedOffset, iw, ih}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
         else
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iColorOffsetY + iFlippedOffset, iw, ih});
     } else {
         if (state == 2)
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, iColorOffsetY + iFlippedOffset, iw, ih});
         else if (state == 1)
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY + iFlippedOffset, iw, ih);
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, iColorOffsetY + iFlippedOffset, iw, ih});
     }
 
     if (frozen) {
-        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
+        rm->spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, {0, 0, 32, 32});
     } else if (fSmoking) {
-        eyecandy[0].add(new EC_SingleAnimation(&rm->spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3));
+        eyecandy[0].emplace<EC_SingleAnimation>(&rm->spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3);
     }
 }
 
@@ -474,7 +474,7 @@ void CO_Shell::Die()
         return;
     }
 
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_shelldead, ix, iy, -velx / 4.0f, -VELJUMP / 2.0f, 1, 0, static_cast<int>(iShellType) * 32, 0, 32, 32));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_shelldead, ix, iy, -velx / 4.0f, -VELJUMP / 2.0f, 1, 0, static_cast<int>(iShellType) * 32, 0, 32, 32);
     dead = true;
     ifSoundOnPlay(rm->sfx_kicksound);
     iKillCounter = 0;
@@ -497,17 +497,17 @@ void CO_Shell::ShatterDie()
     }
 
     short iBrokenIceX = ix - collisionOffsetX, iBrokenIceY = iy - collisionOffsetY;
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, iBrokenIceX, iBrokenIceY, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, iBrokenIceX, iBrokenIceY + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
-    eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, iBrokenIceX, iBrokenIceY, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, iBrokenIceX, iBrokenIceY + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
+    eyecandy[2].emplace<EC_FallingObject>(&rm->spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16);
 }
 
 void CO_Shell::SideBounce(bool fRightSide)
 {
     if (state == 1) {
         if (iBounceCounter == 0) {
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4));
+            eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4);
             ifSoundOnPlay(rm->sfx_bump);
 
             iBounceCounter = 7;  // Allow bounce stars to show on each bounce on a 2x wide pit

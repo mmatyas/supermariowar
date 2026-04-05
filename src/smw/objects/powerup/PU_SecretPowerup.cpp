@@ -16,8 +16,8 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // secret powerup
 //------------------------------------------------------------------------------
-PU_SecretPowerup::PU_SecretPowerup(gfxSprite* nspr, short x, short y, short type)
-    : MO_Powerup(nspr, x, y, 4, 8, 30, 30, 1, 1)
+PU_SecretPowerup::PU_SecretPowerup(gfxSprite* nspr, Vec2s pos, short type)
+    : MO_Powerup(nspr, pos, 4, 8, 30, 30, 1, 1)
     , itemtype(type)
 {
     place();
@@ -40,7 +40,7 @@ void PU_SecretPowerup::draw()
     MO_Powerup::draw();
 
     // Draw sparkles
-    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+    rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, {sparkledrawframe, 0, 32, 32});
 }
 
 bool PU_SecretPowerup::collide(CPlayer* player)
@@ -49,7 +49,7 @@ bool PU_SecretPowerup::collide(CPlayer* player)
         game_values.windaffectsplayers = true;
 
         for (short i = 0; i < 15; i++)
-            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), RANDOM_INT(4) + 1));
+            eyecandy[2].emplace<EC_Snow>(&rm->spr_snow, (float)(RANDOM_INT(App::screenWidth)), (float)RANDOM_INT(App::screenHeight), RANDOM_INT(4) + 1);
     } else if (itemtype == 1) {
         game_values.spinscreen = true;
     } else if (itemtype == 2) {

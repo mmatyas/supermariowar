@@ -159,6 +159,6 @@ UI_GameplayOptionsMenu::UI_GameplayOptionsMenu()
     AddNonControl(miGameplayOptionsMenuRightHeaderBar);
     AddNonControl(miGameplayOptionsMenuHeaderText);
 
-    SetHeadControl(miRespawnField);
+    setInitialFocus(miRespawnField);
     SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 };

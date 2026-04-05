@@ -66,14 +66,14 @@ UI_NetNewRoomSettingsMenu::UI_NetNewRoomSettingsMenu(const UI_GameSettingsMenu* 
 
     //AddNonControl(miMapFiltersOnImage);
 
-    SetHeadControl(miContinueButton);
+    setInitialFocus(miContinueButton);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 }
 
 void UI_NetNewRoomSettingsMenu::RefreshGameModeButtons()
 {
     for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
-        miGoalField[iMode]->Show(miModeField->currentValue() == iMode);
+        miGoalField[iMode]->setVisible(miModeField->currentValue() == iMode);
 }
 
 std::string UI_NetNewRoomSettingsMenu::getCurrentMapPath() const

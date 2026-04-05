@@ -20,8 +20,8 @@ extern CResourceManager* rm;
 // class powerup block
 //------------------------------------------------------------------------------
 
-B_PowerupBlock::B_PowerupBlock(gfxSprite* nspr1, short x, short y, short iNumSpr, short aniSpeed, bool fHidden, const short * piSettings)
-    : IO_Block(nspr1, x, y)
+B_PowerupBlock::B_PowerupBlock(gfxSprite* nspr1, Vec2s pos, short iNumSpr, short aniSpeed, bool fHidden, const short * piSettings)
+    : IO_Block(nspr1, pos)
 {
     iw = (short)spr->getWidth() >> 2;
     ih = (short)spr->getHeight() >> 1;  //This sprite has two images (unused and used blocks)
@@ -77,7 +77,7 @@ B_PowerupBlock::~B_PowerupBlock()
 void B_PowerupBlock::draw()
 {
     if (!hidden)
-        spr->draw(ix, iy, drawFrame, state == 0 ? 0 : ih, iw, ih);
+        spr->draw(ix, iy, {drawFrame, state == 0 ? 0 : ih, iw, ih});
 }
 
 void B_PowerupBlock::update()
@@ -96,18 +96,20 @@ void B_PowerupBlock::update()
             state = 3;
             setYi(iposy);
 
+            const Vec2 pos(ix, iy);
+
             if (game_values.gamemode->gamemode == game_mode_health && RANDOM_INT(100) < game_values.gamemodesettings.health.percentextralife) {
-                createpowerup(HEALTH_POWERUP, ix, iy, side, true);
+                createpowerup(HEALTH_POWERUP, pos, side, true);
             } else if ((game_values.gamemode->gamemode == game_mode_timelimit && RANDOM_INT(100) < game_values.gamemodesettings.time.percentextratime) ||
                       (game_values.gamemode->gamemode == game_mode_star && RANDOM_INT(100) < game_values.gamemodesettings.star.percentextratime)) {
-                createpowerup(TIME_POWERUP, ix, iy, side, true);
+                createpowerup(TIME_POWERUP, pos, side, true);
             } else if ((game_values.gamemode->gamemode == game_mode_coins && RANDOM_INT(100) < game_values.gamemodesettings.coins.percentextracoin) ||
                       (game_values.gamemode->gamemode == game_mode_greed && RANDOM_INT(100) < game_values.gamemodesettings.greed.percentextracoin)) {
-                createpowerup(COIN_POWERUP, ix, iy, side, true);
+                createpowerup(COIN_POWERUP, pos, side, true);
             } else if (game_values.gamemode->gamemode == game_mode_jail && (RANDOM_INT(100)) < game_values.gamemodesettings.jail.percentkey) {
-                createpowerup(JAIL_KEY_POWERUP, ix, iy, side, true);
+                createpowerup(JAIL_KEY_POWERUP, pos, side, true);
             } else {
-                createpowerup(SelectPowerup(), ix, iy, side, true);
+                createpowerup(SelectPowerup(), pos, side, true);
             }
 
             ifSoundOnPlay(rm->sfx_sprout);

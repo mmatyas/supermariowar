@@ -16,7 +16,7 @@ extern CResourceManager* rm;
 // class egg (for egg mode)
 //------------------------------------------------------------------------------
 CO_Egg::CO_Egg(gfxSprite* nspr, short iColor)
-    : MO_CarriedObject(nspr, 0, 0, 2, 16, 28, 30, 2, 1, 0, iColor << 5, 32, 32)
+    : MO_CarriedObject(nspr, Vec2s::zero(), 2, 16, 28, 30, 2, 1, 0, iColor << 5, 32, 32)
 {
     state = 1;
     movingObjectType = movingobject_egg;
@@ -93,7 +93,7 @@ void CO_Egg::update()
         if (--explosiondrawtimer <= 0) {
             explosiondrawtimer = 62;
             if (--explosiondrawframe < 0) {
-                objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + (iw >> 1) - 96, iy + (ih >> 1) - 64, 2, 4, -1, -1, KillStyle::Bomb));
+                objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, {ix + (iw >> 1) - 96, iy + (ih >> 1) - 64}, 2, 4, -1, -1, KillStyle::Bomb));
                 placeEgg();
 
                 ifSoundOnPlay(rm->sfx_bobombsound);
@@ -116,9 +116,9 @@ void CO_Egg::draw()
     // Display explosion timer
     if (game_values.gamemodesettings.egg.explode > 0 && explosiondrawframe < 5) {
         if (owner && owner->iswarping())
-            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32, owner->GetWarpState(), owner->GetWarpPlane());
+            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, {explosiondrawframe << 5, color << 5, 32, 32}, static_cast<ClipEdge>(owner->GetWarpState()), owner->GetWarpPlane());
         else
-            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32);
+            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, {explosiondrawframe << 5, color << 5, 32, 32});
     }
 }
 

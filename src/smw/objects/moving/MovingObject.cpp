@@ -28,8 +28,8 @@ extern CPlayer* GetPlayerFromGlobalID(short iGlobalID);
 //------------------------------------------------------------------------------
 // class MovingObject (all moving objects inheirit from this class)
 //------------------------------------------------------------------------------
-IO_MovingObject::IO_MovingObject(gfxSprite* nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth)
-    : CObject(nspr, x, y)
+IO_MovingObject::IO_MovingObject(gfxSprite* nspr, Vec2s pos, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth)
+    : CObject(nspr, pos)
 {
     iNumSprites = iNumSpr;
 
@@ -92,7 +92,7 @@ IO_MovingObject::IO_MovingObject(gfxSprite* nspr, short x, short y, short iNumSp
 
 void IO_MovingObject::draw()
 {
-    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
+    spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, animationOffsetY, iw, ih});
 }
 
 
@@ -757,7 +757,7 @@ void IO_MovingObject::KillObjectMapHazard(short playerID)
         }
 
         dead = true;
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4));
+        eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4);
 
         if (movingObjectType == movingobject_fireball) {
             CPlayer* player = GetPlayerFromGlobalID(iPlayerID);

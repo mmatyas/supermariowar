@@ -36,7 +36,7 @@ Room::Room(uint32_t roomID, const char* name, const char* password, Player* host
     players[0] = host;
     host->skinPackage.setPlayerID(0);
 
-    createTime = TIME_NOW();
+    createTime = time_now();
     lastActivityTime = createTime;
 }
 

@@ -8,22 +8,21 @@ class CGM_Pipe_MiniGame : public CGameMode
 {
     public:
         CGM_Pipe_MiniGame();
-        virtual ~CGM_Pipe_MiniGame() {}
 
-        void init();
-        void think();
+        void init() override;
+        void think() override;
 
-        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style);
-        PlayerKillType playerkilledself(CPlayer &player, KillStyle style);
-        void playerextraguy(CPlayer &player, short iType);
-        PlayerKillType CheckWinner(CPlayer * player);
+        PlayerKillType playerkilledplayer(CPlayer &inflictor, CPlayer &other, KillStyle style) override;
+        PlayerKillType playerkilledself(CPlayer &player, KillStyle style) override;
+        void playerextraguy(CPlayer &player, short iType) override;
+        PlayerKillType CheckWinner(CPlayer * player) override;
 
         void SetBonus(short iType, short iTimer, short iTeamID);
     bool IsSlowdown() {
         return fSlowdown;
     }
 
-    bool HasStoredPowerups() {
+    bool HasStoredPowerups() override {
         return false;
     }
 

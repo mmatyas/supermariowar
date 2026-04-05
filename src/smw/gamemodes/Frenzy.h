@@ -7,11 +7,9 @@ class CGM_Frenzy : public CGM_Frag
 {
     public:
         CGM_Frenzy();
-        virtual ~CGM_Frenzy() {}
 
-        void init();
-        void think();
-        char *getMenuString(char *buffer64);
+        void init() override;
+        void think() override;
 
         void setFrenzyOwner(CPlayer* palyer);
 

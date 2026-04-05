@@ -80,13 +80,13 @@ void CGM_Frenzy::think()
             if (m_frenzyowner->powerup != iSelectedPowerup)
                 m_frenzyowner = NULL;
         } else if (5 == iSelectedPowerup) {
-            if (game_values.gamepowerups[m_frenzyowner->getGlobalID()] != 9)
+            if (game_values.gamepowerups[m_frenzyowner->getGlobalID()] != static_cast<short>(PowerupType::Pow))
                 m_frenzyowner = NULL;
         } else if (6 == iSelectedPowerup) {
-            if (game_values.gamepowerups[m_frenzyowner->getGlobalID()] != 16)
+            if (game_values.gamepowerups[m_frenzyowner->getGlobalID()] != static_cast<short>(PowerupType::Mod))
                 m_frenzyowner = NULL;
         } else if (7 == iSelectedPowerup) {
-            if (game_values.gamepowerups[m_frenzyowner->getGlobalID()] != 10)
+            if (game_values.gamepowerups[m_frenzyowner->getGlobalID()] != static_cast<short>(PowerupType::BulletBill))
                 m_frenzyowner = NULL;
         }
     }

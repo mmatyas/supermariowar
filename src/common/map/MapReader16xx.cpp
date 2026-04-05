@@ -2,13 +2,13 @@
 
 #include "GameValues.h"
 #include "map.h"
+#include "MapReaderConstants.h"
 #include "FileIO.h"
 #include "TilesetManager.h"
 
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
-extern short g_iTileTypeConversion[NUMTILETYPES];
 
 
 namespace {
@@ -86,21 +86,13 @@ void MapReader1600::read_tiles(CMap& map, BinaryFile& mapfile)
                 }
             }
 
-            map.mapdatatop[i][j].iType = tile_nonsolid;
-            map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
+            map.mapdatatop[i][j] = TileType::NonSolid;
 
             for (short k = MAPLAYERS - 1; k >= 0; k--) {
                 TilesetTile * tile = &map.mapdata[i][j][k];
-                TileType type = g_tilesetmanager->classicTileset().tileType(tile->iCol, tile->iRow);
-                if (type != tile_nonsolid) {
-                    if (type >= 0 && type < NUMTILETYPES) {
-                        map.mapdatatop[i][j].iType = type;
-                        map.mapdatatop[i][j].iFlags = g_iTileTypeConversion[type];
-                    } else {
-                        map.mapdatatop[i][j].iType = tile_nonsolid;
-                        map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-                    }
-
+                TileType type = g_tilesetmanager->classicTileset()->tileType(tile->iCol, tile->iRow);
+                if (type != TileType::NonSolid) {
+                    map.mapdatatop[i][j] = type;
                     break;
                 }
             }

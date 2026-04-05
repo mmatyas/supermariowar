@@ -1,12 +1,16 @@
 #include "MI_WorldPreviewDisplay.h"
 
+#include "FileList.h"
+#include "GameValues.h"
 #include "GlobalConstants.h"
 #include "world.h"
 
 extern SDL_Surface* blitdest;
 extern SDL_Surface* screen;
 
+extern CGameValues game_values;
 extern WorldMap g_worldmap;
+extern WorldList *worldlist;
 
 
 MI_WorldPreviewDisplay::MI_WorldPreviewDisplay(short x, short y, short cols, short rows)
@@ -14,16 +18,8 @@ MI_WorldPreviewDisplay::MI_WorldPreviewDisplay(short x, short y, short cols, sho
     , iCols(cols)
     , iRows(rows)
 {
-    sMapSurface = SDL_CreateRGBSurface(screen->flags, 384, 304, screen->format->BitsPerPixel, 0, 0, 0, 0);
+    map_sprite = gfxSprite::blank(384, 304);
     Init();
-}
-
-MI_WorldPreviewDisplay::~MI_WorldPreviewDisplay()
-{
-    if (sMapSurface) {
-        SDL_FreeSurface(sMapSurface);
-        sMapSurface = NULL;
-    }
 }
 
 void MI_WorldPreviewDisplay::Init()
@@ -54,8 +50,8 @@ void MI_WorldPreviewDisplay::Init()
 
     rectDstSurface.w = 320;
     rectDstSurface.h = 240;
-    rectDstSurface.x = ix;
-    rectDstSurface.y = iy;
+    rectDstSurface.x = m_pos.x;
+    rectDstSurface.y = m_pos.y;
 
     if (g_worldmap.iWidth < 20)
         rectDstSurface.x += (20 - g_worldmap.iWidth) * 8;
@@ -73,7 +69,7 @@ void MI_WorldPreviewDisplay::Init()
 
 void MI_WorldPreviewDisplay::Update()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     bool fNeedMapSurfaceUpdate = false;
@@ -190,18 +186,18 @@ void MI_WorldPreviewDisplay::Update()
 
 void MI_WorldPreviewDisplay::Draw()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     rectSrcSurface.x = iMapOffsetX;
     rectSrcSurface.y = iMapOffsetY;
 
-    SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
+    map_sprite.draw(rectSrcSurface, blitdest, rectDstSurface);
 }
 
 void MI_WorldPreviewDisplay::SetWorld()
 {
-    g_worldmap.Load(PREVIEWTILESIZE);
+    g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), PREVIEWTILESIZE);
 
     short w, h;
     g_worldmap.GetWorldSize(&w, &h);
@@ -216,10 +212,10 @@ void MI_WorldPreviewDisplay::SetWorld()
 
 void MI_WorldPreviewDisplay::UpdateMapSurface(bool fFullRefresh)
 {
-    g_worldmap.DrawMapToSurface(-1, fFullRefresh, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+    g_worldmap.DrawMapToSurface(-1, fFullRefresh, map_sprite.getSurface(), iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 
     SDL_Surface * olddest = blitdest;
-    blitdest = sMapSurface;
+    blitdest = map_sprite.getSurface();
     g_worldmap.Draw(iMapGlobalOffsetX, iMapGlobalOffsetY, false, false);
     blitdest = olddest;
 }

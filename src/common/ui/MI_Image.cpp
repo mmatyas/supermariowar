@@ -4,6 +4,8 @@
 
 #include <cmath>
 
+extern SDL_Surface * blitdest;
+
 
 MI_Image::MI_Image(
         gfxSprite * nspr,
@@ -26,7 +28,7 @@ MI_Image::MI_Image(
 
 void MI_Image::Update()
 {
-    if (!fShow)
+    if (!m_visible)
         return;
 
     if (iSpeed > 0 && ++iTimer >= iSpeed) {
@@ -79,7 +81,7 @@ void MI_Image::Update()
 
 void MI_Image::Draw()
 {
-    if (!fShow || (fBlink && !fBlinkShow))
+    if (!m_visible || (fBlink && !fBlinkShow))
         return;
 
     short iXOffset = 0;
@@ -90,8 +92,16 @@ void MI_Image::Draw()
         iYOffset = (short)(dSwirlRadius * sin(dSwirlAngle));
     }
 
-    if (fPulse)
-        spr->drawStretch(ix - iPulseValue + iXOffset, iy - iPulseValue + iYOffset, iw + (iPulseValue << 1), ih + (iPulseValue << 1), iXFrame, iYFrame, iw, ih);
-    else
-        spr->draw(ix + iXOffset, iy + iYOffset, iXFrame, iYFrame, iw, ih);
+    const SDL_Rect srcRect {iXFrame, iYFrame, iw, ih};
+    if (fPulse) {
+        const SDL_Rect dstRect {
+            m_pos.x - iPulseValue + iXOffset,
+            m_pos.y - iPulseValue + iYOffset,
+            iw + (iPulseValue << 1),
+            ih + (iPulseValue << 1),
+        };
+        spr->drawStretch(srcRect, blitdest, dstRect);
+    } else {
+        spr->draw(m_pos.x + iXOffset, m_pos.y + iYOffset, srcRect);
+    }
 }

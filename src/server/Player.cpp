@@ -27,7 +27,7 @@ Player::Player()
     name = "Anonymous";
     network_client = NULL;
 
-    joinTime = TIME_NOW();
+    joinTime = time_now();
     lastActivityTime = joinTime;
 }
 
@@ -42,14 +42,14 @@ void Player::setClient(NetPeer* client)
     assert(network_client == NULL);
     network_client = client;
 
-    lastActivityTime = TIME_NOW();
+    lastActivityTime = time_now();
 }
 
 void Player::setName(const std::string& name)
 {
     this->name = name;
 
-    lastActivityTime = TIME_NOW();
+    lastActivityTime = time_now();
 }
 
 void Player::setSkin(const void* data, size_t data_length)
@@ -62,7 +62,7 @@ void Player::setSkin(const void* data, size_t data_length)
     }
 
     skinPackage.replace_with(data, data_length);
-    lastActivityTime = TIME_NOW();
+    lastActivityTime = time_now();
 }
 
 // Printing stuff
@@ -91,7 +91,7 @@ bool Player::sendData(const void* data, size_t dataLength)
     if (!network_client || !data || dataLength < 3)
         return false;
 
-    lastActivityTime = TIME_NOW();
+    lastActivityTime = time_now();
     return network_client->sendReliable(data, dataLength);
 }
 

@@ -39,6 +39,6 @@ UI_PlayerControlsSelectMenu::UI_PlayerControlsSelectMenu()
     AddNonControl(miPlayerControlsMenuRightHeaderBar);
     AddNonControl(miPlayerControlsMenuHeaderText);
 
-    SetHeadControl(miPlayer1ControlsButton);
+    setInitialFocus(miPlayer1ControlsButton);
     SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 }

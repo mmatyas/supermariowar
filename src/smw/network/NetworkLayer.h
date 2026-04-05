@@ -8,8 +8,7 @@
 class NetworkLayer
 {
     public:
-        NetworkLayer() {}
-        virtual ~NetworkLayer() {}
+        virtual ~NetworkLayer() = default;
 
         virtual bool init() { return true; }
         virtual void cleanup() {}

@@ -1,0 +1,23 @@
+target_sources(CommonFiles PRIVATE
+    MenuCode.h
+    MI_Button.cpp
+    MI_Button.h
+    MI_Image.cpp
+    MI_Image.h
+    MI_ImageSelectField.cpp
+    MI_ImageSelectField.h
+    MI_MapField.cpp
+    MI_MapField.h
+    MI_MapPreview.cpp
+    MI_MapPreview.h
+    MI_ScoreText.cpp
+    MI_ScoreText.h
+    MI_SelectField.cpp
+    MI_SelectField.h
+    MI_SliderField.cpp
+    MI_SliderField.h
+    MI_Text.cpp
+    MI_Text.h
+    MI_TextField.cpp
+    MI_TextField.h
+)
