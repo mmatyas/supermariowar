@@ -44,6 +44,7 @@ For me, this was the point where I've stopped putting more time on this project 
 - Lots and lots and lots of bugfixes (seriously, there's at least 200)
 - Added Web, ARM and (an experimental) Android ports, and improved support for Windows, Linux and OSX
 - Improved music and sound quality
+- Add support for more audio formats in music packs: 669, AMF, AMS, DBM, DSM, FAR, FLAC, GBS, GDM, IT, KAR, M3U, MAD, MDL, MED, MID, MIDI, MOD, MOL, MP3, MPEG, MPG, MTM, NSF, NST, OGG, OKT, PTM, S3M, SPC, STM, ULT, UMX, VGM, WAV, WOW, XM
 - Ported all parts of the game to SDL2, for hardware accelerated drawing and improved support for many platforms
 - Major cleanup of the source code and the build system
 
