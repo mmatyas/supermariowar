@@ -97,7 +97,7 @@ set(ZLIB_BUILD_TESTING OFF CACHE BOOL "")
 set(ZLIB_BUILD_SHARED OFF CACHE BOOL "")
 set(ZLIB_INSTALL OFF CACHE BOOL "")
 smw_declare_gitrepo(
-    zlib
+    ZLIB
     https://github.com/madler/zlib.git
     v1.3.2
 )
