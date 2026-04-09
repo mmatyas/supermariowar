@@ -78,7 +78,6 @@ add_library(CommonFiles STATIC
 add_subdirectory(ui)
 target_compile_features(CommonFiles PUBLIC cxx_std_20)
 
-target_compile_definitions(CommonFiles PUBLIC USE_SDL2)  # TODO
 if (SDL2_FORCE_GLES)
     target_compile_definitions(CommonFiles PUBLIC SDL2_FORCE_GLES)
 endif()
