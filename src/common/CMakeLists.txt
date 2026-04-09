@@ -84,9 +84,5 @@ endif()
 
 
 if(NOT EMSCRIPTEN)
-    target_link_libraries(CommonFiles
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-        SDL2_mixer::SDL2_mixer
-    )
+    target_link_libraries(CommonFiles smw_sdl smw_sdl_image smw_sdl_mixer)
 endif()

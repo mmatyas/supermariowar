@@ -21,6 +21,7 @@ option(USE_PNG_SAVE "Use PNG for screenshots and thumbnails" ON)
 option(NO_NETWORK "Disable all network communication" OFF)
 option(SDL2_FORCE_GLES "(SDL2) Use OpenGL ES rendering if possible" OFF)
 option(BUILD_TESTS "Build the unit tests" ON)
+option(SMW_USE_SDL3 "Build with SDL3 instead of SDL2" ON)
 
 set(SMW_INSTALL_PORTABLE_DEFAULT OFF)
 if(WIN32)
