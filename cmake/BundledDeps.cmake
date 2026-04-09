@@ -54,25 +54,10 @@ FetchContent_Declare(
 
 # SDL_mixer
 set(SDL2MIXER_VENDORED ON CACHE BOOL "")
-set(SDL2MIXER_DEPS_SHARED OFF CACHE BOOL "")
-set(SDL2MIXER_AIFF OFF CACHE BOOL "")
-set(SDL2MIXER_VOC OFF CACHE BOOL "")
-set(SDL2MIXER_AU OFF CACHE BOOL "")
-set(SDL2MIXER_FLAC OFF CACHE BOOL "")
-set(SDL2MIXER_GME OFF CACHE BOOL "")
-set(SDL2MIXER_MOD OFF CACHE BOOL "")
-set(SDL2MIXER_MP3 OFF CACHE BOOL "")
-set(SDL2MIXER_MIDI OFF CACHE BOOL "")
-set(SDL2MIXER_OPUS OFF CACHE BOOL "")
-set(SDL2MIXER_WAVPACK OFF CACHE BOOL "")
-FetchContent_Declare(
+smw_declare_gitrepo(
     SDL2_mixer
-    GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
-    GIT_TAG release-2.8.1
-    GIT_SHALLOW TRUE
-    GIT_PROGRESS TRUE
-    GIT_SUBMODULES "external/ogg" "external/vorbis"
-    FIND_PACKAGE_ARGS NAMES SDL2_mixer
+    https://github.com/libsdl-org/SDL_mixer.git
+    release-2.8.1
 )
 
 
