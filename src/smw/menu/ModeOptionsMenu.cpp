@@ -33,6 +33,13 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miClassicModeScoringField->setOutputPtr(&game_values.gamemodemenusettings.classic.scoring);
     miClassicModeScoringField->setCurrentValue(game_values.gamemodemenusettings.classic.scoring);
 
+    miClassicModeHazardPenaltyField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 280, "Hazard Penalty", 400, 180);
+    miClassicModeHazardPenaltyField->add("Off", false);
+    miClassicModeHazardPenaltyField->add("On", true);
+    miClassicModeHazardPenaltyField->setOutputPtr(&game_values.gamemodemenusettings.classic.losepointsonhazarddeath);
+    miClassicModeHazardPenaltyField->setCurrentValue(game_values.gamemodemenusettings.classic.losepointsonhazarddeath ? 1 : 0);
+    miClassicModeHazardPenaltyField->setAutoAdvance(true);
+
     miClassicModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miClassicModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
@@ -40,9 +47,29 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miClassicModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
     miClassicModeHeaderText = new MI_HeaderText("Classic Mode Menu", 320, 5);
 
-    mModeSettingsMenu[0].AddControl(miClassicModeStyleField, miClassicModeBackButton, miClassicModeScoringField, NULL, miClassicModeBackButton);
-    mModeSettingsMenu[0].AddControl(miClassicModeScoringField, miClassicModeStyleField, miClassicModeBackButton, NULL, miClassicModeBackButton);
-    mModeSettingsMenu[0].AddControl(miClassicModeBackButton, miClassicModeScoringField, miClassicModeStyleField, miClassicModeScoringField, NULL);
+    mModeSettingsMenu[0].AddControl(miClassicModeStyleField,
+        miClassicModeBackButton,
+        miClassicModeScoringField,
+        NULL,
+        miClassicModeBackButton);
+
+    mModeSettingsMenu[0].AddControl(miClassicModeScoringField,
+        miClassicModeStyleField,
+        miClassicModeHazardPenaltyField,
+        NULL,
+        miClassicModeBackButton);
+
+    mModeSettingsMenu[0].AddControl(miClassicModeHazardPenaltyField,
+        miClassicModeScoringField,
+        miClassicModeBackButton,
+        NULL,
+        miClassicModeBackButton);
+
+    mModeSettingsMenu[0].AddControl(miClassicModeBackButton,
+        miClassicModeHazardPenaltyField,
+        miClassicModeStyleField,
+        miClassicModeHazardPenaltyField,
+        NULL);
 
     mModeSettingsMenu[0].AddNonControl(miClassicModeLeftHeaderBar);
     mModeSettingsMenu[0].AddNonControl(miClassicModeRightHeaderBar);
@@ -68,6 +95,13 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miFragModeScoringField->setOutputPtr(&game_values.gamemodemenusettings.frag.scoring);
     miFragModeScoringField->setCurrentValue(game_values.gamemodemenusettings.frag.scoring);
 
+    miFragModeHazardPenaltyField = new MI_SelectField<bool>(&rm->spr_selectfield, 120, 280, "Hazard Penalty", 400, 180);
+    miFragModeHazardPenaltyField->add("Off", false);
+    miFragModeHazardPenaltyField->add("On", true);
+    miFragModeHazardPenaltyField->setOutputPtr(&game_values.gamemodemenusettings.frag.losepointsonhazarddeath);
+    miFragModeHazardPenaltyField->setCurrentValue(game_values.gamemodemenusettings.frag.losepointsonhazarddeath ? 1 : 0);
+    miFragModeHazardPenaltyField->setAutoAdvance(true);
+
     miFragModeBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, TextAlign::CENTER);
     miFragModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
@@ -75,9 +109,29 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miFragModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
     miFragModeHeaderText = new MI_HeaderText("Frag Mode Menu", 320, 5);
 
-    mModeSettingsMenu[1].AddControl(miFragModeStyleField, miFragModeBackButton, miFragModeScoringField, NULL, miFragModeBackButton);
-    mModeSettingsMenu[1].AddControl(miFragModeScoringField, miFragModeStyleField, miFragModeBackButton, NULL, miFragModeBackButton);
-    mModeSettingsMenu[1].AddControl(miFragModeBackButton, miFragModeScoringField, miFragModeStyleField, miFragModeScoringField, NULL);
+    mModeSettingsMenu[1].AddControl(miFragModeStyleField,
+        miFragModeBackButton,
+        miFragModeScoringField,
+        NULL,
+        miFragModeBackButton);
+
+    mModeSettingsMenu[1].AddControl(miFragModeScoringField,
+        miFragModeStyleField,
+        miFragModeHazardPenaltyField,
+        NULL,
+        miFragModeBackButton);
+
+    mModeSettingsMenu[1].AddControl(miFragModeHazardPenaltyField,
+        miFragModeScoringField,
+        miFragModeBackButton,
+        NULL,
+        miFragModeBackButton);
+
+    mModeSettingsMenu[1].AddControl(miFragModeBackButton,
+        miFragModeHazardPenaltyField,
+        miFragModeStyleField,
+        miFragModeHazardPenaltyField,
+        NULL);
 
     mModeSettingsMenu[1].AddNonControl(miFragModeLeftHeaderBar);
     mModeSettingsMenu[1].AddNonControl(miFragModeRightHeaderBar);
@@ -1401,9 +1455,11 @@ void UI_ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
     if (iMode == game_mode_classic) { // classic
         game_values.gamemodesettings.classic.style = miClassicModeStyleField->randomValue();
         game_values.gamemodesettings.classic.scoring = miClassicModeScoringField->randomValue();
+        game_values.gamemodesettings.classic.losepointsonhazarddeath = miClassicModeHazardPenaltyField->randomValue();
     } else if (iMode == game_mode_frag) { // frag
         game_values.gamemodesettings.frag.style = miFragModeStyleField->randomValue();
         game_values.gamemodesettings.frag.scoring = miFragModeScoringField->randomValue();
+        game_values.gamemodesettings.frag.losepointsonhazarddeath = miFragModeHazardPenaltyField->randomValue();
     } else if (iMode == game_mode_timelimit) { // time
         game_values.gamemodesettings.time.style = miTimeLimitModeStyleField->randomValue();
         game_values.gamemodesettings.time.scoring = miTimeLimitModeScoringField->randomValue();
