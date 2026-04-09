@@ -74,7 +74,7 @@ smw_declare_gitrepo(
 smw_declare_gitrepo(
     enet
     https://github.com/mmatyas/enet.git
-    493c1b826b212a2d442c57b384cfe3101cfff3b7
+    74d43e850f5abda0e5f565caa5d54f462bc210fd
 )
 
 # zlib
