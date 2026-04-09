@@ -2569,11 +2569,7 @@ int editor_platforms()
                     } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                         const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                    #else
-                        Uint8 * keystate = SDL_GetKeyState(NULL);
-                    #endif
                         if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
                         } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous || g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {
