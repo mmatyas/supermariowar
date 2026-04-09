@@ -19,7 +19,7 @@ CGM_Chase::CGM_Chase() : CGameMode()
     goal = 200;
     gamemode = game_mode_chase;
 
-    SetupModeStrings("Phanto", "Points", 50);
+    SetupModeStrings("Ghost Chase", "Points", 50);
 }
 
 void CGM_Chase::init()

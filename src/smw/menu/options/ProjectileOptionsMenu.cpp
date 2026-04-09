@@ -195,12 +195,12 @@ UI_ProjectileOptionsMenu::UI_ProjectileOptionsMenu()
     miProjectileOptionsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
     miProjectileOptionsMenuHeaderText = new MI_HeaderText("Projectile & Weapon Options Menu", 320, 5);
 
-    miFireballText = new MI_Text("Fireball", 10, 50, 0, true, TextAlign::LEFT);
-    miFeatherText = new MI_Text("Feather", 10, 120, 0, true, TextAlign::LEFT);
+    miFireballText = new MI_Text("Chili Pepper", 10, 50, 0, true, TextAlign::LEFT);
+    miFeatherText = new MI_Text("Olli's Cloak", 10, 120, 0, true, TextAlign::LEFT);
     miBoomerangText = new MI_Text("Boomerang", 10, 190, 0, true, TextAlign::LEFT);
     miHammerText = new MI_Text("Hammer", 325, 50, 0, true, TextAlign::LEFT);
     miShellText = new MI_Text("Shell", 10, 300, 0, true, TextAlign::LEFT);
-    miWandText = new MI_Text("Wand", 10, 370, 0, true, TextAlign::LEFT);
+    miWandText = new MI_Text("Freeze Pop", 10, 370, 0, true, TextAlign::LEFT);
     miBlueBlockText = new MI_Text("Throwable Blocks", 325, 200, 0, true, TextAlign::LEFT);
 
     AddControl(miFireballLifeField, miProjectileOptionsMenuBackButton, miFeatherJumpsField, NULL, miHammerLifeField);

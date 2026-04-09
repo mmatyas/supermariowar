@@ -2935,7 +2935,7 @@ SDL_Rect rBackground[2];
 //SDL_Rect rTypeButton[8][4];
 SDL_Rect rIconRects[MAXMAPHAZARDS][2];
 
-const char * szHazardNames[8] = {"Fireballs", "Rotodisc", "Bullet Bill", "Flame Thrower", "Green Pirhana", "Red Pirhana", "Tall Pirhana", "Short Pirhana"};
+const char * szHazardNames[8] = {"Firebar", "Electorb", "Cannonball", "Flamethrower", "Monkey", "Vulcan Turnip", "Bamboo Blossom", "Mr. Prickles"};
 
 bool editor_maphazards_initialized = false;
 void init_editor_maphazards()
@@ -3292,7 +3292,7 @@ int editor_maphazards()
                 rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 2, "[esc] Exit, [l] Location, [+/-] Velocity, [LMB] Angle and Radius");
 
                 if (hazard.itype == 1) {
-                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle, [1-9] Number of Rotodiscs");
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle, [1-9] Number of Electorbs");
                 } else {
                     rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle");
                 }
