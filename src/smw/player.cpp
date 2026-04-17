@@ -694,151 +694,151 @@ void CPlayer::update_respawning()
 
 void CPlayer::triggerPowerup()
 {
-    switch (powerupused.value()) {
-    case PowerupType::PoisonMushroom: {
-        break;
-    }
-    case PowerupType::ExtraLife1: {
-        game_values.gamemode->playerextraguy(*this, 1);
+    auto grantExtraLife = [this](short amount) {
+        game_values.gamemode->playerextraguy(*this, amount);
         ifSoundOnPlay(rm->sfx_extraguysound);
-        break;
-    }
-    case PowerupType::ExtraLife2: {
-        game_values.gamemode->playerextraguy(*this, 2);
-        ifSoundOnPlay(rm->sfx_extraguysound);
-        break;
-    }
-    case PowerupType::ExtraLife3: {
-        game_values.gamemode->playerextraguy(*this, 3);
-        ifSoundOnPlay(rm->sfx_extraguysound);
-        break;
-    }
-    case PowerupType::ExtraLife5: {
-        game_values.gamemode->playerextraguy(*this, 5);
-        ifSoundOnPlay(rm->sfx_extraguysound);
-        break;
-    }
-    case PowerupType::Fire: {
+    };
+
+    auto equipStoredPowerup = [this](short newPowerup) {
         powerup = -1;
-        SetPowerup(1);
+        SetPowerup(newPowerup);
+    };
+
+    auto triggerScreenShake = [this](bool killInAir, short killsCount = 0) {
+        ifSoundOnPlay(rm->sfx_thunder);
+        game_values.flags.screenshaketimer = 20;
+        game_values.flags.screenshakeplayerid = globalID;
+        game_values.flags.screenshaketeamid = teamID;
+        game_values.flags.screenshakekillinair = killInAir;
+        game_values.flags.screenshakekillscount = killsCount;
+    };
+
+    auto spawnStoredShell = [this](ShellType type, bool green, bool bouncing, bool killBounce, bool spiny) {
+        CO_Shell* shell = new CO_Shell(type, Vec2s::zero(), green, bouncing, killBounce, spiny);
+        if (objectcontainer[1].add(shell))
+            shell->UsedAsStoredPowerup(this);
+    };
+
+    switch (powerupused.value()) {
+    case PowerupType::PoisonMushroom:
         break;
-    }
-    case PowerupType::Star: {
+
+    case PowerupType::ExtraLife1:
+        grantExtraLife(1);
+        break;
+    case PowerupType::ExtraLife2:
+        grantExtraLife(2);
+        break;
+    case PowerupType::ExtraLife3:
+        grantExtraLife(3);
+        break;
+    case PowerupType::ExtraLife5:
+        grantExtraLife(5);
+        break;
+
+    case PowerupType::Fire:
+        equipStoredPowerup(1);
+        break;
+
+    case PowerupType::Star:
         invincibility.turn_on(*this);
         break;
-    }
-    case PowerupType::Clock: {
+
+    case PowerupType::Clock:
         turnslowdownon();
         outofarena.reset();
         break;
-    }
-    case PowerupType::Bobomb: {
+
+    case PowerupType::Bobomb:
         powerup = -1;
         bobomb = false;
         SetPowerup(0);
         break;
-    }
-    case PowerupType::Pow: {
-        ifSoundOnPlay(rm->sfx_thunder);
-        game_values.flags.screenshaketimer = 20;
-        game_values.flags.screenshakeplayerid = globalID;
-        game_values.flags.screenshaketeamid = teamID;
-        game_values.flags.screenshakekillinair = false;
-        game_values.flags.screenshakekillscount = 0;
+
+    case PowerupType::Pow:
+        triggerScreenShake(false, 0);
         break;
-    }
-    case PowerupType::BulletBill: {
+
+    case PowerupType::BulletBill:
         game_values.bulletbilltimer[globalID] = 400;
         game_values.bulletbillspawntimer[globalID] = 0;
         break;
-    }
-    case PowerupType::Hammer: {
-        powerup = -1;
-        SetPowerup(2);
+
+    case PowerupType::Hammer:
+        equipStoredPowerup(2);
         break;
-    }
-    case PowerupType::ShellGreen: {
-        CO_Shell * shell = new CO_Shell(ShellType::Green, Vec2s::zero(), true, true, true, false);
-        if (objectcontainer[1].add(shell))
-            shell->UsedAsStoredPowerup(this);
+
+    case PowerupType::ShellGreen:
+        spawnStoredShell(ShellType::Green, true, true, true, false);
         break;
-    }
-    case PowerupType::ShellRed: {
-        CO_Shell * shell = new CO_Shell(ShellType::Red, Vec2s::zero(), false, true, true, false);
-        if (objectcontainer[1].add(shell))
-            shell->UsedAsStoredPowerup(this);
+
+    case PowerupType::ShellRed:
+        spawnStoredShell(ShellType::Red, false, true, true, false);
         break;
-    }
-    case PowerupType::ShellSpiny: {
-        CO_Shell * shell = new CO_Shell(ShellType::Spiny, Vec2s::zero(), false, false, true, true);
-        if (objectcontainer[1].add(shell))
-            shell->UsedAsStoredPowerup(this);
+
+    case PowerupType::ShellSpiny:
+        spawnStoredShell(ShellType::Spiny, false, false, true, true);
         break;
-    }
-    case PowerupType::ShellBuzzy: {
-        CO_Shell * shell = new CO_Shell(ShellType::Buzzy, Vec2s::zero(), false, true, false, false);
-        if (objectcontainer[1].add(shell))
-            shell->UsedAsStoredPowerup(this);
+
+    case PowerupType::ShellBuzzy:
+        spawnStoredShell(ShellType::Buzzy, false, true, false, false);
         break;
-    }
-    case PowerupType::Mod: {
-        ifSoundOnPlay(rm->sfx_thunder);
-        game_values.flags.screenshaketimer = 20;
-        game_values.flags.screenshakeplayerid = globalID;
-        game_values.flags.screenshaketeamid = teamID;
-        game_values.flags.screenshakekillinair = true;
+
+    case PowerupType::Mod:
+        triggerScreenShake(true);
         break;
-    }
-    case PowerupType::Feather: {
-        powerup = -1;
-        SetPowerup(3);
+
+    case PowerupType::Feather:
+        equipStoredPowerup(3);
         break;
-    }
-    case PowerupType::MysteryMushroom: {
+
+    case PowerupType::MysteryMushroom:
         SwapPlayers(localID);
         break;
-    }
-    case PowerupType::Boomerang: {
-        powerup = -1;
-        SetPowerup(4);
+
+    case PowerupType::Boomerang:
+        equipStoredPowerup(4);
         break;
-    }
-    case PowerupType::Tanooki: {
+
+    case PowerupType::Tanooki:
         tanookisuit.onPickup();
         break;
-    }
-    case PowerupType::IceWand: {
-        powerup = -1;
-        SetPowerup(5);
+
+    case PowerupType::IceWand:
+        equipStoredPowerup(5);
         break;
-    }
+
     case PowerupType::Podobo: {
         short numPodobos = RANDOM_INT(6) + 10;
         for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-            objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, {(short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight}, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
+            objectcontainer[2].add(new MO_Podobo(
+                &rm->spr_podobo,
+                {(short)RANDOM_INT(App::screenWidth * 0.95f), App::screenHeight},
+                -(float(RANDOM_INT(9)) / 2.0f) - 9.0f,
+                globalID,
+                teamID,
+                colorID,
+                false));
         }
         ifSoundOnPlay(rm->sfx_thunder);
         break;
     }
-    case PowerupType::Bomb: {
-        powerup = -1;
-        SetPowerup(6);
+
+    case PowerupType::Bomb:
+        equipStoredPowerup(6);
         break;
-    }
-    case PowerupType::Leaf: {
-        powerup = -1;
-        SetPowerup(7);
+
+    case PowerupType::Leaf:
+        equipStoredPowerup(7);
         break;
-    }
-    case PowerupType::PWings: {
-        powerup = -1;
-        SetPowerup(8);
+
+    case PowerupType::PWings:
+        equipStoredPowerup(8);
         break;
-    }
-    case PowerupType::JailKey: {
+
+    case PowerupType::JailKey:
         jail.escape(*this);
         break;
-    }
     }
 
     powerupused.reset();
