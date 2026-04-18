@@ -939,18 +939,26 @@ void CPlayer::trySuperJumping(short movement_direction)
 {
     assert(superjumptype > 0);
 
-    if (superjumptype == 3) { //Kuribo's Shoe Jump
+    switch (superjumptype) {
+    case 3: // Kuribo's Shoe Jump
         Jump(movement_direction, 1.0f, false);
         ifSoundOnPlay(rm->sfx_jump);
-    }
-    if (superjumptype == 2) {
+        break;
+
+    case 2:
         vely = -VELSUPERJUMP;
         inair = true;
         ifSoundOnPlay(rm->sfx_superspring);
-    } else if (superjumptype == 1) {
+        break;
+
+    case 1:
         vely = -VELTURBOJUMP;
         inair = true;
         ifSoundOnPlay(rm->sfx_springjump);
+        break;
+
+    default:
+        break;
     }
 
     superjumptimer = 0;
