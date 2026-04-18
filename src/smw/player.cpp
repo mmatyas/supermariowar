@@ -960,23 +960,23 @@ void CPlayer::trySuperJumping(short movement_direction)
 void CPlayer::tryCapeDoubleJump(short movement_direction)
 {
     assert(powerup == 3);
+
     if (kuriboshoe.is_on())
         return;
 
-    if (extrajumps < game_values.featherjumps) {
-        if (game_values.featherlimit == 0 || projectilelimit > 0) {
-            if (extrajumps < game_values.featherjumps) {
-                Jump(movement_direction, 0.8f, false);
-                ifSoundOnPlay(rm->sfx_capejump);
-                lockjump = true;
-            }
+    if (extrajumps >= game_values.featherjumps)
+        return;
 
-            extrajumps++;
-        }
+    if (game_values.featherlimit > 0 && projectilelimit <= 0)
+        return;
 
-        if (game_values.featherlimit > 0)
-            DecreaseProjectileLimit();
-    }
+    Jump(movement_direction, 0.8f, false);
+    ifSoundOnPlay(rm->sfx_capejump);
+    lockjump = true;
+    extrajumps++;
+
+    if (game_values.featherlimit > 0)
+        DecreaseProjectileLimit();
 }
 
 void CPlayer::tryStartFlying()
