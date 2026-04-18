@@ -182,57 +182,65 @@ void CPlayer::updateFrozenStatus(int keymask)
 
 void CPlayer::accelerate(float direction)
 {
-    // direction is
+    // direction is:
     //  1 on moving right
     // -1 on moving left
     assert(direction == 1.0 || direction == -1.0);
 
-    if (onice)
-        velx += VELMOVINGADDICE * direction;
-    else
-        velx += VELMOVINGADD * direction;
+    velx += (onice ? VELMOVINGADDICE : VELMOVINGADD) * direction;
 
-    float maxVel = 0.0f;
-    if (!frozen) {
-        auto* gmTag = dynamic_cast<CGM_Tag*>(game_values.gamemode);
+    auto taggedBoost = [this]() -> float {
+        if (auto* gmTag = dynamic_cast<CGM_Tag*>(game_values.gamemode))
+            return gmTag->tagged() == this ? TAGGEDBOOST : 0.0f;
+
+        return 0.0f;
+    };
+
+    auto calculateMaxVelocity = [&]() -> float {
+        if (frozen)
+            return 0.0f;
 
         if ((game_values.flags.slowdownon != -1 && game_values.flags.slowdownon != teamID) || jail.isActive())
-            maxVel = VELSLOWMOVING;
-        else if (playerKeys->game_turbo.fDown)
-            maxVel = VELTURBOMOVING + ((gmTag && gmTag->tagged() == this) ? TAGGEDBOOST : 0.0f);
-        else
-            maxVel = VELMOVING + ((gmTag && gmTag->tagged() == this) ? TAGGEDBOOST : 0.0f);
-    }
-    assert(maxVel >= 0.0);
+            return VELSLOWMOVING;
 
-    if ((direction == 1 && velx > maxVel) || (direction == -1 && velx < -maxVel))
+        const float boost = taggedBoost();
+
+        if (playerKeys->game_turbo.fDown)
+            return VELTURBOMOVING + boost;
+
+        return VELMOVING + boost;
+    };
+
+    const float maxVel = calculateMaxVelocity();
+    assert(maxVel >= 0.0f);
+
+    if ((direction == 1.0f && velx > maxVel) || (direction == -1.0f && velx < -maxVel))
         velx = maxVel * direction;
 
-    if (!inair) {
-        //Make player hop or stick to ground in Kuribo's shoe
-        if (kuriboshoe.is_on()) {
-            //This makes the shoe stick to the ground (for sticky shoes)
-            if (kuriboshoe.getType() == STICKY) {
-                velx = 0.0f;
-            } else {
-                //only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
-                if (superjumptimer <= 0) {
-                    Jump(direction, 1.0f, true);
+    if (inair)
+        return;
 
-                    superjumptype = 3;
-                    superjumptimer = 16;
-                }
-            }
+    if (kuriboshoe.is_on()) {
+        if (kuriboshoe.getType() == STICKY) {
+            velx = 0.0f;
+        } else if (superjumptimer <= 0) {
+            Jump(direction, 1.0f, true);
+            superjumptype = 3;
+            superjumptimer = 16;
         }
-        // If the player suddently moved to the other direction, play skid sound
-        else if (direction > 0.0f ? velx < 0.0f : velx > 0.0f)
-            game_values.flags.playskidsound = true;
 
-        //If rain candy is turned on
-        if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && fabs(velx) > VELMOVINGADD && ++rainsteptimer > 7) {
-            rainsteptimer = 0;
-            eyecandy[1].emplace<EC_SingleAnimation>(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16);
-        }
+        return;
+    }
+
+    if ((direction > 0.0f && velx < 0.0f) || (direction < 0.0f && velx > 0.0f))
+        game_values.flags.playskidsound = true;
+
+    const bool hasRainEyecandy =
+        (g_map->eyecandy[0] & 32) || (g_map->eyecandy[1] & 32) || (g_map->eyecandy[2] & 32);
+
+    if (hasRainEyecandy && fabs(velx) > VELMOVINGADD && ++rainsteptimer > 7) {
+        rainsteptimer = 0;
+        eyecandy[1].emplace<EC_SingleAnimation>(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16);
     }
 }
 
