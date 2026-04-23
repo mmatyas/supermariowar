@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <unordered_set>
 
 #if defined(__APPLE__)
@@ -121,7 +122,16 @@ const gfxSprite& CTileset::sprite(DrawSize size) const
 
 TileType CTileset::tileType(size_t tileCol, size_t tileRow) const
 {
-    assert(static_cast<size_t>(tileCol + tileRow * m_width) < m_tiletypes.size());
+    const size_t idx = tileCol + tileRow * m_width;
+    if (m_tiletypes.size() <= idx) {
+        throw std::format(
+            "The tileset at `{}`\n"
+            "tried to use an undefined tile at {}x{}\n"
+            "This happens when the `tileset.tls` file is damaged or saved incorrectly.\n"
+            "Consider downloading or saving again the tileset.",
+            m_tileset_dir.generic_string(), tileCol, tileRow);
+        return TileType::Solid;
+    }
     return m_tiletypes[tileCol + tileRow * m_width];
 }
 
