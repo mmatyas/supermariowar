@@ -355,6 +355,8 @@ bool g_fFullScreen = false;
 void gameloop_frame();
 #endif
 
+void inner_main();
+
 //main main main
 int main(int argc, char *argv[])
 {
@@ -375,6 +377,31 @@ int main(int argc, char *argv[])
         RootDataDirectory = cmd.data_root;
     }
 
+    try {
+        inner_main();
+    }
+    catch (const char* what) {
+        gfx_show_catched_error(what);
+        return 1;
+    }
+    catch (const std::string& ex) {
+        gfx_show_catched_error(ex);
+        return 1;
+    }
+    catch (const std::exception& ex) {
+        gfx_show_catched_error(ex.what());
+        return 1;
+    }
+    catch (...) {
+        gfx_show_catched_error({});
+        return 1;
+    }
+
+    return 0;
+}
+
+void inner_main()
+{
 	ensureSettingsDir();
 
     /* This must occur before any data files are loaded */
@@ -656,7 +683,6 @@ void gameloop_frame()
     g_tilesetmanager->saveTilesets();
 
 	printf("\n---------------- shutdown ----------------\n");
-	return 0;
 #endif
 }
 

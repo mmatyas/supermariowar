@@ -126,7 +126,7 @@ class WorldVehicle : public WorldMovingObject
 	friend int editor_edit();
 	friend int resize_world();
 	friend int editor_vehicles();
-	friend int main(int argc, char *argv[]);
+	friend void inner_main();
 };
 
 struct WorldWarp {
