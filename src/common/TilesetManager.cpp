@@ -93,7 +93,7 @@ CTileset::CTileset(std::filesystem::path dir)
 
 void CTileset::ensureLoaded()
 {
-    if (m_sprite_large)
+    if (isLoaded())
         return;
 
     m_tiletypes = readTileTypeFile(m_tileset_dir / "tileset.tls");
@@ -128,8 +128,10 @@ TileType CTileset::tileType(size_t tileCol, size_t tileRow) const
 
 void CTileset::setTileType(size_t tileCol, size_t tileRow, TileType type)
 {
-    assert(static_cast<size_t>(tileCol + tileRow * m_width) < m_tiletypes.size());
-    m_tiletypes[tileCol + tileRow * m_width] = type;
+    const size_t idx = tileCol + tileRow * m_width;
+    assert(idx < m_tiletypes.size());
+    m_tiletypes[idx] = type;
+    m_modified = true;
 }
 
 
@@ -138,6 +140,7 @@ TileType CTileset::incrementTileType(size_t tileCol, size_t tileRow)
     const size_t idx = tileCol + tileRow * m_width;
     assert(idx < m_tiletypes.size());
     m_tiletypes[idx] = NextTileType(m_tiletypes[idx]);
+    m_modified = true;
     return m_tiletypes[idx];
 }
 
@@ -147,6 +150,7 @@ TileType CTileset::decrementTileType(size_t tileCol, size_t tileRow)
     const size_t idx = tileCol + tileRow * m_width;
     assert(idx < m_tiletypes.size());
     m_tiletypes[idx] = PrevTileType(m_tiletypes[idx]);
+    m_modified = true;
     return m_tiletypes[idx];
 }
 
@@ -159,6 +163,10 @@ void CTileset::draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dst
 
 void CTileset::saveTileset() const
 {
+    assert(isLoaded());
+    if (!isLoaded())
+        return;
+
     const fs::path tileset_path = m_tileset_dir / "tileset.tls";
     BinaryFile tsf(tileset_path, "wb");
     if (!tsf.is_open()) {
@@ -275,6 +283,9 @@ const SDL_Rect& CTilesetManager::rect(DrawSize size, size_t idx)
 
 void CTilesetManager::saveTilesets() const
 {
-    for (const CTileset& tileset : m_tilesets)
-        tileset.saveTileset();
+    for (const CTileset& tileset : m_tilesets) {
+        if (tileset.isLoaded() && tileset.isModified()) {
+            tileset.saveTileset();
+        }
+    }
 }
