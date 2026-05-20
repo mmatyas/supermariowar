@@ -290,22 +290,6 @@ void init_spawnlocations()
 
 void main_game();
 
-void show_catched_error(const std::string& error)
-{
-    std::string message = ""
-        "It seems the game has unexpectedly crashed. If you could tell us\n"
-        "what happened exactly, we might be able to fix this bug. Consider\n"
-        "reporting it on the link below, thanks!\n\n"
-        "https://github.com/mmatyas/supermariowar/issues\n\n"
-        "Sincerely,\nThe Developers";
-    if (!error.empty()) {
-        message += "\n\n\nThe error message:\n" + error;
-    }
-
-    fprintf(stderr, "\n%s\n", message.c_str());
-    gfx_show_error(message.c_str());
-}
-
 int main(int argc, char *argv[])
 {
     const cmd::Args cmd = cmd::parse_args(argc, argv);
@@ -327,19 +311,19 @@ int main(int argc, char *argv[])
         main_game();
     }
     catch (const char* what) {
-        show_catched_error(what);
+        gfx_show_catched_error(what);
         return 1;
     }
     catch (const std::string& ex) {
-        show_catched_error(ex);
+        gfx_show_catched_error(ex);
         return 1;
     }
     catch (const std::exception& ex) {
-        show_catched_error(ex.what());
+        gfx_show_catched_error(ex.what());
         return 1;
     }
     catch (...) {
-        show_catched_error({});
+        gfx_show_catched_error({});
         return 1;
     }
 

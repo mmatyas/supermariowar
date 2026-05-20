@@ -355,6 +355,8 @@ bool g_fFullScreen = false;
 void gameloop_frame();
 #endif
 
+void inner_main();
+
 //main main main
 int main(int argc, char *argv[])
 {
@@ -375,6 +377,31 @@ int main(int argc, char *argv[])
         RootDataDirectory = cmd.data_root;
     }
 
+    try {
+        inner_main();
+    }
+    catch (const char* what) {
+        gfx_show_catched_error(what);
+        return 1;
+    }
+    catch (const std::string& ex) {
+        gfx_show_catched_error(ex);
+        return 1;
+    }
+    catch (const std::exception& ex) {
+        gfx_show_catched_error(ex.what());
+        return 1;
+    }
+    catch (...) {
+        gfx_show_catched_error({});
+        return 1;
+    }
+
+    return 0;
+}
+
+void inner_main()
+{
 	ensureSettingsDir();
 
     /* This must occur before any data files are loaded */
@@ -656,7 +683,6 @@ void gameloop_frame()
     g_tilesetmanager->saveTilesets();
 
 	printf("\n---------------- shutdown ----------------\n");
-	return 0;
 #endif
 }
 
@@ -2569,11 +2595,7 @@ int editor_platforms()
                     } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							g_Platforms[iEditPlatform].types[ix * MAPHEIGHT + iy] = TileType::NonSolid;
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
                         const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                    #else
-                        Uint8 * keystate = SDL_GetKeyState(NULL);
-                    #endif
                         if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::Straight) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT));
                         } else if (g_Platforms[iEditPlatform].iPathType == PlatformPathType::StraightContinuous || g_Platforms[iEditPlatform].iPathType == PlatformPathType::Ellipse) {

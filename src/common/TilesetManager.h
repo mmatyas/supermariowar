@@ -23,6 +23,8 @@ public:
 
     explicit CTileset(std::filesystem::path dir);
     void ensureLoaded();
+    bool isLoaded() const { return m_sprite_large.operator bool(); }
+    bool isModified() const { return m_modified; }
 
     void saveTileset() const;
 
@@ -50,6 +52,7 @@ private:
 
     short m_width = 0;
     short m_height = 0;
+    bool m_modified = false;
 };
 
 

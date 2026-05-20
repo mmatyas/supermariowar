@@ -189,8 +189,19 @@ void gfx_settitle(const char* title) {
     gfx.setTitle(title);
 }
 
-void gfx_show_error(const char* message) {
-    gfx.showErrorBox(message);
+void gfx_show_catched_error(const std::string& error)
+{
+    std::string message = ""
+        "It seems the game has unexpectedly crashed. If you could tell us\n"
+        "what happened exactly, we might be able to fix this bug. Consider\n"
+        "reporting it on the link below, thanks!\n\n"
+        "https://github.com/mmatyas/supermariowar/issues\n\n"
+        "Sincerely,\nThe Developers";
+    if (!error.empty()) {
+        message += "\n\n\nThe error message:\n" + error;
+    }
+    fprintf(stderr, "\n%s\n", message.c_str());
+    gfx.showErrorBox(message.c_str());
 }
 
 void gfx_take_screenshot() {

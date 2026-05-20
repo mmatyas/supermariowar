@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <unordered_set>
 
 #if defined(__APPLE__)
@@ -39,8 +40,10 @@ std::vector<TileType> readTileTypeFile(const fs::path& path)
 {
     printf("Reading %s\n", path.generic_string().c_str());
     //Detect if the tiletype file already exists, if not create it
-    if (!fs::exists(path))
+    if (!fs::exists(path)) {
+        printf("Not found, will use blank tiles\n");
         return {};
+    }
 
     BinaryFile tsf(path, "rb");
     if (!tsf.is_open()) {
@@ -77,7 +80,6 @@ gfxSprite loadImageOrDownscale(const std::filesystem::path& path, const gfxSprit
 
         return gfxSprite(std::move(surf), std::nullopt);
     }
-
 }
 } // namespace
 
@@ -93,7 +95,7 @@ CTileset::CTileset(std::filesystem::path dir)
 
 void CTileset::ensureLoaded()
 {
-    if (m_sprite_large)
+    if (isLoaded())
         return;
 
     m_tiletypes = readTileTypeFile(m_tileset_dir / "tileset.tls");
@@ -121,33 +123,37 @@ const gfxSprite& CTileset::sprite(DrawSize size) const
 
 TileType CTileset::tileType(size_t tileCol, size_t tileRow) const
 {
-    assert(static_cast<size_t>(tileCol + tileRow * m_width) < m_tiletypes.size());
-    return m_tiletypes[tileCol + tileRow * m_width];
+    const size_t idx = tileCol + tileRow * m_width;
+    return (idx < m_tiletypes.size())
+        ? m_tiletypes[idx]
+        : TileType::NonSolid;
 }
 
 
 void CTileset::setTileType(size_t tileCol, size_t tileRow, TileType type)
 {
-    assert(static_cast<size_t>(tileCol + tileRow * m_width) < m_tiletypes.size());
-    m_tiletypes[tileCol + tileRow * m_width] = type;
+    const size_t idx = tileCol + tileRow * m_width;
+    if (m_tiletypes.size() <= idx) {
+        m_tiletypes.resize(idx + 1);
+    }
+    m_tiletypes[idx] = type;
+    m_modified = true;
 }
 
 
 TileType CTileset::incrementTileType(size_t tileCol, size_t tileRow)
 {
-    const size_t idx = tileCol + tileRow * m_width;
-    assert(idx < m_tiletypes.size());
-    m_tiletypes[idx] = NextTileType(m_tiletypes[idx]);
-    return m_tiletypes[idx];
+    TileType new_type = ::NextTileType(tileType(tileCol, tileRow));
+    setTileType(tileCol, tileRow, new_type);
+    return new_type;
 }
 
 
 TileType CTileset::decrementTileType(size_t tileCol, size_t tileRow)
 {
-    const size_t idx = tileCol + tileRow * m_width;
-    assert(idx < m_tiletypes.size());
-    m_tiletypes[idx] = PrevTileType(m_tiletypes[idx]);
-    return m_tiletypes[idx];
+    TileType new_type = ::PrevTileType(tileType(tileCol, tileRow));
+    setTileType(tileCol, tileRow, new_type);
+    return new_type;
 }
 
 
@@ -159,6 +165,10 @@ void CTileset::draw(DrawSize drawsize, const SDL_Rect& srcRect, SDL_Surface* dst
 
 void CTileset::saveTileset() const
 {
+    assert(isLoaded());
+    if (!isLoaded())
+        return;
+
     const fs::path tileset_path = m_tileset_dir / "tileset.tls";
     BinaryFile tsf(tileset_path, "wb");
     if (!tsf.is_open()) {
@@ -275,6 +285,9 @@ const SDL_Rect& CTilesetManager::rect(DrawSize size, size_t idx)
 
 void CTilesetManager::saveTilesets() const
 {
-    for (const CTileset& tileset : m_tilesets)
-        tileset.saveTileset();
+    for (const CTileset& tileset : m_tilesets) {
+        if (tileset.isLoaded() && tileset.isModified()) {
+            tileset.saveTileset();
+        }
+    }
 }
