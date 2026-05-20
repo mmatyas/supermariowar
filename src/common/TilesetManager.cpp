@@ -40,8 +40,10 @@ std::vector<TileType> readTileTypeFile(const fs::path& path)
 {
     printf("Reading %s\n", path.generic_string().c_str());
     //Detect if the tiletype file already exists, if not create it
-    if (!fs::exists(path))
+    if (!fs::exists(path)) {
+        printf("Not found, will use blank tiles\n");
         return {};
+    }
 
     BinaryFile tsf(path, "rb");
     if (!tsf.is_open()) {
@@ -78,7 +80,6 @@ gfxSprite loadImageOrDownscale(const std::filesystem::path& path, const gfxSprit
 
         return gfxSprite(std::move(surf), std::nullopt);
     }
-
 }
 } // namespace
 
@@ -123,23 +124,18 @@ const gfxSprite& CTileset::sprite(DrawSize size) const
 TileType CTileset::tileType(size_t tileCol, size_t tileRow) const
 {
     const size_t idx = tileCol + tileRow * m_width;
-    if (m_tiletypes.size() <= idx) {
-        throw std::format(
-            "The tileset at `{}`\n"
-            "tried to use an undefined tile at {}x{}\n"
-            "This happens when the `tileset.tls` file is damaged or saved incorrectly.\n"
-            "Consider downloading or saving again the tileset.",
-            m_tileset_dir.generic_string(), tileCol, tileRow);
-        return TileType::Solid;
-    }
-    return m_tiletypes[tileCol + tileRow * m_width];
+    return (idx < m_tiletypes.size())
+        ? m_tiletypes[idx]
+        : TileType::NonSolid;
 }
 
 
 void CTileset::setTileType(size_t tileCol, size_t tileRow, TileType type)
 {
     const size_t idx = tileCol + tileRow * m_width;
-    assert(idx < m_tiletypes.size());
+    if (m_tiletypes.size() <= idx) {
+        m_tiletypes.resize(idx + 1);
+    }
     m_tiletypes[idx] = type;
     m_modified = true;
 }
@@ -147,21 +143,17 @@ void CTileset::setTileType(size_t tileCol, size_t tileRow, TileType type)
 
 TileType CTileset::incrementTileType(size_t tileCol, size_t tileRow)
 {
-    const size_t idx = tileCol + tileRow * m_width;
-    assert(idx < m_tiletypes.size());
-    m_tiletypes[idx] = NextTileType(m_tiletypes[idx]);
-    m_modified = true;
-    return m_tiletypes[idx];
+    TileType new_type = ::NextTileType(tileType(tileCol, tileRow));
+    setTileType(tileCol, tileRow, new_type);
+    return new_type;
 }
 
 
 TileType CTileset::decrementTileType(size_t tileCol, size_t tileRow)
 {
-    const size_t idx = tileCol + tileRow * m_width;
-    assert(idx < m_tiletypes.size());
-    m_tiletypes[idx] = PrevTileType(m_tiletypes[idx]);
-    m_modified = true;
-    return m_tiletypes[idx];
+    TileType new_type = ::PrevTileType(tileType(tileCol, tileRow));
+    setTileType(tileCol, tileRow, new_type);
+    return new_type;
 }
 
 
