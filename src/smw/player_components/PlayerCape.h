@@ -16,7 +16,7 @@ private:
     unsigned short iCapeFrameX;
     unsigned short iCapeFrameY;
     bool fCapeUp;
-    unsigned short iCapeYOffset;
+    short iCapeYOffset;
 };
 
 

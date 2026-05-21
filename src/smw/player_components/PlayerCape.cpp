@@ -86,13 +86,14 @@ void PlayerCape::draw(CPlayer &player)
         fPlayerFacingRight = player.isFacingRight();
     }
 
-    if (player.iswarping())
+    if (player.iswarping()) {
         rm->spr_cape.draw(
             player.leftX() - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), player.topY() - PHOFFSET + 4 + iCapeYOffset,
             {(fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32},
             static_cast<ClipEdge>((short)player.state % 4), player.GetWarpPlane());
-    else
+    } else {
         rm->spr_cape.draw(
             player.leftX() - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), player.topY() - PHOFFSET + 4 + iCapeYOffset,
             {(fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32});
+    }
 }
