@@ -505,6 +505,7 @@ TourStop ParseTourStopLine(char* buffer, const Version& version, bool fIsWorld)
                     maplist->random(false);
                     ts.pszMapFile = maplist->currentShortmapname();
                 }
+                printf("WARNING: No map file found with the name '%s'\n", szMap);
             } else {
                 ts.pszMapFile = maplist->currentShortmapname();
             }
