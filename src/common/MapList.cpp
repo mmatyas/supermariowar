@@ -24,9 +24,9 @@ extern CGameValues game_values;
 
 
 namespace {
-void addMapsFrom(const std::string& relDir, std::multimap<std::string, MapListNode>& container)
+void addMapsFrom(const std::string& dirpath, std::multimap<std::string, MapListNode>& container)
 {
-    FilesIterator dir(convertPath(relDir), {".map"});
+    FilesIterator dir(dirpath, {".map"});
     while (auto path = dir.next()) {
         MapListNode node(path->string());
         container.emplace(stripCreatorAndExt(path->filename().string()), std::move(node));
@@ -44,17 +44,17 @@ MapListNode::MapListNode(std::string fullName)
 ///////////// MapList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MapList::MapList(bool fWorldEditor)
 {
-    addMapsFrom("maps/", maps);
+    addMapsFrom(convertPath("maps/"), maps);
 
 #ifdef _DEBUG
-    addMapsFrom("maps/test/", maps);
-    addMapsFrom("maps/special/", maps);
+    addMapsFrom(convertPath("maps/test/"), maps);
+    addMapsFrom(convertPath("maps/special/"), maps);
 #endif
 
     //If this is for the world editor, load all the world maps into the map viewer UI control
     if (fWorldEditor) {
         //Load in the "tour only" maps directory
-        addMapsFrom("maps/tour/", maps);
+        addMapsFrom(convertPath("maps/tour/"), maps);
 
         SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
         for (size_t iDir = 0; iDir < worldeditormapdirs.count(); iDir++) {
@@ -64,7 +64,7 @@ MapList::MapList(bool fWorldEditor)
         }
 
 #ifndef _DEBUG
-        addMapsFrom("maps/special/", maps);
+        addMapsFrom(convertPath("maps/special/"), maps);
 #endif
     }
 
@@ -92,7 +92,7 @@ MapList::MapList(bool fWorldEditor)
     mlnMaps.resize(maps.size());
 
     //Load in the "tour only" maps directory
-    addMapsFrom("maps/tour/", worldmaps);
+    addMapsFrom(convertPath("maps/tour/"), worldmaps);
 
     //Read all world map directories and load them into the world/tour only list
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
@@ -102,7 +102,7 @@ MapList::MapList(bool fWorldEditor)
         worldmapdirs.next();
     }
 
-    addMapsFrom("maps/special/", worldmaps);
+    addMapsFrom(convertPath("maps/special/"), worldmaps);
 }
 
 //Called by level editor to load world maps into the map list
