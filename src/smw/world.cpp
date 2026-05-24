@@ -382,6 +382,8 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
     if (!file)
         throw std::runtime_error("Could not open the world file");
 
+    ResetTourStops();
+
     std::string line;
     short iReadType = 0;
     Version version;
@@ -670,8 +672,6 @@ WorldMap::WorldMap(const std::string& path, short tilesize)
 RETURN:
     if (iReadType != 17)
         throw std::runtime_error("Invalid world file");
-
-    ResetTourStops();  // FIXME
 }
 
 void WorldMap::SetTileConnections(short iCol, short iRow)
