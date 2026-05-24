@@ -1225,8 +1225,8 @@ int editor_edit()
 							fAutoPaint = !fAutoPaint;
 
                     if (event.key.keysym.sym == SDLK_r) {
-							if (g_musiccategorydisplaytimer > 0 && g_worldmap.iMusicCategory == WorldMusicCategory::Sleep)  // FIXME
-								g_worldmap.iMusicCategory = WorldMusicCategory::Grass;
+							if (g_musiccategorydisplaytimer > 0)
+								g_worldmap.iMusicCategory++;
 
 							g_musiccategorydisplaytimer = 90;
 						}

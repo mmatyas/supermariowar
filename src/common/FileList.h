@@ -237,6 +237,18 @@ constexpr std::string_view to_string(WorldMusicCategory category) noexcept {
 #endif
 }
 
+inline WorldMusicCategory& operator++(WorldMusicCategory& self) {
+    auto value = static_cast<unsigned char>(self);
+    value = (value + 1) % static_cast<unsigned char>(WorldMusicCategory::COUNT);
+    self = static_cast<WorldMusicCategory>(value);
+    return self;
+}
+inline WorldMusicCategory operator++(WorldMusicCategory& self, int) {
+    WorldMusicCategory temp = self;
+    ++self;
+    return temp;
+}
+
 
 struct WorldMusicOverride {
     std::string worldname;
