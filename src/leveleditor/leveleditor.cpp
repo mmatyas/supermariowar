@@ -5172,7 +5172,7 @@ void takescreenshot()
 	short iTileSizes[3] = {TILESIZE, PREVIEWTILESIZE, THUMBTILESIZE};
 	SDL_Surface * old_screen = screen;
 
-    for (short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
+	for (short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
 		short iTileSize = iTileSizes[iScreenshotSize];
 
 		//Allow wrapping of path dots
@@ -5187,14 +5187,14 @@ void takescreenshot()
 		drawmap(true, iTileSize);
 
 		//Draw platforms to screenshot
-        for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
+		for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
 			MapPlatform * platform = &g_Platforms[iPlatform];
 			DrawPlatform(platform->iPathType, platform->tiles, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, iScreenshotSize, g_map->platforms[iPlatform]->iTileWidth, g_map->platforms[iPlatform]->iTileHeight, true, true, blitdest);
 		}
 
 		//Draw map hazards
-                for (const MapHazard& hazard : g_map->maphazards)
-                    DrawMapHazard(hazard, iScreenshotSize, false, blitdest);
+		for (const MapHazard& hazard : g_map->maphazards)
+			DrawMapHazard(hazard, iScreenshotSize, false, blitdest);
 
 		//Save the screenshot with the same name as the map file
 		std::string szSaveFile("maps/screenshots/");
@@ -5206,13 +5206,13 @@ void takescreenshot()
 			szSaveFile += "_thumb";
 
 		szSaveFile += ".png";
-                IMG_SavePNG(screenshot.getSurface(), convertPath(szSaveFile).c_str());
+		IMG_SavePNG(screenshot.getSurface(), convertPath(szSaveFile).c_str());
 
 		printf("Screenshot taken: %s\n", szSaveFile.c_str());
-	}
 
-	screen = old_screen;
-	blitdest = screen;
+		screen = old_screen;
+		blitdest = screen;
+	}
 }
 
 bool ReadAnimatedTileTypeFile(const char * szFile)
