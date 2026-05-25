@@ -749,13 +749,14 @@ std::string WriteTourStopLine(const TourStop& ts, bool fIsWorld)
         fields.emplace_back(ts.szName);
         fields.emplace_back(std::to_string(ts.iBonusType));
 
-        std::string field;
+        std::string bonus_text_field;
         const char* delim = DELIM_EMPTY;
         for (short iText = 0; iText < ts.iBonusTextLines; iText++) {
-            field += delim;
-            field += ts.szBonusText[iText];
+            bonus_text_field += delim;
+            bonus_text_field += ts.szBonusText[iText];
             delim = DELIM_PIPE;
         }
+        fields.emplace_back(std::move(bonus_text_field));
 
         if (ts.iNumBonuses == 0) {
             fields.emplace_back("p0");
