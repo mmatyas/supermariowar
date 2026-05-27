@@ -26,7 +26,8 @@
 #include "gfx/gfxSprite.h"
 #include "gfx/gfxFont.h"
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
+
 #include <filesystem>
 #include <optional>
 

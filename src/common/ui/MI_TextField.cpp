@@ -49,7 +49,7 @@ MenuCodeEnum MI_TextField::Modify(bool modify)
 
 MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 {
-    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+    const bool* keystate = SDL_GetKeyboardState(NULL);
 
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         // NOTE: copied from UI_Menu::SendInput
@@ -75,13 +75,13 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
     // TODO: check string conversion
     //Watch for characters typed in including delete and backspace
     SDL_Keycode key = playerInput->iPressedKey;
-    if ((key >= SDLK_a && key <= SDLK_z) || key == SDLK_SPACE || (key >= SDLK_0 && key <= SDLK_9) || key == SDLK_EQUALS ||
-        key == SDLK_MINUS || key == SDLK_BACKQUOTE || (key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET) ||
-        key == SDLK_SEMICOLON || key == SDLK_QUOTE || key == SDLK_COMMA || key == SDLK_PERIOD || key == SDLK_SLASH) {
+    if ((key >= SDLK_A && key <= SDLK_Z) || key == SDLK_SPACE || (key >= SDLK_0 && key <= SDLK_9) || key == SDLK_EQUALS ||
+        key == SDLK_MINUS || key == SDLK_GRAVE || (key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET) ||
+        key == SDLK_SEMICOLON || key == SDLK_APOSTROPHE || key == SDLK_COMMA || key == SDLK_PERIOD || key == SDLK_SLASH) {
         if (iNumChars < iMaxChars - 1) {
             //Take care of holding shift to shift the pressed key to another character
             if (keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT]) {
-                if (key >= SDLK_a && key <= SDLK_z) {
+                if (key >= SDLK_A && key <= SDLK_Z) {
                     key -= 32;
                 } else if (key >= SDLK_0 && key <= SDLK_9) {
                     key = NUMBER_KEY_MAP[key - 48];
@@ -89,14 +89,14 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
                     key = SDLK_UNDERSCORE;
                 } else if (key == SDLK_EQUALS) {
                     key = SDLK_PLUS;
-                } else if (key == SDLK_BACKQUOTE) {
+                } else if (key == SDLK_GRAVE) {
                     key = 126;
                 } else if (key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET) {
                     key += 32;
                 } else if (key == SDLK_SEMICOLON) {
                     key = SDLK_COLON;
-                } else if (key == SDLK_QUOTE) {
-                    key = SDLK_QUOTEDBL;
+                } else if (key == SDLK_APOSTROPHE) {
+                    key = SDLK_DBLAPOSTROPHE;
                 } else if (key == SDLK_COMMA) {
                     key = SDLK_LESS;
                 } else if (key == SDLK_PERIOD) {

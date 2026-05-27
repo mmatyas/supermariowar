@@ -5,7 +5,7 @@
 #include "math/Vec2.h"
 #include "util/SdlHelpers.h"
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 #include <filesystem>
 #include <optional>
@@ -18,7 +18,7 @@ public:
     explicit gfxSprite() = default;
     explicit gfxSprite(SdlSurfacePtr image, std::optional<int> wrap = 640);
 
-    static gfxSprite blank(unsigned w, unsigned h);
+    static gfxSprite blank(unsigned w, unsigned h, std::optional<int> wrap = 640);
 
     /// Draw the whole sprite at the given coordinate. Applies camera shaking.
     void draw(int x, int y) const;

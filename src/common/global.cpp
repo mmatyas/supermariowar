@@ -39,7 +39,7 @@ CTilesetManager *g_tilesetmanager;
 
 //Joystick-Init
 SDL_Joystick **joysticks = NULL;
-short joystickcount = 0;
+int joystickcount = 0;
 
 
 //Koopa Bros Weapons

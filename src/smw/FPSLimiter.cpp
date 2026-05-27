@@ -3,7 +3,7 @@
 #include "GameValues.h"
 #include "ResourceManager.h"
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 #include <format>
 
