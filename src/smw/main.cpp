@@ -72,6 +72,8 @@
 #endif
 #endif
 
+#include <SDL3/SDL_main.h>
+
 
 //now it's really time for an "engine" (aka resource manager)
 
@@ -105,7 +107,7 @@ CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 short currentgamemode = 0;
 
 extern SDL_Joystick     **joysticks;
-extern short            joystickcount;
+extern int              joystickcount;
 
 extern CMap* g_map;
 extern CTilesetManager* g_tilesetmanager;
@@ -210,14 +212,13 @@ void create_globals()
 
 void init_joysticks()
 {
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-    joystickcount = (short)SDL_NumJoysticks();
+    SDL_GetJoysticks(&joystickcount);
     joysticks = new SDL_Joystick*[joystickcount];
 
-    for (short i = 0; i < joystickcount; i++)
-        joysticks[i] = SDL_JoystickOpen(i);
+    for (int i = 0; i < joystickcount; i++)
+        joysticks[i] = SDL_OpenJoystick(i);
 
-    SDL_JoystickEventState(SDL_ENABLE);
+    SDL_SetJoystickEventsEnabled(true);
 }
 
 void create_gamemodes()
@@ -366,7 +367,7 @@ void main_game()
     char title[128];
     sprintf(title, "%s %s %s", TITLESTRING, GIT_REVISION, GIT_DATE);
     gfx_settitle(title);
-    SDL_ShowCursor(SDL_DISABLE);
+    SDL_HideCursor();
 
     printf("\n---------------- loading ----------------\n");
 

@@ -115,7 +115,7 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
         }
 
         if (iPlayer == 0 && iPressedKey > 0) {
-            if ((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
+            if ((iPressedKey >= SDLK_A && iPressedKey <= SDLK_Z) ||
                     (iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9) ||
                     iPressedKey == SDLK_MINUS || iPressedKey == SDLK_EQUALS) {
                 short iOldIndex = maplist->GetCurrent()->second.iIndex;

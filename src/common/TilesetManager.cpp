@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <cstring>
 #include <format>
+#include <optional>
 #include <unordered_set>
 
 #if defined(__APPLE__)
@@ -70,15 +71,12 @@ gfxSprite loadImageOrDownscale(const std::filesystem::path& path, const gfxSprit
     } catch (const std::string& err) {
         printf("\nwarning: %s -> falling back to downscaled image\n", err.c_str());
 
-        auto surf = SdlSurfacePtr(SDL_CreateRGBSurfaceWithFormat(
-            0, largeRes.getWidth() / 2, largeRes.getHeight() / 2,
-            largeRes.getSurface()->format->BitsPerPixel,
-            largeRes.getSurface()->format->format));
-        if (SDL_BlitSurface(largeRes.getSurface(), nullptr, surf.get(), nullptr) < 0) {
+        auto image = gfxSprite::blank(largeRes.getWidth() / 2, largeRes.getHeight() / 2, std::nullopt);
+        if (!SDL_BlitSurfaceScaled(largeRes.getSurface(), nullptr, image.getSurface(), nullptr, SDL_SCALEMODE_PIXELART)) {
             fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
         }
 
-        return gfxSprite(std::move(surf), std::nullopt);
+        return image;
     }
 }
 } // namespace

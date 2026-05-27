@@ -1,17 +1,19 @@
 #pragma once
 
-#include "SDL_mixer.h"
+#include <SDL3_mixer/SDL_mixer.h>
 
 #include <array>
 #include <bitset>
 #include <filesystem>
 
 struct MixDeleter {
-    void operator()(Mix_Chunk* ptr) const noexcept;
-    void operator()(Mix_Music* ptr) const noexcept;
+    void operator()(MIX_Mixer* ptr) const noexcept;
+    void operator()(MIX_Track* ptr) const noexcept;
+    void operator()(MIX_Audio* ptr) const noexcept;
 };
-using MixChunkPtr = std::unique_ptr<Mix_Chunk, MixDeleter>;
-using MixMusicPtr = std::unique_ptr<Mix_Music, MixDeleter>;
+using MixDevicePtr = std::unique_ptr<MIX_Mixer, MixDeleter>;
+using MixTrackPtr = std::unique_ptr<MIX_Track, MixDeleter>;
+using MixAudioPtr = std::unique_ptr<MIX_Audio, MixDeleter>;
 
 
 bool sfx_init();
@@ -35,14 +37,14 @@ public:
 
     bool isPlaying() const { return m_channels.any(); }
 
-    static void onChannelFinished(int channel);
+    static void onTrackFinished(void*, MIX_Track* rawptr);
 
 private:
-    MixChunkPtr m_sfx;
+    MixAudioPtr m_audio;
     std::bitset<k_channels> m_channels;
     size_t m_last_start_time = 0;
 
-    static inline std::array<sfxSound*, k_channels> s_channels {};
+    static inline std::array<std::pair<MIX_Track*, sfxSound*>, k_channels> s_channels {};
 };
 
 
@@ -53,12 +55,13 @@ public:
 
     void play(bool fPlayonce, bool fResume);
     void stop();
+    bool isPlaying() const;
 
     void togglePause();
 
-    bool isPlaying() const;
+    static inline bool fResumeMusic = true;
 
 private:
-    MixMusicPtr m_music;
+    MixAudioPtr m_audio;
     bool m_paused = false;
 };
