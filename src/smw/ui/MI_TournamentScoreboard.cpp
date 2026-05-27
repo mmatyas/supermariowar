@@ -369,7 +369,9 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
         for (short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             static short iPlaceSprite[4] = {4, 0, 8, 9};
             miPlayerImages[iTeam][iPlayer]->SetPosition(m_pos.x + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
-            miPlayerImages[iTeam][iPlayer]->SetImageSource(&rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
+            const size_t player_idx = iTeamIDs[iTeam][iPlayer];
+            const size_t sprite_idx = iPlaceSprite[game_values.tournament_scores[iTeam].wins];
+            miPlayerImages[iTeam][iPlayer]->SetImageSource(&rm->spr_player[player_idx][sprite_idx]);
         }
 
         tourScores[iTeam]->SetPosition(m_pos.x + 508, iTeamY + 24);
