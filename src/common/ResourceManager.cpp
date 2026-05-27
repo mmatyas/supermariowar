@@ -24,19 +24,29 @@ extern CGameValues game_values;
 
 bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
-    try {
-        spr_player[playerID] = gfx_loadmenuskin(skinlist->at(skinID).path, colorID, fLoadBothDirections);
-        return true;
-    } catch (const std::string& what) {
-        std::cout << "ERROR: " << what << std::endl;
-        return false;
-    }
+    return LoadMenuSkin(playerID, skinlist->at(skinID).path, colorID, fLoadBothDirections);
 }
 
-bool CResourceManager::LoadMenuSkin(short playerID, const fs::path& filename, short colorID, bool fLoadBothDirections)
+bool CResourceManager::LoadMenuSkin(short playerID, const fs::path& path, short colorID, bool fLoadBothDirections)
 {
+    LoadedSpriteInfo new_info {
+        .path = path,
+        .colorScheme = colorID,
+    };
+    // We might not need to load again if all frames are present
+    // STANDING_R and RUNNING_R is always loaded, so needs no check,
+    // STANDING_L and RUNNING_L is loaded only when both directions are requested
+    if (loaded_player_sprites[playerID] == new_info) {
+        const bool both_dirs_present = spr_player[playerID][PGFX_STANDING_L] && spr_player[playerID][PGFX_RUNNING_L];
+        const bool already_loaded = !fLoadBothDirections || both_dirs_present;
+        if (already_loaded) {
+            return true;
+        }
+    }
+
     try {
-        spr_player[playerID] = gfx_loadmenuskin(filename, colorID, fLoadBothDirections);
+        spr_player[playerID] = gfx_loadmenuskin(path, colorID, fLoadBothDirections);
+        loaded_player_sprites[playerID] = std::move(new_info);
         return true;
     } catch (const std::string& what) {
         std::cout << "ERROR: " << what << std::endl;
