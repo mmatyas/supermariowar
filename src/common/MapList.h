@@ -20,7 +20,7 @@ public:
     short iIndex = 0;
     short iFilteredIndex = 0;
 
-    bool fInCurrentFilterSet = false;
+    bool fInCurrentFilterSet = true;
     bool fReadFromCache = false;
     bool fValid = true;
 };
