@@ -16,7 +16,9 @@ endfunction()
 
 
 # SDL
-set(SDL_STATIC OFF CACHE BOOL "")
+if(NOT EMSCRIPTEN)
+    set(SDL_STATIC OFF CACHE BOOL "")
+endif()
 smw_declare_gitrepo(
     SDL3
     https://github.com/libsdl-org/SDL.git
