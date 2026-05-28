@@ -338,6 +338,7 @@ void main_game()
     printf("-------------------------------------------------------------------------------\n");
     printf("\n---------------- startup ----------------\n");
 
+    App::registerSdlMetadata(TITLESTRING);
     ensureSettingsDir();
     create_globals();
 

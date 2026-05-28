@@ -2,7 +2,10 @@
 
 #include "path.h"
 
+#include <SDL3/SDL_init.h>
+#include <array>
 #include <cstdio>
+#include <format>
 
 #if _WIN32
 #include <windows.h>
@@ -13,6 +16,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
+
+
+namespace {
+struct SdlProperty {
+    const char* key;
+    const char* val;
+};
+} // namespace
 
 
 void ensureSettingsDir()
@@ -35,4 +46,23 @@ void ensureSettingsDir()
     }
 
 #endif
+}
+
+
+void App::registerSdlMetadata(std::string_view app_title)
+{
+    const std::string version = std::format("{}, {}", GIT_REVISION, GIT_DATE);
+    const std::array<SdlProperty, 6> metadata {
+        SdlProperty { SDL_PROP_APP_METADATA_NAME_STRING, app_title.data() },
+        SdlProperty { SDL_PROP_APP_METADATA_VERSION_STRING, version.c_str() },
+        SdlProperty { SDL_PROP_APP_METADATA_IDENTIFIER_STRING, "net.smwstuff.SuperMarioWar" },
+        SdlProperty { SDL_PROP_APP_METADATA_CREATOR_STRING, "Super Mario War Developers" },
+        SdlProperty { SDL_PROP_APP_METADATA_URL_STRING, "https://github.com/mmatyas/supermariowar" },
+        SdlProperty { SDL_PROP_APP_METADATA_TYPE_STRING, "game" },
+    };
+    for (const SdlProperty& prop : metadata) {
+        if (!SDL_SetAppMetadataProperty(prop.key, prop.val)) {
+            printf("[init] Failed to set %s\n", prop.key);
+        }
+    }
 }
