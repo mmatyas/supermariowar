@@ -80,6 +80,10 @@ add_library(CommonFiles STATIC
 
 add_subdirectory(ui)
 target_compile_features(CommonFiles PUBLIC cxx_std_20)
+target_compile_definitions(CommonFiles PUBLIC
+    GIT_REVISION="${SMW_GIT_REVISION}"
+    GIT_DATE="${SMW_GIT_DATE}"
+)
 
 if (SDL2_FORCE_GLES)
     target_compile_definitions(CommonFiles PUBLIC SDL2_FORCE_GLES)
