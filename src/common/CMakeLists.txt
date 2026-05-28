@@ -85,11 +85,8 @@ if (SDL2_FORCE_GLES)
     target_compile_definitions(CommonFiles PUBLIC SDL2_FORCE_GLES)
 endif()
 
-
-if(NOT EMSCRIPTEN)
-    target_link_libraries(CommonFiles
-        SDL3::SDL3
-        SDL3_image::SDL3_image
-        SDL3_mixer::SDL3_mixer
-    )
-endif()
+target_link_libraries(CommonFiles
+    SDL3::SDL3
+    SDL3_image::SDL3_image
+    SDL3_mixer::SDL3_mixer
+)
