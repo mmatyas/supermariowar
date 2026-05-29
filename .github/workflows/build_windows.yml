@@ -20,7 +20,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake g++-mingw-w64-x86-64-posix ninja-build
-          curl -L https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/smwlibs-mingw64.tar.xz | tar xJf - -C /tmp/
+          curl -L https://github.com/mmatyas/supermariowar/releases/download/v2.0-beta.0/smwlibs-sdl3-mingw64.tar.xz | tar xJf - -C /tmp/
           cmake --version
 
       - name: Configure
@@ -36,7 +36,7 @@ jobs:
           rm -rf supermariowar/include supermariowar/lib
           cp /usr/lib/gcc/x86_64-w64-mingw32/13-posix/{libgcc_s_seh-1,libstdc++-6}.dll supermariowar/
           cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll supermariowar/
-          cp /tmp/smwlibs/bin/{SDL2,SDL2_image,SDL2_mixer,libgme}.dll supermariowar/
+          cp /tmp/smwlibs/bin/{SDL3,SDL3_image,SDL3_mixer}.dll supermariowar/
           zip -9 -r "supermariowar_$(date +%F)_windows.zip" supermariowar
 
       - name: Upload artifacts
@@ -60,9 +60,9 @@ jobs:
       - name: Download dependencies
         run: |
           mkdir libs
-          curl -L https://www.libsdl.org/release/SDL2-devel-2.32.10-VC.zip | tar -x --strip-components=1 -C libs
-          curl -L https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.8.8-VC.zip | tar -x --strip-components=1 -C libs
-          curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.8.1-VC.zip | tar -x --strip-components=1 -C libs
+          curl -L https://www.libsdl.org/release/SDL3-devel-3.4.10-VC.zip | tar -x --strip-components=1 -C libs
+          curl -L https://www.libsdl.org/projects/SDL_image/release/SDL3_image-devel-3.4.4-VC.zip | tar -x --strip-components=1 -C libs
+          curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL3_mixer-devel-3.2.4-VC.zip | tar -x --strip-components=1 -C libs
 
       - name: Configure
         shell: bash

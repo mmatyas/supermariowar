@@ -3,7 +3,7 @@ on: workflow_call
 
 jobs:
   linux:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: X11
     steps:
       - uses: actions/checkout@v6
@@ -13,15 +13,10 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y
           cmake
           g++
-          libsdl2-dev
-          libsdl2-image-dev
-          libsdl2-mixer-dev
+          libsdl3-dev
+          libsdl3-image-dev
           ninja-build
           zlib1g-dev
-      - name: Version checks
-        run: |
-          sdl2-config --version
-          cmake --version
 
       - name: Configure
         run: cmake -B build -G Ninja -DSMW_INSTALL_PORTABLE=ON
