@@ -118,10 +118,10 @@ void gfxSprite::blit(const SDL_Rect* srcRect, SDL_Surface* dst, Vec2i dstPos) co
 
     if (m_wrap_x) {
         if (dstRect.x + getWidth() >= *m_wrap_x) {
-            dstRect.x -= *m_wrap_x;
+            dstRect = { dstPos.x - *m_wrap_x, dstPos.y, 0, 0 };  // NOTE: SDL2 modifies the dst rect
             blitSurface(m_picture.get(), srcRect, dst, &dstRect);
         } else if (dstRect.x < 0) {
-            dstRect.x += *m_wrap_x;
+            dstRect = { dstPos.x + *m_wrap_x, dstPos.y, 0, 0 };  // NOTE: SDL2 modifies the dst rect
             blitSurface(m_picture.get(), srcRect, dst, &dstRect);
         }
     }
