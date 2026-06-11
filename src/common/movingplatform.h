@@ -55,6 +55,8 @@ class MovingPlatform
     const TilesetTile& tileAt(size_t col, size_t row) const;
     TileType tileTypeAt(size_t col, size_t row) const;
 
+    void paintSprite(const gfxSprite& spr, size_t col, size_t row);
+
 	protected:
 
 		void check_map_collision_right(CPlayer * player);
