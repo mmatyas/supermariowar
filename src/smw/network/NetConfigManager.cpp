@@ -73,13 +73,13 @@ void read_servers(const toml::value& config)
         const toml::array& servers = config_servers.as_array();
         for (size_t i = 0; i < servers.size(); i++) {
             if (!servers[i].is_string()) {
-                printf("[net][warning] %s: server #%u is invalid\n", CONFIG_FILENAME, static_cast<unsigned>(i + 1));
+                printf("[net][warning] %s: server #%lu is invalid\n", CONFIG_FILENAME, i + 1);
                 continue;
             }
 
             const std::string& address_str = servers[i].as_string();
             if (address_str.length() < 8 || address_str.length() > 250) {
-                printf("[net][warning] %s: server #%u is invalid\n", CONFIG_FILENAME, static_cast<unsigned>(i + 1));
+                printf("[net][warning] %s: server #%lu is invalid\n", CONFIG_FILENAME, i + 1);
                 continue;
             }
 
