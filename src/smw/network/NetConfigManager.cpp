@@ -3,124 +3,83 @@
 #include "net.h"
 #include "path.h"
 
+#include <toml.hpp>
+
 #include <cassert>
-#include <cstring>
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
-void NetConfigManager::save()
+namespace {
+
+constexpr const char* CONFIG_FILENAME = "servers.toml";
+
+bool load_file(toml::value& config)
 {
-    assert(!netplay.myPlayerName.empty());
-
-    std::ofstream config(GetHomeDirectory() + "servers.yml");
-    if (!config.is_open()) {
-        printf("[net][error] Could not save network settings\n");
-        return;
-    }
-
-    YAML::Emitter content;
-    content << YAML::BeginMap;
-    content << YAML::Key << "player_name";
-    content << YAML::Value << netplay.myPlayerName;
-
-    assert(content.good());
-
-    content << YAML::Key << "servers";
-    content << YAML::Value << YAML::BeginSeq;
-
-    // Remove `(none)`
-    if (netplay.savedServers.size() == 1) {
-        if (netplay.savedServers[0].hostname.compare("(none)") == 0)
-            netplay.savedServers.clear();
-    }
-
-    for (unsigned i = 0; i < netplay.savedServers.size(); i++)
-        content << netplay.savedServers[i].hostname;
-
-    content << YAML::EndSeq;
-    content << YAML::EndMap;
-
-    assert(content.good());
-
-    config << content.c_str();
-    config.close();
-}
-
-void NetConfigManager::load()
-{
-    YAML::Node config;
-    if (!load_file(config))
-        return;
-
-    read_playername(config);
-    read_servers(config);
-}
-
-bool NetConfigManager::load_file(YAML::Node& config) {
     try {
-        config = YAML::LoadFile(GetHomeDirectory() + "servers.yml");
+        config = toml::parse(GetHomeDirectory() + CONFIG_FILENAME);
         return true;
     }
-    catch (YAML::BadFile& error) {
-        printf("[net][warning] Could not open servers.yml, using default values.\n");
+    catch (const toml::file_io_error&) {
+        printf("[net][warning] Could not open %s, using default values.\n", CONFIG_FILENAME);
     }
-    catch (std::runtime_error& error) {
-        printf("[net][warning] servers.yml: %s", error.what());
+    catch (const std::exception& error) {
+        printf("[net][warning] %s: %s\n", CONFIG_FILENAME, error.what());
     }
 
     return false;
 }
 
-void NetConfigManager::read_playername(YAML::Node& config)
+void read_playername(const toml::value& config)
 {
     try {
-        YAML::Node config_playername = config["player_name"];
-        if (config_playername.IsNull())
+        if (!config.contains("player_name"))
             return;
 
-        if (!config_playername.IsScalar())
+        const toml::value& config_playername = config.at("player_name");
+        if (!config_playername.is_string())
             throw std::runtime_error("player name must be a simple string");
 
-        std::string net_player_name = config_playername.as<std::string>();
+        const std::string& net_player_name = config_playername.as_string();
 
         if (net_player_name.length() < 3)
             throw std::runtime_error("player name too short");
 
         if (net_player_name.length() >= NET_MAX_PLAYER_NAME_LENGTH) {
-#if (defined(_WIN32) && defined(__MINGW32__)) || defined(__ANDROID__)
-            // There is a bug in MinGW and Android NDK's GCC <= 4.8.x
-            std::string err("player name must be less than 16 letters");
-#else
             std::string err("player name must be less than ");
             err += std::to_string(NET_MAX_PLAYER_NAME_LENGTH);
             err += " letters";
-#endif
             throw std::runtime_error(err);
         }
 
         netplay.myPlayerName = net_player_name;
     }
-    catch (std::runtime_error& error) {
-        printf("[net][warning] servers.yml: %s\n", error.what());
+    catch (const std::exception& error) {
+        printf("[net][warning] %s: %s\n", CONFIG_FILENAME, error.what());
     }
 }
 
-void NetConfigManager::read_servers(YAML::Node& config)
+void read_servers(const toml::value& config)
 {
     try {
-        YAML::Node config_servers = config["servers"];
-        if (config_servers.IsNull())
+        if (!config.contains("servers"))
             return;
 
-        if (!config_servers.IsSequence())
+        const toml::value& config_servers = config.at("servers");
+        if (!config_servers.is_array())
             throw std::runtime_error("`servers` is in wrong format");
 
-        for (unsigned i = 0; i < config_servers.size(); i++) {
-            std::string address_str = config_servers[i].as<std::string>();
+        const toml::array& servers = config_servers.as_array();
+        for (size_t i = 0; i < servers.size(); i++) {
+            if (!servers[i].is_string()) {
+                printf("[net][warning] %s: server #%u is invalid\n", CONFIG_FILENAME, static_cast<unsigned>(i + 1));
+                continue;
+            }
 
+            const std::string& address_str = servers[i].as_string();
             if (address_str.length() < 8 || address_str.length() > 250) {
-                printf("[net][warning] servers.yml: server #%u is invalid\n", i + 1);
+                printf("[net][warning] %s: server #%u is invalid\n", CONFIG_FILENAME, static_cast<unsigned>(i + 1));
                 continue;
             }
 
@@ -129,7 +88,48 @@ void NetConfigManager::read_servers(YAML::Node& config)
             netplay.savedServers.push_back(host);
         }
     }
-    catch (std::runtime_error& error) {
-        printf("[net][warning] servers.yml: %s\n", error.what());
+    catch (const std::exception& error) {
+        printf("[net][warning] %s: %s\n", CONFIG_FILENAME, error.what());
     }
+}
+
+} // namespace
+
+void NetConfigManager::save()
+{
+    assert(!netplay.myPlayerName.empty());
+
+    std::ofstream config(GetHomeDirectory() + CONFIG_FILENAME);
+    if (!config.is_open()) {
+        printf("[net][error] Could not save network settings\n");
+        return;
+    }
+
+    // Remove `(none)`
+    if (netplay.savedServers.size() == 1) {
+        if (netplay.savedServers[0].hostname.compare("(none)") == 0)
+            netplay.savedServers.clear();
+    }
+
+    std::vector<std::string> servers;
+    servers.reserve(netplay.savedServers.size());
+    for (const ServerAddress& server : netplay.savedServers)
+        servers.push_back(server.hostname);
+
+    const toml::value content = toml::table {
+        { "player_name", netplay.myPlayerName },
+        { "servers", servers },
+    };
+
+    config << toml::format(content);
+}
+
+void NetConfigManager::load()
+{
+    toml::value config;
+    if (!load_file(config))
+        return;
+
+    read_playername(config);
+    read_servers(config);
 }

@@ -71,7 +71,7 @@ if(NOT EMSCRIPTEN)
 	target_link_libraries(smw smw_zlib)
 endif()
 
-target_link_libraries(smw yaml-cpp::yaml-cpp)
+target_link_libraries(smw toml11::toml11)
 
 if (TARGET SDL2::SDL2main)
     target_link_libraries(smw SDL2::SDL2main)
