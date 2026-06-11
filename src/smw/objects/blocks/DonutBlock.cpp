@@ -69,7 +69,7 @@ void B_DonutBlock::triggerBehavior(short iPlayerId)
     MovingPlatformPath * path = new FallingPath(Vec2f((float)ix + 16.0f, (float)iy + 15.8f));
     MovingPlatform * platform = new MovingPlatform({ tile }, { type }, 1, 1, 2, path, false);
     platform->SetPlayerId(iPlayerId);
-    platform->paintSprite(*spr, 0, 0);
+    platform->paintSpriteAt(*spr, 0, 0);
 
     g_map->AddTemporaryPlatform(platform);
 

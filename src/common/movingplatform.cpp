@@ -134,13 +134,13 @@ TileType MovingPlatform::tileTypeAt(size_t col, size_t row) const
 }
 
 //Draw a custom sprite on a tile of the platform, instead of a tileset tile
-void MovingPlatform::paintSprite(const gfxSprite& spr, size_t col, size_t row)
+void MovingPlatform::paintSpriteAt(const gfxSprite& spr, size_t col, size_t row)
 {
     const short iTileSize = iWidth / iTileWidth;
     const Vec2i dstPos(col * iTileSize, row * iTileSize);
 
-    for (gfxSprite& platformSprite : sprites)
-        spr.draw(platformSprite.getSurface(), dstPos);
+    for (gfxSprite& layer : sprites)
+        spr.draw(layer.getSurface(), dstPos);
 }
 
 void MovingPlatform::draw()

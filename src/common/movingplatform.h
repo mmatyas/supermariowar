@@ -55,7 +55,7 @@ class MovingPlatform
     const TilesetTile& tileAt(size_t col, size_t row) const;
     TileType tileTypeAt(size_t col, size_t row) const;
 
-    void paintSprite(const gfxSprite& spr, size_t col, size_t row);
+    void paintSpriteAt(const gfxSprite& spr, size_t col, size_t row);
 
 	protected:
 
