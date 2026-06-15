@@ -76,10 +76,14 @@ smw_declare_gitrepo(
 
 
 # toml11
-smw_declare_gitrepo(
+FetchContent_Declare(
     toml11
-    https://github.com/ToruNiina/toml11.git
-    v4.4.0
+    GIT_REPOSITORY https://github.com/ToruNiina/toml11.git
+    GIT_TAG v4.4.0
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+    GIT_SUBMODULES ""
+    FIND_PACKAGE_ARGS NAMES toml11
 )
 
 # enet
