@@ -3,10 +3,8 @@
 #include "map.h"
 #include "movingplatform.h"
 #include "player.h"
-#include "TilesetManager.h"
 
 extern CMap* g_map;
-extern CTilesetManager* g_tilesetmanager;
 
 B_DonutBlock::B_DonutBlock(gfxSprite *nspr, Vec2s pos)
     : IO_Block(nspr, pos)
@@ -60,18 +58,18 @@ bool B_DonutBlock::hittop(CPlayer * player, bool useBehavior)
 
 void B_DonutBlock::triggerBehavior(short iPlayerId)
 {
-    //eyecandy[2].emplace<EC_FallingObject>(&rm->spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0);
-
+    //The falling block uses this block's own graphic instead of a tileset tile
     TilesetTile tile;
-    tile.iID = g_tilesetmanager->classicTilesetIndex();
-    tile.iCol = 29;
-    tile.iRow = 15;
+    tile.iID = TILESETNONE;
+    tile.iCol = 0;
+    tile.iRow = 0;
 
     TileType type = TileType::Solid;
 
     MovingPlatformPath * path = new FallingPath(Vec2f((float)ix + 16.0f, (float)iy + 15.8f));
     MovingPlatform * platform = new MovingPlatform({ tile }, { type }, 1, 1, 2, path, false);
     platform->SetPlayerId(iPlayerId);
+    platform->paintSpriteAt(*spr, 0, 0);
 
     g_map->AddTemporaryPlatform(platform);
 
