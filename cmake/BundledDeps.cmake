@@ -75,13 +75,15 @@ smw_declare_gitrepo(
 )
 
 
-# yaml-cpp
-set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "")
-set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "")
-smw_declare_gitrepo(
-    yaml-cpp
-    https://github.com/jbeder/yaml-cpp.git
-    yaml-cpp-0.9.0
+# toml11
+FetchContent_Declare(
+    toml11
+    GIT_REPOSITORY https://github.com/ToruNiina/toml11.git
+    GIT_TAG v4.4.0
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+    GIT_SUBMODULES ""
+    FIND_PACKAGE_ARGS NAMES toml11
 )
 
 # enet
@@ -102,7 +104,7 @@ smw_declare_gitrepo(
 )
 
 
-FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer yaml-cpp zlib)
+FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer toml11 zlib)
 if(NOT NO_NETWORK)
     FetchContent_MakeAvailable(enet)
 endif()
