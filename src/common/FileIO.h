@@ -41,6 +41,7 @@ public:
     void read_raw(void*, size_t);
 
 private:
+    const char* m_path = nullptr;
     FILE* fp = nullptr;
 
     void fread_or_exception(void*, size_t, size_t);

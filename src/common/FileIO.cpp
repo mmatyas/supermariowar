@@ -4,10 +4,12 @@
 
 #include <cassert>
 #include <cstring>
+#include <format>
 #include <stdexcept>
 #include <vector>
 
 BinaryFile::BinaryFile(const char* path, const char* options)
+    : m_path(path)
 {
     fp = fopen(path, options);
 }
@@ -28,14 +30,35 @@ BinaryFile::~BinaryFile()
 
 void BinaryFile::fread_or_exception(void* ptr, size_t size, size_t count)
 {
-    if (fread(ptr, size, count, fp) != count)
-        throw std::runtime_error("File read error");
+    long pos = ftell(fp);
+    if (fread(ptr, size, count, fp) != count) {
+        std::string msg = std::format(
+            "File read error in {}\n"
+            "Tried to read {} bytes at position {}, but failed\n"
+            "The file might be damaged, or it's not in the expected format",
+            m_path, size * count, pos);
+        if (std::ferror(fp)) {
+            msg += "\nSystem message: ";
+            msg += std::strerror(errno);
+        }
+        throw std::runtime_error(std::move(msg));
+    }
 }
 
 void BinaryFile::fwrite_or_exception(const void* ptr, size_t size, size_t count)
 {
-    if (fwrite(ptr, size, count, fp) != count)
-        throw std::runtime_error("File write error");
+    long pos = ftell(fp);
+    if (fwrite(ptr, size, count, fp) != count) {
+        std::string msg = std::format(
+            "File write error in {}\n"
+            "Tried to write {} bytes at position {}, but failed",
+            m_path, size * count, pos);
+        if (std::ferror(fp)) {
+            msg += "\nSystem message: ";
+            msg += std::strerror(errno);
+        }
+        throw std::runtime_error(std::move(msg));
+    }
 }
 
 void BinaryFile::rewind()
