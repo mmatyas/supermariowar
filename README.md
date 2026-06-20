@@ -88,14 +88,14 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
     - SDL_image
     - SDL_mixer
 - zlib
-- yaml-cpp
+- toml11
 - ENet (optional)
 
 If you're using package managers, you can get them like this:
 
-- Debian-based: `apt install cmake libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev zlib1g-dev libyaml-cpp-dev libenet-dev`
-- Fedora/RPM: `yum install cmake SDL2-devel SDL2_image-devel SDL2_mixer-devel zlib-devel yaml-cpp-devel enet-devel`
-- Arch: `pacman -S cmake sdl2 sdl2_image sdl2_mixer zlib yaml-cpp enet`
+- Debian-based: `apt install cmake libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev zlib1g-dev libtoml11-dev libenet-dev`
+- Fedora/RPM: `yum install cmake SDL2-devel SDL2_image-devel SDL2_mixer-devel zlib-devel toml11-devel enet-devel`
+- Arch: `pacman -S cmake sdl2 sdl2_image sdl2_mixer zlib toml11 enet`
 
 For all dependencies, you can choose to use a bundled version of them. This is useful if the dependencies are not available for your OS, are outdated, or you simply don't want to install them on your system. In this case, you can tell CMake to download and build the library along with the game come. Please see the [Build configuration](#build-configuration) for enabling this feature.
 
