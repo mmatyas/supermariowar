@@ -84,9 +84,8 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 
 - C++20 supporting compiler
 - CMake
-- SDL 2, with
-    - SDL_image
-    - SDL_mixer
+- SDL 2 or SDL 3, with SDL_image and SDL_mixer
+  - for building with SDL 3, use the `sdl3` branch
 - zlib
 - toml11
 - ENet (optional)
