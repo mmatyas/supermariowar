@@ -1,5 +1,4 @@
-#ifndef GAMEMODESETTINGS_H
-#define GAMEMODESETTINGS_H
+#pragma once
 
 #include "GameplayStyles.h"
 #include "GlobalConstants.h"
@@ -12,6 +11,8 @@ struct ClassicGameModeSettings {
     ScoringStyle scoring;	//When to credit a score, all kills or push kills only (sumo mode)
 
     ClassicGameModeSettings();
+
+    bool operator==(const ClassicGameModeSettings&) const = default;
 };
 
 struct FragGameModeSettings {
@@ -19,6 +20,8 @@ struct FragGameModeSettings {
     ScoringStyle scoring;	//When to credit a score, all kills or push kills only (sumo mode)
 
     FragGameModeSettings();
+
+    bool operator==(const FragGameModeSettings&) const = default;
 };
 
 struct TimeGameModeSettings {
@@ -27,6 +30,8 @@ struct TimeGameModeSettings {
     short percentextratime; //percent chance a stopwatch with extra game time will spawn
 
     TimeGameModeSettings();
+
+    bool operator==(const TimeGameModeSettings&) const = default;
 };
 
 struct JailGameModeSettings {
@@ -36,6 +41,8 @@ struct JailGameModeSettings {
     short percentkey;		//percent chance a jail key will spawn
 
     JailGameModeSettings();
+
+    bool operator==(const JailGameModeSettings&) const = default;
 };
 
 struct CoinGameModeSettings {
@@ -44,6 +51,8 @@ struct CoinGameModeSettings {
     short percentextracoin; //percent chance a bonus coin will appear
 
     CoinGameModeSettings();
+
+    bool operator==(const CoinGameModeSettings&) const = default;
 };
 
 struct StompGameModeSettings {
@@ -51,6 +60,8 @@ struct StompGameModeSettings {
     std::array<short, NUMSTOMPENEMIES> enemyweight;	//What ratio the enemies are chosen
 
     StompGameModeSettings();
+
+    bool operator==(const StompGameModeSettings&) const = default;
 };
 
 struct EggGameModeSettings {
@@ -59,6 +70,8 @@ struct EggGameModeSettings {
     short explode;			//Time until eggs explode
 
     EggGameModeSettings();
+
+    bool operator==(const EggGameModeSettings&) const = default;
 };
 
 struct FlagGameModeSettings {
@@ -70,6 +83,8 @@ struct FlagGameModeSettings {
     bool centerflag;		//Have a single flag that all teams fight to return to their base
 
     FlagGameModeSettings();
+
+    bool operator==(const FlagGameModeSettings&) const = default;
 };
 
 struct ChickenGameModeSettings {
@@ -77,12 +92,16 @@ struct ChickenGameModeSettings {
     bool glide;				//Allow chicken to glide through the air (chicken gets perm leaf powerup)
 
     ChickenGameModeSettings();
+
+    bool operator==(const ChickenGameModeSettings&) const = default;
 };
 
 struct TagGameModeSettings {
     bool tagontouch;		//Transfer tag on touch
 
     TagGameModeSettings();
+
+    bool operator==(const TagGameModeSettings&) const = default;
 };
 
 struct StarGameModeSettings {
@@ -91,6 +110,8 @@ struct StarGameModeSettings {
     short percentextratime; //percent chance a stopwatch with extra game time will spawn
 
     StarGameModeSettings();
+
+    bool operator==(const StarGameModeSettings&) const = default;
 };
 
 struct DominationGameModeSettings {
@@ -101,6 +122,8 @@ struct DominationGameModeSettings {
     short quantity;			//Number of bases
 
     DominationGameModeSettings();
+
+    bool operator==(const DominationGameModeSettings&) const = default;
 };
 
 struct KingOfTheHillModeSettings {
@@ -109,6 +132,8 @@ struct KingOfTheHillModeSettings {
     short maxmultiplier;	//as a player sits in the zone, the score will multiply
 
     KingOfTheHillModeSettings();
+
+    bool operator==(const KingOfTheHillModeSettings&) const = default;
 };
 
 struct RaceGameModeSettings {
@@ -117,6 +142,8 @@ struct RaceGameModeSettings {
     short penalty;			//If dead players lose all tagged, one tagged or none
 
     RaceGameModeSettings();
+
+    bool operator==(const RaceGameModeSettings&) const = default;
 };
 
 struct FrenzyGameModeSettings {
@@ -126,6 +153,8 @@ struct FrenzyGameModeSettings {
     std::array<short, NUMFRENZYCARDS> powerupweight;	//What ratio the powerups are chosen
 
     FrenzyGameModeSettings();
+
+    bool operator==(const FrenzyGameModeSettings&) const = default;
 };
 
 struct SurvivalGameModeSettings {
@@ -135,6 +164,8 @@ struct SurvivalGameModeSettings {
     bool shield;				//Players are shielded when spawning
 
     SurvivalGameModeSettings();
+
+    bool operator==(const SurvivalGameModeSettings&) const = default;
 };
 
 struct GreedGameModeSettings {
@@ -144,6 +175,8 @@ struct GreedGameModeSettings {
     short percentextracoin;		//percent chance a bonus coin will appear
 
     GreedGameModeSettings();
+
+    bool operator==(const GreedGameModeSettings&) const = default;
 };
 
 struct HealthGameModeSettings {
@@ -152,6 +185,8 @@ struct HealthGameModeSettings {
     short percentextralife;		//Percent chance an extra heart with come from a powerup block
 
     HealthGameModeSettings();
+
+    bool operator==(const HealthGameModeSettings&) const = default;
 };
 
 struct CollectionGameModeSettings {
@@ -161,6 +196,8 @@ struct CollectionGameModeSettings {
     short cardlife;				//How long cards live after they are released from players
 
     CollectionGameModeSettings();
+
+    bool operator==(const CollectionGameModeSettings&) const = default;
 };
 
 struct ChaseGameModeSettings {
@@ -168,6 +205,8 @@ struct ChaseGameModeSettings {
     std::array<short, 3> phantoquantity;	//How many phantos there are
 
     ChaseGameModeSettings();
+
+    bool operator==(const ChaseGameModeSettings&) const = default;
 };
 
 struct ShyGuyTagGameModeSettings {
@@ -176,6 +215,8 @@ struct ShyGuyTagGameModeSettings {
     short freetime;				//How long all players will stay shyguys before the game is reset
 
     ShyGuyTagGameModeSettings();
+
+    bool operator==(const ShyGuyTagGameModeSettings&) const = default;
 };
 
 struct BossGameModeSettings {
@@ -184,6 +225,8 @@ struct BossGameModeSettings {
     short hitpoints;			//How much life the boss has
 
     BossGameModeSettings();
+
+    bool operator==(const BossGameModeSettings&) const = default;
 };
 
 struct GameModeSettings {
@@ -210,5 +253,3 @@ struct GameModeSettings {
     ShyGuyTagGameModeSettings shyguytag;
     BossGameModeSettings boss;
 };
-
-#endif // GAMEMODESETTINGS_H

@@ -1,5 +1,6 @@
 add_executable(smw-tests
 	runner.cpp
+	common/test_GameModeSettingsSerialization.cpp
 	common/test_version.cpp
 	common/test_tokenize.cpp
 	common/math/test_vec2.cpp
