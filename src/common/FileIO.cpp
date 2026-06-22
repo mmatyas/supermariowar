@@ -66,6 +66,11 @@ void BinaryFile::rewind()
         ::rewind(fp);
 }
 
+long BinaryFile::pos() const
+{
+    return fp ? ::ftell(fp) : 0;
+}
+
 void BinaryFile::write_i8(int8_t value)
 {
     fwrite_or_exception(&value, sizeof(int8_t), 1);
@@ -122,7 +127,7 @@ void BinaryFile::write_float(float value)
 }
 
 // Writes an i32 that tells the byte length of the string data *including*
-// a terminating null byte, then the text data itself, plus a null byte
+// a terminating null byte, then the text data itself, with a null terminating byte
 void BinaryFile::write_string_long(const std::string& string)
 {
     if (string.length() > 255) {

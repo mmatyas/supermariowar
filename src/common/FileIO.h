@@ -15,6 +15,7 @@ public:
 
     bool is_open() const { return fp; };
     void rewind();
+    long pos() const;
 
     void write_i8(int8_t);
     void write_u8(uint8_t);
