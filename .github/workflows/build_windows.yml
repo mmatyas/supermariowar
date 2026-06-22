@@ -68,6 +68,7 @@ jobs:
         shell: bash
         run: cmake $COMMON_CMAKE_ARGS
           -DCMAKE_PREFIX_PATH=libs
+          -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
           -DCMAKE_C_COMPILER_LAUNCHER=sccache
           -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
 
