@@ -86,9 +86,7 @@ void MapReader1700::read_tiles(CMap& map, BinaryFile& mapfile)
 void MapReader1701::read_background(CMap& map, BinaryFile& mapfile)
 {
     //Read in background to use
-    char text[128];
-    mapfile.read_string_long(text, 128);
-    map.szBackgroundFile = text;
+    map.szBackgroundFile = mapfile.read_string_long(128);
 
     for (const std::string_view background : g_szBackgroundConversion) {
         // All items must have an underscore in g_szBackgroundConversion
@@ -105,9 +103,7 @@ void MapReader1701::read_background(CMap& map, BinaryFile& mapfile)
 void MapReader1702::read_background(CMap& map, BinaryFile& mapfile)
 {
     //Read in background to use
-    char text[128];
-    mapfile.read_string_long(text, 128);
-    map.szBackgroundFile = text;
+    map.szBackgroundFile = mapfile.read_string_long(128);
 }
 
 void MapReader1700::set_preview_switches(CMap& map, BinaryFile& mapfile)

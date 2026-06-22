@@ -34,7 +34,7 @@ public:
 		void addWorldMaps();
 
         void add(const char * name);
-        bool find(const char * name);
+        bool find(const std::string& name);
 		bool findexact(const char * name, bool fWorld);
     bool startswith(char letter);
     bool startswith(const std::string& match);

@@ -22,9 +22,6 @@ public:
     void write_i32(int32_t);
     void write_bool(bool);
     void write_float(float);
-    void write_string(const char*);
-    void write_string(const std::string&);
-    void write_string_long(const char*);
     void write_string_long(const std::string&);
     void write_raw(const void*, size_t);
 
@@ -36,8 +33,7 @@ public:
     float read_float();
     void read_i16_array(int16_t*, size_t);
     void read_i32_array(int32_t*, size_t);
-    void read_string(char*, size_t);
-    void read_string_long(char*, size_t);
+    std::string read_string_long(size_t);
     void read_raw(void*, size_t);
 
 private:

@@ -314,7 +314,7 @@ bool CheckKey(const Uint8 * keystate, SDL_Keycode key) {
 
 bool ignoreclick = false;
 
-char findstring[FILEBUFSIZE] = "";
+std::string findstring;
 
 short g_musiccategorydisplaytimer = 0;
 
@@ -489,7 +489,7 @@ void inner_main()
             saved_col = editor_settings.read_i32();
             saved_row = editor_settings.read_i32();
             g_fFullScreen = editor_settings.read_bool();
-            editor_settings.read_string_long(findstring, FILEBUFSIZE);
+            findstring = editor_settings.read_string_long(FILEBUFSIZE);
         }
     }
 
@@ -617,7 +617,7 @@ void inner_main()
     worldlist->find(findstring);
     game_values.worldindex = worldlist->currentIndex();
 	loadcurrentworld();
-	findstring[0] = 0;  //clear out the find string so that pressing "f" will give you the find dialog
+	findstring.clear();  //clear out the find string so that pressing "f" will give you the find dialog
 
     if (saved_row >= 0 && saved_row <= iWorldHeight - 15 && saved_col >= 0 && saved_col <= iWorldWidth - 20) {
 		draw_offset_row = saved_row;
@@ -1239,7 +1239,7 @@ int editor_edit()
 						}
 
                     if (event.key.keysym.sym == SDLK_f) {
-							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT) || findstring[0] == '\0')
+							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT) || findstring.empty())
 								return FIND;
 
 							findcurrentstring();
@@ -4569,7 +4569,7 @@ int find()
 	//char mapLocation[FILEBUFSIZE] = "maps/";
 
     if (dialog("Find Map", "Enter name:", fileName, 64)) {
-		strcpy(findstring, fileName);
+		findstring = fileName;
 
         if (worldlist->find(findstring)) {
             game_values.worldindex = worldlist->currentIndex();
@@ -4654,7 +4654,7 @@ void SetDisplayMessage(short iTime,
 
 int findcurrentstring()
 {
-    if (findstring[0] != '\0') {
+    if (!findstring.empty()) {
         if (worldlist->find(findstring)) {
             game_values.worldindex = worldlist->currentIndex();
 			loadcurrentworld();

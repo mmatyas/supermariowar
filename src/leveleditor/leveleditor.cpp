@@ -316,7 +316,7 @@ bool view_only_layer = false;
 bool viewwarps = true;
 bool ignoreclick = false;
 
-char findstring[FILEBUFSIZE] = "";
+std::string findstring;
 
 short g_iNumPlatforms = 0;
 MapPlatform g_Platforms[MAX_PLATFORMS];
@@ -419,7 +419,7 @@ void inner_main()
         BinaryFile editor_settings(options_path, "rb");
         if (editor_settings.is_open()) {
             g_fFullScreen = editor_settings.read_bool();
-            editor_settings.read_string_long(findstring, FILEBUFSIZE);
+            findstring = editor_settings.read_string_long(FILEBUFSIZE);
         }
     }
 
@@ -554,7 +554,7 @@ void inner_main()
 
 	maplist->find(findstring);
 	loadcurrentmap();
-	findstring[0] = 0;  //clear out the find string so that pressing "f" will give you the find dialog
+        findstring.clear();  //clear out the find string so that pressing "f" will give you the find dialog
 
 	printf("\n---------------- ready, steady, go! ----------------\n");
 
@@ -967,7 +967,7 @@ int editor_edit()
 						}
 
                     if (key == SDLK_f ) {
-							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT) || findstring[0] == '\0')
+                                                    if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT) || findstring.empty())
 								return FIND;
 
 							findcurrentstring();
@@ -4669,7 +4669,7 @@ int find()
 	//char mapLocation[FILEBUFSIZE] = "maps/";
 
     if (dialog("Find Map", "Enter name:", fileName, 64)) {
-		strcpy(findstring, fileName);
+		findstring = fileName;
 
         if (maplist->find(findstring)) {
 			loadcurrentmap();
@@ -4905,7 +4905,7 @@ void CalculatePlatformDims(short iPlatform, short * ix, short * iy, short * iw, 
 
 int findcurrentstring()
 {
-    if (findstring[0] != '\0') {
+    if (!findstring.empty()) {
         if (maplist->find(findstring)) {
 			loadcurrentmap();
 		}

@@ -123,7 +123,7 @@ void MapList::add(const char * name)
     maps.emplace(stripCreatorAndExt(name), std::move(node));
 }
 
-bool MapList::find(const char * name)
+bool MapList::find(const std::string& name)
 {
     bool fFound = false;
 
@@ -131,7 +131,7 @@ bool MapList::find(const char * name)
     do {
         next(false);	//sets us to the beginning if we hit the end -> loop through the maps
 
-        if (strstr((*current).second.filename.c_str(), name))	//compare names after
+        if (strstr((*current).second.filename.c_str(), name.c_str()))	//compare names after
             fFound = true;
     } while (current != oldCurrent && !fFound);
 
