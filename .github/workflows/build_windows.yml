@@ -52,6 +52,8 @@ jobs:
       SCCACHE_GHA_ENABLED: "true"
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: 'recursive'
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: mozilla/sccache-action@v0.0.9
 
@@ -76,4 +78,15 @@ jobs:
         run: ctest --test-dir build/tests --output-on-failure --build-config Release
 
       - name: Package
-        run: cmake --install build --prefix outdir --strip --config Release
+        shell: bash
+        run: |
+          cmake --install build --prefix supermariowar --strip --config Release
+          rm -rf supermariowar/include supermariowar/lib
+          cp libs/lib/x64/*.dll supermariowar/
+          7z a "supermariowar_$(date +%F)_windows-msvc.zip" supermariowar
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: supermariowar_windows-msvc
+          path: supermariowar_*_windows-msvc.zip
