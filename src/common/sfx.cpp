@@ -61,10 +61,14 @@ AudioSystem::SdlMixer::SdlMixer()
         throw std::format("Could not initialize SDL_mixer: {}", SDL_GetError());
 
     const auto sdlmix_version = MIX_Version();
-    printf("[init] SDL_Mixer %d.%d.%d loaded.\n",
+    printf("[sfx] SDL_Mixer %d.%d.%d loaded.\n",
         SDL_VERSIONNUM_MAJOR(sdlmix_version),
         SDL_VERSIONNUM_MINOR(sdlmix_version),
         SDL_VERSIONNUM_MICRO(sdlmix_version));
+
+    for (int idx = 0; idx < MIX_GetNumAudioDecoders(); idx++) {
+        printf("[sfx]   found audio decoder: %s\n", MIX_GetAudioDecoder(idx));
+    }
 }
 
 AudioSystem::SdlMixer::~SdlMixer()
