@@ -121,6 +121,8 @@ void BinaryFile::write_float(float value)
     fwrite_or_exception(&value, sizeof(float), 1);
 }
 
+// Writes an i32 that tells the byte length of the string data *including*
+// a terminating null byte, then the text data itself, plus a null byte
 void BinaryFile::write_string_long(const std::string& string)
 {
     if (string.length() > 255) {
@@ -131,8 +133,9 @@ void BinaryFile::write_string_long(const std::string& string)
         throw std::runtime_error(std::move(msg));
     }
 
-    write_i32(string.size());
-    fwrite_or_exception(string.data(), sizeof(char), string.size());
+    // NOTE: `size()` doesn't include the terminating null byte
+    write_i32(string.size() + 1);
+    fwrite_or_exception(string.data(), sizeof(char), string.size() + 1);
 }
 
 void BinaryFile::write_raw(const void* source, size_t size)
@@ -248,7 +251,8 @@ float BinaryFile::read_float()
     return in;
 }
 
-// Uses 32 bits to store the length of the string.
+// Uses 32 bits to store the length of the string, then the text data,
+// including a terminating null byte
 std::string BinaryFile::read_string_long(size_t maxlen)
 {
     const int stored_len = read_i32();
@@ -261,6 +265,9 @@ std::string BinaryFile::read_string_long(size_t maxlen)
 
     std::string text(data_len, '\0');
     fread_or_exception(text.data(), sizeof(char), data_len);
+
+    // NOTE: The stored text always includes a terminating null byte
+    text.pop_back();
 
     return text;
 }
