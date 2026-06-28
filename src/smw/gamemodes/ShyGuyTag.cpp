@@ -29,7 +29,7 @@ CGM_ShyGuyTag::CGM_ShyGuyTag() : CGameMode()
     goal = 200;
     gamemode = game_mode_shyguytag;
 
-    SetupModeStrings("Shyguy Tag", "Points", 50);
+    SetupModeStrings("Robo Tag", "Points", 50);
     scorecounter = 0;
 }
 
@@ -151,7 +151,7 @@ void CGM_ShyGuyTag::SetShyGuy(short iTeam)
     for (CPlayer* player : players) {
         if (player->getTeamID() == iTeam) {
             player->shyguy = true;
-            eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, player->centerX(), player->bottomY(), "Shyguy!", -VELJUMP*1.5);
+            eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, player->centerX(), player->bottomY(), "Robo Tag!", -VELJUMP*1.5);
             eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8);
 
             player->StripPowerups();
