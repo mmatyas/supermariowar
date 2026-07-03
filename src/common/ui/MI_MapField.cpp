@@ -3,7 +3,6 @@
 #include "Game.h"
 #include "input.h"
 #include "MapList.h"
-#include "ObjectContainer.h"
 #include "ResourceManager.h"
 #include "ui/MI_Image.h"
 
@@ -11,7 +10,6 @@
 
 extern MapList *maplist;
 extern CResourceManager* rm;
-extern CObjectContainer objectcontainer[3];
 
 /**************************************
  * MI_MapField Class

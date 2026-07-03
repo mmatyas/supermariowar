@@ -1,9 +1,7 @@
 #include "MI_Button.h"
 
-#include "GameValues.h"
 #include "ResourceManager.h"
 
-extern CGameValues game_values;
 extern CResourceManager* rm;
 
 
@@ -46,17 +44,17 @@ void MI_Button::Draw()
 
     switch (m_text_align) {
         case TextAlign::LEFT:
-            rm->menu_font_large.drawChopRight(m_pos.x + 16 + (iImageW > 0 ? iImageW + 2 : 0), m_pos.y + 5, iWidth - 32, szName.c_str());
+            rm->menu_font_large.drawChopRight(m_pos.x + 16 + (iImageW > 0 ? iImageW + 2 : 0), m_pos.y + 5, iWidth - 32, szName);
             if (sprImage)
                 sprImage->draw(m_pos.x + 16, m_pos.y + 16 - (iImageH >> 1), srcRect);
             break;
         case TextAlign::CENTER:
-            rm->menu_font_large.drawCentered(m_pos.x + ((iWidth + (iImageW > 0 ? iImageW + 2 : 0)) >> 1), m_pos.y + 5, szName.c_str());
+            rm->menu_font_large.drawCentered(m_pos.x + ((iWidth + (iImageW > 0 ? iImageW + 2 : 0)) >> 1), m_pos.y + 5, szName);
             if (sprImage)
                 sprImage->draw(m_pos.x + (iWidth >> 1) - ((iTextW + iImageW) >> 1) - 1, m_pos.y + 16 - (iImageH >> 1), srcRect);
             break;
         case TextAlign::RIGHT:
-            rm->menu_font_large.drawRightJustified(m_pos.x + iWidth - 16, m_pos.y + 5, szName.c_str());
+            rm->menu_font_large.drawRightJustified(m_pos.x + iWidth - 16, m_pos.y + 5, szName);
             if (sprImage)
                 sprImage->draw(m_pos.x + iWidth - 18 - iTextW - iImageW, m_pos.y + 16 - (iImageH >> 1), srcRect);
             break;
@@ -66,7 +64,7 @@ void MI_Button::Draw()
 void MI_Button::SetName(std::string name)
 {
     szName = std::move(name);
-    iTextW = rm->menu_font_large.getWidth(szName.c_str());
+    iTextW = rm->menu_font_large.getWidth(szName);
 }
 
 void MI_Button::SetImage(gfxSprite* nsprImage, short x, short y, short w, short h)

@@ -6,15 +6,7 @@
 #include <vector>
 
 
-class CMB_ChatMessage {
-public:
-    CMB_ChatMessage() {}
-
-    CMB_ChatMessage(std::string name, std::string text)
-        : playerName(std::move(name))
-        , message(std::move(text))
-    {}
-
+struct CMB_ChatMessage {
     std::string playerName;
     std::string message;
     // time?
