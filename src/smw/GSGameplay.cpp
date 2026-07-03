@@ -1287,7 +1287,7 @@ void drawExitPauseDialog()
         else
             szGoal += std::to_string(game_values.gamemode->goal);
 
-        rm->menu_font_large.drawCentered(App::screenWidth/2, 264, szGoal.c_str());
+        rm->menu_font_large.drawCentered(App::screenWidth/2, 264, szGoal);
     }
 
     if (game_values.flags.exitinggame) {

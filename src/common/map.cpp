@@ -894,7 +894,7 @@ void CMap::saveMap(const std::string& file)
             mapfile.write_i32(iTileset);
 
             //Tileset Name
-            mapfile.write_string_long(g_tilesetmanager->tileset(iTileset)->name().c_str());
+            mapfile.write_string_long(g_tilesetmanager->tileset(iTileset)->name());
         }
     }
 
@@ -930,7 +930,7 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Write background File
-    mapfile.write_string_long(szBackgroundFile.c_str());
+    mapfile.write_string_long(szBackgroundFile);
 
     //Save the default on/off switch states
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)

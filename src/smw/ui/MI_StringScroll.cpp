@@ -141,7 +141,7 @@ void MI_StringScroll::Draw()
     rm->menu_dialog.draw(m_pos.x, m_pos.y + iNumLines * 32 + 32, {0, 464, iWidth - 16, 16});
     rm->menu_dialog.draw(m_pos.x + iWidth - 16, m_pos.y + iNumLines * 32 + 32, {496, 464, 16, 16});
 
-    rm->menu_font_large.drawCentered(m_pos.x + (iWidth >> 1), m_pos.y + 5, sTitle.c_str());
+    rm->menu_font_large.drawCentered(m_pos.x + (iWidth >> 1), m_pos.y + 5, sTitle);
 
     //Draw each filter field
     for (short iLine = 0; iLine < iNumLines && (unsigned short)iLine < items.size(); iLine++) {

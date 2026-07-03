@@ -1058,7 +1058,7 @@ void inner_main()
             editor_settings.write_i32(draw_offset_col);
             editor_settings.write_i32(draw_offset_row);
             editor_settings.write_bool(g_fFullScreen);
-            editor_settings.write_string_long(worldlist->currentPath().string().c_str());
+            editor_settings.write_string_long(worldlist->currentPath().string());
         }
     }
 
@@ -1866,7 +1866,7 @@ int editor_edit()
 			if (fAutoPaint)
 				rm->menu_font_small.draw(0, 16, "Auto Paint");
 
-                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 
 
             if (--g_musiccategorydisplaytimer > 0) {
@@ -1901,10 +1901,10 @@ void DrawMessage()
 		--g_messagedisplaytimer;
 
 		spr_dialog.draw(224, 176, {0, 0, 192, 128});
-		rm->menu_font_large.drawCentered(320, 195, g_szMessageTitle.c_str());
-		rm->menu_font_large.drawCentered(320, 220, g_szMessageLine[0].c_str());
-		rm->menu_font_large.drawCentered(320, 240, g_szMessageLine[1].c_str());
-		rm->menu_font_large.drawCentered(320, 260, g_szMessageLine[2].c_str());
+		rm->menu_font_large.drawCentered(320, 195, g_szMessageTitle);
+		rm->menu_font_large.drawCentered(320, 220, g_szMessageLine[0]);
+		rm->menu_font_large.drawCentered(320, 240, g_szMessageLine[1]);
+		rm->menu_font_large.drawCentered(320, 260, g_szMessageLine[2]);
 	}
 }
 
@@ -2522,7 +2522,7 @@ int editor_warp()
 
 		spr_warps[0].draw(0, 0, {0, 0, 320, 32});
 
-                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2650,7 +2650,7 @@ int editor_start_items()
 				rm->spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, {iPowerup << 5, 0, 32, 32});
 		}
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2722,7 +2722,7 @@ int editor_boundary()
 
 		rm->spr_worldforegroundspecial[0].draw(0, 0, {0, 0, 320, 320});
 
-                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+                rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -2796,7 +2796,7 @@ int editor_type()
 
 		rm->spr_worldforegroundspecial[0].draw(64, 0, {448, 64, 128, 32});
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -3350,7 +3350,7 @@ int editor_vehicles()
 		mCurrentMenu->Update();
 		mCurrentMenu->Draw();
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -4280,7 +4280,7 @@ int editor_stage()
 				rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[LMB] Select Items, [LMB] Remove Items");
 		}
 
-        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 
 		DrawMessage();
 		gfx_flipscreen();
@@ -4459,7 +4459,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 	spr_dialog.draw(224, 176, {0, 0, 192, 128});
 	rm->menu_font_large.drawCentered(320, 200, title);
 	rm->menu_font_small.draw(240, 235, instructions);
-    rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+    rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 	gfx_flipscreen();
 
     while (true) {
@@ -4488,7 +4488,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 							gfx_flipscreen();
 
 							currentChar--;
@@ -4540,7 +4540,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							rm->menu_font_large.drawCentered(320, 200, title);
 							rm->menu_font_small.draw(240, 235, instructions);
 							rm->menu_font_small.draw(240, 255, input);
-                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string().c_str());
+                        rm->menu_font_small.drawRightJustified(640, 0, worldlist->currentPath().string());
 							gfx_flipscreen();
 						}
 					}
