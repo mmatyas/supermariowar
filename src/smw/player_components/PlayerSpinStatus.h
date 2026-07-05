@@ -1,12 +1,10 @@
-#ifndef PLAYER_SPIN_STATUS
-#define PLAYER_SPIN_STATUS
+#pragma once
 
 #include <stdint.h>
 
 class CPlayer;
 
-class PlayerSpinStatus
-{
+class PlayerSpinStatus {
 public:
     void reset();
     void update(CPlayer& player);
@@ -19,8 +17,6 @@ public:
     uint8_t toCapeFrameX();
 
 private:
-    int8_t timer;
-    uint8_t state;
+    int8_t timer = 0;
+    uint8_t state = 0;
 };
-
-#endif // PLAYER_SPIN_STATUS

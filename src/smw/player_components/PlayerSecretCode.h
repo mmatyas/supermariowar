@@ -1,5 +1,4 @@
-#ifndef PLAYER_SECRETCODE
-#define PLAYER_SECRETCODE
+#pragma once
 
 #include <stdint.h>
 
@@ -13,9 +12,6 @@ public:
 	void update(CPlayer &player, const uint8_t keymask);
 
 private:
-	unsigned short timer;
-	unsigned short index;
+	unsigned short timer = 0;
+	unsigned short index = 0;
 };
-
-
-#endif // PLAYER_SECRETCODE

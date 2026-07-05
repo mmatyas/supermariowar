@@ -1,14 +1,10 @@
-#ifndef PLAYER_WARPSTATUS
-#define PLAYER_WARPSTATUS
+#pragma once
 
 class CPlayer;
 struct Warp;
 
-class PlayerWarpStatus
-{
+class PlayerWarpStatus {
 public:
-    PlayerWarpStatus();
-
     void update(CPlayer& player);
     void enterWarp(CPlayer& player, Warp* warp);
 
@@ -19,10 +15,8 @@ private:
     void decreasewarpcounter(CPlayer& player);
     void chooseWarpExit(CPlayer& player);
 
-    short warpcounter;
-    short warpconnection;
-    short warpid;
-    short warpplane;
+    short warpcounter = 0;
+    short warpconnection = 0;
+    short warpid = 0;
+    short warpplane = 0;
 };
-
-#endif // PLAYER_WARPSTATUS

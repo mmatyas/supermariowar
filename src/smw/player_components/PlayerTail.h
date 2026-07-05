@@ -1,5 +1,4 @@
-#ifndef PLAYER_TAIL
-#define PLAYER_TAIL
+#pragma once
 
 #include <stdint.h>
 
@@ -11,8 +10,7 @@ enum PlayerTailState {
     TAIL_SPIN_AND_SHAKE = 2
 };
 
-class PlayerTail
-{
+class PlayerTail {
 public:
     void reset();
     void shake(CPlayer& player);
@@ -25,9 +23,7 @@ public:
     void draw(CPlayer& player);
 
 private:
-    int8_t iTailTimer;
-    uint16_t iTailFrame;
-    PlayerTailState iTailState;
+    int8_t iTailTimer = 0;
+    uint16_t iTailFrame = 0;
+    PlayerTailState iTailState = TAIL_NOT_IN_USE;
 };
-
-#endif // PLAYER_TAIL

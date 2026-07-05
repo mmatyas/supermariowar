@@ -1,10 +1,8 @@
-#ifndef PLAYER_CAPE
-#define PLAYER_CAPE
+#pragma once
 
 class CPlayer;
 
-class PlayerCape
-{
+class PlayerCape {
 public:
     void reset();
     void restart_animation();
@@ -12,12 +10,9 @@ public:
     void draw(CPlayer& player);
 
 private:
-    unsigned char iCapeTimer;
-    unsigned short iCapeFrameX;
-    unsigned short iCapeFrameY;
-    bool fCapeUp;
-    short iCapeYOffset;
+    unsigned char iCapeTimer = 0;
+    unsigned short iCapeFrameX = 0;
+    unsigned short iCapeFrameY = 0;
+    bool fCapeUp = false;
+    short iCapeYOffset = 0;
 };
-
-
-#endif // PLAYER_CAPE

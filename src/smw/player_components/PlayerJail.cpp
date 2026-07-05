@@ -11,12 +11,6 @@ extern CEyecandyContainer eyecandy[3];
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-PlayerJail::PlayerJail()
-    : owner_teamID(-1)
-    , color(0)
-    , timer(0)
-{}
-
 bool PlayerJail::isActive() const
 {
     return timer > 0;

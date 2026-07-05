@@ -1,12 +1,10 @@
-#ifndef PLAYER_INVINCIBILITY
-#define PLAYER_INVINCIBILITY
+#pragma once
 
 #include "gfx/gfxPalette.h"
 
 class CPlayer;
 
-class PlayerInvincibility
-{
+class PlayerInvincibility {
 public:
 	void reset();
     void update(CPlayer& player);
@@ -16,8 +14,6 @@ public:
     void turn_on(CPlayer& player);
 
 private:
-    bool invincible;
-	short timer;
+    bool invincible = false;
+	short timer = 0;
 };
-
-#endif // PLAYER_INVINCIBILITY

@@ -1,19 +1,14 @@
-#ifndef PLAYER_BURNUP_TIMER
-#define PLAYER_BURNUP_TIMER
+#pragma once
 
 class CPlayer;
 
-class PlayerBurnupTimer
-{
+class PlayerBurnupTimer {
 public:
-    PlayerBurnupTimer();
     void update(CPlayer& player);
 
 private:
-    short timer;
-    short starttimer;
+    short timer = 0;
+    short starttimer = 0;
 
 friend class MysteryMushroomTempPlayer;
 };
-
-#endif // PLAYER_BURNUP_TIMER

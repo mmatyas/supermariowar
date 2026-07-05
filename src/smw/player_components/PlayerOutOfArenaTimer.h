@@ -1,5 +1,4 @@
-#ifndef PLAYER_OUT_OF_ARENA_TIMER
-#define PLAYER_OUT_OF_ARENA_TIMER
+#pragma once
 
 class CPlayer;
 
@@ -11,8 +10,6 @@ public:
     void draw(CPlayer&);
 
 private:
-    short timer;
-    short displaytimer;
+    short timer = 0;
+    short displaytimer = 0;
 };
-
-#endif // PLAYER_OUT_OF_ARENA_TIMER

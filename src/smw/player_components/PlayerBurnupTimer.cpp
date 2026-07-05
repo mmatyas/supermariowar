@@ -11,11 +11,6 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 extern CEyecandyContainer eyecandy[3];
 
-PlayerBurnupTimer::PlayerBurnupTimer()
-    : timer(0)
-    , starttimer(0)
-{}
-
 void PlayerBurnupTimer::update(CPlayer& player)
 {
     if (player.vely >= MAXVELY) {

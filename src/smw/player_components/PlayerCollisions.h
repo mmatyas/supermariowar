@@ -1,11 +1,9 @@
-#ifndef PLAYER_COLLISIONS
-#define PLAYER_COLLISIONS
+#pragma once
 
 class CPlayer;
 class CObject;
 
-class PlayerCollisions
-{
+class PlayerCollisions {
 public:
 	bool checktop(CPlayer&);
 	void checksides(CPlayer&);
@@ -20,7 +18,3 @@ private:
 	bool is_stomping(CPlayer& player, CPlayer& other);
 	void handle_p2p_pushback(CPlayer* o1, CPlayer* o2);
 };
-
-#endif // PLAYER_COLLISIONS
-
-

@@ -1,13 +1,11 @@
-#ifndef PLAYER_AWARDEFFECTS
-#define PLAYER_AWARDEFFECTS
+#pragma once
 
 #include "GlobalConstants.h"
 #include "PlayerKillStyles.h"
 
 class CPlayer;
 
-class PlayerAwardEffects
-{
+class PlayerAwardEffects {
 public:
     void addDeathAward(CPlayer&);
     void addKillerAward(CPlayer& killer, CPlayer* killed, KillStyle style);
@@ -23,6 +21,3 @@ private:
     float awardangle;
     short awards[MAXAWARDS];
 };
-
-
-#endif // PLAYER_AWARDEFFECTS

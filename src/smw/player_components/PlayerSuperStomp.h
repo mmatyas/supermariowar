@@ -1,10 +1,8 @@
-#ifndef PLAYER_SUPERSTOMP
-#define PLAYER_SUPERSTOMP
+#pragma once
 
 class CPlayer;
 
-class PlayerSuperStomp
-{
+class PlayerSuperStomp {
 public:
     PlayerSuperStomp();
     void reset();
@@ -19,10 +17,8 @@ public:
 private:
     // lock on -> floating -> falling -> hitting the ground, create damage zone, lock off
 
-    bool superstomp_lock; // When the player starts super stomping this becomes true
-    short floating_timer; // then the player floats for some time
-    bool is_stomping; // then starts falling
-    short iSuperStompExitTimer; // but after some time, loses the strength of the stomp
+    bool superstomp_lock = false; // When the player starts super stomping this becomes true
+    short floating_timer = 0; // then the player floats for some time
+    bool is_stomping = false; // then starts falling
+    short iSuperStompExitTimer = 0; // but after some time, loses the strength of the stomp
 };
-
-#endif // PLAYER_SUPERSTOMP

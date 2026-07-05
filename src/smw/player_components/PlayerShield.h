@@ -1,5 +1,4 @@
-#ifndef PLAYER_SHIELD
-#define PLAYER_SHIELD
+#pragma once
 
 class CPlayer;
 
@@ -16,8 +15,7 @@ enum PlayerShieldType {
 	HARD = 3
 };
 
-class PlayerShield
-{
+class PlayerShield {
 public:
 	void reset();
     void update();
@@ -39,5 +37,3 @@ private:
 friend class GameplayState;
 #endif
 };
-
-#endif // PLAYER_SHIELD

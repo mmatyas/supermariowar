@@ -12,13 +12,6 @@ extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
-PlayerWarpStatus::PlayerWarpStatus()
-    : warpcounter(0)
-    , warpconnection(0)
-    , warpid(0)
-    , warpplane(0)
-{}
-
 void PlayerWarpStatus::increasewarpcounter(CPlayer& player, short iGoal)
 {
     if (++warpcounter > iGoal) {

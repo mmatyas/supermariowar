@@ -1,14 +1,11 @@
-#ifndef PLAYER_JAIL_STATUS
-#define PLAYER_JAIL_STATUS
+#pragma once
 
 #include <stdint.h>
 
 class CPlayer;
 
-class PlayerJail
-{
+class PlayerJail {
 public:
-    PlayerJail();
     void update(CPlayer& player);
     void draw(CPlayer& player);
 
@@ -22,12 +19,9 @@ public:
     void lockInBy(CPlayer& inflictor);
 
 private:
-    int8_t owner_teamID;
-    int8_t color;
-    short timer;
+    int8_t owner_teamID = -1;
+    int8_t color = 0;
+    short timer = 0;
 
 friend class CGM_Jail;
 };
-
-
-#endif // PLAYER_JAIL_STATUS

@@ -1,5 +1,4 @@
-#ifndef PLAYER_KURIBO_SHOE
-#define PLAYER_KURIBO_SHOE
+#pragma once
 
 #include <stdint.h>
 
@@ -11,8 +10,7 @@ enum KuriboShoeType {
 	STICKY = 2
 };
 
-class PlayerKuriboShoe
-{
+class PlayerKuriboShoe {
 public:
 	void reset();
 	void update(CPlayer &player, uint8_t keymask);
@@ -28,12 +26,9 @@ private:
 	void update_animation();
 	void update_SuperStomp(CPlayer &player);
 
-	KuriboShoeType type;
-	uint8_t animationTimer;
-	uint8_t animationFrame;
-	uint8_t exitTimer;
-	uint8_t exitIndex;
+	KuriboShoeType type = NONE;
+	uint8_t animationTimer = 0;
+	uint8_t animationFrame = 0;
+	uint8_t exitTimer = 0;
+	uint8_t exitIndex = 0;
 };
-
-
-#endif // PLAYER_KURIBO_SHOE
