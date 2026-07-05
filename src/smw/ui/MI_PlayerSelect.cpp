@@ -111,7 +111,7 @@ void MI_PlayerSelect::Draw()
     spr->draw(m_pos.x + iIndent - 16, m_pos.y, {0, (fSelected ? 192 : 128), 32, 64});
     spr->draw(m_pos.x + iIndent + 16, m_pos.y, {528 - iWidth + iIndent, (fSelected ? 64 : 0), iWidth - iIndent - 16, 64});
 
-    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 20, iIndent - 8, szName.c_str());
+    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 20, iIndent - 8, szName);
 
     miModifyImage->Draw();
 

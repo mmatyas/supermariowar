@@ -126,7 +126,7 @@ void MI_MapFilterScroll::Draw()
         if (items[iOffset + iLine]->fSelected)
             rm->menu_map_filter.draw(m_pos.x + 24, m_pos.y + 32 + iLine * 32 + 4, {24, 0, 24, 24});
 
-        rm->menu_font_large.drawChopRight(m_pos.x + 52, m_pos.y + 5 + iLine * 32 + 32, iWidth - 104, items[iOffset + iLine]->sName.c_str());
+        rm->menu_font_large.drawChopRight(m_pos.x + 52, m_pos.y + 5 + iLine * 32 + 32, iWidth - 104, items[iOffset + iLine]->sName);
         rm->spr_map_filter_icons.draw(m_pos.x + 28, m_pos.y + 32 + iLine * 32 + 8, {items[iOffset + iLine]->iIcon % 10 * 16, items[iOffset + iLine]->iIcon / 10 * 16, 16, 16});
     }
 }

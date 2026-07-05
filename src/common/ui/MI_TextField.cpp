@@ -168,13 +168,13 @@ void MI_TextField::Draw()
     spr->draw(m_pos.x + iIndent - 16, m_pos.y, {0, (fSelected ? 96 : 64), 32, 32});
     spr->draw(m_pos.x + iIndent + 16, m_pos.y, {528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32});
 
-    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, iIndent - 8, szName.c_str());
+    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, iIndent - 8, szName);
 
     if (szOutValue) {
         if (iStringWidth <= iAllowedWidth || !fModifying) {
-            rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iAllowedWidth, szOutValue->c_str());
+            rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iAllowedWidth, *szOutValue);
         } else {
-            rm->menu_font_large.drawChopLeft(m_pos.x + iWidth - 16, m_pos.y + 5, iAllowedWidth, szTempValue.c_str());
+            rm->menu_font_large.drawChopLeft(m_pos.x + iWidth - 16, m_pos.y + 5, iAllowedWidth, szTempValue);
         }
     }
 
@@ -245,7 +245,7 @@ void MI_TextField::UpdateCursor()
     szTempValue = *szOutValue;
     szTempValue.resize(iCursorIndex);
 
-    iStringWidth = rm->menu_font_large.getWidth(szTempValue.c_str());
+    iStringWidth = rm->menu_font_large.getWidth(szTempValue);
     if (iStringWidth <= iAllowedWidth) {
         miModifyCursor->SetPosition(m_pos.x + iIndent + 10 + iStringWidth, m_pos.y + 4);
     } else {

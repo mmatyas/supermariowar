@@ -38,10 +38,10 @@ void MI_SliderField::Draw()
     m_spr->draw(m_pos.x + m_indent - 16, m_pos.y, {0, (fSelected ? 96 : 64), 32, 32});
     m_spr->draw(m_pos.x + m_indent + 16, m_pos.y, {528 - m_width + m_indent, (fSelected ? 32 : 0) + m_adjustmentY, m_width - m_indent - 16, 32});
 
-    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, m_indent - 8, m_name.c_str());
+    rm->menu_font_large.drawChopRight(m_pos.x + 16, m_pos.y + 5, m_indent - 8, m_name);
 
     if (!m_items.empty()) {
-        rm->menu_font_large.drawChopRight(m_pos.x + m_indent2 + 16, m_pos.y + 5, m_width - m_indent2 - 24, currentItem().name.c_str());
+        rm->menu_font_large.drawChopRight(m_pos.x + m_indent2 + 16, m_pos.y + 5, m_width - m_indent2 - 24, currentItem().name);
     }
 
     short iSpacing = (m_indent2 - m_indent - 20) / ((short)m_items.size() - 1);

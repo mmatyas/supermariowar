@@ -3482,7 +3482,7 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 
 	rm->menu_mode_large.draw(iMouseX + 16, iMouseY + 16, {iMode << 5, 0, 32, 32});
 
-	rm->menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 16, 164, ts->szName.c_str());
+	rm->menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 16, 164, ts->szName);
 
 	char szPrint[128];
     if (iMode != 24) {

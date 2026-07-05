@@ -13,7 +13,7 @@ StringScrollElement::StringScrollElement(const std::string& text)
 {}
 
 void StringScrollElement::draw(int x, int y, unsigned max_w) {
-    rm->menu_font_large.drawChopRight(x + 28, y + 5, max_w, str.c_str());
+    rm->menu_font_large.drawChopRight(x + 28, y + 5, max_w, str);
 }
 
 
