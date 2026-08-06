@@ -41,6 +41,7 @@ private:
     // Classic
     MI_SelectField<DeathStyle>* miClassicModeStyleField;
     MI_SelectField<ScoringStyle>* miClassicModeScoringField;
+    MI_SelectField<bool>* miClassicModeHazardPenaltyField;
     MI_Button* miClassicModeBackButton;
 
     MI_Image* miClassicModeLeftHeaderBar;
@@ -50,6 +51,7 @@ private:
     // Frag
     MI_SelectField<DeathStyle>* miFragModeStyleField;
     MI_SelectField<ScoringStyle>* miFragModeScoringField;
+    MI_SelectField<bool>* miFragModeHazardPenaltyField;
     MI_Button* miFragModeBackButton;
 
     MI_Image* miFragModeLeftHeaderBar;

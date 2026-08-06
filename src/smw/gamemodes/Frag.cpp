@@ -3,6 +3,7 @@
 #include "GameValues.h"
 #include "player.h"
 #include "ResourceManager.h"
+#include "PlayerKillStyles.h"
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -48,9 +49,11 @@ PlayerKillType CGM_Frag::playerkilledself(CPlayer &player, KillStyle style)
     CGameMode::playerkilledself(player, style);
 
     if (!gameover) {
-        player.Score().AdjustScore(-1);
+        if (ShouldPenalizeHazardDeath(style, game_values.gamemodesettings.frag.losepointsonhazarddeath))
+            player.Score().AdjustScore(-1);
 
-        if (game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == DeathStyle::Shield) {
+        if (game_values.gamemode->gamemode == game_mode_frag &&
+            game_values.gamemodesettings.frag.style == DeathStyle::Shield) {
             ifSoundOnPlay(rm->sfx_powerdown);
             player.Shield().reset();
             return PlayerKillType::NonKill;
