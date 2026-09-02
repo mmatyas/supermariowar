@@ -95,10 +95,19 @@ smw_declare_gitrepo(
     74d43e850f5abda0e5f565caa5d54f462bc210fd
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ENET IMPORTED_TARGET libenet)
+
+
+if(NOT ENET_FOUND AND NOT NO_NETWORK)
+    FetchContent_MakeAvailable(enet)
+endif()
+
 # zlib
 set(ZLIB_BUILD_TESTING OFF CACHE BOOL "")
 set(ZLIB_BUILD_SHARED OFF CACHE BOOL "")
 set(ZLIB_INSTALL OFF CACHE BOOL "")
+
 smw_declare_gitrepo(
     ZLIB
     https://github.com/madler/zlib.git
@@ -107,19 +116,20 @@ smw_declare_gitrepo(
 
 
 FetchContent_MakeAvailable(SDL3 SDL3_image SDL3_mixer toml11)
-if(NOT NO_NETWORK)
-    FetchContent_MakeAvailable(enet)
-endif()
-# SDL *may* pull in its own vendored zlib
-if (NOT TARGET ZLIB::ZLIB AND NOT TARGET ZLIB::ZLIBSTATIC)
+# Try to use the system zlib-ng first
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ZLIB_PC IMPORTED_TARGET zlib)
+if (ZLIB_PC_FOUND)
+    message(STATUS "Using system zlib via pkg-config")
+else()
+    message(STATUS "System zlib not found, using bundled zlib")
     FetchContent_MakeAvailable(zlib)
 endif()
 
 
-# Link to static ZLIB when bundled, shared when using system
 add_library(smw_zlib INTERFACE)
-if (TARGET ZLIB::ZLIB)
-    target_link_libraries(smw_zlib INTERFACE ZLIB::ZLIB)
+if (ZLIB_PC_FOUND)
+    target_link_libraries(smw_zlib INTERFACE PkgConfig::ZLIB_PC)
 else()
     target_link_libraries(smw_zlib INTERFACE ZLIB::ZLIBSTATIC)
 endif()
