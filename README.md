@@ -1,3 +1,5 @@
+![In-game screenshots](docs/gfx/screenshots.png)
+
 # Super Mario War
 
 ![Linux status][build-linux-img] ![Windows status][build-windows-img] ![macOS status][build-macos-img] [![Discord][discord-img]][discord-link]
