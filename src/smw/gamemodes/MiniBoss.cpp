@@ -94,13 +94,13 @@ void CGM_Boss_MiniGame::draw_foreground()
 
             switch (iBossType) {
                 case Boss::Hammer:
-                    rm->game_font_large.drawCentered(App::screenWidth/2, 118, "The Mighty Sledge Brother");
+                    rm->game_font_large.drawCentered(App::screenWidth/2, 118, "The Boss");
                     break;
                 case Boss::Bomb:
-                    rm->game_font_large.drawCentered(App::screenWidth/2, 118, "The Mighty Bomb Brother");
+                    rm->game_font_large.drawCentered(App::screenWidth/2, 118, "The Boss");
                     break;
                 case Boss::Fire:
-                    rm->game_font_large.drawCentered(App::screenWidth/2, 118, "The Mighty Flame Brother");
+                    rm->game_font_large.drawCentered(App::screenWidth/2, 118, "The Boss");
                     break;
             }
         }

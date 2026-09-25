@@ -409,7 +409,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
 
     miEggModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miEggModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miEggModeHeaderText = new MI_HeaderText("Yoshi's Eggs Mode Menu", 320, 5);
+    miEggModeHeaderText = new MI_HeaderText("Bells & Kittens Mode Menu", 320, 5);
 
     mModeSettingsMenu[6].AddControl(miEggModeEggQuantityField[0], miEggModeBackButton, miEggModeEggQuantityField[1], NULL, miEggModeBackButton);
     mModeSettingsMenu[6].AddControl(miEggModeEggQuantityField[1], miEggModeEggQuantityField[0], miEggModeEggQuantityField[2], NULL, miEggModeBackButton);
@@ -608,10 +608,10 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
     miStarModeTimeField->setOutputPtr(&game_values.gamemodemenusettings.star.time);
     miStarModeTimeField->setCurrentValue(game_values.gamemodemenusettings.star.time);
 
-    miStarModeShineField = new MI_SelectField<StarStyle>(&rm->spr_selectfield, 120, 220, "Star Type", 400, 150);
-    miStarModeShineField->add("Ztar", StarStyle::Ztar);
-    miStarModeShineField->add("Shine", StarStyle::Shine);
-    miStarModeShineField->add("Multi Star", StarStyle::Multi);
+    miStarModeShineField = new MI_SelectField<StarStyle>(&rm->spr_selectfield, 120, 220, "Bell Type", 400, 150);
+    miStarModeShineField->add("Dark", StarStyle::Ztar);
+    miStarModeShineField->add("Golden", StarStyle::Shine);
+    miStarModeShineField->add("Multi Bell", StarStyle::Multi);
     miStarModeShineField->add("Random", StarStyle::Random);
     miStarModeShineField->setOutputPtr(&game_values.gamemodemenusettings.star.shine);
     miStarModeShineField->setCurrentValue(game_values.gamemodemenusettings.star.shine);
@@ -647,7 +647,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
 
     miStarModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miStarModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miStarModeHeaderText = new MI_HeaderText("Star Mode Menu", 320, 5);
+    miStarModeHeaderText = new MI_HeaderText("Magic Bells Mode Menu", 320, 5);
 
     mModeSettingsMenu[10].AddControl(miStarModeTimeField, miStarModeBackButton, miStarModeShineField, NULL, miStarModeBackButton);
     mModeSettingsMenu[10].AddControl(miStarModeShineField, miStarModeTimeField, miStarModePercentExtraTime, NULL, miStarModeBackButton);
@@ -1255,7 +1255,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
 
     miChaseModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miChaseModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miChaseModeHeaderText = new MI_HeaderText("Phanto Mode Menu", 320, 5);
+    miChaseModeHeaderText = new MI_HeaderText("Ghost Chase Mode Menu", 320, 5);
 
     mModeSettingsMenu[20].AddControl(miChaseModeSpeedField, miChaseModeBackButton, miChaseModeQuantitySlider[0], NULL, miChaseModeBackButton);
 
@@ -1311,7 +1311,7 @@ UI_ModeOptionsMenu::UI_ModeOptionsMenu()
 
     miShyGuyTagModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miShyGuyTagModeRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miShyGuyTagModeHeaderText = new MI_HeaderText("Shyguy Tag Mode Menu", 320, 5);
+    miShyGuyTagModeHeaderText = new MI_HeaderText("Robo Tag Mode Menu", 320, 5);
 
     mModeSettingsMenu[21].AddControl(miShyGuyTagModeTagOnSuicideField, miShyGuyTagModeBackButton, miShyGuyTagModeTagOnStompField, NULL, miShyGuyTagModeBackButton);
     mModeSettingsMenu[21].AddControl(miShyGuyTagModeTagOnStompField, miShyGuyTagModeTagOnSuicideField, miShyGuyTagModeFreeTimeField, NULL, miShyGuyTagModeBackButton);
