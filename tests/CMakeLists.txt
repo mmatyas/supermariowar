@@ -4,6 +4,7 @@ add_executable(smw-tests
 	common/test_GameModeSettingsSerialization.cpp
 	common/test_version.cpp
 	common/test_tokenize.cpp
+	common/test_hazard_death_penalty.cpp
 	common/math/test_vec2.cpp
 	common/util/test_DirIterator.cpp
 )

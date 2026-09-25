@@ -29,3 +29,8 @@ enum KillStyle {
     Spiny,
     Phanto,
 };
+
+constexpr bool ShouldPenalizeHazardDeath(KillStyle style, bool losePointsOnHazardDeath)
+{
+    return style != Environment || losePointsOnHazardDeath;
+}
