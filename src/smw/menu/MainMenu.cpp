@@ -24,17 +24,27 @@ UI_MainMenu::UI_MainMenu()
 
     miPlayerSelect = new MI_PlayerSelect(&rm->menu_player_select, 120, 250, "Players", 400, 140);
 
-// disable Multiplayer button for web builds
-#ifdef __EMSCRIPTEN__
+// Network play is unavailable in browser and local-only Android builds.
+#if defined(__EMSCRIPTEN__) || (defined(__ANDROID__) && defined(NETWORK_DISABLED))
+#ifdef __ANDROID__
+    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer unavailable", 400);
+    miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 200);
+    miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Keys (Pad fixed)", 200);
+#else
     miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer - Under Construction", 400);
     miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 400);
     miControlsButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Controls", 400);
+#endif
 #else
     miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer", 400);
     miMultiplayerButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
     miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 200);
+#ifdef __ANDROID__
+    miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Keys (Pad fixed)", 200);
+#else
     miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Controls", 200);
+#endif
 #endif
     miOptionsButton->SetCode(MENU_CODE_TO_OPTIONS_MENU);
     miControlsButton->SetCode(MENU_CODE_TO_CONTROLS_MENU);
@@ -46,7 +56,15 @@ UI_MainMenu::UI_MainMenu()
     miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
 #endif
 
-#ifndef __EMSCRIPTEN__
+#if defined(__ANDROID__) && defined(NETWORK_DISABLED)
+    AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
+    AddControl(miQuickGameButton, miExitButton, miPlayerSelect, miMainStartButton, NULL);
+    AddNonControl(miMultiplayerButton);
+    AddControl(miPlayerSelect, miMainStartButton, miOptionsButton, NULL, NULL);
+    AddControl(miOptionsButton, miPlayerSelect, miExitButton, miControlsButton, miControlsButton);
+    AddControl(miControlsButton, miPlayerSelect, miExitButton, miOptionsButton, miOptionsButton);
+    AddControl(miExitButton, miOptionsButton, miMainStartButton, NULL, NULL);
+#elif !defined(__EMSCRIPTEN__)
     AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
     AddControl(miQuickGameButton, miExitButton, miPlayerSelect, miMainStartButton, NULL);
     AddControl(miPlayerSelect, miMainStartButton, miMultiplayerButton, NULL, NULL);

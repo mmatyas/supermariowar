@@ -11,6 +11,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <iterator>
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -314,8 +315,10 @@ void MI_InputControlField::Draw()
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, "(Press Button)");
     else if (iDevice == DEVICE_KEYBOARD)
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, SDL_GetKeyName(*iKey));
-    else
+    else if (*iKey >= 0 && *iKey < static_cast<SDL_Keycode>(std::size(Joynames)))
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, Joynames[*iKey]);
+    else
+        rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, "Other button");
 }
 
 

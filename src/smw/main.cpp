@@ -211,6 +211,9 @@ void create_globals()
 void init_joysticks()
 {
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+#ifdef __ANDROID__
+    InitAndroidController();
+#endif
     joystickcount = (short)SDL_NumJoysticks();
     joysticks = new SDL_Joystick*[joystickcount];
 
@@ -305,6 +308,16 @@ int main(int argc, char *argv[])
     }
     if (!cmd.data_root.empty())
         RootDataDirectory = cmd.data_root;
+#ifdef __ANDROID__
+    else {
+        const std::string home = GetHomeDirectory();
+        if (home.empty()) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "No app-private data path: %s", SDL_GetError());
+            return 1;
+        }
+        RootDataDirectory = home + "data";
+    }
+#endif
 
 
     try {

@@ -39,11 +39,13 @@ std::string GetHomeDirectory()
         result = std::string(folder) + "/" + result;
     return result;
 
-#elif ANDROID
-    const char* extstorage = getenv("EXTERNAL_STORAGE");
-    std::string result(extstorage ? extstorage: "/mnt/sdcard");
-    result += "/supermariowar/";
-    return result;
+#elif defined(__ANDROID__)
+    if (char* sdl_path = SDL_GetPrefPath(nullptr, "supermariowar")) {
+        std::string result = sdl_path;
+        SDL_free(sdl_path);
+        return result;
+    }
+    return {};
 
 #else // catch-all for Linux-based systems
     std::string result;

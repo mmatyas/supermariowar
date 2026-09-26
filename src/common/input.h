@@ -118,4 +118,9 @@ class CPlayerInput
 		SDL_Keycode iPressedKey;
 };
 
+#ifdef __ANDROID__
+// Open the first standardized controller before the first input event.
+void InitAndroidController();
+#endif
+
 #endif // INPUT_H

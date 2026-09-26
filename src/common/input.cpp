@@ -2,8 +2,105 @@
 
 #include "GameValues.h"
 #include "GlobalConstants.h"
+#ifdef __ANDROID__
+#include "AndroidControllerMapping.h"
+#endif
 
 extern CGameValues game_values;
+
+#ifdef __ANDROID__
+namespace {
+SDL_GameController* androidController = nullptr;
+SDL_JoystickID androidControllerId = -1;
+AndroidControllerSnapshot androidInput;
+
+void resetAndroidControl(CPlayerInput& input)
+{
+    androidInput.clear();
+    for (auto& key : input.outputControls[0].keys) {
+        key.fDown = false;
+        key.fPressed = false;
+    }
+}
+
+void openAndroidController(int index)
+{
+    if (androidController || !SDL_IsGameController(index)) return;
+    androidController = SDL_GameControllerOpen(index);
+    if (androidController) {
+        androidControllerId = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(androidController));
+        SDL_Log("Android controller: %s, instance %d", SDL_GameControllerName(androidController), androidControllerId);
+    }
+}
+
+void applyAndroidControl(CPlayerInput& input, short state)
+{
+    const auto desired = AndroidDesiredControls(androidInput, state, game_values.playercontrol[0] == 1);
+    for (int i = 0; i < NUM_KEYS; ++i) {
+        CKeyState& key = input.outputControls[0].keys[i];
+        if (desired[i] && !key.fDown) key.fPressed = true;
+        key.fDown = desired[i];
+    }
+}
+
+bool handleAndroidController(CPlayerInput& input, const SDL_Event& event, short state)
+{
+    if (event.type == SDL_APP_WILLENTERBACKGROUND || event.type == SDL_APP_DIDENTERFOREGROUND) {
+        resetAndroidControl(input);
+        return false;
+    }
+    if (event.type == SDL_CONTROLLERDEVICEADDED) {
+        openAndroidController(event.cdevice.which); // device index at add time
+        return true;
+    }
+    if (event.type == SDL_CONTROLLERDEVICEREMOVED && event.cdevice.which == androidControllerId) {
+        SDL_GameControllerClose(androidController);
+        androidController = nullptr;
+        androidControllerId = -1;
+        resetAndroidControl(input);
+        for (int i = 0; i < SDL_NumJoysticks() && !androidController; ++i) openAndroidController(i);
+        return true;
+    }
+    if (!androidController) return false;
+    if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+        // Keep keyboard and pad sources independent so releasing one cannot
+        // cancel an action still held by the other.
+        for (int mode = 0; mode < 2; ++mode) {
+            for (int key = 0; key < NUM_KEYS; ++key) {
+                if (game_values.inputConfiguration[0][0].inputGameControls[mode].keys[key] == event.key.keysym.sym)
+                    androidInput.keyboard[mode][key] = event.type == SDL_KEYDOWN;
+            }
+        }
+        if (event.type == SDL_KEYDOWN) input.iPressedKey = event.key.keysym.sym;
+        applyAndroidControl(input, state);
+        return true;
+    }
+    if ((event.type == SDL_CONTROLLERBUTTONDOWN || event.type == SDL_CONTROLLERBUTTONUP)
+            && event.cbutton.which == androidControllerId
+            && event.cbutton.button < SDL_CONTROLLER_BUTTON_MAX) {
+        androidInput.buttons[event.cbutton.button] = event.type == SDL_CONTROLLERBUTTONDOWN;
+        applyAndroidControl(input, state);
+        return true;
+    }
+    if (event.type == SDL_CONTROLLERAXISMOTION && event.caxis.which == androidControllerId
+            && event.caxis.axis < SDL_CONTROLLER_AXIS_MAX) {
+        androidInput.axes[event.caxis.axis] = event.caxis.value;
+        applyAndroidControl(input, state);
+        return true;
+    }
+    return false;
+}
+} // namespace
+
+void InitAndroidController()
+{
+    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) != 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_INPUT, "Controller init failed: %s", SDL_GetError());
+        return;
+    }
+    for (int i = 0; i < SDL_NumJoysticks() && !androidController; ++i) openAndroidController(i);
+}
+#endif
 
 CPlayerInput::CPlayerInput()
 {
@@ -29,6 +126,9 @@ void CPlayerInput::ClearPressedKeys(short iGameState)
     }
 
     iPressedKey = 0;
+#ifdef __ANDROID__
+    if (androidController) applyAndroidControl(*this, iGameState);
+#endif
 }
 
 void CPlayerInput::ClearGameActionKeys()
@@ -58,6 +158,10 @@ void CPlayerInput::ResetKeys()
 	}
 
 	iPressedKey = 0;
+#ifdef __ANDROID__
+    // A button held while leaving a screen must be released and pressed again.
+    resetAndroidControl(*this);
+#endif
 }
 
 //Called during game loop to read input events and see if
@@ -66,6 +170,9 @@ void CPlayerInput::ResetKeys()
 //iGameState == 0 for in game and 1 for menu
 void CPlayerInput::Update(SDL_Event event, short iGameState)
 {
+#ifdef __ANDROID__
+    if (handleAndroidController(*this, event, iGameState)) return;
+#endif
 	bool fFound = false;
     for (short iPlayer = -1; iPlayer < MAX_PLAYERS; iPlayer++) {
 		CInputControl * inputControl;

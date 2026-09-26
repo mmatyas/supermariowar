@@ -13,7 +13,8 @@
 
 // main game directory, read from command line argument
 #ifdef __ANDROID__
-std::string RootDataDirectory = GetHomeDirectory() + "data";
+// SDL's Java storage paths are only available after SDL_main starts.
+std::string RootDataDirectory;
 #else
 std::string RootDataDirectory = GetRootDirectory() + "data";
 #endif
