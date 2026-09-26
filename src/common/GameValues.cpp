@@ -127,7 +127,11 @@ void CGameValues::init()
 {
     //set standard game values
     playercontrol[0]  = 1;
+#ifdef __ANDROID__
+    playercontrol[1]  = 2; // Ready-to-play local CPU opponent on first launch.
+#else
     playercontrol[1]  = 1;
+#endif
     showfps       = false;
     frameadvance    = false;
     autokill      = false;

@@ -47,9 +47,14 @@ void quitSdl()
 
 SDL_Window* createWindow(bool fullscreen)
 {
+#ifdef __ANDROID__
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+    Uint32 window_flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+#else
     Uint32 window_flags = SDL_WINDOW_RESIZABLE;
     if (fullscreen)
         window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+#endif
 
     SDL_Window* window = SDL_CreateWindow("smw",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
