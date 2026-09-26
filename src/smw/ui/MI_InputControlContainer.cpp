@@ -345,9 +345,11 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
     miDeviceSelectField->setItemChangedCode(MENU_CODE_INPUT_DEVICE_CHANGED);
     miDeviceSelectField->add("Keyboard", -1);
 
+#ifndef __ANDROID__
     for (short iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
         miDeviceSelectField->add(SDL_JoystickNameForIndex(iJoystick), iJoystick, false);
     }
+#endif
 
     //If the device is not found, default to the keyboard
     if (!miDeviceSelectField->setCurrentValue(iDevice)) {

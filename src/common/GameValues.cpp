@@ -425,6 +425,14 @@ void CGameConfig::ReadBinaryConfig() {
 
             playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
         }
+#ifdef __ANDROID__
+        // The Android pad uses a fixed SDL_GameController profile. The
+        // Controls menu edits keyboard keys, not raw joystick bindings.
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; ++iPlayer) {
+            inputConfiguration[iPlayer][0].iDevice = DEVICE_KEYBOARD;
+            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][0];
+        }
+#endif
     }
     catch (std::exception const& error)
     {
