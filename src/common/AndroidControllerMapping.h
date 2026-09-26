@@ -31,8 +31,8 @@ inline std::array<bool, NUM_KEYS> AndroidDesiredControls(const AndroidController
     } else {
         desired = {left, right,
                    button(SDL_CONTROLLER_BUTTON_A) || button(SDL_CONTROLLER_BUTTON_B), down,
-                   button(SDL_CONTROLLER_BUTTON_Y) || button(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER),
-                   button(SDL_CONTROLLER_BUTTON_X) || button(SDL_CONTROLLER_BUTTON_LEFTSHOULDER),
+                   button(SDL_CONTROLLER_BUTTON_Y),
+                   button(SDL_CONTROLLER_BUTTON_X) || button(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) || button(SDL_CONTROLLER_BUTTON_LEFTSHOULDER),
                    button(SDL_CONTROLLER_BUTTON_START), button(SDL_CONTROLLER_BUTTON_BACK)};
     }
     for (int i = 0; i < NUM_KEYS; ++i) {

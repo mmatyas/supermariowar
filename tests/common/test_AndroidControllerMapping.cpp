@@ -31,7 +31,7 @@ TEST_CASE("Android pad maps menu, gameplay, and concurrent direction sources") {
     CHECK_FALSE(AndroidDesiredControls(source, 0, true)[0]);
 }
 
-TEST_CASE("Android gameplay uses A or B to jump and Y or R1 to run") {
+TEST_CASE("Android gameplay uses A or B to jump, Y to run, and X or shoulders for powerup") {
     AndroidControllerSnapshot source;
 
     source.buttons[SDL_CONTROLLER_BUTTON_A] = true;
@@ -48,11 +48,39 @@ TEST_CASE("Android gameplay uses A or B to jump and Y or R1 to run") {
     source.buttons[SDL_CONTROLLER_BUTTON_Y] = true;
     CHECK(AndroidDesiredControls(source, 0, true)[4]);
     CHECK_FALSE(AndroidDesiredControls(source, 0, true)[2]);
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[5]);
     source.clear();
 
     source.buttons[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = true;
-    CHECK(AndroidDesiredControls(source, 0, true)[4]);
+    CHECK(AndroidDesiredControls(source, 0, true)[5]);
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[4]);
     CHECK_FALSE(AndroidDesiredControls(source, 0, true)[2]);
+    CHECK(AndroidDesiredControls(source, 1, true)[7]); // menu fast-scroll unchanged
+    CHECK_FALSE(AndroidDesiredControls(source, 1, true)[4]); // not select
+    CHECK_FALSE(AndroidDesiredControls(source, 1, true)[5]); // not cancel
+    source.clear();
+
+    source.buttons[SDL_CONTROLLER_BUTTON_X] = true;
+    CHECK(AndroidDesiredControls(source, 0, true)[5]);
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[4]);
+    source.clear();
+
+    source.buttons[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = true;
+    CHECK(AndroidDesiredControls(source, 0, true)[5]);
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[4]);
+    source.clear();
+
+    source.buttons[SDL_CONTROLLER_BUTTON_Y] = true;
+    source.buttons[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = true;
+    CHECK(AndroidDesiredControls(source, 0, true)[4]);
+    CHECK(AndroidDesiredControls(source, 0, true)[5]);
+    source.buttons[SDL_CONTROLLER_BUTTON_Y] = false;
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[4]);
+    CHECK(AndroidDesiredControls(source, 0, true)[5]);
+    source.buttons[SDL_CONTROLLER_BUTTON_Y] = true;
+    source.buttons[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = false;
+    CHECK(AndroidDesiredControls(source, 0, true)[4]);
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[5]);
     source.clear();
 
     source.buttons[SDL_CONTROLLER_BUTTON_B] = true;
