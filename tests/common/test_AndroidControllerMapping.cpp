@@ -8,6 +8,7 @@ TEST_CASE("Android pad maps menu, gameplay, and concurrent direction sources") {
     source.axes[SDL_CONTROLLER_AXIS_LEFTX] = -26000;
     source.buttons[SDL_CONTROLLER_BUTTON_A] = true;
     source.buttons[SDL_CONTROLLER_BUTTON_B] = true;
+    source.buttons[SDL_CONTROLLER_BUTTON_Y] = true;
     source.buttons[SDL_CONTROLLER_BUTTON_X] = true;
     source.buttons[SDL_CONTROLLER_BUTTON_START] = true;
 
@@ -28,6 +29,41 @@ TEST_CASE("Android pad maps menu, gameplay, and concurrent direction sources") {
     CHECK(AndroidDesiredControls(source, 0, true)[0]); // stick still holds left
     source.axes[SDL_CONTROLLER_AXIS_LEFTX] = 0;
     CHECK_FALSE(AndroidDesiredControls(source, 0, true)[0]);
+}
+
+TEST_CASE("Android gameplay uses A or B to jump and Y or R1 to run") {
+    AndroidControllerSnapshot source;
+
+    source.buttons[SDL_CONTROLLER_BUTTON_A] = true;
+    CHECK(AndroidDesiredControls(source, 0, true)[2]);
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[4]);
+    source.clear();
+
+    source.buttons[SDL_CONTROLLER_BUTTON_B] = true;
+    CHECK(AndroidDesiredControls(source, 0, true)[2]);
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[4]);
+    CHECK(AndroidDesiredControls(source, 1, true)[5]); // menu cancel stays B
+    source.clear();
+
+    source.buttons[SDL_CONTROLLER_BUTTON_Y] = true;
+    CHECK(AndroidDesiredControls(source, 0, true)[4]);
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[2]);
+    source.clear();
+
+    source.buttons[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = true;
+    CHECK(AndroidDesiredControls(source, 0, true)[4]);
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[2]);
+    source.clear();
+
+    source.buttons[SDL_CONTROLLER_BUTTON_B] = true;
+    source.buttons[SDL_CONTROLLER_BUTTON_Y] = true;
+    CHECK(AndroidDesiredControls(source, 0, true)[2]);
+    CHECK(AndroidDesiredControls(source, 0, true)[4]);
+    source.buttons[SDL_CONTROLLER_BUTTON_B] = false;
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[2]);
+    CHECK(AndroidDesiredControls(source, 0, true)[4]);
+    source.buttons[SDL_CONTROLLER_BUTTON_Y] = false;
+    CHECK_FALSE(AndroidDesiredControls(source, 0, true)[4]);
 }
 
 TEST_CASE("Android keyboard and pad sources release independently and clear on lifecycle reset") {
