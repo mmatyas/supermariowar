@@ -2400,7 +2400,7 @@ void CMap::drawfrontlayer()
             if (mapdatatop[j][i].iType == TileType::gap)
     		{
     			SDL_Rect r = {j << 5, i << 5, TILESIZE, TILESIZE};
-			SDL_FillSurfaceRect(blitdest, &r, SDL_MapRGB(blitdest->format, 255, 0, 255));
+    			SDL_FillSurfaceRect(blitdest, &r, SDL_MapRGB(blitdest->format, 255, 0, 255));
     		}
     	}
     }*/

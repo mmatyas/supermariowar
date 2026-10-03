@@ -24,7 +24,11 @@ template<typename... Args>
 namespace {
 void initSdl()
 {
-    if (!SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
+    Uint32 flags = SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK;
+#ifdef __ANDROID__
+    flags |= SDL_INIT_GAMEPAD;
+#endif
+    if (!SDL_Init(flags))
         throw_error("SDL error: {}", SDL_GetError());
 
     const auto sdl_version = SDL_GetVersion();

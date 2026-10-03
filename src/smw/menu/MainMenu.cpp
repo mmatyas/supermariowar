@@ -29,7 +29,7 @@ UI_MainMenu::UI_MainMenu()
 #ifdef __ANDROID__
     miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer unavailable", 400);
     miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 200);
-    miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Keys (Pad fixed)", 200);
+    miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Controls", 200);
 #else
     miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer - Under Construction", 400);
     miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 400);
@@ -41,7 +41,7 @@ UI_MainMenu::UI_MainMenu()
 
     miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 200);
 #ifdef __ANDROID__
-    miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Keys (Pad fixed)", 200);
+    miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Controls", 200);
 #else
     miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Controls", 200);
 #endif

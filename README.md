@@ -1,5 +1,3 @@
-![In-game screenshots](docs/gfx/screenshots.png)
-
 # Super Mario War
 
 ![Linux status][build-linux-img] ![Windows status][build-windows-img] ![macOS status][build-macos-img] [![Discord][discord-img]][discord-link]
@@ -37,8 +35,6 @@ As for the game, unfortunately it became clear very soon that the quality and st
 Eventually I've managed to make the network multiplayer working, but it's far from perfect. With good conditions, on local networks it may work fine, but subtle bugs and lag usually makes the gameplay over the internet far from optimal. A proper implementation would likely require a redesign of several core parts of the game and another several hundred clean up/refactoring patches to make the code maintainable. And, with this kind of project of course, there's also a chance that next morning you get a cease-and-desist letter from whatever company.
 
 For me, this was the point where I've stopped putting more time on this project (2016). In the long term, a complete rewrite might be faster and more effective than patching the original game for years. Either way, I hope I've left the project in a better state than it was, and that it will be of use for future developers. Have fun!
-
-Update, 2026: Looks like I've ended up working on it some more. While keeping the game alive, there also has been significant effort to modernize the codebase and try to make it maintainable. There have been some performance improvements, stability fixes, we have an SDL3 port, and the game continues to support newer operating systems. There's also [Super Cat Wars](https://gamejolt.com/games/supercatwars/627452), a complete overhaul mod with its own graphics, maps, and worlds. Give it a try!
 
 [Old releases for Mario War and SMW can be found here.](https://github.com/mmatyas/supermariowar/releases/tag/1.8)
 

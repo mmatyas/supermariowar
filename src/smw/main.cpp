@@ -55,6 +55,7 @@
 
 #include "FPSLimiter.h"
 #include "GSSplashScreen.h"
+#include "GSMenu.h"
 
 #include <ctime>
 #include <cmath>
@@ -212,6 +213,9 @@ void create_globals()
 
 void init_joysticks()
 {
+#ifdef __ANDROID__
+    ResetAndroidGamepadAssignments();
+#endif
     SDL_JoystickID* ids = SDL_GetJoysticks(&joystickcount);
     joysticks = new SDL_Joystick*[joystickcount];
 
@@ -238,6 +242,46 @@ void close_joysticks()
     delete[] joysticks;
     joysticks = nullptr;
     joystickcount = 0;
+}
+
+void close_globals()
+{
+    SplashScreenState::instance().close();
+    MenuState::instance().close();
+    for (CPlayer* player : players)
+        delete player;
+    players.clear();
+
+    for (short i = 0; i < GAMEMODE_LAST; ++i) {
+        delete gamemodes[i];
+        gamemodes[i] = nullptr;
+    }
+    delete bonushousemode; bonushousemode = nullptr;
+    delete pipegamemode; pipegamemode = nullptr;
+    delete bossgamemode; bossgamemode = nullptr;
+    delete boxesgamemode; boxesgamemode = nullptr;
+    game_values.gamemode = nullptr;
+
+    for (short i = 0; i < MAX_PLAYERS; ++i) {
+        delete score[i];
+        score[i] = nullptr;
+    }
+    delete rm; rm = nullptr;
+    delete g_map; g_map = nullptr;
+    delete g_tilesetmanager; g_tilesetmanager = nullptr;
+
+    delete gamegraphicspacklist; gamegraphicspacklist = nullptr;
+    delete worldgraphicspacklist; worldgraphicspacklist = nullptr;
+    delete menugraphicspacklist; menugraphicspacklist = nullptr;
+    delete worldlist; worldlist = nullptr;
+    delete tourlist; tourlist = nullptr;
+    delete announcerlist; announcerlist = nullptr;
+    delete soundpacklist; soundpacklist = nullptr;
+    delete worldmusiclist; worldmusiclist = nullptr;
+    delete musiclist; musiclist = nullptr;
+    delete skinlist; skinlist = nullptr;
+    delete maplist; maplist = nullptr;
+    delete filterslist; filterslist = nullptr;
 }
 #endif
 
@@ -459,13 +503,17 @@ void main_game()
 
     printf("\n---------------- shutdown ----------------\n");
 
+#ifdef __ANDROID__
+    net_close();
+    close_globals();
+    sfx_close();
+    close_joysticks();
+    gfx_close();
+#else
     for (short i = 0; i < GAMEMODE_LAST; i++)
         delete gamemodes[i];
 
     sfx_close();
-#ifdef __ANDROID__
-    close_joysticks();
-#endif
     gfx_close();
     net_close();
 
@@ -476,4 +524,5 @@ void main_game()
 
 	// release all resources
 	delete rm;
+#endif
 }

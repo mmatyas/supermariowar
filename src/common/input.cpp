@@ -3,10 +3,54 @@
 #include "GameValues.h"
 #include "GlobalConstants.h"
 
+#include <array>
+
 extern CGameValues game_values;
 
 #ifdef __ANDROID__
 namespace {
+std::array<SDL_JoystickID, MAX_PLAYERS> selectedGamepads {};
+std::array<CInputPlayerControl*, MAX_PLAYERS> selectedConfigs {};
+std::array<short, MAX_PLAYERS> selectedIndexes {};
+
+void bindGamepads(CPlayerInput& input)
+{
+    int count = 0;
+    SDL_JoystickID* ids = SDL_GetJoysticks(&count);
+    for (int player = 0; player < MAX_PLAYERS; ++player) {
+        CInputPlayerControl* config = input.inputControls[player];
+        const short index = config ? config->iDevice : DEVICE_KEYBOARD;
+        if (config != selectedConfigs[player] || index != selectedIndexes[player]) {
+            selectedGamepads[player] = 0;
+            selectedConfigs[player] = config;
+            selectedIndexes[player] = index;
+            for (auto& key : input.outputControls[player].keys)
+                key = {};
+        }
+        if (selectedGamepads[player] || index < 0 || index >= count || !ids)
+            continue;
+        SDL_JoystickID candidate = ids[index];
+        bool taken = false;
+        for (int other = 0; other < MAX_PLAYERS; ++other)
+            taken |= other != player && selectedGamepads[other] == candidate;
+        if (taken) {
+            candidate = 0;
+            for (int otherIndex = 0; otherIndex < count; ++otherIndex) {
+                bool used = false;
+                for (SDL_JoystickID id : selectedGamepads)
+                    used |= id == ids[otherIndex];
+                if (!used && SDL_IsGamepad(ids[otherIndex])) {
+                    candidate = ids[otherIndex];
+                    break;
+                }
+            }
+        }
+        if (candidate && SDL_IsGamepad(candidate))
+            selectedGamepads[player] = candidate;
+    }
+    SDL_free(ids);
+}
+
 bool gamepadControlDown(SDL_Gamepad* pad, SDL_Keycode binding, int mode, int key)
 {
     const auto button = [&](SDL_GamepadButton code) { return SDL_GetGamepadButton(pad, code); };
@@ -37,13 +81,15 @@ bool gamepadControlDown(SDL_Gamepad* pad, SDL_Keycode binding, int mode, int key
     return down;
 }
 
-void clearGamepadControls(CPlayerInput& input)
+void clearGamepadControls(CPlayerInput& input, SDL_JoystickID removed = 0)
 {
     for (int player = 0; player < MAX_PLAYERS; ++player) {
-        if (!input.inputControls[player] || input.inputControls[player]->iDevice == DEVICE_KEYBOARD)
+        if (!selectedGamepads[player] || (removed && selectedGamepads[player] != removed))
             continue;
         for (auto& key : input.outputControls[player].keys)
             key = {};
+        if (removed)
+            selectedGamepads[player] = 0;
     }
 }
 
@@ -56,10 +102,11 @@ bool updateGamepad(CPlayerInput& input, const SDL_Event& event, int mode)
     if (event.type == SDL_EVENT_GAMEPAD_ADDED) {
         if (!SDL_GetGamepadFromID(event.gdevice.which))
             SDL_OpenGamepad(event.gdevice.which);
+        bindGamepads(input);
         return true;
     }
     if (event.type == SDL_EVENT_GAMEPAD_REMOVED) {
-        clearGamepadControls(input);
+        clearGamepadControls(input, event.gdevice.which);
         if (SDL_Gamepad* pad = SDL_GetGamepadFromID(event.gdevice.which))
             SDL_CloseGamepad(pad);
         return true;
@@ -71,12 +118,10 @@ bool updateGamepad(CPlayerInput& input, const SDL_Event& event, int mode)
     const SDL_JoystickID instance = event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION ? event.gaxis.which : event.gbutton.which;
     SDL_Gamepad* pad = SDL_GetGamepadFromID(instance);
     if (!pad) return true;
-    int count = 0;
-    SDL_JoystickID* ids = SDL_GetJoysticks(&count);
-    if (!ids) return true;
+    bindGamepads(input);
     for (int player = 0; player < MAX_PLAYERS; ++player) {
         CInputPlayerControl* config = input.inputControls[player];
-        if (!config || config->iDevice < 0 || config->iDevice >= count || ids[config->iDevice] != instance)
+        if (!config || selectedGamepads[player] != instance)
             continue;
         for (int key = 0; key < NUM_KEYS; ++key) {
             if (mode == 0 && game_values.playercontrol[player] != 1 && key < 6)
@@ -87,9 +132,15 @@ bool updateGamepad(CPlayerInput& input, const SDL_Event& event, int mode)
             output.fDown = down;
         }
     }
-    SDL_free(ids);
     return true;
 }
+}
+
+void ResetAndroidGamepadAssignments()
+{
+    selectedGamepads = {};
+    selectedConfigs = {};
+    selectedIndexes = {};
 }
 #endif
 

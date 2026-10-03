@@ -216,6 +216,12 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                 else if (event.gaxis.axis == SDL_GAMEPAD_AXIS_LEFTY)
                     key = event.gaxis.value < -JOYSTICK_DEAD_ZONE ? JOY_STICK_1_UP :
                           event.gaxis.value > JOYSTICK_DEAD_ZONE ? JOY_STICK_1_DOWN : KEY_NONE;
+                else if (event.gaxis.axis == SDL_GAMEPAD_AXIS_RIGHTX)
+                    key = event.gaxis.value < -JOYSTICK_DEAD_ZONE ? JOY_STICK_2_LEFT :
+                          event.gaxis.value > JOYSTICK_DEAD_ZONE ? JOY_STICK_2_RIGHT : KEY_NONE;
+                else if (event.gaxis.axis == SDL_GAMEPAD_AXIS_RIGHTY)
+                    key = event.gaxis.value < -JOYSTICK_DEAD_ZONE ? JOY_STICK_2_UP :
+                          event.gaxis.value > JOYSTICK_DEAD_ZONE ? JOY_STICK_2_DOWN : KEY_NONE;
                 if (key != KEY_NONE) {
                     SetKey(iKey, key, iDevice);
                     done = true;

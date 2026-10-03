@@ -25,7 +25,7 @@ std::string GetHomeDirectory()
         result = std::string(folder) + result;
     return result;
 
-#elif ANDROID
+#elif defined(__ANDROID__)
     if (char* sdl_path = SDL_GetPrefPath(nullptr, "supermariowar")) {
         std::string result = sdl_path;
         SDL_free(sdl_path);

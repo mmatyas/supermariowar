@@ -120,5 +120,9 @@ class CPlayerInput
 		SDL_Keycode iPressedKey;
 };
 
+#ifdef __ANDROID__
+void ResetAndroidGamepadAssignments();
+#endif
+
 
 #endif // INPUT_H
