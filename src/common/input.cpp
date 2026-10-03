@@ -73,7 +73,7 @@ bool gamepadControlDown(SDL_Gamepad* pad, SDL_Keycode binding, int mode, int key
     if (mode == 0 && key == 2 && code == SDL_GAMEPAD_BUTTON_SOUTH)
         down |= button(SDL_GAMEPAD_BUTTON_EAST);
     if (mode == 0 && key == 5 && code == SDL_GAMEPAD_BUTTON_WEST)
-        down |= button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER);
+        down |= button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) || button(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER);
     if (mode == 1 && key == 4 && code == SDL_GAMEPAD_BUTTON_SOUTH)
         down |= button(SDL_GAMEPAD_BUTTON_START);
     if (mode == 1 && key == 5 && code == SDL_GAMEPAD_BUTTON_EAST)
