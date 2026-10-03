@@ -2,7 +2,7 @@
 
 #include "gfx.h"
 
-#include "SDL_image.h"
+#include <SDL3_image/SDL_image.h>
 
 #include <format>
 #include <iostream>
@@ -22,7 +22,7 @@ gfxFont::gfxFont(const std::filesystem::path& path)
     std::cout << "loading font " << path_str << " ...";
     auto surf = SdlSurfacePtr(IMG_Load(path_str.c_str()));
     if (!surf) {
-        throw std::format("Couldn't load {}: {}", path_str, IMG_GetError());
+        throw std::format("Couldn't load {}: {}", path_str, SDL_GetError());
     }
 
     if (SDL_MUSTLOCK(surf.get()))
@@ -38,7 +38,7 @@ gfxFont::gfxFont(const std::filesystem::path& path)
 
     m_glyph_areas.reserve(127);
 
-    const Uint32 raw_magenta = SDL_MapRGB(surf->format, 255, 0, 255);
+    const Uint32 raw_magenta = SDL_MapSurfaceRGB(surf.get(), 255, 0, 255);
     const int width = static_cast<int>(first_row.size());
     int x = 0;
 
@@ -70,14 +70,14 @@ gfxFont::gfxFont(const std::filesystem::path& path)
     m_glyph_areas.shrink_to_fit();
 
     const Uint32 color_key = getRawPixel(surf.get(), 0, 1);
-    if (SDL_SetColorKey(surf.get(), SDL_TRUE, color_key) < 0)
+    if (!SDL_SetSurfaceColorKey(surf.get(), true, color_key))
         throw std::format("Couldn't set color key on font image: {}", SDL_GetError());
 
-    auto surf_opti = SdlSurfacePtr(SDL_ConvertSurface(surf.get(), screen->format, 0));
+    auto surf_opti = SdlSurfacePtr(SDL_ConvertSurface(surf.get(), screen->format));
     if (!surf_opti)
         throw std::format("Couldn't convert {} to the display's pixel format: {}", path_str, SDL_GetError());
 
-    if (SDL_SetSurfaceRLE(surf_opti.get(), 1) < 0)
+    if (!SDL_SetSurfaceRLE(surf_opti.get(), 1))
         throw std::format("Couldn't set RLE acceleration for {}: {}", path_str, SDL_GetError());
 
     m_sprite = gfxSprite(std::move(surf_opti), std::nullopt);
@@ -112,11 +112,11 @@ void gfxFont::draw(int x, int y, std::string_view text, int dst_min_x, int dst_m
 
 void gfxFont::setAlpha(Uint8 alpha)
 {
-    if (SDL_SetSurfaceBlendMode(m_sprite.getSurface(), SDL_BLENDMODE_BLEND) < 0) {
+    if (!SDL_SetSurfaceBlendMode(m_sprite.getSurface(), SDL_BLENDMODE_BLEND)) {
         fprintf(stderr, "\n ERROR: couldn't set blend mode on font surface: %s\n", SDL_GetError());
         return;
     }
-    if (SDL_SetSurfaceAlphaMod(m_sprite.getSurface(), alpha) < 0) {
+    if (!SDL_SetSurfaceAlphaMod(m_sprite.getSurface(), alpha)) {
         fprintf(stderr, "\n ERROR: couldn't set alpha on font surface: %s\n", SDL_GetError());
         return;
     }

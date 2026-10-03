@@ -2,103 +2,94 @@
 
 #include "GameValues.h"
 #include "GlobalConstants.h"
-#ifdef __ANDROID__
-#include "AndroidControllerMapping.h"
-#endif
 
 extern CGameValues game_values;
 
 #ifdef __ANDROID__
 namespace {
-SDL_GameController* androidController = nullptr;
-SDL_JoystickID androidControllerId = -1;
-AndroidControllerSnapshot androidInput;
-
-void resetAndroidControl(CPlayerInput& input)
+bool gamepadControlDown(SDL_Gamepad* pad, SDL_Keycode binding, int mode, int key)
 {
-    androidInput.clear();
-    for (auto& key : input.outputControls[0].keys) {
-        key.fDown = false;
-        key.fPressed = false;
+    const auto button = [&](SDL_GamepadButton code) { return SDL_GetGamepadButton(pad, code); };
+    const auto axis = [&](SDL_GamepadAxis code) { return SDL_GetGamepadAxis(pad, code); };
+    switch (binding) {
+        case JOY_STICK_1_LEFT:  return axis(SDL_GAMEPAD_AXIS_LEFTX) < -JOYSTICK_DEAD_ZONE || button(SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+        case JOY_STICK_1_RIGHT: return axis(SDL_GAMEPAD_AXIS_LEFTX) > JOYSTICK_DEAD_ZONE || button(SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+        case JOY_STICK_1_UP:    return axis(SDL_GAMEPAD_AXIS_LEFTY) < -JOYSTICK_DEAD_ZONE || button(SDL_GAMEPAD_BUTTON_DPAD_UP);
+        case JOY_STICK_1_DOWN:  return axis(SDL_GAMEPAD_AXIS_LEFTY) > JOYSTICK_DEAD_ZONE || button(SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+        case JOY_STICK_2_LEFT:  return axis(SDL_GAMEPAD_AXIS_RIGHTX) < -JOYSTICK_DEAD_ZONE;
+        case JOY_STICK_2_RIGHT: return axis(SDL_GAMEPAD_AXIS_RIGHTX) > JOYSTICK_DEAD_ZONE;
+        case JOY_STICK_2_UP:    return axis(SDL_GAMEPAD_AXIS_RIGHTY) < -JOYSTICK_DEAD_ZONE;
+        case JOY_STICK_2_DOWN:  return axis(SDL_GAMEPAD_AXIS_RIGHTY) > JOYSTICK_DEAD_ZONE;
+        default: break;
+    }
+    if (binding < GAMEPAD_BUTTON_START || binding >= GAMEPAD_BUTTON_START + SDL_GAMEPAD_BUTTON_COUNT)
+        return false;
+    const auto code = static_cast<SDL_GamepadButton>(binding - GAMEPAD_BUTTON_START);
+    bool down = button(code);
+    if (mode == 0 && key == 2 && code == SDL_GAMEPAD_BUTTON_SOUTH)
+        down |= button(SDL_GAMEPAD_BUTTON_EAST);
+    if (mode == 0 && key == 5 && code == SDL_GAMEPAD_BUTTON_WEST)
+        down |= button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER);
+    if (mode == 1 && key == 4 && code == SDL_GAMEPAD_BUTTON_SOUTH)
+        down |= button(SDL_GAMEPAD_BUTTON_START);
+    if (mode == 1 && key == 5 && code == SDL_GAMEPAD_BUTTON_EAST)
+        down |= button(SDL_GAMEPAD_BUTTON_BACK);
+    return down;
+}
+
+void clearGamepadControls(CPlayerInput& input)
+{
+    for (int player = 0; player < MAX_PLAYERS; ++player) {
+        if (!input.inputControls[player] || input.inputControls[player]->iDevice == DEVICE_KEYBOARD)
+            continue;
+        for (auto& key : input.outputControls[player].keys)
+            key = {};
     }
 }
 
-void openAndroidController(int index)
+bool updateGamepad(CPlayerInput& input, const SDL_Event& event, int mode)
 {
-    if (androidController || !SDL_IsGameController(index)) return;
-    androidController = SDL_GameControllerOpen(index);
-    if (androidController) {
-        androidControllerId = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(androidController));
-        SDL_Log("Android controller: %s, instance %d", SDL_GameControllerName(androidController), androidControllerId);
-    }
-}
-
-void applyAndroidControl(CPlayerInput& input, short state)
-{
-    const auto desired = AndroidDesiredControls(androidInput, state, game_values.playercontrol[0] == 1);
-    for (int i = 0; i < NUM_KEYS; ++i) {
-        CKeyState& key = input.outputControls[0].keys[i];
-        if (desired[i] && !key.fDown) key.fPressed = true;
-        key.fDown = desired[i];
-    }
-}
-
-bool handleAndroidController(CPlayerInput& input, const SDL_Event& event, short state)
-{
-    if (event.type == SDL_APP_WILLENTERBACKGROUND || event.type == SDL_APP_DIDENTERFOREGROUND) {
-        resetAndroidControl(input);
+    if (event.type == SDL_EVENT_WILL_ENTER_BACKGROUND || event.type == SDL_EVENT_DID_ENTER_FOREGROUND) {
+        clearGamepadControls(input);
         return false;
     }
-    if (event.type == SDL_CONTROLLERDEVICEADDED) {
-        openAndroidController(event.cdevice.which); // device index at add time
+    if (event.type == SDL_EVENT_GAMEPAD_ADDED) {
+        if (!SDL_GetGamepadFromID(event.gdevice.which))
+            SDL_OpenGamepad(event.gdevice.which);
         return true;
     }
-    if (event.type == SDL_CONTROLLERDEVICEREMOVED && event.cdevice.which == androidControllerId) {
-        SDL_GameControllerClose(androidController);
-        androidController = nullptr;
-        androidControllerId = -1;
-        resetAndroidControl(input);
-        for (int i = 0; i < SDL_NumJoysticks() && !androidController; ++i) openAndroidController(i);
+    if (event.type == SDL_EVENT_GAMEPAD_REMOVED) {
+        clearGamepadControls(input);
+        if (SDL_Gamepad* pad = SDL_GetGamepadFromID(event.gdevice.which))
+            SDL_CloseGamepad(pad);
         return true;
     }
-    if (!androidController) return false;
-    if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-        // Keep keyboard and pad sources independent so releasing one cannot
-        // cancel an action still held by the other.
-        for (int mode = 0; mode < 2; ++mode) {
-            for (int key = 0; key < NUM_KEYS; ++key) {
-                if (game_values.inputConfiguration[0][0].inputGameControls[mode].keys[key] == event.key.keysym.sym)
-                    androidInput.keyboard[mode][key] = event.type == SDL_KEYDOWN;
-            }
-        }
-        if (event.type == SDL_KEYDOWN) input.iPressedKey = event.key.keysym.sym;
-        applyAndroidControl(input, state);
-        return true;
-    }
-    if ((event.type == SDL_CONTROLLERBUTTONDOWN || event.type == SDL_CONTROLLERBUTTONUP)
-            && event.cbutton.which == androidControllerId
-            && event.cbutton.button < SDL_CONTROLLER_BUTTON_MAX) {
-        androidInput.buttons[event.cbutton.button] = event.type == SDL_CONTROLLERBUTTONDOWN;
-        applyAndroidControl(input, state);
-        return true;
-    }
-    if (event.type == SDL_CONTROLLERAXISMOTION && event.caxis.which == androidControllerId
-            && event.caxis.axis < SDL_CONTROLLER_AXIS_MAX) {
-        androidInput.axes[event.caxis.axis] = event.caxis.value;
-        applyAndroidControl(input, state);
-        return true;
-    }
-    return false;
-}
-} // namespace
+    if (event.type != SDL_EVENT_GAMEPAD_BUTTON_DOWN && event.type != SDL_EVENT_GAMEPAD_BUTTON_UP
+            && event.type != SDL_EVENT_GAMEPAD_AXIS_MOTION)
+        return false;
 
-void InitAndroidController()
-{
-    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) != 0) {
-        SDL_LogError(SDL_LOG_CATEGORY_INPUT, "Controller init failed: %s", SDL_GetError());
-        return;
+    const SDL_JoystickID instance = event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION ? event.gaxis.which : event.gbutton.which;
+    SDL_Gamepad* pad = SDL_GetGamepadFromID(instance);
+    if (!pad) return true;
+    int count = 0;
+    SDL_JoystickID* ids = SDL_GetJoysticks(&count);
+    if (!ids) return true;
+    for (int player = 0; player < MAX_PLAYERS; ++player) {
+        CInputPlayerControl* config = input.inputControls[player];
+        if (!config || config->iDevice < 0 || config->iDevice >= count || ids[config->iDevice] != instance)
+            continue;
+        for (int key = 0; key < NUM_KEYS; ++key) {
+            if (mode == 0 && game_values.playercontrol[player] != 1 && key < 6)
+                continue;
+            CKeyState& output = input.outputControls[player].keys[key];
+            const bool down = gamepadControlDown(pad, config->inputGameControls[mode].keys[key], mode, key);
+            if (down && !output.fDown) output.fPressed = true;
+            output.fDown = down;
+        }
     }
-    for (int i = 0; i < SDL_NumJoysticks() && !androidController; ++i) openAndroidController(i);
+    SDL_free(ids);
+    return true;
+}
 }
 #endif
 
@@ -126,9 +117,6 @@ void CPlayerInput::ClearPressedKeys(short iGameState)
     }
 
     iPressedKey = 0;
-#ifdef __ANDROID__
-    if (androidController) applyAndroidControl(*this, iGameState);
-#endif
 }
 
 void CPlayerInput::ClearGameActionKeys()
@@ -158,10 +146,6 @@ void CPlayerInput::ResetKeys()
 	}
 
 	iPressedKey = 0;
-#ifdef __ANDROID__
-    // A button held while leaving a screen must be released and pressed again.
-    resetAndroidControl(*this);
-#endif
 }
 
 //Called during game loop to read input events and see if
@@ -171,7 +155,10 @@ void CPlayerInput::ResetKeys()
 void CPlayerInput::Update(SDL_Event event, short iGameState)
 {
 #ifdef __ANDROID__
-    if (handleAndroidController(*this, event, iGameState)) return;
+    if (updateGamepad(*this, event, iGameState)) return;
+    if ((event.type == SDL_EVENT_JOYSTICK_HAT_MOTION || event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
+            || event.type == SDL_EVENT_JOYSTICK_BUTTON_UP || event.type == SDL_EVENT_JOYSTICK_AXIS_MOTION)
+            && SDL_IsGamepad(event.jbutton.which)) return;
 #endif
 	bool fFound = false;
     for (short iPlayer = -1; iPlayer < MAX_PLAYERS; iPlayer++) {
@@ -198,9 +185,9 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 		}
 
         if (iDeviceID == DEVICE_KEYBOARD) {
-            if (SDL_KEYDOWN == event.type) {
+            if (SDL_EVENT_KEY_DOWN == event.type) {
                 for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
-                    if (inputControl->keys[iKey] == event.key.keysym.sym) {
+                    if (inputControl->keys[iKey] == event.key.key) {
 						fFound = true;
 
 						//Ignore input for cpu controlled players
@@ -214,10 +201,10 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 					}
 				}
 
-				iPressedKey = event.key.keysym.sym;
-            } else if (SDL_KEYUP == event.type) {
+				iPressedKey = event.key.key;
+            } else if (SDL_EVENT_KEY_UP == event.type) {
                 for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
-                    if (inputControl->keys[iKey] == event.key.keysym.sym) {
+                    if (inputControl->keys[iKey] == event.key.key) {
 						fFound = true;
 
 						//Ignore input for cpu controlled players
@@ -227,14 +214,14 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 						outputControl->keys[iKey].fDown = false;
 					}
 				}
-            } else if (SDL_MOUSEMOTION == event.type) {
+            } else if (SDL_EVENT_MOUSE_MOTION == event.type) {
                 for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if (inputControl->keys[iKey] >= MOUSE_UP) {
 						if ((inputControl->keys[iKey] == MOUSE_UP && event.motion.yrel < -MOUSE_Y_DEAD_ZONE) ||
 							(inputControl->keys[iKey] == MOUSE_DOWN && event.motion.yrel > MOUSE_Y_DEAD_ZONE) ||
 							(inputControl->keys[iKey] == MOUSE_LEFT && event.motion.xrel < -MOUSE_X_DEAD_ZONE) ||
 							(inputControl->keys[iKey] == MOUSE_RIGHT && event.motion.xrel > MOUSE_X_DEAD_ZONE) ||
-                                (inputControl->keys[iKey] >= MOUSE_BUTTON_START && (event.motion.state & SDL_BUTTON(inputControl->keys[iKey] - MOUSE_BUTTON_START)))) {
+                                (inputControl->keys[iKey] >= MOUSE_BUTTON_START && (event.motion.state & SDL_BUTTON_MASK(inputControl->keys[iKey] - MOUSE_BUTTON_START)))) {
 							fFound = true;
 
 							//Ignore input for cpu controlled players
@@ -258,7 +245,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 						}
 					}
 				}
-            } else if (SDL_MOUSEBUTTONDOWN == event.type) {
+            } else if (SDL_EVENT_MOUSE_BUTTON_DOWN == event.type) {
                 for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if (inputControl->keys[iKey] == event.button.button + MOUSE_BUTTON_START) {
 						fFound = true;
@@ -273,7 +260,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 						outputControl->keys[iKey].fDown = true;
 					}
 				}
-            } else if (SDL_MOUSEBUTTONUP == event.type) {
+            } else if (SDL_EVENT_MOUSE_BUTTON_UP == event.type) {
                 for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if (inputControl->keys[iKey] == event.button.button + MOUSE_BUTTON_START) {
 						fFound = true;
@@ -291,8 +278,12 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 				}
 			}
         } else {
-            if (SDL_JOYHATMOTION == event.type) {
-				if (iDeviceID != event.jhat.which)
+            int count = 0;
+            SDL_JoystickID* ids = SDL_GetJoysticks(&count);
+            const SDL_JoystickID instance = ids && iDeviceID >= 0 && iDeviceID < count ? ids[iDeviceID] : 0;
+            SDL_free(ids);
+            if (SDL_EVENT_JOYSTICK_HAT_MOTION == event.type) {
+				if (instance != event.jhat.which)
 					continue;
 
                 for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
@@ -320,8 +311,8 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 						}
 					}
 				}
-            } else if (SDL_JOYBUTTONDOWN == event.type) {
-				if (iDeviceID != event.jbutton.which)
+            } else if (SDL_EVENT_JOYSTICK_BUTTON_DOWN == event.type) {
+                if (instance != event.jbutton.which)
 					continue;
 
                 for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
@@ -338,8 +329,8 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 						outputControl->keys[iKey].fDown = true;
 					}
 				}
-            } else if (SDL_JOYBUTTONUP == event.type) {
-				if (iDeviceID != event.jbutton.which)
+            } else if (SDL_EVENT_JOYSTICK_BUTTON_UP == event.type) {
+                if (instance != event.jbutton.which)
 					continue;
 
                 for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
@@ -353,8 +344,8 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 						outputControl->keys[iKey].fDown = false;
 					}
 				}
-            } else if (SDL_JOYAXISMOTION == event.type) {
-				if (iDeviceID != event.jaxis.which)
+            } else if (SDL_EVENT_JOYSTICK_AXIS_MOTION == event.type) {
+                if (instance != event.jaxis.which)
 					continue;
 
                 for (int iKey = 0; iKey < NUM_KEYS; iKey++) {

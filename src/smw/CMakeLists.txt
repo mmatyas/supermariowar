@@ -46,10 +46,6 @@ add_subdirectory(objects)
 add_subdirectory(ui)
 
 target_compile_features(smw PUBLIC cxx_std_14)
-target_compile_definitions(smw PRIVATE
-	GIT_REVISION="${SMW_GIT_REVISION}"
-	GIT_DATE="${SMW_GIT_DATE}"
-)
 
 if(NO_NETWORK)
 	target_compile_definitions(smw PRIVATE NETWORK_DISABLED)
@@ -79,10 +75,6 @@ if(NOT EMSCRIPTEN)
 endif()
 
 target_link_libraries(smw toml11::toml11)
-
-if (TARGET SDL2::SDL2main)
-    target_link_libraries(smw SDL2::SDL2main)
-endif()
 
 #
 # Installation

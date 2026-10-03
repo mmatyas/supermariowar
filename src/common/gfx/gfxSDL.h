@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 
 class GraphicsSDL {
@@ -8,6 +8,7 @@ public:
     ~GraphicsSDL();
 
     bool init(bool fullscreen);
+    void close();
 
     void flipScreen() const;
     void changeFullScreen(bool fullcreen) const;

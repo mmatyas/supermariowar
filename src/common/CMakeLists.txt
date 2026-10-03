@@ -80,16 +80,17 @@ add_library(CommonFiles STATIC
 
 add_subdirectory(ui)
 target_compile_features(CommonFiles PUBLIC cxx_std_20)
+target_compile_definitions(CommonFiles PUBLIC
+    GIT_REVISION="${SMW_GIT_REVISION}"
+    GIT_DATE="${SMW_GIT_DATE}"
+)
 
 if (SDL2_FORCE_GLES)
     target_compile_definitions(CommonFiles PUBLIC SDL2_FORCE_GLES)
 endif()
 
-
-if(NOT EMSCRIPTEN)
-    target_link_libraries(CommonFiles
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-        SDL2_mixer::SDL2_mixer
-    )
-endif()
+target_link_libraries(CommonFiles
+    SDL3::SDL3
+    SDL3_image::SDL3_image
+    SDL3_mixer::SDL3_mixer
+)

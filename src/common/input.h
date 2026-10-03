@@ -1,7 +1,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
+
 #include <stdint.h>
 
 //This set of classes takes SDL input events, sees if a
@@ -40,6 +41,7 @@
 #define JOY_HAT_LEFT        10
 #define JOY_HAT_RIGHT       11
 #define JOY_BUTTON_START    12
+#define GAMEPAD_BUTTON_START 64
 
 #define KEY_NONE            -1
 
@@ -118,9 +120,5 @@ class CPlayerInput
 		SDL_Keycode iPressedKey;
 };
 
-#ifdef __ANDROID__
-// Open the first standardized controller before the first input event.
-void InitAndroidController();
-#endif
 
 #endif // INPUT_H

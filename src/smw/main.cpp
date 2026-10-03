@@ -72,6 +72,8 @@
 #endif
 #endif
 
+#include <SDL3/SDL_main.h>
+
 
 //now it's really time for an "engine" (aka resource manager)
 
@@ -105,7 +107,7 @@ CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 short currentgamemode = 0;
 
 extern SDL_Joystick     **joysticks;
-extern short            joystickcount;
+extern int              joystickcount;
 
 extern CMap* g_map;
 extern CTilesetManager* g_tilesetmanager;
@@ -210,18 +212,34 @@ void create_globals()
 
 void init_joysticks()
 {
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-#ifdef __ANDROID__
-    InitAndroidController();
-#endif
-    joystickcount = (short)SDL_NumJoysticks();
+    SDL_JoystickID* ids = SDL_GetJoysticks(&joystickcount);
     joysticks = new SDL_Joystick*[joystickcount];
 
-    for (short i = 0; i < joystickcount; i++)
-        joysticks[i] = SDL_JoystickOpen(i);
+    for (int i = 0; i < joystickcount; i++) {
+        joysticks[i] = SDL_OpenJoystick(ids[i]);
+#ifdef __ANDROID__
+        if (SDL_IsGamepad(ids[i]))
+            SDL_OpenGamepad(ids[i]);
+#endif
+    }
+    SDL_free(ids);
 
-    SDL_JoystickEventState(SDL_ENABLE);
+    SDL_SetJoystickEventsEnabled(true);
 }
+
+#ifdef __ANDROID__
+void close_joysticks()
+{
+    for (int i = 0; i < joystickcount; ++i) {
+        if (SDL_Gamepad* pad = SDL_GetGamepadFromID(SDL_GetJoystickID(joysticks[i])))
+            SDL_CloseGamepad(pad);
+        SDL_CloseJoystick(joysticks[i]);
+    }
+    delete[] joysticks;
+    joysticks = nullptr;
+    joystickcount = 0;
+}
+#endif
 
 void create_gamemodes()
 {
@@ -350,6 +368,7 @@ void main_game()
     printf("-------------------------------------------------------------------------------\n");
     printf("\n---------------- startup ----------------\n");
 
+    App::registerSdlMetadata(TITLESTRING);
     ensureSettingsDir();
     create_globals();
 
@@ -379,7 +398,7 @@ void main_game()
     char title[128];
     sprintf(title, "%s %s %s", TITLESTRING, GIT_REVISION, GIT_DATE);
     gfx_settitle(title);
-    SDL_ShowCursor(SDL_DISABLE);
+    SDL_HideCursor();
 
     printf("\n---------------- loading ----------------\n");
 
@@ -419,6 +438,9 @@ void main_game()
     if (!fLoadOK) {
         printf("\n---------------- EXIT DURING LOADING ----------------\n\n");
         sfx_close();
+#ifdef __ANDROID__
+        close_joysticks();
+#endif
         gfx_close();
         net_close();
         return 0;
@@ -441,6 +463,9 @@ void main_game()
         delete gamemodes[i];
 
     sfx_close();
+#ifdef __ANDROID__
+    close_joysticks();
+#endif
     gfx_close();
     net_close();
 

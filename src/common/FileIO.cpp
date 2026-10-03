@@ -1,6 +1,6 @@
 #include "FileIO.h"
 
-#include "SDL_endian.h"
+#include <SDL3/SDL_endian.h>
 
 #include <cassert>
 #include <cstring>

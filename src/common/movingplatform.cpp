@@ -70,10 +70,10 @@ MovingPlatform::MovingPlatform(std::vector<TilesetTile>&& tiledata, std::vector<
         sprites[iSurface] = gfxSprite::blank(w * iTileSize, h * iTileSize);
         sprites[iSurface].setWrap();
 
-        if (SDL_SetColorKey(sprites[iSurface].getSurface(), SDL_TRUE, SDL_MapRGB(sprites[iSurface].getSurface()->format, 255, 0, 255)) < 0)
+        if (!SDL_SetSurfaceColorKey(sprites[iSurface].getSurface(), true, SDL_MapSurfaceRGB(sprites[iSurface].getSurface(), 255, 0, 255)))
             printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
 
-        SDL_FillRect(sprites[iSurface].getSurface(), NULL, SDL_MapRGB(sprites[iSurface].getSurface()->format, 255, 0, 255));
+        SDL_FillSurfaceRect(sprites[iSurface].getSurface(), NULL, SDL_MapSurfaceRGB(sprites[iSurface].getSurface(), 255, 0, 255));
     }
 
     //Run through all tiles in the platform, detect unknown and blank tiles,
@@ -147,7 +147,7 @@ void MovingPlatform::draw()
 {
     //Comment this back in to see the no spawn area of the platform
     //SDL_Rect r = {(int)pPath->currentPos1().x - iHalfWidth, (int)pPath->currentPos1().y - iHalfHeight, iWidth, iHeight};
-    //SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 0, 0, 255));
+    //SDL_FillSurfaceRect(blitdest, &r, SDL_MapSurfaceRGB(blitdest->format, 0, 0, 255));
 
     rDstRect.x = ix - iHalfWidth + x_shake;
     rDstRect.y = iy - iHalfHeight + y_shake;

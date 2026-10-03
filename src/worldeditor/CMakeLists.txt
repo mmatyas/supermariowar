@@ -45,10 +45,6 @@ endif()
 target_link_libraries(smw-worldedit CommonFiles)
 target_compile_definitions(smw-worldedit PRIVATE IS_WORLDEDIT)
 
-if (TARGET SDL2::SDL2main)
-    target_link_libraries(smw-worldedit SDL2::SDL2main)
-endif()
-
 #
 # Installation
 #
