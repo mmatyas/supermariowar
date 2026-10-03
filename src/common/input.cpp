@@ -51,15 +51,22 @@ void bindGamepads(CPlayerInput& input)
     SDL_free(ids);
 }
 
-bool gamepadControlDown(SDL_Gamepad* pad, SDL_Keycode binding, int mode, int key)
+bool gamepadControlDown(SDL_Gamepad* pad, const CInputControl& controls, int mode, int key)
 {
     const auto button = [&](SDL_GamepadButton code) { return SDL_GetGamepadButton(pad, code); };
     const auto axis = [&](SDL_GamepadAxis code) { return SDL_GetGamepadAxis(pad, code); };
+    const auto alias = [&](SDL_GamepadButton code) {
+        for (int other = 0; other < NUM_KEYS; ++other)
+            if (other != key && controls.keys[other] == GAMEPAD_BUTTON_START + code)
+                return false;
+        return button(code);
+    };
+    const SDL_Keycode binding = controls.keys[key];
     switch (binding) {
-        case JOY_STICK_1_LEFT:  return axis(SDL_GAMEPAD_AXIS_LEFTX) < -JOYSTICK_DEAD_ZONE || button(SDL_GAMEPAD_BUTTON_DPAD_LEFT);
-        case JOY_STICK_1_RIGHT: return axis(SDL_GAMEPAD_AXIS_LEFTX) > JOYSTICK_DEAD_ZONE || button(SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
-        case JOY_STICK_1_UP:    return axis(SDL_GAMEPAD_AXIS_LEFTY) < -JOYSTICK_DEAD_ZONE || button(SDL_GAMEPAD_BUTTON_DPAD_UP);
-        case JOY_STICK_1_DOWN:  return axis(SDL_GAMEPAD_AXIS_LEFTY) > JOYSTICK_DEAD_ZONE || button(SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+        case JOY_STICK_1_LEFT:  return axis(SDL_GAMEPAD_AXIS_LEFTX) < -JOYSTICK_DEAD_ZONE || alias(SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+        case JOY_STICK_1_RIGHT: return axis(SDL_GAMEPAD_AXIS_LEFTX) > JOYSTICK_DEAD_ZONE || alias(SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+        case JOY_STICK_1_UP:    return axis(SDL_GAMEPAD_AXIS_LEFTY) < -JOYSTICK_DEAD_ZONE || alias(SDL_GAMEPAD_BUTTON_DPAD_UP);
+        case JOY_STICK_1_DOWN:  return axis(SDL_GAMEPAD_AXIS_LEFTY) > JOYSTICK_DEAD_ZONE || alias(SDL_GAMEPAD_BUTTON_DPAD_DOWN);
         case JOY_STICK_2_LEFT:  return axis(SDL_GAMEPAD_AXIS_RIGHTX) < -JOYSTICK_DEAD_ZONE;
         case JOY_STICK_2_RIGHT: return axis(SDL_GAMEPAD_AXIS_RIGHTX) > JOYSTICK_DEAD_ZONE;
         case JOY_STICK_2_UP:    return axis(SDL_GAMEPAD_AXIS_RIGHTY) < -JOYSTICK_DEAD_ZONE;
@@ -71,13 +78,13 @@ bool gamepadControlDown(SDL_Gamepad* pad, SDL_Keycode binding, int mode, int key
     const auto code = static_cast<SDL_GamepadButton>(binding - GAMEPAD_BUTTON_START);
     bool down = button(code);
     if (mode == 0 && key == 2 && code == SDL_GAMEPAD_BUTTON_SOUTH)
-        down |= button(SDL_GAMEPAD_BUTTON_EAST);
+        down |= alias(SDL_GAMEPAD_BUTTON_EAST);
     if (mode == 0 && key == 5 && code == SDL_GAMEPAD_BUTTON_WEST)
-        down |= button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) || button(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER);
+        down |= alias(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) || alias(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER);
     if (mode == 1 && key == 4 && code == SDL_GAMEPAD_BUTTON_SOUTH)
-        down |= button(SDL_GAMEPAD_BUTTON_START);
+        down |= alias(SDL_GAMEPAD_BUTTON_START);
     if (mode == 1 && key == 5 && code == SDL_GAMEPAD_BUTTON_EAST)
-        down |= button(SDL_GAMEPAD_BUTTON_BACK);
+        down |= alias(SDL_GAMEPAD_BUTTON_BACK);
     return down;
 }
 
@@ -127,7 +134,7 @@ bool updateGamepad(CPlayerInput& input, const SDL_Event& event, int mode)
             if (mode == 0 && game_values.playercontrol[player] != 1 && key < 6)
                 continue;
             CKeyState& output = input.outputControls[player].keys[key];
-            const bool down = gamepadControlDown(pad, config->inputGameControls[mode].keys[key], mode, key);
+            const bool down = gamepadControlDown(pad, config->inputGameControls[mode], mode, key);
             if (down && !output.fDown) output.fPressed = true;
             output.fDown = down;
         }
