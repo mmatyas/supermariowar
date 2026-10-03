@@ -1,4 +1,11 @@
-add_executable(smw WIN32
+if(ANDROID)
+    add_library(smw SHARED)
+    set_target_properties(smw PROPERTIES OUTPUT_NAME main)
+else()
+    add_executable(smw WIN32)
+endif()
+
+target_sources(smw PRIVATE
 	main.cpp
 
 	ai.cpp

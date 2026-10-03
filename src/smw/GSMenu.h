@@ -71,6 +71,7 @@ class MenuState : public GameState
 {
 	public:
         bool init() override;
+        void close();
         void update() override;
 
         static MenuState& instance();

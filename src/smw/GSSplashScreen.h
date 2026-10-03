@@ -11,6 +11,7 @@ class SplashScreenState : public GameState
     public:
         bool init() override;
         void update() override;
+        void close();
 
         static SplashScreenState& instance();
 
@@ -20,7 +21,7 @@ class SplashScreenState : public GameState
         SDL_Event loop_event;
         gfxSprite* menu_dpi_logo;
         gfxSprite* menu_contest_winners;
-        gfxSprite* menu_credits;
+        gfxSprite* menu_credits = nullptr;
         int alpha;
         int state;
         int timer;

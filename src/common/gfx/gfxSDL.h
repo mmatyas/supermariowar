@@ -8,6 +8,7 @@ public:
     ~GraphicsSDL();
 
     bool init(bool fullscreen);
+    void close();
 
     void flipScreen() const;
     void changeFullScreen(bool fullcreen) const;

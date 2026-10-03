@@ -24,7 +24,11 @@ template<typename... Args>
 namespace {
 void initSdl()
 {
-    if (!SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
+    Uint32 flags = SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK;
+#ifdef __ANDROID__
+    flags |= SDL_INIT_GAMEPAD;
+#endif
+    if (!SDL_Init(flags))
         throw_error("SDL error: {}", SDL_GetError());
 
     const auto sdl_version = SDL_GetVersion();
@@ -47,9 +51,14 @@ void quitSdl()
 
 SDL_Window* createWindow(bool fullscreen)
 {
+#ifdef __ANDROID__
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+    Uint32 window_flags = SDL_WINDOW_FULLSCREEN;
+#else
     Uint32 window_flags = SDL_WINDOW_RESIZABLE;
     if (fullscreen)
         window_flags |= SDL_WINDOW_FULLSCREEN;
+#endif
 
     SDL_Window* window = SDL_CreateWindow("smw",
         GFX_SCREEN_W, GFX_SCREEN_H,
@@ -124,11 +133,22 @@ bool GraphicsSDL::init(bool fullscreen)
 
 GraphicsSDL::~GraphicsSDL()
 {
+    close();
+}
+
+void GraphicsSDL::close()
+{
     SDL_DestroyTexture(sdl_screen_texture);
+    sdl_screen_texture = nullptr;
     SDL_DestroySurface(sdl_screen_surface);
+    sdl_screen_surface = nullptr;
     SDL_DestroyRenderer(sdl_renderer);
+    sdl_renderer = nullptr;
     SDL_DestroyWindow(sdl_window);
-    quitSdl();
+    sdl_window = nullptr;
+    screen = nullptr;
+    if (SDL_WasInit(0))
+        quitSdl();
 }
 
 void GraphicsSDL::showErrorBox(const char* message) const

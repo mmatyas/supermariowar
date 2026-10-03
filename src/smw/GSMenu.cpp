@@ -119,6 +119,40 @@ MenuState& MenuState::instance()
     return menu;
 }
 
+void MenuState::close()
+{
+    mCurrentMenu = nullptr;
+    szCurrentMapName = nullptr;
+    mNetRoomMenu.reset();
+    mNetNewRoomSettingsMenu.reset();
+    mNetNewRoomMenu.reset();
+    mNetLobbyMenu.reset();
+    mNetEditServersMenu.reset();
+    mNetServersMenu.reset();
+    mBonusWheelMenu.reset();
+    mTournamentScoreboardMenu.reset();
+    mTeamSelectMenu.reset();
+    mWorldMenu.reset();
+    mTourStopMenu.reset();
+    mMapFilterEditMenu.reset();
+    mGameSettingsMenu.reset();
+    mMatchSelectionMenu.reset();
+    mModeOptionsMenu.reset();
+    mPlayerControlsMenu.reset();
+    mPlayerControlsSelectMenu.reset();
+    mSoundOptionsMenu.reset();
+    mEyeCandyOptionsMenu.reset();
+    mGraphicsOptionsMenu.reset();
+    mProjectileOptionsMenu.reset();
+    mProjectileLimitsMenu.reset();
+    mPowerupSettingsMenu.reset();
+    mPowerupDropRatesMenu.reset();
+    mTeamOptionsMenu.reset();
+    mGameplayOptionsMenu.reset();
+    mOptionsMenu.reset();
+    mMainMenu.reset();
+}
+
 bool MenuState::init()
 {
     mMainMenu = std::make_unique<UI_MainMenu>();

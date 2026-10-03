@@ -42,11 +42,22 @@ SplashScreenState& SplashScreenState::instance() {
 
 void SplashScreenState::onLeaveState()
 {
+    close();
+}
+
+void SplashScreenState::close()
+{
     delete menu_credits;
+    menu_credits = nullptr;
 }
 
 bool SplashScreenState::init()
 {
+    close();
+    alpha = 255;
+    state = 7;
+    timer = 120;
+    firstFrame = true;
     rm->loadStartGraphics();
 
 //  gfx_loadimagenocolorkey(&rm->menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist->current_name()));
@@ -154,10 +165,12 @@ void SplashScreenState::update()
         game_values.playerInput.Update(loop_event, 1);
     }
 
+    // The menu's map preview needs tilesets created by loadAllGraphics below.
+    // Ignore early select/cancel input until the loading frame has completed.
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
-        if (game_values.playerInput.outputControls[iPlayer].menu_select.fPressed ||
+        if (state >= 8 && (game_values.playerInput.outputControls[iPlayer].menu_select.fPressed ||
             game_values.playerInput.outputControls[iPlayer].menu_cancel.fPressed ||
-            game_values.playerInput.outputControls[iPlayer].menu_random.fPressed) {
+            game_values.playerInput.outputControls[iPlayer].menu_random.fPressed)) {
             //if (state <= 6)
             //{
             //  state = 6;

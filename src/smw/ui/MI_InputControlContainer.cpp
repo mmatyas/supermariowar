@@ -11,6 +11,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <iterator>
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -194,6 +195,40 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                 done = true;
             }
         } else {
+#ifdef __ANDROID__
+            int count = 0;
+            SDL_JoystickID* ids = SDL_GetJoysticks(&count);
+            const SDL_JoystickID selected = ids && iDevice >= 0 && iDevice < count ? ids[iDevice] : 0;
+            SDL_free(ids);
+            if ((event.type == SDL_EVENT_JOYSTICK_HAT_MOTION || event.type == SDL_EVENT_JOYSTICK_AXIS_MOTION
+                    || event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN) && SDL_IsGamepad(event.jbutton.which))
+                continue;
+            if (event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) {
+                if (event.gbutton.which != selected) continue;
+                SetKey(iKey, GAMEPAD_BUTTON_START + event.gbutton.button, iDevice);
+                done = true;
+            } else if (event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION) {
+                if (event.gaxis.which != selected) continue;
+                SDL_Keycode key = KEY_NONE;
+                if (event.gaxis.axis == SDL_GAMEPAD_AXIS_LEFTX)
+                    key = event.gaxis.value < -JOYSTICK_DEAD_ZONE ? JOY_STICK_1_LEFT :
+                          event.gaxis.value > JOYSTICK_DEAD_ZONE ? JOY_STICK_1_RIGHT : KEY_NONE;
+                else if (event.gaxis.axis == SDL_GAMEPAD_AXIS_LEFTY)
+                    key = event.gaxis.value < -JOYSTICK_DEAD_ZONE ? JOY_STICK_1_UP :
+                          event.gaxis.value > JOYSTICK_DEAD_ZONE ? JOY_STICK_1_DOWN : KEY_NONE;
+                else if (event.gaxis.axis == SDL_GAMEPAD_AXIS_RIGHTX)
+                    key = event.gaxis.value < -JOYSTICK_DEAD_ZONE ? JOY_STICK_2_LEFT :
+                          event.gaxis.value > JOYSTICK_DEAD_ZONE ? JOY_STICK_2_RIGHT : KEY_NONE;
+                else if (event.gaxis.axis == SDL_GAMEPAD_AXIS_RIGHTY)
+                    key = event.gaxis.value < -JOYSTICK_DEAD_ZONE ? JOY_STICK_2_UP :
+                          event.gaxis.value > JOYSTICK_DEAD_ZONE ? JOY_STICK_2_DOWN : KEY_NONE;
+                if (key != KEY_NONE) {
+                    SetKey(iKey, key, iDevice);
+                    done = true;
+                }
+            }
+            if (done) break;
+#endif
             if (event.type == SDL_EVENT_KEY_DOWN) {
                 if (event.key.key == SDLK_ESCAPE) {
                     done = true;
@@ -314,8 +349,15 @@ void MI_InputControlField::Draw()
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, "(Press Button)");
     else if (iDevice == DEVICE_KEYBOARD)
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, SDL_GetKeyName(*iKey));
-    else
+#ifdef __ANDROID__
+    else if (*iKey >= GAMEPAD_BUTTON_START && *iKey < GAMEPAD_BUTTON_START + SDL_GAMEPAD_BUTTON_COUNT)
+        rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16,
+            SDL_GetGamepadStringForButton(static_cast<SDL_GamepadButton>(*iKey - GAMEPAD_BUTTON_START)));
+#endif
+    else if (*iKey >= 0 && *iKey < static_cast<SDL_Keycode>(std::size(Joynames)))
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, Joynames[*iKey]);
+    else
+        rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, "Other button");
 }
 
 
@@ -342,9 +384,12 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
     miDeviceSelectField->setItemChangedCode(MENU_CODE_INPUT_DEVICE_CHANGED);
     miDeviceSelectField->add("Keyboard", -1);
 
-    for (int iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
-        miDeviceSelectField->add(SDL_GetJoystickNameForID(iJoystick), iJoystick, false);
+    int count = 0;
+    SDL_JoystickID* ids = SDL_GetJoysticks(&count);
+    for (int iJoystick = 0; iJoystick < count; iJoystick++) {
+        miDeviceSelectField->add(SDL_GetJoystickNameForID(ids[iJoystick]), iJoystick, false);
     }
+    SDL_free(ids);
 
     //If the device is not found, default to the keyboard
     if (!miDeviceSelectField->setCurrentValue(iDevice)) {
