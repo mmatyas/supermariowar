@@ -20,6 +20,7 @@
 #include "FileIO.h"
 #include "FileList.h"
 #include "GameMode.h"
+#include "GameModeSettingsSerialization.h"
 #include "GameValues.h"
 #include "map.h"
 #include "MapList.h"
@@ -3645,15 +3646,15 @@ void AdjustBonuses(TourStop * ts)
 
 void SaveStage(short iEditStage)
 {
+	if (game_values.tourstops[iEditStage]->iMode >= 25 && game_values.tourstops[iEditStage]->iMode <= 27)
+		game_values.tourstops[iEditStage]->iMode += 975;
+
 	//Set the number of game mode settings to the maximum so we write them all out
 	game_values.tourstops[iEditStage]->fUseSettings = true;
-	game_values.tourstops[iEditStage]->iNumUsedSettings = g_iNumGameModeSettings[game_values.tourstops[iEditStage]->iMode];
+	game_values.tourstops[iEditStage]->iNumUsedSettings = serializeGMS(game_values.tourstops[iEditStage]->iMode, game_values.gamemodemenusettings).size();
 
 	//Copy the working values back into the structure that will be saved
 	memcpy(&game_values.tourstops[iEditStage]->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
-
-	if (game_values.tourstops[iEditStage]->iMode >= 25 && game_values.tourstops[iEditStage]->iMode <= 27)
-		game_values.tourstops[iEditStage]->iMode += 975;
 }
 
 void EditStage(short iEditStage)
