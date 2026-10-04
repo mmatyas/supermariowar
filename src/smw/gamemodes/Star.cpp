@@ -101,7 +101,7 @@ void CGM_Star::think()
 
     //Make sure there is a star player(s)
     if (iCurrentModeType == StarStyle::Multi) {
-        for (size_t iStar1 = 0; iStar1 + 1 <= players.size(); iStar1++) {
+        for (size_t iStar1 = 0; iStar1 + 1 < players.size(); iStar1++) {
             //If we're missing a star player, then reassign them all
             if (!starPlayer[iStar1]) {
                 CPlayer * players[4];
@@ -181,7 +181,7 @@ void CGM_Star::think()
         } else if (iCurrentModeType == StarStyle::Multi) {
             for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
                 bool fFound = false;
-                for (size_t iStar = 0; iStar + 1 <= players.size(); iStar++) {
+                for (size_t iStar = 0; iStar + 1 < players.size(); iStar++) {
                     if (starPlayer[iStar] == players[iPlayer]) {
                         fFound = true;
                         break;
