@@ -41,7 +41,8 @@ bool MO_FrenzyCard::collide(CPlayer* player)
 {
     if (type < 14 || type > 17 || game_values.gamemodesettings.frenzy.storedshells) {
         player->SetPowerup(type);
-        static_cast<CGM_Frenzy*>(game_values.gamemode)->setFrenzyOwner(player);
+        if (game_values.gamemode->gamemode == game_mode_frenzy)
+            static_cast<CGM_Frenzy*>(game_values.gamemode)->setFrenzyOwner(player);
     } else {
         switch (type) {
         case 14: {
