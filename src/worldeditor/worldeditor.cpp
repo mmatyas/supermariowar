@@ -4145,11 +4145,13 @@ int editor_stage()
 					}
 
 					//Scan vehicles and remove references to deleted stage
-					std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
-                    while (itrVehicle != limVehicle) {
+					std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin();
+                    while (itrVehicle != vehiclelist.end()) {
 						WorldVehicle * vehicle = *itrVehicle;
                         if (vehicle->iActionId == iEditStage) {
-							RemoveVehicleFromTile(vehicle->currentTile.x, vehicle->currentTile.y);
+							delete vehicle;
+							itrVehicle = vehiclelist.erase(itrVehicle);
+							continue;
                         } else if (vehicle->iActionId > iEditStage) {
 							vehicle->iActionId--;
 						}
