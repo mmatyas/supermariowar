@@ -322,12 +322,12 @@ short CGameMode::GetScoreRankedPlayerList(CPlayer * outPlayers[4], bool fGetHigh
         fNeedSwap = false;
         short iRandom = 0;
         for (short iIndex = 0; iIndex < iNumPlayersInList - 1; iIndex++) {
-            if ((fGetHighest && players[iIndex]->Score().score < players[iIndex + 1]->Score().score) ||
-                    (!fGetHighest && players[iIndex]->Score().score > players[iIndex + 1]->Score().score) ||
-                    (players[iIndex]->Score().score == players[iIndex + 1]->Score().score && RANDOM_BOOL() && iRandom++ < 5)) {
-                CPlayer * pTemp = players[iIndex];
-                players[iIndex] = players[iIndex + 1];
-                players[iIndex + 1] = pTemp;
+            if ((fGetHighest && outPlayers[iIndex]->Score().score < outPlayers[iIndex + 1]->Score().score) ||
+                    (!fGetHighest && outPlayers[iIndex]->Score().score > outPlayers[iIndex + 1]->Score().score) ||
+                    (outPlayers[iIndex]->Score().score == outPlayers[iIndex + 1]->Score().score && RANDOM_BOOL() && iRandom++ < 5)) {
+                CPlayer * pTemp = outPlayers[iIndex];
+                outPlayers[iIndex] = outPlayers[iIndex + 1];
+                outPlayers[iIndex + 1] = pTemp;
 
                 fNeedSwap = true;
             }
