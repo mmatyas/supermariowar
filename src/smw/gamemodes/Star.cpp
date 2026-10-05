@@ -25,7 +25,7 @@ CGM_Star::CGM_Star() : CGM_TimeLimit()
 {
     goal = 5;
     gamemode = game_mode_star;
-    SetupModeStrings("Star", "Lives", 1);
+    SetupModeStrings("Magic Bells", "Lives", 1);
     iCurrentModeType = StarStyle::Ztar;
 };
 
@@ -310,9 +310,9 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
         starItem[id]->setPlayerColor(starPlayer[id]->getColorID());
 
     if (starItem[id]->getType() == 1)
-        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, player->centerX(), player->bottomY(), iCurrentModeType == StarStyle::Multi ? "Star Get!" : "Shine Get!", -VELJUMP*1.5);
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, player->centerX(), player->bottomY(), iCurrentModeType == StarStyle::Multi ? "Bell Get!" : "Shiny!", -VELJUMP*1.5);
     else
-        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, player->centerX(), player->bottomY(), "Ztarred!", -VELJUMP*1.5);
+        eyecandy[2].emplace<EC_GravText>(&rm->game_font_large, player->centerX(), player->bottomY(), "Corrupted!", -VELJUMP*1.5);
 
     eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8);
     ifSoundOnPlay(rm->sfx_transform);

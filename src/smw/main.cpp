@@ -365,7 +365,7 @@ void main_game()
     //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
     char title[128];
     sprintf(title, "%s %s %s", TITLESTRING, GIT_REVISION, GIT_DATE);
-    gfx_settitle(title);
+    gfx_settitle(TITLESTRING);
     SDL_ShowCursor(SDL_DISABLE);
 
     printf("\n---------------- loading ----------------\n");

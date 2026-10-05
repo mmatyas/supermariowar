@@ -1,7 +1,7 @@
 #ifndef GAMEVALUES_H
 #define GAMEVALUES_H
 
-#define TITLESTRING "Super Mario War"
+#define TITLESTRING "Super Cat Wars"
 
 #include "EyecandyStyles.h"
 #include "GameModeSettings.h"
