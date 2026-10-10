@@ -60,8 +60,8 @@ jobs:
       - name: Download dependencies
         run: |
           mkdir libs
-          curl -L https://www.libsdl.org/release/SDL3-devel-3.4.10-VC.zip | tar -x --strip-components=1 -C libs
-          curl -L https://www.libsdl.org/projects/SDL_image/release/SDL3_image-devel-3.4.4-VC.zip | tar -x --strip-components=1 -C libs
+          curl -L https://www.libsdl.org/release/SDL3-devel-3.4.18-VC.zip | tar -x --strip-components=1 -C libs
+          curl -L https://www.libsdl.org/projects/SDL_image/release/SDL3_image-devel-3.4.8-VC.zip | tar -x --strip-components=1 -C libs
           curl -L https://www.libsdl.org/projects/SDL_mixer/release/SDL3_mixer-devel-3.2.4-VC.zip | tar -x --strip-components=1 -C libs
 
       - name: Configure
