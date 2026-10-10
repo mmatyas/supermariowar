@@ -88,19 +88,19 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 
 - C++20 supporting compiler
 - CMake
-- SDL 2 or SDL 3, with SDL_image and SDL_mixer
-  - for building with SDL 3, use the `sdl3` branch
+- SDL 3, with SDL_image and SDL_mixer
+  - in case you still want to use SDL 2, consider building the `sdl2` branch
 - zlib
 - toml11
 - ENet (optional)
 
 If you're using package managers, you can get them like this:
 
-- Debian-based: `apt install cmake libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev zlib1g-dev libtoml11-dev libenet-dev`
-- Fedora/RPM: `yum install cmake SDL2-devel SDL2_image-devel SDL2_mixer-devel zlib-devel toml11-devel enet-devel`
-- Arch: `pacman -S cmake sdl2 sdl2_image sdl2_mixer zlib toml11 enet`
+- Debian-based: `apt install cmake libsdl3-dev libsdl3-image-dev libsdl3-mixer-dev zlib1g-dev libtoml11-dev libenet-dev`
+- Fedora/RPM: `yum install cmake SDL3-devel SDL3_image-devel SDL3_mixer-devel zlib-devel toml11-devel enet-devel`
+- Arch: `pacman -S cmake sdl3 sdl3_image sdl3_mixer zlib toml11 enet`
 
-For all dependencies, you can choose to use a bundled version of them. This is useful if the dependencies are not available for your OS, are outdated, or you simply don't want to install them on your system. In this case, you can tell CMake to download and build the library along with the game come. Please see the [Build configuration](#build-configuration) for enabling this feature.
+If a dependency is not available on your system, CMake will automatically try to download and build it.
 
 ### Get the code
 

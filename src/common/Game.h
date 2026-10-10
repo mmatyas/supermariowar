@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string_view>
 
 /// Creates the user-writable settings directory, if it doesn't exist yet.
 void ensureSettingsDir();
@@ -10,4 +11,6 @@ public:
     static constexpr int screenWidth = 640;
     static constexpr int screenHeight = 480;
     static constexpr int menuTransparency = 72;
+
+    static void registerSdlMetadata(std::string_view app_title);
 };

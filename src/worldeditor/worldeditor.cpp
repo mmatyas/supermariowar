@@ -51,7 +51,8 @@
 #include "objects/moving/MO_Coin.h"
 #include "objects/overmap/WO_Area.h"
 
-#include "SDL_image.h"
+#include <SDL3/SDL_main.h>
+#include <SDL3_image/SDL_image.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -230,7 +231,7 @@ extern std::string RootDataDirectory;
 
 gfxSprite		spr_overlay, spr_overlayhole;
 
-void SDLCALL musicfinished(){}
+void SDLCALL musicfinished(void*, MIX_Track* rawptr){}
 
 CEyecandyContainer eyecandy[3];
 gfxSprite		spr_frontmap[2];
@@ -309,8 +310,8 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 void updateworldsurface();
 void takescreenshot();
 
-bool CheckKey(const Uint8 * keystate, SDL_Keycode key) {
-    return keystate[SDL_GetScancodeFromKey(key)];
+bool CheckKey(const bool* keystate, SDL_Keycode key) {
+    return keystate[SDL_GetScancodeFromKey(key, nullptr)];
 }
 
 bool ignoreclick = false;
@@ -470,17 +471,19 @@ int main(int argc, char *argv[])
 
 void inner_main()
 {
+    printf("-------------------------------------------------------------------------------\n");
+    printf(" %s %s\n", TITLESTRING, MAPTITLESTRING);
+    printf("-------------------------------------------------------------------------------\n");
+    printf("\n---------------- startup ----------------\n");
+
+    App::registerSdlMetadata(TITLESTRING);
+
     ensureSettingsDir();
 
     /* This must occur before any data files are loaded */
     Initialize_Paths();
 
 	bool done;
-
-	printf("-------------------------------------------------------------------------------\n");
-	printf(" %s %s\n", TITLESTRING, MAPTITLESTRING);
-	printf("-------------------------------------------------------------------------------\n");
-	printf("\n---------------- startup ----------------\n");
 
     int saved_col = 0, saved_row = 0;
     {
@@ -1087,21 +1090,21 @@ int editor_edit()
 			//handle messages
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
-                case SDL_KEYDOWN: {
-                    const SDL_Keycode key = event.key.keysym.sym;
+                case SDL_EVENT_KEY_DOWN: {
+                    const SDL_Keycode key = event.key.key;
 
                     if (key == SDLK_LEFT) {
 							fSelectedYes = true;
                     } else if (key == SDLK_RIGHT) {
 							fSelectedYes = false;
-                    } else if (event.key.keysym.sym == SDLK_KP_ENTER || event.key.keysym.sym == SDLK_RETURN) {
+                    } else if (event.key.key == SDLK_KP_ENTER || event.key.key == SDLK_RETURN) {
 							if (fSelectedYes)
 								return EDITOR_QUIT;
 
 							fExiting = false;
 						}
 #ifdef _DEBUG
-                    else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                    else if (event.key.key == SDLK_ESCAPE) {
 							return EDITOR_QUIT;
 						}
 #endif
@@ -1112,14 +1115,14 @@ int editor_edit()
 			//handle messages
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
-                case SDL_QUIT: {
+                case SDL_EVENT_QUIT: {
 						done = true;
 						break;
 					}
 
-                case SDL_KEYDOWN: {
-                    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
-                    if (event.key.keysym.sym == SDLK_ESCAPE) {
+                case SDL_EVENT_KEY_DOWN: {
+                    const bool* keystate = SDL_GetKeyboardState(NULL);
+                    if (event.key.key == SDLK_ESCAPE) {
 							if (g_musiccategorydisplaytimer > 0)
 								g_musiccategorydisplaytimer = 0;
                         else if (edit_mode != 0) {
@@ -1131,48 +1134,48 @@ int editor_edit()
 							}
 						}
 
-                    if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
-                        if (event.key.keysym.sym == SDLK_RETURN) {
+                    if (event.key.mod & (SDL_KMOD_LALT | SDL_KMOD_RALT)) {
+                        if (event.key.key == SDLK_RETURN) {
 								g_fFullScreen = !g_fFullScreen;
 								gfx_changefullscreen(g_fFullScreen);
 								blitdest = screen;
 							}
 						}
 
-						if (event.key.keysym.sym == SDLK_INSERT)
+						if (event.key.key == SDLK_INSERT)
 							takescreenshot();
 
-						if (event.key.keysym.sym == SDLK_1)
+						if (event.key.key == SDLK_1)
 							return EDITOR_WATER;
 
-						if (event.key.keysym.sym == SDLK_2)
+						if (event.key.key == SDLK_2)
 							return EDITOR_BACKGROUND;
 
-						if (event.key.keysym.sym == SDLK_3)
+						if (event.key.key == SDLK_3)
 							return EDITOR_STAGEFOREGROUND;
 
-						if (event.key.keysym.sym == SDLK_4)
+						if (event.key.key == SDLK_4)
 							return EDITOR_PATHSPRITE;
 
-						if (event.key.keysym.sym == SDLK_5)
+						if (event.key.key == SDLK_5)
 							return EDITOR_STRUCTUREFOREGROUND;
 
-						if (event.key.keysym.sym == SDLK_6)
+						if (event.key.key == SDLK_6)
 							return EDITOR_BRIDGES;
 
-						if (event.key.keysym.sym == SDLK_t)
+						if (event.key.key == SDLK_T)
 							return EDITOR_TYPE;
 
-						if (event.key.keysym.sym == SDLK_e)
+						if (event.key.key == SDLK_E)
 							return EDITOR_STAGE;
 
-						if (event.key.keysym.sym == SDLK_p)
+						if (event.key.key == SDLK_P)
 							return EDITOR_PATH;
 
-						if (event.key.keysym.sym == SDLK_v)
+						if (event.key.key == SDLK_V)
 							return EDITOR_VEHICLES;
 
-                    if (event.key.keysym.sym == SDLK_SPACE) {
+                    if (event.key.key == SDLK_SPACE) {
 							g_fShowStagePreviews = !g_fShowStagePreviews;
 							if (g_fShowStagePreviews)
 								SetDisplayMessage(60, "Stage Previews", "Preview popups", "have been", "enabled.");
@@ -1180,7 +1183,7 @@ int editor_edit()
 								SetDisplayMessage(60, "Stage Previews", "Preview popups", "have been", "disabled.");
 						}
 
-                    if (edit_mode == 5 && event.key.keysym.sym == SDLK_c) {
+                    if (edit_mode == 5 && event.key.key == SDLK_C) {
 							short iButtonX = mouse_x - draw_offset_x;
 							short iButtonY = mouse_y - draw_offset_y;
 							short iCol = iButtonX / TILESIZE + draw_offset_col;
@@ -1213,53 +1216,53 @@ int editor_edit()
 							}
 						}
 
-						if (event.key.keysym.sym == SDLK_w)
+						if (event.key.key == SDLK_W)
 							return EDITOR_WARP;
 
-						if (event.key.keysym.sym == SDLK_i)
+						if (event.key.key == SDLK_I)
 							return EDITOR_START_ITEMS;
 
-						if (event.key.keysym.sym == SDLK_b)
+						if (event.key.key == SDLK_B)
 							return EDITOR_BOUNDARY;
 
-						if (event.key.keysym.sym == SDLK_a)
+						if (event.key.key == SDLK_A)
 							fAutoPaint = !fAutoPaint;
 
-                    if (event.key.keysym.sym == SDLK_r) {
+                    if (event.key.key == SDLK_R) {
 							if (g_musiccategorydisplaytimer > 0)
 								g_worldmap.iMusicCategory++;
 
 							g_musiccategorydisplaytimer = 90;
 						}
 
-                    if (event.key.keysym.sym == SDLK_s) {
+                    if (event.key.key == SDLK_S) {
 							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT))
 								return SAVE_AS;
 
 							return SAVE;
 						}
 
-                    if (event.key.keysym.sym == SDLK_f) {
+                    if (event.key.key == SDLK_F) {
 							if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT) || findstring.empty())
 								return FIND;
 
 							findcurrentstring();
 						}
 
-                    if (event.key.keysym.sym == SDLK_DELETE && (CheckKey(keystate, SDLK_LCTRL) || CheckKey(keystate, SDLK_RCTRL))) {
+                    if (event.key.key == SDLK_DELETE && (CheckKey(keystate, SDLK_LCTRL) || CheckKey(keystate, SDLK_RCTRL))) {
 							return CLEAR_WORLD;
 						}
 
-						if (event.key.keysym.sym == SDLK_n)
+						if (event.key.key == SDLK_N)
 							return NEW_WORLD;
 
-						if (event.key.keysym.sym == SDLK_k)
+						if (event.key.key == SDLK_K)
 							return RESIZE_WORLD;
 
-						if (event.key.keysym.sym == SDLK_h || event.key.keysym.sym == SDLK_F1)
+						if (event.key.key == SDLK_H || event.key.key == SDLK_F1)
 							return DISPLAY_HELP;
 
-                    if (event.key.keysym.sym == SDLK_UP) {
+                    if (event.key.key == SDLK_UP) {
                         if (draw_offset_row > 0) {
 								draw_offset_row--;
 								updateworldsurface();
@@ -1269,7 +1272,7 @@ int editor_edit()
 
 								iStageDisplay = -1;
 							}
-                    } else if (event.key.keysym.sym == SDLK_DOWN) {
+                    } else if (event.key.key == SDLK_DOWN) {
                         if (draw_offset_row < iWorldHeight - 15) {
 								draw_offset_row++;
 								updateworldsurface();
@@ -1279,7 +1282,7 @@ int editor_edit()
 
 								iStageDisplay = -1;
 							}
-                    } else if (event.key.keysym.sym == SDLK_LEFT) {
+                    } else if (event.key.key == SDLK_LEFT) {
                         if (draw_offset_col > 0) {
 								draw_offset_col--;
 								updateworldsurface();
@@ -1289,7 +1292,7 @@ int editor_edit()
 
 								iStageDisplay = -1;
 							}
-                    } else if (event.key.keysym.sym == SDLK_RIGHT) {
+                    } else if (event.key.key == SDLK_RIGHT) {
                         if (draw_offset_col < iWorldWidth - 20) {
 								draw_offset_col++;
 								updateworldsurface();
@@ -1301,7 +1304,7 @@ int editor_edit()
 							}
 						}
 
-                    if (event.key.keysym.sym == SDLK_PAGEUP) {
+                    if (event.key.key == SDLK_PAGEUP) {
 							if (--game_values.worldindex < 0)
                             game_values.worldindex = worldlist->count() - 1;
 
@@ -1312,7 +1315,7 @@ int editor_edit()
 							iOldStageId = -1;
 						}
 
-                    if (event.key.keysym.sym == SDLK_PAGEDOWN) {
+                    if (event.key.key == SDLK_PAGEDOWN) {
                         if (++game_values.worldindex >= worldlist->count())
 								game_values.worldindex = 0;
 
@@ -1326,9 +1329,9 @@ int editor_edit()
 						break;
 					}
 
-                case SDL_KEYUP: {
-						if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN ||
-                            event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_RIGHT) {
+                case SDL_EVENT_KEY_UP: {
+						if (event.key.key == SDLK_UP || event.key.key == SDLK_DOWN ||
+                            event.key.key == SDLK_LEFT || event.key.key == SDLK_RIGHT) {
 							view_repeat_direction = -1;
 							view_repeat_timer = 0;
 						}
@@ -1336,7 +1339,7 @@ int editor_edit()
 						break;
 					}
 
-                case SDL_MOUSEBUTTONDOWN: {
+                case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 						short iButtonX = bound_to_window_w(event.button.x) - draw_offset_x;
 						short iButtonY = bound_to_window_h(event.button.y) - draw_offset_y;
 						short iCol = iButtonX / TILESIZE + draw_offset_col;
@@ -1514,7 +1517,7 @@ int editor_edit()
 						break;
 					}
 					//Painting tiles with mouse movement
-                case SDL_MOUSEMOTION: {
+                case SDL_EVENT_MOUSE_MOTION: {
 						bound_mouse_motion_coords();
 						short iButtonX = bound_to_window_w(event.motion.x) - draw_offset_x;
 						short iButtonY = bound_to_window_h(event.motion.y) - draw_offset_y;
@@ -1522,7 +1525,7 @@ int editor_edit()
 						short iRow = (iButtonY >> 5) + draw_offset_row;
 
                     if (iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE) {
-                        if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick) {
+                        if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT) && !ignoreclick) {
                             if (edit_mode == 0) { //selected background
                                 if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile || fAutoPaint) {
 										bool fNeedUpdate = false;
@@ -1606,7 +1609,7 @@ int editor_edit()
 
 									g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
 								}
-                        } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+                        } else if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) {
                             if (edit_mode == 0) { //selected background
                                 if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != 0 || fAutoPaint) {
 										bool fNeedUpdate = false;
@@ -1708,7 +1711,7 @@ int editor_edit()
 						break;
 					}
 
-                case SDL_MOUSEBUTTONUP: {
+                case SDL_EVENT_MOUSE_BUTTON_UP: {
                     if (event.button.button == SDL_BUTTON_LEFT) {
 							ignoreclick = false;
 						}
@@ -1789,7 +1792,7 @@ int editor_edit()
 					itr++;
 				}
             } else if (edit_mode == 8) { //draw boundaries
-				int color = SDL_MapRGB(blitdest->format, 255, 0, 255);
+				int color = SDL_MapSurfaceRGB(blitdest, 255, 0, 255);
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
 						short iBoundary = g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary - 1;
@@ -1798,14 +1801,14 @@ int editor_edit()
 							short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
 							short iy = (iRow - draw_offset_row) * TILESIZE + draw_offset_y;
 							SDL_Rect r = {ix, iy, 32, 32};
-							SDL_FillRect(blitdest, &r, color);
+							SDL_FillSurfaceRect(blitdest, &r, color);
 
 							rm->spr_worldforegroundspecial[0].draw(ix, iy, {(iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32});
 						}
 					}
 				}
             } else if (edit_mode == 9) { //draw stages
-				int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
+				int color = SDL_MapSurfaceRGB(blitdest, 0, 0, 255);
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
 						short iType = g_worldmap.tiles.at(iCol, iRow).iType - 6;
@@ -1814,7 +1817,7 @@ int editor_edit()
 							short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
 							short iy = (iRow - draw_offset_row) * TILESIZE + draw_offset_y;
 							SDL_Rect r = {ix, iy, 32, 32};
-							SDL_FillRect(blitdest, &r, color);
+							SDL_FillSurfaceRect(blitdest, &r, color);
 
 							rm->spr_worldforegroundspecial[0].draw(ix, iy, {(iType % 10) << 5, (iType / 10) << 5, 32, 32});
 						}
@@ -1828,7 +1831,7 @@ int editor_edit()
 
             if (edit_mode == 5 || edit_mode == 8) { //draw vehicles
 				std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-				int color = SDL_MapRGB(blitdest->format, 0, 0, 128);
+				int color = SDL_MapSurfaceRGB(blitdest, 0, 0, 128);
                 while (itr != lim) {
 					WorldVehicle * vehicle = *itr;
 
@@ -1836,7 +1839,7 @@ int editor_edit()
 					short iy = (vehicle->currentTile.y - draw_offset_row) * TILESIZE + draw_offset_y;
 
 					SDL_Rect r = {ix, iy, 32, 32};
-					SDL_FillRect(blitdest, &r, color);
+					SDL_FillSurfaceRect(blitdest, &r, color);
 
 					rm->spr_worldvehicle[0].draw(ix, iy, {vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32});
 
@@ -2467,7 +2470,7 @@ void updateworldsurface()
 void drawmap(bool fScreenshot, short iBlockSize)
 {
 	if (fNeedBlackBackground)
-		SDL_FillRect(screen, NULL, 0x0);
+		SDL_FillSurfaceRect(screen, NULL, 0x0);
 
 	sMapSurface.draw(rectSrcSurface, blitdest, rectDstSurface);
 }
@@ -2482,17 +2485,17 @@ int editor_warp()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					edit_mode = 6;  //change to edit mode using warps
 					return EDITOR_EDIT;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 					short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 					short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
@@ -2580,16 +2583,16 @@ int editor_start_items()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					return EDITOR_EDIT;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 					short iButtonX = bound_to_window_w(event.button.x);
 					short iButtonY = bound_to_window_h(event.button.y);
 
@@ -2678,17 +2681,17 @@ int editor_boundary()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					edit_mode = 8;  //change to edit mode using warps
 					return EDITOR_EDIT;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 					short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 					short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
 
@@ -2717,9 +2720,9 @@ int editor_boundary()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
-		int color = SDL_MapRGB(blitdest->format, 255, 0, 255);
+		int color = SDL_MapSurfaceRGB(blitdest, 255, 0, 255);
 		SDL_Rect r = {0, 0, 320, 320};
-		SDL_FillRect(blitdest, &r, color);
+		SDL_FillSurfaceRect(blitdest, &r, color);
 
 		rm->spr_worldforegroundspecial[0].draw(0, 0, {0, 0, 320, 320});
 
@@ -2750,19 +2753,19 @@ int editor_type()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					edit_mode = 3;  //change to edit mode using doors/start
 					return EDITOR_EDIT;
 
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
@@ -2824,17 +2827,17 @@ int editor_water()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					edit_mode = 7;
 					return EDITOR_EDIT;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
@@ -2858,7 +2861,7 @@ int editor_water()
 			}
 		}
 
-		SDL_FillRect(screen, NULL, 0x0);
+		SDL_FillSurfaceRect(screen, NULL, 0x0);
 
 		for (short iWater = 0; iWater < 3; iWater++)
 			rm->spr_worldbackground[0].draw(iWater << 5, 0, {512 + (iWater << 7), 0, 32, 32});
@@ -2889,13 +2892,13 @@ int editor_background()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
-                const SDL_Keycode key = event.key.keysym.sym;
+            case SDL_EVENT_KEY_DOWN: {
+                const SDL_Keycode key = event.key.key;
                 if (key >= SDLK_1 && key <= SDLK_2) {
 						iPage = key - SDLK_1;
                 } else {
@@ -2906,7 +2909,7 @@ int editor_background()
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
@@ -2948,7 +2951,7 @@ int editor_background()
 			}
 		}
 
-		SDL_FillRect(screen, NULL, 0x0);
+		SDL_FillSurfaceRect(screen, NULL, 0x0);
 
 		rm->spr_worldbackground[0].draw(0, 0, {iPage * 640, 32, 640, 480});
 
@@ -2978,13 +2981,13 @@ int editor_stageforeground()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
-                const SDL_Keycode key = event.key.keysym.sym;
+            case SDL_EVENT_KEY_DOWN: {
+                const SDL_Keycode key = event.key.key;
 
                 if (key >= SDLK_1 && key <= SDLK_4) {
 						iForegroundScreen = key - SDLK_1;
@@ -2996,7 +2999,7 @@ int editor_stageforeground()
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
@@ -3020,7 +3023,7 @@ int editor_stageforeground()
 			}
 		}
 
-		SDL_FillRect(screen, NULL, 0x0);
+		SDL_FillSurfaceRect(screen, NULL, 0x0);
 
         for (short iRow = 0; iRow < 10; iRow++) {
             for (short iCol = 0; iCol < 10; iCol++) {
@@ -3055,19 +3058,19 @@ int editor_bridges()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					edit_mode = 1;
 					return EDITOR_EDIT;
 
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
@@ -3091,7 +3094,7 @@ int editor_bridges()
 			}
 		}
 
-		SDL_FillRect(screen, NULL, 0x0);
+		SDL_FillSurfaceRect(screen, NULL, 0x0);
 
 		rm->spr_worldforegroundspecial[0].draw(0, 0, {320, 224, 128, 32});
 
@@ -3120,19 +3123,19 @@ int editor_structureforeground()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					edit_mode = 1;
 					return EDITOR_EDIT;
 
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
@@ -3162,7 +3165,7 @@ int editor_structureforeground()
 			}
 		}
 
-		SDL_FillRect(screen, NULL, 0x0);
+		SDL_FillSurfaceRect(screen, NULL, 0x0);
 
 		rm->spr_worldforeground[0].draw(0, 0, {0, 0, 416, 480});
 		rm->spr_worldforeground[0].draw(416, 0, {512, 0, 32, 480});
@@ -3192,17 +3195,17 @@ int editor_pathsprite()
         //handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					edit_mode = 4;
 					return EDITOR_EDIT;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
@@ -3225,7 +3228,7 @@ int editor_pathsprite()
 			}
 		}
 
-		SDL_FillRect(screen, NULL, 0x0);
+		SDL_FillSurfaceRect(screen, NULL, 0x0);
 
         for (short iPath = 0; iPath < 8; iPath++) {
 			rm->spr_worldpaths[0].draw(iPath << 5, 0, {(iPath % 4) * 160, (iPath / 4) * 320, 32, 192});
@@ -3284,14 +3287,14 @@ int editor_vehicles()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					edit_mode = 5;
 					game_values.playerInput.ResetKeys();
 					return EDITOR_EDIT;
 				}
 
-            case SDL_KEYDOWN: {
-                if (event.key.keysym.sym == SDLK_v) {
+            case SDL_EVENT_KEY_DOWN: {
+                if (event.key.key == SDLK_V) {
                     if (!mCurrentMenu->IsModifying()) {
 							edit_mode = 5;
 							game_values.playerInput.ResetKeys();
@@ -3302,7 +3305,7 @@ int editor_vehicles()
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 					short iButtonX = bound_to_window_w(event.button.x);
 					short iButtonY = bound_to_window_h(event.button.y);
 
@@ -3378,17 +3381,17 @@ int editor_path()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					edit_mode = 2;
 					return EDITOR_EDIT;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						short iButtonX = bound_to_window_w(event.button.x) / TILESIZE;
 						short iButtonY = bound_to_window_h(event.button.y) / TILESIZE;
@@ -3410,7 +3413,7 @@ int editor_path()
 			}
 		}
 
-		SDL_FillRect(screen, NULL, 0x0);
+		SDL_FillSurfaceRect(screen, NULL, 0x0);
 		spr_path.draw(0, 0, {0, 0, 480, 32});
 
 		DrawMessage();
@@ -3866,19 +3869,19 @@ int editor_stage()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
+            case SDL_EVENT_QUIT: {
 					done = true;
 					break;
 				}
 
-            case SDL_KEYDOWN: {
+            case SDL_EVENT_KEY_DOWN: {
 					//Do not allow saving world by pressing 's' key
 					//World data structures are not in the correct state to be saved
 					//until exiting the stage editor menu in (MENU_CODE_EXIT_APPLICATION == code) below
 
-                if (iEditStage == -1 && event.key.keysym.sym == SDLK_n) {
+                if (iEditStage == -1 && event.key.key == SDLK_N) {
 						NewStage(&iEditStage);
-                } else if ((event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_e) && iEditStage == -1) {
+                } else if ((event.key.key == SDLK_ESCAPE || event.key.key == SDLK_E) && iEditStage == -1) {
                     if (g_worldmap.iNumStages == 0) {
 							edit_mode = 1;
                     } else if (set_tile < 6 || set_tile >= g_worldmap.iNumStages + 6) {
@@ -3889,21 +3892,21 @@ int editor_stage()
 						}
 
 						return EDITOR_EDIT;
-                } else if (mCurrentMenu == &mBonusItemPicker && event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_4) {
+                } else if (mCurrentMenu == &mBonusItemPicker && event.key.key >= SDLK_1 && event.key.key <= SDLK_4) {
 						TourStop * ts = game_values.tourstops[iEditStage];
                     if (ts->iStageType == 0) {
-							short iPlace = event.key.keysym.sym - SDLK_1 + 1;
+							short iPlace = event.key.key - SDLK_1 + 1;
 
 							TestAndSetBonusItem(ts, iPlace, mouse_x, mouse_y);
 						}
-                } else if ((event.key.keysym.sym == SDLK_PAGEUP && iEditStage > 0) ||
-                          (event.key.keysym.sym == SDLK_PAGEDOWN && iEditStage < g_worldmap.iNumStages - 1)) {
+                } else if ((event.key.key == SDLK_PAGEUP && iEditStage > 0) ||
+                          (event.key.key == SDLK_PAGEDOWN && iEditStage < g_worldmap.iNumStages - 1)) {
                     if (iEditStage != -1 && mCurrentMenu == &mStageSettingsMenu) {
 							SaveStage(iEditStage);
 
-							if (event.key.keysym.sym == SDLK_PAGEUP)
+							if (event.key.key == SDLK_PAGEUP)
 								iEditStage--;
-							else if (event.key.keysym.sym == SDLK_PAGEDOWN)
+							else if (event.key.key == SDLK_PAGEDOWN)
 								iEditStage++;
 
 							EditStage(iEditStage);
@@ -3918,7 +3921,7 @@ int editor_stage()
 					break;
 				}
 
-            case SDL_MOUSEBUTTONDOWN: {
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 					short iTileX = bound_to_window_w(event.button.x) / TILESIZE;
 					short iTileY = bound_to_window_h(event.button.y) / TILESIZE;
 					short iButtonX = bound_to_window_w(event.button.x);
@@ -3986,7 +3989,7 @@ int editor_stage()
 					break;
 				}
 
-            case SDL_MOUSEMOTION: {
+            case SDL_EVENT_MOUSE_MOTION: {
 					bound_mouse_motion_coords();
 					iStageDisplay = -1;
 
@@ -4190,7 +4193,7 @@ int editor_stage()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
-		int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
+		int color = SDL_MapSurfaceRGB(blitdest, 0, 0, 255);
 
         if (iEditStage == -1) {
             for (short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
@@ -4198,7 +4201,7 @@ int editor_stage()
 				short iy = ((iStage / 20) << 5);
 
 				SDL_Rect r = {ix, iy, 32, 32};
-				SDL_FillRect(blitdest, &r, color);
+				SDL_FillSurfaceRect(blitdest, &r, color);
 
 				rm->spr_worldforegroundspecial[0].draw(ix, iy, {(iStage % 10) << 5, (iStage / 10) << 5, 32, 32});
 			}
@@ -4224,7 +4227,7 @@ int editor_stage()
 				short iy = 20;
 
 				SDL_Rect r = {ix, iy, 32, 32};
-				SDL_FillRect(blitdest, &r, color);
+				SDL_FillSurfaceRect(blitdest, &r, color);
 
 				rm->spr_worldforegroundspecial[0].draw(ix, iy, {(iEditStage % 10) << 5, (iEditStage / 10) << 5, 32, 32});
 			}
@@ -4412,11 +4415,11 @@ int display_help()
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					return 0;
 				break;
 
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					return 0;
 				break;
 
@@ -4471,17 +4474,17 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					return false;
 				break;
 
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 
-                if (event.key.keysym.sym == SDLK_KP_ENTER || event.key.keysym.sym == SDLK_RETURN) {
+                if (event.key.key == SDLK_KP_ENTER || event.key.key == SDLK_RETURN) {
 						return true;
-                } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                } else if (event.key.key == SDLK_ESCAPE) {
 						return false;
-                } else if (event.key.keysym.sym == SDLK_BACKSPACE) {
+                } else if (event.key.key == SDLK_BACKSPACE) {
                     if (currentChar > 0) {
 							input[currentChar-1] = '\0';
 
@@ -4499,37 +4502,37 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
                 } else {
 
 						/* I realize the if statement below is long and can be substituted with
-						the function isalnum(event.key.keysym.sym) but I did it this way because
+						the function isalnum(event.key.key) but I did it this way because
 						isalnum acts funny (ie wrong) when the number pad is pressed. */
-                    if ((isdigit(event.key.keysym.sym) || event.key.keysym.sym == 45 || event.key.keysym.sym == 32 || event.key.keysym.sym == 61 || (event.key.keysym.sym >= 95 && event.key.keysym.sym <= 122)) && currentChar < (unsigned)inputsize - 1) {
+                    if ((isdigit(event.key.key) || event.key.key == 45 || event.key.key == 32 || event.key.key == 61 || (event.key.key >= 95 && event.key.key <= 122)) && currentChar < (unsigned)inputsize - 1) {
 							//insert character into fileName and onScreenText and increment current char
-							Uint8 key = event.key.keysym.sym;
+							Uint8 key = event.key.key;
 
-                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                        const bool* keystate = SDL_GetKeyboardState(NULL);
                         if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
-								if (event.key.keysym.sym == 45)
+								if (event.key.key == 45)
 									key = 95;
-								else if (event.key.keysym.sym >= 95 && event.key.keysym.sym <= 122)
+								else if (event.key.key >= 95 && event.key.key <= 122)
 									key-= 32;  //Capitalize
-								else if (event.key.keysym.sym == 48)
+								else if (event.key.key == 48)
 									key = 41;
-								else if (event.key.keysym.sym == 49)
+								else if (event.key.key == 49)
 									key = 33;
-								else if (event.key.keysym.sym == 50)
+								else if (event.key.key == 50)
 									key = 64;
-								else if (event.key.keysym.sym == 51)
+								else if (event.key.key == 51)
 									key = 35;
-								else if (event.key.keysym.sym == 52)
+								else if (event.key.key == 52)
 									key = 36;
-								else if (event.key.keysym.sym == 53)
+								else if (event.key.key == 53)
 									key = 37;
-								else if (event.key.keysym.sym == 54)
+								else if (event.key.key == 54)
 									key = 94;
-								else if (event.key.keysym.sym == 55)
+								else if (event.key.key == 55)
 									key = 38;
-								else if (event.key.keysym.sym == 57)
+								else if (event.key.key == 57)
 									key = 40;
-								else if (event.key.keysym.sym == 61)
+								else if (event.key.key == 61)
 									key = 43;
 							}
 

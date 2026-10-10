@@ -1,19 +1,12 @@
 #include "path.h"
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 #include <array>
 #include <cassert>
 #include <cstring>
 #include <string>
 #include <sys/stat.h>
-
-#ifdef _WIN32
-#include <shlobj.h>
-#include "SDL_platform.h"
-#else
-#include <stdlib.h>
-#endif
 
 namespace fs = std::filesystem;
 
@@ -30,13 +23,6 @@ std::string GetHomeDirectory()
     char* folder = getenv("HOME");
     if (folder)
         result = std::string(folder) + result;
-    return result;
-
-#elif _WIN32
-    std::string result(".smw/");
-    char folder[MAX_PATH];
-    if (SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, folder) == S_OK)
-        result = std::string(folder) + "/" + result;
     return result;
 
 #elif ANDROID
@@ -60,9 +46,8 @@ std::string GetRootDirectory()
 #if !defined(_WIN32)
     // TODO: SDL_GetBasePath returns an UTF-8 string, which needs
     // some special treatment on Windows to work
-    if (char* sdl_path = SDL_GetBasePath()) {
+    if (const char* sdl_path = SDL_GetBasePath()) {
         std::string result = sdl_path;
-        SDL_free(sdl_path);
         return result;
     }
 #endif
