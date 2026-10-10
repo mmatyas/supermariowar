@@ -22,7 +22,7 @@ endif()
 smw_declare_gitrepo(
     SDL3
     https://github.com/libsdl-org/SDL.git
-    release-3.4.8
+    release-3.4.18
 )
 
 # SDL_image
@@ -47,7 +47,7 @@ set(SDLIMAGE_XV OFF CACHE BOOL "")
 FetchContent_Declare(
     SDL3_image
     GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
-    GIT_TAG release-3.4.4
+    GIT_TAG release-3.4.8
     GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE
     GIT_SUBMODULES "external/libpng" "external/zlib"
@@ -73,7 +73,7 @@ endif()
 smw_declare_gitrepo(
     SDL3_mixer
     https://github.com/libsdl-org/SDL_mixer.git
-    release-3.2.2
+    release-3.2.4
 )
 
 
