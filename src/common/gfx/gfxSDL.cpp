@@ -34,7 +34,7 @@ void initSdl()
         SDL_VERSIONNUM_MICRO(sdl_version));
 
     const auto sdlimg_version = IMG_Version();
-    printf("[init] SDL_image %d.%d.%d loaded.\n",
+    printf("[gfx] SDL_image %d.%d.%d loaded.\n",
         SDL_VERSIONNUM_MAJOR(sdlimg_version),
         SDL_VERSIONNUM_MINOR(sdlimg_version),
         SDL_VERSIONNUM_MICRO(sdlimg_version));
