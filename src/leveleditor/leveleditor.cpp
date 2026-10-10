@@ -250,7 +250,7 @@ bool ReadAnimatedTileTypeFile(const char * szFile);
 bool WriteAnimatedTileTypeFile(const char * szFile);
 
 bool CheckKey(const bool* keystate, SDL_Keycode key) {
-    return false; //keystate[SDL_GetScancodeFromKey(key)];
+    return keystate[SDL_GetScancodeFromKey(key, nullptr)];
 }
 
 gfxSprite s_platform;

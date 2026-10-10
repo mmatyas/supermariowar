@@ -311,7 +311,7 @@ void updateworldsurface();
 void takescreenshot();
 
 bool CheckKey(const bool* keystate, SDL_Keycode key) {
-    return false; //return keystate[SDL_GetScancodeFromKey(key)];
+    return keystate[SDL_GetScancodeFromKey(key, nullptr)];
 }
 
 bool ignoreclick = false;
