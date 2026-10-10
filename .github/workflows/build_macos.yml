@@ -9,7 +9,7 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Install dependencies
-        run: brew install SDL2 SDL2_image SDL2_mixer
+        run: brew install SDL3 SDL3_image SDL3_mixer
 
       - name: Configure
         run: cmake
