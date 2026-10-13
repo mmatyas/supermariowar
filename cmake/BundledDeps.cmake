@@ -19,6 +19,12 @@ endfunction()
 if(NOT EMSCRIPTEN)
     set(SDL_STATIC OFF CACHE BOOL "")
 endif()
+set(SDL_TEST_LIBRARY OFF CACHE BOOL "")
+set(SDL_CAMERA OFF CACHE BOOL "")
+set(SDL_POWER OFF CACHE BOOL "")
+set(SDL_SENSOR OFF CACHE BOOL "")
+set(SDL_TRAY OFF CACHE BOOL "")
+set(SDL_NOTIFICATION OFF CACHE BOOL "")
 smw_declare_gitrepo(
     SDL3
     https://github.com/libsdl-org/SDL.git
