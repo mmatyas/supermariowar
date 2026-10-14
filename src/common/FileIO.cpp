@@ -83,27 +83,13 @@ void BinaryFile::write_u8(uint8_t value)
 
 void BinaryFile::write_i16(int16_t value)
 {
-#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    int16_t tmp = value;
-
-    ((char*)&value)[0] = ((char*)&tmp)[1];
-    ((char*)&value)[1] = ((char*)&tmp)[0];
-#endif
-
+    value = SDL_Swap16LE(value);
     fwrite_or_exception(&value, sizeof(int16_t), 1);
 }
 
 void BinaryFile::write_i32(int32_t value)
 {
-#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    int32_t tmp = value;
-
-    ((char*)&value)[0] = ((char*)&tmp)[3];
-    ((char*)&value)[1] = ((char*)&tmp)[2];
-    ((char*)&value)[2] = ((char*)&tmp)[1];
-    ((char*)&value)[3] = ((char*)&tmp)[0];
-#endif
-
+    value = SDL_Swap32LE(value);
     fwrite_or_exception(&value, sizeof(int32_t), 1);
 }
 
@@ -114,15 +100,7 @@ void BinaryFile::write_bool(bool value)
 
 void BinaryFile::write_float(float value)
 {
-#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    float tmp = value;
-
-    ((char*)&value)[0] = ((char*)&tmp)[3];
-    ((char*)&value)[1] = ((char*)&tmp)[2];
-    ((char*)&value)[2] = ((char*)&tmp)[1];
-    ((char*)&value)[3] = ((char*)&tmp)[0];
-#endif
-
+    value = SDL_SwapFloatLE(value);
     fwrite_or_exception(&value, sizeof(float), 1);
 }
 
@@ -171,15 +149,7 @@ int16_t BinaryFile::read_i16()
 {
     int16_t in;
     fread_or_exception(&in, sizeof(int16_t), 1);
-
-#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    int16_t tmp = in;
-
-    ((char*)&in)[0] = ((char*)&tmp)[1];
-    ((char*)&in)[1] = ((char*)&tmp)[0];
-#endif
-
-    return in;
+    return SDL_Swap16LE(in);
 }
 
 void BinaryFile::read_i16_array(int16_t* target, size_t size)
@@ -187,35 +157,18 @@ void BinaryFile::read_i16_array(int16_t* target, size_t size)
     assert(target);
     assert(size > 0);
 
-#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    for (unsigned int i = 0; i < size; i++) {
-        fread_or_exception(&target[i], sizeof(int16_t), 1);
-
-        int16_t tmp = target[i];
-
-        ((char*)&target[i])[0] = ((char*)&tmp)[1];
-        ((char*)&target[i])[1] = ((char*)&tmp)[0];
-    }
-#else
     fread_or_exception(target, sizeof(int16_t), size);
-#endif
+
+    for (size_t i = 0; i < size; i++) {
+        target[i] = SDL_Swap16LE(target[i]);
+    }
 }
 
 int32_t BinaryFile::read_i32()
 {
     int32_t in;
     fread_or_exception(&in, sizeof(int32_t), 1);
-
-#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    int32_t tmp = in;
-
-    ((char*)&in)[0] = ((char*)&tmp)[3];
-    ((char*)&in)[1] = ((char*)&tmp)[2];
-    ((char*)&in)[2] = ((char*)&tmp)[1];
-    ((char*)&in)[3] = ((char*)&tmp)[0];
-#endif
-
-    return in;
+    return SDL_Swap32LE(in);
 }
 
 void BinaryFile::read_i32_array(int32_t* target, size_t size)
@@ -223,37 +176,18 @@ void BinaryFile::read_i32_array(int32_t* target, size_t size)
     assert(target);
     assert(size > 0);
 
-#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    for (unsigned int i = 0; i < size; i++) {
-        fread_or_exception(&target[i], sizeof(int32_t), 1);
-
-        int32_t tmp = target[i];
-
-        ((char*)&target[i])[0] = ((char*)&tmp)[3];
-        ((char*)&target[i])[1] = ((char*)&tmp)[2];
-        ((char*)&target[i])[2] = ((char*)&tmp)[1];
-        ((char*)&target[i])[3] = ((char*)&tmp)[0];
-    }
-#else
     fread_or_exception(target, sizeof(int32_t), size);
-#endif
+
+    for (size_t i = 0; i < size; i++) {
+        target[i] = SDL_Swap32LE(target[i]);
+    }
 }
 
 float BinaryFile::read_float()
 {
     float in;
     fread_or_exception(&in, sizeof(float), 1);
-
-#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-    float tmp = in;
-
-    ((char*)&in)[0] = ((char*)&tmp)[3];
-    ((char*)&in)[1] = ((char*)&tmp)[2];
-    ((char*)&in)[2] = ((char*)&tmp)[1];
-    ((char*)&in)[3] = ((char*)&tmp)[0];
-#endif
-
-    return in;
+    return SDL_SwapFloatLE(in);
 }
 
 // Uses 32 bits to store the length of the string, then the text data,
