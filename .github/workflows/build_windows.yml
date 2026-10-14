@@ -2,7 +2,7 @@ name: Build - Windows
 on: workflow_call
 
 env:
-  COMMON_CMAKE_ARGS: >
+  COMMON_CMAKE_ARGS: >-
     -B build
     -G Ninja
     -DCMAKE_BUILD_TYPE=Release
