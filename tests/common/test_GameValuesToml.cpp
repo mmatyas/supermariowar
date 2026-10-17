@@ -23,10 +23,14 @@ CGameConfig makePeculiarConfig()
     config.framelimiter = 13;
     config.fullscreen = true;
 
-    // audio (pack names are provided separately)
+    // audio
     config.musicvolume = 11;
     config.soundvolume = 11;
     config.playnextmusic = true;
+    config.announcerpack = "dude_duds";
+    config.soundpack = "retro";
+    config.gamemusicpack = "smb3 packs";
+    config.worldmusicpack = "Tournament 2026";
 
     // gameplay
     config.respawn = 11;
@@ -111,21 +115,20 @@ CGameConfig makePeculiarConfig()
     return config;
 }
 
-toml::ordered_value make_document(const CGameConfig& config, const tomlconfig::AudioPackNames& pack_names)
+toml::ordered_value make_document(const CGameConfig& config)
 {
-    return tomlconfig::make_config_document(config, pack_names);
+    return tomlconfig::make_config_document(config);
 }
 
-std::string document_roundtrip(const CGameConfig& config, const tomlconfig::AudioPackNames& pack_names,
-                                tomlconfig::AudioPackNames& out_names)
+std::string document_round_trip(const CGameConfig& config)
 {
-    const std::string text = toml::format(make_document(config, pack_names));
+    const std::string text = toml::format(make_document(config));
     const toml::value parsed = toml::parse_str(text);
 
     CGameConfig restored {};
-    tomlconfig::apply_config_document(restored, parsed, out_names);
+    tomlconfig::apply_config_document(restored, parsed);
 
-    return toml::format(tomlconfig::make_config_document(restored, out_names));
+    return toml::format(tomlconfig::make_config_document(restored));
 }
 
 } // namespace
@@ -133,29 +136,43 @@ std::string document_roundtrip(const CGameConfig& config, const tomlconfig::Audi
 
 TEST_CASE("TOML config document round trip with non-default values")
 {
-    const tomlconfig::AudioPackNames pack_names {
-        "dude_duds", "retro", "smb3 packs", "Tournament 2026",
-    };
     const CGameConfig config = makePeculiarConfig();
-
-    tomlconfig::AudioPackNames out_names;
-    CHECK(document_roundtrip(config, pack_names, out_names) == toml::format(make_document(config, pack_names)));
-    CHECK(out_names == pack_names);
+    CHECK(document_round_trip(config) == toml::format(make_document(config)));
 }
 
 TEST_CASE("TOML config document round trip with defaulted values")
 {
     const CGameConfig config {};
-    const tomlconfig::AudioPackNames pack_names;
+    CHECK(document_round_trip(config) == toml::format(make_document(config)));
+}
 
-    tomlconfig::AudioPackNames out_names;
-    CHECK(document_roundtrip(config, pack_names, out_names) == toml::format(make_document(config, pack_names)));
-    CHECK(out_names == pack_names);
+TEST_CASE("TOML config document covers every descriptor field exactly once")
+{
+    // sections with fields list them one by one; sub-struct sections render a
+    // whole registered struct
+    std::array<size_t, 3> counts {}; // field sections, fields, sub-struct sections
+    std::apply([&counts](const auto&... sec) {
+        auto count_section = [&](const auto& sec) {
+            if constexpr (requires { sec.fields;}) {
+                counts[0]++;
+                std::apply([&counts](const auto&... f) {
+                    counts[1] += sizeof...(f);
+                }, sec.fields);
+            } else {
+                counts[2]++;
+            }
+        };
+        (count_section(sec), ...);
+    }, tomlconfig::NamedLayout<CGameConfig>::sections);
+
+    CHECK(counts[0] == 9);
+    CHECK(counts[1] == 61);
+    CHECK(counts[2] == 1);
 }
 
 TEST_CASE("TOML config document values map to the documented TOML type")
 {
-    const std::string text = toml::format(make_document(makePeculiarConfig(), tomlconfig::AudioPackNames {}));
+    const std::string text = toml::format(make_document(makePeculiarConfig()));
     const toml::value document = toml::parse_str(text);
 
     // enums are stored by their canonical string names
@@ -188,8 +205,7 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
 
     const CGameConfig config {};
     CGameConfig restored {};
-    tomlconfig::AudioPackNames out_names;
-    tomlconfig::apply_config_document(restored, document, out_names);
+    tomlconfig::apply_config_document(restored, document);
 
     // wrong value type: kept as-is
     CHECK(restored.fireballttl == config.fireballttl);
@@ -210,8 +226,7 @@ TEST_CASE("Applying a TOML document without chapters keeps the existing values")
     )");
 
     CGameConfig restored {};
-    tomlconfig::AudioPackNames out_names;
-    tomlconfig::apply_config_document(restored, document, out_names);
+    tomlconfig::apply_config_document(restored, document);
 
     CHECK(restored.fireballttl == CGameConfig {}.fireballttl);
     CHECK(restored.gamemodemenusettings.chicken.usetarget == CGameConfig {}.gamemodemenusettings.chicken.usetarget);

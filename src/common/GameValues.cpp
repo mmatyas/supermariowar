@@ -368,7 +368,7 @@ void CGameConfig::ReadBinaryConfig() {
         suicidetime = options.read_i16();
 
         poweruppreset = options.read_i16();
-        options.read_i16_array((int16_t *)allPowerupPresets, NUM_POWERUP_PRESETS * NUM_POWERUPS);
+        options.read_i16_array((int16_t *)allPowerupPresets.data(), NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
         fullscreen = options.read_bool();
 
@@ -507,7 +507,7 @@ void CGameConfig::WriteConfig() const
         options.write_i16(suicidetime);
 
         options.write_i16(poweruppreset);
-        options.write_raw(&allPowerupPresets, sizeof(short) * NUM_POWERUP_PRESETS * NUM_POWERUPS);
+        options.write_raw(allPowerupPresets.data(), sizeof(short) * NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
         options.write_bool(fullscreen);
 
@@ -567,23 +567,22 @@ void CGameConfig::ReadConfigToml() {
     try {
         const toml::value root = toml::parse(config_path);
 
-        tomlconfig::AudioPackNames pack_names;
-        tomlconfig::apply_config_document(*this, root, pack_names);
+        tomlconfig::apply_config_document(*this, root);
 
         // SimpleFileList::find() only moves the current item if the name is found.
-        if (!pack_names.announcer.empty())
-            announcerlist->find(pack_names.announcer);
-        if (!pack_names.sound_pack.empty())
-            soundpacklist->find(pack_names.sound_pack);
+        if (!announcerpack.empty())
+            announcerlist->find(announcerpack);
+        if (!soundpack.empty())
+            soundpacklist->find(soundpack);
 
         for (size_t pack = 0; pack < musiclist->count(); pack++) {
-            if (musiclist->nameAt(pack) == pack_names.game_music) {
+            if (musiclist->nameAt(pack) == gamemusicpack) {
                 musiclist->setCurrent(pack);
                 break;
             }
         }
         for (size_t pack = 0; pack < worldmusiclist->count(); pack++) {
-            if (worldmusiclist->nameAt(pack) == pack_names.world_music) {
+            if (worldmusiclist->nameAt(pack) == worldmusicpack) {
                 worldmusiclist->setCurrent(pack);
                 break;
             }
@@ -601,19 +600,17 @@ void CGameConfig::ReadConfigToml() {
 }
 
 
-void CGameConfig::WriteConfigToml() const {
+void CGameConfig::WriteConfigToml() {
     const std::string config_path = GetHomeDirectory() + "options.toml";
     std::ofstream config(config_path);
     if (!config.is_open())
         throw std::runtime_error("Could not create " + config_path);
 
-    const tomlconfig::AudioPackNames pack_names {
-        GetNameFromFileName(announcerlist->currentPath().string()),
-        GetNameFromFileName(soundpacklist->currentPath().string()),
-        musiclist->currentName(),
-        worldmusiclist->currentName(),
-    };
+    announcerpack = GetNameFromFileName(announcerlist->currentPath().string());
+    soundpack = GetNameFromFileName(soundpacklist->currentPath().string());
+    gamemusicpack = musiclist->currentName();
+    worldmusicpack = worldmusiclist->currentName();
 
-    const toml::ordered_value document = tomlconfig::make_config_document(*this, pack_names);
+    const toml::ordered_value document = tomlconfig::make_config_document(*this);
     config << toml::format(document);
 }

@@ -373,7 +373,9 @@ toml::ordered_value to_toml(const T& value)
         for (const auto& element : value)
             arr.push_back(to_toml(element));
         toml::ordered_value result = std::move(arr);
-        result.as_array_fmt().fmt = toml::array_format::oneline;
+        // arrays of scalars read better on one line
+        if constexpr (std::is_arithmetic_v<typename T::value_type>)
+            result.as_array_fmt().fmt = toml::array_format::oneline;
         return result;
     } else if constexpr (has_named_struct<T>::value) {
         return to_toml_table(value);
@@ -471,218 +473,159 @@ void from_toml(T& value, const toml::value& t)
 }
 
 
-struct AudioPackNames {
-    std::string announcer;
-    std::string sound_pack;
-    std::string game_music;
-    std::string world_music;
-
-    bool operator==(const AudioPackNames&) const = default;
+/// A TOML table whose entries map directly to fields of the config struct
+template <typename Struct, typename... T>
+struct Section {
+    std::string_view name;
+    std::tuple<Field<Struct, T>...> fields;
 };
 
-inline toml::ordered_value make_config_document(const CGameConfig& config, const AudioPackNames& pack_names)
+template <typename Struct, typename... T>
+constexpr Section<Struct, T...> section(std::string_view name, Field<Struct, T>... fields)
 {
-    std::vector<toml::ordered_value> toml_powerup_presets;
-    for (size_t preset = 0; preset < NUM_POWERUP_PRESETS; preset++) {
-        toml::ordered_value val = std::vector<short>(config.allPowerupPresets[preset], config.allPowerupPresets[preset] + NUM_POWERUPS);
-        val.as_array_fmt().fmt = toml::array_format::oneline;
-        toml_powerup_presets.emplace_back(std::move(val));
-    }
-
-    toml::ordered_value toml_gamemode_settings = to_toml_table(config.gamemodemenusettings);
-    // The table only contains sub-tables, so suppress its own header
-    toml_gamemode_settings.as_table_fmt().fmt = toml::table_format::implicit;
-
-    return toml::ordered_value(toml::ordered_table {
-        { "video", toml::table {
-            { "top_layer", config.toplayer },
-            { "frame_limiter", config.framelimiter },
-            { "fullscreen", config.fullscreen },
-        }},
-        { "audio", toml::table {
-            { "music_volume", config.musicvolume },
-            { "sound_volume", config.soundvolume },
-            { "play_next_music", config.playnextmusic },
-            { "announcer", pack_names.announcer },
-            { "sound_pack", pack_names.sound_pack },
-            { "game_music_pack", pack_names.game_music },
-            { "world_music_pack", pack_names.world_music },
-        }},
-        { "gameplay", toml::table {
-            { "respawn_time", config.respawn },
-            { "shield_style", tomlconfig::as_str(config.shieldstyle) },
-            { "shield_time", config.shieldtime },
-            { "out_of_bounds_time", config.outofboundstime },
-            { "suicide_time", config.suicidetime },
-            { "warp_lock_style", tomlconfig::as_str(config.warplockstyle) },
-            { "warp_lock_time", config.warplocktime },
-            { "bot_difficulty", config.cpudifficulty },
-            { "point_speed", config.pointspeed },
-            { "secrets", config.secretsenabled },
-        }},
-        { "team", toml::table {
-            { "team_collision_style", tomlconfig::as_str(config.teamcollision) },
-            { "team_colors", config.teamcolors },
-            { "tournament_control_style", tomlconfig::as_str(config.tournamentcontrolstyle) },
-        }},
-        { "eyecandy", toml::table {
-            { "spawn_style", tomlconfig::as_str(config.spawnstyle) },
-            { "award_style", tomlconfig::as_str(config.awardstyle) },
-            { "scoreboard_style", tomlconfig::as_str(config.scoreboardstyle) },
-            { "screen_crunch", config.screencrunch },
-            { "show_leader_crown", config.showwinningcrown },
-            { "start_game_countdown", config.startgamecountdown },
-            { "show_gamemode", config.startmodedisplay },
-            { "dead_team_notice", config.deadteamnotice },
-        }},
-        { "weapons", toml::table {
-            { "fireball_ttl", config.fireballttl },
-            { "feather_jumps", config.featherjumps },
-            { "boomerang_style", tomlconfig::as_str(config.boomerangstyle) },
-            { "boomerang_life", config.boomeranglife },
-            { "shell_ttl", config.shellttl },
-            { "wand_freeze_time", config.wandfreezetime },
-            { "hammer_ttl", config.hammerttl },
-            { "hammer_delay", config.hammerdelay },
-            { "hammer_one_kill", config.hammerpower },
-            { "blue_block_ttl", config.blueblockttl },
-            { "red_block_ttl", config.redblockttl },
-            { "gray_block_ttl", config.grayblockttl },
-        }},
-        { "weapon_limits", toml::table {
-            { "fireball_limit", config.fireballlimit },
-            { "hammer_limit", config.hammerlimit },
-            { "boomerang_limit", config.boomeranglimit },
-            { "feather_limit", config.featherlimit },
-            { "leaf_limit", config.leaflimit },
-            { "pwings_limit", config.pwingslimit },
-            { "tanooki_limit", config.tanookilimit },
-            { "bombs_limit", config.bombslimit },
-            { "wand_limit", config.wandlimit },
-        }},
-        { "powerups", toml::table {
-            { "stored_powerup_delay", config.storedpowerupdelay },
-            { "item_respawn_time", config.itemrespawntime },
-            { "hidden_block_respawn", config.hiddenblockrespawn },
-            { "swap_style", tomlconfig::as_str(config.swapstyle) },
-            { "bonus_wheel_style", tomlconfig::as_str(config.bonuswheel) },
-            { "bonus_keep_powerup", config.keeppowerup },
-        }},
-        { "powerup_rates", toml::ordered_table {
-            { "drop_rate_style", tomlconfig::as_str(config.overridepowerupsettings) },
-            { "selected_preset", config.poweruppreset },
-            { "presets", toml_powerup_presets },
-        }},
-        { "gamemode_settings", toml_gamemode_settings },
-    });
+    return {name, {fields...}};
 }
 
-inline void apply_config_document(CGameConfig& config, const toml::value& document, AudioPackNames& pack_names)
+// A TOML table that mirrors a single, registered sub-struct field in full
+template <typename Struct, typename T>
+struct SubStructSection {
+    std::string_view name;
+    T Struct::* member;
+};
+
+template <typename Struct, typename T>
+constexpr SubStructSection<Struct, T> struct_section(std::string_view name, T Struct::* member)
 {
-    if (document.contains("video")) {
-        const toml::value& video = document.at("video");
-        read_field(config.toplayer, video, "top_layer");
-        read_field(config.framelimiter, video, "frame_limiter");
-        read_field(config.fullscreen, video, "fullscreen");
-    }
+    return {name, member};
+}
 
-    if (document.contains("audio")) {
-        const toml::value& audio = document.at("audio");
-        read_field(config.musicvolume, audio, "music_volume");
-        read_field(config.soundvolume, audio, "sound_volume");
-        read_field(config.playnextmusic, audio, "play_next_music");
+template <typename Struct> struct NamedLayout;
 
-        read_field(pack_names.announcer, audio, "announcer");
-        read_field(pack_names.sound_pack, audio, "sound_pack");
-        read_field(pack_names.game_music, audio, "game_music_pack");
-        read_field(pack_names.world_music, audio, "world_music_pack");
-    }
+template<> struct NamedLayout<CGameConfig> {
+    static constexpr auto sections = std::make_tuple(
+        section("video",
+            field("top_layer", &CGameConfig::toplayer),
+            field("frame_limiter", &CGameConfig::framelimiter),
+            field("fullscreen", &CGameConfig::fullscreen)),
+        section("audio",
+            field("music_volume", &CGameConfig::musicvolume),
+            field("sound_volume", &CGameConfig::soundvolume),
+            field("play_next_music", &CGameConfig::playnextmusic),
+            field("announcer", &CGameConfig::announcerpack),
+            field("sound_pack", &CGameConfig::soundpack),
+            field("game_music_pack", &CGameConfig::gamemusicpack),
+            field("world_music_pack", &CGameConfig::worldmusicpack)),
+        section("gameplay",
+            field("respawn_time", &CGameConfig::respawn),
+            field("shield_style", &CGameConfig::shieldstyle),
+            field("shield_time", &CGameConfig::shieldtime),
+            field("out_of_bounds_time", &CGameConfig::outofboundstime),
+            field("suicide_time", &CGameConfig::suicidetime),
+            field("warp_lock_style", &CGameConfig::warplockstyle),
+            field("warp_lock_time", &CGameConfig::warplocktime),
+            field("bot_difficulty", &CGameConfig::cpudifficulty),
+            field("point_speed", &CGameConfig::pointspeed),
+            field("secrets", &CGameConfig::secretsenabled)),
+        section("team",
+            field("team_collision_style", &CGameConfig::teamcollision),
+            field("team_colors", &CGameConfig::teamcolors),
+            field("tournament_control_style", &CGameConfig::tournamentcontrolstyle)),
+        section("eyecandy",
+            field("spawn_style", &CGameConfig::spawnstyle),
+            field("award_style", &CGameConfig::awardstyle),
+            field("scoreboard_style", &CGameConfig::scoreboardstyle),
+            field("screen_crunch", &CGameConfig::screencrunch),
+            field("show_leader_crown", &CGameConfig::showwinningcrown),
+            field("start_game_countdown", &CGameConfig::startgamecountdown),
+            field("show_gamemode", &CGameConfig::startmodedisplay),
+            field("dead_team_notice", &CGameConfig::deadteamnotice)),
+        section("weapons",
+            field("fireball_ttl", &CGameConfig::fireballttl),
+            field("feather_jumps", &CGameConfig::featherjumps),
+            field("boomerang_style", &CGameConfig::boomerangstyle),
+            field("boomerang_life", &CGameConfig::boomeranglife),
+            field("shell_ttl", &CGameConfig::shellttl),
+            field("wand_freeze_time", &CGameConfig::wandfreezetime),
+            field("hammer_ttl", &CGameConfig::hammerttl),
+            field("hammer_delay", &CGameConfig::hammerdelay),
+            field("hammer_one_kill", &CGameConfig::hammerpower),
+            field("blue_block_ttl", &CGameConfig::blueblockttl),
+            field("red_block_ttl", &CGameConfig::redblockttl),
+            field("gray_block_ttl", &CGameConfig::grayblockttl)),
+        section("weapon_limits",
+            field("fireball_limit", &CGameConfig::fireballlimit),
+            field("hammer_limit", &CGameConfig::hammerlimit),
+            field("boomerang_limit", &CGameConfig::boomeranglimit),
+            field("feather_limit", &CGameConfig::featherlimit),
+            field("leaf_limit", &CGameConfig::leaflimit),
+            field("pwings_limit", &CGameConfig::pwingslimit),
+            field("tanooki_limit", &CGameConfig::tanookilimit),
+            field("bombs_limit", &CGameConfig::bombslimit),
+            field("wand_limit", &CGameConfig::wandlimit)),
+        section("powerups",
+            field("stored_powerup_delay", &CGameConfig::storedpowerupdelay),
+            field("item_respawn_time", &CGameConfig::itemrespawntime),
+            field("hidden_block_respawn", &CGameConfig::hiddenblockrespawn),
+            field("swap_style", &CGameConfig::swapstyle),
+            field("bonus_wheel_style", &CGameConfig::bonuswheel),
+            field("bonus_keep_powerup", &CGameConfig::keeppowerup)),
+        section("powerup_rates",
+            field("drop_rate_style", &CGameConfig::overridepowerupsettings),
+            field("selected_preset", &CGameConfig::poweruppreset),
+            field("presets", &CGameConfig::allPowerupPresets)),
+        struct_section("gamemode_settings", &CGameConfig::gamemodemenusettings)
+    );
+};
 
-    if (document.contains("gameplay")) {
-        const toml::value& gameplay = document.at("gameplay");
-        read_field(config.respawn, gameplay, "respawn_time");
-        read_field(config.shieldstyle, gameplay, "shield_style");
-        read_field(config.shieldtime, gameplay, "shield_time");
-        read_field(config.outofboundstime, gameplay, "out_of_bounds_time");
-        read_field(config.suicidetime, gameplay, "suicide_time");
-        read_field(config.warplockstyle, gameplay, "warp_lock_style");
-        read_field(config.warplocktime, gameplay, "warp_lock_time");
-        read_field(config.cpudifficulty, gameplay, "bot_difficulty");
-        read_field(config.pointspeed, gameplay, "point_speed");
-        read_field(config.secretsenabled, gameplay, "secrets");
-    }
 
-    if (document.contains("team")) {
-        const toml::value& team = document.at("team");
-        read_field(config.teamcollision, team, "team_collision_style");
-        read_field(config.teamcolors, team, "team_colors");
-        read_field(config.tournamentcontrolstyle, team, "tournament_control_style");
-    }
+template <typename Struct>
+toml::ordered_value make_config_document(const Struct& config)
+{
+    toml::ordered_table root;
+    std::apply([&root, &config](const auto&... sec) {
+        auto add_section = [&](const auto& sec) {
+            if constexpr (requires { sec.fields; }) {
+                toml::ordered_table table;
+                std::apply([&table, &config](const auto&... f) {
+                    (table.emplace(std::string(f.name), to_toml(config.*(f.member))), ...);
+                }, sec.fields);
+                root.emplace(std::string(sec.name), toml::ordered_value(std::move(table)));
+            } else {
+                toml::ordered_value value = to_toml_table(config.*(sec.member));
+                if (value.is_table())
+                    value.as_table_fmt().fmt = toml::table_format::implicit;
+                root.emplace(std::string(sec.name), std::move(value));
+            }
+        };
+        (add_section(sec), ...);
+    }, NamedLayout<std::remove_cv_t<Struct>>::sections);
+    return toml::ordered_value(std::move(root));
+}
 
-    if (document.contains("eyecandy")) {
-        const toml::value& eyecandy = document.at("eyecandy");
-        read_field(config.spawnstyle, eyecandy, "spawn_style");
-        read_field(config.awardstyle, eyecandy, "award_style");
-        read_field(config.scoreboardstyle, eyecandy, "scoreboard_style");
-        read_field(config.screencrunch, eyecandy, "screen_crunch");
-        read_field(config.showwinningcrown, eyecandy, "show_leader_crown");
-        read_field(config.startgamecountdown, eyecandy, "start_game_countdown");
-        read_field(config.startmodedisplay, eyecandy, "show_gamemode");
-        read_field(config.deadteamnotice, eyecandy, "dead_team_notice");
-    }
 
-    if (document.contains("weapons")) {
-        const toml::value& weapons = document.at("weapons");
-        read_field(config.fireballttl, weapons, "fireball_ttl");
-        read_field(config.featherjumps, weapons, "feather_jumps");
-        read_field(config.boomerangstyle, weapons, "boomerang_style");
-        read_field(config.boomeranglife, weapons, "boomerang_life");
-        read_field(config.shellttl, weapons, "shell_ttl");
-        read_field(config.wandfreezetime, weapons, "wand_freeze_time");
-        read_field(config.hammerttl, weapons, "hammer_ttl");
-        read_field(config.hammerdelay, weapons, "hammer_delay");
-        read_field(config.hammerpower, weapons, "hammer_one_kill");
-        read_field(config.blueblockttl, weapons, "blue_block_ttl");
-        read_field(config.redblockttl, weapons, "red_block_ttl");
-        read_field(config.grayblockttl, weapons, "gray_block_ttl");
-    }
+template <typename Struct>
+void apply_config_document(Struct& config, const toml::value& document)
+{
+    if (!document.is_table())
+        return;
 
-    if (document.contains("weapon_limits")) {
-        const toml::value& weapon_limits = document.at("weapon_limits");
-        read_field(config.fireballlimit, weapon_limits, "fireball_limit");
-        read_field(config.hammerlimit, weapon_limits, "hammer_limit");
-        read_field(config.boomeranglimit, weapon_limits, "boomerang_limit");
-        read_field(config.featherlimit, weapon_limits, "feather_limit");
-        read_field(config.leaflimit, weapon_limits, "leaf_limit");
-        read_field(config.pwingslimit, weapon_limits, "pwings_limit");
-        read_field(config.tanookilimit, weapon_limits, "tanooki_limit");
-        read_field(config.bombslimit, weapon_limits, "bombs_limit");
-        read_field(config.wandlimit, weapon_limits, "wand_limit");
-    }
+    std::apply([&config, &document](const auto&... sec) {
+        auto read_section = [&](const auto& sec) {
+            if (!document.contains(std::string(sec.name)))
+                return;
+            const toml::value& table = document.at(std::string(sec.name));
 
-    if (document.contains("powerups")) {
-        const toml::value& powerups = document.at("powerups");
-        read_field(config.storedpowerupdelay, powerups, "stored_powerup_delay");
-        read_field(config.itemrespawntime, powerups, "item_respawn_time");
-        read_field(config.hiddenblockrespawn, powerups, "hidden_block_respawn");
-        read_field(config.swapstyle, powerups, "swap_style");
-        read_field(config.bonuswheel, powerups, "bonus_wheel_style");
-        read_field(config.keeppowerup, powerups, "bonus_keep_powerup");
-    }
-
-    if (document.contains("powerup_rates")) {
-        const toml::value& powerup_rates = document.at("powerup_rates");
-        read_field(config.overridepowerupsettings, powerup_rates, "drop_rate_style");
-        read_field(config.poweruppreset, powerup_rates, "selected_preset");
-
-        if (powerup_rates.contains("presets") && powerup_rates.at("presets").is_array()) {
-            const toml::array& presets = powerup_rates.at("presets").as_array();
-            for (size_t preset = 0; preset < NUM_POWERUP_PRESETS && preset < presets.size(); preset++)
-                read_field(config.allPowerupPresets[preset], powerup_rates.at("presets"), preset);
-        }
-    }
-
-    read_field(config.gamemodemenusettings, document, "gamemode_settings");
+            if constexpr (requires { sec.fields; }) {
+                std::apply([&table, &config](const auto&... f) {
+                    (read_field(config.*(f.member), table, f.name), ...);
+                }, sec.fields);
+            } else {
+                if (table.is_table())
+                    from_toml(config.*(sec.member), table);
+            }
+        };
+        (read_section(sec), ...);
+    }, NamedLayout<std::remove_cv_t<Struct>>::sections);
 }
 
 } // namespace tomlconfig

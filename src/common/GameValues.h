@@ -9,6 +9,8 @@
 #include "input.h"
 #include "MatchTypes.h"
 
+#include <array>
+#include <string>
 #include <vector>
 
 class sfxSound;
@@ -121,6 +123,10 @@ public:
     short		playercontrol[4];
     CPlayerInput playerInput;
     bool		playnextmusic;  //automatically advance to the next music track after one finishes
+    std::string	announcerpack;      //name of the announcer pack (resolved through AnnouncerList)
+    std::string	soundpack;          //name of the sound pack (resolved through SoundsList)
+    std::string	gamemusicpack;      //name of the game music pack (resolved through MusicList)
+    std::string	worldmusicpack;     //name of the world music pack (resolved through WorldMusicList)
     short		outofboundstime;
     PowerupDropRateStyle overridepowerupsettings;
     bool		secretsenabled;
@@ -128,7 +134,7 @@ public:
     bool		music;
     short		pointspeed;
     short poweruppreset;
-    short allPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
+    std::array<std::array<short, NUM_POWERUPS>, NUM_POWERUP_PRESETS> allPowerupPresets;
     bool		randomskin[4];
     ScoreboardStyle scoreboardstyle;
     bool		screencrunch;
@@ -152,7 +158,7 @@ public:
     void WriteConfig() const;
 
     void ReadConfigToml();
-    void WriteConfigToml() const;
+    void WriteConfigToml();
 };
 
 // these are actually the program options
