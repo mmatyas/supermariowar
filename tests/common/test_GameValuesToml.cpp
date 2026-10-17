@@ -12,28 +12,31 @@ short y_shake = 0;
 
 namespace {
 
-// Fill all serializable CGameConfig fields with distinctive non-default values so
-// that a dropped and a coincidentally-matching field do not cancel each other out.
-CGameConfig makePeculiarConfig()
+// Fill all serializable CGameConfig and Bridge fields with distinctive non-default
+// values so that a dropped and a coincidentally-matching field do not cancel each
+// other out.
+std::pair<CGameConfig, tomlconfig::Bridge> makePeculiar()
 {
-    CGameConfig config {}; // zero initialize
+    std::pair<CGameConfig, tomlconfig::Bridge> result {CGameConfig {}, tomlconfig::Bridge {}};
+    CGameConfig& config = result.first;
+    tomlconfig::Bridge& bridge = result.second;
 
     // video
     config.toplayer = true;
     config.framelimiter = 13;
     config.fullscreen = true;
-    config.menugraphicspack = "Classical Menu";
-    config.worldgraphicspack = "Unbiased World";
-    config.gamegraphicspack = "Retro Game";
+    bridge.menugraphicspack = "Classical Menu";
+    bridge.worldgraphicspack = "Unbiased World";
+    bridge.gamegraphicspack = "Retro Game";
 
     // audio
     config.musicvolume = 11;
     config.soundvolume = 11;
     config.playnextmusic = true;
-    config.announcerpack = "dude_duds";
-    config.soundpack = "retro";
-    config.gamemusicpack = "smb3 packs";
-    config.worldmusicpack = "Tournament 2026";
+    bridge.announcerpack = "dude_duds";
+    bridge.soundpack = "retro";
+    bridge.gamemusicpack = "smb3 packs";
+    bridge.worldmusicpack = "Tournament 2026";
 
     // gameplay
     config.respawn = 11;
@@ -53,14 +56,14 @@ CGameConfig makePeculiarConfig()
     config.tournamentcontrolstyle = TournamentControlStyle::RoundRobin;
 
     // players
-    config.skins[0] = "toad";
-    config.skins[1] = ""; // random
-    config.skins[2] = "fire";
-    config.skins[3] = "kid";
-    config.player_slots[0] = PlayerType::Human;
-    config.player_slots[1] = PlayerType::CPU;
-    config.player_slots[2] = PlayerType::CPU;
-    config.player_slots[3] = PlayerType::Empty;
+    bridge.skins[0] = "toad";
+    bridge.skins[1] = ""; // random
+    bridge.skins[2] = "fire";
+    bridge.skins[3] = "kid";
+    bridge.player_slots[0] = PlayerType::Human;
+    bridge.player_slots[1] = PlayerType::CPU;
+    bridge.player_slots[2] = PlayerType::CPU;
+    bridge.player_slots[3] = PlayerType::Empty;
 
     // eyecandy
     config.spawnstyle = SpawnStyle::Swirl;
@@ -126,47 +129,48 @@ CGameConfig makePeculiarConfig()
     config.gamemodemenusettings.boss.bosstype = Boss::Bomb;
 
     // gamemode_goals
-    config.gamemodegoals.classic = 11;
-    config.gamemodegoals.frag = 12;
-    config.gamemodegoals.time = 13;
-    config.gamemodegoals.jail = 14;
-    config.gamemodegoals.coins = 15;
-    config.gamemodegoals.stomp = 16;
-    config.gamemodegoals.egg = 17;
-    config.gamemodegoals.flag = 18;
-    config.gamemodegoals.chicken = 19;
-    config.gamemodegoals.tag = 20;
-    config.gamemodegoals.star = 21;
-    config.gamemodegoals.domination = 22;
-    config.gamemodegoals.kingofthehill = 23;
-    config.gamemodegoals.race = 24;
-    config.gamemodegoals.owned = 25;
-    config.gamemodegoals.frenzy = 26;
-    config.gamemodegoals.survival = 27;
-    config.gamemodegoals.greed = 28;
-    config.gamemodegoals.health = 29;
-    config.gamemodegoals.collection = 30;
-    config.gamemodegoals.chase = 31;
-    config.gamemodegoals.shyguytag = 32;
-    config.gamemodegoals.boss = 33;
+    bridge.gamemodegoals.classic = 11;
+    bridge.gamemodegoals.frag = 12;
+    bridge.gamemodegoals.time = 13;
+    bridge.gamemodegoals.jail = 14;
+    bridge.gamemodegoals.coins = 15;
+    bridge.gamemodegoals.stomp = 16;
+    bridge.gamemodegoals.egg = 17;
+    bridge.gamemodegoals.flag = 18;
+    bridge.gamemodegoals.chicken = 19;
+    bridge.gamemodegoals.tag = 20;
+    bridge.gamemodegoals.star = 21;
+    bridge.gamemodegoals.domination = 22;
+    bridge.gamemodegoals.kingofthehill = 23;
+    bridge.gamemodegoals.race = 24;
+    bridge.gamemodegoals.owned = 25;
+    bridge.gamemodegoals.frenzy = 26;
+    bridge.gamemodegoals.survival = 27;
+    bridge.gamemodegoals.greed = 28;
+    bridge.gamemodegoals.health = 29;
+    bridge.gamemodegoals.collection = 30;
+    bridge.gamemodegoals.chase = 31;
+    bridge.gamemodegoals.shyguytag = 32;
+    bridge.gamemodegoals.boss = 33;
 
-    return config;
+    return result;
 }
 
-toml::ordered_value make_document(const CGameConfig& config)
+toml::ordered_value make_document(const CGameConfig& config, const tomlconfig::Bridge& bridge)
 {
-    return tomlconfig::make_config_document(config);
+    return tomlconfig::make_config_document(config, bridge);
 }
 
-std::string document_round_trip(const CGameConfig& config)
+std::string document_round_trip(const CGameConfig& config, const tomlconfig::Bridge& bridge)
 {
-    const std::string text = toml::format(make_document(config));
+    const std::string text = toml::format(make_document(config, bridge));
     const toml::value parsed = toml::parse_str(text);
 
     CGameConfig restored {};
-    tomlconfig::apply_config_document(restored, parsed);
+    tomlconfig::Bridge restored_bridge {};
+    tomlconfig::apply_config_document(restored, restored_bridge, parsed);
 
-    return toml::format(tomlconfig::make_config_document(restored));
+    return toml::format(tomlconfig::make_config_document(restored, restored_bridge));
 }
 
 } // namespace
@@ -174,14 +178,15 @@ std::string document_round_trip(const CGameConfig& config)
 
 TEST_CASE("TOML config document round trip with non-default values")
 {
-    const CGameConfig config = makePeculiarConfig();
-    CHECK(document_round_trip(config) == toml::format(make_document(config)));
+    const auto [config, bridge] = makePeculiar();
+    CHECK(document_round_trip(config, bridge) == toml::format(make_document(config, bridge)));
 }
 
 TEST_CASE("TOML config document round trip with defaulted values")
 {
     const CGameConfig config {};
-    CHECK(document_round_trip(config) == toml::format(make_document(config)));
+    const tomlconfig::Bridge bridge {};
+    CHECK(document_round_trip(config, bridge) == toml::format(make_document(config, bridge)));
 }
 
 TEST_CASE("TOML config document covers every descriptor field exactly once")
@@ -210,8 +215,8 @@ TEST_CASE("TOML config document covers every descriptor field exactly once")
 
 TEST_CASE("TOML config document values map to the documented TOML type")
 {
-    const std::string text = toml::format(make_document(makePeculiarConfig()));
-    const toml::value document = toml::parse_str(text);
+    const auto [config, bridge] = makePeculiar();
+    const auto document = make_document(config, bridge);
 
     // enums are stored by their canonical string names
     const toml::value& gameplay = document.at("gameplay");
@@ -248,14 +253,15 @@ TEST_CASE("Applying a TOML document fills the per-mode goals")
     )");
 
     CGameConfig restored {};
-    tomlconfig::apply_config_document(restored, document);
+    tomlconfig::Bridge restored_bridge {};
+    tomlconfig::apply_config_document(restored, restored_bridge, document);
 
     // goals from the table fill their members,
     // the remaining goals keep their defaults
-    CHECK(restored.gamemodegoals.classic == 7);
-    CHECK(restored.gamemodegoals.chase == 3);
-    CHECK(restored.gamemodegoals.frag == GameModeGoals {}.frag);
-    CHECK(restored.gamemodegoals.boss == GameModeGoals {}.boss);
+    CHECK(restored_bridge.gamemodegoals.classic == 7);
+    CHECK(restored_bridge.gamemodegoals.chase == 3);
+    CHECK(restored_bridge.gamemodegoals.frag == GameModeGoals {}.frag);
+    CHECK(restored_bridge.gamemodegoals.boss == GameModeGoals {}.boss);
 }
 
 TEST_CASE("Applying a broken TOML document keeps the existing values")
@@ -283,7 +289,8 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
 
     const CGameConfig config {};
     CGameConfig restored {};
-    tomlconfig::apply_config_document(restored, document);
+    tomlconfig::Bridge restored_bridge {};
+    tomlconfig::apply_config_document(restored, restored_bridge, document);
 
     // wrong value type: kept as-is
     CHECK(restored.fireballttl == config.fireballttl);
@@ -291,16 +298,16 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
     CHECK(restored.fullscreen == config.fullscreen);
     CHECK(restored.respawn == config.respawn);
     // wrong array length: kept as-is
-    CHECK(restored.skins == config.skins);
+    CHECK(restored_bridge.skins == tomlconfig::Bridge {}.skins);
     // wrong value inside the array: kept as-is
-    CHECK(restored.player_slots == config.player_slots);
+    CHECK(restored_bridge.player_slots == tomlconfig::Bridge {}.player_slots);
     // valid keys of valid sections are still applied
     CHECK(restored.secretsenabled == true);
     CHECK(restored.gamemodemenusettings.classic.scoring == ScoringStyle::PushOnly);
     // unknown enum values fall back to the current value
     CHECK(restored.gamemodemenusettings.classic.style == config.gamemodemenusettings.classic.style);
     // wrong goal value type: kept as-is
-    CHECK(restored.gamemodegoals.classic == GameModeGoals {}.classic);
+    CHECK(restored_bridge.gamemodegoals.classic == GameModeGoals {}.classic);
 }
 
 TEST_CASE("Applying a TOML document without chapters keeps the existing values")
@@ -310,7 +317,8 @@ TEST_CASE("Applying a TOML document without chapters keeps the existing values")
     )");
 
     CGameConfig restored {};
-    tomlconfig::apply_config_document(restored, document);
+    tomlconfig::Bridge restored_bridge {};
+    tomlconfig::apply_config_document(restored, restored_bridge, document);
 
     CHECK(restored.fireballttl == CGameConfig {}.fireballttl);
     CHECK(restored.gamemodemenusettings.chicken.usetarget == CGameConfig {}.gamemodemenusettings.chicken.usetarget);

@@ -567,52 +567,53 @@ void CGameConfig::ReadConfigToml() {
     try {
         const toml::value root = toml::parse(config_path);
 
-        tomlconfig::apply_config_document(*this, root);
+        tomlconfig::Bridge bridge;
+        tomlconfig::apply_config_document(*this, bridge, root);
 
         // Propagate the per-mode goals into the runtime modes.
         // The boss minigame goal is set per tour stop, so it has no runtime counterpart here.
         if (root.contains("gamemode_goals")) {
-            gamemodes[game_mode_classic]->goal = gamemodegoals.classic;
-            gamemodes[game_mode_frag]->goal = gamemodegoals.frag;
-            gamemodes[game_mode_timelimit]->goal = gamemodegoals.time;
-            gamemodes[game_mode_jail]->goal = gamemodegoals.jail;
-            gamemodes[game_mode_coins]->goal = gamemodegoals.coins;
-            gamemodes[game_mode_stomp]->goal = gamemodegoals.stomp;
-            gamemodes[game_mode_eggs]->goal = gamemodegoals.egg;
-            gamemodes[game_mode_ctf]->goal = gamemodegoals.flag;
-            gamemodes[game_mode_chicken]->goal = gamemodegoals.chicken;
-            gamemodes[game_mode_tag]->goal = gamemodegoals.tag;
-            gamemodes[game_mode_star]->goal = gamemodegoals.star;
-            gamemodes[game_mode_domination]->goal = gamemodegoals.domination;
-            gamemodes[game_mode_koth]->goal = gamemodegoals.kingofthehill;
-            gamemodes[game_mode_race]->goal = gamemodegoals.race;
-            gamemodes[game_mode_owned]->goal = gamemodegoals.owned;
-            gamemodes[game_mode_frenzy]->goal = gamemodegoals.frenzy;
-            gamemodes[game_mode_survival]->goal = gamemodegoals.survival;
-            gamemodes[game_mode_greed]->goal = gamemodegoals.greed;
-            gamemodes[game_mode_health]->goal = gamemodegoals.health;
-            gamemodes[game_mode_collection]->goal = gamemodegoals.collection;
-            gamemodes[game_mode_chase]->goal = gamemodegoals.chase;
-            gamemodes[game_mode_shyguytag]->goal = gamemodegoals.shyguytag;
+            gamemodes[game_mode_classic]->goal = bridge.gamemodegoals.classic;
+            gamemodes[game_mode_frag]->goal = bridge.gamemodegoals.frag;
+            gamemodes[game_mode_timelimit]->goal = bridge.gamemodegoals.time;
+            gamemodes[game_mode_jail]->goal = bridge.gamemodegoals.jail;
+            gamemodes[game_mode_coins]->goal = bridge.gamemodegoals.coins;
+            gamemodes[game_mode_stomp]->goal = bridge.gamemodegoals.stomp;
+            gamemodes[game_mode_eggs]->goal = bridge.gamemodegoals.egg;
+            gamemodes[game_mode_ctf]->goal = bridge.gamemodegoals.flag;
+            gamemodes[game_mode_chicken]->goal = bridge.gamemodegoals.chicken;
+            gamemodes[game_mode_tag]->goal = bridge.gamemodegoals.tag;
+            gamemodes[game_mode_star]->goal = bridge.gamemodegoals.star;
+            gamemodes[game_mode_domination]->goal = bridge.gamemodegoals.domination;
+            gamemodes[game_mode_koth]->goal = bridge.gamemodegoals.kingofthehill;
+            gamemodes[game_mode_race]->goal = bridge.gamemodegoals.race;
+            gamemodes[game_mode_owned]->goal = bridge.gamemodegoals.owned;
+            gamemodes[game_mode_frenzy]->goal = bridge.gamemodegoals.frenzy;
+            gamemodes[game_mode_survival]->goal = bridge.gamemodegoals.survival;
+            gamemodes[game_mode_greed]->goal = bridge.gamemodegoals.greed;
+            gamemodes[game_mode_health]->goal = bridge.gamemodegoals.health;
+            gamemodes[game_mode_collection]->goal = bridge.gamemodegoals.collection;
+            gamemodes[game_mode_chase]->goal = bridge.gamemodegoals.chase;
+            gamemodes[game_mode_shyguytag]->goal = bridge.gamemodegoals.shyguytag;
         }
 
         // SimpleFileList::find() only moves the current item if the name is found.
-        if (!announcerpack.empty())
-            announcerlist->find(announcerpack);
-        if (!soundpack.empty())
-            soundpacklist->find(soundpack);
+        if (!bridge.announcerpack.empty())
+            announcerlist->find(bridge.announcerpack);
+        if (!bridge.soundpack.empty())
+            soundpacklist->find(bridge.soundpack);
 
-        if (!menugraphicspack.empty())
-            menugraphicspacklist->find(menugraphicspack);
-        if (!worldgraphicspack.empty())
-            worldgraphicspacklist->find(worldgraphicspack);
-        if (!gamegraphicspack.empty())
-            gamegraphicspacklist->find(gamegraphicspack);
+        if (!bridge.menugraphicspack.empty())
+            menugraphicspacklist->find(bridge.menugraphicspack);
+        if (!bridge.worldgraphicspack.empty())
+            worldgraphicspacklist->find(bridge.worldgraphicspack);
+        if (!bridge.gamegraphicspack.empty())
+            gamegraphicspacklist->find(bridge.gamegraphicspack);
 
         // Resolve the selected skin names into skin IDs; an empty name selects a random skin.
         // Unknown names warn and keep the current skin.
         for (size_t player = 0; player < MAX_PLAYERS; player++) {
-            if (skins[player].empty()) {
+            if (bridge.skins[player].empty()) {
                 randomskin[player] = true;
                 continue;
             }
@@ -620,27 +621,27 @@ void CGameConfig::ReadConfigToml() {
             randomskin[player] = false;
             bool found = false;
             for (size_t skin = 0; skin < skinlist->count(); skin++) {
-                if (skinlist->at(skin).name == skins[player]) {
+                if (skinlist->at(skin).name == bridge.skins[player]) {
                     skinids[player] = static_cast<short>(skin);
                     found = true;
                     break;
                 }
             }
             if (!found)
-                printf("[config][warning] Skin '%s' for player %d not found, keeping the current skin.\n", skins[player].c_str(), static_cast<int>(player));
+                printf("[config][warning] Skin '%s' for player %d not found, keeping the current skin.\n", bridge.skins[player].c_str(), static_cast<int>(player));
         }
 
         for (size_t player = 0; player < MAX_PLAYERS; player++)
-            playercontrol[player] = static_cast<short>(player_slots[player]);
+            playercontrol[player] = static_cast<short>(bridge.player_slots[player]);
 
         for (size_t pack = 0; pack < musiclist->count(); pack++) {
-            if (musiclist->nameAt(pack) == gamemusicpack) {
+            if (musiclist->nameAt(pack) == bridge.gamemusicpack) {
                 musiclist->setCurrent(pack);
                 break;
             }
         }
         for (size_t pack = 0; pack < worldmusiclist->count(); pack++) {
-            if (worldmusiclist->nameAt(pack) == worldmusicpack) {
+            if (worldmusiclist->nameAt(pack) == bridge.worldmusicpack) {
                 worldmusiclist->setCurrent(pack);
                 break;
             }
@@ -664,53 +665,56 @@ void CGameConfig::WriteConfigToml() {
     if (!config.is_open())
         throw std::runtime_error("Could not create " + config_path);
 
-    announcerpack = GetNameFromFileName(announcerlist->currentPath().string());
-    soundpack = GetNameFromFileName(soundpacklist->currentPath().string());
-    gamemusicpack = musiclist->currentName();
-    worldmusicpack = worldmusiclist->currentName();
+    tomlconfig::Bridge bridge;
 
-    menugraphicspack = GetNameFromFileName(menugraphicspacklist->currentPath().string());
-    worldgraphicspack = GetNameFromFileName(worldgraphicspacklist->currentPath().string());
-    gamegraphicspack = GetNameFromFileName(gamegraphicspacklist->currentPath().string());
+    bridge.announcerpack = GetNameFromFileName(announcerlist->currentPath().string());
+    bridge.soundpack = GetNameFromFileName(soundpacklist->currentPath().string());
+    bridge.gamemusicpack = musiclist->currentName();
+    bridge.worldmusicpack = worldmusiclist->currentName();
+
+    bridge.menugraphicspack = GetNameFromFileName(menugraphicspacklist->currentPath().string());
+    bridge.worldgraphicspack = GetNameFromFileName(worldgraphicspacklist->currentPath().string());
+    bridge.gamegraphicspack = GetNameFromFileName(gamegraphicspacklist->currentPath().string());
 
     for (size_t player = 0; player < MAX_PLAYERS; player++) {
-        if (randomskin[player] || skinids[player] < 0 || skinids[player] >= skinlist->count())
-            skins[player].clear();
-        else
-            skins[player] = skinlist->at(skinids[player]).name;
+        if (randomskin[player] || skinids[player] < 0 || skinids[player] >= skinlist->count()) {
+            bridge.skins[player].clear();
+        } else {
+            bridge.skins[player] = skinlist->at(skinids[player]).name;
+        }
     }
-
     for (size_t player = 0; player < MAX_PLAYERS; player++) {
-        if (playercontrol[player] >= 0 && playercontrol[player] <= 2)
-            player_slots[player] = static_cast<PlayerType>(playercontrol[player]);
-        else
-            player_slots[player] = PlayerType::Empty;
+        if (playercontrol[player] >= 0 && playercontrol[player] <= 2) {
+            bridge.player_slots[player] = static_cast<PlayerType>(playercontrol[player]);
+        } else {
+            bridge.player_slots[player] = PlayerType::Empty;
+        }
     }
 
     // The boss minigame goal is set per tour stop, so it is not bridged here
-    gamemodegoals.classic = gamemodes[game_mode_classic]->goal;
-    gamemodegoals.frag = gamemodes[game_mode_frag]->goal;
-    gamemodegoals.time = gamemodes[game_mode_timelimit]->goal;
-    gamemodegoals.jail = gamemodes[game_mode_jail]->goal;
-    gamemodegoals.coins = gamemodes[game_mode_coins]->goal;
-    gamemodegoals.stomp = gamemodes[game_mode_stomp]->goal;
-    gamemodegoals.egg = gamemodes[game_mode_eggs]->goal;
-    gamemodegoals.flag = gamemodes[game_mode_ctf]->goal;
-    gamemodegoals.chicken = gamemodes[game_mode_chicken]->goal;
-    gamemodegoals.tag = gamemodes[game_mode_tag]->goal;
-    gamemodegoals.star = gamemodes[game_mode_star]->goal;
-    gamemodegoals.domination = gamemodes[game_mode_domination]->goal;
-    gamemodegoals.kingofthehill = gamemodes[game_mode_koth]->goal;
-    gamemodegoals.race = gamemodes[game_mode_race]->goal;
-    gamemodegoals.owned = gamemodes[game_mode_owned]->goal;
-    gamemodegoals.frenzy = gamemodes[game_mode_frenzy]->goal;
-    gamemodegoals.survival = gamemodes[game_mode_survival]->goal;
-    gamemodegoals.greed = gamemodes[game_mode_greed]->goal;
-    gamemodegoals.health = gamemodes[game_mode_health]->goal;
-    gamemodegoals.collection = gamemodes[game_mode_collection]->goal;
-    gamemodegoals.chase = gamemodes[game_mode_chase]->goal;
-    gamemodegoals.shyguytag = gamemodes[game_mode_shyguytag]->goal;
+    bridge.gamemodegoals.classic = gamemodes[game_mode_classic]->goal;
+    bridge.gamemodegoals.frag = gamemodes[game_mode_frag]->goal;
+    bridge.gamemodegoals.time = gamemodes[game_mode_timelimit]->goal;
+    bridge.gamemodegoals.jail = gamemodes[game_mode_jail]->goal;
+    bridge.gamemodegoals.coins = gamemodes[game_mode_coins]->goal;
+    bridge.gamemodegoals.stomp = gamemodes[game_mode_stomp]->goal;
+    bridge.gamemodegoals.egg = gamemodes[game_mode_eggs]->goal;
+    bridge.gamemodegoals.flag = gamemodes[game_mode_ctf]->goal;
+    bridge.gamemodegoals.chicken = gamemodes[game_mode_chicken]->goal;
+    bridge.gamemodegoals.tag = gamemodes[game_mode_tag]->goal;
+    bridge.gamemodegoals.star = gamemodes[game_mode_star]->goal;
+    bridge.gamemodegoals.domination = gamemodes[game_mode_domination]->goal;
+    bridge.gamemodegoals.kingofthehill = gamemodes[game_mode_koth]->goal;
+    bridge.gamemodegoals.race = gamemodes[game_mode_race]->goal;
+    bridge.gamemodegoals.owned = gamemodes[game_mode_owned]->goal;
+    bridge.gamemodegoals.frenzy = gamemodes[game_mode_frenzy]->goal;
+    bridge.gamemodegoals.survival = gamemodes[game_mode_survival]->goal;
+    bridge.gamemodegoals.greed = gamemodes[game_mode_greed]->goal;
+    bridge.gamemodegoals.health = gamemodes[game_mode_health]->goal;
+    bridge.gamemodegoals.collection = gamemodes[game_mode_collection]->goal;
+    bridge.gamemodegoals.chase = gamemodes[game_mode_chase]->goal;
+    bridge.gamemodegoals.shyguytag = gamemodes[game_mode_shyguytag]->goal;
 
-    const toml::ordered_value document = tomlconfig::make_config_document(*this);
+    const toml::ordered_value document = tomlconfig::make_config_document(*this, bridge);
     config << toml::format(document);
 }

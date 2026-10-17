@@ -183,6 +183,21 @@ constexpr Field<S, T> field(std::string_view name, T S::* member) {
 }
 
 
+/// Fields of the TOML document that do not live in CGameConfig
+struct Bridge {
+    std::string announcerpack;
+    std::string soundpack;
+    std::string gamemusicpack;
+    std::string worldmusicpack;
+    std::string menugraphicspack;
+    std::string worldgraphicspack;
+    std::string gamegraphicspack;
+    std::array<std::string, MAX_PLAYERS> skins;
+    std::array<PlayerType, MAX_PLAYERS> player_slots;
+    GameModeGoals gamemodegoals;
+};
+
+
 template <typename S> struct NamedStruct;
 
 template<> struct NamedStruct<ClassicGameModeSettings> {
@@ -345,7 +360,6 @@ template<> struct NamedStruct<GameModeSettings> {
         field("shyguytag", &GameModeSettings::shyguytag),
         field("boss", &GameModeSettings::boss));
 };
-
 template<> struct NamedStruct<GameModeGoals> {
     static constexpr auto table = std::make_tuple(
         field("classic", &GameModeGoals::classic),
@@ -509,16 +523,15 @@ void from_toml(T& value, const toml::value& t)
 }
 
 
-/// A TOML table whose entries map directly to fields of the config struct
-template <typename Struct, typename... T>
+/// A TOML table whose entries map directly to fields of the config struct;
+/// the fields may belong to the config or to the Bridge (see field_value)
+template <typename... F>
 struct Section {
     std::string_view name;
-    std::tuple<Field<Struct, T>...> fields;
+    std::tuple<F...> fields;
 };
-
-template <typename Struct, typename... T>
-constexpr Section<Struct, T...> section(std::string_view name, Field<Struct, T>... fields)
-{
+template <typename... F>
+constexpr Section<F...> section(std::string_view name, F... fields) {
     return {name, {fields...}};
 }
 
@@ -530,8 +543,7 @@ struct SubStructSection {
 };
 
 template <typename Struct, typename T>
-constexpr SubStructSection<Struct, T> struct_section(std::string_view name, T Struct::* member)
-{
+constexpr SubStructSection<Struct, T> struct_section(std::string_view name, T Struct::* member) {
     return {name, member};
 }
 
@@ -543,17 +555,17 @@ template<> struct NamedLayout<CGameConfig> {
             field("top_layer", &CGameConfig::toplayer),
             field("frame_limiter", &CGameConfig::framelimiter),
             field("fullscreen", &CGameConfig::fullscreen),
-            field("menu_pack", &CGameConfig::menugraphicspack),
-            field("world_pack", &CGameConfig::worldgraphicspack),
-            field("game_pack", &CGameConfig::gamegraphicspack)),
+            field("menu_pack", &Bridge::menugraphicspack),
+            field("world_pack", &Bridge::worldgraphicspack),
+            field("game_pack", &Bridge::gamegraphicspack)),
         section("audio",
             field("music_volume", &CGameConfig::musicvolume),
             field("sound_volume", &CGameConfig::soundvolume),
             field("play_next_music", &CGameConfig::playnextmusic),
-            field("announcer", &CGameConfig::announcerpack),
-            field("sound_pack", &CGameConfig::soundpack),
-            field("game_music_pack", &CGameConfig::gamemusicpack),
-            field("world_music_pack", &CGameConfig::worldmusicpack)),
+            field("announcer", &Bridge::announcerpack),
+            field("sound_pack", &Bridge::soundpack),
+            field("game_music_pack", &Bridge::gamemusicpack),
+            field("world_music_pack", &Bridge::worldmusicpack)),
         section("gameplay",
             field("respawn_time", &CGameConfig::respawn),
             field("shield_style", &CGameConfig::shieldstyle),
@@ -570,8 +582,8 @@ template<> struct NamedLayout<CGameConfig> {
             field("team_colors", &CGameConfig::teamcolors),
             field("tournament_control_style", &CGameConfig::tournamentcontrolstyle)),
         section("players",
-            field("skins", &CGameConfig::skins),
-            field("player_slots", &CGameConfig::player_slots)),
+            field("skins", &Bridge::skins),
+            field("player_slots", &Bridge::player_slots)),
         section("eyecandy",
             field("spawn_style", &CGameConfig::spawnstyle),
             field("award_style", &CGameConfig::awardstyle),
@@ -616,25 +628,51 @@ template<> struct NamedLayout<CGameConfig> {
             field("selected_preset", &CGameConfig::poweruppreset),
             field("presets", &CGameConfig::allPowerupPresets)),
         struct_section("gamemode_settings", &CGameConfig::gamemodemenusettings),
-        struct_section("gamemode_goals", &CGameConfig::gamemodegoals)
+        struct_section("gamemode_goals", &Bridge::gamemodegoals)
     );
 };
 
 
+template <typename Ptr> struct member_ptr_owner;
+template <typename T, typename Owner> struct member_ptr_owner<T Owner::*> {
+    using type = Owner;
+};
+
+/// Resolves a field's pointer-to-member against the object that owns it,
+/// which is either the config or the Bridge (see Bridge).
+template <typename Ptr, typename Config, typename Bridge>
+const auto& field_value(Ptr member, const Config& config, const Bridge& bridge)
+{
+    if constexpr (std::is_same_v<typename member_ptr_owner<Ptr>::type, Config>) {
+        return config.*member;
+    } else {
+        return bridge.*member;
+    }
+}
+template <typename Ptr, typename Config, typename Bridge>
+auto& field_value(Ptr member, Config& config, Bridge& bridge)
+{
+    if constexpr (std::is_same_v<typename member_ptr_owner<Ptr>::type, Config>) {
+        return config.*member;
+    } else {
+        return bridge.*member;
+    }
+}
+
 template <typename Struct>
-toml::ordered_value make_config_document(const Struct& config)
+toml::ordered_value make_config_document(const Struct& config, const Bridge& bridge)
 {
     toml::ordered_table root;
-    std::apply([&root, &config](const auto&... sec) {
+    std::apply([&root, &config, &bridge](const auto&... sec) {
         auto add_section = [&](const auto& sec) {
             if constexpr (requires { sec.fields; }) {
                 toml::ordered_table table;
-                std::apply([&table, &config](const auto&... f) {
-                    (table.emplace(std::string(f.name), to_toml(config.*(f.member))), ...);
+                std::apply([&table, &config, &bridge](const auto&... f) {
+                    (table.emplace(std::string(f.name), to_toml(field_value(f.member, config, bridge))), ...);
                 }, sec.fields);
                 root.emplace(std::string(sec.name), toml::ordered_value(std::move(table)));
             } else {
-                toml::ordered_value value = to_toml_table(config.*(sec.member));
+                toml::ordered_value value = to_toml_table(field_value(sec.member, config, bridge));
                 // Skip the header for a table of tables (eg. gamemode_settings)
                 // Keep it for plain tables (eg. gamemode_goals)
                 if (value.is_table() && std::all_of(value.as_table().begin(), value.as_table().end(),
@@ -650,24 +688,24 @@ toml::ordered_value make_config_document(const Struct& config)
 
 
 template <typename Struct>
-void apply_config_document(Struct& config, const toml::value& document)
+void apply_config_document(Struct& config, Bridge& bridge, const toml::value& document)
 {
     if (!document.is_table())
         return;
 
-    std::apply([&config, &document](const auto&... sec) {
+    std::apply([&config, &bridge, &document](const auto&... sec) {
         auto read_section = [&](const auto& sec) {
             if (!document.contains(std::string(sec.name)))
                 return;
             const toml::value& table = document.at(std::string(sec.name));
 
             if constexpr (requires { sec.fields; }) {
-                std::apply([&table, &config](const auto&... f) {
-                    (read_field(config.*(f.member), table, f.name), ...);
+                std::apply([&table, &config, &bridge](const auto&... f) {
+                    (read_field(field_value(f.member, config, bridge), table, f.name), ...);
                 }, sec.fields);
             } else {
                 if (table.is_table())
-                    from_toml(config.*(sec.member), table);
+                    from_toml(field_value(sec.member, config, bridge), table);
             }
         };
         (read_section(sec), ...);

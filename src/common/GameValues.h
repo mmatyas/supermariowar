@@ -131,27 +131,16 @@ public:
     short		playercontrol[4];
     CPlayerInput playerInput;
     bool		playnextmusic;  //automatically advance to the next music track after one finishes
-    std::string	announcerpack;      //name of the announcer pack (resolved through AnnouncerList)
-    std::string	soundpack;          //name of the sound pack (resolved through SoundsList)
-    std::string	gamemusicpack;      //name of the game music pack (resolved through MusicList)
-    std::string	worldmusicpack;     //name of the world music pack (resolved through WorldMusicList)
     short		outofboundstime;
     PowerupDropRateStyle overridepowerupsettings;
     bool		secretsenabled;
     GameModeSettings gamemodemenusettings;
-    GameModeGoals gamemodegoals;    //only meaningful for writing/reading the TOML file (see GameModeGoals)
     bool		music;
     short		pointspeed;
     short poweruppreset;
     std::array<std::array<short, NUM_POWERUPS>, NUM_POWERUP_PRESETS> allPowerupPresets;
     bool		randomskin[4];
     ScoreboardStyle scoreboardstyle;
-    // name of each player's selected skin (SkinList), empty string selects a random skin;
-    // only meaningful for writing/reading the TOML file, runtime state stays in skinids/randomskin
-    std::array<std::string, MAX_PLAYERS> skins;
-    // what kind of player sits in each seat; only meaningful for writing/reading the
-    // TOML file, runtime state stays in playercontrol
-    std::array<PlayerType, MAX_PLAYERS> player_slots;
     bool		screencrunch;
     short		shieldtime;
     ShieldStyle shieldstyle;
@@ -161,9 +150,6 @@ public:
     TournamentControlStyle tournamentcontrolstyle;  //ID for the player selected control style
     short		wandfreezetime;
     bool		toplayer;
-    std::string	menugraphicspack;   //name of the menu graphics pack (resolved through GraphicsList)
-    std::string	worldgraphicspack;  //name of the world graphics pack (resolved through GraphicsList)
-    std::string	gamegraphicspack;   //name of the game graphics pack (resolved through GraphicsList)
     bool		teamcolors;
     bool		sound;
     bool		startgamecountdown;
