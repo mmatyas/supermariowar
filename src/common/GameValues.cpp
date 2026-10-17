@@ -575,6 +575,13 @@ void CGameConfig::ReadConfigToml() {
         if (!soundpack.empty())
             soundpacklist->find(soundpack);
 
+        if (!menugraphicspack.empty())
+            menugraphicspacklist->find(menugraphicspack);
+        if (!worldgraphicspack.empty())
+            worldgraphicspacklist->find(worldgraphicspack);
+        if (!gamegraphicspack.empty())
+            gamegraphicspacklist->find(gamegraphicspack);
+
         for (size_t pack = 0; pack < musiclist->count(); pack++) {
             if (musiclist->nameAt(pack) == gamemusicpack) {
                 musiclist->setCurrent(pack);
@@ -610,6 +617,10 @@ void CGameConfig::WriteConfigToml() {
     soundpack = GetNameFromFileName(soundpacklist->currentPath().string());
     gamemusicpack = musiclist->currentName();
     worldmusicpack = worldmusiclist->currentName();
+
+    menugraphicspack = GetNameFromFileName(menugraphicspacklist->currentPath().string());
+    worldgraphicspack = GetNameFromFileName(worldgraphicspacklist->currentPath().string());
+    gamegraphicspack = GetNameFromFileName(gamegraphicspacklist->currentPath().string());
 
     const toml::ordered_value document = tomlconfig::make_config_document(*this);
     config << toml::format(document);

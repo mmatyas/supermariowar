@@ -146,6 +146,9 @@ public:
     TournamentControlStyle tournamentcontrolstyle;  //ID for the player selected control style
     short		wandfreezetime;
     bool		toplayer;
+    std::string	menugraphicspack;   //name of the menu graphics pack (resolved through GraphicsList)
+    std::string	worldgraphicspack;  //name of the world graphics pack (resolved through GraphicsList)
+    std::string	gamegraphicspack;   //name of the game graphics pack (resolved through GraphicsList)
     bool		teamcolors;
     bool		sound;
     bool		startgamecountdown;

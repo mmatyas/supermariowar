@@ -22,6 +22,9 @@ CGameConfig makePeculiarConfig()
     config.toplayer = true;
     config.framelimiter = 13;
     config.fullscreen = true;
+    config.menugraphicspack = "Classical Menu";
+    config.worldgraphicspack = "Unbiased World";
+    config.gamegraphicspack = "Retro Game";
 
     // audio
     config.musicvolume = 11;
@@ -166,7 +169,7 @@ TEST_CASE("TOML config document covers every descriptor field exactly once")
     }, tomlconfig::NamedLayout<CGameConfig>::sections);
 
     CHECK(counts[0] == 9);
-    CHECK(counts[1] == 61);
+    CHECK(counts[1] == 64);
     CHECK(counts[2] == 1);
 }
 
