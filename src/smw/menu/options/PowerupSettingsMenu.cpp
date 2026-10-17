@@ -58,17 +58,17 @@ UI_PowerupSettingsMenu::UI_PowerupSettingsMenu()
     miHiddenBlockRespawnField->setOutputPtr(&game_values.hiddenblockrespawn);
     miHiddenBlockRespawnField->setCurrentValue(game_values.hiddenblockrespawn);
 
-    miSwapStyleField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 220, "Swap Style", 500, 220);
-    miSwapStyleField->add("Walk", 0);
-    miSwapStyleField->add("Blink", 1);
-    miSwapStyleField->add("Instant", 2);
+    miSwapStyleField = new MI_SelectField<MysteryMushroomSwapStyle>(&rm->spr_selectfield, 70, 220, "Swap Style", 500, 220);
+    miSwapStyleField->add("Walk", MysteryMushroomSwapStyle::Walk);
+    miSwapStyleField->add("Blink", MysteryMushroomSwapStyle::Blink);
+    miSwapStyleField->add("Instant", MysteryMushroomSwapStyle::Instant);
     miSwapStyleField->setOutputPtr(&game_values.swapstyle);
     miSwapStyleField->setCurrentValue(game_values.swapstyle);
 
-    miBonusWheelField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 260, "Bonus Wheel", 500, 220);
-    miBonusWheelField->add("Off", 0);
-    miBonusWheelField->add("Tournament Win", 1);
-    miBonusWheelField->add("Every Game", 2);
+    miBonusWheelField = new MI_SelectField<BonusWheelStyle>(&rm->spr_selectfield, 70, 260, "Bonus Wheel", 500, 220);
+    miBonusWheelField->add("Off", BonusWheelStyle::Off);
+    miBonusWheelField->add("Tournament Win", BonusWheelStyle::TournamentWin);
+    miBonusWheelField->add("Every Game", BonusWheelStyle::EveryGame);
     miBonusWheelField->setOutputPtr(&game_values.bonuswheel);
     miBonusWheelField->setCurrentValue(game_values.bonuswheel);
 

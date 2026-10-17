@@ -93,7 +93,7 @@ public:
     short		redblockttl;
     short		grayblockttl;
     short		bombslimit;
-    short		bonuswheel;
+    BonusWheelStyle bonuswheel;
     short		fireballttl;
     short		fireballlimit;
     BoomerangStyle boomerangstyle;
@@ -122,7 +122,7 @@ public:
     CPlayerInput playerInput;
     bool		playnextmusic;  //automatically advance to the next music track after one finishes
     short		outofboundstime;
-    short		overridepowerupsettings;
+    PowerupDropRateStyle overridepowerupsettings;
     bool		secretsenabled;
     GameModeSettings gamemodemenusettings;
     bool		music;
@@ -145,7 +145,7 @@ public:
     bool		startgamecountdown;
     bool		startmodedisplay;
     short		storedpowerupdelay;
-    short		swapstyle;
+    MysteryMushroomSwapStyle swapstyle;
     short		respawn;
 
     void ReadBinaryConfig();

@@ -1133,7 +1133,7 @@ void GameplayState::drawPlayerSwap()
             if (storedpowerupid != -1) {
                 short iPowerupX, iPowerupY;
 
-                if (game_values.swapstyle == 1) {
+                if (game_values.swapstyle == MysteryMushroomSwapStyle::Blink) {
                     iPowerupX = game_values.flags.swapplayersblink ? player->iOldPowerupX : player->iNewPowerupX;
                     iPowerupY = game_values.flags.swapplayersblink ? player->iOldPowerupY : player->iNewPowerupY;
                 } else {
@@ -1145,7 +1145,7 @@ void GameplayState::drawPlayerSwap()
             }
         }
 
-        if (game_values.swapstyle == 0) {
+        if (game_values.swapstyle == MysteryMushroomSwapStyle::Walk) {
             if (!rm->sfx_skid.isPlaying())
                 ifSoundOnPlay(rm->sfx_skid);
         }
@@ -1161,12 +1161,12 @@ void GameplayState::drawPlayerSwap()
             game_values.flags.swapplayers = false;
             game_values.screenfade = 0;
 
-            if (game_values.swapstyle == 0)
+            if (game_values.swapstyle == MysteryMushroomSwapStyle::Walk)
                 rm->sfx_skid.stop();
 
             ifSoundOnPlay(rm->sfx_transform);
 
-            if (game_values.swapstyle == 1) {
+            if (game_values.swapstyle == MysteryMushroomSwapStyle::Blink) {
                 for (CPlayer* player : players)
                     eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, player->leftX() + (HALFPW) - 16, player->topY() + (HALFPH) - 16, 3, 8);
             }
@@ -2628,11 +2628,11 @@ bool SwapPlayers(short iUsingPlayerID)
     if (iNumAvailablePlayers <= 1)
         return false;
 
-    if (game_values.swapstyle != 2) {
+    if (game_values.swapstyle != MysteryMushroomSwapStyle::Instant) {
         game_values.flags.swapplayers = true;
         game_values.flags.swapplayersposition = 0.0f;
 
-        if (game_values.swapstyle == 1) {
+        if (game_values.swapstyle == MysteryMushroomSwapStyle::Blink) {
             game_values.flags.swapplayersblink = false;
             game_values.flags.swapplayersblinkcount = 0;
         } else {
@@ -2674,10 +2674,10 @@ bool SwapPlayers(short iUsingPlayerID)
 
         spots[iPlayer].GetPlayer(player, &game_values.gamepowerups[player->getGlobalID()]);
 
-        if (game_values.swapstyle != 1)
+        if (game_values.swapstyle != MysteryMushroomSwapStyle::Blink)
             eyecandy[2].emplace<EC_SingleAnimation>(&rm->spr_fireballexplosion, (short)player->fNewSwapX + (HALFPW) - 16, (short)player->fNewSwapY + (HALFPH) - 16, 3, 8);
 
-        if (game_values.swapstyle == 2) {
+        if (game_values.swapstyle == MysteryMushroomSwapStyle::Instant) {
             player->setXf(player->fNewSwapX);
             player->setYf(player->fNewSwapY);
 

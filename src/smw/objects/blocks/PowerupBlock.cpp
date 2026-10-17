@@ -2,6 +2,7 @@
 
 #include "GameValues.h"
 #include "GameMode.h"
+#include "GameplayStyles.h"
 #include "map.h"
 #include "objectgame.h"
 #include "player.h"
@@ -36,16 +37,16 @@ B_PowerupBlock::B_PowerupBlock(gfxSprite* nspr1, Vec2s pos, short iNumSpr, short
 
     hidden = ishiddentype = fHidden;
 
-    if (piSettings[0] == -1 || game_values.overridepowerupsettings == 1) { //Game Only
+    if (piSettings[0] == -1 || game_values.overridepowerupsettings == PowerupDropRateStyle::UseGame) { //Game Only
         for (short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
             settings[iSetting] = game_values.powerupweights[iSetting];
-    } else if (game_values.overridepowerupsettings == 0) { //Map Only
+    } else if (game_values.overridepowerupsettings == PowerupDropRateStyle::UseMap) { //Map Only
         for (short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
             settings[iSetting] = piSettings[iSetting];
-    } else if (game_values.overridepowerupsettings == 2) { //Average
+    } else if (game_values.overridepowerupsettings == PowerupDropRateStyle::SimpleAverage) { //Average
         for (short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
             settings[iSetting] = piSettings[iSetting] + game_values.powerupweights[iSetting];
-    } else if (game_values.overridepowerupsettings == 3) { //Weighted
+    } else if (game_values.overridepowerupsettings == PowerupDropRateStyle::WeightedAverage) { //Weighted
         float dMapWeightCount = 0;
         for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
             dMapWeightCount += piSettings[iPowerup];

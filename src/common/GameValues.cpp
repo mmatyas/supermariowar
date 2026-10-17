@@ -196,7 +196,7 @@ void CGameValues::init()
     wandfreezetime    = 310;  //5 seconds of freeze time
     wandlimit     = 0;  //Unlimited
     storedpowerupdelay  = 4;
-    bonuswheel      = 1;
+    bonuswheel      = BonusWheelStyle::TournamentWin;
     keeppowerup     = false;
     showwinningcrown  = false;
     startgamecountdown  = true;
@@ -204,11 +204,11 @@ void CGameValues::init()
     deadteamnotice    = true;
     playnextmusic   = false;
     pointspeed      = 20;
-    swapstyle     = 1;  //Blink then swap
+    swapstyle     = MysteryMushroomSwapStyle::Blink;  //Blink then swap
     worldpointsbonus  = -1; //no world multiplier until player uses item to boost it
     singleplayermode  = -1;
     worldskipscoreboard = false;
-    overridepowerupsettings = 0;
+    overridepowerupsettings = PowerupDropRateStyle::UseMap;
     secretsenabled  = false;
     poweruppreset   = 0;
     tournamentcontrolstyle = TournamentControlStyle::All;
@@ -322,13 +322,13 @@ void CGameConfig::ReadBinaryConfig() {
         outofboundstime = options.read_u8();
         cpudifficulty = options.read_u8();
         framelimiter = options.read_u8();
-        bonuswheel = options.read_u8();
+        bonuswheel = static_cast<BonusWheelStyle>(options.read_u8());
         keeppowerup = options.read_u8();
         showwinningcrown = options.read_u8();
         playnextmusic = options.read_u8();
         pointspeed = options.read_u8();
-        swapstyle = options.read_u8();
-        overridepowerupsettings = options.read_u8();
+        swapstyle = static_cast<MysteryMushroomSwapStyle>(options.read_u8());
+        overridepowerupsettings = static_cast<PowerupDropRateStyle>(options.read_u8());
         secretsenabled = options.read_u8();
         startgamecountdown = options.read_u8();
         deadteamnotice = options.read_u8();
@@ -461,13 +461,13 @@ void CGameConfig::WriteConfig() const
         options.write_u8(outofboundstime);
         options.write_u8(cpudifficulty);
         options.write_u8(framelimiter);
-        options.write_u8(bonuswheel);
+        options.write_u8(static_cast<uint8_t>(bonuswheel));
         options.write_u8(keeppowerup);
         options.write_u8(showwinningcrown);
         options.write_u8(playnextmusic);
         options.write_u8(pointspeed);
-        options.write_u8(swapstyle);
-        options.write_u8(overridepowerupsettings);
+        options.write_u8(static_cast<uint8_t>(swapstyle));
+        options.write_u8(static_cast<uint8_t>(overridepowerupsettings));
         options.write_u8(secretsenabled);
         options.write_u8(startgamecountdown);
         options.write_u8(deadteamnotice);
