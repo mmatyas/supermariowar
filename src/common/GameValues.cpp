@@ -567,8 +567,8 @@ void CGameConfig::ReadConfigToml() {
     try {
         const toml::value root = toml::parse(config_path);
 
-        tomlconfig::Bridge bridge;
-        tomlconfig::apply_config_document(*this, bridge, root);
+        config::Bridge bridge;
+        config::apply_config_document(*this, bridge, root);
 
         // Propagate the per-mode goals into the runtime modes.
         // The boss minigame goal is set per tour stop, so it has no runtime counterpart here.
@@ -665,7 +665,7 @@ void CGameConfig::WriteConfigToml() {
     if (!config.is_open())
         throw std::runtime_error("Could not create " + config_path);
 
-    tomlconfig::Bridge bridge;
+    config::Bridge bridge;
 
     bridge.announcerpack = GetNameFromFileName(announcerlist->currentPath().string());
     bridge.soundpack = GetNameFromFileName(soundpacklist->currentPath().string());
@@ -685,9 +685,9 @@ void CGameConfig::WriteConfigToml() {
     }
     for (size_t player = 0; player < MAX_PLAYERS; player++) {
         if (playercontrol[player] >= 0 && playercontrol[player] <= 2) {
-            bridge.player_slots[player] = static_cast<PlayerType>(playercontrol[player]);
+            bridge.player_slots[player] = static_cast<PlayerSlot>(playercontrol[player]);
         } else {
-            bridge.player_slots[player] = PlayerType::Empty;
+            bridge.player_slots[player] = PlayerSlot::Empty;
         }
     }
 
@@ -715,6 +715,6 @@ void CGameConfig::WriteConfigToml() {
     bridge.gamemodegoals.chase = gamemodes[game_mode_chase]->goal;
     bridge.gamemodegoals.shyguytag = gamemodes[game_mode_shyguytag]->goal;
 
-    const toml::ordered_value document = tomlconfig::make_config_document(*this, bridge);
+    const toml::ordered_value document = config::make_config_document(*this, bridge);
     config << toml::format(document);
 }

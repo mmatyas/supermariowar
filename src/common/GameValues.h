@@ -31,14 +31,6 @@ enum class AppState: unsigned char {
     Quit,
 };
 
-// what kind of player occupies a seat; the integer values match the
-// playercontrol[] shorts used at runtime (0 empty, 1 human, 2 cpu)
-enum class PlayerType : unsigned char {
-    Empty,
-    Human,
-    CPU,
-};
-
 //tournament scores
 struct TournamentScores {
     short       wins;

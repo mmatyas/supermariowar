@@ -15,11 +15,11 @@ namespace {
 // Fill all serializable CGameConfig and Bridge fields with distinctive non-default
 // values so that a dropped and a coincidentally-matching field do not cancel each
 // other out.
-std::pair<CGameConfig, tomlconfig::Bridge> makePeculiar()
+std::pair<CGameConfig, config::Bridge> makePeculiar()
 {
-    std::pair<CGameConfig, tomlconfig::Bridge> result {CGameConfig {}, tomlconfig::Bridge {}};
+    std::pair<CGameConfig, config::Bridge> result {CGameConfig {}, config::Bridge {}};
     CGameConfig& config = result.first;
-    tomlconfig::Bridge& bridge = result.second;
+    config::Bridge& bridge = result.second;
 
     // video
     config.toplayer = true;
@@ -60,10 +60,10 @@ std::pair<CGameConfig, tomlconfig::Bridge> makePeculiar()
     bridge.skins[1] = ""; // random
     bridge.skins[2] = "fire";
     bridge.skins[3] = "kid";
-    bridge.player_slots[0] = PlayerType::Human;
-    bridge.player_slots[1] = PlayerType::CPU;
-    bridge.player_slots[2] = PlayerType::CPU;
-    bridge.player_slots[3] = PlayerType::Empty;
+    bridge.player_slots[0] = PlayerSlot::Human;
+    bridge.player_slots[1] = PlayerSlot::Cpu;
+    bridge.player_slots[2] = PlayerSlot::Cpu;
+    bridge.player_slots[3] = PlayerSlot::Empty;
 
     // eyecandy
     config.spawnstyle = SpawnStyle::Swirl;
@@ -156,21 +156,21 @@ std::pair<CGameConfig, tomlconfig::Bridge> makePeculiar()
     return result;
 }
 
-toml::ordered_value make_document(const CGameConfig& config, const tomlconfig::Bridge& bridge)
+toml::ordered_value make_document(const CGameConfig& config, const config::Bridge& bridge)
 {
-    return tomlconfig::make_config_document(config, bridge);
+    return config::make_config_document(config, bridge);
 }
 
-std::string document_round_trip(const CGameConfig& config, const tomlconfig::Bridge& bridge)
+std::string document_round_trip(const CGameConfig& config, const config::Bridge& bridge)
 {
     const std::string text = toml::format(make_document(config, bridge));
     const toml::value parsed = toml::parse_str(text);
 
     CGameConfig restored {};
-    tomlconfig::Bridge restored_bridge {};
-    tomlconfig::apply_config_document(restored, restored_bridge, parsed);
+    config::Bridge restored_bridge {};
+    config::apply_config_document(restored, restored_bridge, parsed);
 
-    return toml::format(tomlconfig::make_config_document(restored, restored_bridge));
+    return toml::format(config::make_config_document(restored, restored_bridge));
 }
 
 } // namespace
@@ -185,7 +185,7 @@ TEST_CASE("TOML config document round trip with non-default values")
 TEST_CASE("TOML config document round trip with defaulted values")
 {
     const CGameConfig config {};
-    const tomlconfig::Bridge bridge {};
+    const config::Bridge bridge {};
     CHECK(document_round_trip(config, bridge) == toml::format(make_document(config, bridge)));
 }
 
@@ -206,7 +206,7 @@ TEST_CASE("TOML config document covers every descriptor field exactly once")
             }
         };
         (count_section(sec), ...);
-    }, tomlconfig::NamedLayout<CGameConfig>::sections);
+    }, config::NamedLayout<CGameConfig>::sections);
 
     CHECK(counts[0] == 10);
     CHECK(counts[1] == 66);
@@ -253,8 +253,8 @@ TEST_CASE("Applying a TOML document fills the per-mode goals")
     )");
 
     CGameConfig restored {};
-    tomlconfig::Bridge restored_bridge {};
-    tomlconfig::apply_config_document(restored, restored_bridge, document);
+    config::Bridge restored_bridge {};
+    config::apply_config_document(restored, restored_bridge, document);
 
     // goals from the table fill their members,
     // the remaining goals keep their defaults
@@ -289,8 +289,8 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
 
     const CGameConfig config {};
     CGameConfig restored {};
-    tomlconfig::Bridge restored_bridge {};
-    tomlconfig::apply_config_document(restored, restored_bridge, document);
+    config::Bridge restored_bridge {};
+    config::apply_config_document(restored, restored_bridge, document);
 
     // wrong value type: kept as-is
     CHECK(restored.fireballttl == config.fireballttl);
@@ -298,9 +298,9 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
     CHECK(restored.fullscreen == config.fullscreen);
     CHECK(restored.respawn == config.respawn);
     // wrong array length: kept as-is
-    CHECK(restored_bridge.skins == tomlconfig::Bridge {}.skins);
+    CHECK(restored_bridge.skins == config::Bridge {}.skins);
     // wrong value inside the array: kept as-is
-    CHECK(restored_bridge.player_slots == tomlconfig::Bridge {}.player_slots);
+    CHECK(restored_bridge.player_slots == config::Bridge {}.player_slots);
     // valid keys of valid sections are still applied
     CHECK(restored.secretsenabled == true);
     CHECK(restored.gamemodemenusettings.classic.scoring == ScoringStyle::PushOnly);
@@ -317,8 +317,8 @@ TEST_CASE("Applying a TOML document without chapters keeps the existing values")
     )");
 
     CGameConfig restored {};
-    tomlconfig::Bridge restored_bridge {};
-    tomlconfig::apply_config_document(restored, restored_bridge, document);
+    config::Bridge restored_bridge {};
+    config::apply_config_document(restored, restored_bridge, document);
 
     CHECK(restored.fireballttl == CGameConfig {}.fireballttl);
     CHECK(restored.gamemodemenusettings.chicken.usetarget == CGameConfig {}.gamemodemenusettings.chicken.usetarget);

@@ -25,3 +25,10 @@ enum class Boss : unsigned char {
     Bomb,
     Fire,
 };
+
+
+enum class PlayerSlot : unsigned char {
+    Empty,
+    Human,
+    Cpu,
+};
