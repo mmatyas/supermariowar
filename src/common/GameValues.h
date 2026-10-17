@@ -137,6 +137,9 @@ public:
     std::array<std::array<short, NUM_POWERUPS>, NUM_POWERUP_PRESETS> allPowerupPresets;
     bool		randomskin[4];
     ScoreboardStyle scoreboardstyle;
+    // name of each player's selected skin (SkinList), empty string selects a random skin;
+    // only meaningful for writing/reading the TOML file, runtime state stays in skinids/randomskin
+    std::array<std::string, MAX_PLAYERS> skins;
     bool		screencrunch;
     short		shieldtime;
     ShieldStyle shieldstyle;

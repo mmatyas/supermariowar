@@ -582,6 +582,27 @@ void CGameConfig::ReadConfigToml() {
         if (!gamegraphicspack.empty())
             gamegraphicspacklist->find(gamegraphicspack);
 
+        // Resolve the selected skin names into skin IDs; an empty name selects a random skin.
+        // Unknown names warn and keep the current skin.
+        for (size_t player = 0; player < MAX_PLAYERS; player++) {
+            if (skins[player].empty()) {
+                randomskin[player] = true;
+                continue;
+            }
+
+            randomskin[player] = false;
+            bool found = false;
+            for (size_t skin = 0; skin < skinlist->count(); skin++) {
+                if (skinlist->at(skin).name == skins[player]) {
+                    skinids[player] = static_cast<short>(skin);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                printf("[config][warning] Skin '%s' for player %d not found, keeping the current skin.\n", skins[player].c_str(), static_cast<int>(player));
+        }
+
         for (size_t pack = 0; pack < musiclist->count(); pack++) {
             if (musiclist->nameAt(pack) == gamemusicpack) {
                 musiclist->setCurrent(pack);
@@ -621,6 +642,13 @@ void CGameConfig::WriteConfigToml() {
     menugraphicspack = GetNameFromFileName(menugraphicspacklist->currentPath().string());
     worldgraphicspack = GetNameFromFileName(worldgraphicspacklist->currentPath().string());
     gamegraphicspack = GetNameFromFileName(gamegraphicspacklist->currentPath().string());
+
+    for (size_t player = 0; player < MAX_PLAYERS; player++) {
+        if (randomskin[player] || skinids[player] < 0 || skinids[player] >= skinlist->count())
+            skins[player].clear();
+        else
+            skins[player] = skinlist->at(skinids[player]).name;
+    }
 
     const toml::ordered_value document = tomlconfig::make_config_document(*this);
     config << toml::format(document);

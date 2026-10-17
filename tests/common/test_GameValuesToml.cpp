@@ -52,6 +52,12 @@ CGameConfig makePeculiarConfig()
     config.teamcolors = true;
     config.tournamentcontrolstyle = TournamentControlStyle::RoundRobin;
 
+    // players
+    config.skins[0] = "toad";
+    config.skins[1] = ""; // random
+    config.skins[2] = "fire";
+    config.skins[3] = "kid";
+
     // eyecandy
     config.spawnstyle = SpawnStyle::Swirl;
     config.awardstyle = AwardStyle::Fireworks;
@@ -168,8 +174,8 @@ TEST_CASE("TOML config document covers every descriptor field exactly once")
         (count_section(sec), ...);
     }, tomlconfig::NamedLayout<CGameConfig>::sections);
 
-    CHECK(counts[0] == 9);
-    CHECK(counts[1] == 64);
+    CHECK(counts[0] == 10);
+    CHECK(counts[1] == 65);
     CHECK(counts[2] == 1);
 }
 
@@ -187,6 +193,10 @@ TEST_CASE("TOML config document values map to the documented TOML type")
     // booleans stay booleans while other fields stay integers
     CHECK(document.at("powerups").at("bonus_keep_powerup").is_boolean());
     CHECK(document.at("powerup_rates").at("presets").is_array());
+
+    // player skins are stored as names, empty string selects a random skin
+    CHECK(document.at("players").at("skins").is_array());
+    CHECK(document.at("players").at("skins").as_array().at(1).as_string().empty());
 }
 
 TEST_CASE("Applying a broken TOML document keeps the existing values")
@@ -200,6 +210,9 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
 
         [video]
         full_screen = "yes"
+
+        [players]
+        skins = ["toad", "peach"]
 
         [gamemode_settings.classic]
         death_style = "made_up"
@@ -215,6 +228,8 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
     // wrong key name: kept as-is
     CHECK(restored.fullscreen == config.fullscreen);
     CHECK(restored.respawn == config.respawn);
+    // wrong array length: kept as-is
+    CHECK(restored.skins == config.skins);
     // valid keys of valid sections are still applied
     CHECK(restored.secretsenabled == true);
     CHECK(restored.gamemodemenusettings.classic.scoring == ScoringStyle::PushOnly);

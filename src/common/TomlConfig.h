@@ -373,8 +373,8 @@ toml::ordered_value to_toml(const T& value)
         for (const auto& element : value)
             arr.push_back(to_toml(element));
         toml::ordered_value result = std::move(arr);
-        // arrays of scalars read better on one line
-        if constexpr (std::is_arithmetic_v<typename T::value_type>)
+        // arrays of scalars and strings read better on one line
+        if constexpr (std::is_arithmetic_v<typename T::value_type> || std::is_same_v<typename T::value_type, std::string>)
             result.as_array_fmt().fmt = toml::array_format::oneline;
         return result;
     } else if constexpr (has_named_struct<T>::value) {
@@ -533,6 +533,8 @@ template<> struct NamedLayout<CGameConfig> {
             field("team_collision_style", &CGameConfig::teamcollision),
             field("team_colors", &CGameConfig::teamcolors),
             field("tournament_control_style", &CGameConfig::tournamentcontrolstyle)),
+        section("players",
+            field("skins", &CGameConfig::skins)),
         section("eyecandy",
             field("spawn_style", &CGameConfig::spawnstyle),
             field("award_style", &CGameConfig::awardstyle),
