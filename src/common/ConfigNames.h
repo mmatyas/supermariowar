@@ -374,6 +374,21 @@ template<> struct NamedStruct<GameModeGoals> {
 };
 
 
+// Powerup droprate presets
+
+constexpr std::array<std::string_view, NUM_POWERUPS> POWERUP_DROPRATE_KEYS_ORDERED = {
+    "1up", "2up", "3up", "5up", "mystery",
+    "flower", "hammer", "boomerang", "bomb", "wand",
+    "feather", "leaf", "pwing", "poison", "star",
+    "bobomb", "tanooki", "clock", "bbill", "podobo",
+    "pow", "mod", "gshell", "rshell", "bshell", "spiky",
+};
+
+template <typename T>
+inline constexpr bool is_powerup_rate_presets = std::is_same_v<
+    T, std::array<std::array<short, NUM_POWERUPS>, NUM_POWERUP_PRESETS>>;
+
+
 // The game config itself
 
 /// Fields that do not live in CGameConfig

@@ -21,6 +21,19 @@ toml::ordered_value to_toml(const T& value)
         return toml::ordered_value(std::string(as_str(value)));
     } else if constexpr (std::is_arithmetic_v<T>) {
         return toml::ordered_value(value);
+    } else if constexpr (is_powerup_rate_presets<T>) {
+        toml::ordered_array arr;
+        for (const auto& preset : value) {
+            toml::ordered_table rates;
+            for (std::size_t i = 0; i < NUM_POWERUPS; i++)
+                rates.emplace(std::string(POWERUP_DROPRATE_KEYS_ORDERED[i]), toml::ordered_value(preset[i]));
+            toml::ordered_value row(std::move(rates));
+            row.as_table_fmt().fmt = toml::table_format::oneline;
+            arr.push_back(std::move(row));
+        }
+        toml::ordered_value result = std::move(arr);
+        result.as_array_fmt().fmt = toml::array_format::multiline;  // keep every preset on its own line
+        return toml::ordered_value(std::move(result));
     } else if constexpr (is_std_array<T>::value) {
         toml::ordered_array arr;
         for (const auto& element : value)
@@ -106,6 +119,21 @@ void from_toml(T& value, const toml::value& t)
         value = *parsed;
     } else if constexpr (std::is_arithmetic_v<T>) {
         value = static_cast<T>(t.as_integer());
+    } else if constexpr (is_powerup_rate_presets<T>) {
+        const toml::array& presets = t.as_array();
+        if (presets.size() != NUM_POWERUP_PRESETS)
+            throw std::runtime_error("array size mismatch: expected " + std::to_string(NUM_POWERUP_PRESETS) + " presets");
+        for (std::size_t preset = 0; preset < NUM_POWERUP_PRESETS; preset++) {
+            const toml::value& rates = presets[preset];
+            if (!rates.is_table())
+                throw std::runtime_error("preset " + std::to_string(preset) + ": expected a table");
+            for (std::size_t i = 0; i < NUM_POWERUPS; i++) {
+                const std::string key(POWERUP_DROPRATE_KEYS_ORDERED[i]);
+                if (!rates.contains(key))
+                    throw std::runtime_error("preset " + std::to_string(preset) + ": missing key '" + key + "'");
+                value[preset][i] = static_cast<short>(rates.at(key).as_integer());
+            }
+        }
     } else if constexpr (std::is_array_v<T>) {
         constexpr std::size_t length = std::extent_v<T>;
         const toml::array& arr = t.as_array();

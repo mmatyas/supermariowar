@@ -226,7 +226,17 @@ TEST_CASE("TOML config document values map to the documented TOML type")
 
     // booleans stay booleans while other fields stay integers
     CHECK(document.at("powerups").at("bonus_keep_powerup").is_boolean());
-    CHECK(document.at("powerup_rates").at("presets").is_array());
+
+    // powerup drop rate presets are named tables, one per preset
+    const toml::value& presets = document.at("powerup_rates").at("presets");
+    CHECK(presets.is_array());
+    CHECK(presets.as_array().size() == NUM_POWERUP_PRESETS);
+    CHECK(presets.as_array().at(0).is_table());
+    CHECK(presets.as_array().at(0).as_table().size() == NUM_POWERUPS);
+    CHECK(presets.as_array().at(0).at("1up").as_integer() == 0);
+    CHECK(presets.as_array().at(0).at("2up").as_integer() == 1);
+    CHECK(presets.as_array().at(0).at("spiky").as_integer() == 25);
+    CHECK(presets.as_array().at(3).at("star").as_integer() == 3 * NUM_POWERUPS + 14);
 
     // player skins are stored as names, empty string selects a random skin
     CHECK(document.at("players").at("skins").is_array());
@@ -285,6 +295,9 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
         scoring_style = "push_only"
         [gamemode_goals]
         classic = "nope"
+
+        [powerup_rates]
+        presets = [{ 1up = 90 }]
     )");
 
     const CGameConfig config {};
@@ -308,6 +321,8 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
     CHECK(restored.gamemodemenusettings.classic.style == config.gamemodemenusettings.classic.style);
     // wrong goal value type: kept as-is
     CHECK(restored_bridge.gamemodegoals.classic == GameModeGoals {}.classic);
+    // wrong preset count/keys: kept as-is
+    CHECK(restored.allPowerupPresets == config.allPowerupPresets);
 }
 
 TEST_CASE("Applying a TOML document without chapters keeps the existing values")
