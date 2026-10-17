@@ -111,6 +111,18 @@ constexpr short DEFAULT_POWERUP_PRESETS[NUM_POWERUP_PRESETS][NUM_POWERUPS] {
     {0, 3, 0, 0, 0, 8, 4, 0, 0, 0, 5, 2,10, 9, 4, 5, 0, 0, 0, 4, 3, 0, 4, 0, 8, 5}, //Super Mario Bros 3
     {0,10, 0, 0, 0,10, 6, 0, 0, 0, 2, 0, 8, 4, 2, 4, 0, 4, 0, 0, 0, 0, 5, 0, 0, 0}, //Super Mario World
 };
+
+std::string GetOptionsTomlPath() {
+    return GetHomeDirectory() + "options.toml";
+}
+
+std::string GetOptionsBinPath() {
+    return GetHomeDirectory() + "options.bin";
+}
+
+std::string GetControlsBinPath() {
+    return GetHomeDirectory() + "controls.sdl2.bin";
+}
 } // namespace
 
 extern CGameValues game_values;
@@ -290,10 +302,33 @@ void CGameValues::resetSecretCounters()
     unlocksecretunlocked[3] = false;
 }
 
-// Read saved settings from disk
+void CGameConfig::ReadConfig()
+{
+    if (FileExists(GetOptionsTomlPath())) {
+        ReadTomlConfig();
+    } else {
+        ReadBinaryConfig();
+    }
+    ReadInputConfig();
+}
+
+void CGameConfig::WriteConfig() const
+{
+    WriteTomlConfig();
+    WriteInputConfig();
+
+    maplist->WriteFilters();
+    maplist->WriteMapSummaryCache();
+}
+
 void CGameConfig::ReadBinaryConfig() {
+    const std::string options_path(GetOptionsBinPath());
+    if (!FileExists(options_path)) {
+        printf("[config] No options.bin, using default values.\n");
+        return;
+    }
+
     try {
-        std::string options_path(GetHomeDirectory() + "options.bin");
         BinaryFile options(options_path, "rb");
         if (!options.is_open())
             throw std::runtime_error("Could not open " + options_path);
@@ -403,42 +438,14 @@ void CGameConfig::ReadBinaryConfig() {
     }
     catch (std::exception const& error)
     {
-        perror(error.what());
-        return;
-    }
-
-    try {
-        std::string controls_path(GetHomeDirectory() + "controls.sdl2.bin");
-        BinaryFile controls(controls_path, "rb");
-        if (!controls.is_open())
-            throw std::runtime_error("Could not open " + controls_path);
-
-        //TODO: Need to test what happens when you unplug some controllers from the xbox
-        //and then start up (device index will probably point to a gamepad that isn't in the list)
-        //and this will cause a crash
-        controls.read_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
-
-        //setup player input controls for game
-        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            short iDevice = controls.read_i16();
-
-            if (iDevice >= joystickcount)
-                iDevice = DEVICE_KEYBOARD;
-
-            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
-        }
-    }
-    catch (std::exception const& error)
-    {
-        perror(error.what());
-        return;
+        printf("[config][warning] Failed to read %s, using default values. (%s)\n", options_path.c_str(), error.what());
     }
 }
 
-void CGameConfig::WriteConfig() const
+void CGameConfig::WriteBinaryConfig() const
 {
     try {
-        std::string options_path(GetHomeDirectory() + "options.bin");
+        std::string options_path(GetOptionsBinPath());
         BinaryFile options(options_path, "wb");
         if (!options.is_open())
             throw std::runtime_error("Could not open " + options_path);
@@ -538,32 +545,64 @@ void CGameConfig::WriteConfig() const
         perror(error.what());
         return;
     }
+}
+
+void CGameConfig::ReadInputConfig() {
+    const std::string controls_path(GetControlsBinPath());
+    if (!FileExists(controls_path)) {
+        printf("[config] No controls file, using default controls.\n");
+        return;
+    }
 
     try {
-        std::string controls_path(GetHomeDirectory() + "controls.sdl2.bin");
+        BinaryFile controls(controls_path, "rb");
+        if (!controls.is_open())
+            throw std::runtime_error("Could not open " + controls_path);
+
+        //TODO: Need to test what happens when you unplug some controllers from the xbox
+        //and then start up (device index will probably point to a gamepad that isn't in the list)
+        //and this will cause a crash
+        controls.read_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
+
+        //setup player input controls for game
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+            short iDevice = controls.read_i16();
+
+            if (iDevice >= joystickcount)
+                iDevice = DEVICE_KEYBOARD;
+
+            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
+        }
+    }
+    catch (std::exception const& error)
+    {
+        printf("[config][warning] Failed to read %s, using default controls. (%s)\n", controls_path.c_str(), error.what());
+    }
+}
+
+void CGameConfig::WriteInputConfig() const {
+    //the input configuration is stored in its own file, independently of
+    //the game settings
+    const std::string controls_path(GetControlsBinPath());
+    try {
         BinaryFile controls(controls_path, "wb");
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);
 
-
         controls.write_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
 
-        for (int iPlayer = 0; iPlayer < 4; iPlayer++)
+        for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++)
             controls.write_i16(playerInput.inputControls[iPlayer]->iDevice);
     }
     catch (std::exception const& error)
     {
-        perror(error.what());
-        return;
+        printf("[config][warning] Failed to write %s: %s\n", controls_path.c_str(), error.what());
     }
-
-    maplist->WriteFilters();
-    maplist->WriteMapSummaryCache();
 }
 
 
-void CGameConfig::ReadConfigToml() {
-    const std::string config_path = GetHomeDirectory() + "options.toml";
+void CGameConfig::ReadTomlConfig() {
+    const std::string config_path(GetOptionsTomlPath());
     try {
         const toml::value root = toml::parse(config_path);
 
@@ -659,62 +698,67 @@ void CGameConfig::ReadConfigToml() {
 }
 
 
-void CGameConfig::WriteConfigToml() {
-    const std::string config_path = GetHomeDirectory() + "options.toml";
-    std::ofstream config(config_path);
-    if (!config.is_open())
-        throw std::runtime_error("Could not create " + config_path);
+void CGameConfig::WriteTomlConfig() const {
+    const std::string config_path(GetOptionsTomlPath());
+    try {
+        std::ofstream config(config_path);
+        if (!config.is_open())
+            throw std::runtime_error("Could not create " + config_path);
 
-    config::Bridge bridge;
+        config::Bridge bridge;
 
-    bridge.announcerpack = GetNameFromFileName(announcerlist->currentPath().string());
-    bridge.soundpack = GetNameFromFileName(soundpacklist->currentPath().string());
-    bridge.gamemusicpack = musiclist->currentName();
-    bridge.worldmusicpack = worldmusiclist->currentName();
+        bridge.announcerpack = GetNameFromFileName(announcerlist->currentPath().string());
+        bridge.soundpack = GetNameFromFileName(soundpacklist->currentPath().string());
+        bridge.gamemusicpack = musiclist->currentName();
+        bridge.worldmusicpack = worldmusiclist->currentName();
 
-    bridge.menugraphicspack = GetNameFromFileName(menugraphicspacklist->currentPath().string());
-    bridge.worldgraphicspack = GetNameFromFileName(worldgraphicspacklist->currentPath().string());
-    bridge.gamegraphicspack = GetNameFromFileName(gamegraphicspacklist->currentPath().string());
+        bridge.menugraphicspack = GetNameFromFileName(menugraphicspacklist->currentPath().string());
+        bridge.worldgraphicspack = GetNameFromFileName(worldgraphicspacklist->currentPath().string());
+        bridge.gamegraphicspack = GetNameFromFileName(gamegraphicspacklist->currentPath().string());
 
-    for (size_t player = 0; player < MAX_PLAYERS; player++) {
-        if (randomskin[player] || skinids[player] < 0 || skinids[player] >= skinlist->count()) {
-            bridge.skins[player].clear();
-        } else {
-            bridge.skins[player] = skinlist->at(skinids[player]).name;
+        for (size_t player = 0; player < MAX_PLAYERS; player++) {
+            if (randomskin[player] || skinids[player] < 0 || skinids[player] >= skinlist->count()) {
+                bridge.skins[player].clear();
+            } else {
+                bridge.skins[player] = skinlist->at(skinids[player]).name;
+            }
         }
-    }
-    for (size_t player = 0; player < MAX_PLAYERS; player++) {
-        if (playercontrol[player] >= 0 && playercontrol[player] <= 2) {
-            bridge.player_slots[player] = static_cast<PlayerSlot>(playercontrol[player]);
-        } else {
-            bridge.player_slots[player] = PlayerSlot::Empty;
+        for (size_t player = 0; player < MAX_PLAYERS; player++) {
+            if (playercontrol[player] >= 0 && playercontrol[player] <= 2) {
+                bridge.player_slots[player] = static_cast<PlayerSlot>(playercontrol[player]);
+            } else {
+                bridge.player_slots[player] = PlayerSlot::Empty;
+            }
         }
+
+        // The boss minigame goal is set per tour stop, so it is not bridged here
+        bridge.gamemodegoals.classic = gamemodes[game_mode_classic]->goal;
+        bridge.gamemodegoals.frag = gamemodes[game_mode_frag]->goal;
+        bridge.gamemodegoals.time = gamemodes[game_mode_timelimit]->goal;
+        bridge.gamemodegoals.jail = gamemodes[game_mode_jail]->goal;
+        bridge.gamemodegoals.coins = gamemodes[game_mode_coins]->goal;
+        bridge.gamemodegoals.stomp = gamemodes[game_mode_stomp]->goal;
+        bridge.gamemodegoals.egg = gamemodes[game_mode_eggs]->goal;
+        bridge.gamemodegoals.flag = gamemodes[game_mode_ctf]->goal;
+        bridge.gamemodegoals.chicken = gamemodes[game_mode_chicken]->goal;
+        bridge.gamemodegoals.tag = gamemodes[game_mode_tag]->goal;
+        bridge.gamemodegoals.star = gamemodes[game_mode_star]->goal;
+        bridge.gamemodegoals.domination = gamemodes[game_mode_domination]->goal;
+        bridge.gamemodegoals.kingofthehill = gamemodes[game_mode_koth]->goal;
+        bridge.gamemodegoals.race = gamemodes[game_mode_race]->goal;
+        bridge.gamemodegoals.owned = gamemodes[game_mode_owned]->goal;
+        bridge.gamemodegoals.frenzy = gamemodes[game_mode_frenzy]->goal;
+        bridge.gamemodegoals.survival = gamemodes[game_mode_survival]->goal;
+        bridge.gamemodegoals.greed = gamemodes[game_mode_greed]->goal;
+        bridge.gamemodegoals.health = gamemodes[game_mode_health]->goal;
+        bridge.gamemodegoals.collection = gamemodes[game_mode_collection]->goal;
+        bridge.gamemodegoals.chase = gamemodes[game_mode_chase]->goal;
+        bridge.gamemodegoals.shyguytag = gamemodes[game_mode_shyguytag]->goal;
+
+        const toml::ordered_value document = config::make_config_document(*this, bridge);
+        config << toml::format(document);
     }
-
-    // The boss minigame goal is set per tour stop, so it is not bridged here
-    bridge.gamemodegoals.classic = gamemodes[game_mode_classic]->goal;
-    bridge.gamemodegoals.frag = gamemodes[game_mode_frag]->goal;
-    bridge.gamemodegoals.time = gamemodes[game_mode_timelimit]->goal;
-    bridge.gamemodegoals.jail = gamemodes[game_mode_jail]->goal;
-    bridge.gamemodegoals.coins = gamemodes[game_mode_coins]->goal;
-    bridge.gamemodegoals.stomp = gamemodes[game_mode_stomp]->goal;
-    bridge.gamemodegoals.egg = gamemodes[game_mode_eggs]->goal;
-    bridge.gamemodegoals.flag = gamemodes[game_mode_ctf]->goal;
-    bridge.gamemodegoals.chicken = gamemodes[game_mode_chicken]->goal;
-    bridge.gamemodegoals.tag = gamemodes[game_mode_tag]->goal;
-    bridge.gamemodegoals.star = gamemodes[game_mode_star]->goal;
-    bridge.gamemodegoals.domination = gamemodes[game_mode_domination]->goal;
-    bridge.gamemodegoals.kingofthehill = gamemodes[game_mode_koth]->goal;
-    bridge.gamemodegoals.race = gamemodes[game_mode_race]->goal;
-    bridge.gamemodegoals.owned = gamemodes[game_mode_owned]->goal;
-    bridge.gamemodegoals.frenzy = gamemodes[game_mode_frenzy]->goal;
-    bridge.gamemodegoals.survival = gamemodes[game_mode_survival]->goal;
-    bridge.gamemodegoals.greed = gamemodes[game_mode_greed]->goal;
-    bridge.gamemodegoals.health = gamemodes[game_mode_health]->goal;
-    bridge.gamemodegoals.collection = gamemodes[game_mode_collection]->goal;
-    bridge.gamemodegoals.chase = gamemodes[game_mode_chase]->goal;
-    bridge.gamemodegoals.shyguytag = gamemodes[game_mode_shyguytag]->goal;
-
-    const toml::ordered_value document = config::make_config_document(*this, bridge);
-    config << toml::format(document);
+    catch (const std::exception& error) {
+        printf("[config][warning] Failed to write %s: %s\n", config_path.c_str(), error.what());
+    }
 }

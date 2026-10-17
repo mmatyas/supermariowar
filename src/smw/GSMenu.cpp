@@ -1668,7 +1668,6 @@ void MenuState::Exit()
 #endif
     game_values.appstate = AppState::Quit;
     game_values.WriteConfig();
-    game_values.WriteConfigToml();
 }
 
 void MenuState::ResetTournamentBackToMainMenu()

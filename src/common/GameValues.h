@@ -150,11 +150,17 @@ public:
     MysteryMushroomSwapStyle swapstyle;
     short		respawn;
 
-    void ReadBinaryConfig();
+    void ReadConfig();
     void WriteConfig() const;
 
-    void ReadConfigToml();
-    void WriteConfigToml();
+private:
+    void ReadInputConfig();
+    void ReadBinaryConfig();
+    void ReadTomlConfig();
+
+    void WriteInputConfig() const;
+    void WriteBinaryConfig() const;
+    void WriteTomlConfig() const;
 };
 
 // these are actually the program options

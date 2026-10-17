@@ -379,7 +379,7 @@ void main_game()
 
     create_gamemodes();
 
-    game_values.ReadBinaryConfig();
+    game_values.ReadConfig();
 
     //Assign the powerup weights to the selected preset
     for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
