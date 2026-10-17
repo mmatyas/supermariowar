@@ -219,10 +219,9 @@ TEST_CASE("TOML config document values map to the documented TOML type")
     const auto document = make_document(config, bridge);
 
     // enums are stored by their canonical string names
-    const toml::value& gameplay = document.at("gameplay");
-    CHECK(gameplay.at("shield_style").as_string() == "hard");
+    CHECK(document.at("gameplay").at("shield_style").as_string() == "hard");
     CHECK(document.at("weapons").at("boomerang_style").as_string() == "zelda");
-    CHECK(document.at("gamemode_settings").at("boss").at("bosstype").as_string() == "bomb");
+    CHECK(document.at("gamemode_settings").at("boss").at("boss_type").as_string() == "bomb");
 
     // booleans stay booleans while other fields stay integers
     CHECK(document.at("powerups").at("bonus_keep_powerup").is_boolean());

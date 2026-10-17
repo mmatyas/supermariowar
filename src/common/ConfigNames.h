@@ -205,20 +205,20 @@ template<> struct NamedStruct<TimeGameModeSettings> {
 template<> struct NamedStruct<JailGameModeSettings> {
     static constexpr auto table = std::make_tuple(
         field("style", &JailGameModeSettings::style),
-        field("tagfree", &JailGameModeSettings::tagfree),
-        field("timetofree", &JailGameModeSettings::timetofree),
-        field("percentkey", &JailGameModeSettings::percentkey));
+        field("tag_free", &JailGameModeSettings::tagfree),
+        field("time_to_free", &JailGameModeSettings::timetofree),
+        field("percent_key", &JailGameModeSettings::percentkey));
 };
 template<> struct NamedStruct<CoinGameModeSettings> {
     static constexpr auto table = std::make_tuple(
         field("penalty", &CoinGameModeSettings::penalty),
         field("quantity", &CoinGameModeSettings::quantity),
-        field("percentextracoin", &CoinGameModeSettings::percentextracoin));
+        field("percent_extra_coin", &CoinGameModeSettings::percentextracoin));
 };
 template<> struct NamedStruct<StompGameModeSettings> {
     static constexpr auto table = std::make_tuple(
         field("rate", &StompGameModeSettings::rate),
-        field("enemyweight", &StompGameModeSettings::enemyweight));
+        field("enemy_weight", &StompGameModeSettings::enemyweight));
 };
 template<> struct NamedStruct<EggGameModeSettings> {
     static constexpr auto table = std::make_tuple(
@@ -229,40 +229,40 @@ template<> struct NamedStruct<EggGameModeSettings> {
 template<> struct NamedStruct<FlagGameModeSettings> {
     static constexpr auto table = std::make_tuple(
         field("speed", &FlagGameModeSettings::speed),
-        field("touchreturn", &FlagGameModeSettings::touchreturn),
-        field("pointmove", &FlagGameModeSettings::pointmove),
-        field("autoreturn", &FlagGameModeSettings::autoreturn),
-        field("homescore", &FlagGameModeSettings::homescore),
-        field("centerflag", &FlagGameModeSettings::centerflag));
+        field("touch_return", &FlagGameModeSettings::touchreturn),
+        field("point_move", &FlagGameModeSettings::pointmove),
+        field("auto_return", &FlagGameModeSettings::autoreturn),
+        field("home_score", &FlagGameModeSettings::homescore),
+        field("center_flag", &FlagGameModeSettings::centerflag));
 };
 template<> struct NamedStruct<ChickenGameModeSettings> {
     static constexpr auto table = std::make_tuple(
-        field("usetarget", &ChickenGameModeSettings::usetarget),
+        field("use_target", &ChickenGameModeSettings::usetarget),
         field("glide", &ChickenGameModeSettings::glide));
 };
 template<> struct NamedStruct<TagGameModeSettings> {
     static constexpr auto table = std::make_tuple(
-        field("tagontouch", &TagGameModeSettings::tagontouch));
+        field("tag_on_touch", &TagGameModeSettings::tagontouch));
 };
 template<> struct NamedStruct<StarGameModeSettings> {
     static constexpr auto table = std::make_tuple(
         field("time", &StarGameModeSettings::time),
         field("shine", &StarGameModeSettings::shine),
-        field("percentextratime", &StarGameModeSettings::percentextratime));
+        field("percent_extra_time", &StarGameModeSettings::percentextratime));
 };
 template<> struct NamedStruct<DominationGameModeSettings> {
     static constexpr auto table = std::make_tuple(
-        field("loseondeath", &DominationGameModeSettings::loseondeath),
-        field("stealondeath", &DominationGameModeSettings::stealondeath),
-        field("relocateondeath", &DominationGameModeSettings::relocateondeath),
-        field("relocationfrequency", &DominationGameModeSettings::relocationfrequency),
+        field("lose_on_death", &DominationGameModeSettings::loseondeath),
+        field("steal_on_death", &DominationGameModeSettings::stealondeath),
+        field("relocate_on_death", &DominationGameModeSettings::relocateondeath),
+        field("relocation_frequency", &DominationGameModeSettings::relocationfrequency),
         field("quantity", &DominationGameModeSettings::quantity));
 };
 template<> struct NamedStruct<KingOfTheHillModeSettings> {
     static constexpr auto table = std::make_tuple(
-        field("areasize", &KingOfTheHillModeSettings::areasize),
-        field("relocationfrequency", &KingOfTheHillModeSettings::relocationfrequency),
-        field("maxmultiplier", &KingOfTheHillModeSettings::maxmultiplier));
+        field("area_size", &KingOfTheHillModeSettings::areasize),
+        field("relocation_frequency", &KingOfTheHillModeSettings::relocationfrequency),
+        field("max_multiplier", &KingOfTheHillModeSettings::maxmultiplier));
 };
 template<> struct NamedStruct<RaceGameModeSettings> {
     static constexpr auto table = std::make_tuple(
@@ -274,12 +274,12 @@ template<> struct NamedStruct<FrenzyGameModeSettings> {
     static constexpr auto table = std::make_tuple(
         field("quantity", &FrenzyGameModeSettings::quantity),
         field("rate", &FrenzyGameModeSettings::rate),
-        field("storedshells", &FrenzyGameModeSettings::storedshells),
-        field("powerupweight", &FrenzyGameModeSettings::powerupweight));
+        field("stored_shells", &FrenzyGameModeSettings::storedshells),
+        field("powerup_weight", &FrenzyGameModeSettings::powerupweight));
 };
 template<> struct NamedStruct<SurvivalGameModeSettings> {
     static constexpr auto table = std::make_tuple(
-        field("enemyweight", &SurvivalGameModeSettings::enemyweight),
+        field("enemy_weight", &SurvivalGameModeSettings::enemyweight),
         field("density", &SurvivalGameModeSettings::density),
         field("speed", &SurvivalGameModeSettings::speed),
         field("shield", &SurvivalGameModeSettings::shield));
@@ -289,35 +289,35 @@ template<> struct NamedStruct<GreedGameModeSettings> {
         field("coinlife", &GreedGameModeSettings::coinlife),
         field("owncoins", &GreedGameModeSettings::owncoins),
         field("multiplier", &GreedGameModeSettings::multiplier),
-        field("percentextracoin", &GreedGameModeSettings::percentextracoin));
+        field("percent_extra_coin", &GreedGameModeSettings::percentextracoin));
 };
 template<> struct NamedStruct<HealthGameModeSettings> {
     static constexpr auto table = std::make_tuple(
-        field("startlife", &HealthGameModeSettings::startlife),
-        field("maxlife", &HealthGameModeSettings::maxlife),
-        field("percentextralife", &HealthGameModeSettings::percentextralife));
+        field("start_life", &HealthGameModeSettings::startlife),
+        field("max_life", &HealthGameModeSettings::maxlife),
+        field("percent_extra_life", &HealthGameModeSettings::percentextralife));
 };
 template<> struct NamedStruct<CollectionGameModeSettings> {
     static constexpr auto table = std::make_tuple(
         field("quantity", &CollectionGameModeSettings::quantity),
         field("rate", &CollectionGameModeSettings::rate),
-        field("banktime", &CollectionGameModeSettings::banktime),
-        field("cardlife", &CollectionGameModeSettings::cardlife));
+        field("bank_time", &CollectionGameModeSettings::banktime),
+        field("card_life", &CollectionGameModeSettings::cardlife));
 };
 template<> struct NamedStruct<ChaseGameModeSettings> {
     static constexpr auto table = std::make_tuple(
-        field("phantospeed", &ChaseGameModeSettings::phantospeed),
-        field("phantoquantity", &ChaseGameModeSettings::phantoquantity));
+        field("phanto_speed", &ChaseGameModeSettings::phantospeed),
+        field("phanto_quantity", &ChaseGameModeSettings::phantoquantity));
 };
 template<> struct NamedStruct<ShyGuyTagGameModeSettings> {
     static constexpr auto table = std::make_tuple(
-        field("tagonsuicide", &ShyGuyTagGameModeSettings::tagonsuicide),
-        field("tagtransfer", &ShyGuyTagGameModeSettings::tagtransfer),
-        field("freetime", &ShyGuyTagGameModeSettings::freetime));
+        field("tag_on_suicide", &ShyGuyTagGameModeSettings::tagonsuicide),
+        field("tag_transfer", &ShyGuyTagGameModeSettings::tagtransfer),
+        field("free_time", &ShyGuyTagGameModeSettings::freetime));
 };
 template<> struct NamedStruct<BossGameModeSettings> {
     static constexpr auto table = std::make_tuple(
-        field("bosstype", &BossGameModeSettings::bosstype),
+        field("boss_type", &BossGameModeSettings::bosstype),
         field("difficulty", &BossGameModeSettings::difficulty),
         field("hitpoints", &BossGameModeSettings::hitpoints));
 };
