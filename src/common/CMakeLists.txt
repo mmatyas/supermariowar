@@ -63,6 +63,7 @@ add_library(CommonFiles STATIC
     TilesetManager.h
     TileTypes.cpp
     TileTypes.h
+    TomlConfig.h
     uicontrol.cpp
     uicontrol.h
     uimenu.cpp
@@ -93,4 +94,5 @@ target_link_libraries(CommonFiles
     SDL3::SDL3
     SDL3_image::SDL3_image
     SDL3_mixer::SDL3_mixer
+    toml11::toml11
 )

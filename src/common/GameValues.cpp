@@ -1,5 +1,6 @@
 #include "GameValues.h"
 
+#include "TomlConfig.h"
 #include "FileIO.h"
 #include "FileList.h"
 #include "GameMode.h"
@@ -9,6 +10,7 @@
 #include "Version.h"
 #include "sfx.h"
 
+#include <toml.hpp>
 #include <stdio.h>
 #include <stdexcept>
 
@@ -557,4 +559,123 @@ void CGameConfig::WriteConfig() const
 
     maplist->WriteFilters();
     maplist->WriteMapSummaryCache();
+}
+
+
+void CGameConfig::ReadConfigToml() {
+    const std::string config_path = GetHomeDirectory() + "options.toml";
+    try {
+        const toml::value root = toml::parse(config_path);
+
+        // TODO: implement reading
+    }
+    catch (const toml::file_io_error&) {
+        printf("[net][warning] Could not open %s, using default values.\n", config_path.c_str());
+    }
+    catch (const std::exception& error) {
+        printf("[net][warning] %s: %s\n", config_path.c_str(), error.what());
+    }
+}
+
+
+void CGameConfig::WriteConfigToml() const {
+    const std::string config_path = GetHomeDirectory() + "options.toml";
+    std::ofstream config(config_path);
+    if (!config.is_open())
+        throw std::runtime_error("Could not create " + config_path);
+
+    std::vector<toml::ordered_value> toml_powerup_presets;
+    for (size_t preset = 0; preset < NUM_POWERUP_PRESETS; preset++) {
+        toml::ordered_value val = std::vector<short>(allPowerupPresets[preset], allPowerupPresets[preset] + NUM_POWERUPS);
+        val.as_array_fmt().fmt = toml::array_format::oneline;
+        toml_powerup_presets.emplace_back(std::move(val));
+    }
+
+    toml::ordered_value toml_gamemode_settings = tomlconfig::to_toml_table(gamemodemenusettings);
+    toml_gamemode_settings.as_table_fmt().fmt = toml::table_format::implicit;
+
+    const toml::ordered_value root = toml::ordered_table {
+        { "video", toml::table {
+            { "top_layer", toplayer },
+            { "frame_limiter", framelimiter },
+            { "fullscreen", fullscreen },
+        }},
+        { "audio", toml::table {
+            { "music_volume", musicvolume },
+            { "sound_volume", soundvolume },
+            { "play_next_music", playnextmusic },
+            { "announcer", GetNameFromFileName(announcerlist->currentPath().string()) },
+            { "sound_pack", GetNameFromFileName(soundpacklist->currentPath().string()) },
+            { "game_music_pack", musiclist->currentName() },
+            { "world_music_pack", worldmusiclist->currentName() },
+        }},
+        { "gameplay", toml::table {
+            { "respawn_time", respawn },
+            { "shield_style", tomlconfig::as_str(shieldstyle) },
+            { "shield_time", shieldtime },
+            { "out_of_bounds_time", outofboundstime },
+            { "suicide_time", suicidetime },
+            { "warp_lock_style", tomlconfig::as_str(warplockstyle) },
+            { "warp_lock_time", warplocktime },
+            { "bot_difficulty", cpudifficulty },
+            { "point_speed", pointspeed },
+            { "secrets", secretsenabled },
+        }},
+        { "team", toml::table {
+            { "team_collision_style", tomlconfig::as_str(teamcollision) },
+            { "team_colors", teamcolors },
+            { "tournament_control_style", tomlconfig::as_str(tournamentcontrolstyle) },
+        }},
+        { "eyecandy", toml::table {
+            { "spawn_style", tomlconfig::as_str(spawnstyle) },
+            { "award_style", tomlconfig::as_str(awardstyle) },
+            { "scoreboard_style", tomlconfig::as_str(scoreboardstyle) },
+            { "screen_crunch", screencrunch },
+            { "show_leader_crown", showwinningcrown },
+            { "start_game_countdown", startgamecountdown },
+            { "show_gamemode", startmodedisplay },
+            { "dead_team_notice", deadteamnotice },
+        }},
+        { "weapons", toml::table {
+            { "fireball_ttl", fireballttl },
+            { "feather_jumps", featherjumps },
+            { "boomerang_style", tomlconfig::as_str(boomerangstyle) },
+            { "boomerang_life", boomeranglife },
+            { "shell_ttl", shellttl },
+            { "wand_freeze_time", wandfreezetime },
+            { "hammer_ttl", hammerttl },
+            { "hammer_delay", hammerdelay },
+            { "hammer_one_kill", hammerpower },
+            { "blue_block_ttl", blueblockttl },
+            { "red_block_ttl", redblockttl },
+            { "gray_block_ttl", grayblockttl },
+        }},
+        { "weapon_limits", toml::table {
+            { "fireball_limit", fireballlimit },
+            { "hammer_limit", hammerlimit },
+            { "boomerang_limit", boomeranglimit },
+            { "feather_limit", featherlimit },
+            { "leaf_limit", leaflimit },
+            { "pwings_limit", pwingslimit },
+            { "tanooki_limit", tanookilimit },
+            { "bombs_limit", bombslimit },
+            { "wand_limit", wandlimit },
+        }},
+        { "powerups", toml::table {
+            { "stored_powerup_delay", storedpowerupdelay },
+            { "item_respawn_time", itemrespawntime },
+            { "hidden_block_respawn", hiddenblockrespawn },
+            { "swap_style", tomlconfig::as_str(swapstyle) },
+            { "bonus_wheel_style", tomlconfig::as_str(bonuswheel) },
+            { "bonus_keep_powerup", keeppowerup },
+        }},
+        { "powerup_rates", toml::ordered_table {
+            { "drop_rate_style", tomlconfig::as_str(overridepowerupsettings) },
+            { "selected_preset", poweruppreset },
+            { "presets", toml_powerup_presets },
+        }},
+        { "gamemode_settings", toml_gamemode_settings },
+    };
+
+    config << toml::format(root);
 }

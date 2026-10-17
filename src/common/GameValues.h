@@ -150,6 +150,9 @@ public:
 
     void ReadBinaryConfig();
     void WriteConfig() const;
+
+    void ReadConfigToml();
+    void WriteConfigToml() const;
 };
 
 // these are actually the program options
