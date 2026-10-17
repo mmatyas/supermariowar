@@ -125,6 +125,31 @@ CGameConfig makePeculiarConfig()
     config.gamemodemenusettings.star.shine = StarStyle::Shine;
     config.gamemodemenusettings.boss.bosstype = Boss::Bomb;
 
+    // gamemode_goals
+    config.gamemodegoals.classic = 11;
+    config.gamemodegoals.frag = 12;
+    config.gamemodegoals.time = 13;
+    config.gamemodegoals.jail = 14;
+    config.gamemodegoals.coins = 15;
+    config.gamemodegoals.stomp = 16;
+    config.gamemodegoals.egg = 17;
+    config.gamemodegoals.flag = 18;
+    config.gamemodegoals.chicken = 19;
+    config.gamemodegoals.tag = 20;
+    config.gamemodegoals.star = 21;
+    config.gamemodegoals.domination = 22;
+    config.gamemodegoals.kingofthehill = 23;
+    config.gamemodegoals.race = 24;
+    config.gamemodegoals.owned = 25;
+    config.gamemodegoals.frenzy = 26;
+    config.gamemodegoals.survival = 27;
+    config.gamemodegoals.greed = 28;
+    config.gamemodegoals.health = 29;
+    config.gamemodegoals.collection = 30;
+    config.gamemodegoals.chase = 31;
+    config.gamemodegoals.shyguytag = 32;
+    config.gamemodegoals.boss = 33;
+
     return config;
 }
 
@@ -180,7 +205,7 @@ TEST_CASE("TOML config document covers every descriptor field exactly once")
 
     CHECK(counts[0] == 10);
     CHECK(counts[1] == 66);
-    CHECK(counts[2] == 1);
+    CHECK(counts[2] == 2); // gamemode_settings, gamemode_goals
 }
 
 TEST_CASE("TOML config document values map to the documented TOML type")
@@ -204,6 +229,33 @@ TEST_CASE("TOML config document values map to the documented TOML type")
 
     // player types are stored as strings
     CHECK(document.at("players").at("player_slots").as_array().at(2).as_string() == "cpu");
+
+    // the per-mode goals live in their own table
+    CHECK(document.at("gamemode_goals").at("classic").as_integer() == 11);
+    CHECK(document.at("gamemode_goals").at("flag").as_integer() == 18);
+    CHECK(document.at("gamemode_goals").at("race").as_integer() == 24);
+    CHECK(document.at("gamemode_goals").at("frenzy").as_integer() == 26);
+    CHECK(document.at("gamemode_goals").at("owned").as_integer() == 25);
+    CHECK(document.at("gamemode_goals").at("boss").as_integer() == 33);
+}
+
+TEST_CASE("Applying a TOML document fills the per-mode goals")
+{
+    const toml::value document = toml::parse_str(R"(
+        [gamemode_goals]
+        classic = 7
+        chase = 3
+    )");
+
+    CGameConfig restored {};
+    tomlconfig::apply_config_document(restored, document);
+
+    // goals from the table fill their members,
+    // the remaining goals keep their defaults
+    CHECK(restored.gamemodegoals.classic == 7);
+    CHECK(restored.gamemodegoals.chase == 3);
+    CHECK(restored.gamemodegoals.frag == GameModeGoals {}.frag);
+    CHECK(restored.gamemodegoals.boss == GameModeGoals {}.boss);
 }
 
 TEST_CASE("Applying a broken TOML document keeps the existing values")
@@ -225,6 +277,8 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
         [gamemode_settings.classic]
         death_style = "made_up"
         scoring_style = "push_only"
+        [gamemode_goals]
+        classic = "nope"
     )");
 
     const CGameConfig config {};
@@ -245,6 +299,8 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
     CHECK(restored.gamemodemenusettings.classic.scoring == ScoringStyle::PushOnly);
     // unknown enum values fall back to the current value
     CHECK(restored.gamemodemenusettings.classic.style == config.gamemodemenusettings.classic.style);
+    // wrong goal value type: kept as-is
+    CHECK(restored.gamemodegoals.classic == GameModeGoals {}.classic);
 }
 
 TEST_CASE("Applying a TOML document without chapters keeps the existing values")

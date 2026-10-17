@@ -569,6 +569,33 @@ void CGameConfig::ReadConfigToml() {
 
         tomlconfig::apply_config_document(*this, root);
 
+        // Propagate the per-mode goals into the runtime modes.
+        // The boss minigame goal is set per tour stop, so it has no runtime counterpart here.
+        if (root.contains("gamemode_goals")) {
+            gamemodes[game_mode_classic]->goal = gamemodegoals.classic;
+            gamemodes[game_mode_frag]->goal = gamemodegoals.frag;
+            gamemodes[game_mode_timelimit]->goal = gamemodegoals.time;
+            gamemodes[game_mode_jail]->goal = gamemodegoals.jail;
+            gamemodes[game_mode_coins]->goal = gamemodegoals.coins;
+            gamemodes[game_mode_stomp]->goal = gamemodegoals.stomp;
+            gamemodes[game_mode_eggs]->goal = gamemodegoals.egg;
+            gamemodes[game_mode_ctf]->goal = gamemodegoals.flag;
+            gamemodes[game_mode_chicken]->goal = gamemodegoals.chicken;
+            gamemodes[game_mode_tag]->goal = gamemodegoals.tag;
+            gamemodes[game_mode_star]->goal = gamemodegoals.star;
+            gamemodes[game_mode_domination]->goal = gamemodegoals.domination;
+            gamemodes[game_mode_koth]->goal = gamemodegoals.kingofthehill;
+            gamemodes[game_mode_race]->goal = gamemodegoals.race;
+            gamemodes[game_mode_owned]->goal = gamemodegoals.owned;
+            gamemodes[game_mode_frenzy]->goal = gamemodegoals.frenzy;
+            gamemodes[game_mode_survival]->goal = gamemodegoals.survival;
+            gamemodes[game_mode_greed]->goal = gamemodegoals.greed;
+            gamemodes[game_mode_health]->goal = gamemodegoals.health;
+            gamemodes[game_mode_collection]->goal = gamemodegoals.collection;
+            gamemodes[game_mode_chase]->goal = gamemodegoals.chase;
+            gamemodes[game_mode_shyguytag]->goal = gamemodegoals.shyguytag;
+        }
+
         // SimpleFileList::find() only moves the current item if the name is found.
         if (!announcerpack.empty())
             announcerlist->find(announcerpack);
@@ -659,6 +686,30 @@ void CGameConfig::WriteConfigToml() {
         else
             player_slots[player] = PlayerType::Empty;
     }
+
+    // The boss minigame goal is set per tour stop, so it is not bridged here
+    gamemodegoals.classic = gamemodes[game_mode_classic]->goal;
+    gamemodegoals.frag = gamemodes[game_mode_frag]->goal;
+    gamemodegoals.time = gamemodes[game_mode_timelimit]->goal;
+    gamemodegoals.jail = gamemodes[game_mode_jail]->goal;
+    gamemodegoals.coins = gamemodes[game_mode_coins]->goal;
+    gamemodegoals.stomp = gamemodes[game_mode_stomp]->goal;
+    gamemodegoals.egg = gamemodes[game_mode_eggs]->goal;
+    gamemodegoals.flag = gamemodes[game_mode_ctf]->goal;
+    gamemodegoals.chicken = gamemodes[game_mode_chicken]->goal;
+    gamemodegoals.tag = gamemodes[game_mode_tag]->goal;
+    gamemodegoals.star = gamemodes[game_mode_star]->goal;
+    gamemodegoals.domination = gamemodes[game_mode_domination]->goal;
+    gamemodegoals.kingofthehill = gamemodes[game_mode_koth]->goal;
+    gamemodegoals.race = gamemodes[game_mode_race]->goal;
+    gamemodegoals.owned = gamemodes[game_mode_owned]->goal;
+    gamemodegoals.frenzy = gamemodes[game_mode_frenzy]->goal;
+    gamemodegoals.survival = gamemodes[game_mode_survival]->goal;
+    gamemodegoals.greed = gamemodes[game_mode_greed]->goal;
+    gamemodegoals.health = gamemodes[game_mode_health]->goal;
+    gamemodegoals.collection = gamemodes[game_mode_collection]->goal;
+    gamemodegoals.chase = gamemodes[game_mode_chase]->goal;
+    gamemodegoals.shyguytag = gamemodes[game_mode_shyguytag]->goal;
 
     const toml::ordered_value document = tomlconfig::make_config_document(*this);
     config << toml::format(document);

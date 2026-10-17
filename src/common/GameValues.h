@@ -139,6 +139,7 @@ public:
     PowerupDropRateStyle overridepowerupsettings;
     bool		secretsenabled;
     GameModeSettings gamemodemenusettings;
+    GameModeGoals gamemodegoals;    //only meaningful for writing/reading the TOML file (see GameModeGoals)
     bool		music;
     short		pointspeed;
     short poweruppreset;

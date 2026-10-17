@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <optional>
 #include <stdexcept>
+#include <algorithm>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -345,6 +346,33 @@ template<> struct NamedStruct<GameModeSettings> {
         field("boss", &GameModeSettings::boss));
 };
 
+template<> struct NamedStruct<GameModeGoals> {
+    static constexpr auto table = std::make_tuple(
+        field("classic", &GameModeGoals::classic),
+        field("frag", &GameModeGoals::frag),
+        field("time", &GameModeGoals::time),
+        field("jail", &GameModeGoals::jail),
+        field("coins", &GameModeGoals::coins),
+        field("stomp", &GameModeGoals::stomp),
+        field("egg", &GameModeGoals::egg),
+        field("flag", &GameModeGoals::flag),
+        field("chicken", &GameModeGoals::chicken),
+        field("tag", &GameModeGoals::tag),
+        field("star", &GameModeGoals::star),
+        field("domination", &GameModeGoals::domination),
+        field("kingofthehill", &GameModeGoals::kingofthehill),
+        field("race", &GameModeGoals::race),
+        field("owned", &GameModeGoals::owned),
+        field("frenzy", &GameModeGoals::frenzy),
+        field("survival", &GameModeGoals::survival),
+        field("greed", &GameModeGoals::greed),
+        field("health", &GameModeGoals::health),
+        field("collection", &GameModeGoals::collection),
+        field("chase", &GameModeGoals::chase),
+        field("shyguytag", &GameModeGoals::shyguytag),
+        field("boss", &GameModeGoals::boss));
+};
+
 
 template <typename T, typename = void>
 struct has_named_enum : std::false_type {};
@@ -587,7 +615,8 @@ template<> struct NamedLayout<CGameConfig> {
             field("drop_rate_style", &CGameConfig::overridepowerupsettings),
             field("selected_preset", &CGameConfig::poweruppreset),
             field("presets", &CGameConfig::allPowerupPresets)),
-        struct_section("gamemode_settings", &CGameConfig::gamemodemenusettings)
+        struct_section("gamemode_settings", &CGameConfig::gamemodemenusettings),
+        struct_section("gamemode_goals", &CGameConfig::gamemodegoals)
     );
 };
 
@@ -606,7 +635,10 @@ toml::ordered_value make_config_document(const Struct& config)
                 root.emplace(std::string(sec.name), toml::ordered_value(std::move(table)));
             } else {
                 toml::ordered_value value = to_toml_table(config.*(sec.member));
-                if (value.is_table())
+                // Skip the header for a table of tables (eg. gamemode_settings)
+                // Keep it for plain tables (eg. gamemode_goals)
+                if (value.is_table() && std::all_of(value.as_table().begin(), value.as_table().end(),
+                        [](const auto& item) { return item.second.is_table(); }))
                     value.as_table_fmt().fmt = toml::table_format::implicit;
                 root.emplace(std::string(sec.name), std::move(value));
             }

@@ -253,3 +253,30 @@ struct GameModeSettings {
     ShyGuyTagGameModeSettings shyguytag;
     BossGameModeSettings boss;
 };
+
+
+struct GameModeGoals {
+    short classic = 10;
+    short frag = 20;
+    short time = 60;
+    short jail = 20;
+    short coins = 20;
+    short stomp = 10;
+    short egg = 20;
+    short flag = 20;
+    short chicken = 200;
+    short tag = 200;
+    short star = 5;
+    short domination = 200;
+    short kingofthehill = 200;
+    short race = 10;
+    short owned = 200;
+    short frenzy = 20;
+    short survival = 20;
+    short greed = 40;
+    short health = 5;
+    short collection = 30;
+    short chase = 200;
+    short shyguytag = 200;
+    short boss = 5;
+};
