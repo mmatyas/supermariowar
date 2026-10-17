@@ -603,6 +603,9 @@ void CGameConfig::ReadConfigToml() {
                 printf("[config][warning] Skin '%s' for player %d not found, keeping the current skin.\n", skins[player].c_str(), static_cast<int>(player));
         }
 
+        for (size_t player = 0; player < MAX_PLAYERS; player++)
+            playercontrol[player] = static_cast<short>(player_slots[player]);
+
         for (size_t pack = 0; pack < musiclist->count(); pack++) {
             if (musiclist->nameAt(pack) == gamemusicpack) {
                 musiclist->setCurrent(pack);
@@ -648,6 +651,13 @@ void CGameConfig::WriteConfigToml() {
             skins[player].clear();
         else
             skins[player] = skinlist->at(skinids[player]).name;
+    }
+
+    for (size_t player = 0; player < MAX_PLAYERS; player++) {
+        if (playercontrol[player] >= 0 && playercontrol[player] <= 2)
+            player_slots[player] = static_cast<PlayerType>(playercontrol[player]);
+        else
+            player_slots[player] = PlayerType::Empty;
     }
 
     const toml::ordered_value document = tomlconfig::make_config_document(*this);

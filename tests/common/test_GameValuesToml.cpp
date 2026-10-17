@@ -57,6 +57,10 @@ CGameConfig makePeculiarConfig()
     config.skins[1] = ""; // random
     config.skins[2] = "fire";
     config.skins[3] = "kid";
+    config.player_slots[0] = PlayerType::Human;
+    config.player_slots[1] = PlayerType::CPU;
+    config.player_slots[2] = PlayerType::CPU;
+    config.player_slots[3] = PlayerType::Empty;
 
     // eyecandy
     config.spawnstyle = SpawnStyle::Swirl;
@@ -175,7 +179,7 @@ TEST_CASE("TOML config document covers every descriptor field exactly once")
     }, tomlconfig::NamedLayout<CGameConfig>::sections);
 
     CHECK(counts[0] == 10);
-    CHECK(counts[1] == 65);
+    CHECK(counts[1] == 66);
     CHECK(counts[2] == 1);
 }
 
@@ -197,6 +201,9 @@ TEST_CASE("TOML config document values map to the documented TOML type")
     // player skins are stored as names, empty string selects a random skin
     CHECK(document.at("players").at("skins").is_array());
     CHECK(document.at("players").at("skins").as_array().at(1).as_string().empty());
+
+    // player types are stored as strings
+    CHECK(document.at("players").at("player_slots").as_array().at(2).as_string() == "cpu");
 }
 
 TEST_CASE("Applying a broken TOML document keeps the existing values")
@@ -213,6 +220,7 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
 
         [players]
         skins = ["toad", "peach"]
+        player_slots = ["human", "nope"]
 
         [gamemode_settings.classic]
         death_style = "made_up"
@@ -230,6 +238,8 @@ TEST_CASE("Applying a broken TOML document keeps the existing values")
     CHECK(restored.respawn == config.respawn);
     // wrong array length: kept as-is
     CHECK(restored.skins == config.skins);
+    // wrong value inside the array: kept as-is
+    CHECK(restored.player_slots == config.player_slots);
     // valid keys of valid sections are still applied
     CHECK(restored.secretsenabled == true);
     CHECK(restored.gamemodemenusettings.classic.scoring == ScoringStyle::PushOnly);

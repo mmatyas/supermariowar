@@ -28,6 +28,13 @@ template<> struct NamedEnum<Boss> {
         { Boss::Fire, "fire" },
     });
 };
+template<> struct NamedEnum<PlayerType> {
+    static constexpr auto table = std::to_array<std::pair<PlayerType, std::string_view>>({
+        { PlayerType::Empty, "empty" },
+        { PlayerType::Human, "human" },
+        { PlayerType::CPU, "cpu" },
+    });
+};
 template<> struct NamedEnum<SpawnStyle> {
     static constexpr auto table = std::to_array<std::pair<SpawnStyle, std::string_view>>({
         { SpawnStyle::Instant, "instant" },
@@ -373,8 +380,9 @@ toml::ordered_value to_toml(const T& value)
         for (const auto& element : value)
             arr.push_back(to_toml(element));
         toml::ordered_value result = std::move(arr);
-        // arrays of scalars and strings read better on one line
-        if constexpr (std::is_arithmetic_v<typename T::value_type> || std::is_same_v<typename T::value_type, std::string>)
+        // arrays of scalars, strings, and enums read better on one line
+        if constexpr (std::is_arithmetic_v<typename T::value_type> || std::is_same_v<typename T::value_type, std::string>
+                      || std::is_enum_v<typename T::value_type>)
             result.as_array_fmt().fmt = toml::array_format::oneline;
         return result;
     } else if constexpr (has_named_struct<T>::value) {
@@ -534,7 +542,8 @@ template<> struct NamedLayout<CGameConfig> {
             field("team_colors", &CGameConfig::teamcolors),
             field("tournament_control_style", &CGameConfig::tournamentcontrolstyle)),
         section("players",
-            field("skins", &CGameConfig::skins)),
+            field("skins", &CGameConfig::skins),
+            field("player_slots", &CGameConfig::player_slots)),
         section("eyecandy",
             field("spawn_style", &CGameConfig::spawnstyle),
             field("award_style", &CGameConfig::awardstyle),

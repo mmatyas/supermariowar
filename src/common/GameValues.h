@@ -31,6 +31,14 @@ enum class AppState: unsigned char {
     Quit,
 };
 
+// what kind of player occupies a seat; the integer values match the
+// playercontrol[] shorts used at runtime (0 empty, 1 human, 2 cpu)
+enum class PlayerType : unsigned char {
+    Empty,
+    Human,
+    CPU,
+};
+
 //tournament scores
 struct TournamentScores {
     short       wins;
@@ -140,6 +148,9 @@ public:
     // name of each player's selected skin (SkinList), empty string selects a random skin;
     // only meaningful for writing/reading the TOML file, runtime state stays in skinids/randomskin
     std::array<std::string, MAX_PLAYERS> skins;
+    // what kind of player sits in each seat; only meaningful for writing/reading the
+    // TOML file, runtime state stays in playercontrol
+    std::array<PlayerType, MAX_PLAYERS> player_slots;
     bool		screencrunch;
     short		shieldtime;
     ShieldStyle shieldstyle;
