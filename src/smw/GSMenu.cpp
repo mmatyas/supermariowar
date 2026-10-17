@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "GameValues.h"
 #include "GSGameplay.h"
+#include "GameplayStyles.h"
 #include "net.h"
 #include "map.h"
 #include "MapList.h"
@@ -181,7 +182,7 @@ void MenuState::onEnterState()
     fNeedMenuMusicReset = false;
 
     if (game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1 &&
-            (((game_values.matchtype == MatchType::SingleGame || game_values.matchtype == MatchType::QuickGame || game_values.matchtype == MatchType::MiniGame || game_values.matchtype == MatchType::Tournament || game_values.matchtype == MatchType::NetGame) && game_values.bonuswheel == 2) || (game_values.matchtype == MatchType::Tour && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
+            (((game_values.matchtype == MatchType::SingleGame || game_values.matchtype == MatchType::QuickGame || game_values.matchtype == MatchType::MiniGame || game_values.matchtype == MatchType::Tournament || game_values.matchtype == MatchType::NetGame) && game_values.bonuswheel == BonusWheelStyle::EveryGame) || (game_values.matchtype == MatchType::Tour && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
         mBonusWheelMenu->miBonusWheel->Reset(false);
         mCurrentMenu = mBonusWheelMenu.get();
     } else if (game_values.matchtype != MatchType::SingleGame && game_values.matchtype != MatchType::QuickGame && game_values.matchtype != MatchType::MiniGame && game_values.matchtype != MatchType::NetGame) {
@@ -812,7 +813,7 @@ void MenuState::update()
         } else if (MENU_CODE_BACK_TO_GAME_SETUP_MENU == code) {
             bool fNeedTeamAnnouncement = false;
             if (game_values.matchtype == MatchType::World) {
-                if (game_values.tournamentwinner == -2 || (game_values.tournamentwinner >= 0 && game_values.bonuswheel == 0)) {
+                if (game_values.tournamentwinner == -2 || (game_values.tournamentwinner >= 0 && game_values.bonuswheel == BonusWheelStyle::Off)) {
                     ResetTournamentBackToMainMenu();
                 } else if (game_values.tournamentwinner >= 0) {
                     mBonusWheelMenu->miBonusWheel->Reset(true);
@@ -827,7 +828,7 @@ void MenuState::update()
                 if (game_values.tournamentwinner == -2) { //Tied Tour Result
                     ResetTournamentBackToMainMenu();
                 } else if (game_values.tournamentwinner >= 0) { //Tournament/Tour Won and Bonus Wheel will be spun
-                    if (game_values.bonuswheel == 0 || (game_values.matchtype == MatchType::Tour && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)) {
+                    if (game_values.bonuswheel == BonusWheelStyle::Off || (game_values.matchtype == MatchType::Tour && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)) {
                         ResetTournamentBackToMainMenu();
                     } else {
                         mBonusWheelMenu->miBonusWheel->Reset(true);
@@ -920,7 +921,7 @@ void MenuState::update()
                         ResetTournamentBackToMainMenu();
                 } else {
                     if ((game_values.matchtype == MatchType::Tour || game_values.matchtype == MatchType::Tournament) && game_values.tournamentwinner == -1 &&
-                            ((game_values.matchtype != MatchType::Tour && game_values.bonuswheel == 2) || (game_values.matchtype == MatchType::Tour && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
+                            ((game_values.matchtype != MatchType::Tour && game_values.bonuswheel == BonusWheelStyle::EveryGame) || (game_values.matchtype == MatchType::Tour && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
                         mCurrentMenu = mTournamentScoreboardMenu.get();
                     } else if (game_values.matchtype == MatchType::SingleGame) {
                         mCurrentMenu = mGameSettingsMenu.get();

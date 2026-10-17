@@ -388,3 +388,6 @@ template class MI_SelectField<StarStyle>;
 template class MI_SelectField<TeamCollisionStyle>;
 template class MI_SelectField<TournamentControlStyle>;
 template class MI_SelectField<WarpLockStyle>;
+template class MI_SelectField<BonusWheelStyle>;
+template class MI_SelectField<MysteryMushroomSwapStyle>;
+template class MI_SelectField<PowerupDropRateStyle>;

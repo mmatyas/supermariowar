@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameplayStyles.h"
 #include "uicontrol.h"
 #include "GlobalConstants.h"
 
@@ -42,7 +43,7 @@ private:
     // TODO: Ownership of most members gets passed to this menu
     std::unique_ptr<UI_Menu> mMenu;
 
-    MI_SelectField<short>* miOverride = nullptr;
+    MI_SelectField<PowerupDropRateStyle>* miOverride = nullptr;
     MI_SelectField<short>* miPreset = nullptr;
 
     std::array<MI_PowerupSlider*, NUM_POWERUPS> miPowerupSlider;

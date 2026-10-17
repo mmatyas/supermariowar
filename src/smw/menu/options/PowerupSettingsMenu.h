@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameplayStyles.h"
 #include "uimenu.h"
 
 class MI_Button;
@@ -19,8 +20,8 @@ public:
 private:
     MI_SelectField<short>* miStoredPowerupDelayField = nullptr;
     MI_SelectField<short>* miItemRespawnField = nullptr;
-    MI_SelectField<short>* miSwapStyleField = nullptr;
-    MI_SelectField<short>* miBonusWheelField = nullptr;
+    MI_SelectField<MysteryMushroomSwapStyle>* miSwapStyleField = nullptr;
+    MI_SelectField<BonusWheelStyle>* miBonusWheelField = nullptr;
     MI_SelectField<bool>* miKeepPowerupField = nullptr;
     MI_SelectField<short>* miHiddenBlockRespawnField = nullptr;
     MI_StoredPowerupResetButton* miStoredPowerupResetButton = nullptr;

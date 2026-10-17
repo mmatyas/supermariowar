@@ -70,3 +70,25 @@ enum class BoomerangStyle : unsigned char {
     Zelda,
     Random,
 };
+
+
+enum class MysteryMushroomSwapStyle : unsigned char {
+    Walk,
+    Blink,
+    Instant,
+};
+
+
+enum class BonusWheelStyle : unsigned char {
+    Off,
+    TournamentWin,
+    EveryGame,
+};
+
+
+enum class PowerupDropRateStyle : unsigned char {
+    UseMap,
+    UseGame,
+    SimpleAverage,
+    WeightedAverage,
+};
