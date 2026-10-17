@@ -184,6 +184,12 @@ public:
     void setCurrent(size_t index) {
         m_currentIndex = index < m_entries.size() ? index : 0;
     }
+    size_t count() const {
+        return m_entries.size();
+    }
+    const std::string& nameAt(size_t index) const {
+        return m_entries.at(index).name();
+    }
     const std::string& currentName() const {
         return m_entries.at(m_currentIndex).name();
     }
@@ -283,6 +289,9 @@ public:
     }
     void setCurrent(size_t index) {
         m_currentIndex = index < m_entries.size() ? index : 0;
+    }
+    const std::string& nameAt(size_t index) const {
+        return m_entries.at(index).name();
     }
     const std::string& currentName() const {
         return m_entries[m_currentIndex].name();

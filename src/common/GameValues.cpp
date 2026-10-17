@@ -567,13 +567,140 @@ void CGameConfig::ReadConfigToml() {
     try {
         const toml::value root = toml::parse(config_path);
 
-        // TODO: implement reading
+        if (root.contains("video")) {
+            const toml::value& video = root.at("video");
+            tomlconfig::read_field(toplayer, video, "top_layer");
+            tomlconfig::read_field(framelimiter, video, "frame_limiter");
+            tomlconfig::read_field(fullscreen, video, "fullscreen");
+        }
+
+        if (root.contains("audio")) {
+            const toml::value& audio = root.at("audio");
+            tomlconfig::read_field(musicvolume, audio, "music_volume");
+            tomlconfig::read_field(soundvolume, audio, "sound_volume");
+            tomlconfig::read_field(playnextmusic, audio, "play_next_music");
+
+            // Find the music and sound packs by name; if the key is absent or invalid keep the current ones
+            std::string announcer_name, sound_pack_name, music_pack_name, world_music_pack_name;
+            tomlconfig::read_field(announcer_name, audio, "announcer");
+            tomlconfig::read_field(sound_pack_name, audio, "sound_pack");
+            tomlconfig::read_field(music_pack_name, audio, "game_music_pack");
+            tomlconfig::read_field(world_music_pack_name, audio, "world_music_pack");
+
+            // SimpleFileList::find() only moves the current item if the name is found
+            if (!announcer_name.empty())
+                announcerlist->find(announcer_name);
+            if (!sound_pack_name.empty())
+                soundpacklist->find(sound_pack_name);
+
+            for (size_t pack = 0; pack < musiclist->count(); pack++) {
+                if (musiclist->nameAt(pack) == music_pack_name) {
+                    musiclist->setCurrent(pack);
+                    break;
+                }
+            }
+            for (size_t pack = 0; pack < worldmusiclist->count(); pack++) {
+                if (worldmusiclist->nameAt(pack) == world_music_pack_name) {
+                    worldmusiclist->setCurrent(pack);
+                    break;
+                }
+            }
+        }
+
+        if (root.contains("gameplay")) {
+            const toml::value& gameplay = root.at("gameplay");
+            tomlconfig::read_field(respawn, gameplay, "respawn_time");
+            tomlconfig::read_field(shieldstyle, gameplay, "shield_style");
+            tomlconfig::read_field(shieldtime, gameplay, "shield_time");
+            tomlconfig::read_field(outofboundstime, gameplay, "out_of_bounds_time");
+            tomlconfig::read_field(suicidetime, gameplay, "suicide_time");
+            tomlconfig::read_field(warplockstyle, gameplay, "warp_lock_style");
+            tomlconfig::read_field(warplocktime, gameplay, "warp_lock_time");
+            tomlconfig::read_field(cpudifficulty, gameplay, "bot_difficulty");
+            tomlconfig::read_field(pointspeed, gameplay, "point_speed");
+            tomlconfig::read_field(secretsenabled, gameplay, "secrets");
+        }
+
+        if (root.contains("team")) {
+            const toml::value& team = root.at("team");
+            tomlconfig::read_field(teamcollision, team, "team_collision_style");
+            tomlconfig::read_field(teamcolors, team, "team_colors");
+            tomlconfig::read_field(tournamentcontrolstyle, team, "tournament_control_style");
+        }
+
+        if (root.contains("eyecandy")) {
+            const toml::value& eyecandy = root.at("eyecandy");
+            tomlconfig::read_field(spawnstyle, eyecandy, "spawn_style");
+            tomlconfig::read_field(awardstyle, eyecandy, "award_style");
+            tomlconfig::read_field(scoreboardstyle, eyecandy, "scoreboard_style");
+            tomlconfig::read_field(screencrunch, eyecandy, "screen_crunch");
+            tomlconfig::read_field(showwinningcrown, eyecandy, "show_leader_crown");
+            tomlconfig::read_field(startgamecountdown, eyecandy, "start_game_countdown");
+            tomlconfig::read_field(startmodedisplay, eyecandy, "show_gamemode");
+            tomlconfig::read_field(deadteamnotice, eyecandy, "dead_team_notice");
+        }
+
+        if (root.contains("weapons")) {
+            const toml::value& weapons = root.at("weapons");
+            tomlconfig::read_field(fireballttl, weapons, "fireball_ttl");
+            tomlconfig::read_field(featherjumps, weapons, "feather_jumps");
+            tomlconfig::read_field(boomerangstyle, weapons, "boomerang_style");
+            tomlconfig::read_field(boomeranglife, weapons, "boomerang_life");
+            tomlconfig::read_field(shellttl, weapons, "shell_ttl");
+            tomlconfig::read_field(wandfreezetime, weapons, "wand_freeze_time");
+            tomlconfig::read_field(hammerttl, weapons, "hammer_ttl");
+            tomlconfig::read_field(hammerdelay, weapons, "hammer_delay");
+            tomlconfig::read_field(hammerpower, weapons, "hammer_one_kill");
+            tomlconfig::read_field(blueblockttl, weapons, "blue_block_ttl");
+            tomlconfig::read_field(redblockttl, weapons, "red_block_ttl");
+            tomlconfig::read_field(grayblockttl, weapons, "gray_block_ttl");
+        }
+
+        if (root.contains("weapon_limits")) {
+            const toml::value& weapon_limits = root.at("weapon_limits");
+            tomlconfig::read_field(fireballlimit, weapon_limits, "fireball_limit");
+            tomlconfig::read_field(hammerlimit, weapon_limits, "hammer_limit");
+            tomlconfig::read_field(boomeranglimit, weapon_limits, "boomerang_limit");
+            tomlconfig::read_field(featherlimit, weapon_limits, "feather_limit");
+            tomlconfig::read_field(leaflimit, weapon_limits, "leaf_limit");
+            tomlconfig::read_field(pwingslimit, weapon_limits, "pwings_limit");
+            tomlconfig::read_field(tanookilimit, weapon_limits, "tanooki_limit");
+            tomlconfig::read_field(bombslimit, weapon_limits, "bombs_limit");
+            tomlconfig::read_field(wandlimit, weapon_limits, "wand_limit");
+        }
+
+        if (root.contains("powerups")) {
+            const toml::value& powerups = root.at("powerups");
+            tomlconfig::read_field(storedpowerupdelay, powerups, "stored_powerup_delay");
+            tomlconfig::read_field(itemrespawntime, powerups, "item_respawn_time");
+            tomlconfig::read_field(hiddenblockrespawn, powerups, "hidden_block_respawn");
+            tomlconfig::read_field(swapstyle, powerups, "swap_style");
+            tomlconfig::read_field(bonuswheel, powerups, "bonus_wheel_style");
+            tomlconfig::read_field(keeppowerup, powerups, "bonus_keep_powerup");
+        }
+
+        if (root.contains("powerup_rates")) {
+            const toml::value& powerup_rates = root.at("powerup_rates");
+            tomlconfig::read_field(overridepowerupsettings, powerup_rates, "drop_rate_style");
+            tomlconfig::read_field(poweruppreset, powerup_rates, "selected_preset");
+
+            if (powerup_rates.contains("presets") && powerup_rates.at("presets").is_array()) {
+                const toml::array& presets = powerup_rates.at("presets").as_array();
+                for (size_t preset = 0; preset < NUM_POWERUP_PRESETS && preset < presets.size(); preset++)
+                    tomlconfig::read_field(allPowerupPresets[preset], powerup_rates.at("presets"), preset);
+            }
+        }
+
+        tomlconfig::read_field(gamemodemenusettings, root, "gamemode_settings");
+
+        sfx_setmusicvolume(musicvolume);
+        sfx_setsoundvolume(soundvolume);
     }
     catch (const toml::file_io_error&) {
-        printf("[net][warning] Could not open %s, using default values.\n", config_path.c_str());
+        printf("[config][warning] Could not open %s, using default values.\n", config_path.c_str());
     }
     catch (const std::exception& error) {
-        printf("[net][warning] %s: %s\n", config_path.c_str(), error.what());
+        printf("[config][warning] %s: %s\n", config_path.c_str(), error.what());
     }
 }
 
