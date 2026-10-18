@@ -43,7 +43,7 @@ enum TileTypeFlag {
     tile_flag_super_death_left = 1024,
     tile_flag_super_death_right = 2048,
     tile_flag_player_death = 4096,
-    tile_flag_water = 4160,
+    tile_flag_water = 8192,
 
     tile_flag_has_regular_death = tile_flag_death_on_top|tile_flag_death_on_bottom|tile_flag_death_on_left|tile_flag_death_on_right,
     tile_flag_has_super_death = tile_flag_super_death_top|tile_flag_super_death_bottom|tile_flag_super_death_left|tile_flag_super_death_right,
