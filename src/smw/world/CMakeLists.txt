@@ -3,6 +3,8 @@ target_sources(smw PRIVATE
     WorldMovingObject.h
     WorldPlayer.cpp
     WorldPlayer.h
+    WorldVehicle.cpp
+    WorldVehicle.h
     WorldWarp.cpp
     WorldWarp.h
 )

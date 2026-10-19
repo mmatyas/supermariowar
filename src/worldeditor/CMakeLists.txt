@@ -7,6 +7,8 @@ add_executable(smw-worldedit WIN32
 	../smw/world/WorldMovingObject.h
 	../smw/world/WorldPlayer.cpp
 	../smw/world/WorldPlayer.h
+	../smw/world/WorldVehicle.cpp
+	../smw/world/WorldVehicle.h
 	../smw/world/WorldWarp.cpp
 	../smw/world/WorldWarp.h
 	../smw/objects/IO_BulletBillCannon.cpp
