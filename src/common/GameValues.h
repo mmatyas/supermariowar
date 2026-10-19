@@ -159,7 +159,6 @@ private:
     void ReadTomlConfig();
 
     void WriteInputConfig() const;
-    void WriteBinaryConfig() const;
     void WriteTomlConfig() const;
 };
 
