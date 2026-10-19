@@ -232,10 +232,10 @@ TEST_CASE("TOML config document values map to the documented TOML type")
     CHECK(presets.as_array().size() == NUM_POWERUP_PRESETS);
     CHECK(presets.as_array().at(0).is_table());
     CHECK(presets.as_array().at(0).as_table().size() == NUM_POWERUPS);
-    CHECK(presets.as_array().at(0).at("1up").as_integer() == 0);
-    CHECK(presets.as_array().at(0).at("2up").as_integer() == 1);
-    CHECK(presets.as_array().at(0).at("spiky").as_integer() == 25);
-    CHECK(presets.as_array().at(3).at("star").as_integer() == 3 * NUM_POWERUPS + 14);
+    CHECK(presets.as_array().at(0).at("1up").as_integer() == 1);
+    CHECK(presets.as_array().at(0).at("2up").as_integer() == 2);
+    CHECK(presets.as_array().at(0).at("spiky").as_integer() == 14);
+    CHECK(presets.as_array().at(3).at("star").as_integer() == 3 * NUM_POWERUPS + 6);
 
     // player skins are stored as names, empty string selects a random skin
     CHECK(document.at("players").at("skins").is_array());

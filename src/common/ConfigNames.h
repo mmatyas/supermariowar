@@ -377,11 +377,32 @@ template<> struct NamedStruct<GameModeGoals> {
 // Powerup droprate presets
 
 constexpr std::array<std::string_view, NUM_POWERUPS> POWERUP_DROPRATE_KEYS_ORDERED = {
-    "1up", "2up", "3up", "5up", "mystery",
-    "flower", "hammer", "boomerang", "bomb", "wand",
-    "feather", "leaf", "pwing", "poison", "star",
-    "bobomb", "tanooki", "clock", "bbill", "podobo",
-    "pow", "mod", "gshell", "rshell", "bshell", "spiky",
+    "poison",
+    "1up",
+    "2up",
+    "3up",
+    "5up",
+    "flower",
+    "star",
+    "clock",
+    "bobomb",
+    "pow",
+    "bbill",
+    "hammer",
+    "gshell",
+    "rshell",
+    "spiky",
+    "bshell",
+    "mod",
+    "feather",
+    "mystery",
+    "boomerang",
+    "tanooki",
+    "icewand",
+    "podobo",
+    "bomb",
+    "leaf",
+    "pwing",
 };
 
 template <typename T>
