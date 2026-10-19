@@ -51,10 +51,4 @@ private:
     short iPaceTimer;
 
     short iBoundary;
-
-friend int editor_stage();
-friend int editor_edit();
-friend int resize_world();
-friend int editor_vehicles();
-friend void inner_main();
 };

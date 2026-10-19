@@ -848,15 +848,14 @@ void inner_main()
 
 	mModeOptionsMenu = new UI_ModeOptionsMenu();
 
-	g_wvVehicleStamp.iDrawSprite = 0;
-	g_wvVehicleStamp.iActionId = 0;
-	g_wvVehicleStamp.currentTile.x = 0;
-	g_wvVehicleStamp.currentTile.y = 0;
-	g_wvVehicleStamp.iMinMoves = 5;
-	g_wvVehicleStamp.iMaxMoves = 8;
-	g_wvVehicleStamp.fSpritePaces = true;
-	g_wvVehicleStamp.iDrawDirection = 0;
-	g_wvVehicleStamp.iBoundary = 0;
+	g_wvVehicleStamp.setDrawSprite(0);
+	g_wvVehicleStamp.setActionId(0);
+	g_wvVehicleStamp.setCurrentTile(0, 0);
+	g_wvVehicleStamp.setMinMoves(5);
+	g_wvVehicleStamp.setMaxMoves(8);
+	g_wvVehicleStamp.setSpritePacing(true);
+	g_wvVehicleStamp.setDrawDirection(0);
+	g_wvVehicleStamp.setBoundary(0);
 
 	//Create Vehicle Menu
 	miVehicleSpriteField = new MI_ImageSelectField(&rm->spr_selectfield, &spr_vehicleicons, 70, 80, "Sprite", 500, 150, 16, 16);
@@ -869,11 +868,11 @@ void inner_main()
 	miVehicleSpriteField->add("Airship 1", 6);
 	miVehicleSpriteField->add("Airship 2", 7);
 	miVehicleSpriteField->add("Tank 2", 8);
-	miVehicleSpriteField->setOutputPtr(&g_wvVehicleStamp.iDrawSprite);
-	miVehicleSpriteField->setCurrentValue(g_wvVehicleStamp.iDrawSprite);
+	miVehicleSpriteField->setOnChanged([](short sprite) { g_wvVehicleStamp.setDrawSprite(sprite); });
+	miVehicleSpriteField->setCurrentValue(g_wvVehicleStamp.getDrawSprite());
 
 	miVehicleStageField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 120, "Stage", 500, 150, 16, 16);
-	miVehicleStageField->setOutputPtr(&g_wvVehicleStamp.iActionId);
+	miVehicleStageField->setOnChanged([](short stage) { g_wvVehicleStamp.setActionId(stage); });
 
 	miVehicleMinMovesField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 160, "Min Moves", 500, 150);
 
@@ -883,8 +882,8 @@ void inner_main()
 		miVehicleMinMovesField->add(szMinMoves, iMinMoves);
 	}
 
-	miVehicleMinMovesField->setOutputPtr(&g_wvVehicleStamp.iMinMoves);
-	miVehicleMinMovesField->setCurrentValue(g_wvVehicleStamp.iMinMoves);
+	miVehicleMinMovesField->setOnChanged([](short minmoves) { g_wvVehicleStamp.setMinMoves(minmoves); });
+	miVehicleMinMovesField->setCurrentValue(g_wvVehicleStamp.getMinMoves());
 	miVehicleMinMovesField->setItemChangedCode(MENU_CODE_VEHICLE_MIN_MOVES_CHANGED);
 	miVehicleMinMovesField->allowWrap(false);
 	miVehicleMinMovesField->allowFastScroll(true);
@@ -897,8 +896,8 @@ void inner_main()
 		miVehicleMaxMovesField->add(szMaxMoves, iMaxMoves);
 	}
 
-	miVehicleMaxMovesField->setOutputPtr(&g_wvVehicleStamp.iMaxMoves);
-	miVehicleMaxMovesField->setCurrentValue(g_wvVehicleStamp.iMaxMoves);
+	miVehicleMaxMovesField->setOnChanged([](short maxmoves) { g_wvVehicleStamp.setMaxMoves(maxmoves); });
+	miVehicleMaxMovesField->setCurrentValue(g_wvVehicleStamp.getMaxMoves());
 	miVehicleMaxMovesField->setItemChangedCode(MENU_CODE_VEHICLE_MAX_MOVES_CHANGED);
 	miVehicleMaxMovesField->allowWrap(false);
 	miVehicleMaxMovesField->allowFastScroll(true);
@@ -906,15 +905,15 @@ void inner_main()
 	miVehiclePacesField = new MI_SelectField<bool>(&rm->spr_selectfield, 70, 240, "Paces", 500, 150);
 	miVehiclePacesField->add("No", false);
 	miVehiclePacesField->add("Yes", true);
-	miVehiclePacesField->setOutputPtr(&g_wvVehicleStamp.fSpritePaces);
-	miVehiclePacesField->setCurrentValue(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
+	miVehiclePacesField->setOnChanged([](bool paces) { g_wvVehicleStamp.setSpritePacing(paces); });
+	miVehiclePacesField->setCurrentValue(g_wvVehicleStamp.isSpritePacing() ? 1 : 0);
 	miVehiclePacesField->setAutoAdvance(true);
 
 	miVehicleDirectionField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 280, "Direction", 500, 150);
 	miVehicleDirectionField->add("Left", false);
 	miVehicleDirectionField->add("Right", true);
-	miVehicleDirectionField->setOutputPtr(&g_wvVehicleStamp.iDrawDirection);
-	miVehicleDirectionField->setCurrentValue(g_wvVehicleStamp.iDrawDirection);
+	miVehicleDirectionField->setOnChanged([](short direction) { g_wvVehicleStamp.setDrawDirection(direction); });
+	miVehicleDirectionField->setCurrentValue(g_wvVehicleStamp.getDrawDirection());
 	miVehicleDirectionField->setAutoAdvance(true);
 
 	miVehicleBoundaryField = new MI_SelectField<short>(&rm->spr_selectfield, 70, 320, "Boundary", 500, 150);
@@ -926,8 +925,8 @@ void inner_main()
 		miVehicleBoundaryField->add(szBoundary, iBoundary);
 	}
 
-	miVehicleBoundaryField->setOutputPtr(&g_wvVehicleStamp.iBoundary);
-	miVehicleBoundaryField->setCurrentValue(g_wvVehicleStamp.iBoundary);
+	miVehicleBoundaryField->setOnChanged([](short boundary) { g_wvVehicleStamp.setBoundary(boundary); });
+	miVehicleBoundaryField->setCurrentValue(g_wvVehicleStamp.getBoundary());
 	miVehicleBoundaryField->allowFastScroll(true);
 
     miVehicleCreateButton = new MI_Button(&rm->spr_selectfield, 430, 360, "OK", 140, TextAlign::CENTER);
@@ -1192,22 +1191,22 @@ int editor_edit()
 							std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
                         while (itr != lim) {
 								WorldVehicle * vehicle = *itr;
-                            if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
-									g_wvVehicleStamp.iDrawSprite = vehicle->iDrawSprite;
-									g_wvVehicleStamp.iActionId = vehicle->iActionId;
-									g_wvVehicleStamp.iMinMoves = vehicle->iMinMoves;
-									g_wvVehicleStamp.iMaxMoves = vehicle->iMaxMoves;
-									g_wvVehicleStamp.fSpritePaces = vehicle->fSpritePaces;
-									g_wvVehicleStamp.iDrawDirection = vehicle->iDrawDirection;
-									g_wvVehicleStamp.iBoundary = vehicle->iBoundary;
+                            if (vehicle->getCurrentTile().x == iCol && vehicle->getCurrentTile().y == iRow) {
+									g_wvVehicleStamp.setDrawSprite(vehicle->getDrawSprite());
+									g_wvVehicleStamp.setActionId(vehicle->getActionId());
+									g_wvVehicleStamp.setMinMoves(vehicle->getMinMoves());
+									g_wvVehicleStamp.setMaxMoves(vehicle->getMaxMoves());
+									g_wvVehicleStamp.setSpritePacing(vehicle->isSpritePacing());
+									g_wvVehicleStamp.setDrawDirection(vehicle->getDrawDirection());
+									g_wvVehicleStamp.setBoundary(vehicle->getBoundary());
 
-									miVehicleSpriteField->setCurrentValue(g_wvVehicleStamp.iDrawSprite);
-									miVehicleStageField->setCurrentValue(g_wvVehicleStamp.iActionId);
-									miVehicleMinMovesField->setCurrentValue(g_wvVehicleStamp.iMinMoves);
-									miVehicleMaxMovesField->setCurrentValue(g_wvVehicleStamp.iMaxMoves);
-									miVehiclePacesField->setCurrentValue(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
-									miVehicleDirectionField->setCurrentValue(g_wvVehicleStamp.iDrawDirection);
-									miVehicleBoundaryField->setCurrentValue(g_wvVehicleStamp.iBoundary);
+									miVehicleSpriteField->setCurrentValue(g_wvVehicleStamp.getDrawSprite());
+									miVehicleStageField->setCurrentValue(g_wvVehicleStamp.getActionId());
+									miVehicleMinMovesField->setCurrentValue(g_wvVehicleStamp.getMinMoves());
+									miVehicleMaxMovesField->setCurrentValue(g_wvVehicleStamp.getMaxMoves());
+									miVehiclePacesField->setCurrentValue(g_wvVehicleStamp.isSpritePacing() ? 1 : 0);
+									miVehicleDirectionField->setCurrentValue(g_wvVehicleStamp.getDrawDirection());
+									miVehicleBoundaryField->setCurrentValue(g_wvVehicleStamp.getBoundary());
 
 									return EDITOR_VEHICLES;
 								}
@@ -1691,8 +1690,8 @@ int editor_edit()
 							std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
                         while (itr != lim) {
 								WorldVehicle * vehicle = *itr;
-                            if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
-									iStageDisplay = vehicle->iActionId;
+                            if (vehicle->getCurrentTile().x == iCol && vehicle->getCurrentTile().y == iRow) {
+									iStageDisplay = vehicle->getActionId();
 									break;
 								}
 
@@ -1835,20 +1834,20 @@ int editor_edit()
                 while (itr != lim) {
 					WorldVehicle * vehicle = *itr;
 
-					short ix = (vehicle->currentTile.x  - draw_offset_col) * TILESIZE + draw_offset_x;
-					short iy = (vehicle->currentTile.y - draw_offset_row) * TILESIZE + draw_offset_y;
+					short ix = (vehicle->getCurrentTile().x - draw_offset_col) * TILESIZE + draw_offset_x;
+					short iy = (vehicle->getCurrentTile().y - draw_offset_row) * TILESIZE + draw_offset_y;
 
 					SDL_Rect r = {ix, iy, 32, 32};
 					SDL_FillSurfaceRect(blitdest, &r, color);
 
-					rm->spr_worldvehicle[0].draw(ix, iy, {vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32});
+					rm->spr_worldvehicle[0].draw(ix, iy, {vehicle->getDrawDirection() << 5, vehicle->getDrawSprite() << 5, 32, 32});
 
                     if (edit_mode == 5) {
-						rm->spr_worldforegroundspecial[0].draw(ix, iy, {(vehicle->iActionId % 10) << 5, (vehicle->iActionId / 10) << 5, 32, 32});
+						rm->spr_worldforegroundspecial[0].draw(ix, iy, {(vehicle->getActionId() % 10) << 5, (vehicle->getActionId() / 10) << 5, 32, 32});
 					}
 
                     if (edit_mode == 8) {
-						short iBoundary = vehicle->iBoundary - 1;
+						short iBoundary = vehicle->getBoundary() - 1;
 						if (iBoundary == -1)
 							rm->spr_worldforegroundspecial[0].draw(ix, iy, {288, 288, 32, 32});
 						else
@@ -3272,7 +3271,7 @@ int editor_vehicles()
 		item.iconOverride = ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode);
 	}
 
-	miVehicleStageField->setCurrentValue(g_wvVehicleStamp.iActionId);
+	miVehicleStageField->setCurrentValue(g_wvVehicleStamp.getActionId());
 
     while (!done) {
 		int framestart = SDL_GetTicks();
@@ -4149,12 +4148,12 @@ int editor_stage()
 					std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin();
                     while (itrVehicle != vehiclelist.end()) {
 						WorldVehicle * vehicle = *itrVehicle;
-                        if (vehicle->iActionId == iEditStage) {
+                        if (vehicle->getActionId() == iEditStage) {
 							delete vehicle;
 							itrVehicle = vehiclelist.erase(itrVehicle);
 							continue;
-                        } else if (vehicle->iActionId > iEditStage) {
-							vehicle->iActionId--;
+                        } else if (vehicle->getActionId() > iEditStage) {
+							vehicle->setActionId(vehicle->getActionId() - 1);
 						}
 
 						itrVehicle++;
@@ -4730,8 +4729,8 @@ int resize_world()
 
 		std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
         while (itrVehicle != limVehicle) {
-			if ((*itrVehicle)->currentTile.x >= iWidth || (*itrVehicle)->currentTile.y >= iHeight) {
-				RemoveVehicleFromTile((*itrVehicle)->currentTile.x, (*itrVehicle)->currentTile.y);
+			if ((*itrVehicle)->getCurrentTile().x >= iWidth || (*itrVehicle)->getCurrentTile().y >= iHeight) {
+				RemoveVehicleFromTile((*itrVehicle)->getCurrentTile().x, (*itrVehicle)->getCurrentTile().y);
 				//List was modified, restart.
 				itrVehicle = vehiclelist.begin();
 				limVehicle = vehiclelist.end();

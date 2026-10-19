@@ -42,6 +42,7 @@ MI_SelectField<T>::MI_SelectField(const MI_SelectField<T>& other)
     , m_items(other.m_items)
     , m_goodRandomIndices(other.m_goodRandomIndices)
     , m_outputPtr(other.m_outputPtr)
+    , m_onChanged(other.m_onChanged)
 {
     setCurrentIndex(other.m_index);
 
@@ -252,6 +253,9 @@ void MI_SelectField<T>::updateOutput() const
 {
     if (m_outputPtr)
         *m_outputPtr = currentValue();
+
+    if (m_onChanged)
+        m_onChanged(currentValue());
 }
 
 

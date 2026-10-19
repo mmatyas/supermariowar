@@ -2,6 +2,7 @@
 
 #include "uicontrol.h"
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -62,6 +63,10 @@ public:
         m_outputPtr = ptr;
     }
 
+    void setOnChanged(std::function<void(T)> onChanged) {
+        m_onChanged = std::move(onChanged);
+    }
+
     //! Gets the currently selected item
     const Item& currentItem() const {
         return m_items.at(m_index);
@@ -117,6 +122,7 @@ protected:
     std::vector<size_t> m_goodRandomIndices;
     size_t m_index = 0;
     T* m_outputPtr = nullptr;
+    std::function<void(T)> m_onChanged;
 
     bool moveNext();
     bool movePrev();
