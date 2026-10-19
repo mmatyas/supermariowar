@@ -582,14 +582,14 @@ bool WorldMap::Save(const std::string& szPath) const
 
     for (short iVehicle = 0; iVehicle < vehicles.size(); iVehicle++) {
         fprintf(file, "%d,", vehicles[iVehicle].getDrawSprite());
-        fprintf(file, "%d,", vehicles[iVehicle].iActionId);
+        fprintf(file, "%d,", vehicles[iVehicle].getActionId());
         fprintf(file, "%d,", vehicles[iVehicle].getCurrentTile().x);
         fprintf(file, "%d,", vehicles[iVehicle].getCurrentTile().y);
-        fprintf(file, "%d,", vehicles[iVehicle].iMinMoves);
-        fprintf(file, "%d,", vehicles[iVehicle].iMaxMoves);
-        fprintf(file, "%d,", vehicles[iVehicle].fSpritePaces);
+        fprintf(file, "%d,", vehicles[iVehicle].getMinMoves());
+        fprintf(file, "%d,", vehicles[iVehicle].getMaxMoves());
+        fprintf(file, "%d,", vehicles[iVehicle].isSpritePacing());
         fprintf(file, "%d,", vehicles[iVehicle].getDrawDirection());
-        fprintf(file, "%d\n", vehicles[iVehicle].iBoundary);
+        fprintf(file, "%d\n", vehicles[iVehicle].getBoundary());
     }
     fprintf(file, "\n");
 
@@ -685,7 +685,7 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
 
     *fPlayerVehicleCollision = false;
     for (WorldVehicle& vehicle : vehicles) {
-        if (!vehicle.fEnabled)
+        if (!vehicle.isEnabled())
             continue;
 
         *fPlayerVehicleCollision |= vehicle.Update();
@@ -703,7 +703,7 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
 void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping) const
 {
     for (const WorldVehicle& vehicle : vehicles) {
-        if (!vehicle.fEnabled)
+        if (!vehicle.isEnabled())
             continue;
 
         vehicle.Draw(iMapOffsetX, iMapOffsetY, fVehiclesSleeping);
@@ -887,7 +887,7 @@ bool WorldMap::IsVehicleMoving() const
 {
     return std::any_of(vehicles.cbegin(), vehicles.cend(),
         [](const WorldVehicle& vehicle) {
-            return vehicle.fEnabled && vehicle.getState() > 0;
+            return vehicle.isEnabled() && vehicle.getState() > 0;
         });
 }
 
@@ -896,12 +896,12 @@ short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
     for (size_t i = 0; i < vehicles.size(); i++) {
         const WorldVehicle& vehicle = vehicles[i];
 
-        if (!vehicle.fEnabled)
+        if (!vehicle.isEnabled())
             continue;
 
         if (vehicle.getCurrentTile() == player.getCurrentTile()) {
             *vehicleIndex = i;
-            return vehicle.iActionId;
+            return vehicle.getActionId();
         }
     }
 
@@ -912,27 +912,27 @@ short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex) const
 void WorldMap::MoveVehicles()
 {
     for (WorldVehicle& vehicle : vehicles) {
-        if (vehicle.fEnabled)
+        if (vehicle.isEnabled())
             vehicle.Move();
     }
 }
 
 void WorldMap::RemoveVehicle(short iVehicleIndex)
 {
-    vehicles[iVehicleIndex].fEnabled = false;
+    vehicles[iVehicleIndex].setEnabled(false);
 }
 
 size_t WorldMap::NumVehiclesInTile(Vec2s iTile) const
 {
     return std::count_if(vehicles.cbegin(), vehicles.cend(),
         [iTile](const WorldVehicle& vehicle) {
-            return vehicle.fEnabled && vehicle.getCurrentTile() == iTile;
+            return vehicle.isEnabled() && vehicle.getCurrentTile() == iTile;
         });
 }
 
 short WorldMap::GetVehicleStageScore(short iVehicleIndex) const
 {
-    return game_values.tourstops[vehicles[iVehicleIndex].iActionId]->iPoints;
+    return game_values.tourstops[vehicles[iVehicleIndex].getActionId()]->iPoints;
 }
 
 bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const

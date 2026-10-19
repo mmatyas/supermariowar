@@ -17,11 +17,14 @@ public:
 
     Vec2s getPosition() const { return pos; }
     Vec2s getCurrentTile() const { return currentTile; }
+    void setCurrentTile(short iCol, short iRow) { currentTile = {iCol, iRow}; }
     Vec2s getDestTile() const { return destTile; }
 
     short getState() const { return iState; }
     short getDrawSprite() const { return iDrawSprite; }
+    void setDrawSprite(short iSprite) { iDrawSprite = iSprite; }
     short getDrawDirection() const { return iDrawDirection; }
+    void setDrawDirection(short iDirection) { iDrawDirection = iDirection; }
 
 protected:
     Vec2s pos;

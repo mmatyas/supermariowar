@@ -15,6 +15,24 @@ public:
     bool Update();
     void Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping) const;
 
+    bool isEnabled() const { return fEnabled; }
+    void setEnabled(bool fEnabledIn) { fEnabled = fEnabledIn; }
+
+    short getActionId() const { return iActionId; }
+    void setActionId(short iActionIdIn) { iActionId = iActionIdIn; }
+
+    short getMinMoves() const { return iMinMoves; }
+    void setMinMoves(short iMinMovesIn) { iMinMoves = iMinMovesIn; }
+
+    short getMaxMoves() const { return iMaxMoves; }
+    void setMaxMoves(short iMaxMovesIn) { iMaxMoves = iMaxMovesIn; }
+
+    bool isSpritePacing() const { return fSpritePaces; }
+    void setSpritePacing(bool fSpritePacesIn) { fSpritePaces = fSpritePacesIn; }
+
+    short getBoundary() const { return iBoundary; }
+    void setBoundary(short iBoundaryIn) { iBoundary = iBoundaryIn; }
+
 private:
     void SetNextDest();
 
@@ -33,12 +51,6 @@ private:
     short iPaceTimer;
 
     short iBoundary;
-
-friend class WorldMap;
-friend void AddVehicleToTile(short iCol, short iRow, short iType);
-friend void RemoveVehicleFromTile(short iCol, short iRow);
-friend void ReadVehiclesIntoEditor();
-friend void WriteVehiclesIntoWorld();
 
 friend int editor_stage();
 friend int editor_edit();

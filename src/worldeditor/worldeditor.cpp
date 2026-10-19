@@ -1955,15 +1955,14 @@ void ReadVehiclesIntoEditor()
     for (const WorldVehicle& vehicle : g_worldmap.vehicles) {
         WorldVehicle * vehiclecopy = new WorldVehicle();
 
-        vehiclecopy->iDrawSprite = vehicle.iDrawSprite;
-        vehiclecopy->iActionId = vehicle.iActionId;
-        vehiclecopy->currentTile.x = vehicle.currentTile.x;
-        vehiclecopy->currentTile.y = vehicle.currentTile.y;
-        vehiclecopy->iMinMoves = vehicle.iMinMoves;
-        vehiclecopy->iMaxMoves = vehicle.iMaxMoves;
-        vehiclecopy->fSpritePaces = vehicle.fSpritePaces;
-        vehiclecopy->iDrawDirection = vehicle.iDrawDirection;
-        vehiclecopy->iBoundary = vehicle.iBoundary;
+        vehiclecopy->setDrawSprite(vehicle.getDrawSprite());
+        vehiclecopy->setActionId(vehicle.getActionId());
+        vehiclecopy->setCurrentTile(vehicle.getCurrentTile().x, vehicle.getCurrentTile().y);
+        vehiclecopy->setMinMoves(vehicle.getMinMoves());
+        vehiclecopy->setMaxMoves(vehicle.getMaxMoves());
+        vehiclecopy->setSpritePacing(vehicle.isSpritePacing());
+        vehiclecopy->setDrawDirection(vehicle.getDrawDirection());
+        vehiclecopy->setBoundary(vehicle.getBoundary());
 
         vehiclelist.push_back(vehiclecopy);
     }
@@ -1979,15 +1978,14 @@ void WriteVehiclesIntoWorld()
 
     for (const WorldVehicle* vehicle : vehiclelist) {
         WorldVehicle vehiclecopy;
-        vehiclecopy.iDrawSprite = vehicle->iDrawSprite;
-        vehiclecopy.iActionId = vehicle->iActionId;
-        vehiclecopy.currentTile.x = vehicle->currentTile.x;
-        vehiclecopy.currentTile.y = vehicle->currentTile.y;
-        vehiclecopy.iMinMoves = vehicle->iMinMoves;
-        vehiclecopy.iMaxMoves = vehicle->iMaxMoves;
-        vehiclecopy.fSpritePaces = vehicle->fSpritePaces;
-        vehiclecopy.iDrawDirection = vehicle->iDrawDirection;
-        vehiclecopy.iBoundary = vehicle->iBoundary;
+        vehiclecopy.setDrawSprite(vehicle->getDrawSprite());
+        vehiclecopy.setActionId(vehicle->getActionId());
+        vehiclecopy.setCurrentTile(vehicle->getCurrentTile().x, vehicle->getCurrentTile().y);
+        vehiclecopy.setMinMoves(vehicle->getMinMoves());
+        vehiclecopy.setMaxMoves(vehicle->getMaxMoves());
+        vehiclecopy.setSpritePacing(vehicle->isSpritePacing());
+        vehiclecopy.setDrawDirection(vehicle->getDrawDirection());
+        vehiclecopy.setBoundary(vehicle->getBoundary());
         g_worldmap.vehicles.emplace_back(std::move(vehiclecopy));
     }
 }
@@ -1998,7 +1996,7 @@ void AddVehicleToTile(short iCol, short iRow, short iType)
 	WorldVehicle * newvehicle = NULL;
     while (itr != lim) {
 		WorldVehicle * vehicle = *itr;
-        if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
+        if (vehicle->getCurrentTile().x == iCol && vehicle->getCurrentTile().y == iRow) {
 			newvehicle = vehicle;
 			break;
 		}
@@ -2008,18 +2006,17 @@ void AddVehicleToTile(short iCol, short iRow, short iType)
 
     if (!newvehicle) {
 		newvehicle = new WorldVehicle();
-		newvehicle->currentTile.x = iCol;
-		newvehicle->currentTile.y = iRow;
+		newvehicle->setCurrentTile(iCol, iRow);
 		vehiclelist.push_back(newvehicle);
 	}
 
-	newvehicle->iDrawSprite = g_wvVehicleStamp.iDrawSprite;
-	newvehicle->iActionId = g_wvVehicleStamp.iActionId;
-	newvehicle->iMinMoves = g_wvVehicleStamp.iMinMoves;
-	newvehicle->iMaxMoves = g_wvVehicleStamp.iMaxMoves;
-	newvehicle->fSpritePaces = g_wvVehicleStamp.fSpritePaces;
-	newvehicle->iDrawDirection = g_wvVehicleStamp.iDrawDirection;
-	newvehicle->iBoundary = g_wvVehicleStamp.iBoundary;
+	newvehicle->setDrawSprite(g_wvVehicleStamp.getDrawSprite());
+	newvehicle->setActionId(g_wvVehicleStamp.getActionId());
+	newvehicle->setMinMoves(g_wvVehicleStamp.getMinMoves());
+	newvehicle->setMaxMoves(g_wvVehicleStamp.getMaxMoves());
+	newvehicle->setSpritePacing(g_wvVehicleStamp.isSpritePacing());
+	newvehicle->setDrawDirection(g_wvVehicleStamp.getDrawDirection());
+	newvehicle->setBoundary(g_wvVehicleStamp.getBoundary());
 }
 
 void RemoveVehicleFromTile(short iCol, short iRow)
@@ -2027,7 +2024,7 @@ void RemoveVehicleFromTile(short iCol, short iRow)
 	std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
     while (itr != lim) {
 		WorldVehicle * vehicle = *itr;
-        if (vehicle->currentTile.x == iCol && vehicle->currentTile.y == iRow) {
+        if (vehicle->getCurrentTile().x == iCol && vehicle->getCurrentTile().y == iRow) {
 			delete (*itr);
 
 			itr = vehiclelist.erase(itr);
