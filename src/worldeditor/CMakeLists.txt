@@ -3,6 +3,8 @@ add_executable(smw-worldedit WIN32
 	../common/movingplatform.h
 	../smw/world.cpp
 	../smw/world.h
+	../smw/world/WorldMovingObject.cpp
+	../smw/world/WorldMovingObject.h
 	../smw/objects/IO_BulletBillCannon.cpp
 	../smw/objects/IO_BulletBillCannon.h
 	../smw/objects/IO_FlameCannon.cpp

@@ -33,6 +33,7 @@ add_executable(smw WIN32
 )
 
 add_subdirectory(player_components)
+add_subdirectory(world)
 add_subdirectory(menu)
 add_subdirectory(gamemodes)
 add_subdirectory(objects)
