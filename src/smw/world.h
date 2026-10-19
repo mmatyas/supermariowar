@@ -4,6 +4,7 @@
 #include "math/Vec2.h"
 #include "util/Grid.h"
 #include "world/WorldMovingObject.h"
+#include "world/WorldWarp.h"
 
 #include <SDL3/SDL.h>
 
@@ -98,16 +99,6 @@ class WorldVehicle : public WorldMovingObject
 	friend int resize_world();
 	friend int editor_vehicles();
 	friend void inner_main();
-};
-
-struct WorldWarp {
-    WorldWarp(short id, Vec2s posA, Vec2s posB);
-
-    Vec2s getOtherSide(Vec2s target) const;
-
-    short id;
-    Vec2s posA;
-    Vec2s posB;
 };
 
 class WorldMap {
