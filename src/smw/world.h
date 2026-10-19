@@ -4,6 +4,7 @@
 #include "math/Vec2.h"
 #include "util/Grid.h"
 #include "world/WorldMovingObject.h"
+#include "world/WorldPlayer.h"
 #include "world/WorldWarp.h"
 
 #include <SDL3/SDL.h>
@@ -44,15 +45,6 @@ struct WorldMapTile {
 	short iRow;
 
 	short iVehicleBoundary;
-};
-
-class WorldPlayer : public WorldMovingObject {
-public:
-    WorldPlayer();
-    WorldPlayer(short iCol, short iRow);
-
-    void SetSprite(short iPlayer);
-    void Draw(short iWorldOffsetX, short iWorldOffsetY) const;
 };
 
 class WorldVehicle : public WorldMovingObject
