@@ -77,10 +77,10 @@ public:
         *h = iHeight;
     }
 
-    Vec2s GetPlayerCurrentTile() const { return player.currentTile; }
-    Vec2s GetPlayerDestTile() const { return player.destTile; };
-    short GetPlayerState() const { return player.iState; };
-    Vec2s GetPlayerPosition() const { return player.pos; }
+    Vec2s GetPlayerCurrentTile() const { return player.getCurrentTile(); }
+    Vec2s GetPlayerDestTile() const { return player.getDestTile(); };
+    short GetPlayerState() const { return player.getState(); };
+    Vec2s GetPlayerPosition() const { return player.getPosition(); }
     void SetPlayerPosition(short iPlayerCol, short iPlayerRow);
     void SetPlayerSprite(short iPlayerSprite);
     void MovePlayer(short iDirection);

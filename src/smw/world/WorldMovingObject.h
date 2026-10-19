@@ -15,6 +15,14 @@ public:
     void FaceDirection(short iDirection);
     void SetPosition(short iCol, short iRow);
 
+    Vec2s getPosition() const { return pos; }
+    Vec2s getCurrentTile() const { return currentTile; }
+    Vec2s getDestTile() const { return destTile; }
+
+    short getState() const { return iState; }
+    short getDrawSprite() const { return iDrawSprite; }
+    short getDrawDirection() const { return iDrawDirection; }
+
 protected:
     Vec2s pos;
     Vec2s currentTile;
@@ -28,7 +36,4 @@ protected:
 
     short iTileSize = 0;
     short iTileSheet = 0;
-
-    friend class WorldMap;
-    friend void takescreenshot();
 };

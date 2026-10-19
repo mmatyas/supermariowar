@@ -4782,10 +4782,10 @@ void takescreenshot()
         while (itr != lim) {
 			WorldVehicle * vehicle = *itr;
 
-			short ix = vehicle->currentTile.x * iTileSize;
-			short iy = vehicle->currentTile.y * iTileSize;
+			short ix = vehicle->getCurrentTile().x * iTileSize;
+			short iy = vehicle->getCurrentTile().y * iTileSize;
 
-			rm->spr_worldvehicle[iScreenshotSize].draw(ix, iy, {vehicle->iDrawDirection * iTileSize, vehicle->iDrawSprite * iTileSize, iTileSize, iTileSize});
+			rm->spr_worldvehicle[iScreenshotSize].draw(ix, iy, {vehicle->getDrawDirection() * iTileSize, vehicle->getDrawSprite() * iTileSize, iTileSize, iTileSize});
 
 			itr++;
 		}
