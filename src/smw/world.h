@@ -163,9 +163,6 @@ private:
 
     std::string worldName;
 
-    friend void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9]);
-    friend bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9]);
-
     friend void ReadVehiclesIntoEditor();
     friend void WriteVehiclesIntoWorld();
     friend void ReadWarpsIntoEditor();

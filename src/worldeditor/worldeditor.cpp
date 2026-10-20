@@ -1917,7 +1917,7 @@ void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9])
     for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
         for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
             if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-				iOldTiles[iIndex++] = g_worldmap.tiles.at(iAutoCol, iAutoRow).iForegroundSprite;
+				iOldTiles[iIndex++] = g_worldmap.getTile(iAutoCol, iAutoRow).iForegroundSprite;
 			}
 		}
 	}
@@ -1932,7 +1932,7 @@ bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9])
     for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
         for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
             if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-				if (g_worldmap.tiles.at(iAutoCol, iAutoRow).iForegroundSprite != iOldTiles[iIndex++])
+				if (g_worldmap.getTile(iAutoCol, iAutoRow).iForegroundSprite != iOldTiles[iIndex++])
 					return true;
 			}
 		}
