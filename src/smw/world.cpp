@@ -31,9 +31,7 @@ extern SkinList *skinlist;
 **********************************/
 
 WorldMap::WorldMap(short w, short h)
-    : iWidth(w)
-    , iHeight(h)
-    , tiles(w, h)
+    : tiles(w, h)
 {
     ResetTourStops();  // FIXME
 }
@@ -45,7 +43,7 @@ void WorldMap::nextMusicCategory()
 
 void WorldMap::SetTileConnections(short iCol, short iRow)
 {
-    if (iCol < 0 || iRow < 0 || iCol >= iWidth || iRow >= iHeight)
+    if (iCol < 0 || iRow < 0 || iCol >= getWidth() || iRow >= getHeight())
         return;
 
     WorldMapTile& tile = tiles.at(iCol, iRow);
@@ -64,7 +62,7 @@ void WorldMap::SetTileConnections(short iCol, short iRow)
                                         tile.iConnectionType == 15);
     }
 
-    if (iRow < iHeight - 1) {
+    if (iRow < getHeight() - 1) {
         const WorldMapTile& bottomTile = tiles.at(iCol, iRow + 1);
 
         tile.fConnection[1] = (bottomTile.iConnectionType == 1 || bottomTile.iConnectionType == 3 || bottomTile.iConnectionType == 4 ||
@@ -85,7 +83,7 @@ void WorldMap::SetTileConnections(short iCol, short iRow)
                                         tile.iConnectionType == 10 || tile.iConnectionType == 11 || tile.iConnectionType == 13);
     }
 
-    if (iCol < iWidth - 1) {
+    if (iCol < getWidth() - 1) {
         const WorldMapTile& rightTile = tiles.at(iCol + 1, iRow);
 
         tile.fConnection[3] = (rightTile.iConnectionType == 2 || rightTile.iConnectionType == 3 || rightTile.iConnectionType == 6 ||
@@ -106,7 +104,7 @@ void WorldMap::Clear()
             tile.iForegroundSprite = 0;
             tile.iConnectionType = 0;
             tile.iType = 0;
-            tile.iID = row * iWidth + col;
+            tile.iID = row * getWidth() + col;
             tile.iVehicleBoundary = 0;
             tile.iWarp = 0;
         }
@@ -140,13 +138,11 @@ void WorldMap::Resize(short w, short h)
     const short iOldHeight = static_cast<short>(tiles.rows());
 
     //Create new map
-    iWidth = w;
-    iHeight = h;
     Grid<WorldMapTile> newTiles(w, h);
 
     //Copy tiles to new map
-    for (short iCol = 0; iCol < iWidth; iCol++) {
-        for (short iRow = 0; iRow < iHeight; iRow++) {
+    for (short iCol = 0; iCol < getWidth(); iCol++) {
+        for (short iRow = 0; iRow < getHeight(); iRow++) {
             WorldMapTile& newTile = newTiles.at(iCol, iRow);
             if (iCol < iOldWidth && iRow < iOldHeight) {
                 newTile = std::move(tiles.at(iCol, iRow));
@@ -156,7 +152,7 @@ void WorldMap::Resize(short w, short h)
                 newTile.iForegroundSprite = 0;
                 newTile.iConnectionType = 0;
                 newTile.iType = 0;
-                newTile.iID = iRow * iWidth + iCol;
+                newTile.iID = iRow * getWidth() + iCol;
                 newTile.iVehicleBoundary = 0;
                 newTile.iWarp = 0;
             }
@@ -168,7 +164,7 @@ void WorldMap::Resize(short w, short h)
 
     // The incremental draw refreshes part of the world surface per frame
     // 19 * 24 = 456 max tiles in world surface
-    short iDrawSurfaceTiles = std::min(iWidth * iHeight, 456);
+    short iDrawSurfaceTiles = std::min(getWidth() * getHeight(), 456);
     iTilesPerCycle = iDrawSurfaceTiles / 8;
 }
 
@@ -215,8 +211,8 @@ void WorldMap::UpdateTile(SDL_Surface * surface, short iCol, short iRow, short i
 
 void WorldMap::DrawMapToSurface(SDL_Surface * surface) const
 {
-    for (short iRow = 0; iRow < iHeight; iRow++) {
-        for (short iCol = 0; iCol < iWidth; iCol++) {
+    for (short iRow = 0; iRow < getHeight(); iRow++) {
+        for (short iCol = 0; iCol < getWidth(); iCol++) {
             DrawTileToSurface(surface, iCol, iRow, 0, 0, true, 0, 0);
         }
     }
@@ -230,8 +226,8 @@ void WorldMap::ResetDrawCycle()
 
 void WorldMap::DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface* surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame)
 {
-    short iRowEnd = 19 + iMapDrawOffsetRow < iHeight ? 19 : iHeight - iMapDrawOffsetRow;
-    short iColEnd = 24 + iMapDrawOffsetCol < iWidth ? 24 : iWidth - iMapDrawOffsetCol;
+    short iRowEnd = 19 + iMapDrawOffsetRow < getHeight() ? 19 : getHeight() - iMapDrawOffsetRow;
+    short iColEnd = 24 + iMapDrawOffsetCol < getWidth() ? 24 : getWidth() - iMapDrawOffsetCol;
 
     short iCounter = 0, iRow, iCol;
     short iLayer = iCycleIndex == -1 ? 0 : iCycleIndex < 8 ? 1 : 2;
@@ -445,8 +441,8 @@ bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow) const
 
 void WorldMap::MoveBridges()
 {
-    for (short iRow = 0; iRow < iHeight; iRow++) {
-        for (short iCol = 0; iCol < iWidth; iCol++) {
+    for (short iRow = 0; iRow < getHeight(); iRow++) {
+        for (short iCol = 0; iCol < getWidth(); iCol++) {
             if (tiles.at(iCol, iRow).iConnectionType == 12) {
                 tiles.at(iCol, iRow).iConnectionType = 13;
                 SetTileConnections(iCol, iRow);
@@ -494,7 +490,7 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4]) const
         }
     }
 
-    if (iCol < iWidth - 1) {
+    if (iCol < getWidth() - 1) {
         if (tile.iCompleted >= -1) {
             short iType = tiles.at(iCol + 1, iRow).iType - 2;
 
@@ -512,7 +508,7 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4]) const
         }
     }
 
-    if (iCol < iHeight - 1) {
+    if (iCol < getHeight() - 1) {
         if (tile.iCompleted >= -1) {
             short iType = tiles.at(iCol, iRow + 1).iType - 2;
 
@@ -524,7 +520,7 @@ void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4]) const
 
 bool WorldMap::IsDoor(short iCol, short iRow) const
 {
-    if (iCol >= 0 && iRow >= 0 && iCol < iWidth && iRow < iHeight) {
+    if (iCol >= 0 && iRow >= 0 && iCol < getWidth() && iRow < getHeight()) {
         short iType = tiles.at(iCol, iRow).iType;
         if (iType >= 2 && iType <= 5)
             return true;
@@ -546,7 +542,7 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow, bool fCloud)
         }
     }
 
-    if (iCol < iWidth - 1) {
+    if (iCol < getWidth() - 1) {
         if ((tile.iCompleted >= -1 || fCloud) && tiles.at(iCol + 1, iRow).iType - 2 == iKeyType) {
             tiles.at(iCol + 1, iRow).iType = 0;
             iDoorsOpened |= 2;
@@ -560,7 +556,7 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow, bool fCloud)
         }
     }
 
-    if (iRow < iHeight - 1) {
+    if (iRow < getHeight() - 1) {
         if ((tile.iCompleted >= -1 || fCloud) && tiles.at(iCol, iRow + 1).iType - 2 == iKeyType) {
             tiles.at(iCol, iRow + 1).iType = 0;
             iDoorsOpened |= 8;
@@ -572,7 +568,7 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow, bool fCloud)
 
 short WorldMap::GetVehicleBoundary(short iCol, short iRow) const
 {
-    if (iCol >= 0 && iRow >= 0 && iCol < iWidth && iRow < iHeight) {
+    if (iCol >= 0 && iRow >= 0 && iCol < getWidth() && iRow < getHeight()) {
         return tiles.at(iCol, iRow).iVehicleBoundary;
     }
 
@@ -610,15 +606,15 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
 
             while (true) {
                 if (iBackTileDirection == 0)
-                    iBackTileId -= iWidth;
+                    iBackTileId -= getWidth();
                 else if (iBackTileDirection == 1)
-                    iBackTileId += iWidth;
+                    iBackTileId += getWidth();
                 else if (iBackTileDirection == 2)
                     iBackTileId -= 1;
                 else if (iBackTileDirection == 3)
                     iBackTileId += 1;
                 else if (iBackTileDirection == 4) {
-                    const Vec2s target(iBackTileId % iWidth, iBackTileId / iWidth);
+                    const Vec2s target(iBackTileId % getWidth(), iBackTileId / getWidth());
                     const Vec2s pos = warps[tiles.at(iCol, iRow).iWarp].getOtherSide(target);
                     iBackTileId = tiles.at(pos.x, pos.y).iID;
                 }
@@ -649,7 +645,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
                         visitedTiles[topTile.iID] = 1;
                         next.push(&topTile);
                     }
-                } else if (iNeighbor == 1 && tile->iRow < iHeight - 1) {
+                } else if (iNeighbor == 1 && tile->iRow < getHeight() - 1) {
                     const WorldMapTile& bottomTile = tiles.at(tile->iCol, tile->iRow + 1);
 
                     //Stop at door tiles
@@ -671,7 +667,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
                         visitedTiles[leftTile.iID] = 3;
                         next.push(&leftTile);
                     }
-                } else if (iNeighbor == 3 && tile->iCol < iWidth - 1) {
+                } else if (iNeighbor == 3 && tile->iCol < getWidth() - 1) {
                     const WorldMapTile& rightTile = tiles.at(tile->iCol + 1, tile->iRow);
 
                     //Stop at door tiles

@@ -71,8 +71,8 @@ public:
     void DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface* surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
     void GetWorldSize(short * w, short * h) const {
-        *w = iWidth;
-        *h = iHeight;
+        *w = getWidth();
+        *h = getHeight();
     }
 
     Vec2s GetPlayerCurrentTile() const { return player.getCurrentTile(); }
@@ -106,8 +106,8 @@ public:
     WorldMusicCategory GetMusicCategory() const { return iMusicCategory; }
     const std::string& GetWorldName() { return worldName; }
 
-    short getWidth() const { return iWidth; }
-    short getHeight() const { return iHeight; }
+    short getWidth() const { return static_cast<short>(tiles.cols()); }
+    short getHeight() const { return static_cast<short>(tiles.rows()); }
     short getNumStages() const { return iNumStages; }
     void setNumStages(short iNumStages) { this->iNumStages = iNumStages; }
     const WorldMapTile& getTile(short iCol, short iRow) const { return tiles.at(iCol, iRow); }
@@ -137,9 +137,6 @@ private:
     void SetTileConnections(short iCol, short iRow);
 
     void DrawTileToSurface(SDL_Surface* surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer = 0) const;
-
-    short iWidth = 0;
-    short iHeight = 0;
 
     short iNumStages = 0;
 
