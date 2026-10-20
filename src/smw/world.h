@@ -111,8 +111,24 @@ public:
     short getWidth() const { return iWidth; }
     short getHeight() const { return iHeight; }
     short getNumStages() const { return iNumStages; }
+    void setNumStages(short iNumStages) { this->iNumStages = iNumStages; }
     const WorldMapTile& getTile(short iCol, short iRow) const { return tiles.at(iCol, iRow); }
     WorldMapTile& getTile(short iCol, short iRow) { return tiles.at(iCol, iRow); }
+
+    short getNumInitialBonuses() const { return iNumInitialBonuses; }
+    short getInitialBonus(short iIndex) const { return iInitialBonuses[iIndex]; }
+    void addInitialBonus(short iBonus) {
+        if (iNumInitialBonuses < 32)
+            iInitialBonuses[iNumInitialBonuses++] = iBonus;
+    }
+    void removeInitialBonus(short iIndex) {
+        for (short iAdjust = iIndex; iAdjust < iNumInitialBonuses - 1; iAdjust++)
+            iInitialBonuses[iAdjust] = iInitialBonuses[iAdjust + 1];
+
+        iNumInitialBonuses--;
+    }
+
+    void nextMusicCategory();
 
 private:
     void SetTileConnections(short iCol, short iRow);
@@ -146,13 +162,6 @@ private:
     short iTilesPerCycle;
 
     std::string worldName;
-
-    friend int editor_edit();
-    friend int editor_type();
-    friend int editor_stage();
-    friend int editor_start_items();
-    friend int editor_vehicles();
-    friend void NewStage(short * iEditStage);
 
     friend bool AutoSetTile(short iCol, short iRow);
     friend void AutoSetPath(short iCol, short iRow);

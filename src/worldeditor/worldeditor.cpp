@@ -1229,7 +1229,7 @@ int editor_edit()
 
                     if (event.key.key == SDLK_R) {
 							if (g_musiccategorydisplaytimer > 0)
-								g_worldmap.iMusicCategory++;
+								g_worldmap.nextMusicCategory();
 
 							g_musiccategorydisplaytimer = 90;
 						}
@@ -1347,10 +1347,10 @@ int editor_edit()
                     if (iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE) {
                         if (event.button.button == SDL_BUTTON_LEFT && !ignoreclick) {
                             if (edit_mode == 0) { //selected background
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile || fAutoPaint) {
+                                if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite != set_tile || fAutoPaint) {
 										bool fNeedUpdate = false;
-                                    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile) {
-											g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = set_tile;
+                                    if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite != set_tile) {
+											g_worldmap.getTile(iCol, iRow).iBackgroundSprite = set_tile;
 											fNeedUpdate = true;
 										}
 
@@ -1363,33 +1363,33 @@ int editor_edit()
 											updateworldsurface();
 									}
                             } else if (edit_mode == 1) { //selected foreground
-                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile;
+                                if (g_worldmap.getTile(iCol, iRow).iForegroundSprite != set_tile) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = set_tile;
 										updateworldsurface();
 
 										if (set_tile >= WORLD_BRIDGE_SPRITE_OFFSET && set_tile <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
-											g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile - WORLD_BRIDGE_SPRITE_OFFSET + 12;
+											g_worldmap.getTile(iCol, iRow).iConnectionType = set_tile - WORLD_BRIDGE_SPRITE_OFFSET + 12;
 									}
                             } else if (edit_mode == 2) { //selected connection
-									g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile;
+									g_worldmap.getTile(iCol, iRow).iConnectionType = set_tile;
 
 									if (fAutoPaint)
 										UpdatePath(iCol, iRow);
                             } else if (edit_mode == 3) { //selected type
 									//start tiles
                                 if (set_tile <= 1) {
-                                    if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
-											g_worldmap.tiles.at(iCol, iRow).iType = 1;
-											g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+                                    if (g_worldmap.getTile(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
+											g_worldmap.getTile(iCol, iRow).iType = 1;
+											g_worldmap.getTile(iCol, iRow).iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
 											updateworldsurface();
 										}
                                 } else if (set_tile <= 5) { //doors
-                                    if (g_worldmap.tiles.at(iCol, iRow).iType != set_tile) {
+                                    if (g_worldmap.getTile(iCol, iRow).iType != set_tile) {
 											//if the door was placed on a start tile
-											if (g_worldmap.tiles.at(iCol, iRow).iType == 1)
-												g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+											if (g_worldmap.getTile(iCol, iRow).iType == 1)
+												g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 
-											g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
+											g_worldmap.getTile(iCol, iRow).iType = set_tile;
 											updateworldsurface();
 										}
 									}
@@ -1397,8 +1397,8 @@ int editor_edit()
 									short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
 									bool fNeedUpdate = false;
 
-                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != iAdjustedTile) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
+                                if (!fAutoPaint && g_worldmap.getTile(iCol, iRow).iForegroundSprite != iAdjustedTile) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = iAdjustedTile;
 										fNeedUpdate = true;
 									}
 
@@ -1406,7 +1406,7 @@ int editor_edit()
                                 if (fAutoPaint) {
 										short iOldTiles[9];
 										GetForegroundTileValues(iCol, iRow, iOldTiles);
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = iAdjustedTile;
 										UpdatePathSprite(iCol, iRow);
 
 										if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
@@ -1420,28 +1420,28 @@ int editor_edit()
                             } else if (edit_mode == 6) { //selected warp
 									AddWarpToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != set_tile) {
-										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = set_tile;
+                                if (g_worldmap.getTile(iCol, iRow).iBackgroundWater != set_tile) {
+										g_worldmap.getTile(iCol, iRow).iBackgroundWater = set_tile;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 8) { //boundary
-									g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = set_tile;
+									g_worldmap.getTile(iCol, iRow).iVehicleBoundary = set_tile;
                             } else if (edit_mode == 9) {
 									//if the stage was placed on a start tile
-                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+                                if (g_worldmap.getTile(iCol, iRow).iType == 1) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
 									}
 
-									g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
+									g_worldmap.getTile(iCol, iRow).iType = set_tile;
 								}
                         } else if (event.button.button == SDL_BUTTON_RIGHT) {
                             if (edit_mode == 0) {
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != 0 || fAutoPaint) {
+                                if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite != 0 || fAutoPaint) {
 										bool fNeedUpdate = false;
 
-                                    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != 0) {
-											g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = 0;
+                                    if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite != 0) {
+											g_worldmap.getTile(iCol, iRow).iBackgroundSprite = 0;
 											fNeedUpdate = true;
 										}
 
@@ -1454,30 +1454,30 @@ int editor_edit()
 											updateworldsurface();
 									}
                             } else if (edit_mode == 1) {
-                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+                                if (g_worldmap.getTile(iCol, iRow).iForegroundSprite != 0) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 2) {
-									g_worldmap.tiles.at(iCol, iRow).iConnectionType = 0;
+									g_worldmap.getTile(iCol, iRow).iConnectionType = 0;
 
 									if (fAutoPaint)
 										UpdatePath(iCol, iRow);
                             } else if (edit_mode == 3) { //selected start/door
-                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+                                if (g_worldmap.getTile(iCol, iRow).iType == 1) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
-                                } else if (g_worldmap.tiles.at(iCol, iRow).iType <= 5) {
-										g_worldmap.tiles.at(iCol, iRow).iType = 0;
+                                } else if (g_worldmap.getTile(iCol, iRow).iType <= 5) {
+										g_worldmap.getTile(iCol, iRow).iType = 0;
 										updateworldsurface();
 									}
 
-									g_worldmap.tiles.at(iCol, iRow).iType = 0;
+									g_worldmap.getTile(iCol, iRow).iType = 0;
                             } else if (edit_mode == 4) {
 									bool fNeedUpdate = false;
 
-                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+                                if (!fAutoPaint && g_worldmap.getTile(iCol, iRow).iForegroundSprite != 0) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										fNeedUpdate = true;
 									}
 
@@ -1485,7 +1485,7 @@ int editor_edit()
                                 if (fAutoPaint) {
 										short iOldTiles[9];
 										GetForegroundTileValues(iCol, iRow, iOldTiles);
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										UpdatePathSprite(iCol, iRow);
 
 										if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
@@ -1500,14 +1500,14 @@ int editor_edit()
                             } else if (edit_mode == 6) {
 									RemoveWarpFromTile(iCol, iRow);
                             } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != 0) {
-										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = 0;
+                                if (g_worldmap.getTile(iCol, iRow).iBackgroundWater != 0) {
+										g_worldmap.getTile(iCol, iRow).iBackgroundWater = 0;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 8) { //boundary
-									g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary = 0;
+									g_worldmap.getTile(iCol, iRow).iVehicleBoundary = 0;
                             } else if (edit_mode == 9) { //stage
-									g_worldmap.tiles.at(iCol, iRow).iType = 0;
+									g_worldmap.getTile(iCol, iRow).iType = 0;
 									iStageDisplay = -1;
 								}
 							}
@@ -1526,10 +1526,10 @@ int editor_edit()
                     if (iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE) {
                         if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_LEFT) && !ignoreclick) {
                             if (edit_mode == 0) { //selected background
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile || fAutoPaint) {
+                                if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite != set_tile || fAutoPaint) {
 										bool fNeedUpdate = false;
-                                    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != set_tile) {
-											g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = set_tile;
+                                    if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite != set_tile) {
+											g_worldmap.getTile(iCol, iRow).iBackgroundSprite = set_tile;
 											fNeedUpdate = true;
 										}
 
@@ -1542,29 +1542,29 @@ int editor_edit()
 											updateworldsurface();
 									}
                             } else if (edit_mode == 1) {
-                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile;
+                                if (g_worldmap.getTile(iCol, iRow).iForegroundSprite != set_tile) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = set_tile;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 2) {
-									g_worldmap.tiles.at(iCol, iRow).iConnectionType = set_tile;
+									g_worldmap.getTile(iCol, iRow).iConnectionType = set_tile;
 
 									if (fAutoPaint)
 										UpdatePath(iCol, iRow);
                             } else if (edit_mode == 3) { //selected stage/door
                                 if (set_tile <= 1) {
-                                    if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
-											g_worldmap.tiles.at(iCol, iRow).iType = 1;
-											g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+                                    if (g_worldmap.getTile(iCol, iRow).iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET) {
+											g_worldmap.getTile(iCol, iRow).iType = 1;
+											g_worldmap.getTile(iCol, iRow).iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
 											updateworldsurface();
 										}
                                 } else if (set_tile <= 5) {
-                                    if (g_worldmap.tiles.at(iCol, iRow).iType != set_tile) {
+                                    if (g_worldmap.getTile(iCol, iRow).iType != set_tile) {
 											//if the door was placed on a start tile
-											if (g_worldmap.tiles.at(iCol, iRow).iType == 1)
-												g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+											if (g_worldmap.getTile(iCol, iRow).iType == 1)
+												g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 
-											g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
+											g_worldmap.getTile(iCol, iRow).iType = set_tile;
 											updateworldsurface();
 										}
 									}
@@ -1572,8 +1572,8 @@ int editor_edit()
 									short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
 									bool fNeedUpdate = false;
 
-                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != iAdjustedTile) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
+                                if (!fAutoPaint && g_worldmap.getTile(iCol, iRow).iForegroundSprite != iAdjustedTile) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = iAdjustedTile;
 										fNeedUpdate = true;
 									}
 
@@ -1581,7 +1581,7 @@ int editor_edit()
                                 if (fAutoPaint) {
 										short iOldTiles[9];
 										GetForegroundTileValues(iCol, iRow, iOldTiles);
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iAdjustedTile;
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = iAdjustedTile;
 										UpdatePathSprite(iCol, iRow);
 
 										if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
@@ -1595,25 +1595,25 @@ int editor_edit()
                             } else if (edit_mode == 6) {
 									AddWarpToTile(iCol, iRow, set_tile);
                             } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != set_tile) {
-										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = set_tile;
+                                if (g_worldmap.getTile(iCol, iRow).iBackgroundWater != set_tile) {
+										g_worldmap.getTile(iCol, iRow).iBackgroundWater = set_tile;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 9) { //stage
 									//if the stage was placed on a start tile
-                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+                                if (g_worldmap.getTile(iCol, iRow).iType == 1) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
 									}
 
-									g_worldmap.tiles.at(iCol, iRow).iType = set_tile;
+									g_worldmap.getTile(iCol, iRow).iType = set_tile;
 								}
                         } else if (event.motion.state == SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) {
                             if (edit_mode == 0) { //selected background
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != 0 || fAutoPaint) {
+                                if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite != 0 || fAutoPaint) {
 										bool fNeedUpdate = false;
-                                    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != 0) {
-											g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = 0;
+                                    if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite != 0) {
+											g_worldmap.getTile(iCol, iRow).iBackgroundSprite = 0;
 											fNeedUpdate = true;
 										}
 
@@ -1626,30 +1626,30 @@ int editor_edit()
 											updateworldsurface();
 									}
                             } else if (edit_mode == 1) {
-                                if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+                                if (g_worldmap.getTile(iCol, iRow).iForegroundSprite != 0) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 2) {
-									g_worldmap.tiles.at(iCol, iRow).iConnectionType = 0;
+									g_worldmap.getTile(iCol, iRow).iConnectionType = 0;
 
 									if (fAutoPaint)
 										UpdatePath(iCol, iRow);
                             } else if (edit_mode == 3) {
-                                if (g_worldmap.tiles.at(iCol, iRow).iType == 1) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+                                if (g_worldmap.getTile(iCol, iRow).iType == 1) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										updateworldsurface();
-                                } else if (g_worldmap.tiles.at(iCol, iRow).iType <= 5) {
-										g_worldmap.tiles.at(iCol, iRow).iType = 0;
+                                } else if (g_worldmap.getTile(iCol, iRow).iType <= 5) {
+										g_worldmap.getTile(iCol, iRow).iType = 0;
 										updateworldsurface();
 									}
 
-									g_worldmap.tiles.at(iCol, iRow).iType = 0;
+									g_worldmap.getTile(iCol, iRow).iType = 0;
                             } else if (edit_mode == 4) {
 									bool fNeedUpdate = false;
 
-                                if (!fAutoPaint && g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != 0) {
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+                                if (!fAutoPaint && g_worldmap.getTile(iCol, iRow).iForegroundSprite != 0) {
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										fNeedUpdate = true;
 									}
 
@@ -1657,7 +1657,7 @@ int editor_edit()
                                 if (fAutoPaint) {
 										short iOldTiles[9];
 										GetForegroundTileValues(iCol, iRow, iOldTiles);
-										g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = 0;
+										g_worldmap.getTile(iCol, iRow).iForegroundSprite = 0;
 										UpdatePathSprite(iCol, iRow);
 
 										if (ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
@@ -1672,12 +1672,12 @@ int editor_edit()
                             } else if (edit_mode == 6) { //Warps
 									RemoveWarpFromTile(iCol, iRow);
                             } else if (edit_mode == 7) { //water
-                                if (g_worldmap.tiles.at(iCol, iRow).iBackgroundWater != 0) {
-										g_worldmap.tiles.at(iCol, iRow).iBackgroundWater = 0;
+                                if (g_worldmap.getTile(iCol, iRow).iBackgroundWater != 0) {
+										g_worldmap.getTile(iCol, iRow).iBackgroundWater = 0;
 										updateworldsurface();
 									}
                             } else if (edit_mode == 9) { //stage
-									g_worldmap.tiles.at(iCol, iRow).iType = 0;
+									g_worldmap.getTile(iCol, iRow).iType = 0;
 									iStageDisplay = -1;
 								}
 							}
@@ -1700,7 +1700,7 @@ int editor_edit()
                     } else if (edit_mode == 9) {
 							iStageDisplay = -1;
                         if (iCol >= 0 && iRow >= 0 && iCol < iWorldWidth && iRow < iWorldHeight) {
-								short iType = g_worldmap.tiles.at(iCol, iRow).iType - 6;
+								short iType = g_worldmap.getTile(iCol, iRow).iType - 6;
                             if (iType >= 0) {
 									iStageDisplay = iType;
 								}
@@ -1761,7 +1761,7 @@ int editor_edit()
             if (edit_mode == 2) {
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
-						short iConnection = g_worldmap.tiles.at(iCol, iRow).iConnectionType;
+						short iConnection = g_worldmap.getTile(iCol, iRow).iConnectionType;
 
 						if (iConnection > 0)
 							spr_path.draw((iCol - draw_offset_col) * TILESIZE + draw_offset_x, (iRow - draw_offset_row) * TILESIZE + draw_offset_y, {(iConnection - 1) << 5, 0, TILESIZE, TILESIZE});
@@ -1794,7 +1794,7 @@ int editor_edit()
 				int color = SDL_MapSurfaceRGB(blitdest, 255, 0, 255);
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
-						short iBoundary = g_worldmap.tiles.at(iCol, iRow).iVehicleBoundary - 1;
+						short iBoundary = g_worldmap.getTile(iCol, iRow).iVehicleBoundary - 1;
 
                         if (iBoundary >= 0) {
 							short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
@@ -1810,7 +1810,7 @@ int editor_edit()
 				int color = SDL_MapSurfaceRGB(blitdest, 0, 0, 255);
                 for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
                     for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
-						short iType = g_worldmap.tiles.at(iCol, iRow).iType - 6;
+						short iType = g_worldmap.getTile(iCol, iRow).iType - 6;
 
                         if (iType >= 0) {
 							short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
@@ -1875,7 +1875,7 @@ int editor_edit()
             if (--g_musiccategorydisplaytimer > 0) {
 				spr_dialog.draw(224, 176, {0, 0, 192, 128});
 				rm->menu_font_small.drawCentered(320, 195, "Music Category");
-                                rm->menu_font_large.drawCentered(320, 220, to_string(g_worldmap.iMusicCategory).data());
+                                rm->menu_font_large.drawCentered(320, 220, to_string(g_worldmap.GetMusicCategory()).data());
 
 				rm->menu_font_small.drawCentered(320, 255, "Press 'R' Again");
 				rm->menu_font_small.drawCentered(320, 270, "To Change");
@@ -2593,29 +2593,23 @@ int editor_start_items()
 					short iButtonY = bound_to_window_h(event.button.y);
 
                 if (event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT) {
-                    if (g_worldmap.iNumInitialBonuses < 32) {
-                        for (short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++) {
-								if (iButtonX >= rItemDst[iItem].x && iButtonX < rItemDst[iItem].w + rItemDst[iItem].x &&
-                                    iButtonY >= rItemDst[iItem].y && iButtonY < rItemDst[iItem].h + rItemDst[iItem].y) {
-									g_worldmap.iInitialBonuses[g_worldmap.iNumInitialBonuses++] = iItem;
-									break;
-								}
-							}
-						}
-
-                    for (short iRemoveItem = 0; iRemoveItem < g_worldmap.iNumInitialBonuses; iRemoveItem++) {
-							if (iButtonX >= rPickedItemDst[iRemoveItem].x && iButtonX < rPickedItemDst[iRemoveItem].w + rPickedItemDst[iRemoveItem].x &&
-                                iButtonY >= rPickedItemDst[iRemoveItem].y && iButtonY < rPickedItemDst[iRemoveItem].h + rPickedItemDst[iRemoveItem].y) {
-                            for (short iAdjust = iRemoveItem; iAdjust < g_worldmap.iNumInitialBonuses - 1; iAdjust++) {
-									g_worldmap.iInitialBonuses[iAdjust] = g_worldmap.iInitialBonuses[iAdjust + 1];
-								}
-
-								g_worldmap.iNumInitialBonuses--;
-
+                    for (short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++) {
+							if (iButtonX >= rItemDst[iItem].x && iButtonX < rItemDst[iItem].w + rItemDst[iItem].x &&
+                                iButtonY >= rItemDst[iItem].y && iButtonY < rItemDst[iItem].h + rItemDst[iItem].y) {
+								g_worldmap.addInitialBonus(iItem);
 								break;
 							}
 						}
 					}
+
+                    for (short iRemoveItem = 0; iRemoveItem < g_worldmap.getNumInitialBonuses(); iRemoveItem++) {
+							if (iButtonX >= rPickedItemDst[iRemoveItem].x && iButtonX < rPickedItemDst[iRemoveItem].w + rPickedItemDst[iRemoveItem].x &&
+                                iButtonY >= rPickedItemDst[iRemoveItem].y && iButtonY < rPickedItemDst[iRemoveItem].h + rPickedItemDst[iRemoveItem].y) {
+								g_worldmap.removeInitialBonus(iRemoveItem);
+
+								break;
+							}
+						}
 
 					break;
 				}
@@ -2642,8 +2636,8 @@ int editor_start_items()
 			rm->spr_worlditempopup.draw(320, 416 - (iPopup << 6), {192, 0, 320, 64});
 		}
 
-        for (short iPickedItem = 0; iPickedItem < g_worldmap.iNumInitialBonuses; iPickedItem++) {
-			short iPowerup = g_worldmap.iInitialBonuses[iPickedItem];
+        for (short iPickedItem = 0; iPickedItem < g_worldmap.getNumInitialBonuses(); iPickedItem++) {
+			short iPowerup = g_worldmap.getInitialBonus(iPickedItem);
 			if (iPowerup >= NUM_POWERUPS)
 				rm->spr_worlditems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, {(iPowerup - NUM_POWERUPS) << 5, 0, 32, 32});
 			else
@@ -3250,7 +3244,7 @@ int editor_pathsprite()
 
 int editor_vehicles()
 {
-    if (g_worldmap.iNumStages <= 0) {
+    if (g_worldmap.getNumStages() <= 0) {
 		SetDisplayMessage(120, "No Stages", "You need to create", "stages before you", "can create vehicles");
 		return EDITOR_EDIT;
 	}
@@ -3262,7 +3256,7 @@ int editor_vehicles()
 
 	miVehicleStageField->clear();
 
-    for (short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
+    for (short iStage = 0; iStage < g_worldmap.getNumStages(); iStage++) {
 		TourStop * ts = game_values.tourstops[iStage];
 		char szStageName[256];
 		snprintf(szStageName, sizeof(szStageName), "(%d) %s", iStage + 1, ts->szName.c_str());
@@ -3805,7 +3799,7 @@ void NewStage(short * iEditStage)
 	memcpy(&ts->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
 
 	game_values.tourstops.push_back(ts);
-	g_worldmap.iNumStages++;
+	g_worldmap.setNumStages(g_worldmap.getNumStages() + 1);
 
 	*iEditStage = game_values.tourstops.size() - 1;
 	EditStage(*iEditStage);
@@ -3878,9 +3872,9 @@ int editor_stage()
                 if (iEditStage == -1 && event.key.key == SDLK_N) {
 						NewStage(&iEditStage);
                 } else if ((event.key.key == SDLK_ESCAPE || event.key.key == SDLK_E) && iEditStage == -1) {
-                    if (g_worldmap.iNumStages == 0) {
+                    if (g_worldmap.getNumStages() == 0) {
 							edit_mode = 1;
-                    } else if (set_tile < 6 || set_tile >= g_worldmap.iNumStages + 6) {
+                    } else if (set_tile < 6 || set_tile >= g_worldmap.getNumStages() + 6) {
 							set_tile = 6;
 							edit_mode = 9;
                     } else {
@@ -3896,7 +3890,7 @@ int editor_stage()
 							TestAndSetBonusItem(ts, iPlace, mouse_x, mouse_y);
 						}
                 } else if ((event.key.key == SDLK_PAGEUP && iEditStage > 0) ||
-                          (event.key.key == SDLK_PAGEDOWN && iEditStage < g_worldmap.iNumStages - 1)) {
+                          (event.key.key == SDLK_PAGEDOWN && iEditStage < g_worldmap.getNumStages() - 1)) {
                     if (iEditStage != -1 && mCurrentMenu == &mStageSettingsMenu) {
 							SaveStage(iEditStage);
 
@@ -3926,7 +3920,7 @@ int editor_stage()
                 if (event.button.button == SDL_BUTTON_LEFT) {
 						//Stages
                     if (iEditStage == -1) {
-                        if (iTileX >= 0 && iTileX < g_worldmap.iNumStages - (iTileY * 20) && iTileY >= 0 && iTileY <= (g_worldmap.iNumStages - 1) / 20) {
+                        if (iTileX >= 0 && iTileX < g_worldmap.getNumStages() - (iTileY * 20) && iTileY >= 0 && iTileY <= (g_worldmap.getNumStages() - 1) / 20) {
 								set_tile = iTileX + (iTileY * 20) + 6;
 
 								edit_mode = 9;  //change to edit mode using warps
@@ -3971,7 +3965,7 @@ int editor_stage()
 						}
                 } else if (event.button.button == SDL_BUTTON_RIGHT) {
                     if (iEditStage == -1) {
-                        if (iTileX >= 0 && iTileX < g_worldmap.iNumStages - (iTileY * 20) && iTileY >= 0 && iTileY <= (g_worldmap.iNumStages - 1) / 20) {
+                        if (iTileX >= 0 && iTileX < g_worldmap.getNumStages() - (iTileY * 20) && iTileY >= 0 && iTileY <= (g_worldmap.getNumStages() - 1) / 20) {
 								iEditStage = iTileX + (iTileY * 20);
 								EditStage(iEditStage);
 
@@ -3995,7 +3989,7 @@ int editor_stage()
 							short iMouseX = bound_to_window_w(event.button.x) / TILESIZE;
 							short iMouseY = bound_to_window_h(event.button.y) / TILESIZE;
 
-                        if (iMouseX >= 0 && iMouseX < g_worldmap.iNumStages - (iMouseY * 20) && iMouseY >= 0 && iMouseY <= (g_worldmap.iNumStages - 1) / 20) {
+                        if (iMouseX >= 0 && iMouseX < g_worldmap.getNumStages() - (iMouseY * 20) && iMouseY >= 0 && iMouseY <= (g_worldmap.getNumStages() - 1) / 20) {
 								iStageDisplay = iMouseX + (iMouseY * 20);
 							}
 						}
@@ -4136,10 +4130,10 @@ int editor_stage()
 					//and decrement stage numbers greater than this stage
                     for (short iRow = 0; iRow < iWorldHeight; iRow++) {
                         for (short iCol = 0; iCol < iWorldWidth; iCol++) {
-                            if (g_worldmap.tiles.at(iCol, iRow).iType == iEditStage + 6) {
-								g_worldmap.tiles.at(iCol, iRow).iType = 0;
-                            } else if (g_worldmap.tiles.at(iCol, iRow).iType > iEditStage + 6) {
-								g_worldmap.tiles.at(iCol, iRow).iType--;
+                            if (g_worldmap.getTile(iCol, iRow).iType == iEditStage + 6) {
+								g_worldmap.getTile(iCol, iRow).iType = 0;
+                            } else if (g_worldmap.getTile(iCol, iRow).iType > iEditStage + 6) {
+								g_worldmap.getTile(iCol, iRow).iType--;
 							}
 						}
 					}
@@ -4168,7 +4162,7 @@ int editor_stage()
 							delete (*itr);
 
 							game_values.tourstops.erase(itr);
-							g_worldmap.iNumStages--;
+							g_worldmap.setNumStages(g_worldmap.getNumStages() - 1);
 
 							break;
 						}
@@ -4192,7 +4186,7 @@ int editor_stage()
 		int color = SDL_MapSurfaceRGB(blitdest, 0, 0, 255);
 
         if (iEditStage == -1) {
-            for (short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
+            for (short iStage = 0; iStage < g_worldmap.getNumStages(); iStage++) {
 				short ix = (iStage % 20) << 5;
 				short iy = ((iStage / 20) << 5);
 

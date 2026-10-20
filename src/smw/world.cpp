@@ -384,6 +384,11 @@ RETURN:
         throw std::runtime_error("Invalid world file");
 }
 
+void WorldMap::nextMusicCategory()
+{
+    iMusicCategory++;
+}
+
 void WorldMap::SetTileConnections(short iCol, short iRow)
 {
     if (iCol < 0 || iRow < 0 || iCol >= iWidth || iRow >= iHeight)
