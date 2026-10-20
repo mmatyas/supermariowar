@@ -3,6 +3,8 @@ add_executable(smw-worldedit WIN32
 	../common/movingplatform.h
 	../smw/world.cpp
 	../smw/world.h
+	../smw/world/WorldMapIO.cpp
+	../smw/world/WorldMapIO.h
 	../smw/world/WorldMovingObject.cpp
 	../smw/world/WorldMovingObject.h
 	../smw/world/WorldPlayer.cpp

@@ -1,4 +1,6 @@
 target_sources(smw PRIVATE
+    WorldMapIO.cpp
+    WorldMapIO.h
     WorldMovingObject.cpp
     WorldMovingObject.h
     WorldPlayer.cpp

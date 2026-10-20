@@ -27,6 +27,7 @@
 #include "Version.h"
 #include "world.h"
 #include "WorldTourStop.h"
+#include "world/WorldMapIO.h"
 
 #include "menu/BonusWheelMenu.h"
 #include "menu/GameSettingsMenu.h"
@@ -721,7 +722,7 @@ void MenuState::update()
                 } else if (game_values.matchtype == MatchType::World) {
                     printf("  Match type: World\n");
                     try {
-                        g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), TILESIZE);
+                        g_worldmap = loadWorldMap(worldlist->at(game_values.worldindex).string(), TILESIZE);
 
                         mTournamentScoreboardMenu->miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &rm->spr_tour_markers);
 

@@ -32,6 +32,7 @@
 #include "sfx.h"
 #include "TilesetManager.h"
 #include "world.h"
+#include "world/WorldMapIO.h"
 #include "WorldTourStop.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
@@ -1052,7 +1053,7 @@ void inner_main()
 
 	WriteVehiclesIntoWorld();
 	WriteWarpsIntoWorld();
-	g_worldmap.Save(convertPath("worlds/ZZworldeditor.txt").c_str());
+	saveWorldMap(g_worldmap, convertPath("worlds/ZZworldeditor.txt"));
 
     {
         const std::string options_path(GetHomeDirectory() + "worldeditor.bin");
@@ -4587,7 +4588,7 @@ int clear_world()
 void loadcurrentworld()
 {
 	game_values.worldindex = worldlist->currentIndex();
-	g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), TILESIZE);
+	g_worldmap = loadWorldMap(worldlist->at(game_values.worldindex).string(), TILESIZE);
 	ReadVehiclesIntoEditor();
 	ReadWarpsIntoEditor();
 
@@ -4630,7 +4631,7 @@ int savecurrentworld()
 
 	WriteVehiclesIntoWorld();
 	WriteWarpsIntoWorld();
-	g_worldmap.Save(worldlist->at(game_values.worldindex).string());
+	saveWorldMap(g_worldmap, worldlist->at(game_values.worldindex).string());
 	return 0;
 }
 
@@ -4755,7 +4756,7 @@ void takescreenshot()
 
     for (short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
 		short iTileSize = iTileSizes[iScreenshotSize];
-		g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), iTileSize);
+		g_worldmap = loadWorldMap(worldlist->at(game_values.worldindex).string(), iTileSize);
 
 		short w, h;
 		g_worldmap.GetWorldSize(&w, &h);
@@ -4806,6 +4807,6 @@ void takescreenshot()
 		IMG_SavePNG(sScreenshot.getSurface(), convertPath(szSaveFile).c_str());
 	}
 
-	g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), iTileSizes[0]);
+	g_worldmap = loadWorldMap(worldlist->at(game_values.worldindex).string(), iTileSizes[0]);
 	blitdest = screen;
 }

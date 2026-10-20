@@ -4,6 +4,7 @@
 #include "GameValues.h"
 #include "GlobalConstants.h"
 #include "world.h"
+#include "world/WorldMapIO.h"
 
 extern SDL_Surface* blitdest;
 extern SDL_Surface* screen;
@@ -197,7 +198,7 @@ void MI_WorldPreviewDisplay::Draw()
 
 void MI_WorldPreviewDisplay::SetWorld()
 {
-    g_worldmap = WorldMap(worldlist->at(game_values.worldindex).string(), PREVIEWTILESIZE);
+    g_worldmap = loadWorldMap(worldlist->at(game_values.worldindex).string(), PREVIEWTILESIZE);
 
     short w, h;
     g_worldmap.GetWorldSize(&w, &h);

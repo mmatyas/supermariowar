@@ -51,16 +51,14 @@ struct WorldMapTile {
 class WorldMap {
 public:
     WorldMap(short w, short h);
-    WorldMap(const std::string& path, short iTileSize);
 
     WorldMap(const WorldMap&) = delete;
     WorldMap& operator=(const WorldMap&) = delete;
     WorldMap(WorldMap&&) = default;
     WorldMap& operator=(WorldMap&&) = default;
 
-    bool Save(const std::string& szPath) const;
-
     void Resize(short iWidth, short iHeight);
+    void setTileSize(short tilesize);
     void Clear();
 
     bool Update(bool* fPlayerVehicleCollision);
@@ -142,8 +140,6 @@ private:
 
     short iWidth = 0;
     short iHeight = 0;
-    short iStartX = 0;
-    short iStartY = 0;
 
     short iNumStages = 0;
 
@@ -164,9 +160,11 @@ private:
     short iLastDrawRow;
     short iLastDrawCol;
 
-    short iTilesPerCycle;
+    short iTilesPerCycle = 0;
 
     std::string worldName;
+
+    friend WorldMap loadWorldMap(const std::string& path, short tilesize);
 };
 
 #endif // WORLD_H
