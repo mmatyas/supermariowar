@@ -61,7 +61,7 @@ void WorldVehicle::SetNextDest()
     if (iState != 0 || iMaxMoves == 0)
         return;
 
-    WorldMapTile * tile = &g_worldmap.tiles.at(currentTile.x, currentTile.y);
+    WorldMapTile * tile = &g_worldmap.getTile(currentTile.x, currentTile.y);
     const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
     if (iNumMoves-- <= 0) {

@@ -108,6 +108,12 @@ public:
     WorldMusicCategory GetMusicCategory() const { return iMusicCategory; }
     const std::string& GetWorldName() { return worldName; }
 
+    short getWidth() const { return iWidth; }
+    short getHeight() const { return iHeight; }
+    short getNumStages() const { return iNumStages; }
+    const WorldMapTile& getTile(short iCol, short iRow) const { return tiles.at(iCol, iRow); }
+    WorldMapTile& getTile(short iCol, short iRow) { return tiles.at(iCol, iRow); }
+
 private:
     void SetTileConnections(short iCol, short iRow);
 
@@ -140,10 +146,6 @@ private:
     short iTilesPerCycle;
 
     std::string worldName;
-
-    friend class MI_World;
-    friend class MI_WorldPreviewDisplay;
-    friend class WorldVehicle;
 
     friend int editor_edit();
     friend int editor_type();

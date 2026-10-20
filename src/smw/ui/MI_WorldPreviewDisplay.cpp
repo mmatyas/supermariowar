@@ -38,28 +38,28 @@ void MI_WorldPreviewDisplay::Init()
     iAnimationTimer = 0;
     iAnimationFrame = 0;
 
-    if (g_worldmap.iWidth > 20)
+    if (g_worldmap.getWidth() > 20)
         rectSrcSurface.w = 320;
     else
-        rectSrcSurface.w = g_worldmap.iWidth * PREVIEWTILESIZE;
+        rectSrcSurface.w = g_worldmap.getWidth() * PREVIEWTILESIZE;
 
-    if (g_worldmap.iHeight > 15)
+    if (g_worldmap.getHeight() > 15)
         rectSrcSurface.h = 240;
     else
-        rectSrcSurface.h = g_worldmap.iHeight * PREVIEWTILESIZE;
+        rectSrcSurface.h = g_worldmap.getHeight() * PREVIEWTILESIZE;
 
     rectDstSurface.w = 320;
     rectDstSurface.h = 240;
     rectDstSurface.x = m_pos.x;
     rectDstSurface.y = m_pos.y;
 
-    if (g_worldmap.iWidth < 20)
-        rectDstSurface.x += (20 - g_worldmap.iWidth) * 8;
+    if (g_worldmap.getWidth() < 20)
+        rectDstSurface.x += (20 - g_worldmap.getWidth()) * 8;
 
-    if (g_worldmap.iHeight < 15)
-        rectDstSurface.y += (15 - g_worldmap.iHeight) * 8;
+    if (g_worldmap.getHeight() < 15)
+        rectDstSurface.y += (15 - g_worldmap.getHeight()) * 8;
 
-    short iNumScrollTiles = (g_worldmap.iWidth > 20 ? g_worldmap.iWidth - 20 : 0) + (g_worldmap.iHeight > 15 ? g_worldmap.iHeight - 15 : 0);
+    short iNumScrollTiles = (g_worldmap.getWidth() > 20 ? g_worldmap.getWidth() - 20 : 0) + (g_worldmap.getHeight() > 15 ? g_worldmap.getHeight() - 15 : 0);
 
     iScrollSpeed = 0;
     iScrollSpeedTimer = 0;

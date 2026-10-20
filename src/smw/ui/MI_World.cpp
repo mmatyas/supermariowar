@@ -88,19 +88,19 @@ void MI_World::Init()
     iPressSelectTimer = 0;
     pressSelectKeys = NULL;
 
-    iDrawWidth = g_worldmap.iWidth < 20 ? g_worldmap.iWidth << 5 : App::screenWidth;
-    iDrawHeight = g_worldmap.iHeight < 15 ? g_worldmap.iHeight << 5 : App::screenHeight;
+    iDrawWidth = g_worldmap.getWidth() < 20 ? g_worldmap.getWidth() << 5 : App::screenWidth;
+    iDrawHeight = g_worldmap.getHeight() < 15 ? g_worldmap.getHeight() << 5 : App::screenHeight;
 
     iSrcOffsetX = 0;
     iSrcOffsetY = 0;
     iDstOffsetX = 0;
     iDstOffsetY = 0;
 
-    if (g_worldmap.iWidth < 20)
-        iDstOffsetX = (20 - g_worldmap.iWidth) << 4;
+    if (g_worldmap.getWidth() < 20)
+        iDstOffsetX = (20 - g_worldmap.getWidth()) << 4;
 
-    if (g_worldmap.iHeight < 15)
-        iDstOffsetY = (15 - g_worldmap.iHeight) << 4;
+    if (g_worldmap.getHeight() < 15)
+        iDstOffsetY = (15 - g_worldmap.getHeight()) << 4;
 }
 
 void MI_World::SetControllingTeam(short iWinningTeam)
@@ -141,7 +141,7 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
     } else {
         const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
-        WorldMapTile * tile = &g_worldmap.tiles.at(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
+        WorldMapTile * tile = &g_worldmap.getTile(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
         //tile->iForegroundSprite = game_values.colorids[game_values.teamids[iWinningTeam][0]] + WORLD_WINNING_TEAM_SPRITE_OFFSET; //Update with team completed sprite
         //tile->fAnimated = false; //Update with team completed sprite
         tile->iCompleted = game_values.colorids[game_values.teamids[iWinningTeam][0]];
@@ -206,7 +206,7 @@ void MI_World::Update()
 
     if (iSleepTurns <= 0 && !fUsingCloud && (fPlayerVehicleCollision || fPlayerMoveDone)) {
         short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
-        if (iStage >= 0 && iStage < g_worldmap.iNumStages) {
+        if (iStage >= 0 && iStage < g_worldmap.getNumStages()) {
             game_values.tourstopcurrent = iStage;
             fForceStageStart = true;
         }
@@ -214,16 +214,16 @@ void MI_World::Update()
 
            //Player is moving from one tile to the next (up)
     if (iPlayerState == 1) {
-        if (g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerDrawPos.y < (g_worldmap.iHeight << 5) - (App::screenHeight * 0.53f))
+        if (g_worldmap.getHeight() > 15 && iMapOffsetY < 0 && iPlayerDrawPos.y < (g_worldmap.getHeight() << 5) - (App::screenHeight * 0.53f))
             iMapOffsetY += 2;
     } else if (iPlayerState == 2) { //down
-        if (g_worldmap.iHeight > 15 && iMapOffsetY > App::screenHeight - (g_worldmap.iHeight << 5) && iPlayerDrawPos.y > (App::screenHeight * 0.47f))
+        if (g_worldmap.getHeight() > 15 && iMapOffsetY > App::screenHeight - (g_worldmap.getHeight() << 5) && iPlayerDrawPos.y > (App::screenHeight * 0.47f))
             iMapOffsetY -= 2;
     } else if (iPlayerState == 3) { //left
-        if (g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerDrawPos.x < (g_worldmap.iWidth << 5) - (App::screenWidth * 0.525f))
+        if (g_worldmap.getWidth() > 20 && iMapOffsetX < 0 && iPlayerDrawPos.x < (g_worldmap.getWidth() << 5) - (App::screenWidth * 0.525f))
             iMapOffsetX += 2;
     } else if (iPlayerState == 4) { //right
-        if (g_worldmap.iWidth > 20 && iMapOffsetX > App::screenWidth - (g_worldmap.iWidth << 5) && iPlayerDrawPos.x > (App::screenWidth * 0.475f))
+        if (g_worldmap.getWidth() > 20 && iMapOffsetX > App::screenWidth - (g_worldmap.getWidth() << 5) && iPlayerDrawPos.x > (App::screenWidth * 0.475f))
             iMapOffsetX -= 2;
     }
 
@@ -346,26 +346,26 @@ void MI_World::SetMapOffset()
 {
     const Vec2s iPlayerDrawPos = g_worldmap.GetPlayerPosition();
 
-    if (g_worldmap.iWidth > 20) {
-        if (iPlayerDrawPos.x < (g_worldmap.iWidth << 5) - 336 && iPlayerDrawPos.x > 304)
+    if (g_worldmap.getWidth() > 20) {
+        if (iPlayerDrawPos.x < (g_worldmap.getWidth() << 5) - 336 && iPlayerDrawPos.x > 304)
             iMapOffsetX = 304 - iPlayerDrawPos.x;
         else if (iPlayerDrawPos.x <= 304)
             iMapOffsetX = 0;
         else
-            iMapOffsetX = App::screenWidth - (g_worldmap.iWidth << 5);
+            iMapOffsetX = App::screenWidth - (g_worldmap.getWidth() << 5);
     } else {
-        iMapOffsetX = (App::screenWidth - (g_worldmap.iWidth << 5)) >> 1;
+        iMapOffsetX = (App::screenWidth - (g_worldmap.getWidth() << 5)) >> 1;
     }
 
-    if (g_worldmap.iHeight > 15) {
-        if (iPlayerDrawPos.y < (g_worldmap.iHeight << 5) - 256 && iPlayerDrawPos.y > 224)
+    if (g_worldmap.getHeight() > 15) {
+        if (iPlayerDrawPos.y < (g_worldmap.getHeight() << 5) - 256 && iPlayerDrawPos.y > 224)
             iMapOffsetY = 224 - iPlayerDrawPos.y;
         else if (iPlayerDrawPos.y <= 224)
             iMapOffsetY = 0;
         else
-            iMapOffsetY = App::screenHeight - (g_worldmap.iHeight << 5);
+            iMapOffsetY = App::screenHeight - (g_worldmap.getHeight() << 5);
     } else {
-        iMapOffsetY = (App::screenHeight - (g_worldmap.iHeight << 5)) >> 1;
+        iMapOffsetY = (App::screenHeight - (g_worldmap.getHeight() << 5)) >> 1;
     }
 }
 
@@ -373,20 +373,20 @@ void MI_World::RepositionMapImage()
 {
     const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
-    if (g_worldmap.iWidth > 24) {
+    if (g_worldmap.getWidth() > 24) {
         iMapDrawOffsetCol = iPlayerCurrentTile.x - 11;
         if (iMapDrawOffsetCol < 0)
             iMapDrawOffsetCol = 0;
-        else if (iMapDrawOffsetCol > g_worldmap.iWidth - 24)
-            iMapDrawOffsetCol = g_worldmap.iWidth - 24;
+        else if (iMapDrawOffsetCol > g_worldmap.getWidth() - 24)
+            iMapDrawOffsetCol = g_worldmap.getWidth() - 24;
     }
 
-    if (g_worldmap.iHeight > 19) {
+    if (g_worldmap.getHeight() > 19) {
         iMapDrawOffsetRow = iPlayerCurrentTile.y - 9;
         if (iMapDrawOffsetRow < 0)
             iMapDrawOffsetRow = 0;
-        else if (iMapDrawOffsetRow > g_worldmap.iHeight - 19)
-            iMapDrawOffsetRow = g_worldmap.iHeight - 19;
+        else if (iMapDrawOffsetRow > g_worldmap.getHeight() - 19)
+            iMapDrawOffsetRow = g_worldmap.getHeight() - 19;
     }
 
     iNextMapDrawOffsetCol = iMapDrawOffsetCol;
@@ -401,10 +401,10 @@ void MI_World::Draw()
 
     const Vec2s iPlayerDrawPos = g_worldmap.GetPlayerPosition();
 
-    if (g_worldmap.iWidth > 20)
+    if (g_worldmap.getWidth() > 20)
         iSrcOffsetX = -iMapOffsetX - (iMapDrawOffsetCol << 5);
 
-    if (g_worldmap.iHeight > 15)
+    if (g_worldmap.getHeight() > 15)
         iSrcOffsetY = -iMapOffsetY - (iMapDrawOffsetRow << 5);
 
     rectSrcSurface = {iSrcOffsetX, iSrcOffsetY, iDrawWidth, iDrawHeight};
@@ -606,7 +606,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
         if (iState == -1 && iNumPopups == 0 && iPopupFlag[0] == false && iPopupFlag[1] == false && iPopupFlag[2] == false && iPopupFlag[3] == false) {
             if (iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) { //if this player is player or cpu
-                WorldMapTile * tile = &g_worldmap.tiles.at(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
+                WorldMapTile * tile = &g_worldmap.getTile(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
 
                 short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
                 bool fVehicleInTile = g_worldmap.GetVehicleInPlayerTile(&iTemp) >= 0;
@@ -696,15 +696,15 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                     //Lookup current tile and see if it is a type of tile you can interact with
                     //If there is a vehicle on this tile, then load it's stage
                     short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
-                    if (iStage >= 0 && iStage < g_worldmap.iNumStages) {
+                    if (iStage >= 0 && iStage < g_worldmap.getNumStages()) {
                         return InitGame(iStage, iPlayer, fNeedAiControl);
                     }
 
                            //if it is a stage, then load the stage
-                    WorldMapTile * tile = &g_worldmap.tiles.at(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
+                    WorldMapTile * tile = &g_worldmap.getTile(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
 
                     short iType = tile->iType - 6;
-                    if (iType >= 0 && iType < g_worldmap.iNumStages && tile->iCompleted == -2) {
+                    if (iType >= 0 && iType < g_worldmap.getNumStages() && tile->iCompleted == -2) {
                         return InitGame(iType, iPlayer, fNeedAiControl);
                     }
 
@@ -811,20 +811,20 @@ void MI_World::RestartDrawCycleIfNeeded()
 
     const Vec2s iPlayerDestTile = g_worldmap.GetPlayerDestTile();
 
-    if (g_worldmap.iWidth > 24) {
+    if (g_worldmap.getWidth() > 24) {
         iNextMapDrawOffsetCol = iPlayerDestTile.x - 11;
         if (iNextMapDrawOffsetCol < 0)
             iNextMapDrawOffsetCol = 0;
-        else if (iNextMapDrawOffsetCol > g_worldmap.iWidth - 24)
-            iNextMapDrawOffsetCol = g_worldmap.iWidth - 24;
+        else if (iNextMapDrawOffsetCol > g_worldmap.getWidth() - 24)
+            iNextMapDrawOffsetCol = g_worldmap.getWidth() - 24;
     }
 
-    if (g_worldmap.iHeight > 19) {
+    if (g_worldmap.getHeight() > 19) {
         iNextMapDrawOffsetRow = iPlayerDestTile.y - 9;
         if (iNextMapDrawOffsetRow < 0)
             iNextMapDrawOffsetRow = 0;
-        else if (iNextMapDrawOffsetRow > g_worldmap.iHeight - 19)
-            iNextMapDrawOffsetRow = g_worldmap.iHeight - 19;
+        else if (iNextMapDrawOffsetRow > g_worldmap.getHeight() - 19)
+            iNextMapDrawOffsetRow = g_worldmap.getHeight() - 19;
     }
 
            //Reset the draw cycle if the map offset col/row is going to move
@@ -879,7 +879,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         }
     } else if (iPowerup == NUM_POWERUPS + 3 && iState == -1) { //Advance Turn
         const Vec2s iDest = g_worldmap.GetPlayerDestTile();
-        short iSprite = g_worldmap.tiles.at(iDest.x, iDest.y).iForegroundSprite;
+        short iSprite = g_worldmap.getTile(iDest.x, iDest.y).iForegroundSprite;
 
         if (iSprite < WORLD_BRIDGE_SPRITE_OFFSET || iSprite > WORLD_BRIDGE_SPRITE_OFFSET + 3) {
             AdvanceTurn();
@@ -888,7 +888,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         }
     } else if (iPowerup == NUM_POWERUPS + 4 && iState == -1) { //Revive stage
         const Vec2s iDest = g_worldmap.GetPlayerDestTile();
-        WorldMapTile * tile = &g_worldmap.tiles.at(iDest.x, iDest.y);
+        WorldMapTile * tile = &g_worldmap.getTile(iDest.x, iDest.y);
 
         if (tile->iType >= 6 && tile->iCompleted >= 0) {
             tile->iCompleted = -2;
