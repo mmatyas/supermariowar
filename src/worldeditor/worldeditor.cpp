@@ -2141,7 +2141,7 @@ void AutoSetPathSprite(short iCol, short iRow)
 	short iPath = 0;
 	short iNeighborIndex = 0;
 
-	short iForegroundSprite = g_worldmap.tiles.at(iCol, iRow).iForegroundSprite;
+	short iForegroundSprite = g_worldmap.getTile(iCol, iRow).iForegroundSprite;
 	short iForegroundStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
 
 	if (iForegroundSprite == 0 || iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET)
@@ -2154,7 +2154,7 @@ void AutoSetPathSprite(short iCol, short iRow)
 
             if ((iAutoCol == iCol && iAutoRow != iRow) || (iAutoCol != iCol && iAutoRow == iRow)) {
                 if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-					iForegroundSprite = g_worldmap.tiles.at(iAutoCol, iAutoRow).iForegroundSprite;
+					iForegroundSprite = g_worldmap.getTile(iAutoCol, iAutoRow).iForegroundSprite;
 
 					if ((iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) ||
 						(iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399) ||
@@ -2176,7 +2176,7 @@ void AutoSetPathSprite(short iCol, short iRow)
 	}
 
 	//#1 == -  2 == |  3 == -o  4 == !  5 == -`  6 == o
-	g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = AdjustForeground(iPathTypes[iPath] + iForegroundStyle * WORLD_PATH_SPRITE_SET_SIZE, iCol, iRow);
+	g_worldmap.getTile(iCol, iRow).iForegroundSprite = AdjustForeground(iPathTypes[iPath] + iForegroundStyle * WORLD_PATH_SPRITE_SET_SIZE, iCol, iRow);
 }
 
 //Convert foreground sprite to match the background sprite
@@ -2185,7 +2185,7 @@ short AdjustForeground(short iSprite, short iCol, short iRow)
 	if (iSprite >= WORLD_FOREGROUND_STAGE_OFFSET)
 		return iSprite;
 
-	short iBackgroundSprite = g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE;
+	short iBackgroundSprite = g_worldmap.getTile(iCol, iRow).iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE;
 
 	short iPathStyle = iSprite / WORLD_PATH_SPRITE_SET_SIZE;
 	iSprite %= WORLD_PATH_SPRITE_SET_SIZE;
@@ -2250,7 +2250,7 @@ void AutoSetPath(short iCol, short iRow)
 	short iPath = 0;
 	short iNeighborIndex = 0;
 
-	if (g_worldmap.tiles.at(iCol, iRow).iConnectionType == 0)
+	if (g_worldmap.getTile(iCol, iRow).iConnectionType == 0)
 		return;
 
     for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
@@ -2260,7 +2260,7 @@ void AutoSetPath(short iCol, short iRow)
 
             if ((iAutoCol == iCol && iAutoRow != iRow) || (iAutoCol != iCol && iAutoRow == iRow)) {
                 if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-					if (g_worldmap.tiles.at(iAutoCol, iAutoRow).iConnectionType > 0)
+					if (g_worldmap.getTile(iAutoCol, iAutoRow).iConnectionType > 0)
 						iPath += 1 << iNeighborIndex;
 				}
 
@@ -2273,7 +2273,7 @@ void AutoSetPath(short iCol, short iRow)
 	//#7 == -|  8 == -`-  9 == |-  10 == -,-  11 == +
 
 	short iPathType = iPathTypes[iPath];
-	short iForegroundSprite = g_worldmap.tiles.at(iCol, iRow).iForegroundSprite;
+	short iForegroundSprite = g_worldmap.getTile(iCol, iRow).iForegroundSprite;
 
     if (iPathType == 2 && iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 1) {
 		iPathType = iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 12;
@@ -2281,15 +2281,15 @@ void AutoSetPath(short iCol, short iRow)
 		iPathType = iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 12;
 	}
 
-	g_worldmap.tiles.at(iCol, iRow).iConnectionType = iPathType;
+	g_worldmap.getTile(iCol, iRow).iConnectionType = iPathType;
 }
 
 bool UpdateForeground(short iCol, short iRow)
 {
-	short iNewForeground = AdjustForeground(g_worldmap.tiles.at(iCol, iRow).iForegroundSprite, iCol, iRow);
+	short iNewForeground = AdjustForeground(g_worldmap.getTile(iCol, iRow).iForegroundSprite, iCol, iRow);
 
-    if (g_worldmap.tiles.at(iCol, iRow).iForegroundSprite != iNewForeground) {
-		g_worldmap.tiles.at(iCol, iRow).iForegroundSprite = iNewForeground;
+    if (g_worldmap.getTile(iCol, iRow).iForegroundSprite != iNewForeground) {
+		g_worldmap.getTile(iCol, iRow).iForegroundSprite = iNewForeground;
 		return true;
 	}
 
@@ -2318,7 +2318,7 @@ bool UpdateCoastline(short iCol, short iRow)
 bool AutoSetTile(short iCol, short iRow)
 {
 	//Don't need to do anything if this tile is solid
-	if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE == 1)
+	if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE == 1)
 		return false;
 
 	bool iTile[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -2332,7 +2332,7 @@ bool AutoSetTile(short iCol, short iRow)
 				continue;
 
             if (iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
-				short iBackgroundSprite = g_worldmap.tiles.at(iAutoCol, iAutoRow).iBackgroundSprite;
+				short iBackgroundSprite = g_worldmap.getTile(iAutoCol, iAutoRow).iBackgroundSprite;
 
                 if (iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE == 1) {
 					iTile[iNeighborIndex] = true;
@@ -2450,8 +2450,8 @@ bool AutoSetTile(short iCol, short iRow)
 		iNewTile = iTileStyleOffset + 0;
 	}
 
-    if (g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite != iNewTile) {
-		g_worldmap.tiles.at(iCol, iRow).iBackgroundSprite = iNewTile;
+    if (g_worldmap.getTile(iCol, iRow).iBackgroundSprite != iNewTile) {
+		g_worldmap.getTile(iCol, iRow).iBackgroundSprite = iNewTile;
 		return true;
 	}
 
