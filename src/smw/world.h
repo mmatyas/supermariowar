@@ -130,6 +130,11 @@ public:
 
     void nextMusicCategory();
 
+    const std::vector<WorldVehicle>& getVehicles() const { return vehicles; }
+    void setVehicles(std::vector<WorldVehicle> newVehicles) { vehicles = std::move(newVehicles); }
+    const std::vector<WorldWarp>& getWarps() const { return warps; }
+    void setWarps(std::vector<WorldWarp> newWarps) { warps = std::move(newWarps); }
+
 private:
     void SetTileConnections(short iCol, short iRow);
 
@@ -162,11 +167,6 @@ private:
     short iTilesPerCycle;
 
     std::string worldName;
-
-    friend void ReadVehiclesIntoEditor();
-    friend void WriteVehiclesIntoWorld();
-    friend void ReadWarpsIntoEditor();
-    friend void WriteWarpsIntoWorld();
 };
 
 #endif // WORLD_H

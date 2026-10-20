@@ -1951,7 +1951,7 @@ void ReadVehiclesIntoEditor()
 
 	vehiclelist.clear();
 
-    for (const WorldVehicle& vehicle : g_worldmap.vehicles) {
+    for (const WorldVehicle& vehicle : g_worldmap.getVehicles()) {
         WorldVehicle * vehiclecopy = new WorldVehicle();
 
         vehiclecopy->setDrawSprite(vehicle.getDrawSprite());
@@ -1969,11 +1969,9 @@ void ReadVehiclesIntoEditor()
 
 void WriteVehiclesIntoWorld()
 {
-    //Cleanup old vehicles
-    g_worldmap.vehicles.clear();
-
     //Insert new vehicles
-    g_worldmap.vehicles.reserve(vehiclelist.size());
+    std::vector<WorldVehicle> worldvehicles;
+    worldvehicles.reserve(vehiclelist.size());
 
     for (const WorldVehicle* vehicle : vehiclelist) {
         WorldVehicle vehiclecopy;
@@ -1985,8 +1983,10 @@ void WriteVehiclesIntoWorld()
         vehiclecopy.setSpritePacing(vehicle->isSpritePacing());
         vehiclecopy.setDrawDirection(vehicle->getDrawDirection());
         vehiclecopy.setBoundary(vehicle->getBoundary());
-        g_worldmap.vehicles.emplace_back(std::move(vehiclecopy));
+        worldvehicles.emplace_back(std::move(vehiclecopy));
     }
+
+    g_worldmap.setVehicles(std::move(worldvehicles));
 }
 
 void AddVehicleToTile(short iCol, short iRow, short iType)
@@ -2046,22 +2046,21 @@ void ReadWarpsIntoEditor()
 
 	warplist.clear();
 
-    for (const WorldWarp& warp : g_worldmap.warps) {
+    for (const WorldWarp& warp : g_worldmap.getWarps()) {
         warplist.push_back(new WorldWarp(warp));
     }
 }
 
 void WriteWarpsIntoWorld()
 {
-    //Cleanup old vehicles
-    g_worldmap.warps.clear();
-
-    //Insert new vehicles
-    g_worldmap.warps.reserve(warplist.size());
+    std::vector<WorldWarp> worldwarps;
+    worldwarps.reserve(warplist.size());
 
     for (const WorldWarp* warp : warplist) {
-        g_worldmap.warps.emplace_back(*warp);
+        worldwarps.emplace_back(*warp);
     }
+
+    g_worldmap.setWarps(std::move(worldwarps));
 }
 
 void AddWarpToTile(short iCol, short iRow, short iType)
