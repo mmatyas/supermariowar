@@ -53,7 +53,7 @@ MenuCodeEnum MI_MapField::Modify(bool modify)
 
 MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 {
-    short iPressedKey = playerInput->iPressedKey;
+    const SDL_Keycode iPressedKey = playerInput->iPressedKey;
 
     /*
     if (playerInput->iPressedKey > 0)

@@ -1381,7 +1381,7 @@ void UpdateScoreBoard()
         for (short iScore = 0; iScore < score_cnt; iScore++) {
             game_values.tournament_scores[iScore].total = 0;
 
-            for (short iTourStop = 0; iTourStop <= game_values.tourstopcurrent; iTourStop++) {
+            for (size_t iTourStop = 0; iTourStop <= game_values.tourstopcurrent; iTourStop++) {
                 game_values.tournament_scores[iScore].total += (3 - game_values.tournament_scores[iScore].type[iTourStop]) * game_values.tourstops[iTourStop]->iPoints;
             }
 
@@ -1641,7 +1641,6 @@ void LoadMapObjects(bool fPreview)
 
 void CleanUp()
 {
-    short i;
     //delete object list
     for (CPlayer* player : players) {
         delete player;
@@ -2652,7 +2651,7 @@ bool SwapPlayers(short iUsingPlayerID)
         short iNewSpot = iPlayer + iIncrement;
 
         do {
-            if (++iNewSpot >= players.size())
+            if (++iNewSpot >= static_cast<short>(players.size()))
                 iNewSpot = 0;
         } while (spots[iNewSpot].fUsed || !players[iNewSpot]->isready());
 
@@ -2666,7 +2665,7 @@ bool SwapPlayers(short iUsingPlayerID)
         }
     }
 
-    for (short iPlayer = 0; iPlayer < players.size(); iPlayer++) {
+    for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
         CPlayer* player  = players[iPlayer];
 
         if (!player->isready())

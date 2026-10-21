@@ -1600,7 +1600,7 @@ void MenuState::StartGame()
     }
 
     //Load soundtrack music if changed
-    if (game_values.loadedmusic != musiclist->currentIndex()) {
+    if (game_values.loadedmusic != (short)musiclist->currentIndex()) {
         game_values.loadedmusic = (short)musiclist->currentIndex();
         rm->backgroundmusic[1] = sfxMusic(musiclist->music(0)); //Stage Clear
         rm->backgroundmusic[3] = sfxMusic(musiclist->music(2)); //Tournament Menu

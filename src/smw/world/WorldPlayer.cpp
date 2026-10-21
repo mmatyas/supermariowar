@@ -27,7 +27,7 @@ void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY) const
 void WorldPlayer::SetSprite(short iPlayer)
 {
     while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], true)) {
-        if (++game_values.skinids[iPlayer] >= skinlist->count())
+        if (++game_values.skinids[iPlayer] >= static_cast<short>(skinlist->count()))
             game_values.skinids[iPlayer] = 0;
     }
 

@@ -458,7 +458,7 @@ void MI_TournamentScoreboard::RefreshTourScores()
             miPlayerImages[iTeam][iPlayer]->SetImageSource(&rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
         }
 
-        for (short iGame = 0; iGame < game_values.tourstopcurrent; iGame++) {
+        for (size_t iGame = 0; iGame < game_values.tourstopcurrent; iGame++) {
             miIconImages[iTeam][iGame]->SetImage(0, game_values.tournament_scores[iTeam].type[iGame] * 32, 32, 32);
 
             miIconImages[iTeam][iGame]->SetPosition(m_pos.x + 128 + (short)dSpacing + (short)((float)iGame * (32.0f + dSpacing)) - 40, iTeamY + 16);

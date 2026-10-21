@@ -169,7 +169,7 @@ void create_globals()
 {
     // this instance will contain the other relevant objects
     rm = new CResourceManager();
-#pragma warning ("delete these or use boost GC shared_ptr")
+    // delete these or use boost GC shared_ptr
 
     g_map = new CMap();
 

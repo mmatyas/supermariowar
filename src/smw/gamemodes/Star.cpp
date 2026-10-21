@@ -287,7 +287,7 @@ void CGM_Star::playerextraguy(CPlayer &player, short iType)
 
 bool CGM_Star::isplayerstar(const CPlayer * player)
 {
-    for (short iPlayer = 0; iPlayer < players.size() - 1; iPlayer++) {
+    for (size_t iPlayer = 0; iPlayer < players.size() - 1; iPlayer++) {
         if (starPlayer[iPlayer] == player)
             return true;
     }

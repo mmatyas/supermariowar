@@ -99,7 +99,7 @@ WorldMap loadWorldMap(const std::string& path, short tilesize)
             iReadType = 4;
         } else if (iReadType == 4) { //background water
             std::list<std::string_view> tokens = tokenize(line, ',');
-            if (tokens.size() < result.getWidth())
+            if (tokens.size() < static_cast<size_t>(result.getWidth()))
                 goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < result.getWidth(); iMapTileReadCol++) {
@@ -113,7 +113,7 @@ WorldMap loadWorldMap(const std::string& path, short tilesize)
             }
         } else if (iReadType == 5) { //background sprites
             std::list<std::string_view> tokens = tokenize(line, ',');
-            if (tokens.size() < result.getWidth())
+            if (tokens.size() < static_cast<size_t>(result.getWidth()))
                 goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < result.getWidth(); iMapTileReadCol++) {
@@ -132,7 +132,7 @@ WorldMap loadWorldMap(const std::string& path, short tilesize)
             }
         } else if (iReadType == 6) { //foreground sprites
             std::list<std::string_view> tokens = tokenize(line, ',');
-            if (tokens.size() < result.getWidth())
+            if (tokens.size() < static_cast<size_t>(result.getWidth()))
                 goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < result.getWidth(); iMapTileReadCol++) {
@@ -162,7 +162,7 @@ WorldMap loadWorldMap(const std::string& path, short tilesize)
             }
         } else if (iReadType == 7) { //path connections
             std::list<std::string_view> tokens = tokenize(line, ',');
-            if (tokens.size() < result.getWidth())
+            if (tokens.size() < static_cast<size_t>(result.getWidth()))
                 goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < result.getWidth(); iMapTileReadCol++) {
@@ -186,7 +186,7 @@ WorldMap loadWorldMap(const std::string& path, short tilesize)
             }
         } else if (iReadType == 8) { //stages
             std::list<std::string_view> tokens = tokenize(line, ',');
-            if (tokens.size() < result.getWidth())
+            if (tokens.size() < static_cast<size_t>(result.getWidth()))
                 goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < result.getWidth(); iMapTileReadCol++) {
@@ -207,7 +207,7 @@ WorldMap loadWorldMap(const std::string& path, short tilesize)
             }
         } else if (iReadType == 9) { //vehicle boundaries
             std::list<std::string_view> tokens = tokenize(line, ',');
-            if (tokens.size() < result.getWidth())
+            if (tokens.size() < static_cast<size_t>(result.getWidth()))
                 goto RETURN;
 
             for (short iMapTileReadCol = 0; iMapTileReadCol < result.getWidth(); iMapTileReadCol++) {
@@ -268,7 +268,7 @@ WorldMap loadWorldMap(const std::string& path, short tilesize)
             result.tiles.at(iCol1, iRow1).iWarp = warpId;
             result.tiles.at(iCol2, iRow2).iWarp = warpId;
 
-            if (result.warps.size() >= iNumWarps)
+            if (result.warps.size() >= static_cast<size_t>(iNumWarps))
                 iReadType = 14;
         } else if (iReadType == 14) { //number of vehicles
             iNumVehicles = std::stoi(line);
@@ -306,7 +306,7 @@ WorldMap loadWorldMap(const std::string& path, short tilesize)
             result.vehicles.emplace_back(WorldVehicle());
             result.vehicles.back().Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary, result.iTileSize);
 
-            if (result.vehicles.size() >= iNumVehicles)
+            if (result.vehicles.size() >= static_cast<size_t>(iNumVehicles))
                 iReadType = 16;
         } else if (iReadType == 16) { //initial bonus items
             std::list<std::string_view> tokens = tokenize(line, ',');
@@ -469,7 +469,7 @@ bool saveWorldMap(const WorldMap& world, const std::string& szPath)
 
     fprintf(file, "%zu\n", game_values.tourstops.size());
 
-    for (short iStage = 0; iStage < game_values.tourstops.size(); iStage++) {
+    for (size_t iStage = 0; iStage < game_values.tourstops.size(); iStage++) {
         std::string line = WriteTourStopLine(*game_values.tourstops[iStage], true);
         fprintf(file, "%s", line.c_str());
     }
@@ -493,7 +493,7 @@ bool saveWorldMap(const WorldMap& world, const std::string& szPath)
 
     fprintf(file, "%zu\n", vehicles.size());
 
-    for (short iVehicle = 0; iVehicle < vehicles.size(); iVehicle++) {
+    for (size_t iVehicle = 0; iVehicle < vehicles.size(); iVehicle++) {
         fprintf(file, "%d,", vehicles[iVehicle].getDrawSprite());
         fprintf(file, "%d,", vehicles[iVehicle].getActionId());
         fprintf(file, "%d,", vehicles[iVehicle].getCurrentTile().x);

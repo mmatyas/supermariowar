@@ -3068,7 +3068,7 @@ int editor_maphazards()
                 } else if (event.key.key == SDLK_DELETE) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState || MAPHAZARD_EDIT_STATE_LOCATION == iEditState) {
                         //Copy platforms into empty spot
-                        for (short iMapHazard = iEditMapHazard; iMapHazard < g_map->maphazards.size() - 1; iMapHazard++) {
+                        for (short iMapHazard = iEditMapHazard; iMapHazard < static_cast<short>(g_map->maphazards.size()) - 1; iMapHazard++) {
                             g_map->maphazards[iMapHazard].itype = g_map->maphazards[iMapHazard + 1].itype;
                             g_map->maphazards[iMapHazard].ix = g_map->maphazards[iMapHazard + 1].ix;
                             g_map->maphazards[iMapHazard].iy = g_map->maphazards[iMapHazard + 1].iy;
@@ -3287,7 +3287,7 @@ int editor_maphazards()
 
 			rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Map Hazard Mode: [esc] Exit");
 
-			for (int iMapHazard = 0; iMapHazard < g_map->maphazards.size(); iMapHazard++)
+			for (size_t iMapHazard = 0; iMapHazard < g_map->maphazards.size(); iMapHazard++)
 				s_platform.draw(rIconRects[iMapHazard][0], screen, rIconRects[iMapHazard][1]);
 
 			if (g_map->maphazards.size() < MAXMAPHAZARDS)
@@ -3500,7 +3500,7 @@ int editor_tiles()
 								view_tileset_y = 0;
 							}
                     } else if (event.key.key == SDLK_PAGEDOWN) {
-                        if (set_tile_tileset < g_tilesetmanager->count() - 1) {
+                        if (set_tile_tileset < static_cast<int>(g_tilesetmanager->count()) - 1) {
 								set_tile_tileset++;
                             tileset = g_tilesetmanager->tileset(set_tile_tileset);
 								view_tileset_x = 0;
@@ -4111,7 +4111,7 @@ int editor_backgrounds()
                     editor_backgrounds_initialized = false;
                     return EDITOR_EDIT;
                 } else if (event.key.key == SDLK_PAGEDOWN || event.key.key == SDLK_DOWN) {
-                    if ((iPage + 1) * 16 < backgroundlist->count()) {
+                    if ((iPage + 1) * 16 < static_cast<int>(backgroundlist->count())) {
 							iPage++;
 							LoadBackgroundPage(sBackgrounds, iPage);
 						}
@@ -4127,7 +4127,7 @@ int editor_backgrounds()
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 if (event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT) {
                     for (short iBackground = 0; iBackground < 16; iBackground++) {
-                        if (iPage * 16 + iBackground >= backgroundlist->count())
+                        if (iPage * 16 + iBackground >= static_cast<int>(backgroundlist->count()))
 								break;
 
 							if (event.button.x >= rDst[iBackground].x && event.button.x < rDst[iBackground].x + rDst[iBackground].w &&
@@ -4171,7 +4171,7 @@ int editor_backgrounds()
 		SDL_FillSurfaceRect(screen, &rect, 0x0);
 
         for (short iBackground = 0; iBackground < 16; iBackground++) {
-            if (iPage * 16 + iBackground >= backgroundlist->count())
+            if (iPage * 16 + iBackground >= static_cast<int>(backgroundlist->count()))
 				break;
 
 			sBackgrounds[iBackground].draw(rSrc, screen, rDst[iBackground]);
@@ -4182,7 +4182,7 @@ int editor_backgrounds()
 
 		int iID = mouse_x / 160 + mouse_y / 120 * 4 + iPage * 16;
 
-        if (iID < backgroundlist->count())
+        if (iID < static_cast<int>(backgroundlist->count()))
             rm->menu_font_small.draw(0, 0, backgroundlist->at(iID).string());
 
 		DrawMessage();
@@ -4374,7 +4374,7 @@ void LoadBackgroundPage(std::array<gfxSprite, 16>& sBackgrounds, short iPage)
 	SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
 	for (short iIndex = 0; iIndex < 16; iIndex++) {
-		if (iPage * 16 + iIndex >= backgroundlist->count())
+		if (iPage * 16 + iIndex >= static_cast<int>(backgroundlist->count()))
 			break;
 
 		const std::filesystem::path& path = backgroundlist->at(iPage * 16 + iIndex);
@@ -4696,7 +4696,7 @@ int clearMap()
 #ifdef _DEBUG
 void convertAll()
 {
-    for (int k = 0; k < maplist->count(); k++) {
+    for (size_t k = 0; k < maplist->count(); k++) {
 		//g_map->convertMap();
 		g_map->saveMap(maplist->currentFilename());
 		maplist->next(false);

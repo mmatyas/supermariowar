@@ -62,7 +62,7 @@ void CGM_ShyGuyTag::think()
 
     //If we are not waiting to clear, check if we need to start waiting
     if (!fRunClock) {
-        if (shyguycount == players.size()) {
+        if (static_cast<short>(players.size()) == shyguycount) {
             if (game_values.gamemodesettings.shyguytag.freetime > 0) {
                 fRunClock = true;
                 gameClock.SetTime(game_values.gamemodesettings.shyguytag.freetime);

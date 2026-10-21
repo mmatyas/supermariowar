@@ -85,7 +85,6 @@ private:
     short m_steps;
     Vec2f m_edge;
 
-    unsigned short m_currentStep[2] {0, 0};
     Vec2f* m_goalPoint[2] {&m_startPos, &m_startPos};
 };
 

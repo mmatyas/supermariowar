@@ -61,7 +61,7 @@ void CGM_Survival::think()
             while (iWeightCount < iRandEnemy)
                 iWeightCount += game_values.gamemodesettings.survival.enemyweight[++iSelectedEnemy];
 
-#pragma warning("Replace all these magic constants with proportional values")
+            //TODO: Replace all these magic constants with proportional values
             if (0 == iSelectedEnemy) {
                 objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)RANDOM_INT(App::screenWidth * 0.92f), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(RANDOM_INT(20))/10.0f));
                 timer = (short)(RANDOM_INT(21) - 10 + rate);

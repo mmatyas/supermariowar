@@ -421,7 +421,7 @@ void CGameConfig::ReadBinaryConfig() {
 
         //Load skin/team settings
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            if (skinids[iPlayer] >= skinlist->count() || skinids[iPlayer] < 0)
+            if (skinids[iPlayer] >= static_cast<short>(skinlist->count()) || skinids[iPlayer] < 0)
                 skinids[iPlayer] = 0;
         }
 
@@ -612,7 +612,7 @@ void CGameConfig::WriteTomlConfig() const {
         bridge.gamegraphicspack = GetNameFromFileName(gamegraphicspacklist->currentPath().string());
 
         for (size_t player = 0; player < MAX_PLAYERS; player++) {
-            if (randomskin[player] || skinids[player] < 0 || skinids[player] >= skinlist->count()) {
+            if (randomskin[player] || skinids[player] < 0 || skinids[player] >= static_cast<short>(skinlist->count())) {
                 bridge.skins[player].clear();
             } else {
                 bridge.skins[player] = skinlist->at(skinids[player]).name;

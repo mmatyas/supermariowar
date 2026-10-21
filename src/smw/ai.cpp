@@ -560,7 +560,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
 
         //Look through all platforms and see if we are hitting solid or death tiles in them
-        for (short iPlatform = 0; iPlatform < g_map->platforms.size(); iPlatform++) {
+        for (size_t iPlatform = 0; iPlatform < g_map->platforms.size(); iPlatform++) {
             int lefttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix, iDeathY << 5);
             int righttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix + PW, iDeathY << 5);
 
@@ -673,7 +673,7 @@ ExitDeathCheck:
                 case PowerupType::MysteryMushroom:
                     //See if another player has a powerup
                     for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
-                        if (iPlayer == pPlayer->localID || players[iPlayer]->teamID == iTeamID) {
+                        if (iPlayer == static_cast<size_t>(pPlayer->localID) || players[iPlayer]->teamID == iTeamID) {
                             continue;
                         }
                         if (game_values.gamepowerups[players[iPlayer]->globalID] > 0) {
@@ -1049,7 +1049,7 @@ void CPlayerAI::GetNearestObjects()
 
     //Figure out where the other players are
     for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
-        if (iPlayer == pPlayer->localID || players[iPlayer]->state != PlayerState::Ready)
+        if (iPlayer == static_cast<size_t>(pPlayer->localID) || players[iPlayer]->state != PlayerState::Ready)
             continue;
 
         //Find players in jail on own team to tag

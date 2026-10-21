@@ -1316,7 +1316,7 @@ int editor_edit()
 						}
 
                     if (event.key.key == SDLK_PAGEDOWN) {
-                        if (++game_values.worldindex >= worldlist->count())
+                        if (++game_values.worldindex >= static_cast<short>(worldlist->count()))
 								game_values.worldindex = 0;
 
                         worldlist->next();

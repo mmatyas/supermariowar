@@ -49,7 +49,7 @@ void CGM_Collection::think()
         if (5 < iPowerupQuantity)
             iPowerupQuantity = players.size() + iPowerupQuantity - 7;
 
-        if (objectcontainer[1].countMovingTypes(movingobject_collectioncard) < iPowerupQuantity) {
+        if (static_cast<short>(objectcontainer[1].countMovingTypes(movingobject_collectioncard)) < iPowerupQuantity) {
             short iRandom = RANDOM_INT(5);
             short iRandomCard = 0;
             if (iRandom == 4)

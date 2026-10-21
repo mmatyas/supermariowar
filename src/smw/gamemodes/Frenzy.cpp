@@ -53,7 +53,7 @@ void CGM_Frenzy::think()
             if (5 < iPowerupQuantity)
                 iPowerupQuantity = players.size() + iPowerupQuantity - 7;
 
-            if (objectcontainer[1].countTypes(object_frenzycard) < iPowerupQuantity) {
+            if (static_cast<short>(objectcontainer[1].countTypes(object_frenzycard)) < iPowerupQuantity) {
                 if (iItemWeightCount == 0) {
                     //If all weights are zero, then choose the random powerup
                     iSelectedPowerup = NUMFRENZYCARDS - 1;
