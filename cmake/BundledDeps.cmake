@@ -10,6 +10,7 @@ function(smw_declare_gitrepo name url tag)
         GIT_TAG ${tag}
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
+        SYSTEM
         FIND_PACKAGE_ARGS NAMES ${name}
     )
 endfunction()
@@ -57,6 +58,7 @@ FetchContent_Declare(
     GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE
     GIT_SUBMODULES "external/libpng" "external/zlib"
+    SYSTEM
     FIND_PACKAGE_ARGS NAMES SDL3_image
 )
 
@@ -91,6 +93,7 @@ FetchContent_Declare(
     GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE
     GIT_SUBMODULES ""
+    SYSTEM
     FIND_PACKAGE_ARGS NAMES toml11
 )
 
