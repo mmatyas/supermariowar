@@ -9,6 +9,7 @@
 #include "ui/MI_Text.h"
 #include "ResourceManager.h"
 
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 
@@ -165,8 +166,8 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                 SetKey(iKey, key, iDevice);
                 done = true;
             } else if (event.type == SDL_EVENT_MOUSE_MOTION) {
-                short xmag = (short)abs(event.motion.xrel);
-                short ymag = (short)abs(event.motion.yrel);
+                const float xmag = std::abs(event.motion.xrel);
+                const float ymag = std::abs(event.motion.yrel);
 
                 if (xmag < MOUSE_X_DEAD_ZONE && ymag < MOUSE_Y_DEAD_ZONE)
                     continue;

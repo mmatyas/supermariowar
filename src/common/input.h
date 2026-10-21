@@ -42,7 +42,7 @@
 #define JOY_HAT_RIGHT       11
 #define JOY_BUTTON_START    12
 
-#define KEY_NONE            -1
+#define KEY_NONE            SDLK_UNKNOWN
 
 
 struct CKeyState {

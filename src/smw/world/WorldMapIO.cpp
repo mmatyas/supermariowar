@@ -467,7 +467,7 @@ bool saveWorldMap(const WorldMap& world, const std::string& szPath)
     fprintf(file, "#Stage Type 0,Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)\n");
     fprintf(file, "#Stage Type 1,Bonus House Name,Sequential/Random Order,Display Text,Powerup List(Max 5)\n");
 
-    fprintf(file, "%d\n", game_values.tourstops.size());
+    fprintf(file, "%zu\n", game_values.tourstops.size());
 
     for (short iStage = 0; iStage < game_values.tourstops.size(); iStage++) {
         std::string line = WriteTourStopLine(*game_values.tourstops[iStage], true);
@@ -478,7 +478,7 @@ bool saveWorldMap(const WorldMap& world, const std::string& szPath)
     fprintf(file, "#Warps\n");
     fprintf(file, "#location 1 x, y, location 2 x, y\n");
 
-    fprintf(file, "%d\n", warps.size());
+    fprintf(file, "%zu\n", warps.size());
 
     for (const WorldWarp& warp : warps) {
         fprintf(file, "%d,", warp.posA.x);
@@ -491,7 +491,7 @@ bool saveWorldMap(const WorldMap& world, const std::string& szPath)
     fprintf(file, "#Vehicles\n");
     fprintf(file, "#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction, Boundary\n");
 
-    fprintf(file, "%d\n", vehicles.size());
+    fprintf(file, "%zu\n", vehicles.size());
 
     for (short iVehicle = 0; iVehicle < vehicles.size(); iVehicle++) {
         fprintf(file, "%d,", vehicles[iVehicle].getDrawSprite());

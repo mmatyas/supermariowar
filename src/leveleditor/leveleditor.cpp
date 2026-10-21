@@ -2319,8 +2319,9 @@ int editor_platforms()
                 if (event.key.key == SDLK_S) {
 						savecurrentmap();
                 } else if (event.key.key >= SDLK_1 && event.key.key <= SDLK_9) {
-                    if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState && event.key.key - SDLK_1 < g_iNumPlatforms) {
-							iEditPlatform = event.key.key - SDLK_1;
+                    const int platformIndex = static_cast<int>(event.key.key) - SDLK_1;
+                    if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState && platformIndex < g_iNumPlatforms) {
+							iEditPlatform = platformIndex;
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
                     } else if ((PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState) && event.key.key >= SDLK_1 && event.key.key <= SDLK_3) {
 							g_Platforms[iEditPlatform].iPathType = static_cast<PlatformPathType>(event.key.key - SDLK_1);
@@ -2331,9 +2332,9 @@ int editor_platforms()
                         } else {
 								iPlatformEditState = PLATFORM_EDIT_STATE_PATH;
 							}
-                    } else if (PLATFORM_EDIT_STATE_MOVE == iPlatformEditState && event.key.key - SDLK_1 < g_iNumPlatforms) {
+                    } else if (PLATFORM_EDIT_STATE_MOVE == iPlatformEditState && platformIndex < g_iNumPlatforms) {
                         if (iPlatformSwitchState == 1) {
-								SwitchPlatforms(iPlatformSwitchIndex, event.key.key - SDLK_1);
+								SwitchPlatforms(iPlatformSwitchIndex, platformIndex);
 
 								iPlatformPreview = -1;
 
