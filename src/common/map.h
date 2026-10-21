@@ -34,6 +34,18 @@ enum MapItemType : unsigned char {
     ThrowBox,
 };
 
+// NOTE: Types have a fixed order! See the 1.8 map reader.
+enum class MapHazardType : unsigned char {
+    FireBar,
+    RotoDisc,
+    BulletBill,
+    FlameCannon,
+    PirhanaGreen,
+    PirhanaRed,
+    PirhanaTall,
+    PirhanaShort,
+};
+
 /*
 									PD  SDR SDL SDB SDT G	DR	DL	DB	DT	I	SOT	S
 	tile_nonsolid = 0				0	0	0	0	0	0	0	0	0	0	0	0	0
@@ -121,7 +133,7 @@ struct MapItem {
 };
 
 struct MapHazard {
-	short itype;
+	MapHazardType itype;
 	short ix;
 	short iy;
 

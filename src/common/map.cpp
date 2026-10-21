@@ -118,102 +118,121 @@ void DrawMapHazard(const MapHazard& hazard, short iSize, bool fDrawCenter, SDL_S
 
     rPathDst = {hazard.ix << (iSizeShift - 1), hazard.iy << (iSizeShift - 1), iTileSize, iTileSize};
 
-    if (fDrawCenter) {
-        if (hazard.itype <= 1) {
-            rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
-        }
-    }
+    switch (hazard.itype) {
+        case MapHazardType::FireBar: {
+            if (fDrawCenter)
+                rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
 
-    if (hazard.itype == 0) { //fireball string
-        short iNumDots = 16;
-        float dRadius = (float)((hazard.iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
-        float dAngle = hazard.dparam[1];
-        for (short iDot = 0; iDot < iNumDots; iDot++) {
-            rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
-            rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
-            rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
+            short iNumDots = 16;
+            float dRadius = (float)((hazard.iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
+            float dAngle = hazard.dparam[1];
+            for (short iDot = 0; iDot < iNumDots; iDot++) {
+                rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
+                rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
+                rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 
-            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, {rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h});
-            dAngle += TWO_PI / iNumDots;
-        }
+                rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, {rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h});
+                dAngle += TWO_PI / iNumDots;
+            }
 
-        //Draw the fireball string
-        for (short iFireball = 0; iFireball < hazard.iparam[0]; iFireball++) {
-            short x = (hazard.ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
-            short y = (hazard.iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
+            //Draw the fireball string
+            for (short iFireball = 0; iFireball < hazard.iparam[0]; iFireball++) {
+                short x = (hazard.ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
+                short y = (hazard.iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard.dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
 
-            rm->spr_hazard_fireball[iSize].draw(x, y, {0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]});
-        }
-    } else if (hazard.itype == 1) { //rotodisc
-        short iNumDots = 16;
-        float dRadius = (hazard.dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
-        float dAngle = hazard.dparam[1];
-        for (short iDot = 0; iDot < iNumDots; iDot++) {
-            rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
-            rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
-            rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
-
-            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, {rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h});
-            dAngle += TWO_PI / iNumDots;
+                rm->spr_hazard_fireball[iSize].draw(x, y, {0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]});
+            }
+            break;
         }
 
-        //Draw the rotodiscs
-        float dSector = TWO_PI / hazard.iparam[0];
-        dAngle = hazard.dparam[1];
-        dRadius = hazard.dparam[2] / (float)(1 << iSize);
-        for (short iRotodisc = 0; iRotodisc < hazard.iparam[0]; iRotodisc++) {
-            short x = rPathDst.x + (short)(dRadius * cos(dAngle));
-            short y = rPathDst.y + (short)(dRadius * sin(dAngle));
+        case MapHazardType::RotoDisc: {
+            if (fDrawCenter)
+                rm->spr_platformpath.draw(rPathSrc, dst, rPathDst);
 
-            rm->spr_hazard_rotodisc[iSize].draw(x, y, {0, 0, iTileSize, iTileSize});
+            short iNumDots = 16;
+            float dRadius = (hazard.dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
+            float dAngle = hazard.dparam[1];
+            for (short iDot = 0; iDot < iNumDots; iDot++) {
+                rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
+                rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
+                rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 
-            dAngle += dSector;
-        }
-    } else if (hazard.itype == 2) { //bullet bill
-        rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, {0, hazard.dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize});
+                rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, {rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h});
+                dAngle += TWO_PI / iNumDots;
+            }
 
-        short iBulletPathX = rPathDst.x - iPlatformPathDotSize[iSize];
-        if (hazard.dparam[0] > 0.0f)
-            iBulletPathX = rPathDst.x + iTileSize;
+            //Draw the rotodiscs
+            float dSector = TWO_PI / hazard.iparam[0];
+            dAngle = hazard.dparam[1];
+            dRadius = hazard.dparam[2] / (float)(1 << iSize);
+            for (short iRotodisc = 0; iRotodisc < hazard.iparam[0]; iRotodisc++) {
+                short x = rPathDst.x + (short)(dRadius * cos(dAngle));
+                short y = rPathDst.y + (short)(dRadius * sin(dAngle));
 
-        short iBulletPathSpacing = (short)(hazard.dparam[0] * dBulletBillFrequency[iSize]);
-        while (iBulletPathX >= 0 && iBulletPathX < GetScreenWidth(iSize)) {
-            rDotDst = {iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
-            rm->spr_platformpath.draw(rDotSrc, dst, rDotDst);
+                rm->spr_hazard_rotodisc[iSize].draw(x, y, {0, 0, iTileSize, iTileSize});
 
-            iBulletPathX += hazard.iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
-        }
-    } else if (hazard.itype == 3) { //flame cannon
-        const SDL_Rect * rect = &g_rFlameRects[hazard.iparam[1]][2];
-
-        short iOffsetX = 0;
-        short iOffsetY = 0;
-
-        if (hazard.iparam[1] == 1) {
-            iOffsetX = -(iTileSize << 1);
-        } else if (hazard.iparam[1] == 2) {
-            iOffsetY = -(iTileSize << 1);
+                dAngle += dSector;
+            }
+            break;
         }
 
-        rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, {rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize});
-    } else if (hazard.itype >= 4 && hazard.itype <= 7) { //pirhana plants
-        const SDL_Rect * rect = &g_rPirhanaRects[hazard.itype - 4][hazard.iparam[1]][0];
-        short iOffsetX = 0;
-        short iOffsetY = 0;
+        case MapHazardType::BulletBill: {
+            rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, {0, hazard.dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize});
 
-        if (hazard.iparam[1] == 0) {
-            if (hazard.itype == 6)
-                iOffsetY = -iTileSize;
-            else
-                iOffsetY = -(iTileSize >> 1);
-        } else if (hazard.iparam[1] == 2) {
-            if (hazard.itype == 6)
-                iOffsetX = -iTileSize;
-            else
-                iOffsetX = -(iTileSize >> 1);
+            short iBulletPathX = rPathDst.x - iPlatformPathDotSize[iSize];
+            if (hazard.dparam[0] > 0.0f)
+                iBulletPathX = rPathDst.x + iTileSize;
+
+            short iBulletPathSpacing = (short)(hazard.dparam[0] * dBulletBillFrequency[iSize]);
+            while (iBulletPathX >= 0 && iBulletPathX < GetScreenWidth(iSize)) {
+                rDotDst = {iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]};
+                rm->spr_platformpath.draw(rDotSrc, dst, rDotDst);
+
+                iBulletPathX += hazard.iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
+            }
+            break;
         }
 
-        rm->spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, {rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize});
+        case MapHazardType::FlameCannon: {
+            const SDL_Rect * rect = &g_rFlameRects[hazard.iparam[1]][2];
+
+            short iOffsetX = 0;
+            short iOffsetY = 0;
+
+            if (hazard.iparam[1] == 1) {
+                iOffsetX = -(iTileSize << 1);
+            } else if (hazard.iparam[1] == 2) {
+                iOffsetY = -(iTileSize << 1);
+            }
+
+            rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, {rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize});
+            break;
+        }
+
+        case MapHazardType::PirhanaGreen:
+        case MapHazardType::PirhanaRed:
+        case MapHazardType::PirhanaTall:
+        case MapHazardType::PirhanaShort: {
+            const short iPirhanaPlantType = static_cast<short>(hazard.itype) - static_cast<short>(MapHazardType::PirhanaGreen);
+            const SDL_Rect * rect = &g_rPirhanaRects[iPirhanaPlantType][hazard.iparam[1]][0];
+            short iOffsetX = 0;
+            short iOffsetY = 0;
+
+            if (hazard.iparam[1] == 0) {
+                if (hazard.itype == MapHazardType::PirhanaTall)
+                    iOffsetY = -iTileSize;
+                else
+                    iOffsetY = -(iTileSize >> 1);
+            } else if (hazard.iparam[1] == 2) {
+                if (hazard.itype == MapHazardType::PirhanaTall)
+                    iOffsetX = -iTileSize;
+                else
+                    iOffsetX = -(iTileSize >> 1);
+            }
+
+            rm->spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, {rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize});
+            break;
+        }
     }
 }
 
@@ -1003,7 +1022,7 @@ void CMap::saveMap(const std::string& file)
     mapfile.write_i32(maphazards.size());
 
     for (const MapHazard& hazard : maphazards) {
-        mapfile.write_i32(hazard.itype);
+        mapfile.write_i32(static_cast<int32_t>(hazard.itype));
         mapfile.write_i32(hazard.ix);
         mapfile.write_i32(hazard.iy);
 

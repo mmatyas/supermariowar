@@ -153,7 +153,7 @@ void MapReader1800::read_hazards(CMap& map, BinaryFile& mapfile)
 
     for (size_t idx = 0; idx < iNumMapHazards; idx++) {
         MapHazard hazard = {};
-        hazard.itype = mapfile.read_i32();
+        hazard.itype = static_cast<MapHazardType>(mapfile.read_i32()); // TODO: Error handling
         hazard.ix = mapfile.read_i32();
         hazard.iy = mapfile.read_i32();
 

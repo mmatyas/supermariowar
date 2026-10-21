@@ -3062,7 +3062,7 @@ int editor_maphazards()
                     } else if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
-							if (hazard->itype == 0 || hazard->itype == 1)
+							if (hazard->itype == MapHazardType::FireBar || hazard->itype == MapHazardType::RotoDisc)
 								hazard->iparam[0] = event.key.key - SDLK_1 + 1;
 						}
                 } else if (event.key.key == SDLK_DELETE) {
@@ -3093,37 +3093,53 @@ int editor_maphazards()
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
-                        if (hazard->itype == 0 || hazard->itype == 1) {
-								if (g_map->maphazards[iEditMapHazard].dparam[0] > -0.05f)
-									g_map->maphazards[iEditMapHazard].dparam[0] -= 0.005f;
-                        } else if (hazard->itype == 2) {
-								if (g_map->maphazards[iEditMapHazard].dparam[0] > -10.0f)
-									g_map->maphazards[iEditMapHazard].dparam[0] -= 1.0f;
+							switch (hazard->itype) {
+								case MapHazardType::FireBar:
+								case MapHazardType::RotoDisc:
+									if (g_map->maphazards[iEditMapHazard].dparam[0] > -0.05f)
+										g_map->maphazards[iEditMapHazard].dparam[0] -= 0.005f;
+									break;
 
-								if (g_map->maphazards[iEditMapHazard].dparam[0] == 0.0f)
-									g_map->maphazards[iEditMapHazard].dparam[0] -= 1.0f;
+								case MapHazardType::BulletBill:
+									if (g_map->maphazards[iEditMapHazard].dparam[0] > -10.0f)
+										g_map->maphazards[iEditMapHazard].dparam[0] -= 1.0f;
+
+									if (g_map->maphazards[iEditMapHazard].dparam[0] == 0.0f)
+										g_map->maphazards[iEditMapHazard].dparam[0] -= 1.0f;
+									break;
+
+								default:
+									break;
 							}
 						}
                 } else if (event.key.key == SDLK_KP_PLUS || event.key.key == SDLK_EQUALS) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
-                        if (hazard->itype == 0 || hazard->itype == 1) {
-								if (g_map->maphazards[iEditMapHazard].dparam[0] < 0.05f)
-									g_map->maphazards[iEditMapHazard].dparam[0] += 0.005f;
-                        } else if (hazard->itype == 2) {
-								if (g_map->maphazards[iEditMapHazard].dparam[0] < 10.0f)
-									g_map->maphazards[iEditMapHazard].dparam[0] += 1.0f;
+							switch (hazard->itype) {
+								case MapHazardType::FireBar:
+								case MapHazardType::RotoDisc:
+									if (g_map->maphazards[iEditMapHazard].dparam[0] < 0.05f)
+										g_map->maphazards[iEditMapHazard].dparam[0] += 0.005f;
+									break;
 
-								if (g_map->maphazards[iEditMapHazard].dparam[0] == 0.0f)
-									g_map->maphazards[iEditMapHazard].dparam[0] += 1.0f;
+								case MapHazardType::BulletBill:
+									if (g_map->maphazards[iEditMapHazard].dparam[0] < 10.0f)
+										g_map->maphazards[iEditMapHazard].dparam[0] += 1.0f;
+
+									if (g_map->maphazards[iEditMapHazard].dparam[0] == 0.0f)
+										g_map->maphazards[iEditMapHazard].dparam[0] += 1.0f;
+									break;
+
+								default:
+									break;
 							}
 						}
                 } else if (event.key.key == SDLK_COMMA || event.key.key == SDLK_LEFTBRACKET) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
-                        if (hazard->itype >= 2 && hazard->itype <= 7) {
+                        if (hazard->itype >= MapHazardType::BulletBill && hazard->itype <= MapHazardType::PirhanaShort) {
 								if (g_map->maphazards[iEditMapHazard].iparam[0] > 30)
 									g_map->maphazards[iEditMapHazard].iparam[0] -= 30;
 							}
@@ -3132,7 +3148,7 @@ int editor_maphazards()
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
-                        if (hazard->itype >= 2 && hazard->itype <= 7) {
+                        if (hazard->itype >= MapHazardType::BulletBill && hazard->itype <= MapHazardType::PirhanaShort) {
 								if (g_map->maphazards[iEditMapHazard].iparam[0] < 480)
 									g_map->maphazards[iEditMapHazard].iparam[0] += 30;
 							}
@@ -3141,11 +3157,22 @@ int editor_maphazards()
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
 
-                        if (hazard->itype >= 3 && hazard->itype <= 7) {
-								if (++hazard->iparam[1] > 3)
-									hazard->iparam[1] = 0;
-                        } else if (hazard->itype == 2) {
-								g_map->maphazards[iEditMapHazard].dparam[0] = -g_map->maphazards[iEditMapHazard].dparam[0];
+							switch (hazard->itype) {
+								case MapHazardType::FlameCannon:
+								case MapHazardType::PirhanaGreen:
+								case MapHazardType::PirhanaRed:
+								case MapHazardType::PirhanaTall:
+								case MapHazardType::PirhanaShort:
+									if (++hazard->iparam[1] > 3)
+										hazard->iparam[1] = 0;
+									break;
+
+								case MapHazardType::BulletBill:
+									g_map->maphazards[iEditMapHazard].dparam[0] = -g_map->maphazards[iEditMapHazard].dparam[0];
+									break;
+
+								default:
+									break;
 							}
 						}
                 } else if (event.key.key == SDLK_N) {
@@ -3187,29 +3214,43 @@ int editor_maphazards()
 								if (iClickX >= rTypeButton[iType][1].x && iClickX < rTypeButton[iType][1].x + rTypeButton[iType][1].w &&
                                     iClickY >= rTypeButton[iType][1].y && iClickY < rTypeButton[iType][1].y + rTypeButton[iType][1].h) {
 									MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
-									hazard->itype = iType;
+									const MapHazardType type = static_cast<MapHazardType>(iType);
+									hazard->itype = type;
 									iEditState = MAPHAZARD_EDIT_STATE_LOCATION;
 									ignoreclick = true;
 
 									//Set some default values for the selected type
-                                if (iType == 0) {
-										hazard->iparam[0] = 5; //Number of fireballs in string
-										hazard->dparam[0] = 0.02f; //Angular velocity
-										hazard->dparam[1] = 0.0f; //Start Angle
-                                } else if (iType == 1) {
-										hazard->iparam[0] = 2; //Number of fireballs in string
-										hazard->dparam[0] = 0.02f; //Angular velocity
-										hazard->dparam[1] = 0.0f; //Start Angle
-										hazard->dparam[2] = 112.0f; //Radius
-                                } else if (iType == 2) {
-										hazard->iparam[0] = 120; //Frequency
-										hazard->dparam[0] = 2.0f; //Velocity
-                                } else if (iType == 3) {
-										hazard->iparam[0] = 120; //Frequency
-										hazard->iparam[1] = 0; //Direction
-                                } else if (iType >= 4 && iType <= 7) {
-										hazard->iparam[0] = 300; //Frequency
-										hazard->iparam[1] = 0; //Direction
+									switch (type) {
+										case MapHazardType::FireBar:
+											hazard->iparam[0] = 5; //Number of fireballs in string
+											hazard->dparam[0] = 0.02f; //Angular velocity
+											hazard->dparam[1] = 0.0f; //Start Angle
+											break;
+
+										case MapHazardType::RotoDisc:
+											hazard->iparam[0] = 2; //Number of fireballs in string
+											hazard->dparam[0] = 0.02f; //Angular velocity
+											hazard->dparam[1] = 0.0f; //Start Angle
+											hazard->dparam[2] = 112.0f; //Radius
+											break;
+
+										case MapHazardType::BulletBill:
+											hazard->iparam[0] = 120; //Frequency
+											hazard->dparam[0] = 2.0f; //Velocity
+											break;
+
+										case MapHazardType::FlameCannon:
+											hazard->iparam[0] = 120; //Frequency
+											hazard->iparam[1] = 0; //Direction
+											break;
+
+										case MapHazardType::PirhanaGreen:
+										case MapHazardType::PirhanaRed:
+										case MapHazardType::PirhanaTall:
+										case MapHazardType::PirhanaShort:
+											hazard->iparam[0] = 300; //Frequency
+											hazard->iparam[1] = 0; //Direction
+											break;
 									}
 
 									break;
@@ -3221,21 +3262,24 @@ int editor_maphazards()
 							hazard->iy = iClickY / 16;
                     } else if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState && !ignoreclick) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
-							short iType = hazard->itype;
-                        if (iType == 0) { //Edit fireball string
-								AdjustMapHazardRadius(hazard, iClickX, iClickY);
-                        } else if (iType == 1) { //rotodisc
-								AdjustMapHazardRadius(hazard, iClickX, iClickY);
+							switch (hazard->itype) {
+								case MapHazardType::FireBar: //Edit fireball string
+								case MapHazardType::RotoDisc: //rotodisc
+									AdjustMapHazardRadius(hazard, iClickX, iClickY);
+									break;
+
+								default:
+									break;
 							}
 						}
 
 						break;
                 } else if (event.button.button == SDL_BUTTON_RIGHT) {
                     if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
-							short iType = g_map->maphazards[iEditMapHazard].itype;
-                        if (iType == 0) { //Edit fireball string
+							MapHazardType iType = g_map->maphazards[iEditMapHazard].itype;
+                        if (iType == MapHazardType::FireBar) { //Edit fireball string
 
-                        } else if (iType == 1) { //rotodisc
+                        } else if (iType == MapHazardType::RotoDisc) { //rotodisc
 
 							}
 						}
@@ -3253,11 +3297,14 @@ int editor_maphazards()
 							hazard->iy = iClickY / 16;
                     } else if (MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							MapHazard * hazard = &g_map->maphazards[iEditMapHazard];
-							short iType = hazard->itype;
-                        if (iType == 0) { //Edit fireball string
-								AdjustMapHazardRadius(hazard, iClickX, iClickY);
-                        } else if (iType == 1) { //rotodisc
-								AdjustMapHazardRadius(hazard, iClickX, iClickY);
+							switch (hazard->itype) {
+								case MapHazardType::FireBar: //Edit fireball string
+								case MapHazardType::RotoDisc: //rotodisc
+									AdjustMapHazardRadius(hazard, iClickX, iClickY);
+									break;
+
+								default:
+									break;
 							}
 						}
 					}
@@ -3317,23 +3364,35 @@ int editor_maphazards()
             DrawMapHazard(hazard, 0, true, blitdest);
             DrawMapHazardControls(hazard);
 
-            if (hazard.itype == 0 || hazard.itype == 1) {
-                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 3, "Properties");
-                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 2, "[esc] Exit, [l] Location, [+/-] Velocity, [LMB] Angle and Radius");
+            switch (hazard.itype) {
+                case MapHazardType::FireBar:
+                case MapHazardType::RotoDisc:
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 3, "Properties");
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight() * 2, "[esc] Exit, [l] Location, [+/-] Velocity, [LMB] Angle and Radius");
 
-                if (hazard.itype == 1) {
-                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle, [1-9] Number of Rotodiscs");
-                } else {
-                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle");
-                }
-            } else if (hazard.itype == 2) {
-                rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location, [d] Direction");
-                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[-/+] Velocity, [[/]] or [</>] Frequency");
-            } else if (hazard.itype >= 3 && hazard.itype <= 7) {
-                rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location");
-                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[[/]] or [</>] Frequency, [d] direction");
-            } else {
-                rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location");
+                    if (hazard.itype == MapHazardType::RotoDisc)
+                        rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle, [1-9] Number of Rotodiscs");
+                    else
+                        rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[Shift + LMB] Snap To Angle");
+                    break;
+
+                case MapHazardType::BulletBill:
+                    rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location, [d] Direction");
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[-/+] Velocity, [[/]] or [</>] Frequency");
+                    break;
+
+                case MapHazardType::FlameCannon:
+                case MapHazardType::PirhanaGreen:
+                case MapHazardType::PirhanaRed:
+                case MapHazardType::PirhanaTall:
+                case MapHazardType::PirhanaShort:
+                    rm->menu_font_small.draw(0, 480 - (rm->menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location");
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "[[/]] or [</>] Frequency, [d] direction");
+                    break;
+
+                default:
+                    rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location");
+                    break;
             }
         }
 
@@ -3346,7 +3405,7 @@ int editor_maphazards()
 short NewMapHazard()
 {
     MapHazard hazard;
-    hazard.itype = 0;
+    hazard.itype = MapHazardType::FireBar;
     hazard.ix = 10;
     hazard.iy = 7;
 
@@ -3361,10 +3420,10 @@ short NewMapHazard()
 
 void DrawMapHazardControls(const MapHazard& hazard)
 {
-    if (hazard.itype == 0 || hazard.itype == 1 || hazard.itype == 2) {
+    if (hazard.itype == MapHazardType::FireBar || hazard.itype == MapHazardType::RotoDisc || hazard.itype == MapHazardType::BulletBill) {
 		short iVelMarkerX = 0;
 
-		if (hazard.itype == 2)
+		if (hazard.itype == MapHazardType::BulletBill)
 			iVelMarkerX = (short)(hazard.dparam[0] + 10.0f) * 12 + 196;
 		else
 			iVelMarkerX = (short)((hazard.dparam[0] + 0.05f) / 0.005f) * 12 + 196;
@@ -3375,7 +3434,7 @@ void DrawMapHazardControls(const MapHazard& hazard)
 		SDL_Rect rMarker[2] = {{244,400,8,18},{iVelMarkerX,418,8,18}};
 		s_platform.draw(rMarker[0], screen, rMarker[1]);
 
-        if (hazard.itype == 2) {
+        if (hazard.itype == MapHazardType::BulletBill) {
 			rm->menu_font_small.drawRightJustified(190, 420, "Left");
 			rm->menu_font_small.draw(450, 420, "Right");
         } else {
@@ -3384,7 +3443,7 @@ void DrawMapHazardControls(const MapHazard& hazard)
 		}
 	}
 
-    if (hazard.itype >= 2 && hazard.itype <= 7) { // Draw frequency for bullet bill and flame cannon
+    if (hazard.itype >= MapHazardType::BulletBill && hazard.itype <= MapHazardType::PirhanaShort) { // Draw frequency for bullet bill and flame cannon
 		short iFreqMarkerX = ((hazard.iparam[0] / 30) - 1) * 12 + 196;
 
 		SDL_Rect rVel[2] = {{0, 384, 184, 13},{198, 390, 184, 13}};
@@ -3425,28 +3484,35 @@ void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
 		}
 	}
 
-    if (hazard->itype == 0) {
-        if (radius >= 24.0f) {
-			hazard->iparam[0] = (short)radius / 24 + 1;
-			hazard->dparam[1] = angle;
-        } else {
-			hazard->iparam[0] = 1;
-			hazard->dparam[1] = 0.0f;
-		}
-    } else if (hazard->itype == 1) {
-		hazard->dparam[1] = angle;
-
-        if (radius > 32.0f) {
-            if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
-				//Snap radius to every 16 pixels
-				hazard->dparam[2] = (float)(((int)(radius - 16.0f) >> 4) << 4);
+    switch (hazard->itype) {
+        case MapHazardType::FireBar:
+            if (radius >= 24.0f) {
+				hazard->iparam[0] = (short)radius / 24 + 1;
+				hazard->dparam[1] = angle;
             } else {
-				hazard->dparam[2] = radius - 16.0f;
+				hazard->iparam[0] = 1;
+				hazard->dparam[1] = 0.0f;
 			}
-        } else {
-			hazard->dparam[2] = 16.0f;
-		}
-	}
+            break;
+
+        case MapHazardType::RotoDisc:
+			hazard->dparam[1] = angle;
+
+            if (radius > 32.0f) {
+                if (CheckKey(keystate, SDLK_LSHIFT) || CheckKey(keystate, SDLK_RSHIFT)) {
+					//Snap radius to every 16 pixels
+					hazard->dparam[2] = (float)(((int)(radius - 16.0f) >> 4) << 4);
+                } else {
+					hazard->dparam[2] = radius - 16.0f;
+				}
+            } else {
+				hazard->dparam[2] = 16.0f;
+			}
+            break;
+
+        default:
+            break;
+    }
 }
 
 CTileset * tileset = nullptr;
