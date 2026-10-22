@@ -187,6 +187,8 @@ void CPlayer::accelerate(float direction)
 
     if (onice)
         velx += VELMOVINGADDICE * direction;
+    else (inwater)
+        velx += VELMOVINGADDICE * direction;
     else
         velx += VELMOVINGADD * direction;
 
@@ -194,7 +196,7 @@ void CPlayer::accelerate(float direction)
     if (!frozen) {
         auto* gmTag = dynamic_cast<CGM_Tag*>(game_values.gamemode);
 
-        if ((game_values.flags.slowdownon != -1 && game_values.flags.slowdownon != teamID) || jail.isActive())
+        if ((game_values.flags.slowdownon != -1 && game_values.flags.slowdownon != teamID) || jail.isActive() || inwater)
             maxVel = VELSLOWMOVING;
         else if (playerKeys->game_turbo.fDown)
             maxVel = VELTURBOMOVING + ((gmTag && gmTag->tagged() == this) ? TAGGEDBOOST : 0.0f);
@@ -258,6 +260,8 @@ void CPlayer::decreaseVelocity()
             velx -= VELAIRFRICTION;
         else if (onice)
             velx -= VELICEFRICTION;
+        else if (inwater)
+            velx -= VELICEFRICTION;
         else
             velx -= VELMOVINGFRICTION;
 
@@ -267,6 +271,8 @@ void CPlayer::decreaseVelocity()
         if (inair)
             velx += VELAIRFRICTION;
         else if (onice)
+            velx += VELICEFRICTION;
+        else if (inwater)
             velx += VELICEFRICTION;
         else
             velx += VELMOVINGFRICTION;
@@ -1594,7 +1600,7 @@ void CPlayer::Jump(short iMove, float jumpModifier, bool fKuriboBounce)
 {
     if (fKuriboBounce)
         vely = -VELKURIBOBOUNCE;
-    else if ((game_values.flags.slowdownon != -1 && game_values.flags.slowdownon != teamID) || jail.isActive())
+    else if ((game_values.flags.slowdownon != -1 && game_values.flags.slowdownon != teamID) || jail.isActive() || inwater)
         vely = -VELSLOWJUMP * jumpModifier;
     else if (fabs(velx) > VELMOVING && iMove != 0 && playerKeys->game_turbo.fDown)
         vely = -VELTURBOJUMP * jumpModifier;

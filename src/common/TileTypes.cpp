@@ -25,6 +25,7 @@ constexpr std::array<TileType, 19> ordered_tile_types {
     TileType::SuperDeathLeft,
     TileType::SuperDeathRight,
     TileType::PlayerDeath,
+    TileType::Water,
 };
 } // namespace
 

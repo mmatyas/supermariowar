@@ -297,6 +297,7 @@ private:
 		bool inair;			//true... player is in the air, false... player is on the ground
 							//inair is set in CPlayer::collision_detection_map()
 		bool onice;			//on ice... friction goes way down
+		bool inwater;
 
 		bool lockjump;		//is the player allowed to jump
 		bool lockfall;		//on PC verion, the down key makes player fall through solid_on_top tiles
