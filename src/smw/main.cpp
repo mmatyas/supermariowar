@@ -85,6 +85,7 @@ SDL_Surface		*blitdest = NULL;	//the destination surface for all drawing (can be
 
 short			x_shake = 0;
 short			y_shake = 0;
+std::string default_data_path = "../data";
 
 
 //------ game relevant stuff ------
@@ -308,7 +309,7 @@ int main(int argc, char *argv[])
     if (!cmd.data_root.empty())
         RootDataDirectory = cmd.data_root;
     else
-        RootDataDirectory = "../data";
+        RootDataDirectory = default_data_path;
 
 
     try {
