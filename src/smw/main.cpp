@@ -59,6 +59,7 @@
 #include <ctime>
 #include <cmath>
 #include <cstdlib> // srand()
+#include <iostream>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -306,6 +307,8 @@ int main(int argc, char *argv[])
     }
     if (!cmd.data_root.empty())
         RootDataDirectory = cmd.data_root;
+    else
+        RootDataDirectory = "../data";
 
 
     try {
