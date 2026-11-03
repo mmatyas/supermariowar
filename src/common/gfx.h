@@ -30,9 +30,11 @@
 
 #include <filesystem>
 #include <optional>
+#include "gfx/gfxSDL.h"
 
 using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
 
+extern GraphicsSDL gfx;
 
 bool gfx_init(int w, int h, bool fullscreen);
 void gfx_changefullscreen(bool fullscreen);

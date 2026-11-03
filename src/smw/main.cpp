@@ -26,6 +26,7 @@
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"
+#include "gfx/gfxSDL.h"
 #include "gamemodes/BonusHouse.h"
 #include "gamemodes/CaptureTheFlag.h"
 #include "gamemodes/CardCollection.h"
@@ -59,6 +60,8 @@
 #include <ctime>
 #include <cmath>
 #include <cstdlib> // srand()
+#include <iostream>
+#include <SDL3/SDL.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -73,6 +76,7 @@
 #endif
 
 #include <SDL3/SDL_main.h>
+#include <SDL3_image/SDL_image.h>
 
 
 //now it's really time for an "engine" (aka resource manager)
@@ -367,6 +371,20 @@ void main_game()
     //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
     char title[128];
     sprintf(title, "%s %s %s", TITLESTRING, GIT_REVISION, GIT_DATE);
+
+    std::filesystem::path icon_path = GetRootDirectory();
+    icon_path = icon_path.parent_path().parent_path().append("resources").append("icons").append("smw.ico");
+    SDL_Surface* icon = nullptr;
+
+    if(std::filesystem::exists(icon_path)){
+        icon = IMG_Load(icon_path.string().c_str());
+        if(SDL_SetWindowIcon(gfx.sdl_window, icon))
+            std::cout << "could not set Window Icon: " << SDL_GetError() << std::endl;
+    }
+    else 
+        std::cout << "file: " << icon_path.string().c_str() << " does not exist !" << std::endl;
+    
+
     gfx_settitle(title);
     SDL_HideCursor();
 
@@ -432,6 +450,8 @@ void main_game()
     sfx_close();
     gfx_close();
     net_close();
+    if(icon)
+        SDL_DestroySurface(icon);
 
     //Delete player skins
     for (short k = 0; k < MAX_PLAYERS; k++) {

@@ -2,7 +2,7 @@
 
 #include "gfx/Color.h"
 #include "gfx/gfxPalette.h"
-#include "gfx/gfxSDL.h"
+
 
 #include <SDL3_image/SDL_image.h>
 
@@ -23,8 +23,9 @@ extern SDL_Surface * screen;
 extern short x_shake;
 extern short y_shake;
 
-GraphicsSDL gfx;
+
 gfxPalette gfx_palette;
+GraphicsSDL gfx;
 
 
 namespace {

@@ -1,7 +1,7 @@
 #include "gfxSprite.h"
 
 #include "gfx.h"
-
+#include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 
 #include <cassert>
