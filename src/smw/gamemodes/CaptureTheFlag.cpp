@@ -28,7 +28,7 @@ void CGM_CaptureTheFlag::init()
 {
     CGameMode::init();
 
-    bool fTeamUsed[4] = {false, false, false, false};
+    bool fTeamUsed[MAX_PLAYERS] = {};
 
     for (CPlayer* player : players) {
         short iTeamID = player->getTeamID();

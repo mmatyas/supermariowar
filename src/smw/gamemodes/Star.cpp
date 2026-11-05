@@ -9,7 +9,7 @@
 #include "Score.h"
 #include "objects/carriable/CO_Star.h"
 
-extern CScore *score[4];
+extern CScore *score[MAX_PLAYERS];
 extern short score_cnt;
 
 extern CObjectContainer objectcontainer[3];
@@ -51,7 +51,7 @@ void CGM_Star::init()
             score[iScore]->SetScore(goal);
     }
 
-    for (short iStar = 0; iStar < 3; iStar++) {
+    for (short iStar = 0; iStar < MAX_PLAYERS - 1; iStar++) {
         starItem[iStar] = NULL;
         starPlayer[iStar] = NULL;
     }
@@ -62,7 +62,7 @@ void CGM_Star::init()
 void CGM_Star::SetupMode()
 {
     //Clean up old stars
-    for (short iStar = 0; iStar < 3; iStar++) {
+    for (short iStar = 0; iStar < MAX_PLAYERS - 1; iStar++) {
         if (starItem[iStar]) {
             starItem[iStar]->Drop();
             starItem[iStar]->dead = true;
@@ -74,7 +74,7 @@ void CGM_Star::SetupMode()
 
     //If multi star, add more stars
     if (iCurrentModeType == StarStyle::Multi) {
-        CPlayer * players[4];
+        CPlayer * players[MAX_PLAYERS];
         short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
         for (short iStar = 0; iStar < iNumPlayers - 1; iStar++) {
@@ -104,7 +104,7 @@ void CGM_Star::think()
         for (size_t iStar1 = 0; iStar1 + 1 < players.size(); iStar1++) {
             //If we're missing a star player, then reassign them all
             if (!starPlayer[iStar1]) {
-                CPlayer * players[4];
+                CPlayer * players[MAX_PLAYERS];
                 short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
                 for (short iStar2 = 0; iStar2 < iNumPlayers - 1; iStar2++) {
@@ -212,7 +212,7 @@ void CGM_Star::think()
                 }
 
                 if (game_values.gamemodesettings.star.shine != StarStyle::Random && fNeedRebalance) {
-                    CPlayer * players[4];
+                    CPlayer * players[MAX_PLAYERS];
                     short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
                     for (short iStar = 0; iStar < iNumPlayers - 1; iStar++) {

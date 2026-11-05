@@ -14,6 +14,7 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
+#include "ScoreboardLayout.h"
 #include "sfx.h"
 #include "WorldTourStop.h"
 #include "gamemodes/Chicken.h"
@@ -79,7 +80,7 @@ extern short currentgamemode;
 extern CMap* g_map;
 
 extern std::vector<CPlayer*> players;
-extern CScore* score[4];
+extern CScore* score[MAX_PLAYERS];
 extern short score_cnt;
 
 extern MapList *maplist;
@@ -98,16 +99,11 @@ CEyecandyContainer eyecandy[3];
 SpotlightManager spotlightManager;
 
 short g_iWinningPlayer;
-short scorepowerupoffsets[3][3] = { {  37,  0,    0 },
-                                    {  71,  89,   0 },
-                                    { 105, 123, 141 } };
-
-short GameplayState::scoreoffsets[3] = {2, 36, 70};
 short GameplayState::g_iPowerupToIcon[8] = {80, 176, 272, 304, 336, 368, 384, 400};
 
 GameplayState::GameplayState()
 {
-    for (short p = 0; p < 4; p++) {
+    for (short p = 0; p < MAX_PLAYERS; p++) {
         respawnCount[p] = 0;
         respawnanimationtimer[p] = 0;
         respawnanimationframe[p] = 0;
@@ -285,7 +281,7 @@ short GetModeIconIndexFromMode(short iMode)
 void GameplayState::createPlayers()
 {
     //Create players for this game
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         respawnCount[iPlayer] = 0;
 
         if (game_values.singleplayermode == -1 || game_values.singleplayermode == iPlayer) {
@@ -318,34 +314,65 @@ void GameplayState::createPlayers()
 
 void GameplayState::initScoreDisplayPosition()
 {
-    short i;
-    short totalspace = 0;
-    for (i = 0; i < score_cnt; i++) {
-        totalspace += 56 + game_values.teamcounts[i] * 34;
-    }
-    totalspace += 20 * (score_cnt - 1);
+    short iScoreOffsetY = 0;
+    if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
+        iScoreOffsetY = 18;
 
-    for (i = 0; i < score_cnt; i++) {
-        if (game_values.scoreboardstyle == ScoreboardStyle::Top || game_values.scoreboardstyle == ScoreboardStyle::Bottom) {
-            score[i]->x = ((App::screenWidth - totalspace) >> 1);
+    constexpr short GAP = 20;
+    auto width = [](short team) { return scoreboard::boxWidth(game_values.teamcounts[team]); };
 
-            for (short k = 0; k < i; k++)
-                score[i]->x += 76 + game_values.teamcounts[k] * 34;
+    if (game_values.scoreboardstyle == ScoreboardStyle::Top || game_values.scoreboardstyle == ScoreboardStyle::Bottom) {
+        // Use a single centered row if possible, or two rows if there are too many teams
+        short totalspace = 0;
+        for (short i = 0; i < score_cnt; i++)
+            totalspace += width(i);
+        totalspace += GAP * (score_cnt - 1);
 
-            short iScoreOffsetY = 0;
-            if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
-                iScoreOffsetY = 18;
+        const short rowCount = totalspace > App::screenWidth - 10 ? 2 : 1;
+        const short teamsPerRow = (score_cnt + rowCount - 1) / rowCount;
+        const short rowHeight = 46 + iScoreOffsetY;
 
-            score[i]->y = 5 + (game_values.scoreboardstyle == ScoreboardStyle::Bottom ? 429 - iScoreOffsetY : 0);
-        } else {
-            short iScoreOffsetY = 0;
-            if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
-                iScoreOffsetY = 18;
+        for (short row = 0; row < rowCount; row++) {
+            const short first = row * teamsPerRow;
+            const short last = std::min<short>(score_cnt, first + teamsPerRow);
 
-            score[i]->x = 5 + (574 - (34 * game_values.teamcounts[i])) * (i % 2);
-            score[i]->y = 5 + (429 - iScoreOffsetY) * (i > 1 ? 1 : 0);
+            short rowWidth = GAP * (last - first - 1);
+            for (short i = first; i < last; i++)
+                rowWidth += width(i);
+
+            short x = (App::screenWidth - rowWidth) >> 1;
+            for (short i = first; i < last; i++) {
+                score[i]->x = x;
+                x += width(i) + GAP;
+
+                if (game_values.scoreboardstyle == ScoreboardStyle::Bottom)
+                    score[i]->y = 5 + 429 - iScoreOffsetY - (rowCount - 1 - row) * rowHeight;
+                else
+                    score[i]->y = 5 + row * rowHeight;
+            }
         }
+    } else {
+        // Corners: the first 4 teams are in the corners,
+        // the next ones are placed next to them, towards the center
+        for (short i = 0; i < score_cnt; i++) {
+            const short corner = i % 4;
+            const bool rightSide = corner % 2;
+            const bool bottomSide = corner > 1;
 
+            short x = rightSide ? App::screenWidth - 5 - width(i) : 5;
+            if (i >= 4) {
+                if (rightSide)
+                    x = score[corner]->x - 10 - width(i);
+                else
+                    x = score[corner]->x + width(corner) + 10;
+            }
+
+            score[i]->x = x;
+            score[i]->y = 5 + (bottomSide ? 429 - iScoreOffsetY : 0);
+        }
+    }
+
+    for (short i = 0; i < score_cnt; i++) {
         score[i]->fromx = score[i]->x;
         score[i]->fromy = score[i]->y;
         score[i]->place = i;
@@ -493,14 +520,14 @@ short CountAliveTeams(short * lastteam)
 {
     short findlastteam = 0;
 
-    bool teamalive[4] = {false, false, false, false};
+    bool teamalive[MAX_PLAYERS] = {};
     for (CPlayer* player : players) {
         if (!player->isdead())
             teamalive[player->teamID] = true;
     }
 
     short numteams = 0;
-    for (short k = 0; k < 4; k++) {
+    for (short k = 0; k < MAX_PLAYERS; k++) {
         if (teamalive[k]) {
             findlastteam = k;
             numteams++;
@@ -641,7 +668,7 @@ void shakeScreen()
 
     //Kill players touching the ground (or in air for MOd blocks)
     short iNumKillPlayers = 0;
-    CPlayer * pKillPlayers[4];
+    CPlayer * pKillPlayers[MAX_PLAYERS];
 
     CPlayer * killer1 = GetPlayerFromGlobalID(game_values.flags.screenshakeplayerid);
 
@@ -892,7 +919,7 @@ void handleObj2ObjCollisions()
     }
 }
 
-void GameplayState::drawScoreboard(short iScoreTextOffset[4])
+void GameplayState::drawScoreboard(short iScoreTextOffset[MAX_PLAYERS])
 {
     g_iWinningPlayer = -1;
 
@@ -936,10 +963,11 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
         //in game scoreboards
         for (i = 0; i < score_cnt; i++) {
+            const gfxSprite& shade = rm->spr_shade[game_values.teamcounts[i] - 1];
             if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
-                rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
+                shade.draw(score[i]->x, score[i]->y);
             else
-                rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, {0, 0, 256, 41});
+                shade.draw(score[i]->x, score[i]->y, {0, 0, static_cast<int>(shade.getWidth()), 41});
 
             for (short k = 0; k < game_values.teamcounts[i]; k++) {
                 short globalID = game_values.teamids[i][k];
@@ -954,7 +982,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                             respawnanimationframe[globalID] = 0;
                     }
 
-                    short scorex = score[i]->x + scoreoffsets[k];
+                    short scorex = score[i]->x + scoreboard::playerOffsetX(k);
                     short scorey = score[i]->y + 2;
                     rm->spr_egg.draw(scorex, scorey, {respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32});
                     rm->spr_eggnumbers.draw(scorex, scorey, {((respawnCount[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32});
@@ -973,7 +1001,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                     CPlayer * player = GetPlayerFromGlobalID(globalID);
 
                     if (player && !game_values.gamemode->gameover) {
-                        short iScoreOffsetX = score[i]->x + scoreoffsets[k];
+                        short iScoreOffsetX = score[i]->x + scoreboard::playerOffsetX(k);
                         short iScoreOffsetY = score[i]->y + 2;
 
                         if (player->ownerPlayerID > -1)
@@ -993,12 +1021,12 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                         if (player->tanookisuit.isOn())
                             rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, {App::screenWidth/2, 0, 16, 16});
                     } else {
-                        rm->spr_player[globalID][iScoreboardSprite].draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, {0, 0, 32, 32});
+                        rm->spr_player[globalID][iScoreboardSprite].draw(score[i]->x + scoreboard::playerOffsetX(k), score[i]->y + 2, {0, 0, 32, 32});
                     }
 
                     //give crown to player(s) with most kills
                     if (g_iWinningPlayer == i)
-                        rm->spr_crown.draw(score[i]->x + scoreoffsets[k] + 12, score[i]->y - 4);
+                        rm->spr_crown.draw(score[i]->x + scoreboard::playerOffsetX(k) + 12, score[i]->y - 4);
                 }
 
                 short storedpowerupid = game_values.gamepowerups[globalID];
@@ -1006,7 +1034,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                 //Draw stored powerup
                 if (storedpowerupid != -1) {
                     if (!game_values.flags.swapplayers) {
-                        rm->spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, {storedpowerupid * 16, 0, 16, 16});
+                        rm->spr_storedpowerupsmall.draw(score[i]->x + scoreboard::powerupOffsetX(game_values.teamcounts[i], k), score[i]->y + 25, {storedpowerupid * 16, 0, 16, 16});
                     }
                 }
             }
@@ -1015,7 +1043,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
             if (game_values.gamemode->gamemode == game_mode_health) {
                 short iLife = score[i]->subscore[0];
                 short iMax = score[i]->subscore[1];
-                short iHeartX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
+                short iHeartX = score[i]->x + scoreboard::powerupOffsetX(game_values.teamcounts[i], 0) - 32;
 
                 for (short iHeart = 0; iHeart < iLife; iHeart++) {
                     if (iHeart == iMax - 1 && iHeart % 2 == 0)
@@ -1035,7 +1063,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                 if (score[i]->subscore[0] < 3 || score[i]->subscore[2] % 20 < 10) {
                     short iNumCards = score[i]->subscore[0];
                     short iCardValues = score[i]->subscore[1];
-                    short iCardX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 20;
+                    short iCardX = score[i]->x + scoreboard::powerupOffsetX(game_values.teamcounts[i], 0) - 20;
 
                     for (short iCard = 0; iCard < iNumCards; iCard++) {
                         rm->spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, {(iCardValues & 3) << 4, 0, 16, 16});
@@ -1045,7 +1073,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
             } else if (game_values.gamemode->gamemode == game_mode_boxes_minigame) { //Draw coins for boxes minigame
                 //Flash collected cards if 3 have been collected
                 short iNumCoins = score[i]->subscore[0];
-                short iCoinX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
+                short iCoinX = score[i]->x + scoreboard::powerupOffsetX(game_values.teamcounts[i], 0) - 32;
 
                 short iCoin = 0;
                 for (; iCoin < iNumCoins; iCoin++) {
@@ -1252,7 +1280,7 @@ void GameplayState::drawOutOfScreenIndicators()
         player->drawOutOfScreenIndicators();
 }
 
-void GameplayState::drawEverything(short iCountDownState, short iScoreTextOffset[4])
+void GameplayState::drawEverything(short iCountDownState, short iScoreTextOffset[MAX_PLAYERS])
 {
     drawBackLayer();
     drawMiddleLayer();
@@ -1382,7 +1410,7 @@ void UpdateScoreBoard()
             game_values.tournament_scores[iScore].total = 0;
 
             for (size_t iTourStop = 0; iTourStop <= game_values.tourstopcurrent; iTourStop++) {
-                game_values.tournament_scores[iScore].total += (3 - game_values.tournament_scores[iScore].type[iTourStop]) * game_values.tourstops[iTourStop]->iPoints;
+                game_values.tournament_scores[iScore].total += std::max(0, 3 - game_values.tournament_scores[iScore].type[iTourStop]) * game_values.tourstops[iTourStop]->iPoints;
             }
 
             game_values.tournament_scores[iScore].wins = 0;
@@ -1683,7 +1711,7 @@ bool updateExitPauseDialog(short iCountDownState) // true on exit
             }
         }
 
-        for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+        for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
             //If the start key is pressed (pause key)
@@ -1776,7 +1804,7 @@ void updateScreenShake()
 // updates the bullet bills spawned by a powerup
 void updateBulletBillPowerup()
 {
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if (game_values.bulletbilltimer[iPlayer] > 0) {
             game_values.bulletbilltimer[iPlayer]--;
 
@@ -2509,7 +2537,7 @@ void GameplayState::update()
     }
 
     for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
-        iScoreTextOffset[iTeam] = 34 * game_values.teamcounts[iTeam] + 1;
+        iScoreTextOffset[iTeam] = scoreboard::scoreTextOffsetX(game_values.teamcounts[iTeam]);
     }
 
 #ifdef _DEBUG
@@ -2619,7 +2647,7 @@ bool SwapPlayers(short iUsingPlayerID)
             player->fOldSwapX = player->leftX();
             player->fOldSwapY = player->topY();
 
-            player->iNewPowerupX = player->score->x + scorepowerupoffsets[game_values.teamcounts[player->teamID] - 1][player->subTeamID];
+            player->iNewPowerupX = player->score->x + scoreboard::powerupOffsetX(game_values.teamcounts[player->teamID], player->subTeamID);
             player->iNewPowerupY = player->score->y + 25;
         }
     }
@@ -2641,7 +2669,7 @@ bool SwapPlayers(short iUsingPlayerID)
 
     short iIncrement = RANDOM_INT (iNumAvailablePlayers - 1);
 
-    MysteryMushroomTempPlayer spots[4];
+    MysteryMushroomTempPlayer spots[MAX_PLAYERS];
     for (size_t iPlayer = 0; iPlayer < players.size(); iPlayer++) {
         CPlayer* player  = players[iPlayer];
 

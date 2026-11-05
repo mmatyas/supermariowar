@@ -22,7 +22,7 @@ MenuCodeEnum MI_PacksField::SendInput(CPlayerInput* playerInput)
     if (iLastIndex != list->currentIndex())
         returnCode = itemChangedCode;
 
-    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if (playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed)
             return returnCode;
 

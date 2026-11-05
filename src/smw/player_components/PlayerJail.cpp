@@ -24,7 +24,7 @@ bool PlayerJail::isActive() const
 
 void PlayerJail::setColor(int8_t color)
 {
-    assert(color < 4 && color >= -1);
+    assert(color < MAX_PLAYERS && color >= -1);
     this->color = color;
 }
 

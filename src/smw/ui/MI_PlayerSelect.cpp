@@ -18,9 +18,11 @@ MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, short x, short y, std::string
     miModifyImage = std::make_unique<MI_Image>(nspr, m_pos.x, m_pos.y - 6, 32, 128, 78, 78, 4, 1, 8);
     miModifyImage->setVisible(false);
 
-    const short iSpacing = (width - indent - 136) / 5;
+    constexpr short ICON_WIDTH = 34;
+    const short iSlots = static_cast<short>(iPlayerPosition.size());
+    const float fSpacing = static_cast<float>(width - indent - ICON_WIDTH * iSlots) / (iSlots + 1);
     for (size_t i = 0; i < iPlayerPosition.size(); i++) {
-        iPlayerPosition[i] = iSpacing + indent + i * (iSpacing + 34);
+        iPlayerPosition[i] = static_cast<short>(indent + fSpacing + i * (fSpacing + ICON_WIDTH));
     }
 
     SetImagePosition();
@@ -35,9 +37,9 @@ MenuCodeEnum MI_PlayerSelect::Modify(bool modify)
 
 MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput* playerInput)
 {
-    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if (playerInput->outputControls[iPlayer].menu_right.fPressed) {
-            if (++iSelectedPlayer > 3)
+            if (++iSelectedPlayer > MAX_PLAYERS - 1)
                 iSelectedPlayer = 0;
 
             SetImagePosition();
@@ -45,7 +47,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput* playerInput)
 
         if (playerInput->outputControls[iPlayer].menu_left.fPressed) {
             if (--iSelectedPlayer < 0)
-                iSelectedPlayer = 3;
+                iSelectedPlayer = MAX_PLAYERS - 1;
 
             SetImagePosition();
         }
@@ -56,7 +58,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput* playerInput)
 
             if (game_values.playercontrol[iSelectedPlayer] == 0) {
                 int iCountPlayers = 0;
-                for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+                for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
                     if (game_values.playercontrol[iPlayer] > 0)
                         iCountPlayers++;
                 }
@@ -72,7 +74,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput* playerInput)
 
             if (game_values.playercontrol[iSelectedPlayer] == 0) {
                 int iCountPlayers = 0;
-                for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+                for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
                     if (game_values.playercontrol[iPlayer] > 0)
                         iCountPlayers++;
                 }
@@ -115,7 +117,7 @@ void MI_PlayerSelect::Draw()
 
     miModifyImage->Draw();
 
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         spr->draw(m_pos.x + iPlayerPosition[iPlayer], m_pos.y + 16, {game_values.playercontrol[iPlayer] * 34 + 32, 206, 34, 32});
     }
 }

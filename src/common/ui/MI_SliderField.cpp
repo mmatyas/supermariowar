@@ -69,7 +69,7 @@ void MI_SliderField::Draw()
 
 MenuCodeEnum MI_SliderField::SendInput(CPlayerInput * playerInput)
 {
-    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if (playerInput->outputControls[iPlayer].menu_scrollfast.fPressed) {
             if (m_index == 0)
                 while (moveNext());

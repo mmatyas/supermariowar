@@ -43,7 +43,7 @@ extern CResourceManager* rm;
 extern short currentgamemode;
 extern CGameMode * gamemodes[GAMEMODE_LAST];
 
-short backup_playercontrol[4];
+short backup_playercontrol[MAX_PLAYERS];
 
 Net_PlayerData::Net_PlayerData()
     : x(0), y(0), xvel(0), yvel(0)
@@ -203,9 +203,15 @@ bool net_startSession()
     std::fill_n(netplay.player_disconnected, 4, false);
 
     COutputControl nullinput {}; // set every field to false
-    for (uint8_t p = 0; p < 4; p++) {
-        // backup singleplayer settings
+    // backup singleplayer settings
+    for (uint8_t p = 0; p < MAX_PLAYERS; p++)
         backup_playercontrol[p] = game_values.playercontrol[p];
+
+    // Online play supports up to 4 players
+    for (uint8_t p = NET_MAX_PLAYERS; p < MAX_PLAYERS; p++)
+        game_values.playercontrol[p] = 0;
+
+    for (uint8_t p = 0; p < NET_MAX_PLAYERS; p++) {
 
         netplay.latest_playerdata.player_input[p].clear();
         netplay.latest_playerdata.player_input[p].push_back(nullinput);
@@ -228,7 +234,7 @@ void net_endSession()
         netplay.connectSuccessful = false;
 
         // restore singleplayer settings
-        for (uint8_t p = 0; p < 4; p++)
+        for (uint8_t p = 0; p < MAX_PLAYERS; p++)
             game_values.playercontrol[p] = backup_playercontrol[p];
     }
 }

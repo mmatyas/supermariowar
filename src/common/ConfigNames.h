@@ -421,8 +421,8 @@ struct Bridge {
     std::string menugraphicspack;
     std::string worldgraphicspack;
     std::string gamegraphicspack;
-    std::array<std::string, MAX_PLAYERS> skins;
-    std::array<PlayerSlot, MAX_PLAYERS> player_slots;
+    std::array<std::string, MAX_PLAYERS> skins {};
+    std::array<PlayerSlot, MAX_PLAYERS> player_slots {}; // defaults to Empty
     GameModeGoals gamemodegoals;
 };
 

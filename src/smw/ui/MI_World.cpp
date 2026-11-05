@@ -1,5 +1,7 @@
 #include "MI_World.h"
 
+#include <algorithm>
+
 #include "eyecandy.h"
 #include "FileList.h"
 #include "Game.h"
@@ -13,6 +15,7 @@
 #include <cmath>
 
 extern CGameValues game_values;
+extern short score_cnt;
 extern CResourceManager* rm;
 extern WorldMap g_worldmap;
 extern WorldMusicList* worldmusiclist;
@@ -56,7 +59,7 @@ void MI_World::Init()
 
     iState = -2;
 
-    for (short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < MAX_PLAYERS; iTeam++) {
         iStateTransition[iTeam] = 0;
         iItemPopupDrawY[iTeam] = 0;
         iPopupFlag[iTeam] = false;
@@ -101,6 +104,12 @@ void MI_World::Init()
 
     if (g_worldmap.getHeight() < 15)
         iDstOffsetY = (15 - g_worldmap.getHeight()) << 4;
+}
+
+short MI_World::GetPopupPitch() const
+{
+    // The inventory popups of the teams stack from the bottom of the screen
+    return score_cnt <= 4 ? 64 : 52;
 }
 
 void MI_World::SetControllingTeam(short iWinningTeam)
@@ -248,7 +257,7 @@ void MI_World::Update()
     }
 
     if (iNumPopups > 0) {
-        for (short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeam = 0; iTeam < MAX_PLAYERS; iTeam++) {
             //Do inventory popup open effect
             if (iStateTransition[iTeam] == 1) {
                 iItemPopupDrawY[iTeam] += 4;
@@ -273,7 +282,7 @@ void MI_World::Update()
 
                         if (fStartShift) {
                             iPopupOrder[iMoveTeam] = iPopupOrder[iMoveTeam + 1];
-                            iPopupOffsets[iPopupOrder[iMoveTeam]] = iMoveTeam << 6;
+                            iPopupOffsets[iPopupOrder[iMoveTeam]] = iMoveTeam * GetPopupPitch();
                         }
                     }
 
@@ -282,7 +291,7 @@ void MI_World::Update()
             }
         }
 
-        for (short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeam = 0; iTeam < MAX_PLAYERS; iTeam++) {
             //Transition the inventory popup to it's new location if it needs to move
             if (iPopupOffsetsCurrent[iTeam] > iPopupOffsets[iTeam]) {
                 iPopupOffsetsCurrent[iTeam] -= 4;
@@ -293,7 +302,7 @@ void MI_World::Update()
     }
 
     bool iShowStoredItems = false;
-    for (short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < MAX_PLAYERS; iTeam++) {
         if ((iShowStoredItems = (iStateTransition[iTeam] == 1 || iStateTransition[iTeam] == 3)))
             break;
     }
@@ -437,26 +446,31 @@ void MI_World::Draw()
 
            //If the item selector for a player is displayed
     if (iNumPopups > 0) {
+        // The colored item selection boxes are in the last row of the image
+        const short iItemBoxesY = rm->spr_worlditempopup.getHeight() - 48;
+
         //Draw Spots and Stored Powerups
         short iPlayerCount = 0;
-        for (short iCountPlayers = 0; iCountPlayers < 4; iCountPlayers++) {
+        for (short iCountPlayers = 0; iCountPlayers < MAX_PLAYERS; iCountPlayers++) {
             iPlayerCount += game_values.teamcounts[iCountPlayers];
         }
 
-        short iStoredPowerupBoxX = 296 - 48 * (iPlayerCount - 1);
-        for (short iTeamStore = 0; iTeamStore < 4; iTeamStore++) {
+        // The boxes are 48 pixels wide, normally with 48 pixels between them; squeeze them when there are many players
+        const short iStoredPowerupBoxPitch = std::min<short>(96, (App::screenWidth - 48) / std::max<short>(1, iPlayerCount - 1));
+        short iStoredPowerupBoxX = App::screenWidth / 2 - 24 - iStoredPowerupBoxPitch * (iPlayerCount - 1) / 2;
+        for (short iTeamStore = 0; iTeamStore < MAX_PLAYERS; iTeamStore++) {
             for (short iMemberStore = 0; iMemberStore < game_values.teamcounts[iTeamStore]; iMemberStore++) {
                 short iPlayerId = game_values.teamids[iTeamStore][iMemberStore];
 
-                rm->spr_worlditempopup.draw(iStoredPowerupBoxX, iStoredItemPopupDrawY, {game_values.colorids[iPlayerId] * 48, 256, 48, 48});
+                rm->spr_worlditempopup.draw(iStoredPowerupBoxX, iStoredItemPopupDrawY, {game_values.colorids[iPlayerId] * 48, iItemBoxesY, 48, 48});
 
                 rm->spr_storedpoweruplarge.draw(iStoredPowerupBoxX + 8, iStoredItemPopupDrawY + 8, {game_values.storedpowerups[iPlayerId] << 5, 0, 32, 32});
 
-                iStoredPowerupBoxX += 96;
+                iStoredPowerupBoxX += iStoredPowerupBoxPitch;
             }
         }
 
-        for (short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeam = 0; iTeam < MAX_PLAYERS; iTeam++) {
             if (iStateTransition[iTeam] != 0) {
                 short iColorId = game_values.colorids[game_values.teamids[iTeam][0]];
                 rm->spr_worlditempopup.draw(0, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], {0, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1});
@@ -466,7 +480,7 @@ void MI_World::Draw()
                     short iNumPowerups = game_values.worldpowerupcount[iTeam];
 
                     if (iNumPowerups > 0)
-                        rm->spr_worlditempopup.draw(iItemCol[iTeam] * 52 + 114, 424 - iPopupOffsetsCurrent[iTeam], {iColorId * 48, 256, 48, 48});
+                        rm->spr_worlditempopup.draw(iItemCol[iTeam] * 52 + 114, 424 - iPopupOffsetsCurrent[iTeam], {iColorId * 48, iItemBoxesY, 48, 48});
 
                     short iStartItem = iItemPage[iTeam] << 3;
                     for (short iItem = iStartItem; iItem < iStartItem + 8 && iItem < iNumPowerups; iItem++) {
@@ -499,7 +513,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
     if (fForceStageStart) {
         iState = -1;
 
-        for (short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeam = 0; iTeam < MAX_PLAYERS; iTeam++) {
             iNumPopups = 0;
             iStateTransition[iTeam] = 0;
             iItemPopupDrawY[iTeam] = 0;
@@ -597,14 +611,14 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
         }
     }
 
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
         const Vec2s iPlayerCurrentTile = g_worldmap.GetPlayerCurrentTile();
 
         short iTeamId = LookupTeamID(iPlayer);
 
-        if (iState == -1 && iNumPopups == 0 && iPopupFlag[0] == false && iPopupFlag[1] == false && iPopupFlag[2] == false && iPopupFlag[3] == false) {
+        if (iState == -1 && iNumPopups == 0 && std::none_of(std::begin(iPopupFlag), std::end(iPopupFlag), [](bool flag) { return flag; })) {
             if (iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) { //if this player is player or cpu
                 WorldMapTile * tile = &g_worldmap.getTile(iPlayerCurrentTile.x, iPlayerCurrentTile.y);
 
@@ -782,7 +796,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                     iPopupFlag[iTeamId] = false;
 
                     iPopupOrder[iNumPopups] = iTeamId;
-                    iPopupOffsets[iTeamId] = iNumPopups++ << 6;
+                    iPopupOffsets[iTeamId] = iNumPopups++ * GetPopupPitch();
                     iPopupOffsetsCurrent[iTeamId] = iPopupOffsets[iTeamId];
 
                     iStateTransition[iTeamId] = 1;
@@ -973,7 +987,7 @@ MenuCodeEnum MI_World::InitGame(short iStage, short iPlayer, bool fNeedAiControl
         game_values.singleplayermode = iPlayer;
 
            //If player was trying to get to his inventory menu, cancel that because a game is about to start
-    for (short iTeam = 0; iTeam < 4; iTeam++)
+    for (short iTeam = 0; iTeam < MAX_PLAYERS; iTeam++)
         iPopupFlag[iTeam] = false;
 
     if (fNeedAiControl || fBonusHouse)

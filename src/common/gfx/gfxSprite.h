@@ -2,6 +2,7 @@
 #define GFX_SPRITE
 
 #include "gfx/Color.h"
+#include "gfx/TeamColors.h"
 #include "math/Vec2.h"
 #include "util/SdlHelpers.h"
 
@@ -9,6 +10,7 @@
 
 #include <filesystem>
 #include <optional>
+#include <vector>
 
 enum class ClipEdge : unsigned char { Top, Right, Bottom, Left };
 
@@ -95,6 +97,12 @@ public:
         m_optimize = false;
         return *this;
     }
+    /// The image contains art for the 4 base team colors; generate the rest.
+    /// Can be called multiple times, the layouts are applied in order.
+    ImageLoader& withTeamBands(teamcolors::BandLayout layout) {
+        m_team_bands.push_back(layout);
+        return *this;
+    }
     gfxSprite create() const;
 
 private:
@@ -103,6 +111,7 @@ private:
     std::optional<RGB> m_color_key = colors::MAGENTA;
     std::optional<Uint8> m_alpha = std::nullopt;
     std::optional<int> m_wrap_x = std::nullopt;
+    std::vector<teamcolors::BandLayout> m_team_bands;
 };
 
 #endif // GFX_SPRITE

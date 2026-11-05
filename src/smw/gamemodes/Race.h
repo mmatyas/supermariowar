@@ -26,7 +26,7 @@ class CGM_Race : public CGameMode
 
     protected:
         void PenalizeRaceGoals(CPlayer &player);
-        short nextGoal[4];
+        short nextGoal[MAX_PLAYERS];
         short quantity;
         short penalty;
 };

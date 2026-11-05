@@ -702,7 +702,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow) const
 
 void WorldMap::SetInitialPowerups()
 {
-    for (short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < MAX_PLAYERS; iTeam++) {
         game_values.worldpowerupcount[iTeam] = iNumInitialBonuses;
 
         for (short iItem = 0; iItem < iNumInitialBonuses; iItem++)

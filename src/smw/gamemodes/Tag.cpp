@@ -6,7 +6,7 @@
 #include "ResourceManager.h"
 #include "Score.h"
 
-extern CScore *score[4];
+extern CScore *score[MAX_PLAYERS];
 extern short score_cnt;
 
 extern CEyecandyContainer eyecandy[3];

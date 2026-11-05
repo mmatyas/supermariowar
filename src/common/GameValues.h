@@ -4,6 +4,7 @@
 #define TITLESTRING "Super Mario War"
 
 #include "EyecandyStyles.h"
+#include "GlobalConstants.h"
 #include "GameModeSettings.h"
 #include "GameplayStyles.h"
 #include "input.h"
@@ -114,13 +115,13 @@ public:
     bool		deadteamnotice;
     short		framelimiter;
     short		hiddenblockrespawn;
-    CInputPlayerControl inputConfiguration[4][2]; //[NumPlayers][Keyboard/Joystick]
+    CInputPlayerControl inputConfiguration[MAX_PLAYERS][2]; //[NumPlayers][Keyboard/Joystick]
     short		itemrespawntime;
     bool		keeppowerup;
     short		leaflimit;
     short		pwingslimit;
     short		tanookilimit;
-    short		playercontrol[4];
+    short		playercontrol[MAX_PLAYERS];
     CPlayerInput playerInput;
     bool		playnextmusic;  //automatically advance to the next music track after one finishes
     short		outofboundstime;
@@ -131,13 +132,13 @@ public:
     short		pointspeed;
     short poweruppreset;
     std::array<std::array<short, NUM_POWERUPS>, NUM_POWERUP_PRESETS> allPowerupPresets;
-    bool		randomskin[4];
+    bool		randomskin[MAX_PLAYERS];
     ScoreboardStyle scoreboardstyle;
     bool		screencrunch;
     short		shieldtime;
     ShieldStyle shieldstyle;
     bool		showwinningcrown;
-	short		skinids[4];
+	short		skinids[MAX_PLAYERS];
     short		wandlimit;
     TournamentControlStyle tournamentcontrolstyle;  //ID for the player selected control style
     short		wandfreezetime;
@@ -185,8 +186,8 @@ public:
 
     MatchType matchtype;	//The currently selected match type: quick game, single, tournament, tour, world, minigame
 
-    short		teamids[4][3];
-    short		teamcounts[4];
+    short		teamids[MAX_PLAYERS][MAX_TEAM_SIZE];
+    short		teamcounts[MAX_PLAYERS];
 
     short		tournamentgames;	//How many games that are played in this tournament
     short		tournamentwinner;     //-2 for a tied tournament (for tours), -1 for no winner yet, 0 or greater for the team that has won the tournament
@@ -202,19 +203,19 @@ public:
 
     short		worldindex;
 
-    short		storedpowerups[4];
-    short		gamepowerups[4];
+    short		storedpowerups[MAX_PLAYERS];
+    short		gamepowerups[MAX_PLAYERS];
     short		powerupweights[NUM_POWERUPS];
 
-    short		worldpowerups[4][32];
-    short		worldpowerupcount[4];
+    short		worldpowerups[MAX_PLAYERS][32];
+    short		worldpowerupcount[MAX_PLAYERS];
 
     short		worldpointsbonus;
 
-    short		colorids[4];
+    short		colorids[MAX_PLAYERS];
 
-    short		bulletbilltimer[4];
-    short		bulletbillspawntimer[4];
+    short		bulletbilltimer[MAX_PLAYERS];
+    short		bulletbillspawntimer[MAX_PLAYERS];
 
     size_t		loadedannouncer;
     short		loadedmusic;
@@ -224,7 +225,7 @@ public:
 
     //Player input used during game.  Reads SDL_Events and sets buttons that were pressed
 
-    TournamentScores tournament_scores[4];
+    TournamentScores tournament_scores[MAX_PLAYERS];
 
     GameModeSettings gamemodesettings;
 
@@ -245,13 +246,13 @@ public:
     bool		reversewalk;
     bool		spotlights;
 
-    bool		unlocksecret1part1[4];
+    bool		unlocksecret1part1[MAX_PLAYERS];
     short		unlocksecret1part2;
     bool		unlocksecret2part1;
     short		unlocksecret2part2;
-    short		unlocksecret3part1[4];
-    short		unlocksecret3part2[4];
-    bool		unlocksecretunlocked[4];
+    short		unlocksecret3part1[MAX_PLAYERS];
+    short		unlocksecret3part2[MAX_PLAYERS];
+    bool		unlocksecretunlocked[MAX_PLAYERS];
 };
 
 #endif // GAMEVALUES_H

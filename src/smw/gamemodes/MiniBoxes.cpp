@@ -10,7 +10,7 @@
 #include <cmath>
 
 extern short score_cnt;
-extern CScore *score[4];
+extern CScore *score[MAX_PLAYERS];
 extern CObjectContainer objectcontainer[3];
 extern CResourceManager* rm;
 

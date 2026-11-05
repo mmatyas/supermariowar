@@ -1,6 +1,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include "GlobalConstants.h"
+
 #include <SDL3/SDL.h>
 
 #include <stdint.h>
@@ -111,10 +113,10 @@ class CPlayerInput
 		void Update(SDL_Event event, short iGameState);
 
 		//Points to the input controls in the global inputConfiguration class
-		CInputPlayerControl * inputControls[4];
+		CInputPlayerControl * inputControls[MAX_PLAYERS] = {};
 
 		//Use these structures to see what input has been pressed
-		COutputControl outputControls[4];
+		COutputControl outputControls[MAX_PLAYERS];
 
 		SDL_Keycode iPressedKey;
 };

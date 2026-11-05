@@ -25,9 +25,18 @@ public:
 
 private:
     void FreeScoreboard();
-    short GetYFromPlace(short iPlace) const {
-        return m_pos.y + iPlace * 69 + (4 - iNumTeams) * 35;
+    /// With more than 4 teams the rows are made shorter, so they fit on the screen
+    bool IsCompact() const {
+        return iNumTeams > 4;
     }
+    short GetRowHeight() const;
+    short GetYFromPlace(short iPlace) const;
+    /// Vertical offset of the row content (players, icons) relative to the top of the row
+    short GetContentOffsetY() const {
+        return (GetRowHeight() - 32) / 2;
+    }
+    static short GetPlayerOffsetX(short iTeamSize, short iSlot);
+    static short GetPlaceSprite(short iPlace);
     float GetIconSpacing() const {
         return (float)(372 - iNumGames * 32) / (float)(iNumGames + 1);
     }
@@ -54,17 +63,17 @@ private:
     gfxSprite* sprBackground = nullptr;
     gfxSprite* sprIcons = nullptr;
 
-    short iTeamIDs[4][3];
-    short iTeamCounts[4];
+    short iTeamIDs[MAX_PLAYERS][MAX_TEAM_SIZE];
+    short iTeamCounts[MAX_PLAYERS];
 
-    MI_ScoreText* tourScores[4];
+    MI_ScoreText* tourScores[MAX_PLAYERS];
     MI_ScoreText* tourPoints[10];
     MI_Image* miTourPointBar = nullptr;
     MI_Image* tourBonus[10];
 
-    MI_Image* worldBonus[4][MAX_WORLD_BONUSES_AWARDED];
+    MI_Image* worldBonus[MAX_PLAYERS][MAX_WORLD_BONUSES_AWARDED];
     MI_Image* worldScoreModifier = nullptr;
-    MI_Image* worldPlace[4];
+    MI_Image* worldPlace[MAX_PLAYERS];
     MI_ScoreText* worldScore = nullptr;
-    MI_Image* worldPointsBackground[4];
+    MI_Image* worldPointsBackground[MAX_PLAYERS];
 };

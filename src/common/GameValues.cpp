@@ -13,6 +13,7 @@
 #include <toml.hpp>
 #include <stdio.h>
 #include <stdexcept>
+#include <filesystem>
 
 // TODO: Refactor externs
 
@@ -33,10 +34,14 @@ extern int joystickcount;
 
 
 //[Keyboard/Joystick][Game/Menu][NumPlayers][NumKeys]  left, right, jump, down, turbo, powerup, start, cancel
-SDL_Keycode controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RCTRL, SDLK_RSHIFT, SDLK_RETURN, SDLK_ESCAPE},
+//Players 5-8 have no default keyboard keys (SDLK_UNKNOWN); they are expected to use gamepads.
+#define SMW_DEFAULT_JOY_GAME_KEYS {JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_STICK_1_DOWN, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3, JOY_BUTTON_START + 4}
+#define SMW_DEFAULT_JOY_MENU_KEYS {JOY_STICK_1_UP, JOY_STICK_1_DOWN, JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3}
+SDL_Keycode controlkeys[2][2][MAX_PLAYERS][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RCTRL, SDLK_RSHIFT, SDLK_RETURN, SDLK_ESCAPE},
             {SDLK_A, SDLK_D, SDLK_W, SDLK_S, SDLK_E, SDLK_Q, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_G, SDLK_J, SDLK_Y, SDLK_H, SDLK_U, SDLK_T, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_L, SDLK_APOSTROPHE, SDLK_P, SDLK_SEMICOLON, SDLK_LEFTBRACKET, SDLK_O, SDLK_UNKNOWN, SDLK_UNKNOWN}
+            // remaining players: SDLK_UNKNOWN
         },
 
         //up, down, left, right, select, cancel, random, fast scroll
@@ -44,23 +49,23 @@ SDL_Keycode controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_
             {SDLK_W, SDLK_S, SDLK_A, SDLK_D, SDLK_E, SDLK_Q, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_Y, SDLK_H, SDLK_G, SDLK_J, SDLK_U, SDLK_T, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_P, SDLK_SEMICOLON, SDLK_L, SDLK_APOSTROPHE, SDLK_LEFTBRACKET, SDLK_O, SDLK_UNKNOWN, SDLK_UNKNOWN}
+            // remaining players: SDLK_UNKNOWN
         }
     },
     //left, right, jump, down, turbo, powerup, start, cancel;
-    { { {JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_STICK_1_DOWN, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3, JOY_BUTTON_START + 4},
-            {JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_STICK_1_DOWN, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3, JOY_BUTTON_START + 4},
-            {JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_STICK_1_DOWN, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3, JOY_BUTTON_START + 4},
-            {JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_STICK_1_DOWN, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3, JOY_BUTTON_START + 4}
+    { { SMW_DEFAULT_JOY_GAME_KEYS, SMW_DEFAULT_JOY_GAME_KEYS, SMW_DEFAULT_JOY_GAME_KEYS, SMW_DEFAULT_JOY_GAME_KEYS,
+        SMW_DEFAULT_JOY_GAME_KEYS, SMW_DEFAULT_JOY_GAME_KEYS, SMW_DEFAULT_JOY_GAME_KEYS, SMW_DEFAULT_JOY_GAME_KEYS
         },
 
         //up, down, left, right, select, cancel, random, fast scroll
-        {   {JOY_STICK_1_UP, JOY_STICK_1_DOWN, JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3},
-            {JOY_STICK_1_UP, JOY_STICK_1_DOWN, JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3},
-            {JOY_STICK_1_UP, JOY_STICK_1_DOWN, JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3},
-            {JOY_STICK_1_UP, JOY_STICK_1_DOWN, JOY_STICK_1_LEFT, JOY_STICK_1_RIGHT, JOY_BUTTON_START, JOY_BUTTON_START + 1, JOY_BUTTON_START + 2, JOY_BUTTON_START + 3}
+        { SMW_DEFAULT_JOY_MENU_KEYS, SMW_DEFAULT_JOY_MENU_KEYS, SMW_DEFAULT_JOY_MENU_KEYS, SMW_DEFAULT_JOY_MENU_KEYS,
+          SMW_DEFAULT_JOY_MENU_KEYS, SMW_DEFAULT_JOY_MENU_KEYS, SMW_DEFAULT_JOY_MENU_KEYS, SMW_DEFAULT_JOY_MENU_KEYS
         }
     }
 };
+#undef SMW_DEFAULT_JOY_GAME_KEYS
+#undef SMW_DEFAULT_JOY_MENU_KEYS
+static_assert(MAX_PLAYERS == 8, "Update the default joystick controls above");
 
 namespace {
 /*
@@ -236,7 +241,7 @@ void CGameValues::init()
     //networkhost   = false;
     //gamehost      = false;
 
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         storedpowerups[iPlayer] = -1;
         gamepowerups[iPlayer] = -1;
         teamids[iPlayer][0] = iPlayer;
@@ -282,24 +287,16 @@ void CGameValues::resetGameplaySettings()
 void CGameValues::resetSecretCounters()
 {
     //Reset Secret Counters
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++)
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         unlocksecret1part1[iPlayer] = false;
+        unlocksecret3part1[iPlayer] = 0;
+        unlocksecret3part2[iPlayer] = 0;
+        unlocksecretunlocked[iPlayer] = false;
+    }
 
     unlocksecret1part2 = 0;
     unlocksecret2part1 = false;
     unlocksecret2part2 = 0;
-    unlocksecret3part1[0] = 0;
-    unlocksecret3part1[1] = 0;
-    unlocksecret3part1[2] = 0;
-    unlocksecret3part1[3] = 0;
-    unlocksecret3part2[0] = 0;
-    unlocksecret3part2[1] = 0;
-    unlocksecret3part2[2] = 0;
-    unlocksecret3part2[3] = 0;
-    unlocksecretunlocked[0] = false;
-    unlocksecretunlocked[1] = false;
-    unlocksecretunlocked[2] = false;
-    unlocksecretunlocked[3] = false;
 }
 
 void CGameConfig::ReadConfig()
@@ -415,9 +412,10 @@ void CGameConfig::ReadBinaryConfig() {
         // FIXME: See WriteConfig
         //fread_or_exception(&teamcounts, sizeof(short), 4, fp);
         //fread_or_exception(&teamids, sizeof(short), 12, fp);
-        options.read_raw(&skinids, sizeof(short) * 4);
-        options.read_raw(&randomskin, sizeof(bool) * 4);
-        options.read_raw(&playercontrol, sizeof(short) * 4);
+        // The legacy binary format only knows about the first 4 players
+        options.read_raw(&skinids, sizeof(short) * LEGACY_MAX_PLAYERS);
+        options.read_raw(&randomskin, sizeof(bool) * LEGACY_MAX_PLAYERS);
+        options.read_raw(&playercontrol, sizeof(short) * LEGACY_MAX_PLAYERS);
 
         //Load skin/team settings
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
@@ -457,10 +455,16 @@ void CGameConfig::ReadInputConfig() {
         //TODO: Need to test what happens when you unplug some controllers from the xbox
         //and then start up (device index will probably point to a gamepad that isn't in the list)
         //and this will cause a crash
-        controls.read_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
+        // Older versions stored the controls of 4 players only;
+        // detect them by the file size and keep the defaults for the rest
+        constexpr size_t legacySize = sizeof(CInputPlayerControl) * 2 * LEGACY_MAX_PLAYERS + sizeof(int16_t) * LEGACY_MAX_PLAYERS;
+        const bool isLegacy = std::filesystem::file_size(controls_path) == legacySize;
+        const short storedPlayers = isLegacy ? LEGACY_MAX_PLAYERS : MAX_PLAYERS;
+
+        controls.read_raw(inputConfiguration, sizeof(CInputPlayerControl) * 2 * storedPlayers);
 
         //setup player input controls for game
-        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < storedPlayers; iPlayer++) {
             short iDevice = controls.read_i16();
 
             if (iDevice >= joystickcount)
@@ -484,7 +488,7 @@ void CGameConfig::WriteInputConfig() const {
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);
 
-        controls.write_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
+        controls.write_raw(inputConfiguration, sizeof(CInputPlayerControl) * 2 * MAX_PLAYERS);
 
         for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++)
             controls.write_i16(playerInput.inputControls[iPlayer]->iDevice);

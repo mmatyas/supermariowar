@@ -5,6 +5,7 @@
 #include "GameValues.h"
 #include "TilesetManager.h"
 #include "path.h"
+#include "ScoreboardLayout.h"
 #include "gfx/Color.h"
 
 #include <iostream>
@@ -20,6 +21,73 @@ extern SoundsList *soundpacklist;
 extern CTilesetManager  *g_tilesetmanager;
 
 extern CGameValues game_values;
+
+namespace {
+/// The graphics packs contain scoreboard shades for teams of 1-3 players.
+/// This builds the shade of a larger team, from the parts of the 3 player version.
+gfxSprite composeWideShade(const fs::path& shade3Path, short teamSize)
+{
+    const gfxSprite base = ImageLoader(shade3Path).withoutOptimization().create();
+    SDL_Surface* src = base.getSurface();
+
+    // Parts of the original image (see shade3.png)
+    constexpr int TOP_H = 24;         // top bar, behind the player icons and score
+    constexpr int BLOCK_Y = 24;       // area below the player icons, and the powerup slots
+    constexpr int BLOCK_H = 20;
+    constexpr int BOTTOM_Y = 44;      // bottom bar, for the hearts/cards/coins of some modes
+    constexpr int BOTTOM_W = 90;
+    constexpr int CAP_W = 8;          // rounded ends of the top bar
+    constexpr int SLOT_SRC_X = 104;   // first powerup slot
+    constexpr int SLOT_W = 18;
+    constexpr int BLOCK_END_SRC_X = 90; // rounded end of the block below the players (ends at SLOT_SRC_X)
+    constexpr int ORIG_TEAM_SIZE = 3;
+
+    const int srcW = src->w;
+    const int srcH = src->h;
+    const int width = scoreboard::boxWidth(teamSize);
+    const int blockEnd = 2 + 34 * teamSize;
+
+    auto out = SdlSurfacePtr(SDL_CreateSurface(width, srcH, src->format));
+    if (!out || srcW < SLOT_SRC_X + ORIG_TEAM_SIZE * SLOT_W || srcH < BOTTOM_Y)
+        return ImageLoader(shade3Path).withAlpha(64).create();  // unexpected image, use the original
+
+    const Uint32 key = SDL_MapSurfaceRGB(out.get(), colors::MAGENTA.r, colors::MAGENTA.g, colors::MAGENTA.b);
+    SDL_FillSurfaceRect(out.get(), nullptr, key);
+    SDL_SetSurfaceBlendMode(src, SDL_BLENDMODE_NONE);
+
+    auto copy = [&](int sx, int sy, int w, int h, int dx, int dy) {
+        SDL_Rect srcRect {sx, sy, w, h};
+        SDL_Rect dstRect {dx, dy, w, h};
+        SDL_BlitSurface(src, &srcRect, out.get(), &dstRect);
+    };
+    auto stretch = [&](int sx, int sy, int h, int dxFrom, int dxTo) {
+        for (int dx = dxFrom; dx < dxTo; dx++)
+            copy(sx, sy, 1, h, dx, sy);
+    };
+
+    // Top bar
+    copy(0, 0, CAP_W, TOP_H, 0, 0);
+    stretch(srcW / 2, 0, TOP_H, CAP_W, width - CAP_W);
+    copy(srcW - CAP_W, 0, CAP_W, TOP_H, width - CAP_W, 0);
+
+    // Block below the players
+    copy(0, BLOCK_Y, 36, BLOCK_H, 0, BLOCK_Y);
+    stretch(50, BLOCK_Y, BLOCK_H, 36, blockEnd - (SLOT_SRC_X - BLOCK_END_SRC_X));
+    copy(BLOCK_END_SRC_X, BLOCK_Y, SLOT_SRC_X - BLOCK_END_SRC_X, BLOCK_H, blockEnd - (SLOT_SRC_X - BLOCK_END_SRC_X), BLOCK_Y);
+
+    // Powerup slots
+    for (short slot = 0; slot < teamSize; slot++)
+        copy(SLOT_SRC_X, BLOCK_Y, SLOT_W, BLOCK_H, blockEnd + slot * SLOT_W, BLOCK_Y);
+
+    // Bottom bar
+    copy(srcW - BOTTOM_W, BOTTOM_Y, BOTTOM_W, srcH - BOTTOM_Y, width - BOTTOM_W, BOTTOM_Y);
+
+    SDL_SetSurfaceColorKey(out.get(), true, key);
+    SDL_SetSurfaceBlendMode(out.get(), SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceAlphaMod(out.get(), 64);
+    return gfxSprite(std::move(out), std::nullopt);
+}
+} // namespace
 
 
 bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
@@ -137,7 +205,7 @@ void CResourceManager::loadAllSprites() {
     spr_iceblock = builder("gfx/packs/eyecandy/iceblock.png").withWrapping().create();
 
     spr_tanooki = builder("gfx/packs/powerups/tanooki.png").withWrapping().create();
-    spr_statue = builder("gfx/packs/projectiles/statue.png").withWrapping().create();
+    spr_statue = builder("gfx/packs/projectiles/statue.png").withTeamBands({teamcolors::Axis::Horizontal, 0, 32}).withWrapping().create();
     spr_starpowerup = builder("gfx/packs/powerups/starpowerup.png").withWrapping().create();
     spr_1uppowerup = builder("gfx/packs/powerups/1uppowerup.png").withWrapping().create();
     spr_2uppowerup = builder("gfx/packs/powerups/2uppowerup.png").withWrapping().create();
@@ -172,6 +240,8 @@ void CResourceManager::loadAllSprites() {
     spr_shade[0] = builder("gfx/packs/eyecandy/shade1.png").withAlpha(64).create();
     spr_shade[1] = builder("gfx/packs/eyecandy/shade2.png").withAlpha(64).create();
     spr_shade[2] = builder("gfx/packs/eyecandy/shade3.png").withAlpha(64).create();
+    for (short teamSize = 4; teamSize <= MAX_TEAM_SIZE; teamSize++)
+        spr_shade[teamSize - 1] = composeWideShade(convertPath("gfx/packs/eyecandy/shade3.png", graphicspack), teamSize);
     spr_scorehearts = builder("gfx/packs/menu/score_hearts.png").create();
     spr_scorecards = builder("gfx/packs/menu/score_cards.png").create();
     spr_scorecoins = builder("gfx/packs/menu/score_coins.png").create();
@@ -191,21 +261,21 @@ void CResourceManager::loadAllSprites() {
     spr_shellbounce = builder("gfx/packs/eyecandy/shellbounce.png").withWrapping().create();
     spr_superstomp = builder("gfx/packs/eyecandy/supersmash.png").withWrapping().create();
 
-    spr_egg = builder("gfx/packs/modeobjects/egg.png").withWrapping().create();
-    spr_eggnumbers = builder("gfx/packs/modeobjects/eggnumbers.png").withWrapping().create();
-    spr_star = builder("gfx/packs/modeobjects/star.png").withWrapping().create();
-    spr_flags = builder("gfx/packs/modeobjects/flags.png").withWrapping().create();
+    spr_egg = builder("gfx/packs/modeobjects/egg.png").withTeamBands({teamcolors::Axis::Vertical, 0, 32}).withWrapping().create();
+    spr_eggnumbers = builder("gfx/packs/modeobjects/eggnumbers.png").withTeamBands({teamcolors::Axis::Vertical, 0, 32}).withWrapping().create();
+    spr_star = builder("gfx/packs/modeobjects/star.png").withTeamBands({teamcolors::Axis::Vertical, 64, 32}).withWrapping().create();
+    spr_flags = builder("gfx/packs/modeobjects/flags.png").withTeamBands({teamcolors::Axis::Vertical, 0, 64}).withWrapping().create();
     spr_frenzycards = builder("gfx/packs/modeobjects/frenzycards.png").withWrapping().create();
     spr_collectcards = builder("gfx/packs/modeobjects/collectcards.png").withWrapping().create();
 
     spr_yoshi = builder("gfx/packs/modeobjects/yoshi.png").withWrapping().create();
-    spr_coin = builder("gfx/packs/modeobjects/coin.png").withWrapping().create();
+    spr_coin = builder("gfx/packs/modeobjects/coin.png").withTeamBands({teamcolors::Axis::Vertical, 0, 32}).withWrapping().create();
     spr_thwomp = builder("gfx/packs/modeobjects/thwomp.png").withWrapping().create();
-    spr_podobo = builder("gfx/packs/modeobjects/podobo.png").create();
+    spr_podobo = builder("gfx/packs/modeobjects/podobo.png").withTeamBands({teamcolors::Axis::Vertical, 64, 64}).create();
     spr_bowserfire = builder("gfx/packs/modeobjects/bowserfire.png").create();
-    spr_areas = builder("gfx/packs/modeobjects/areas.png").create();
-    spr_kingofthehillarea = builder("gfx/packs/modeobjects/kingofthehill.png").withAlpha(128).create();
-    spr_jail = builder("gfx/packs/modeobjects/jail.png").withAlpha(160).withWrapping().create();
+    spr_areas = builder("gfx/packs/modeobjects/areas.png").withTeamBands({teamcolors::Axis::Horizontal, 32, 32}).create();
+    spr_kingofthehillarea = builder("gfx/packs/modeobjects/kingofthehill.png").withTeamBands({teamcolors::Axis::Horizontal, 96, 96}).withAlpha(128).create();
+    spr_jail = builder("gfx/packs/modeobjects/jail.png").withTeamBands({teamcolors::Axis::Horizontal, 44, 44}).withAlpha(160).withWrapping().create();
     spr_goomba = builder("gfx/packs/modeobjects/goomba.png").withWrapping().create();
     spr_goombadead = builder("gfx/packs/eyecandy/goombadead.png").withWrapping().create();
     spr_goombadeadflying = builder("gfx/packs/eyecandy/goombadeadflying.png").withWrapping().create();
@@ -222,8 +292,8 @@ void CResourceManager::loadAllSprites() {
     spr_sledgebrothers = builder("gfx/packs/modeobjects/sledgebrothers.png").withWrapping().create();
     spr_sledgebrothersdead = builder("gfx/packs/eyecandy/sledgebrothersdead.png").withWrapping().create();
 
-    spr_bulletbill = builder("gfx/packs/projectiles/bulletbill.png").create();
-    spr_bulletbilldead = builder("gfx/packs/eyecandy/bulletbilldead.png").create();
+    spr_bulletbill = builder("gfx/packs/projectiles/bulletbill.png").withTeamBands({teamcolors::Axis::Vertical, 0, 64}).create();
+    spr_bulletbilldead = builder("gfx/packs/eyecandy/bulletbilldead.png").withTeamBands({teamcolors::Axis::Vertical, 0, 32}).create();
     spr_chicken = builder("gfx/packs/modeobjects/chicken.png").withAlpha(160).withWrapping().create();
     spr_racegoal = builder("gfx/packs/modeobjects/racegoal.png").create();
     spr_pipegamebonus = builder("gfx/packs/modeobjects/pipeminigamebonuses.png").withWrapping().create();
@@ -234,17 +304,17 @@ void CResourceManager::loadAllSprites() {
     spr_bonuschest = builder("gfx/packs/modeobjects/bonuschest.png").withWrapping().create();
     spr_teleportstar = builder("gfx/packs/eyecandy/teleportstar.png").create();
 
-    spr_fireball = builder("gfx/packs/projectiles/fireball.png").withWrapping().create();
-    spr_hammer = builder("gfx/packs/projectiles/hammer.png").withWrapping().create();
-    spr_iceblast = builder("gfx/packs/projectiles/wandblast.png").withWrapping().create();
-    spr_boomerang = builder("gfx/packs/projectiles/boomerang.png").withWrapping().create();
+    spr_fireball = builder("gfx/packs/projectiles/fireball.png").withTeamBands({teamcolors::Axis::Vertical, 0, 36}).withWrapping().create();
+    spr_hammer = builder("gfx/packs/projectiles/hammer.png").withTeamBands({teamcolors::Axis::Vertical, 0, 28}).withWrapping().create();
+    spr_iceblast = builder("gfx/packs/projectiles/wandblast.png").withTeamBands({teamcolors::Axis::Vertical, 32, 32}).withWrapping().create();
+    spr_boomerang = builder("gfx/packs/projectiles/boomerang.png").withTeamBands({teamcolors::Axis::Vertical, 0, 64}).withWrapping().create();
     spr_shell = builder("gfx/packs/projectiles/shell.png").withWrapping().create();
     spr_shelldead = builder("gfx/packs/eyecandy/shelldead.png").withWrapping().create();
     spr_blueblock = builder("gfx/packs/projectiles/throwblock.png").withWrapping().create();
-    spr_bomb = builder("gfx/packs/projectiles/bomb.png").withWrapping().create();
+    spr_bomb = builder("gfx/packs/projectiles/bomb.png").withTeamBands({teamcolors::Axis::Vertical, 38, 38}).withWrapping().create();
 
-    spr_superfireball = builder("gfx/packs/modeobjects/superfire.png").withWrapping().create();
-    spr_sledgehammer = builder("gfx/packs/modeobjects/sledgehammer.png").withWrapping().create();
+    spr_superfireball = builder("gfx/packs/modeobjects/superfire.png").withTeamBands({teamcolors::Axis::Vertical, 64, 64}).withWrapping().create();
+    spr_sledgehammer = builder("gfx/packs/modeobjects/sledgehammer.png").withTeamBands({teamcolors::Axis::Vertical, 32, 32}).withWrapping().create();
 
     spr_hazard_fireball[0] = builder("gfx/packs/hazards/fireball.png").withWrapping().create();
     spr_hazard_fireball[1] = builder("gfx/packs/hazards/fireball_preview.png").withWrapping().create();
@@ -273,33 +343,33 @@ void CResourceManager::loadAllSprites() {
     spr_bobombsmoke = builder("gfx/packs/eyecandy/bobombsmoke.png").withAlpha(160).withWrapping().create();
     spr_explosion = builder("gfx/packs/eyecandy/explosion.png").withWrapping().create();
     spr_burnup = builder("gfx/packs/eyecandy/burnup.png").withAlpha(192).withWrapping().create();
-    spr_fireworks = builder("gfx/packs/eyecandy/fireworks.png").withWrapping().create();
+    spr_fireworks = builder("gfx/packs/eyecandy/fireworks.png").withTeamBands({teamcolors::Axis::Vertical, 0, 64}).withWrapping().create();
     spr_poof = builder("gfx/packs/eyecandy/poof.png").withWrapping().create();
 
-    spr_spawnsmoke = builder("gfx/packs/eyecandy/spawnsmoke.png").withAlpha(128).withWrapping().create();
-    spr_spawndoor = builder("gfx/packs/eyecandy/spawndoor.png").withWrapping().create();
+    spr_spawnsmoke = builder("gfx/packs/eyecandy/spawnsmoke.png").withTeamBands({teamcolors::Axis::Vertical, 0, 32}).withAlpha(128).withWrapping().create();
+    spr_spawndoor = builder("gfx/packs/eyecandy/spawndoor.png").withTeamBands({teamcolors::Axis::Vertical, 0, 32}).withWrapping().create();
 
-    spr_bonus = builder("gfx/packs/eyecandy/bonus.png").withWrapping().create();
-    spr_extralife = builder("gfx/packs/eyecandy/extralife.png").withWrapping().create();
+    spr_bonus = builder("gfx/packs/eyecandy/bonus.png").withTeamBands({teamcolors::Axis::Vertical, 0, 16}).withWrapping().create();
+    spr_extralife = builder("gfx/packs/eyecandy/extralife.png").withTeamBands({teamcolors::Axis::Horizontal, 0, 38}).withWrapping().create();
 
     spr_windmeter = builder("gfx/packs/eyecandy/wind_meter.png").withAlpha(192).withWrapping().create();
     spr_overlayhole = builder("gfx/packs/eyecandy/overlayholes.png").withColorKey(RGB {0, 255, 0}).withWrapping().create();
 
     spr_award = builder("gfx/packs/awards/killsinrow.png").withAlpha(128).withWrapping().create();
     spr_awardsolid = builder("gfx/packs/awards/killsinrow.png").withWrapping().create();
-    spr_awardsouls = builder("gfx/packs/awards/souls.png").withWrapping().create();
+    spr_awardsouls = builder("gfx/packs/awards/souls.png").withTeamBands({.axis = teamcolors::Axis::Horizontal, .offset = 0, .size = 16, .insertAt = teamcolors::BandLayout::AT_END}).withWrapping().create();
     spr_awardsoulspawn = builder("gfx/packs/awards/soulspawn.png").withWrapping().create();
 
-    spr_awardkillsinrow = builder("gfx/packs/awards/killsinrownumbers.png").withWrapping().create();
+    spr_awardkillsinrow = builder("gfx/packs/awards/killsinrownumbers.png").withTeamBands({teamcolors::Axis::Vertical, 0, 16}).withWrapping().create();
 
-    spr_flagbases = builder("gfx/packs/modeobjects/flagbases.png").withAlpha(160).withWrapping().create();
-    spr_ownedtags = builder("gfx/packs/modeobjects/ownedtags.png").withAlpha(160).withWrapping().create();
+    spr_flagbases = builder("gfx/packs/modeobjects/flagbases.png").withTeamBands({teamcolors::Axis::Horizontal, 0, 48}).withAlpha(160).withWrapping().create();
+    spr_ownedtags = builder("gfx/packs/modeobjects/ownedtags.png").withTeamBands({teamcolors::Axis::Horizontal, 0, 48}).withAlpha(160).withWrapping().create();
 
     spr_storedpowerupsmall = builder("gfx/packs/powerups/small.png").withWrapping().create();
     spr_storedpoweruplarge = builder("gfx/packs/powerups/large.png").create();
     spr_powerupselector = builder("gfx/packs/awards/award.png").create();
 
-    spr_abovearrows = builder("gfx/packs/eyecandy/abovearrows.png").withWrapping().create();
+    spr_abovearrows = builder("gfx/packs/eyecandy/abovearrows.png").withTeamBands({teamcolors::Axis::Horizontal, 0, 32}).withWrapping().create();
 }
 
 void CResourceManager::loadMenuGraphics()
@@ -328,21 +398,21 @@ void CResourceManager::loadMenuGraphics()
     spr_dialogbutton = builder("gfx/packs/menu/dialog_button.png").create();
     spr_tournament_background = builder("gfx/packs/menu/tournament_background.png").create();
     spr_tournament_powerup_splash = builder("gfx/packs/menu/tournament_powerup_splash.png").create();
-    spr_player_select_background = builder("gfx/packs/menu/player_select_background.png").create();
+    spr_player_select_background = builder("gfx/packs/menu/player_select_background.png").withTeamBands({teamcolors::Axis::Horizontal, 14, 96}).create();
     spr_player_select_ready = builder("gfx/packs/menu/player_select_ready.png").create();
     //spr_ipfield = builder("gfx/packs/menu/menu_ipfield.png").create();
     spr_selectfield = builder("gfx/packs/menu/menu_selectfield.png").create();
     spr_selectfielddisabled = builder("gfx/packs/menu/menu_selectfield_disabled.png").create();
     spr_map_filter_icons = builder("gfx/packs/menu/menu_map_flags.png").create();
     spr_tour_markers = builder("gfx/packs/menu/tour_markers.png").create();
-    spr_menu_boxed_numbers = builder("gfx/packs/menu/menu_boxed_numbers.png").create();
+    spr_menu_boxed_numbers = builder("gfx/packs/menu/menu_boxed_numbers.png").withTeamBands({teamcolors::Axis::Vertical, 0, 16}).create();
     spr_countdown_numbers = builder("gfx/packs/menu/game_countdown_numbers.png").create();
     spr_thumbnail_warps[0] = builder("gfx/packs/menu/menu_warp_preview.png").create();
     spr_thumbnail_warps[1] = builder("gfx/packs/menu/menu_warp_thumbnail.png").create();
     spr_thumbnail_mapitems[0] = builder("gfx/packs/menu/menu_mapitems_preview.png").create();
     spr_thumbnail_mapitems[1] = builder("gfx/packs/menu/menu_mapitems_thumbnail.png").create();
 
-    spr_announcementicons = builder("gfx/packs/menu/menu_announcement_icons.png").create();
+    spr_announcementicons = builder("gfx/packs/menu/menu_announcement_icons.png").withTeamBands({teamcolors::Axis::Horizontal, 0, 32}).create();
 
     spr_platformstarttile = builder("gfx/leveleditor/leveleditor_platformstarttile.png").withAlpha(64).withWrapping().create();
     spr_platformendtile = builder("gfx/leveleditor/leveleditor_selectedtile.png").withAlpha(64).withWrapping().create();
@@ -362,8 +432,12 @@ void CResourceManager::loadWorldGraphics()
     spr_worldforeground[0] = builder("gfx/packs/world/world_foreground.png").create();
     spr_worldforeground[1] = builder("gfx/packs/world/preview/world_foreground.png").create();
 
-    spr_worldforegroundspecial[0] = builder("gfx/packs/world/world_foreground_special.png").create();
-    spr_worldforegroundspecial[1] = builder("gfx/packs/world/preview/world_foreground_special.png").create();
+    // The tiles of completed stages (one per team color) are in the 5th row, starting at the 10th column
+    const auto completedStageTiles = [](int tileSize) {
+        return teamcolors::BandLayout {teamcolors::Axis::Horizontal, 10 * tileSize, tileSize, 5 * tileSize, tileSize};
+    };
+    spr_worldforegroundspecial[0] = builder("gfx/packs/world/world_foreground_special.png").withTeamBands(completedStageTiles(32)).create();
+    spr_worldforegroundspecial[1] = builder("gfx/packs/world/preview/world_foreground_special.png").withTeamBands(completedStageTiles(16)).create();
 
     spr_worldpaths[0] = builder("gfx/packs/world/world_paths.png").create();
     spr_worldpaths[1] = builder("gfx/packs/world/preview/world_paths.png").create();
@@ -372,7 +446,11 @@ void CResourceManager::loadWorldGraphics()
     spr_worldvehicle[1] = builder("gfx/packs/world/preview/world_vehicles.png").create();
 
     spr_worlditems = builder("gfx/packs/world/world_powerups.png").create();
-    spr_worlditempopup = builder("gfx/packs/world/world_item_popup.png").create();
+    // The colored inventory bars are below each other, followed by a row of the colored item selection boxes
+    spr_worlditempopup = builder("gfx/packs/world/world_item_popup.png")
+        .withTeamBands({teamcolors::Axis::Vertical, 0, 64})
+        .withTeamBands({teamcolors::Axis::Horizontal, 0, 48, 64 * MAX_PLAYERS, 48})
+        .create();
     spr_worlditemssmall = builder("gfx/packs/world/world_powerupssmall.png").create();
     spr_worlditemsplace = builder("gfx/packs/world/world_bonusplace.png").create();
     spr_worldbonushouse = builder("gfx/packs/world/world_bonushouse.png").create();

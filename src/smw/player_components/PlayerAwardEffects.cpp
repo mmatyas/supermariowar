@@ -11,6 +11,19 @@
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
+namespace {
+/// The souls of the generated team colors are at the end of the souls sprite sheet
+short soulIndexOfColor(short colorID)
+{
+    if (colorID < NUM_BASE_TEAM_COLORS)
+        return colorID;
+
+    constexpr short SOUL_SIZE = 16;
+    const short generatedStart = rm->spr_awardsouls.getWidth() / SOUL_SIZE - (MAX_PLAYERS - NUM_BASE_TEAM_COLORS);
+    return generatedStart + colorID - NUM_BASE_TEAM_COLORS;
+}
+} // namespace
+
 extern CEyecandyContainer eyecandy[3];
 
 struct STextAward {
@@ -202,7 +215,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, KillSt
             killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = (short)style;
         else if (game_values.awardstyle == AwardStyle::Souls) {
             if (killed)
-                killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = killed->getColorID();
+                killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = soulIndexOfColor(killed->getColorID());
             else if (style == KillStyle::Goomba)
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = 4; //soul id for goomba
             else if (style == KillStyle::BulletBill)

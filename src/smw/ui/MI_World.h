@@ -28,6 +28,7 @@ public:
     }
 
 private:
+    short GetPopupPitch() const;
     MenuCodeEnum InitGame(short iStage, short iPlayer, bool fNeedAiControl);
 
     void RestartDrawCycleIfNeeded();
@@ -41,18 +42,18 @@ private:
     void UseCloud(bool fUseCloud);
 
     short iState = 0;
-    short iStateTransition[4];
-    short iItemPopupDrawY[4];
-    short iPopupOffsets[4];
-    short iPopupOffsetsCurrent[4];
-    short iPopupOrder[4];
+    short iStateTransition[MAX_PLAYERS];
+    short iItemPopupDrawY[MAX_PLAYERS];
+    short iPopupOffsets[MAX_PLAYERS];
+    short iPopupOffsetsCurrent[MAX_PLAYERS];
+    short iPopupOrder[MAX_PLAYERS];
     short iNumPopups = 0;
     short iStoredItemPopupDrawY = 0;
 
-    bool iPopupFlag[4];
+    bool iPopupFlag[MAX_PLAYERS];
 
-    short iItemCol[4];
-    short iItemPage[4];
+    short iItemCol[MAX_PLAYERS];
+    short iItemPage[MAX_PLAYERS];
 
     std::array<gfxSprite, 2> map_sprites;
     SDL_Rect rectSrcSurface;

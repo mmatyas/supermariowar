@@ -35,7 +35,7 @@ OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite* nspr)
     objectType = object_kingofthehill_area;
     state = 1;
 
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         playersTouching[iPlayer] = NULL;
         playersTouchingCount[iPlayer] = 0;
     }
@@ -85,7 +85,7 @@ void OMO_KingOfTheHillZone::update()
     short iMax = 0;
     short iMaxTeam = -1;
 
-    for (short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < MAX_PLAYERS; iTeam++) {
         if (playersTouchingCount[iTeam] > iMax) {
             iMax = playersTouchingCount[iTeam];
             iMaxTeam = iTeam;
@@ -129,7 +129,7 @@ void OMO_KingOfTheHillZone::update()
         }
     }
 
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         playersTouching[iPlayer] = NULL;
         playersTouchingCount[iPlayer] = 0;
     }

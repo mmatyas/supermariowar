@@ -101,6 +101,10 @@ void MI_Image::Draw()
             ih + (iPulseValue << 1),
         };
         spr->drawStretch(srcRect, blitdest, dstRect);
+    } else if (iHiddenRowsCount > 0) {
+        const short iBottomRows = ih - iHiddenRowsFrom - iHiddenRowsCount;
+        spr->draw(m_pos.x + iXOffset, m_pos.y + iYOffset, {iXFrame, iYFrame, iw, iHiddenRowsFrom});
+        spr->draw(m_pos.x + iXOffset, m_pos.y + iYOffset + iHiddenRowsFrom, {iXFrame, iYFrame + ih - iBottomRows, iw, iBottomRows});
     } else {
         spr->draw(m_pos.x + iXOffset, m_pos.y + iYOffset, srcRect);
     }

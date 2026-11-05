@@ -158,7 +158,7 @@ void MI_BonusWheel::Update()
 
                        //Reset all player's stored item
                 if (!game_values.keeppowerup) {
-                    for (short iPlayer = 0; iPlayer < 4; iPlayer++)
+                    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++)
                         game_values.storedpowerups[iPlayer] = -1;
                 }
 

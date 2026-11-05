@@ -89,7 +89,7 @@ short			y_shake = 0;
 //------ game relevant stuff ------
 std::vector<CPlayer*> players;
 
-CScore			*score[4];
+CScore			*score[MAX_PLAYERS];
 
 short			score_cnt;
 
@@ -201,7 +201,7 @@ void create_globals()
     gamegraphicspacklist->setCurrentIndex(0);
     soundpacklist->setCurrentIndex(0);
 
-    players.reserve(4);
+    players.reserve(MAX_PLAYERS);
 
     try {
         UpdateMusicWithOverrides(*musiclist, *worldmusiclist);
@@ -372,7 +372,7 @@ void main_game()
 
     printf("\n---------------- loading ----------------\n");
 
-    for (short iScore = 0; iScore < 4; iScore++)
+    for (short iScore = 0; iScore < MAX_PLAYERS; iScore++)
         score[iScore] = new CScore(iScore);
 
     game_values.init();

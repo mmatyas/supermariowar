@@ -27,6 +27,12 @@ public:
         iXFrame = srcx;
         iYFrame = srcy;
     }
+    /// Skips `count` rows of the image starting at row `from` when drawing,
+    /// making the image shorter (eg. to fit more rows on the screen).
+    void SetHiddenRows(short from, short count) {
+        iHiddenRowsFrom = from;
+        iHiddenRowsCount = count;
+    }
     void SetImageSource(gfxSprite * nspr) {
         spr = nspr;
     }
@@ -73,6 +79,8 @@ private:
     short iTimer = 0;
     short iXFrame = 0;
     short iYFrame = 0;
+    short iHiddenRowsFrom = 0;
+    short iHiddenRowsCount = 0;
 
     bool fPulse = false;
     short iPulseValue = 0;

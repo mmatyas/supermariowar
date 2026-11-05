@@ -19,9 +19,25 @@ extern CResourceManager* rm;
 //------------------------------------------------------------------------------
 // class race goal (for Race mode)
 //------------------------------------------------------------------------------
+namespace {
 short flagpositions[3][4][2] = { { { 18, 20 }, { 34, 20 }, { 0, 0 }, { 0, 0 } },
     { { 18, 20 }, { 34, 20 }, { 26, 36 }, { 0, 0 } },
     { { 18, 20 }, { 34, 20 }, { 18, 36 }, { 34, 36 } } };
+
+/// Position of the team flag on the goal
+Vec2s flagPosition(short teamCount, short team)
+{
+    if (teamCount <= 4)
+        return {flagpositions[teamCount - 2][team][0], flagpositions[teamCount - 2][team][1]};
+
+    // More than 4 teams: two rows of (up to) 4 flags
+    const short perRow = (teamCount + 1) / 2;
+    const short row = team / perRow;
+    const short col = team % perRow;
+    const short rowCount = row == 0 ? perRow : teamCount - perRow;
+    return {static_cast<short>(34 - rowCount * 8 + col * 16), static_cast<short>(20 + row * 16)};
+}
+} // namespace
 
 OMO_RaceGoal::OMO_RaceGoal(gfxSprite* nspr, short id)
     : IO_OverMapObject(nspr, Vec2s::zero(), 2, 8)
@@ -37,7 +53,7 @@ OMO_RaceGoal::OMO_RaceGoal(gfxSprite* nspr, short id)
     objectType = object_race_goal;
     state = 1;
 
-    for (short k = 0; k < 4; k++)
+    for (short k = 0; k < MAX_PLAYERS; k++)
         tagged[k] = -1;
 
     angle = (float)(RANDOM_INT(1000) * 0.00628f);
@@ -82,8 +98,10 @@ void OMO_RaceGoal::draw()
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, {drawframe, 0, iw, ih});
 
         for (short k = 0; k < score_cnt; k++) {
-            if (tagged[k] > -1)
-                rm->spr_bonus.draw(ix - collisionOffsetX + flagpositions[score_cnt - 2][k][0], iy - collisionOffsetY + flagpositions[score_cnt - 2][k][1], {0, tagged[k] * 16, 16, 16});
+            if (tagged[k] > -1) {
+                const Vec2s flagPos = flagPosition(score_cnt, k);
+                rm->spr_bonus.draw(ix - collisionOffsetX + flagPos.x, iy - collisionOffsetY + flagPos.y, {0, tagged[k] * 16, 16, 16});
+            }
         }
     }
 

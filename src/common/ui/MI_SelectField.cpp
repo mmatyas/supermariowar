@@ -120,7 +120,7 @@ MenuCodeEnum MI_SelectField<T>::Modify(bool modify)
 template<typename T>
 MenuCodeEnum MI_SelectField<T>::SendInput(CPlayerInput * playerInput)
 {
-    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         short iNumMoves = 1;
         if (m_fastScroll && playerInput->outputControls[iPlayer].menu_scrollfast.fDown)
             iNumMoves = 10;

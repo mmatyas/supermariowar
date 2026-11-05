@@ -29,6 +29,8 @@ add_library(CommonFiles STATIC
     gfx/gfxSDL.h
     gfx/gfxSprite.cpp
     gfx/gfxSprite.h
+    gfx/TeamColors.cpp
+    gfx/TeamColors.h
     global.cpp
     input.cpp
     input.h
@@ -57,6 +59,7 @@ add_library(CommonFiles STATIC
     RandomNumberGenerator.h
     ResourceManager.cpp
     ResourceManager.h
+    ScoreboardLayout.h
     sfx.cpp
     sfx.h
     TilesetManager.cpp

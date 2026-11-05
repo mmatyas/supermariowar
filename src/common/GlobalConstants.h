@@ -157,7 +157,17 @@
 #define NUMSURVIVALENEMIES  3
 #define NUMFRENZYCARDS      19
 
-#define MAX_PLAYERS 4
+// Maximum number of local players (and therefore teams, as every player can be on their own team)
+#define MAX_PLAYERS 8
+// A team always has at least one opponent, so a team can have at most this many members
+#define MAX_TEAM_SIZE (MAX_PLAYERS - 1)
+// Number of team colors that the original graphics packs provide;
+// the remaining (MAX_PLAYERS - NUM_BASE_TEAM_COLORS) are generated at load time
+#define NUM_BASE_TEAM_COLORS 4
+// Online play keeps using the original 4 player protocol
+#define NET_MAX_PLAYERS 4
+// Old (binary) config files store this many player entries
+#define LEGACY_MAX_PLAYERS 4
 
 
 #endif // GLOBALCONSTANTS_H

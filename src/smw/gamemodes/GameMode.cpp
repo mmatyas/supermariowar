@@ -1,6 +1,8 @@
 #include "GameMode.h"
 
 #include "eyecandy.h"
+#include "Game.h"
+#include "gfx/TeamColors.h"
 #include "GameValues.h"
 #include "net.h"
 #include "ObjectContainer.h"
@@ -8,10 +10,13 @@
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "Score.h"
+#include "ScoreboardLayout.h"
 #include "WorldTourStop.h"
 #include "objects/powerup/PU_TreasureChestBonus.h"
 
-extern CScore *score[4];
+#include <algorithm>
+
+extern CScore *score[MAX_PLAYERS];
 extern short score_cnt;
 
 extern CObjectContainer objectcontainer[3];
@@ -54,7 +59,7 @@ void SetupScoreBoard(bool fOrderMatters)
 {
     short i, j;
 
-    bool doneWithScore[4] = {false, false, false, false};
+    bool doneWithScore[MAX_PLAYERS] = {};
 
     short oldmax = -1;
     short max = -1;
@@ -121,9 +126,19 @@ void ShowScoreBoard()
     if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
         iScoreboardElementHeight = 63;
 
+    // With many teams, start higher and squeeze the rows so they fit on the screen
+    short iScoreboardStartY = 140;
+    if (iScoreboardStartY + score_cnt * iScoreboardElementHeight > 470) {
+        iScoreboardStartY = 115;
+        iScoreboardElementHeight = std::min<short>(iScoreboardElementHeight, (475 - iScoreboardStartY) / score_cnt);
+    }
+
     for (short i = 0; i < score_cnt; i++) {
-        score[i]->destx = 309 - 34 * game_values.teamcounts[i];
-        score[i]->desty = score[i]->displayorder * iScoreboardElementHeight + 140;
+        const short teamSize = game_values.teamcounts[i];
+        score[i]->destx = teamSize <= 3
+            ? 309 - 34 * teamSize
+            : (App::screenWidth - scoreboard::boxWidth(teamSize)) / 2;
+        score[i]->desty = score[i]->displayorder * iScoreboardElementHeight + iScoreboardStartY;
     }
 
     if (game_values.music) {
@@ -158,7 +173,7 @@ bool RemoveTeam(short teamid)
     //Announce that a team was removed
     if (game_values.deadteamnotice && game_values.flags.teamdeadcounter < score_cnt - 1) {
         eyecandy[2].emplace<EC_Announcement>(&rm->game_font_large, &rm->spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200);
-        rm->sfx_announcer[iAnnouncementColor + 16].play();
+        rm->sfx_announcer[teamcolors::baseColorOf(iAnnouncementColor) + 16].play();
     }
 
     return game_values.flags.teamdeadcounter == score_cnt - 1;
@@ -274,7 +289,7 @@ CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
 {
     size_t i, j;
     short count = 1;
-    short tiedplayers[4];
+    short tiedplayers[MAX_PLAYERS];
     tiedplayers[0] = 0;
 
     //Find the first non-dead player and use them for the first player to compare to
@@ -304,7 +319,7 @@ CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
 }
 
 //Returns number of players in list
-short CGameMode::GetScoreRankedPlayerList(CPlayer * outPlayers[4], bool fGetHighest)
+short CGameMode::GetScoreRankedPlayerList(CPlayer * outPlayers[MAX_PLAYERS], bool fGetHighest)
 {
     short iNumPlayersInList = 0;
 

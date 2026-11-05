@@ -7,7 +7,7 @@
 #include "Score.h"
 #include "objects/overmap/WO_Area.h"
 
-extern CScore *score[4];
+extern CScore *score[MAX_PLAYERS];
 extern short score_cnt;
 
 extern std::vector<CPlayer*> players;
@@ -40,7 +40,7 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
 
             //Apply rules for "Classic" jail
             if (game_values.gamemodesettings.jail.style == JailStyle::Classic) {
-                short jailedteams[4];
+                short jailedteams[MAX_PLAYERS] = {};
 
                 short i;
                 for (i = 0; i < score_cnt; i++)
@@ -91,7 +91,9 @@ PlayerKillType CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
             }
             //Apply rules for "Owned" jail
             else if (game_values.gamemodesettings.jail.style == JailStyle::Owned) {
-                short jailedteams[4] = {-1, -1, -1, -1};
+                short jailedteams[MAX_PLAYERS];
+                for (short& team : jailedteams)
+                    team = -1;
 
                 //Figure out which teams have been jailed
                 for (CPlayer* player : players) {

@@ -19,8 +19,11 @@ void MI_StoredPowerupResetButton::Draw()
 
     MI_Button::Draw();
 
-    for (short iPowerup = 0; iPowerup < 4; iPowerup++) {
-        rm->spr_selectfield.draw(m_pos.x + iWidth - 142 + iPowerup * 30, m_pos.y + 4, {188, 88, 24, 24});
-        rm->spr_storedpowerupsmall.draw(m_pos.x + iWidth - 138 + iPowerup * 30, m_pos.y + 8, {game_values.storedpowerups[iPowerup] * 16, 0, 16, 16});
+    // One slot per player, right aligned
+    constexpr short SLOT_SPACING = 26;
+    const short firstSlotX = m_pos.x + iWidth - 22 - MAX_PLAYERS * SLOT_SPACING;
+    for (short iPowerup = 0; iPowerup < MAX_PLAYERS; iPowerup++) {
+        rm->spr_selectfield.draw(firstSlotX + iPowerup * SLOT_SPACING, m_pos.y + 4, {188, 88, 24, 24});
+        rm->spr_storedpowerupsmall.draw(firstSlotX + 4 + iPowerup * SLOT_SPACING, m_pos.y + 8, {game_values.storedpowerups[iPowerup] * 16, 0, 16, 16});
     }
 }

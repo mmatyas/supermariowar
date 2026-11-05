@@ -87,7 +87,7 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
     }
     */
 
-    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if (playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
             if (MoveNext(playerInput->outputControls[iPlayer].menu_scrollfast.fDown))
                 return MENU_CODE_MAP_CHANGED;

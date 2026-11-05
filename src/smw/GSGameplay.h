@@ -32,12 +32,12 @@ class GameplayState : public GameState
         void drawScreenFade();
         void drawPlayerSwap();
         void drawScreenShakeBackground();
-        void drawScoreboard(short iScoreTextOffset[4]);
+        void drawScoreboard(short iScoreTextOffset[MAX_PLAYERS]);
         void drawWindMeter();
         void drawCountdown();
         void drawSpotlights();
         void drawOutOfScreenIndicators();
-        void drawEverything(short iCountDownState, short iScoreTextOffset[4]);
+        void drawEverything(short iCountDownState, short iScoreTextOffset[MAX_PLAYERS]);
         //.
         //..
         //...
@@ -50,16 +50,15 @@ class GameplayState : public GameState
         short iCountDownTimer;
         short iWindTimer;
         float dNextWind;
-        short iScoreTextOffset[4];
+        short iScoreTextOffset[MAX_PLAYERS];
 
-        short respawnCount[4];
-        short respawnanimationtimer[4];
-        short respawnanimationframe[4];
+        short respawnCount[MAX_PLAYERS];
+        short respawnanimationtimer[MAX_PLAYERS];
+        short respawnanimationframe[MAX_PLAYERS];
 
         COutputControl* current_playerKeys;
         COutputControl previous_playerKeys;
 
-        static short scoreoffsets[3];
         static short g_iPowerupToIcon[8];
 
         //Vars that keep track of spinning the screen

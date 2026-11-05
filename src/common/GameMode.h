@@ -4,6 +4,7 @@
 #define GAMEMODE_NUM_OPTIONS 21
 
 #include "GameModeType.h"
+#include "GlobalConstants.h"
 #include "PlayerKillStyles.h"
 #include "PlayerKillTypes.h"
 #include <string>
@@ -83,7 +84,7 @@ class CGameMode
 		void SetupModeStrings(const char * szMode, const char * szGoal, short iGoalSpacing);
 
 		CPlayer * GetHighestScorePlayer(bool fGetHighest);
-		short GetScoreRankedPlayerList(CPlayer * players[4], bool fGetHighest);
+		short GetScoreRankedPlayerList(CPlayer * players[MAX_PLAYERS], bool fGetHighest);
 
 		bool fReverseScoring;
 };

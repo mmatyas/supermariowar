@@ -64,6 +64,8 @@ std::pair<CGameConfig, config::Bridge> makePeculiar()
     bridge.player_slots[1] = PlayerSlot::Cpu;
     bridge.player_slots[2] = PlayerSlot::Cpu;
     bridge.player_slots[3] = PlayerSlot::Empty;
+    bridge.skins[7] = "luigi";
+    bridge.player_slots[7] = PlayerSlot::Cpu;
 
     // eyecandy
     config.spawnstyle = SpawnStyle::Swirl;
@@ -336,4 +338,43 @@ TEST_CASE("Applying a TOML document without chapters keeps the existing values")
 
     CHECK(restored.fireballttl == CGameConfig {}.fireballttl);
     CHECK(restored.gamemodemenusettings.chicken.usetarget == CGameConfig {}.gamemodemenusettings.chicken.usetarget);
+}
+
+TEST_CASE("Applying a TOML document with 4 players keeps the rest of the players")
+{
+    // Config files from before the player limit was raised only have 4 entries
+    const toml::value document = toml::parse_str(R"(
+        [players]
+        skins = ["toad", "", "fire", "kid"]
+        player_slots = ["human", "cpu", "cpu", "empty"]
+    )");
+
+    CGameConfig restored {};
+    config::Bridge restored_bridge {};
+    config::apply_config_document(restored, restored_bridge, document);
+
+    CHECK(restored_bridge.skins[0] == "toad");
+    CHECK(restored_bridge.skins[3] == "kid");
+    CHECK(restored_bridge.player_slots[0] == PlayerSlot::Human);
+    CHECK(restored_bridge.player_slots[2] == PlayerSlot::Cpu);
+    for (size_t player = 4; player < MAX_PLAYERS; player++) {
+        CHECK(restored_bridge.skins[player].empty());
+        CHECK(restored_bridge.player_slots[player] == PlayerSlot::Empty);
+    }
+}
+
+TEST_CASE("Applying a TOML document with a wrong number of players is rejected")
+{
+    const toml::value document = toml::parse_str(R"(
+        [players]
+        skins = ["toad", "peach", "kid", "fire", "luigi"]
+        player_slots = ["cpu", "cpu", "cpu", "cpu", "cpu", "cpu", "cpu", "cpu", "cpu"]
+    )");
+
+    CGameConfig restored {};
+    config::Bridge restored_bridge {};
+    config::apply_config_document(restored, restored_bridge, document);
+
+    CHECK(restored_bridge.skins == config::Bridge {}.skins);
+    CHECK(restored_bridge.player_slots == config::Bridge {}.player_slots);
 }

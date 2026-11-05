@@ -84,7 +84,7 @@ MenuCodeEnum MI_NetworkListScroll::Modify(bool modify)
 
 MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
 {
-    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         //Only allow the controlling team to control the menu (if there is one)
         if (iControllingTeam != -1) {
             if (iControllingTeam != LookupTeamID(iPlayer) || game_values.playercontrol[iPlayer] != 1)

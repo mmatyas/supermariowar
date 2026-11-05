@@ -1,6 +1,7 @@
 #ifndef UI_TEAM_SELECT_H
 #define UI_TEAM_SELECT_H
 
+#include "GlobalConstants.h"
 #include "uimenu.h"
 #include "uicontrol.h"
 
@@ -25,23 +26,29 @@ class MI_TeamSelect : public UI_Control
 	private:
 
 		void FindNewTeam(short iPlayerID, short iDirection);
+		/// Up to 4 players the original layout with 4 team slots is used;
+		/// if any of players 5-8 is playing, there are 8 team slots.
+		bool IsWideLayout() const;
+		short GetTeamSlotCount() const;
+		void SetPlayerColor(short iPlayerID, short iTeam);
+		void DrawBackground(bool fWide) const;
+		void DrawReadyPanel(short iPlayer, short x, short y, short w) const;
 
-		MI_Image * miImage;
 		gfxSprite * spr;
 
-		short iTeamIDs[4][3];
-		short iTeamCounts[4];
+		short iTeamIDs[MAX_PLAYERS][MAX_TEAM_SIZE];
+		short iTeamCounts[MAX_PLAYERS];
 		short iNumTeams;
 
 		short iAnimationTimer;
 		short iAnimationFrame;
 		short iRandomAnimationFrame;
 
-		bool fReady[4];
+		bool fReady[MAX_PLAYERS];
 		bool fAllReady;
 
-		short iFastScroll[4];
-		short iFastScrollTimer[4];
+		short iFastScroll[MAX_PLAYERS];
+		short iFastScrollTimer[MAX_PLAYERS];
 
 	friend class MenuState;
 };

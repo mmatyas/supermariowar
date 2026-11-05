@@ -51,7 +51,7 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 {
     const bool* keystate = SDL_GetKeyboardState(NULL);
 
-    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         // NOTE: copied from UI_Menu::SendInput
         // Only let player 1 on the keyboard control the menu
         if (iPlayer != 0

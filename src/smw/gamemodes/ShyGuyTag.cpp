@@ -6,7 +6,7 @@
 #include "ResourceManager.h"
 #include "Score.h"
 
-extern CScore *score[4];
+extern CScore *score[MAX_PLAYERS];
 extern short score_cnt;
 
 extern CEyecandyContainer eyecandy[3];
@@ -88,7 +88,7 @@ void CGM_ShyGuyTag::think()
             scorecounter = 0;
 
             CPlayer * pCheckWinner = NULL;
-            bool fAlreadyScored[4] = {false, false, false, false};
+            bool fAlreadyScored[MAX_PLAYERS] = {};
             for (CPlayer* player : players) {
                 if (!player->shyguy) {
                     short iTeam = player->getTeamID();

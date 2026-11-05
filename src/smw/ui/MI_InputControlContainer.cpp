@@ -271,7 +271,7 @@ void MI_InputControlField::SetKey(SDL_Keycode * iSetKey, SDL_Keycode key, short 
     bool fNeedSwap = false;
     short iSwapPlayer, iSwapKey;
 
-    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if (game_values.playerInput.inputControls[iPlayer]->iDevice != device)
             continue;
 
@@ -487,7 +487,7 @@ void MI_InputControlContainer::SetPlayer(short playerID)
     //Hide input options that other players are using
     miDeviceSelectField->hideAllItems(false);
 
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if (iPlayer == playerID)
             continue;
 

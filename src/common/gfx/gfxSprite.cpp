@@ -23,7 +23,8 @@ SdlSurfacePtr loadImage(
     const fs::path& path,
     bool optimize = true,
     std::optional<RGB> color_key = std::nullopt,
-    std::optional<Uint8> alpha = std::nullopt)
+    std::optional<Uint8> alpha = std::nullopt,
+    const std::vector<teamcolors::BandLayout>& team_bands = {})
 {
     const std::string path_str = path.generic_string();
 
@@ -41,6 +42,9 @@ SdlSurfacePtr loadImage(
     if (!raw) {
         throw std::format("Couldn't load {}: {}", path_str, SDL_GetError());
     }
+
+    for (const teamcolors::BandLayout& layout : team_bands)
+        raw = teamcolors::extendBands(raw.get(), layout);
 
     if (color_key) {
         const Uint32 key = SDL_MapSurfaceRGB(raw.get(), color_key->r, color_key->g, color_key->b);
@@ -194,5 +198,5 @@ void gfxSprite::setWrap(short wrapsize)
 
 gfxSprite ImageLoader::create() const
 {
-    return gfxSprite(loadImage(m_path, m_optimize, m_color_key, m_alpha), m_wrap_x);
+    return gfxSprite(loadImage(m_path, m_optimize, m_color_key, m_alpha, m_team_bands), m_wrap_x);
 }

@@ -91,7 +91,7 @@ void CO_Flag::update()
     if (centerflag) {
         if (animationtimer % 2 == 0) {
             animationOffsetY += 64;
-            if (animationOffsetY > 192)
+            if (animationOffsetY > (MAX_PLAYERS - 1) * 64)
                 animationOffsetY = 0;
         }
     }

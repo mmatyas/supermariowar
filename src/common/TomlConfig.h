@@ -142,11 +142,16 @@ void from_toml(T& value, const toml::value& t)
         for (std::size_t i = 0; i < length; i++)
             from_toml(value[i], arr[i]);
     } else if constexpr (is_std_array<T>::value) {
+        // Per-player settings saved before the player limit was raised only have 4 elements;
+        // in that case the remaining elements keep their current values
         const toml::array& arr = t.as_array();
-        if (arr.size() != value.size())
+        const bool isLegacyPlayerArray = value.size() == MAX_PLAYERS && arr.size() == LEGACY_MAX_PLAYERS;
+        if (arr.size() != value.size() && !isLegacyPlayerArray)
             throw std::runtime_error("array size mismatch: expected " + std::to_string(value.size()) + " elements");
-        for (std::size_t i = 0; i < value.size(); i++)
-            from_toml(value[i], arr[i]);
+        T parsed = value;  // only apply if every element is valid
+        for (std::size_t i = 0; i < arr.size(); i++)
+            from_toml(parsed[i], arr[i]);
+        value = std::move(parsed);
     } else if constexpr (has_named_struct<T>::value) {
         from_toml_table(value, t);
     } else {

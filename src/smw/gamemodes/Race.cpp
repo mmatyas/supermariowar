@@ -7,7 +7,7 @@
 #include "Score.h"
 #include "objects/overmap/WO_RaceGoal.h"
 
-extern CScore *score[4];
+extern CScore *score[MAX_PLAYERS];
 extern CObjectContainer objectcontainer[3];
 extern CGameValues game_values;
 extern CResourceManager* rm;
@@ -62,7 +62,7 @@ void CGM_Race::init()
     for (short iRaceGoal = 0; iRaceGoal < quantity; iRaceGoal++)
         objectcontainer[2].add(new OMO_RaceGoal(&rm->spr_racegoal, iRaceGoal));
 
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++)
+    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++)
         nextGoal[iPlayer] = 0;
 }
 

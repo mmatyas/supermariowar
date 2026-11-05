@@ -22,7 +22,7 @@ UI_MainMenu::UI_MainMenu()
     miQuickGameButton = new MI_Button(&rm->spr_selectfield, 440, 210, "Go!", 80);
     miQuickGameButton->SetCode(MENU_CODE_QUICK_GAME_START);
 
-    miPlayerSelect = new MI_PlayerSelect(&rm->menu_player_select, 120, 250, "Players", 400, 140);
+    miPlayerSelect = new MI_PlayerSelect(&rm->menu_player_select, 120, 250, "Players", 400, 120);
 
 // disable Multiplayer button for web builds
 #ifdef __EMSCRIPTEN__
