@@ -178,16 +178,19 @@ bool gfx_init(int w, int h, bool fullscreen) {
     return gfx.init(fullscreen);
 }
 
-void gfx_changefullscreen(bool fullscreen) {
+void gfx_changeFullScreen(bool fullscreen) {
     gfx.changeFullScreen(fullscreen);
 }
 
-void gfx_flipscreen() {
+void gfx_flipScreen() {
     gfx.flipScreen();
 }
 
-void gfx_settitle(const char* title) {
+void gfx_setTitle(const char* title) {
     gfx.setTitle(title);
+}
+void gfx_setIcon(std::string iconPath, SDL_Surface* icon) {
+    gfx.setIcon(iconPath, icon);
 }
 
 void gfx_show_catched_error(const std::string& error)

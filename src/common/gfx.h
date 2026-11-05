@@ -37,11 +37,12 @@ using SpriteStrip = std::array<gfxSprite, PGFX_LAST>;
 extern GraphicsSDL gfx;
 
 bool gfx_init(int w, int h, bool fullscreen);
-void gfx_changefullscreen(bool fullscreen);
-void gfx_flipscreen();
-void gfx_settitle(const char*);
+void gfx_changeFullScreen(bool fullscreen);
+void gfx_flipScreen();
+void gfx_setTitle(const char*);
 void gfx_show_catched_error(const std::string&);
 void gfx_take_screenshot();
+void gfx_setIcon(std::string iconPath, SDL_Surface* icon);
 
 void gfx_close();
 bool gfx_loadpalette(const std::filesystem::path& palette_path);

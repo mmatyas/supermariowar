@@ -62,7 +62,6 @@
 #include <cstdlib> // srand()
 #include <iostream>
 #include <SDL3/SDL.h>
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -77,6 +76,9 @@
 
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
+#include "ui/MI_InputControlContainer.h"
+#include "SDL_Helper.h"
+#include <filesystem>
 
 
 //now it's really time for an "engine" (aka resource manager)
@@ -88,6 +90,7 @@ SDL_Surface		*blitdest = NULL;	//the destination surface for all drawing (can be
 
 short			x_shake = 0;
 short			y_shake = 0;
+
 
 
 //------ game relevant stuff ------
@@ -161,7 +164,7 @@ void gameloop_frame()
         GameStateManager::instance().currentState->update();
 
         FPSLimiter::instance().beforeFlip();
-        gfx_flipscreen();
+        gfx_flipScreen();
         FPSLimiter::instance().afterFlip();
     }
 
@@ -213,14 +216,20 @@ void create_globals()
         throw std::format("ERROR: Could not load music overrides: {}", ex.what());
     }
 }
-
+// all SDL_Joystick methods require a real Joystick ID not just an int val
+// you cannot access it via SDL_OpenJoystick(i)
 void init_joysticks()
 {
-    SDL_GetJoysticks(&joystickcount);
+    // pass pointer to MI_InputControlContainer
+    jid = SDL_TrialAndError(SDL_GetJoysticks(&joystickcount));
+
     joysticks = new SDL_Joystick*[joystickcount];
 
-    for (int i = 0; i < joystickcount; i++)
-        joysticks[i] = SDL_OpenJoystick(i);
+    for (int i = 0; i < joystickcount; i++){
+        
+        joysticks[i] = SDL_TrialAndError(SDL_OpenJoystick(jid[i]));
+        std::cout << "[SDL init]    found joystick name: " << SDL_GetJoystickName(joysticks[i]) << std::endl;
+    }
 
     SDL_SetJoystickEventsEnabled(true);
 }
@@ -312,6 +321,7 @@ int main(int argc, char *argv[])
         RootDataDirectory = cmd.data_root;
 
 
+
     try {
         main_game();
     }
@@ -372,20 +382,13 @@ void main_game()
     char title[128];
     sprintf(title, "%s %s %s", TITLESTRING, GIT_REVISION, GIT_DATE);
 
+    gfx_setTitle(title);
+
+    SDL_Surface* icon = nullptr;
     std::filesystem::path icon_path = GetRootDirectory();
     icon_path = icon_path.parent_path().parent_path().append("resources").append("icons").append("smw.ico");
-    SDL_Surface* icon = nullptr;
-
-    if(std::filesystem::exists(icon_path)){
-        icon = IMG_Load(icon_path.string().c_str());
-        if(SDL_SetWindowIcon(gfx.sdl_window, icon))
-            std::cout << "could not set Window Icon: " << SDL_GetError() << std::endl;
-    }
-    else 
-        std::cout << "file: " << icon_path.string().c_str() << " does not exist !" << std::endl;
+    gfx_setIcon(icon_path.string(), icon);
     
-
-    gfx_settitle(title);
     SDL_HideCursor();
 
     printf("\n---------------- loading ----------------\n");
@@ -405,7 +408,7 @@ void main_game()
     }
 
     if (game_values.fullscreen) {
-        gfx_changefullscreen(true);
+        gfx_changeFullScreen(true);
         blitdest = screen;
     }
 

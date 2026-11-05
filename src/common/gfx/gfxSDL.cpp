@@ -6,9 +6,11 @@
 
 #include <chrono>
 #include <iomanip>
+
 #include <sstream>
 #include <cstdio>
 #include <cstdlib>
+#include <SDL_Helper.h>
 
 extern SDL_Surface* screen;
 
@@ -139,6 +141,16 @@ void GraphicsSDL::showErrorBox(const char* message) const
 void GraphicsSDL::setTitle(const char* title) const
 {
     SDL_SetWindowTitle(sdl_window, title);
+}
+
+void GraphicsSDL::setIcon(std::string icon_path, SDL_Surface* icon) const {
+
+    if(std::filesystem::exists(icon_path)){
+        icon = IMG_Load(icon_path.c_str());
+        SDL_TrialAndError(SDL_SetWindowIcon(sdl_window, icon));
+    }
+    else 
+        std::cout << "file: " << icon_path.c_str() << " does not exist !" << std::endl;
 }
 
 void GraphicsSDL::flipScreen() const

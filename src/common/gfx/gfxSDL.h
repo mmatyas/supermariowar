@@ -1,13 +1,11 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-
+#include <string>
 
 class GraphicsSDL {
 public:
     ~GraphicsSDL();
-
-    SDL_Window* sdl_window = nullptr;
 
     bool init(bool fullscreen);
 
@@ -16,10 +14,12 @@ public:
     void setTitle(const char*) const;
     void showErrorBox(const char*) const;
     void takeScreenshot() const;
+    void setIcon(std::string icon_path,   SDL_Surface* icon) const;
+
 
 private:
     // surface -> texture -> renderer -> window
-    
+    SDL_Window* sdl_window = nullptr;
     SDL_Renderer* sdl_renderer = nullptr;
     SDL_Surface* sdl_screen_surface = nullptr;
     SDL_Texture* sdl_screen_texture = nullptr;
