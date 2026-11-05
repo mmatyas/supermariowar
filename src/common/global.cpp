@@ -37,11 +37,6 @@ WorldList *worldlist;
 CMap      *g_map;
 CTilesetManager *g_tilesetmanager;
 
-//Joystick-Init
-SDL_Joystick **joysticks = NULL;
-int joystickcount = 0;
-
-
 //Koopa Bros Weapons
 //Mushrooms Only
 //Super Mario Bros (All mushrooms ((poison was in lost levels, that counts as SMB1)), fireflower, star, and maybe the shells)

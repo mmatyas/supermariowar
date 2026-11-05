@@ -5,6 +5,7 @@
 #include "GameValues.h"
 #include "GSGameplay.h"
 #include "GameplayStyles.h"
+#include "joystick.h"
 #include "net.h"
 #include "map.h"
 #include "MapList.h"
@@ -400,6 +401,11 @@ void MenuState::update()
         case SDL_EVENT_QUIT:
             Exit();
             return;
+            break;
+
+        case SDL_EVENT_JOYSTICK_ADDED:
+        case SDL_EVENT_JOYSTICK_REMOVED:
+            JoystickManager::instance().handleEvent(event);
             break;
 
         case SDL_EVENT_KEY_DOWN: {

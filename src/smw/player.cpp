@@ -281,7 +281,7 @@ bool CPlayer::canSuperStomp() const {
 }
 
 bool CPlayer::wantsToSuperStomp() const {
-    return (playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD)
+    return (playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD_ID)
         || (playerKeys->game_jump.fPressed && playerKeys->game_down.fDown);
 }
 
@@ -1289,7 +1289,7 @@ void CPlayer::move()
                 enableFreeFall();
 
             if (playerKeys->game_down.fDown) {
-                if (!lockfall && !inair && (playerDevice == DEVICE_KEYBOARD || pPlayerAI)) {
+                if (!lockfall && !inair && (playerDevice == DEVICE_KEYBOARD_ID || pPlayerAI)) {
                     lockfall = true;
                     fallthrough = true;
                 }

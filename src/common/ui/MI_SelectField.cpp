@@ -371,6 +371,7 @@ bool MI_SelectField<T>::moveRandom()
 
 template class MI_SelectField<bool>;
 template class MI_SelectField<short>;
+template class MI_SelectField<SDL_JoystickID>;
 
 #include "MatchTypes.h"
 template class MI_SelectField<Boss>;

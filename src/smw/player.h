@@ -266,7 +266,7 @@ private:
         void triggerPowerup();
 
 		COutputControl * playerKeys;
-		short playerDevice;
+		SDL_JoystickID playerDevice;
 
         // tanooki
         PlayerTanookiSuit tanookisuit;

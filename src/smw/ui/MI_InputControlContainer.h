@@ -17,11 +17,11 @@ class MI_InputControlField : public UI_Control
 
 		void Draw();
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		void SetKey(SDL_Keycode * iSetKey, SDL_Keycode key, short device);
+		void SetKey(SDL_Keycode * iSetKey, SDL_Keycode key, SDL_JoystickID device);
 
 		MenuCodeEnum Modify(bool modify);
 
-    void SetDevice(short device) {
+    void SetDevice(SDL_JoystickID device) {
         iDevice = device;
     }
     void SetKey(SDL_Keycode * key) {
@@ -44,7 +44,7 @@ class MI_InputControlField : public UI_Control
 
 		short iWidth, iIndent;
 
-		short iDevice;
+		SDL_JoystickID iDevice;
 		SDL_Keycode * iKey;
 		short iType;
 		short iKeyIndex;
@@ -69,21 +69,22 @@ class MI_InputControlContainer : public UI_Control
 
 		void SetPlayer(short iPlayerID);
 
-		void UpdateDeviceKeys(short iDevice);
+		void UpdateDeviceKeys(SDL_JoystickID iDevice);
 
 	private:
 
 		void SetVisibleInputFields();
+		void refreshDeviceList();
 
 		short iPlayerID;
-		short iDevice;
+		SDL_JoystickID iDevice;
 		short iSelectedInputType;
 
 		UI_Menu * mInputMenu;
 
 		MI_Image * miImage[2];
 		MI_Text * miText;
-		MI_SelectField<short>* miDeviceSelectField;
+		MI_SelectField<SDL_JoystickID>* miDeviceSelectField;
 		MI_Button * miInputTypeButton;
 		MI_InputControlField * miGameInputControlFields[NUM_KEYS];
 		MI_InputControlField * miMenuInputControlFields[NUM_KEYS];

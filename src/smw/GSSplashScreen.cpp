@@ -4,6 +4,7 @@
 #include "MapList.h"
 #include "Game.h"
 #include "GameValues.h"
+#include "joystick.h"
 #include "GSMenu.h"
 #include "GSGameplay.h"
 #include "eyecandy.h"
@@ -119,6 +120,11 @@ void SplashScreenState::update()
             return;
         }
         break;
+
+        case SDL_EVENT_JOYSTICK_ADDED:
+        case SDL_EVENT_JOYSTICK_REMOVED:
+            JoystickManager::instance().handleEvent(loop_event);
+            break;
 
         case SDL_EVENT_KEY_DOWN: {
             switch (loop_event.key.key) {

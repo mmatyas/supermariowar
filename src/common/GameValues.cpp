@@ -5,6 +5,7 @@
 #include "FileList.h"
 #include "GameMode.h"
 #include "GlobalConstants.h"
+#include "joystick.h"
 #include "MapList.h" // req. only by WriteConfig
 #include "path.h"
 #include "Version.h"
@@ -13,6 +14,7 @@
 #include <toml.hpp>
 #include <stdio.h>
 #include <stdexcept>
+#include <filesystem>
 
 // TODO: Refactor externs
 
@@ -28,8 +30,6 @@ extern GraphicsList *menugraphicspacklist;
 extern GraphicsList *worldgraphicspacklist;
 extern GraphicsList *gamegraphicspacklist;
 extern SoundsList *soundpacklist;
-
-extern int joystickcount;
 
 
 //[Keyboard/Joystick][Game/Menu][NumPlayers][NumKeys]  left, right, jump, down, turbo, powerup, start, cancel
@@ -247,7 +247,7 @@ void CGameValues::init()
 
         //Setup the default key/button input configurations
         for (short iInputType = 0; iInputType < 2; iInputType++) { //for keyboard/joystick
-            inputConfiguration[iPlayer][iInputType].iDevice = iInputType - 1;
+            inputConfiguration[iPlayer][iInputType].iDevice = DEVICE_KEYBOARD_ID;
 
             for (short iInputState = 0; iInputState < 2; iInputState++) { //for game/menu
                 for (short iKey = 0; iKey < NUM_KEYS; iKey++) {
@@ -454,19 +454,29 @@ void CGameConfig::ReadInputConfig() {
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);
 
-        //TODO: Need to test what happens when you unplug some controllers from the xbox
-        //and then start up (device index will probably point to a gamepad that isn't in the list)
-        //and this will cause a crash
         controls.read_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
+
+        // Each player stores the SDL joystick instance ID it is bound to (0 == DEVICE_KEYBOARD_ID).
+        // Old files stored a 16 bit joystick index per player, which cannot be mapped to instance IDs anymore,
+        // so those players fall back to the keyboard.
+        const size_t legacyFileSize = sizeof(CInputPlayerControl) * 8 + sizeof(int16_t) * MAX_PLAYERS;
+        const bool legacyDeviceFormat = std::filesystem::file_size(controls_path) == legacyFileSize;
 
         //setup player input controls for game
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            short iDevice = controls.read_i16();
+            SDL_JoystickID iDevice;
+            if (legacyDeviceFormat) {
+                controls.read_i16();
+                iDevice = DEVICE_KEYBOARD_ID;
+            } else {
+                iDevice = controls.read_u32();
+            }
 
-            if (iDevice >= joystickcount)
-                iDevice = DEVICE_KEYBOARD;
+            if (iDevice != DEVICE_KEYBOARD_ID && !JoystickManager::instance().isAttached(iDevice))
+                iDevice = DEVICE_KEYBOARD_ID;
 
-            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
+            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD_ID ? 0 : 1];
+            playerInput.inputControls[iPlayer]->iDevice = iDevice;
         }
     }
     catch (std::exception const& error)
@@ -487,7 +497,7 @@ void CGameConfig::WriteInputConfig() const {
         controls.write_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
 
         for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++)
-            controls.write_i16(playerInput.inputControls[iPlayer]->iDevice);
+            controls.write_u32(playerInput.inputControls[iPlayer]->iDevice);
     }
     catch (std::exception const& error)
     {

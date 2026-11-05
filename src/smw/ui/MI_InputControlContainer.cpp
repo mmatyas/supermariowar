@@ -2,6 +2,7 @@
 
 #include "GameValues.h"
 #include "gfx/gfxSprite.h"
+#include "joystick.h"
 #include "uimenu.h"
 #include "ui/MI_Button.h"
 #include "ui/MI_Image.h"
@@ -12,11 +13,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <ranges>
 
 extern CGameValues game_values;
 extern CResourceManager* rm;
-
-extern int joystickcount;
 
 
 namespace {
@@ -57,7 +57,7 @@ MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, s
     iIndent = indent;
     fSelected = false;
 
-    iDevice = DEVICE_KEYBOARD;
+    iDevice = DEVICE_KEYBOARD_ID;
     iKey = NULL;
     iType = 0;
     iKeyIndex = 0;
@@ -88,6 +88,9 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
         #ifndef __EMSCRIPTEN__
         SDL_WaitEvent(&event);
         #endif
+
+        //Keep the joystick list up to date while the menu owns the event queue
+        JoystickManager::instance().handleEvent(event);
 
         /*
         if (event.type == SDL_KEYDOWN)
@@ -159,7 +162,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
         }
         */
 
-        if (iDevice == DEVICE_KEYBOARD) {
+        if (iDevice == DEVICE_KEYBOARD_ID) {
             if (event.type == SDL_EVENT_KEY_DOWN) {
                 const SDL_Keycode key = event.key.key;
 
@@ -266,7 +269,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
     return MENU_CODE_UNSELECT_ITEM;
 }
 
-void MI_InputControlField::SetKey(SDL_Keycode * iSetKey, SDL_Keycode key, short device)
+void MI_InputControlField::SetKey(SDL_Keycode * iSetKey, SDL_Keycode key, SDL_JoystickID device)
 {
     bool fNeedSwap = false;
     short iSwapPlayer, iSwapKey;
@@ -313,7 +316,7 @@ void MI_InputControlField::Draw()
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, "Unassigned");
     else if (fModifying)
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, "(Press Button)");
-    else if (iDevice == DEVICE_KEYBOARD)
+    else if (iDevice == DEVICE_KEYBOARD_ID)
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, SDL_GetKeyName(*iKey));
     else
         rm->menu_font_large.drawChopRight(m_pos.x + iIndent + 8, m_pos.y + 5, iWidth - iIndent - 16, Joynames[*iKey]);
@@ -339,17 +342,13 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
     miImage[0] = new MI_Image(spr_button, 0, 0, 0, 0, 320, 32, 1, 1, 0);
     miImage[1] = new MI_Image(spr_button, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 
-    miDeviceSelectField = new MI_SelectField<short>(spr_button, x + 16, y + 38, "Device", 420, 150);
+    miDeviceSelectField = new MI_SelectField<SDL_JoystickID>(spr_button, x + 16, y + 38, "Device", 420, 150);
     miDeviceSelectField->setItemChangedCode(MENU_CODE_INPUT_DEVICE_CHANGED);
-    miDeviceSelectField->add("Keyboard", -1);
-
-    for (int iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
-        miDeviceSelectField->add(SDL_GetJoystickNameForID(iJoystick), iJoystick, false);
-    }
+    refreshDeviceList();
 
     //If the device is not found, default to the keyboard
     if (!miDeviceSelectField->setCurrentValue(iDevice)) {
-        iDevice = DEVICE_KEYBOARD;
+        iDevice = DEVICE_KEYBOARD_ID;
         miDeviceSelectField->setCurrentValue(iDevice);
     }
 
@@ -450,10 +449,6 @@ MenuCodeEnum MI_InputControlContainer::SendInput(CPlayerInput * playerInput)
 
         return MENU_CODE_NONE;
     } else if (MENU_CODE_INPUT_DEVICE_CHANGED == ret) {
-        //TODO: Need to handle writing out input configurations, modifying input configs here
-        //Need to handle case where reading in and using a device that is no longer
-        //an option will crash the system (joystick unplugged or something)
-
         UpdateDeviceKeys(miDeviceSelectField->currentValue());
         playerInput->ResetKeys();
 
@@ -469,21 +464,35 @@ MenuCodeEnum MI_InputControlContainer::Modify(bool modify)
     return MENU_CODE_MODIFY_ACCEPTED;
 }
 
+void MI_InputControlContainer::refreshDeviceList()
+{
+    JoystickManager& joystickManager = JoystickManager::instance();
+
+    miDeviceSelectField->clear();
+    miDeviceSelectField->add("Keyboard", DEVICE_KEYBOARD_ID);
+
+    for (const auto& deviceId : std::views::keys(joystickManager.openedDevices()))
+        miDeviceSelectField->add(joystickManager.nameFor(deviceId), deviceId, false);
+}
+
 void MI_InputControlContainer::SetVisibleInputFields()
 {
-    int selDevice = miDeviceSelectField->currentValue();
+    SDL_JoystickID selDevice = miDeviceSelectField->currentValue();
 
     for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
-        miGameInputControlFields[iKey]->setVisible(0 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
+        miGameInputControlFields[iKey]->setVisible(0 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD_ID != selDevice || iPlayerID == 0));
     }
 
     for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
-        miMenuInputControlFields[iKey]->setVisible(1 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
+        miMenuInputControlFields[iKey]->setVisible(1 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD_ID != selDevice || iPlayerID == 0));
     }
 }
 
 void MI_InputControlContainer::SetPlayer(short playerID)
 {
+    // Refresh the device list so joysticks attached or removed since the last visit appear or disappear
+    refreshDeviceList();
+
     //Hide input options that other players are using
     miDeviceSelectField->hideAllItems(false);
 
@@ -491,8 +500,9 @@ void MI_InputControlContainer::SetPlayer(short playerID)
         if (iPlayer == playerID)
             continue;
 
-        if (game_values.playerInput.inputControls[iPlayer]->iDevice > -1)
-            miDeviceSelectField->hideItem(game_values.playerInput.inputControls[iPlayer]->iDevice, true);
+        const SDL_JoystickID deviceId = game_values.playerInput.inputControls[iPlayer]->iDevice;
+        if (deviceId != DEVICE_KEYBOARD_ID)
+            miDeviceSelectField->hideItem(deviceId, true);
     }
 
     iPlayerID = playerID;
@@ -523,9 +533,9 @@ void MI_InputControlContainer::SetPlayer(short playerID)
     mInputMenu->ResetMenu();
 }
 
-void MI_InputControlContainer::UpdateDeviceKeys(short lDevice)
+void MI_InputControlContainer::UpdateDeviceKeys(SDL_JoystickID lDevice)
 {
-    game_values.playerInput.inputControls[iPlayerID] = &game_values.inputConfiguration[iPlayerID][lDevice == DEVICE_KEYBOARD ? 0 : 1];
+    game_values.playerInput.inputControls[iPlayerID] = &game_values.inputConfiguration[iPlayerID][lDevice == DEVICE_KEYBOARD_ID ? 0 : 1];
     game_values.playerInput.inputControls[iPlayerID]->iDevice = lDevice;
 
     for (int iKey = 0; iKey < NUM_KEYS; iKey++) {

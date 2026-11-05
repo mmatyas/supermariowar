@@ -14,7 +14,7 @@
 
 #define NUM_KEYS 8
 
-#define DEVICE_KEYBOARD     -1
+constexpr SDL_JoystickID DEVICE_KEYBOARD_ID = 0;
 
 #define JOYSTICK_DEAD_ZONE  16384
 #define MOUSE_X_DEAD_ZONE   0
@@ -93,7 +93,7 @@ struct COutputControl {
 };
 
 struct CInputPlayerControl {
-	short iDevice;
+	SDL_JoystickID iDevice; // SDL joystick instance ID, DEVICE_KEYBOARD_ID for keyboard
 	CInputControl inputGameControls[2]; //0 == game controls, 1 == menu controls
 };
 

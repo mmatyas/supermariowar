@@ -631,7 +631,7 @@ void inner_main()
 	}
 
 	//Setup input for menus
-	game_values.inputConfiguration[0][0].iDevice = DEVICE_KEYBOARD;
+	game_values.inputConfiguration[0][0].iDevice = DEVICE_KEYBOARD_ID;
     for (short iInputState = 0; iInputState < 2; iInputState++) { //for game/menu
         for (short iKey = 0; iKey < NUM_KEYS; iKey++) {
 			game_values.inputConfiguration[0][0].inputGameControls[iInputState].keys[iKey] = controlkeys[0][iInputState][0][iKey];

@@ -112,6 +112,20 @@ void BinaryFile::write_bool(bool value)
     write_u8(value);
 }
 
+void BinaryFile::write_u32(uint32_t value)
+{
+#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+    uint32_t tmp = value;
+
+    ((char*)&value)[0] = ((char*)&tmp)[3];
+    ((char*)&value)[1] = ((char*)&tmp)[2];
+    ((char*)&value)[2] = ((char*)&tmp)[1];
+    ((char*)&value)[3] = ((char*)&tmp)[0];
+#endif
+
+    fwrite_or_exception(&value, sizeof(uint32_t), 1);
+}
+
 void BinaryFile::write_float(float value)
 {
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
@@ -237,6 +251,23 @@ void BinaryFile::read_i32_array(int32_t* target, size_t size)
 #else
     fread_or_exception(target, sizeof(int32_t), size);
 #endif
+}
+
+uint32_t BinaryFile::read_u32()
+{
+    uint32_t in;
+    fread_or_exception(&in, sizeof(uint32_t), 1);
+
+#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+    uint32_t tmp = in;
+
+    ((char*)&in)[0] = ((char*)&tmp)[3];
+    ((char*)&in)[1] = ((char*)&tmp)[2];
+    ((char*)&in)[2] = ((char*)&tmp)[1];
+    ((char*)&in)[3] = ((char*)&tmp)[0];
+#endif
+
+    return in;
 }
 
 float BinaryFile::read_float()

@@ -55,6 +55,7 @@
 
 #include "FPSLimiter.h"
 #include "GSSplashScreen.h"
+#include "joystick.h"
 
 #include <ctime>
 #include <cmath>
@@ -105,9 +106,6 @@ CGM_Boss_MiniGame	*bossgamemode = NULL;
 CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 
 short currentgamemode = 0;
-
-extern SDL_Joystick     **joysticks;
-extern int              joystickcount;
 
 extern CMap* g_map;
 extern CTilesetManager* g_tilesetmanager;
@@ -208,17 +206,6 @@ void create_globals()
     } catch (const std::exception& ex) {
         throw std::format("ERROR: Could not load music overrides: {}", ex.what());
     }
-}
-
-void init_joysticks()
-{
-    SDL_GetJoysticks(&joystickcount);
-    joysticks = new SDL_Joystick*[joystickcount];
-
-    for (int i = 0; i < joystickcount; i++)
-        joysticks[i] = SDL_OpenJoystick(i);
-
-    SDL_SetJoystickEventsEnabled(true);
 }
 
 void create_gamemodes()
@@ -360,8 +347,7 @@ void main_game()
 
     sfx_init();                     //init the sound system
     net_init();                     //init the networking
-
-    init_joysticks();
+    JoystickManager::instance().init();
 
     //currently this only sets the title, not the icon.
     //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
@@ -429,6 +415,7 @@ void main_game()
     for (short i = 0; i < GAMEMODE_LAST; i++)
         delete gamemodes[i];
 
+    JoystickManager::instance().shutdown();
     sfx_close();
     gfx_close();
     net_close();

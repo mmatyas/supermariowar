@@ -412,7 +412,7 @@ void gfx_drawpreview(
 
 void gfx_setjoystickteamcolor(SDL_Joystick* joystick, short team, float brightness)
 {
-    if (team < 0) {
+    if (!joystick || team < 0) {
         // A non-playing user has no team
         return;
     }

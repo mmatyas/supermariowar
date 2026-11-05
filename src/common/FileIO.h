@@ -21,6 +21,7 @@ public:
     void write_u8(uint8_t);
     void write_i16(int16_t);
     void write_i32(int32_t);
+    void write_u32(uint32_t);
     void write_bool(bool);
     void write_float(float);
     void write_string_long(const std::string&);
@@ -30,6 +31,7 @@ public:
     uint8_t read_u8();
     int16_t read_i16();
     int32_t read_i32();
+    uint32_t read_u32();
     bool read_bool();
     float read_float();
     void read_i16_array(int16_t*, size_t);

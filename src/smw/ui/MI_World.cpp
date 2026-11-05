@@ -768,14 +768,14 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
         if (iState == -1 && (iStateTransition[iTeamId] == 0 || iStateTransition[iTeamId] == 3)) {
             if (playerKeys->menu_cancel.fPressed) {
-                if (DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0) {
+                if (DEVICE_KEYBOARD_ID != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0) {
                     fModifying = false;
                     return MENU_CODE_BACK_TEAM_SELECT_MENU;
                 }
             }
 
             if ((game_values.playercontrol[iPlayer] == 1 || fNoInterestingMoves) && (iPopupFlag[iTeamId] || playerKeys->menu_random.fPressed ||
-                    (iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed))) {
+                    (iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD_ID && playerKeys->menu_cancel.fPressed))) {
                 iPopupFlag[iTeamId] = true;
 
                 if (iPlayerState == 0 && iStateTransition[iTeamId] == 0) {

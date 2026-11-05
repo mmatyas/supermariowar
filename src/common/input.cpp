@@ -5,11 +5,6 @@
 
 extern CGameValues game_values;
 
-namespace {
-// Intentional cast from -1 as a keyboard sentinel
-constexpr SDL_JoystickID KEYBOARD_DEVICE_ID = static_cast<SDL_JoystickID>(DEVICE_KEYBOARD);
-} // namespace
-
 CPlayerInput::CPlayerInput()
 {
     for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
@@ -75,11 +70,11 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
     for (short iPlayer = -1; iPlayer < MAX_PLAYERS; iPlayer++) {
 		CInputControl * inputControl;
 		COutputControl * outputControl;
-		SDL_JoystickID iDeviceID = KEYBOARD_DEVICE_ID;
+		SDL_JoystickID iDeviceID = DEVICE_KEYBOARD_ID;
 
 		//Allow keyboard input from player 1 at all times (even when he is configured to use joystick)
         if (iPlayer == -1) {
-            if (iGameState == 1 && inputControls[0]->iDevice != DEVICE_KEYBOARD) {
+            if (iGameState == 1 && inputControls[0]->iDevice != DEVICE_KEYBOARD_ID) {
 				inputControl = &game_values.inputConfiguration[0][0].inputGameControls[1];
 				outputControl = &outputControls[0];
 				iDeviceID = game_values.inputConfiguration[0][0].iDevice;
@@ -95,7 +90,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 			iDeviceID = inputControls[iPlayer]->iDevice;
 		}
 
-        if (iDeviceID == KEYBOARD_DEVICE_ID) {
+        if (iDeviceID == DEVICE_KEYBOARD_ID) {
             if (SDL_EVENT_KEY_DOWN == event.type) {
                 for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if (inputControl->keys[iKey] == event.key.key) {

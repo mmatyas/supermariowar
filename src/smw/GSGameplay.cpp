@@ -4,6 +4,7 @@
 #include "FileList.h"
 #include "GameMode.h"
 #include "GameValues.h"
+#include "joystick.h"
 #include "GSMenu.h"
 #include "net.h"
 #include "map.h"
@@ -2095,6 +2096,11 @@ void GameplayState::handleInput()
             return;
         }
         break;
+
+        case SDL_EVENT_JOYSTICK_ADDED:
+        case SDL_EVENT_JOYSTICK_REMOVED:
+            JoystickManager::instance().handleEvent(event);
+            break;
 
         case SDL_EVENT_KEY_DOWN: {
             if (event.key.mod & (SDL_KMOD_LALT | SDL_KMOD_RALT)) {

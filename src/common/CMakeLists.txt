@@ -32,6 +32,8 @@ add_library(CommonFiles STATIC
     global.cpp
     input.cpp
     input.h
+    joystick.cpp
+    joystick.h
     linfunc.cpp
     linfunc.h
     map.cpp

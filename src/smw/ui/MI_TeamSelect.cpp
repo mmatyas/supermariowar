@@ -3,6 +3,7 @@
 #include "gfx.h"
 #include "Game.h"
 #include "GameValues.h"
+#include "joystick.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "FileList.h"
@@ -191,7 +192,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
         if (playerInput->outputControls[iPlayer].menu_select.fPressed) {
             fReady[iPlayer] = true;
 
-            if (fAllReady && (DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0)) {
+            if (fAllReady && (DEVICE_KEYBOARD_ID != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0)) {
                 fModifying = false;
                 printf("MI_TeamSelect::SendInput MENU_CODE_TO_GAME_SETUP_MENU\n");
                 return MENU_CODE_TO_GAME_SETUP_MENU;
@@ -211,15 +212,17 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                 fReady[iPlayer] = false;
                 fAllReady = false;
             } else {
-                if (DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0) {
+                if (DEVICE_KEYBOARD_ID != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0) {
                     fModifying = false;
                     return MENU_CODE_BACK_TO_MATCH_SELECTION_MENU;
                 }
             }
         }
-        if (DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice) {
+        if (DEVICE_KEYBOARD_ID != playerInput->inputControls[iPlayer]->iDevice) {
             short team = GetTeam(iPlayer);
-            gfx_setjoystickteamcolor(SDL_GetJoystickFromPlayerIndex(playerInput->inputControls[iPlayer]->iDevice), team, fReady[iPlayer] ? 1.0 : 0.5);
+            SDL_Joystick* joystick = JoystickManager::instance().handleFor(playerInput->inputControls[iPlayer]->iDevice);
+            if (joystick)
+                gfx_setjoystickteamcolor(joystick, team, fReady[iPlayer] ? 1.0 : 0.5);
         }
     }
 

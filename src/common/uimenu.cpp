@@ -106,7 +106,7 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput* playerInput)
                 continue;
         }
         // Only let player 1 on the keyboard control the menu unless there is another controlling team
-        else if (iPlayer != 0 && game_values.playerInput.inputControls[iPlayer] && game_values.playerInput.inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD) {
+        else if (iPlayer != 0 && game_values.playerInput.inputControls[iPlayer] && game_values.playerInput.inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD_ID) {
             continue;
         }
 
