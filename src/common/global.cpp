@@ -48,15 +48,3 @@ CTilesetManager *g_tilesetmanager;
 //Conversion from backgrounds to music categories created by NMcCoy
 const char * g_szMusicCategoryNames[MAXMUSICCATEGORY] = {"Land", "Underground", "Underwater", "Castle", "Platforms", "Ghost", "Bonus", "Battle", "Desert", "Clouds", "Snow"};
 
-
-void LoadCurrentMapBackground()
-{
-    std::string path = "gfx/packs/backgrounds/" + g_map->szBackgroundFile;
-    path = convertPath(path, gamegraphicspacklist->currentPath());
-
-    //if the background file doesn't exist, use the classic background
-    if (!FileExists(path))
-        path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath());
-
-    rm->spr_background = ImageLoader(path).withoutColorKey().create();
-}

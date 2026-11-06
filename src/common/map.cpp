@@ -437,6 +437,18 @@ void DrawPlatform(
     }
 }
 
+void LoadCurrentMapBackground()
+{
+    std::string path = "gfx/packs/backgrounds/" + g_map->szBackgroundFile;
+    path = convertPath(path, gamegraphicspacklist->currentPath());
+
+    //if the background file doesn't exist, use the classic background
+    if (!FileExists(path))
+        path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->currentPath());
+
+    rm->spr_background = ImageLoader(path).withoutColorKey().create();
+}
+
 
 CMap::CMap()
     : warpexits()

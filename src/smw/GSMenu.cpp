@@ -81,8 +81,6 @@ extern short LookupTeamID(short id);
 
 extern WorldMap g_worldmap;
 
-extern void LoadCurrentMapBackground();
-
 extern CMap* g_map;
 
 extern CScore *score[4];

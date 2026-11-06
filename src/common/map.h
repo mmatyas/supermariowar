@@ -173,6 +173,8 @@ void DrawPlatform(PlatformPathType pathtype, const std::vector<TilesetTile>& til
 	short iSize, short iPlatformWidth, short iPlatformHeight,
 	bool fDrawPlatform, bool fDrawShadow, SDL_Surface* dst);
 
+void LoadCurrentMapBackground();
+
 class CMap
 {
 	public:

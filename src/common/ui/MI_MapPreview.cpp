@@ -24,8 +24,6 @@ extern MapList *maplist;
 extern SDL_Surface* blitdest;
 extern CObjectContainer noncolcontainer;
 extern CObjectContainer objectcontainer[3];
-extern void LoadCurrentMapBackground();
-
 #ifndef __EMSCRIPTEN__
     inline void smallDelay() { SDL_Delay(10); }
 #else
