@@ -14,7 +14,11 @@
 #include <toml.hpp>
 #include <stdio.h>
 #include <stdexcept>
+#include <algorithm>
+#include <array>
+#include <cstring>
 #include <filesystem>
+#include <vector>
 
 // TODO: Refactor externs
 
@@ -454,26 +458,38 @@ void CGameConfig::ReadInputConfig() {
         if (!controls.is_open())
             throw std::runtime_error("Could not open " + controls_path);
 
-        controls.read_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
+        const size_t fileSize = std::filesystem::file_size(controls_path);
 
-        // Each player stores the SDL joystick instance ID it is bound to (0 == DEVICE_KEYBOARD_ID).
-        // Old files stored a 16 bit joystick index per player, which cannot be mapped to instance IDs anymore,
-        // so those players fall back to the keyboard.
-        const size_t legacyFileSize = sizeof(CInputPlayerControl) * 8 + sizeof(int16_t) * MAX_PLAYERS;
-        const bool legacyDeviceFormat = std::filesystem::file_size(controls_path) == legacyFileSize;
+        // Joystick bindings are stored by SDL device GUID. The keyboard is stored as zero.
+        // Identical devices share GUID, so they are assigned to players in attachment order.
+        // Old files stored a 16 bit joystick index, so those players fall back to the keyboard.
+        const size_t configsSize = sizeof(CInputPlayerControl) * 8;
+        controls.read_raw(inputConfiguration, configsSize);
 
-        //setup player input controls for game
+        std::array<SDL_GUID, MAX_PLAYERS> savedDeviceGuids = {};
+        if (fileSize == configsSize + sizeof(SDL_GUID) * MAX_PLAYERS) {
+            for (SDL_GUID& deviceGuid : savedDeviceGuids)
+                controls.read_raw(&deviceGuid, sizeof(SDL_GUID));
+        }
+
+        const auto isKeyboardGuid = [](const SDL_GUID& guid) {
+            return std::memcmp(guid.data, DEVICE_KEYBOARD_GUID.data, sizeof(SDL_GUID)) == 0;
+        };
+
+        // Setup player input controls for game
+        std::vector<SDL_JoystickID> claimedDevices;
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            SDL_JoystickID iDevice;
-            if (legacyDeviceFormat) {
-                controls.read_i16();
-                iDevice = DEVICE_KEYBOARD_ID;
-            } else {
-                iDevice = controls.read_u32();
-            }
+            SDL_JoystickID iDevice = DEVICE_KEYBOARD_ID;
 
-            if (iDevice != DEVICE_KEYBOARD_ID && !JoystickManager::instance().isAttached(iDevice))
-                iDevice = DEVICE_KEYBOARD_ID;
+            if (!isKeyboardGuid(savedDeviceGuids[iPlayer])) {
+                for (SDL_JoystickID deviceId : JoystickManager::instance().instanceIdsForGuid(savedDeviceGuids[iPlayer])) {
+                    if (std::ranges::find(claimedDevices, deviceId) == claimedDevices.end()) {
+                        claimedDevices.push_back(deviceId);
+                        iDevice = deviceId;
+                        break;
+                    }
+                }
+            }
 
             playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD_ID ? 0 : 1];
             playerInput.inputControls[iPlayer]->iDevice = iDevice;
@@ -496,8 +512,15 @@ void CGameConfig::WriteInputConfig() const {
 
         controls.write_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
 
-        for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++)
-            controls.write_u32(playerInput.inputControls[iPlayer]->iDevice);
+        for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+            SDL_GUID deviceGuid = DEVICE_KEYBOARD_GUID;
+            const SDL_JoystickID deviceId = playerInput.inputControls[iPlayer]->iDevice;
+
+            if (deviceId != DEVICE_KEYBOARD_ID)
+                deviceGuid = SDL_GetJoystickGUIDForID(deviceId);
+
+            controls.write_raw(&deviceGuid, sizeof(SDL_GUID));
+        }
     }
     catch (std::exception const& error)
     {

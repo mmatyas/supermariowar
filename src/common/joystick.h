@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 class JoystickManager {
 public:
@@ -19,6 +20,8 @@ public:
 
     std::string nameFor(SDL_JoystickID deviceId) const;
     SDL_Joystick* handleFor(SDL_JoystickID deviceId);
+
+    std::vector<SDL_JoystickID> instanceIdsForGuid(const SDL_GUID& guid) const;
 
 private:
     JoystickManager() = default;

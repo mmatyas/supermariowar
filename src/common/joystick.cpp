@@ -5,6 +5,7 @@
 #include "input.h"
 
 #include <cstdio>
+#include <cstring>
 #include <format>
 
 extern CGameValues game_values;
@@ -75,6 +76,22 @@ std::string JoystickManager::nameFor(SDL_JoystickID deviceId) const
         return name;
 
     return std::format("Joystick {}", deviceId);
+}
+
+std::vector<SDL_JoystickID> JoystickManager::instanceIdsForGuid(const SDL_GUID& guid) const
+{
+    const auto sameGuid = [&guid](SDL_JoystickID joyId) {
+        const SDL_GUID deviceGuid = SDL_GetJoystickGUIDForID(joyId);
+        return std::memcmp(guid.data, deviceGuid.data, sizeof(SDL_GUID)) == 0;
+    };
+
+    std::vector<SDL_JoystickID> deviceIds;
+    for (const auto& [joyId, joy] : m_opened) {
+        if (sameGuid(joyId))
+            deviceIds.push_back(joyId);
+    }
+
+    return deviceIds;
 }
 
 SDL_Joystick* JoystickManager::handleFor(SDL_JoystickID deviceId)

@@ -15,6 +15,7 @@
 #define NUM_KEYS 8
 
 constexpr SDL_JoystickID DEVICE_KEYBOARD_ID = 0;
+constexpr SDL_GUID DEVICE_KEYBOARD_GUID = {};
 
 #define JOYSTICK_DEAD_ZONE  16384
 #define MOUSE_X_DEAD_ZONE   0
