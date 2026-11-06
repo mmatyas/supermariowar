@@ -61,6 +61,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 #include <ctype.h>
 #include <cstring>
 #include <cstdlib>
+#include <string_view>
 
 #ifdef _WIN32
 	#include <windows.h>
@@ -323,7 +324,9 @@ short g_iNumPlatforms = 0;
 MapPlatform g_Platforms[MAX_PLATFORMS];
 
 BackgroundList *backgroundlist;
-extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
+
+//Conversion from backgrounds to music categories created by NMcCoy
+const std::array<std::string_view, MAXMUSICCATEGORY> g_szMusicCategoryNames = {"Land", "Underground", "Underwater", "Castle", "Platforms", "Ghost", "Bonus", "Battle", "Desert", "Clouds", "Snow"};
 short g_musiccategorydisplaytimer = 0;
 
 short g_messagedisplaytimer = 0;
@@ -947,7 +950,7 @@ int editor_edit()
                         if (!CheckKey(keystate, SDLK_LSHIFT) && !CheckKey(keystate, SDLK_RSHIFT)) {
 								//Set music to background default
                             for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
-                                if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile.c_str(), strlen(g_szMusicCategoryNames[iCategory]))) {
+                                if (g_map->szBackgroundFile.starts_with(g_szMusicCategoryNames[iCategory])) {
 										g_map->musicCategoryID = iCategory;
 										break;
 									}
@@ -4207,7 +4210,7 @@ int editor_backgrounds()
                                 if (event.button.button == SDL_BUTTON_LEFT) {
 									//Set music to background default
                                     for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
-                                        if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile.c_str(), strlen(g_szMusicCategoryNames[iCategory]))) {
+                                        if (g_map->szBackgroundFile.starts_with(g_szMusicCategoryNames[iCategory])) {
 											g_map->musicCategoryID = iCategory;
 											break;
 										}
