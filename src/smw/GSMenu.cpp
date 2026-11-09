@@ -64,7 +64,7 @@
 #include <cstdlib> // atoi()
 #include <cassert>
 #include <sstream>
-
+#include <sys/stat.h>
 
 extern SDL_Surface* screen;
 extern SDL_Surface* blitdest;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-
+#include <string>
 
 class GraphicsSDL {
 public:
@@ -14,6 +14,8 @@ public:
     void setTitle(const char*) const;
     void showErrorBox(const char*) const;
     void takeScreenshot() const;
+    void setIcon(SDL_Surface* icon) const;
+
 
 private:
     // surface -> texture -> renderer -> window
