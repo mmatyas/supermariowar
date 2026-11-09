@@ -354,6 +354,7 @@ void main_game()
     char title[128];
     sprintf(title, "%s %s %s", TITLESTRING, GIT_REVISION, GIT_DATE);
     gfx_settitle(title);
+    gfx_setIcon();
     SDL_HideCursor();
 
     printf("\n---------------- loading ----------------\n");

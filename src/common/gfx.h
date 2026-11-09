@@ -42,6 +42,7 @@ void gfx_show_catched_error(const std::string&);
 void gfx_take_screenshot();
 
 void gfx_close();
+void gfx_setIcon();
 bool gfx_loadpalette(const std::filesystem::path& palette_path);
 
 void gfx_cliprect(SDL_Rect& srcRect, SDL_Rect& dstRect, const SDL_Rect& clipRect);
