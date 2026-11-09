@@ -6,10 +6,13 @@
 
 #include <chrono>
 #include <iomanip>
+
 #include <sstream>
 #include <cstdio>
 #include <cstdlib>
-#include "SDL_Helper.h"
+#include <iostream>
+
+#include <SDL_Helper.h>
 
 extern SDL_Surface* screen;
 
@@ -145,6 +148,7 @@ void GraphicsSDL::setIcon(SDL_Surface* icon) const
 {
     SDL_TrialAndError((SDL_SetWindowIcon(sdl_window, icon)));
 }
+
 
 void GraphicsSDL::flipScreen() const
 {

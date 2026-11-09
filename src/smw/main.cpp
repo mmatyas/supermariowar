@@ -26,6 +26,7 @@
 #include "ResourceManager.h"
 #include "sfx.h"
 #include "TilesetManager.h"
+#include "gfx/gfxSDL.h"
 #include "gamemodes/BonusHouse.h"
 #include "gamemodes/CaptureTheFlag.h"
 #include "gamemodes/CardCollection.h"
@@ -60,7 +61,8 @@
 #include <ctime>
 #include <cmath>
 #include <cstdlib> // srand()
-
+#include <iostream>
+#include <SDL3/SDL.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -74,6 +76,10 @@
 #endif
 
 #include <SDL3/SDL_main.h>
+#include <SDL3_image/SDL_image.h>
+#include "ui/MI_InputControlContainer.h"
+#include "SDL_Helper.h"
+#include <filesystem>
 
 
 //now it's really time for an "engine" (aka resource manager)
@@ -85,6 +91,7 @@ SDL_Surface		*blitdest = NULL;	//the destination surface for all drawing (can be
 
 short			x_shake = 0;
 short			y_shake = 0;
+
 
 
 //------ game relevant stuff ------
@@ -208,6 +215,7 @@ void create_globals()
     }
 }
 
+
 void create_gamemodes()
 {
     //set game modes
@@ -295,6 +303,7 @@ int main(int argc, char *argv[])
         RootDataDirectory = cmd.data_root;
 
 
+
     try {
         main_game();
     }
@@ -355,6 +364,7 @@ void main_game()
     sprintf(title, "%s %s %s", TITLESTRING, GIT_REVISION, GIT_DATE);
     gfx_settitle(title);
     gfx_setIcon();
+
     SDL_HideCursor();
 
     printf("\n---------------- loading ----------------\n");
