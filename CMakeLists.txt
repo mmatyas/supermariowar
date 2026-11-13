@@ -106,7 +106,6 @@ if(NOT MSVC)
 	# TODO: would like these but they produce overwhelming amounts of warnings
 	check_and_add_flag(ALL -Wall)
 	check_and_add_flag(EXTRA -Wextra)
-	check_and_add_flag(CXX11_NARROWING_OFF -Wno-c++11-narrowing)
 	check_and_add_flag(OVERLOADED_VIRTUAL_OFF -Wno-overloaded-virtual)
 	check_and_add_flag(UNUSED_PARAMETER_OFF -Wno-unused-parameter)
 	check_and_add_flag(ALWAYS_RETURN -Werror=return-type)
@@ -116,10 +115,6 @@ if(NOT MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing -fexceptions -Wno-shadow")
 
 endif(NOT MSVC)
-
-if (APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-narrowing")
-endif()
 
 ## MAIN CONFIG
 

@@ -15,8 +15,8 @@ namespace {
 Vec2f calcVelocity(float speed, float angle)
 {
     Vec2f vel {
-        speed * cos(angle),
-        speed * sin(angle),
+        speed * cosf(angle),
+        speed * sinf(angle),
     };
 
     // Fix rounding errors

@@ -376,7 +376,7 @@ void NetClient::handleNewRoomListEntry(const uint8_t* data, size_t dataLength)
 
     if (uiRoomList) {
         // TODO: strings would be better
-        char playerCountString[4] = {'0' + roomInfo.currentPlayerCount, '/', '4', '\0'};
+        char playerCountString[4] = {static_cast<char>('0' + roomInfo.currentPlayerCount), '/', '4', '\0'};
         uiRoomList->Add(newRoom.name, playerCountString);
     }
 }
