@@ -164,10 +164,8 @@ void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
     short iRow = player.topY() / TILESIZE;
     IO_Block* block = NULL;
 
-    assert(exit->direction != WARP_EXIT_UNDEFINED);
-
-    switch(exit->direction) {
-        case WARP_EXIT_UP:
+    switch (exit->direction) {
+        case WarpExitDirection::Up:
             player.state = PlayerState::LeavingWarpUp;
             player.velx = 0.0f;
             player.vely = -4.0f;
@@ -181,7 +179,7 @@ void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
                     block->triggerBehavior();
             }
             break;
-        case WARP_EXIT_RIGHT:
+        case WarpExitDirection::Right:
             player.state = PlayerState::LeavingWarpRight;
             player.velx = 1.0f;
             player.vely = 1.0f;
@@ -196,7 +194,7 @@ void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
             if (block && !block->isTransparent() && !block->isHidden())
                 block->triggerBehavior();
             break;
-        case WARP_EXIT_DOWN:
+        case WarpExitDirection::Down:
             player.state = PlayerState::LeavingWarpDown;
             player.velx = 0.0f;
             player.vely = 1.1f;
@@ -211,7 +209,7 @@ void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
                     block->triggerBehavior();
             }
             break;
-        case WARP_EXIT_LEFT:
+        case WarpExitDirection::Left:
             player.state = PlayerState::LeavingWarpLeft;
             player.velx = -1.0f;
             player.vely = 1.0f;

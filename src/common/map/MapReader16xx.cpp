@@ -6,6 +6,7 @@
 #include "FileIO.h"
 #include "TilesetManager.h"
 
+#include <algorithm>
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
@@ -131,34 +132,29 @@ void MapReader1600::read_eyecandy(CMap& map, BinaryFile& mapfile)
 void MapReader1600::read_warp_exits(CMap& map, BinaryFile& mapfile)
 {
     map.maxConnection = 0;
+    map.warpexits.clear();
 
-    map.numwarpexits = (short)mapfile.read_i32();
-    for (unsigned short i = 0; i < map.numwarpexits && i < MAXWARPS; i++) {
-        map.warpexits[i].direction = (WarpExitDirection)mapfile.read_i32();
-        map.warpexits[i].connection = (short)mapfile.read_i32();
-        map.warpexits[i].id = (short)mapfile.read_i32();
-        map.warpexits[i].x = (short)mapfile.read_i32();
-        map.warpexits[i].y = (short)mapfile.read_i32();
+    const int numWarpExits = std::clamp(mapfile.read_i32(), 0, MAXWARPS);
+    for (int i = 0; i < numWarpExits; i++) {
+        WarpExit warpExit {};
+        warpExit.direction = static_cast<WarpExitDirection>(mapfile.read_i32());
+        warpExit.connection = static_cast<short>(mapfile.read_i32());
+        warpExit.id = static_cast<short>(mapfile.read_i32());
+        warpExit.x = static_cast<short>(mapfile.read_i32());
+        warpExit.y = static_cast<short>(mapfile.read_i32());
 
-        map.warpexits[i].lockx = (short)mapfile.read_i32();
-        map.warpexits[i].locky = (short)mapfile.read_i32();
+        warpExit.lockx = static_cast<short>(mapfile.read_i32());
+        warpExit.locky = static_cast<short>(mapfile.read_i32());
 
-        map.warpexits[i].warpx = (short)mapfile.read_i32();
-        map.warpexits[i].warpy = (short)mapfile.read_i32();
-        map.warpexits[i].numblocks = (short)mapfile.read_i32();
+        warpExit.warpx = static_cast<short>(mapfile.read_i32());
+        warpExit.warpy = static_cast<short>(mapfile.read_i32());
+        warpExit.numblocks = static_cast<short>(mapfile.read_i32());
 
-        if (map.warpexits[i].connection > map.maxConnection)
-            map.maxConnection = map.warpexits[i].connection;
+        if (warpExit.connection > map.maxConnection)
+            map.maxConnection = warpExit.connection;
+
+        map.warpexits.emplace_back(std::move(warpExit));
     }
-
-    //Ignore any more warps than the max
-    for (unsigned short i = 0; i < map.numwarpexits - MAXWARPS; i++) {
-        for (unsigned short j = 0; j < 10; j++)
-            mapfile.read_i32();
-    }
-
-    if (map.numwarpexits > MAXWARPS)
-        map.numwarpexits = MAXWARPS;
 }
 
 bool MapReader1600::read_spawn_areas(CMap& map, BinaryFile& mapfile)

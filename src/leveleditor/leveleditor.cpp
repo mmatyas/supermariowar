@@ -1819,10 +1819,10 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		g_map->drawPlatforms(4);
 
 	/*
-	for (int k = 0; k < g_map->numwarpexits; k++)
+	for (const WarpExit& warpExit : g_map->warpexits)
 	{
-		SDL_Rect rSrc = {g_map->warpexits[k].connection * TILESIZE, g_map->warpexits[k].direction * TILESIZE, TILESIZE, TILESIZE};
-		SDL_Rect rDst = {g_map->warpexits[k].x, g_map->warpexits[k].y, TILESIZE, TILESIZE};
+		SDL_Rect rSrc = {warpExit.connection * TILESIZE, static_cast<int>(warpExit.direction) * TILESIZE, TILESIZE, TILESIZE};
+		SDL_Rect rDst = {warpExit.x, warpExit.y, TILESIZE, TILESIZE};
 
 		rm->spr_warps[0].draw(rSrc, screen, rDst);
 	}

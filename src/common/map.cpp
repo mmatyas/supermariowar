@@ -439,14 +439,14 @@ void DrawPlatform(
 
 
 CMap::CMap()
-    : warpexits()
-    , tilebltrect()
+    : tilebltrect()
     , bltrect()
     , drawareas()
     , iSwitches()
     , racegoallocations()
     , flagbaselocations()
 {
+    warpexits.reserve(MAXWARPS);
     mapitems.reserve(MAXMAPITEMS);
     maphazards.reserve(MAXMAPHAZARDS);
 }
@@ -525,6 +525,7 @@ void CMap::clearMap()
 
     mapitems.clear();
     maphazards.clear();
+    warpexits.clear();
 
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)
         iSwitches[iSwitch] = 0;
@@ -2241,19 +2242,20 @@ WarpExit * CMap::getRandomWarpExit(int connection, int currentID)
 
     WarpExit * currentWarp = NULL;
 
-    for (int k = 0; k < numwarpexits; k++) {
+    for (size_t k = 0; k < warpexits.size(); k++) {
         if (warpexits[k].connection == connection) {
-            if (warpexits[k].id == currentID)
+            if (warpexits[k].id == currentID) {
                 currentWarp = &warpexits[k];
-            else
-                indices[numIndices++] = k;
+            } else {
+                indices[numIndices++] = static_cast<int>(k);
+            }
         }
     }
 
     if (numIndices == 0)
         return currentWarp;
 
-    return &warpexits[indices[RANDOM_INT( numIndices)]];
+    return &warpexits[indices[RANDOM_INT(numIndices)]];
 }
 
 void CMap::clearWarpLocks()
@@ -2263,16 +2265,16 @@ void CMap::clearWarpLocks()
         warplocked[iConnection] = false;
     }
 
-    for (short iWarpExit = 0; iWarpExit < numwarpexits; iWarpExit++) {
-        warpexits[iWarpExit].locktimer = 0;
+    for (WarpExit& warpExit : warpexits) {
+        warpExit.locktimer = 0;
     }
 }
 
 void CMap::drawWarpLocks()
 {
-    for (int iWarpExit = 0; iWarpExit < numwarpexits; iWarpExit++) {
-        if (warplocked[warpexits[iWarpExit].connection] || warpexits[iWarpExit].locktimer > 0) {
-            rm->spr_warplock.draw(warpexits[iWarpExit].lockx, warpexits[iWarpExit].locky);
+    for (const WarpExit& warpExit : warpexits) {
+        if (warplocked[warpExit.connection] || warpExit.locktimer > 0) {
+            rm->spr_warplock.draw(warpExit.lockx, warpExit.locky);
         }
     }
 }
@@ -2290,9 +2292,9 @@ void CMap::update()
     }
 
     //If warp is individually locked, then reduce lock timer
-    for (short iWarpExit = 0; iWarpExit < numwarpexits; iWarpExit++) {
-        if (warpexits[iWarpExit].locktimer > 0)
-            --warpexits[iWarpExit].locktimer;
+    for (WarpExit& warpExit : warpexits) {
+        if (warpExit.locktimer > 0)
+            --warpExit.locktimer;
     }
 
     //Animate the animated tiles

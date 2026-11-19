@@ -86,12 +86,11 @@ enum WarpEnterDirection {
 	WARP_UNDEFINED = -1
 };
 
-enum WarpExitDirection {
-	WARP_EXIT_UP = 0,
-	WARP_EXIT_RIGHT = 1,
-	WARP_EXIT_DOWN = 2,
-	WARP_EXIT_LEFT = 3,
-	WARP_EXIT_UNDEFINED = -1
+enum class WarpExitDirection : unsigned char {
+	Up = 0,
+	Right = 1,
+	Down = 2,
+	Left = 3,
 };
 
 struct Warp {
@@ -295,8 +294,7 @@ class CMap
 		short		totalspawnsize[NUMSPAWNAREATYPES];
 
 		Warp        warpdata[MAPWIDTH][MAPHEIGHT];
-		short		numwarpexits = 0; //number of warp exits
-		WarpExit	warpexits[MAXWARPS];
+		std::vector<WarpExit> warpexits;
 		short		warplocktimer[10];
 		bool		warplocked[10];
 		short		maxConnection = 0;
