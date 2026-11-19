@@ -788,7 +788,7 @@ void CMap::saveMap(const std::string& file)
             //Calculate what warp tiles belong together (any warps that have the same connection that are
             //next to each other are merged into a single warp)
             //If there are too many warps, then remove any warp encountered that is over that limit
-            if (warpdata[i][j].connection != -1 && !usedtile[i][j]) {
+            if (warpdata[i][j].connection != -1 && !usedtile[i][j] && warpdata[i][j].direction >= 0) {
                 int movex = 0, movey = 0;
                 int currentx = i, currenty = j;
 
@@ -1100,7 +1100,7 @@ void CMap::saveMap(const std::string& file)
         for (i = 0; i < MAPWIDTH; i++) {
             //if we found a warp area and it hasn't been consumed by another warp area
             //then scan for surrounding warp areas and consume them to create a warp exit
-            if (warpdata[i][j].connection != -1 && !usedtile[i][j]) {
+            if (warpdata[i][j].connection != -1 && !usedtile[i][j] && warpdata[i][j].direction >= 0) {
                 int movex = 0, movey = 0;
                 int currentx = i, currenty = j;
 
