@@ -23,7 +23,8 @@ enum class TileType : unsigned char {
     SuperDeathLeft = 16,
     SuperDeathRight = 17,
     PlayerDeath = 18,
-    Gap = 19,
+    Water = 19,
+    Gap = 20,
 };
 
 
@@ -42,6 +43,7 @@ enum TileTypeFlag {
     tile_flag_super_death_left = 1024,
     tile_flag_super_death_right = 2048,
     tile_flag_player_death = 4096,
+    tile_flag_water = 8192,
 
     tile_flag_has_regular_death = tile_flag_death_on_top|tile_flag_death_on_bottom|tile_flag_death_on_left|tile_flag_death_on_right,
     tile_flag_has_super_death = tile_flag_super_death_top|tile_flag_super_death_bottom|tile_flag_super_death_left|tile_flag_super_death_right,
@@ -80,6 +82,8 @@ constexpr unsigned short tileToFlags(TileType tiletype) {
         case TileType::SuperDeathRight: return tile_flag_solid | tile_flag_super_death_right | tile_flag_death_on_right;
         case TileType::PlayerDeath: return tile_flag_player_death;
 
+        case TileType::Water: return tile_flag_nonsolid | tile_flag_water;
+        
         case TileType::Gap: return tile_flag_gap;
         default:
             assert(false);
