@@ -1981,8 +1981,6 @@ void CMap::SetupAnimatedTiles()
         animatedBackmapSurface = rm->spr_backmap[g_iCurrentDrawIndex].getSurface();
         animatedTilesSurface = gfxSprite::blank(1024, 1024);
 
-        int iTransparentColor = SDL_MapSurfaceRGB(animatedTilesSurface.getSurface(), 255, 0, 255);
-
         std::vector<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
 
         bool fSrcSurfaceFull = false;
@@ -2033,8 +2031,6 @@ void CMap::SetupAnimatedTiles()
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     tile->rAnimationSrc[1][sTileAnimationFrame] = rDst;
 
-                    SDL_FillSurfaceRect(animatedTilesSurface.getSurface(), &rDst, iTransparentColor);
-
                     for (short iLayer = 2; iLayer < 4; iLayer++) {
                         TilesetTile * tilesetTile = &tile->layers[iLayer];
                         if (tilesetTile->iID >= 0) {
@@ -2067,8 +2063,6 @@ void CMap::SetupAnimatedTiles()
             if (tile->pPlatform) {
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     tile->rAnimationSrc[0][sTileAnimationFrame] = rDst;
-
-                    SDL_FillSurfaceRect(animatedTilesSurface.getSurface(), &rDst, iTransparentColor);
 
                     TilesetTile * tilesetTile = &tile->layers[0];
                     if (tilesetTile->iID == TILESETANIMATED) {
