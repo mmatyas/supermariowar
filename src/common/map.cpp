@@ -1960,15 +1960,7 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 
 void CMap::predrawforeground(gfxSprite &foregroundspr)
 {
-    if (SDL_MUSTLOCK(foregroundspr.getSurface()))
-        SDL_LockSurface(foregroundspr.getSurface());
-
-    SDL_FillSurfaceRect(foregroundspr.getSurface(), NULL, SDL_MapSurfaceRGB(foregroundspr.getSurface(), 255, 0, 255));
-    SDL_SetSurfaceColorKey(foregroundspr.getSurface(), true, SDL_MapSurfaceRGB(foregroundspr.getSurface(), 255, 0, 255));
-
-    if (SDL_MUSTLOCK(foregroundspr.getSurface()))
-        SDL_UnlockSurface(foregroundspr.getSurface());
-
+    SDL_ClearSurface(foregroundspr.getSurface(), 0.f, 0.f, 0.f, 0.f);
     draw(foregroundspr, 2);
     draw(foregroundspr, 3);
 }
