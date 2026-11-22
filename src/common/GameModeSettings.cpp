@@ -3,11 +3,13 @@
 ClassicGameModeSettings::ClassicGameModeSettings()
     : style(DeathStyle::Respawn)  //Respawn on death
     , scoring(ScoringStyle::AllKills)  //All kills will score
+    , losepointsonhazarddeath(true) //Preserves the current behavior unless player turns the option off.
 {}
 
 FragGameModeSettings::FragGameModeSettings()
     : style(DeathStyle::Respawn)  //Respawn on death
     , scoring(ScoringStyle::AllKills)  //All kills will score
+    , losepointsonhazarddeath(true) //Preserves the current behavior unless player turns the option off.
 {}
 
 TimeGameModeSettings::TimeGameModeSettings()

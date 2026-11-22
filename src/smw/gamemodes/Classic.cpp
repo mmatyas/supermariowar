@@ -4,6 +4,7 @@
 #include "player.h"
 #include "ResourceManager.h"
 #include "Score.h"
+#include "PlayerKillStyles.h"
 
 extern CScore *score[4];
 extern short score_cnt;
@@ -82,14 +83,19 @@ PlayerKillType CGM_Classic::playerkilledself(CPlayer &player, KillStyle style)
     CGameMode::playerkilledself(player, style);
 
     if (!gameover) {
+        const bool penalizeDeath =
+            ShouldPenalizeHazardDeath(style, game_values.gamemodesettings.classic.losepointsonhazarddeath);
+
         if (fReverseScoring) {
-            player.Score().AdjustScore(1);
-        } else {
+            if (penalizeDeath)
+                player.Score().AdjustScore(1);
+        } else if (penalizeDeath) {
             player.Score().AdjustScore(-1);
 
             if (!playedwarningsound) {
                 short countscore = 0;
                 bool playwarning = false;
+
                 for (short j = 0; j < score_cnt; j++) {
                     for (short k = 0; k < score_cnt; k++) {
                         if (j == k)
@@ -116,7 +122,8 @@ PlayerKillType CGM_Classic::playerkilledself(CPlayer &player, KillStyle style)
             }
         }
 
-        if (game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == DeathStyle::Shield) {
+        if (game_values.gamemode->gamemode == game_mode_classic &&
+            game_values.gamemodesettings.classic.style == DeathStyle::Shield) {
             ifSoundOnPlay(rm->sfx_powerdown);
             player.Shield().reset();
             return PlayerKillType::NonKill;
