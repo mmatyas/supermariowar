@@ -3,6 +3,8 @@
 #include "gfx/Color.h"
 #include "gfx/gfxPalette.h"
 #include "gfx/gfxSDL.h"
+#include "global.cpp"
+
 
 #include <SDL3_image/SDL_image.h>
 
@@ -23,8 +25,9 @@ extern SDL_Surface * screen;
 extern short x_shake;
 extern short y_shake;
 
-GraphicsSDL gfx;
+
 gfxPalette gfx_palette;
+GraphicsSDL gfx;
 
 
 namespace {
@@ -187,6 +190,19 @@ void gfx_flipscreen() {
 
 void gfx_settitle(const char* title) {
     gfx.setTitle(title);
+}
+
+void gfx_setIcon() {
+    std::filesystem::path icon_path = std::filesystem::path(RootDataDirectory) / "icons" / "smw.ico";
+    SDL_Surface* icon = nullptr;
+
+    if(std::filesystem::exists(icon_path)){
+        icon = IMG_Load(icon_path.string().c_str());
+        gfx.setIcon(icon);
+        SDL_DestroySurface(icon);
+    }
+    else 
+        std::cout << "file: " << icon_path.string().c_str() << " does not exist !" << std::endl;
 }
 
 void gfx_show_catched_error(const std::string& error)
